@@ -69,6 +69,13 @@ async function bootstrap() {
     initialPlayerDir = existingSave.player.direction;
 
     gameClock.playerSpeed = existingSave.player.speedMultiplier;
+
+    // Only awaken Legendary Beasts if player has reached the Ecruteak Burned Tower story milestone (4+ Badges)
+    if (inventory.badges.length >= 4) {
+      roamingManager.awakenBeasts();
+    } else {
+      roamingManager.sleepBeasts();
+    }
   } else {
     // Default starter
     playerParty = [PokemonFactory.create('cyndaquil', 5, ['tackle', 'leer', 'ember', 'smokescreen'])];
@@ -160,6 +167,25 @@ async function bootstrap() {
     },
     onInteract: () => {
       handleInteract();
+    },
+    onToggleBurnedTower: () => {
+      if (roamingManager.areBeastsAwakened()) {
+        roamingManager.sleepBeasts();
+        overworldHUD.hideRoamerAlert();
+        overworldHUD.showToast('💤 Raikou, Entei & Suicune returned to slumber in Ecruteak\'s Burned Tower.');
+      } else {
+        roamingManager.awakenBeasts();
+        overworldHUD.showToast('🔥 Burned Tower Awakening! Raikou, Entei & Suicune bolted across Johto!');
+        const currentId = mapManager.getCurrentMap()?.id;
+        if (currentId) {
+          const roamerHere = roamingManager.getActiveRoamerOnRoute(currentId);
+          if (roamerHere) {
+            overworldHUD.showRoamerAlert(roamerHere.speciesId, currentId);
+          }
+        }
+      }
+      overworldHUD.updatePokegear(roamingManager.getAllRoamers());
+      saveCurrentGame();
     },
   });
   overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
@@ -348,8 +374,8 @@ async function bootstrap() {
         'fat_man',
         '🔬 PROF. ELM',
         [
-          'Hi, GOLD! Raikou, Entei, and Suicune are roaming across Johto!',
-          'Check your POKéGEAR Roamer Radar whenever you change routes to track them.',
+          "Hi, GOLD! I've been researching unusual POKéMON evolutions here in NEW BARK TOWN.",
+          "MR. POKéMON beyond CHERRYGROVE CITY sent word of a rare discovery, and legends speak of three Legendary Beasts slumbering in ECRUTEAK's BURNED TOWER.",
           'Here—let me heal your POKéMON and record your research progress!',
         ],
         { action: 'HEAL_AND_SAVE' }

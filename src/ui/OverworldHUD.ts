@@ -7,6 +7,7 @@ export interface OverworldHUDOptions {
   onMartOpen?: () => void;
   onSaveGame?: () => void;
   onInteract?: () => void;
+  onToggleBurnedTower?: () => void;
 }
 
 export class OverworldHUD {
@@ -479,6 +480,23 @@ export class OverworldHUD {
     if (!list) return;
 
     list.innerHTML = '';
+    const anyAwakened = roamers.some((r) => r.isAwakened);
+
+    const storyBanner = document.createElement('div');
+    storyBanner.style.cssText = `
+      background: ${anyAwakened ? 'rgba(37, 99, 235, 0.18)' : 'rgba(71, 85, 105, 0.35)'};
+      border: 1px solid ${anyAwakened ? 'rgba(56, 189, 248, 0.35)' : 'rgba(148, 163, 184, 0.25)'};
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #cbd5e1;
+    `;
+    storyBanner.innerHTML = anyAwakened
+      ? `⚡ <strong>Burned Tower Event Active:</strong> Raikou, Entei & Suicune have awakened and are roaming Johto routes!`
+      : `📜 <strong>Story Status (Pre-Ecruteak):</strong> The Legendary Beasts are slumbering inside Ecruteak City's <strong>Burned Tower</strong> and will not appear in the wild until awakened.`;
+    list.appendChild(storyBanner);
+
     for (const r of roamers) {
       const card = document.createElement('div');
       card.style.cssText = `
@@ -489,13 +507,18 @@ export class OverworldHUD {
         flex-direction: column;
         gap: 8px;
         border: 1px solid rgba(255, 255, 255, 0.08);
+        opacity: ${r.isAwakened ? '1' : '0.72'};
       `;
 
       const formattedName = r.speciesId.toUpperCase();
-      const formattedRoute = r.currentMapId.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+      const formattedRoute = r.isAwakened
+        ? r.currentMapId.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+        : 'Burned Tower (Ecruteak City)';
 
       let statusBadge = `<span style="background: #2563eb; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">ROAMING</span>`;
-      if (r.isCaught) {
+      if (!r.isAwakened) {
+        statusBadge = `<span style="background: #475569; color: #cbd5e1; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">SLUMBERING</span>`;
+      } else if (r.isCaught) {
         statusBadge = `<span style="background: #16a34a; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">CAUGHT</span>`;
       } else if (r.isDefeated) {
         statusBadge = `<span style="background: #dc2626; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">DEFEATED</span>`;
@@ -531,6 +554,28 @@ export class OverworldHUD {
       `;
 
       list.appendChild(card);
+    }
+
+    if (this.options.onToggleBurnedTower) {
+      const toggleBtn = document.createElement('button');
+      toggleBtn.style.cssText = `
+        margin-top: 4px;
+        background: ${anyAwakened ? '#334155' : '#b45309'};
+        color: #f8fafc;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      `;
+      toggleBtn.innerText = anyAwakened
+        ? '💤 Return Beasts to Burned Tower (Pre-Story State)'
+        : '🔥 Awaken Beasts (Burned Tower Story Event)';
+      toggleBtn.addEventListener('click', () => {
+        if (this.options.onToggleBurnedTower) this.options.onToggleBurnedTower();
+      });
+      list.appendChild(toggleBtn);
     }
   }
 

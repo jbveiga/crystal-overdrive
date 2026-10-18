@@ -26,26 +26,56 @@ export class RoamingManager {
   private roamers: Map<string, RoamerState> = new Map();
   private graph: RouteAdjacency;
 
-  constructor(graph: RouteAdjacency = JOHTO_ROUTE_GRAPH) {
+  constructor(graph: RouteAdjacency = JOHTO_ROUTE_GRAPH, initiallyAwakened: boolean = false) {
     this.graph = graph;
-    this.initRoamers();
+    this.initRoamers(initiallyAwakened);
   }
 
-  private initRoamers(): void {
+  private initRoamers(initiallyAwakened: boolean): void {
     const beasts: Array<'raikou' | 'entei' | 'suicune'> = ['raikou', 'entei', 'suicune'];
-    const startingRoutes = ['route_29', 'route_30', 'route_31'];
+    const startingRoutes = ['route_37', 'route_36', 'route_38'];
 
     beasts.forEach((speciesId, idx) => {
       const pokemon = PokemonFactory.create(speciesId, 40);
       this.roamers.set(speciesId, {
         speciesId,
-        currentMapId: startingRoutes[idx % startingRoutes.length],
+        currentMapId: initiallyAwakened ? startingRoutes[idx % startingRoutes.length] : 'burned_tower',
         pokemon,
-        isAwakened: true, // Awakened for Vertical Slice
+        isAwakened: initiallyAwakened,
         isCaught: false,
         isDefeated: false,
       });
     });
+  }
+
+  /**
+   * Awakens Raikou, Entei, and Suicune during the Burned Tower story event (Ecruteak City)
+   * and scatters them onto Johto's route graph.
+   */
+  public awakenBeasts(): void {
+    const scatterRoutes = ['route_37', 'route_36', 'route_38'];
+    let idx = 0;
+    for (const roamer of this.roamers.values()) {
+      roamer.isAwakened = true;
+      if (roamer.currentMapId === 'burned_tower' || !this.graph[roamer.currentMapId]) {
+        roamer.currentMapId = scatterRoutes[idx % scatterRoutes.length];
+      }
+      idx++;
+    }
+  }
+
+  /**
+   * Keeps Raikou, Entei, and Suicune dormant in Ecruteak's Burned Tower prior to the story event.
+   */
+  public sleepBeasts(): void {
+    for (const roamer of this.roamers.values()) {
+      roamer.isAwakened = false;
+      roamer.currentMapId = 'burned_tower';
+    }
+  }
+
+  public areBeastsAwakened(): boolean {
+    return this.getAllRoamers().some((r) => r.isAwakened);
   }
 
   public getRoamer(speciesId: 'raikou' | 'entei' | 'suicune'): RoamerState | undefined {
