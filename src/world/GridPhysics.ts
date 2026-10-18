@@ -1,0 +1,129 @@
+import type { Direction, TileCoord } from '../types/game';
+
+export interface GridEntity {
+  id: string;
+  x: number;
+  y: number;
+  targetX: number;
+  targetY: number;
+  renderX: number;
+  renderY: number;
+  direction: Direction;
+  isMoving: boolean;
+  progress: number;
+  isPlayer: boolean;
+}
+
+export type CollisionCheck = (x: number, y: number) => boolean;
+export type TileTypeLookup = (x: number, y: number) => number;
+export type TileEnteredCallback = (entity: GridEntity, coord: TileCoord, tileType: number) => void;
+
+export class GridPhysics {
+  public static readonly BASE_TRAVERSAL_TIME: number = 0.24; // 0.24 seconds per tile at 1x speed
+
+  /**
+   * Helper to get integer delta for a direction
+   */
+  public static getDirectionDelta(dir: Direction): { dx: number; dy: number } {
+    switch (dir) {
+      case 'UP':
+        return { dx: 0, dy: -1 };
+      case 'DOWN':
+        return { dx: 0, dy: 1 };
+      case 'LEFT':
+        return { dx: -1, dy: 0 };
+      case 'RIGHT':
+        return { dx: 1, dy: 0 };
+    }
+  }
+
+  /**
+   * Updates an entity's position, stepping through fractional progress and chaining overflow
+   * without allocating intermediate objects.
+   */
+  public static updateEntity(
+    entity: GridEntity,
+    dt: number,
+    heldDirection: Direction | null,
+    isWalkable: CollisionCheck,
+    getTileType: TileTypeLookup,
+    onTileEntered?: TileEnteredCallback
+  ): void {
+    if (dt <= 0) return;
+
+    // 1. If currently idle, check if we should start moving
+    if (!entity.isMoving) {
+      if (heldDirection) {
+        entity.direction = heldDirection;
+        const delta = this.getDirectionDelta(heldDirection);
+        const nextX = entity.x + delta.dx;
+        const nextY = entity.y + delta.dy;
+
+        if (isWalkable(nextX, nextY)) {
+          entity.isMoving = true;
+          entity.targetX = nextX;
+          entity.targetY = nextY;
+          entity.progress = 0.0;
+        }
+      }
+    }
+
+    // 2. If moving, advance progress
+    if (entity.isMoving) {
+      entity.progress += dt / this.BASE_TRAVERSAL_TIME;
+
+      // Handle tile arrivals and fractional overflow chaining
+      while (entity.progress >= 1.0) {
+        // Snap logically to target
+        entity.x = entity.targetX;
+        entity.y = entity.targetY;
+        const overflow = entity.progress - 1.0;
+
+        // Tile entered callback (checks for warps, wild encounters, grass rustle)
+        if (onTileEntered) {
+          const tileType = getTileType(entity.x, entity.y);
+          onTileEntered(entity, { x: entity.x, y: entity.y }, tileType);
+        }
+
+        // Check if movement was halted by the callback (e.g., warp transition or battle)
+        if (!entity.isMoving) {
+          entity.progress = 0.0;
+          break;
+        }
+
+        // If direction is still held, attempt seamless continuation
+        if (heldDirection) {
+          entity.direction = heldDirection;
+          const delta = this.getDirectionDelta(heldDirection);
+          const nextX = entity.x + delta.dx;
+          const nextY = entity.y + delta.dy;
+
+          if (isWalkable(nextX, nextY)) {
+            entity.targetX = nextX;
+            entity.targetY = nextY;
+            entity.progress = overflow;
+          } else {
+            // Blocked by collision
+            entity.isMoving = false;
+            entity.progress = 0.0;
+            break;
+          }
+        } else {
+          // No input held, stop smoothly on the tile
+          entity.isMoving = false;
+          entity.progress = 0.0;
+          break;
+        }
+      }
+    }
+
+    // 3. Compute continuous render coordinates for smooth visual interpolation
+    if (entity.isMoving) {
+      entity.renderX = entity.x + (entity.targetX - entity.x) * entity.progress;
+      entity.renderY = entity.y + (entity.targetY - entity.y) * entity.progress;
+    } else {
+      entity.renderX = entity.x;
+      entity.renderY = entity.y;
+    }
+  }
+}
