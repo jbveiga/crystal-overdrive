@@ -2182,36 +2182,36 @@
       "x": 23,
       "y": 3,
       "targetMapId": "cherrygrove_mart",
-      "targetX": 3,
-      "targetY": 7
+      "targetX": 2,
+      "targetY": 6
     },
     {
       "x": 29,
       "y": 3,
       "targetMapId": "cherrygrove_poke_center",
       "targetX": 3,
-      "targetY": 7
+      "targetY": 6
     },
     {
       "x": 17,
       "y": 7,
       "targetMapId": "cherrygrove_gym_speech_house",
-      "targetX": 3,
-      "targetY": 7
+      "targetX": 2,
+      "targetY": 6
     },
     {
       "x": 25,
       "y": 9,
       "targetMapId": "guide_gents_house",
-      "targetX": 3,
-      "targetY": 7
+      "targetX": 2,
+      "targetY": 6
     },
     {
       "x": 31,
       "y": 11,
       "targetMapId": "cherrygrove_evolution_speech_house",
-      "targetX": 3,
-      "targetY": 7
+      "targetX": 2,
+      "targetY": 6
     }
   ],
   "grassEncounters": []

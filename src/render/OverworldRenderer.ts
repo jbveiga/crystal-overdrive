@@ -101,7 +101,125 @@ export class OverworldRenderer {
       'lab_wall',
       'lab_window',
       'lab_door',
-      // 66 Authentic pret/pokecrystal 64x64 Johto quadrant tiles
+      // 184 Authentic pret/pokecrystal 64x64 Overworld (jt_*) & Indoor (in_*) quadrant tiles
+      'in_house_00_00_00_00',
+      'in_house_00_00_06_07',
+      'in_house_00_00_0c_0d',
+      'in_house_01_01_01_01',
+      'in_house_02_03_12_13',
+      'in_house_04_04_14_14',
+      'in_house_05_2f_3c_3a',
+      'in_house_0a_0b_08_09',
+      'in_house_0e_0f_1e_1f',
+      'in_house_0e_0f_3c_3b',
+      'in_house_16_17_1e_1f',
+      'in_house_1a_1b_18_19',
+      'in_house_1c_1d_1e_1f',
+      'in_house_24_4a_34_2c',
+      'in_house_26_27_36_2f',
+      'in_house_27_29_2f_39',
+      'in_house_2d_2e_3d_3e',
+      'in_house_2f_15_3a_3b',
+      'in_house_32_33_0e_0f',
+      'in_house_32_33_30_31',
+      'in_lab_01_01_11_11',
+      'in_lab_02_02_12_12',
+      'in_lab_03_04_13_14',
+      'in_lab_05_06_15_16',
+      'in_lab_05_07_03_04',
+      'in_lab_06_06_16_16',
+      'in_lab_06_07_16_17',
+      'in_lab_0a_0b_1a_1b',
+      'in_lab_0c_0d_1c_1d',
+      'in_lab_0e_0f_1e_1f',
+      'in_lab_10_10_10_10',
+      'in_lab_10_10_81_82',
+      'in_lab_20_21_30_31',
+      'in_lab_22_23_32_33',
+      'in_lab_25_26_10_10',
+      'in_lab_26_26_10_10',
+      'in_lab_26_27_10_10',
+      'in_lab_42_43_52_53',
+      'in_lab_44_45_54_55',
+      'in_lab_46_47_56_57',
+      'in_lab_47_49_58_59',
+      'in_lab_85_86_83_84',
+      'in_lab_91_92_a1_a2',
+      'in_lab_93_94_a3_a4',
+      'in_mart_0b_0b_1b_1b',
+      'in_mart_0c_0d_50_51',
+      'in_mart_0c_0d_56_57',
+      'in_mart_11_11_2a_2b',
+      'in_mart_1e_2f_1a_19',
+      'in_mart_20_21_30_31',
+      'in_mart_26_27_36_37',
+      'in_mart_28_29_38_39',
+      'in_mart_3e_3f_3e_3f',
+      'in_mart_40_41_50_51',
+      'in_mart_42_2b_52_45',
+      'in_mart_43_44_53_54',
+      'in_mart_48_48_48_48',
+      'in_mart_50_51_5e_5f',
+      'in_mart_58_59_5a_5b',
+      'in_mart_5c_5d_1f_55',
+      'in_players_house_01_01_01_01',
+      'in_players_house_02_03_12_13',
+      'in_players_house_04_04_14_14',
+      'in_players_house_05_05_05_05',
+      'in_players_house_06_07_16_17',
+      'in_players_house_08_09_3a_3b',
+      'in_players_house_0e_0f_1e_1f',
+      'in_players_house_0e_0f_2e_2f',
+      'in_players_house_0e_0f_3a_3b',
+      'in_players_house_11_11_06_07',
+      'in_players_house_11_11_0a_0b',
+      'in_players_house_11_11_11_11',
+      'in_players_house_11_11_20_21',
+      'in_players_house_15_35_32_34',
+      'in_players_house_16_17_08_09',
+      'in_players_house_1a_1b_2a_2b',
+      'in_players_house_1c_1d_01_01',
+      'in_players_house_1c_40_01_01',
+      'in_players_house_22_24_15_35',
+      'in_players_house_23_22_25_15',
+      'in_players_house_25_15_33_32',
+      'in_players_house_25_35_25_35',
+      'in_players_house_25_35_33_34',
+      'in_players_house_26_27_36_37',
+      'in_players_house_28_29_38_39',
+      'in_players_house_2c_2d_11_11',
+      'in_players_house_2e_2f_18_19',
+      'in_players_house_30_31_0c_0d',
+      'in_players_house_32_34_11_11',
+      'in_players_house_33_32_11_11',
+      'in_players_house_40_1d_01_01',
+      'in_players_house_43_45_18_19',
+      'in_players_house_44_44_44_44',
+      'in_players_house_48_49_58_59',
+      'in_players_house_4a_4b_5a_5b',
+      'in_players_house_4c_4d_5c_5d',
+      'in_players_house_50_51_52_53',
+      'in_players_house_aa_ab_ba_00',
+      'in_pokecenter_01_01_11_11',
+      'in_pokecenter_01_0f_03_25',
+      'in_pokecenter_02_02_02_02',
+      'in_pokecenter_02_02_02_0f',
+      'in_pokecenter_02_02_20_21',
+      'in_pokecenter_04_05_14_15',
+      'in_pokecenter_0a_0b_1a_1b',
+      'in_pokecenter_0c_0c_24_24',
+      'in_pokecenter_11_11_11_11',
+      'in_pokecenter_13_35_46_47',
+      'in_pokecenter_1c_1d_2c_2d',
+      'in_pokecenter_1e_1f_2e_2f',
+      'in_pokecenter_30_31_40_41',
+      'in_pokecenter_34_0c_24_24',
+      'in_pokecenter_34_34_24_24',
+      'in_pokecenter_3c_3d_4c_4d',
+      'in_pokecenter_3d_3f_4e_4f',
+      'in_pokecenter_44_45_54_55',
+      'in_pokecenter_48_49_58_59',
+      'in_pokecenter_51_51_50_50',
       'jt_03_05_05_05',
       'jt_04_04_04_04',
       'jt_05_05_05_03',
@@ -170,15 +288,17 @@ export class OverworldRenderer {
       'jt_5c_4c_3d_14',
     ];
 
-    for (const name of tileNames) {
-      try {
-        const tex = await Assets.load<Texture>(`/assets/tiles/${name}.png`);
-        tex.source.scaleMode = 'nearest';
-        this.tileTextures.set(name, tex);
-      } catch (err) {
-        console.warn(`Could not load tile ${name}:`, err);
-      }
-    }
+    await Promise.all(
+      tileNames.map(async (name) => {
+        try {
+          const tex = await Assets.load<Texture>(`/assets/tiles/${name}.png`);
+          tex.source.scaleMode = 'nearest';
+          this.tileTextures.set(name, tex);
+        } catch (err) {
+          console.warn(`Could not load tile ${name}:`, err);
+        }
+      })
+    );
 
     // Load 4-step authentic water animation frames (0 -> 1 -> 2 -> 1) from pret/pokecrystal water.png
     const animatedWaterTileNames = [
@@ -227,11 +347,6 @@ export class OverworldRenderer {
     };
 
     return {
-      // Confirmed layout from raw pixel inspection:
-      // Indices 0, 1, 2: Stand frames (Down, Up, Side)
-      // Indices 3, 4: Down Walk frames (Left foot, Right foot)
-      // Indices 5, 6: Up Walk frames (Left foot, Right foot)
-      // Indices 7, 8: Side Walk frames (Left foot, Right foot)
       downStand: getFrame(0),
       upStand: getFrame(1),
       sideStand: getFrame(2),
@@ -247,15 +362,60 @@ export class OverworldRenderer {
   private createPlayerSprite(): void {
     this.playerSprite = new Sprite(this.playerFrames.downStand);
     this.playerSprite.anchor.set(0.5, 0.85);
-    // Scale 16x32 up to 48x96 (3x nearest-neighbor)
     this.playerSprite.scale.set(3, 3);
     this.entityContainer.addChild(this.playerSprite);
   }
 
+  private renderMapChunk(map: MapData, offsetTileX: number, offsetTileY: number): void {
+    const grassTex = this.tileTextures.get('grass') || Texture.WHITE;
+    if (!map.tileMap || map.tileMap.length !== map.width * map.height) return;
+
+    for (let y = 0; y < map.height; y++) {
+      for (let x = 0; x < map.width; x++) {
+        const index = y * map.width + x;
+        const tileName = map.tileMap[index];
+        const px = (x + offsetTileX) * this.tileSize;
+        const py = (y + offsetTileY) * this.tileSize;
+
+        const isOpaqueTile = tileName === 'water' || tileName.startsWith('jt_') || tileName.startsWith('in_');
+        if (!isOpaqueTile) {
+          const baseSprite = new Sprite(grassTex);
+          baseSprite.position.set(px, py);
+          baseSprite.width = this.tileSize;
+          baseSprite.height = this.tileSize;
+          this.mapContainer.addChild(baseSprite);
+        }
+
+        const waterFrames = this.waterAnimFrames.get(tileName);
+        const tex = waterFrames ? waterFrames[this.waterAnimStep] : this.tileTextures.get(tileName) || grassTex;
+        const featureSprite = new Sprite(tex);
+        featureSprite.position.set(px, py);
+        featureSprite.width = this.tileSize;
+        featureSprite.height = this.tileSize;
+        this.mapContainer.addChild(featureSprite);
+
+        if (waterFrames) {
+          this.animatedWaterSprites.push({ sprite: featureSprite, frames: waterFrames });
+        }
+
+        if (map.overlayMap && map.overlayMap[index]) {
+          const overlayTex = this.tileTextures.get(map.overlayMap[index]!);
+          if (overlayTex) {
+            const overlaySprite = new Sprite(overlayTex);
+            overlaySprite.position.set(px, py);
+            overlaySprite.width = this.tileSize;
+            overlaySprite.height = this.tileSize;
+            this.mapContainer.addChild(overlaySprite);
+          }
+        }
+      }
+    }
+  }
+
   /**
-   * Builds the textured overworld tilemap
+   * Builds the textured overworld tilemap, including seamlessly connected neighbor maps and outdoor border blocks
    */
-  public renderMap(map: MapData): void {
+  public renderMap(map: MapData, lookupMap?: (mapId: string) => MapData | undefined): void {
     this.mapContainer.removeChildren();
     this.animatedWaterSprites.length = 0;
     this.tileSize = map.tileSize;
@@ -273,47 +433,49 @@ export class OverworldRenderer {
 
     // 1. High-fidelity authentic TileMap rendering if defined
     if (map.tileMap && map.tileMap.length === map.width * map.height) {
-      for (let y = 0; y < map.height; y++) {
-        for (let x = 0; x < map.width; x++) {
-          const index = y * map.width + x;
-          const tileName = map.tileMap[index];
-          const px = x * this.tileSize;
-          const py = y * this.tileSize;
+      const isOutdoor = Object.keys(map.connections || {}).length > 0;
 
-          // Authentic jt_* tiles are complete opaque 64x64 GBC quadrants; legacy tiles render over grass
-          const isOpaqueTile = tileName === 'water' || tileName.startsWith('jt_');
-          if (!isOpaqueTile) {
-            const baseSprite = new Sprite(grassTex);
-            baseSprite.position.set(px, py);
-            baseSprite.width = this.tileSize;
-            baseSprite.height = this.tileSize;
-            this.mapContainer.addChild(baseSprite);
-          }
+      if (isOutdoor) {
+        // Render surrounding Johto pine tree border blocks (border_block 0x05) so the camera never shows empty black void
+        const treeTopTex = this.tileTextures.get('jt_1e_1f_2e_2f') || treeTallTex;
+        const treeBotTex = this.tileTextures.get('jt_2e_2f_3e_3f') || treeTallTex;
+        const padX = 16;
+        const padY = 10;
 
-          const waterFrames = this.waterAnimFrames.get(tileName);
-          const tex = waterFrames ? waterFrames[this.waterAnimStep] : this.tileTextures.get(tileName) || grassTex;
-          const featureSprite = new Sprite(tex);
-          featureSprite.position.set(px, py);
-          featureSprite.width = this.tileSize;
-          featureSprite.height = this.tileSize;
-          this.mapContainer.addChild(featureSprite);
+        const westConn = map.connections.WEST && lookupMap ? lookupMap(map.connections.WEST.mapId) : undefined;
+        const eastConn = map.connections.EAST && lookupMap ? lookupMap(map.connections.EAST.mapId) : undefined;
 
-          if (waterFrames) {
-            this.animatedWaterSprites.push({ sprite: featureSprite, frames: waterFrames });
-          }
-
-          if (map.overlayMap && map.overlayMap[index]) {
-            const overlayTex = this.tileTextures.get(map.overlayMap[index]!);
-            if (overlayTex) {
-              const overlaySprite = new Sprite(overlayTex);
-              overlaySprite.position.set(px, py);
-              overlaySprite.width = this.tileSize;
-              overlaySprite.height = this.tileSize;
-              this.mapContainer.addChild(overlaySprite);
+        for (let ty = -padY; ty < map.height + padY; ty++) {
+          for (let tx = -padX; tx < map.width + padX; tx++) {
+            // Skip tiles inside current map
+            if (tx >= 0 && tx < map.width && ty >= 0 && ty < map.height) continue;
+            // Skip tiles inside connected West map
+            if (westConn && tx >= -westConn.width && tx < 0 && ty >= 0 && ty < westConn.height) continue;
+            // Skip tiles inside connected East map
+            if (eastConn && tx >= map.width && tx < map.width + eastConn.width && ty >= 0 && ty < eastConn.height) {
+              continue;
             }
+
+            const isEvenY = ((ty % 2) + 2) % 2 === 0;
+            const borderSprite = new Sprite(isEvenY ? treeTopTex : treeBotTex);
+            borderSprite.position.set(tx * this.tileSize, ty * this.tileSize);
+            borderSprite.width = this.tileSize;
+            borderSprite.height = this.tileSize;
+            this.mapContainer.addChild(borderSprite);
           }
         }
+
+        // Render connected neighbor maps seamlessly adjacent to the active map
+        if (westConn && map.connections.WEST) {
+          this.renderMapChunk(westConn, -westConn.width, map.connections.WEST.offset);
+        }
+        if (eastConn && map.connections.EAST) {
+          this.renderMapChunk(eastConn, map.width, map.connections.EAST.offset);
+        }
       }
+
+      // Render active map at (0, 0)
+      this.renderMapChunk(map, 0, 0);
       return;
     }
 

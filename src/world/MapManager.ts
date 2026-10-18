@@ -27,8 +27,12 @@ export class MapManager {
     return this.currentMap;
   }
 
+  getMap(mapId: string): MapData | undefined {
+    return this.maps.get(mapId);
+  }
+
   /**
-   * Returns whether a tile coordinate is walkable.
+   * Returns whether a tile coordinate is walkable for the Player (includes map border connections).
    * 0 = Walkable, 1 = Solid, 2 = Tall Grass, 3 = Water
    */
   isWalkable = (x: number, y: number): boolean => {
@@ -43,6 +47,23 @@ export class MapManager {
     const index = y * this.currentMap.width + x;
     const tileType = this.currentMap.collisionGrid[index];
     // Walkable on normal ground (0) and tall grass (2). Solid (1) and Water (3) are blocked.
+    return tileType === 0 || tileType === 2;
+  };
+
+  /**
+   * Returns whether a tile coordinate is walkable for NPCs (strictly within current map bounds, excluding warp doors).
+   */
+  isWalkableInBounds = (x: number, y: number): boolean => {
+    if (!this.currentMap) return false;
+    if (x <= 0 || x >= this.currentMap.width - 1 || y <= 0 || y >= this.currentMap.height - 1) {
+      return false;
+    }
+    for (let i = 0; i < this.currentMap.warps.length; i++) {
+      const w = this.currentMap.warps[i];
+      if (w.x === x && w.y === y) return false;
+    }
+    const index = y * this.currentMap.width + x;
+    const tileType = this.currentMap.collisionGrid[index];
     return tileType === 0 || tileType === 2;
   };
 

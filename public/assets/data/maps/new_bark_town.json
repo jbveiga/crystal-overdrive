@@ -1103,27 +1103,27 @@
       "y": 3,
       "targetMapId": "elms_lab",
       "targetX": 4,
-      "targetY": 7
+      "targetY": 10
     },
     {
       "x": 13,
       "y": 5,
       "targetMapId": "players_house_1f",
-      "targetX": 3,
+      "targetX": 6,
       "targetY": 6
     },
     {
       "x": 3,
       "y": 11,
       "targetMapId": "players_neighbors_house",
-      "targetX": 3,
+      "targetX": 2,
       "targetY": 6
     },
     {
       "x": 11,
       "y": 13,
       "targetMapId": "elms_house",
-      "targetX": 3,
+      "targetX": 2,
       "targetY": 6
     }
   ],

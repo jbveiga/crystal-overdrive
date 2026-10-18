@@ -3,20 +3,9 @@ const path = require('path');
 const zlib = require('zlib');
 
 const projectRoot = path.resolve(__dirname, '..');
-const RAW_DIR = '/Users/bernardo/.gemini/antigravity/brain/4243653b-22ad-4a20-bb03-8ed14dca67e2/scratch/pokecrystal_raw';
-const LOCAL_RAW_DIR = path.join(__dirname, 'pokecrystal_raw');
+const SOURCE_DIR = path.join(__dirname, 'pokecrystal_raw');
 const TILES_DIR = path.join(projectRoot, 'public/assets/tiles');
 const MAPS_DIR = path.join(projectRoot, 'public/assets/data/maps');
-
-// Copy raw pokecrystal files into scripts/pokecrystal_raw if present in scratch
-if (fs.existsSync(RAW_DIR)) {
-  fs.mkdirSync(LOCAL_RAW_DIR, { recursive: true });
-  for (const f of fs.readdirSync(RAW_DIR)) {
-    fs.copyFileSync(path.join(RAW_DIR, f), path.join(LOCAL_RAW_DIR, f));
-  }
-}
-
-const SOURCE_DIR = fs.existsSync(LOCAL_RAW_DIR) ? LOCAL_RAW_DIR : RAW_DIR;
 
 function decode2BitPng(filePath) {
   const buf = fs.readFileSync(filePath);
@@ -108,44 +97,11 @@ function createPNG(width, height, rgbaBuffer) {
   ]);
 }
 
-// 1. Decode johto.png, patch new_bark.png roof tiles into 0x0a..0x12, and decode water.png (4 frames of 8x8)
-const johto = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__johto.png'));
-const roof = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__new_bark.png'));
-const waterAnim = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__water__water.png'));
-for (let i = 0; i < 9; i++) {
-  const tid = 0x0a + i;
-  const dstX = (tid % 16) * 8;
-  const dstY = Math.floor(tid / 16) * 8;
-  const srcX = (i % 3) * 8;
-  const srcY = Math.floor(i / 3) * 8;
-  for (let y = 0; y < 8; y++) {
-    for (let x = 0; x < 8; x++) {
-      johto.pixels[(dstY + y) * johto.width + (dstX + x)] = roof.pixels[(srcY + y) * 24 + (srcX + x)];
-    }
-  }
-}
-
-// 2. Parse johto_palette_map.asm (bank 0)
-const palLines = fs
-  .readFileSync(path.join(SOURCE_DIR, 'gfx__tilesets__johto_palette_map.asm'), 'utf8')
-  .split('\n')
-  .map((l) => l.trim())
-  .filter((l) => l.startsWith('tilepal 0,'));
-const tilePalMap = [];
-for (const l of palLines) {
-  const parts = l
-    .replace('tilepal 0,', '')
-    .split(',')
-    .map((s) => s.trim());
-  tilePalMap.push(...parts);
-}
-
-// 3. Exact Game Boy Color Day Palettes (from gfx/tilesets/bg_tiles.pal & roofs.pal)
 const gbc5to8 = (v) => Math.round((v * 255) / 31);
 const makePal = (c0, c1, c2, c3) =>
   [c0, c1, c2, c3].map((c) => [gbc5to8(c[0]), gbc5to8(c[1]), gbc5to8(c[2]), 255]);
 
-const BASE_PALETTES = {
+const OUTDOOR_PALETTES = {
   GRAY: makePal([27, 31, 27], [21, 21, 21], [13, 13, 13], [7, 7, 7]),
   RED: makePal([27, 31, 27], [31, 19, 24], [30, 10, 6], [7, 7, 7]),
   GREEN: makePal([22, 31, 10], [12, 25, 1], [5, 14, 0], [7, 7, 7]),
@@ -155,63 +111,114 @@ const BASE_PALETTES = {
 };
 
 const ROOF_PALETTES = {
-  // group 24 (New Bark & Route 29): green roofs
   nb: makePal([27, 31, 27], [20, 31, 14], [11, 23, 5], [7, 7, 7]),
-  // group 26 (Cherrygrove City): pink/magenta roofs
   cg: makePal([27, 31, 27], [31, 14, 28], [31, 5, 21], [7, 7, 7]),
 };
 
-// 4. Parse johto_collision.asm
-const collLines = fs
-  .readFileSync(path.join(SOURCE_DIR, 'data__tilesets__johto_collision.asm'), 'utf8')
-  .split('\n')
-  .map((l) => l.trim())
-  .filter((l) => l.startsWith('tilecoll'));
+const INDOOR_PALETTES = {
+  GRAY: makePal([30, 28, 26], [19, 19, 19], [13, 13, 13], [7, 7, 7]),
+  RED: makePal([30, 28, 26], [31, 19, 24], [30, 10, 6], [7, 7, 7]),
+  GREEN: makePal([18, 24, 9], [15, 20, 1], [9, 13, 0], [7, 7, 7]),
+  WATER: makePal([30, 28, 26], [15, 16, 31], [9, 9, 31], [7, 7, 7]),
+  YELLOW: makePal([30, 28, 26], [31, 31, 7], [31, 16, 1], [7, 7, 7]),
+  BROWN: makePal([26, 24, 17], [21, 17, 7], [16, 13, 3], [7, 7, 7]),
+  ROOF: makePal([30, 28, 26], [17, 19, 31], [14, 16, 31], [7, 7, 7]),
+};
 
 function mapCollToken(token) {
   if (
     token === 'FLOOR' ||
     token === 'DOOR' ||
-    token.startsWith('WARP_CARPET')
+    token.startsWith('WARP_CARPET') ||
+    token === 'LADDER' ||
+    token === 'STAIRCASE'
   ) {
     return 0; // Walkable
   }
   if (token === 'TALL_GRASS') {
-    return 2; // Tall grass (wild encounters)
+    return 2; // Tall grass
   }
   if (token === 'WATER' || token === 'WHIRLPOOL') {
     return 3; // Water
   }
-  return 1; // Solid (WALL, HEADBUTT_TREE, CUT_TREE, BUOY, HOP_*, etc.)
+  return 1; // Solid
 }
 
-const blockCollisions = collLines.map((line) => {
-  const body = line.split(';')[0].replace('tilecoll', '').trim();
-  const tokens = body.split(',').map((s) => s.trim());
-  return tokens.map(mapCollToken); // [TL, TR, BL, BR]
-});
+const waterAnim = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__water__water.png'));
+const roofNewBark = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__new_bark.png'));
 
-// 5. Render a 16x16 quadrant [tl, tr, bl, br] of 8x8 tiles to a 64x64 RGBA PNG (4x nearest-neighbor upscale)
-const meta = fs.readFileSync(path.join(SOURCE_DIR, 'data__tilesets__johto_metatiles.bin'));
+function loadTileset(tsName, isOutdoor = false) {
+  const png = decode2BitPng(path.join(SOURCE_DIR, `gfx__tilesets__${tsName}.png`));
+  if (isOutdoor) {
+    for (let i = 0; i < 9; i++) {
+      const tid = 0x0a + i;
+      const dstX = (tid % 16) * 8;
+      const dstY = Math.floor(tid / 16) * 8;
+      const srcX = (i % 3) * 8;
+      const srcY = Math.floor(i / 3) * 8;
+      for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+          png.pixels[(dstY + y) * png.width + (dstX + x)] = roofNewBark.pixels[(srcY + y) * 24 + (srcX + x)];
+        }
+      }
+    }
+  }
+
+  const palText = fs.readFileSync(path.join(SOURCE_DIR, `gfx__tilesets__${tsName}_palette_map.asm`), 'utf8');
+  const pal0 = [];
+  const pal1 = [];
+  for (const l of palText.split('\n').map((s) => s.trim())) {
+    if (l.startsWith('tilepal 0,')) pal0.push(...l.replace('tilepal 0,', '').split(',').map((s) => s.trim()));
+    if (l.startsWith('tilepal 1,')) pal1.push(...l.replace('tilepal 1,', '').split(',').map((s) => s.trim()));
+  }
+
+  const collLines = fs
+    .readFileSync(path.join(SOURCE_DIR, `data__tilesets__${tsName}_collision.asm`), 'utf8')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.startsWith('tilecoll'));
+  const blockCollisions = collLines.map((line) => {
+    const body = line.split(';')[0].replace('tilecoll', '').trim();
+    return body.split(',').map((s) => mapCollToken(s.trim()));
+  });
+
+  const meta = fs.readFileSync(path.join(SOURCE_DIR, `data__tilesets__${tsName}_metatiles.bin`));
+  return { tsName, isOutdoor, png, pal0, pal1, blockCollisions, meta };
+}
+
+const TILESETS = {
+  johto: loadTileset('johto', true),
+  lab: loadTileset('lab', false),
+  players_house: loadTileset('players_house', false),
+  house: loadTileset('house', false),
+  pokecenter: loadTileset('pokecenter', false),
+  mart: loadTileset('mart', false),
+};
+
 const generatedTiles = new Set();
-const generatedWaterTiles = new Set();
 
-function buildQuadrantBuffer(quad8x8, roofGroup, waterFrameIdx = 0) {
+function buildQuadrantBuffer(ts, quad8x8, roofGroup, waterFrameIdx = 0) {
   const rgba = Buffer.alloc(64 * 64 * 4);
+  const palettes = ts.isOutdoor ? OUTDOOR_PALETTES : INDOOR_PALETTES;
+
   for (let qy = 0; qy < 2; qy++) {
     for (let qx = 0; qx < 2; qx++) {
       const tid = quad8x8[qy * 2 + qx];
-      const palName = tilePalMap[tid] || 'GRAY';
-      const pal = palName === 'ROOF' ? ROOF_PALETTES[roofGroup] : BASE_PALETTES[palName] || BASE_PALETTES.GRAY;
-      const srcX = (tid % 16) * 8;
-      const srcY = Math.floor(tid / 16) * 8;
+      const palName = (tid >= 0x80 ? ts.pal1[tid - 0x80] : ts.pal0[tid]) || 'GRAY';
+      const pal =
+        ts.isOutdoor && palName === 'ROOF'
+          ? ROOF_PALETTES[roofGroup]
+          : palettes[palName] || palettes.GRAY;
+      const pngTid = tid >= 0x80 ? (ts.png.height > 48 ? tid - 0x20 : tid - 0x80) : tid;
+      const srcX = (pngTid % 16) * 8;
+      const srcY = Math.floor(pngTid / 16) * 8;
 
       for (let py = 0; py < 8; py++) {
         for (let px = 0; px < 8; px++) {
           const val2b =
-            tid === 0x14
+            ts.isOutdoor && tid === 0x14
               ? waterAnim.pixels[(waterFrameIdx * 8 + py) * 8 + px]
-              : johto.pixels[(srcY + py) * johto.width + (srcX + px)];
+              : ts.png.pixels[(srcY + py) * ts.png.width + (srcX + px)];
           const color = pal[3 - val2b];
           for (let dy = 0; dy < 4; dy++) {
             for (let dx = 0; dx < 4; dx++) {
@@ -231,41 +238,42 @@ function buildQuadrantBuffer(quad8x8, roofGroup, waterFrameIdx = 0) {
   return rgba;
 }
 
-function renderQuadrant64(quad8x8, roofGroup) {
-  const hasRoof = quad8x8.some((tid) => tilePalMap[tid] === 'ROOF');
-  const hasWater = quad8x8.includes(0x14);
+function renderQuadrant64(ts, quad8x8, roofGroup) {
+  const prefix = ts.isOutdoor ? 'jt' : `in_${ts.tsName}`;
+  const hasRoof = ts.isOutdoor && quad8x8.some((tid) => ts.pal0[tid] === 'ROOF');
+  const hasWater = ts.isOutdoor && quad8x8.includes(0x14);
   const suffix = hasRoof ? `_${roofGroup}` : '';
-  const tileName = `jt_${quad8x8.map((x) => x.toString(16).padStart(2, '0')).join('_')}${suffix}`;
+  const tileName = `${prefix}_${quad8x8.map((x) => x.toString(16).padStart(2, '0')).join('_')}${suffix}`;
 
   if (!generatedTiles.has(tileName)) {
-    const rgba0 = buildQuadrantBuffer(quad8x8, roofGroup, 0);
+    const rgba0 = buildQuadrantBuffer(ts, quad8x8, roofGroup, 0);
     fs.writeFileSync(path.join(TILES_DIR, `${tileName}.png`), createPNG(64, 64, rgba0));
     generatedTiles.add(tileName);
 
     if (hasWater) {
-      const rgba1 = buildQuadrantBuffer(quad8x8, roofGroup, 1);
-      const rgba2 = buildQuadrantBuffer(quad8x8, roofGroup, 2);
+      const rgba1 = buildQuadrantBuffer(ts, quad8x8, roofGroup, 1);
+      const rgba2 = buildQuadrantBuffer(ts, quad8x8, roofGroup, 2);
       fs.writeFileSync(path.join(TILES_DIR, `${tileName}__w1.png`), createPNG(64, 64, rgba1));
       fs.writeFileSync(path.join(TILES_DIR, `${tileName}__w2.png`), createPNG(64, 64, rgba2));
-      generatedWaterTiles.add(tileName);
     }
   }
 
   return tileName;
 }
 
-// 6. Build MapData JSON from .blk binary
 function buildMapFromBlk({
   id,
   name,
+  tileset,
   blkFile,
   blocksW,
   blocksH,
-  roofGroup,
-  connections,
-  warps,
-  grassEncounters,
+  roofGroup = 'nb',
+  connections = {},
+  warps = [],
+  grassEncounters = [],
 }) {
+  const ts = TILESETS[tileset];
   const blk = fs.readFileSync(path.join(SOURCE_DIR, blkFile));
   const width = blocksW * 2;
   const height = blocksH * 2;
@@ -276,15 +284,15 @@ function buildMapFromBlk({
     for (let bx = 0; bx < blocksW; bx++) {
       const b = blk[by * blocksW + bx];
       const t = [];
-      for (let i = 0; i < 16; i++) t.push(meta[b * 16 + i]);
+      for (let i = 0; i < 16; i++) t.push(ts.meta[b * 16 + i]);
 
       const quads = [
-        [t[0], t[1], t[4], t[5]],   // TL (dx=0, dy=0)
-        [t[2], t[3], t[6], t[7]],   // TR (dx=1, dy=0)
-        [t[8], t[9], t[12], t[13]], // BL (dx=0, dy=1)
-        [t[10], t[11], t[14], t[15]], // BR (dx=1, dy=1)
+        [t[0], t[1], t[4], t[5]],
+        [t[2], t[3], t[6], t[7]],
+        [t[8], t[9], t[12], t[13]],
+        [t[10], t[11], t[14], t[15]],
       ];
-      const colls = blockCollisions[b] || [1, 1, 1, 1];
+      const colls = ts.blockCollisions[b] || [1, 1, 1, 1];
 
       for (let q = 0; q < 4; q++) {
         const dx = q % 2;
@@ -292,13 +300,13 @@ function buildMapFromBlk({
         const mx = bx * 2 + dx;
         const my = by * 2 + dy;
         const idx = my * width + mx;
-        tileMap[idx] = renderQuadrant64(quads[q], roofGroup);
+        tileMap[idx] = renderQuadrant64(ts, quads[q], roofGroup);
         collisionGrid[idx] = colls[q];
       }
     }
   }
 
-  // Ensure all warp door coordinates are walkable (0)
+  // Ensure all warp door/carpet coordinates are walkable (0)
   for (const w of warps) {
     collisionGrid[w.y * width + w.x] = 0;
   }
@@ -322,10 +330,11 @@ function buildMapFromBlk({
   console.log(`Built authentic ${id}.json (${width}x${height} step tiles)`);
 }
 
-// Build New Bark Town (10x9 blocks = 20x18 step tiles)
+// 1. Overworld Maps
 buildMapFromBlk({
   id: 'new_bark_town',
   name: 'New Bark Town',
+  tileset: 'johto',
   blkFile: 'maps__NewBarkTown.blk',
   blocksW: 10,
   blocksH: 9,
@@ -334,18 +343,18 @@ buildMapFromBlk({
     WEST: { mapId: 'route_29', offset: 0 },
   },
   warps: [
-    { x: 6, y: 3, targetMapId: 'elms_lab', targetX: 4, targetY: 7 },
-    { x: 13, y: 5, targetMapId: 'players_house_1f', targetX: 3, targetY: 6 },
-    { x: 3, y: 11, targetMapId: 'players_neighbors_house', targetX: 3, targetY: 6 },
-    { x: 11, y: 13, targetMapId: 'elms_house', targetX: 3, targetY: 6 },
+    { x: 6, y: 3, targetMapId: 'elms_lab', targetX: 4, targetY: 10 },
+    { x: 13, y: 5, targetMapId: 'players_house_1f', targetX: 6, targetY: 6 },
+    { x: 3, y: 11, targetMapId: 'players_neighbors_house', targetX: 2, targetY: 6 },
+    { x: 11, y: 13, targetMapId: 'elms_house', targetX: 2, targetY: 6 },
   ],
   grassEncounters: [],
 });
 
-// Build Route 29 (30x9 blocks = 60x18 step tiles)
 buildMapFromBlk({
   id: 'route_29',
   name: 'Route 29',
+  tileset: 'johto',
   blkFile: 'maps__Route29.blk',
   blocksW: 30,
   blocksH: 9,
@@ -354,9 +363,7 @@ buildMapFromBlk({
     EAST: { mapId: 'new_bark_town', offset: 0 },
     WEST: { mapId: 'cherrygrove_city', offset: 0 },
   },
-  warps: [
-    { x: 27, y: 1, targetMapId: 'route_29_route_46_gate', targetX: 4, targetY: 7 },
-  ],
+  warps: [],
   grassEncounters: [
     { speciesId: 'pidgey', minLevel: 2, maxLevel: 4, weight: 50 },
     { speciesId: 'sentret', minLevel: 2, maxLevel: 3, weight: 35 },
@@ -364,10 +371,10 @@ buildMapFromBlk({
   ],
 });
 
-// Build Cherrygrove City (20x9 blocks = 40x18 step tiles)
 buildMapFromBlk({
   id: 'cherrygrove_city',
   name: 'Cherrygrove City',
+  tileset: 'johto',
   blkFile: 'maps__CherrygroveCity.blk',
   blocksW: 20,
   blocksH: 9,
@@ -376,13 +383,131 @@ buildMapFromBlk({
     EAST: { mapId: 'route_29', offset: 0 },
   },
   warps: [
-    { x: 23, y: 3, targetMapId: 'cherrygrove_mart', targetX: 3, targetY: 7 },
-    { x: 29, y: 3, targetMapId: 'cherrygrove_poke_center', targetX: 3, targetY: 7 },
-    { x: 17, y: 7, targetMapId: 'cherrygrove_gym_speech_house', targetX: 3, targetY: 7 },
-    { x: 25, y: 9, targetMapId: 'guide_gents_house', targetX: 3, targetY: 7 },
-    { x: 31, y: 11, targetMapId: 'cherrygrove_evolution_speech_house', targetX: 3, targetY: 7 },
+    { x: 23, y: 3, targetMapId: 'cherrygrove_mart', targetX: 2, targetY: 6 },
+    { x: 29, y: 3, targetMapId: 'cherrygrove_poke_center', targetX: 3, targetY: 6 },
+    { x: 17, y: 7, targetMapId: 'cherrygrove_gym_speech_house', targetX: 2, targetY: 6 },
+    { x: 25, y: 9, targetMapId: 'guide_gents_house', targetX: 2, targetY: 6 },
+    { x: 31, y: 11, targetMapId: 'cherrygrove_evolution_speech_house', targetX: 2, targetY: 6 },
   ],
   grassEncounters: [],
+});
+
+// 2. Authentic Indoor Maps
+buildMapFromBlk({
+  id: 'elms_lab',
+  name: "Prof. Elm's Lab",
+  tileset: 'lab',
+  blkFile: 'maps__ElmsLab.blk',
+  blocksW: 5,
+  blocksH: 6,
+  warps: [
+    { x: 4, y: 11, targetMapId: 'new_bark_town', targetX: 6, targetY: 4 },
+    { x: 5, y: 11, targetMapId: 'new_bark_town', targetX: 6, targetY: 4 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'players_house_1f',
+  name: "Player's House",
+  tileset: 'players_house',
+  blkFile: 'maps__PlayersHouse1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 6, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 6 },
+    { x: 7, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 6 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'players_neighbors_house',
+  name: "Neighbor's House",
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'new_bark_town', targetX: 3, targetY: 12 },
+    { x: 3, y: 7, targetMapId: 'new_bark_town', targetX: 3, targetY: 12 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'elms_house',
+  name: "Elm's House",
+  tileset: 'players_house',
+  blkFile: 'maps__House2.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'new_bark_town', targetX: 11, targetY: 14 },
+    { x: 3, y: 7, targetMapId: 'new_bark_town', targetX: 11, targetY: 14 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'cherrygrove_mart',
+  name: 'Cherrygrove Poké Mart',
+  tileset: 'mart',
+  blkFile: 'maps__Mart.blk',
+  blocksW: 6,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 23, targetY: 4 },
+    { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 23, targetY: 4 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'cherrygrove_poke_center',
+  name: 'Cherrygrove Pokémon Center',
+  tileset: 'pokecenter',
+  blkFile: 'maps__Pokecenter1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 29, targetY: 4 },
+    { x: 4, y: 7, targetMapId: 'cherrygrove_city', targetX: 29, targetY: 4 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'guide_gents_house',
+  name: "Guide Gent's House",
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 25, targetY: 10 },
+    { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 25, targetY: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'cherrygrove_gym_speech_house',
+  name: 'Cherrygrove House',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 17, targetY: 8 },
+    { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 17, targetY: 8 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'cherrygrove_evolution_speech_house',
+  name: 'Evolution Speech House',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 31, targetY: 12 },
+    { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 31, targetY: 12 },
+  ],
 });
 
 console.log(`Total authentic 64x64 quadrant PNGs generated: ${generatedTiles.size}`);

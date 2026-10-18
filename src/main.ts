@@ -74,20 +74,32 @@ async function bootstrap() {
     playerParty = [PokemonFactory.create('cyndaquil', 5, ['tackle', 'leer', 'ember', 'smokescreen'])];
   }
 
-  // 3. Fetch and Register Vertical Slice Maps
-  const [newBarkTownRes, route29Res, cherrygroveRes] = await Promise.all([
-    fetch('/assets/data/maps/new_bark_town.json'),
-    fetch('/assets/data/maps/route_29.json'),
-    fetch('/assets/data/maps/cherrygrove_city.json'),
-  ]);
+  // 3. Fetch and Register Vertical Slice Outdoor & Indoor Maps
+  const mapIds = [
+    'new_bark_town',
+    'route_29',
+    'cherrygrove_city',
+    'elms_lab',
+    'players_house_1f',
+    'players_neighbors_house',
+    'elms_house',
+    'cherrygrove_mart',
+    'cherrygrove_poke_center',
+    'guide_gents_house',
+    'cherrygrove_gym_speech_house',
+    'cherrygrove_evolution_speech_house',
+  ];
 
-  const newBarkTown: MapData = await newBarkTownRes.json();
-  const route29: MapData = await route29Res.json();
-  const cherrygrove: MapData = await cherrygroveRes.json();
+  const loadedMaps: MapData[] = await Promise.all(
+    mapIds.map(async (id) => {
+      const res = await fetch(`/assets/data/maps/${id}.json`);
+      return res.json();
+    })
+  );
 
-  mapManager.registerMap(newBarkTown);
-  mapManager.registerMap(route29);
-  mapManager.registerMap(cherrygrove);
+  for (const m of loadedMaps) {
+    mapManager.registerMap(m);
+  }
 
   let initialMap = mapManager.setCurrentMap(initialMapId);
   if (!mapManager.isWalkable(initialPlayerX, initialPlayerY)) {
@@ -151,7 +163,8 @@ async function bootstrap() {
 
   const overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer);
-  overworldRenderer.renderMap(initialMap);
+  const lookupMap = (id: string) => mapManager.getMap(id);
+  overworldRenderer.renderMap(initialMap, lookupMap);
 
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
   const battleHUD = new BattleHUD('battle-hud-container');
@@ -246,7 +259,7 @@ async function bootstrap() {
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = nextMap.width - 1;
       targetY += conn.offset;
-      overworldRenderer.renderMap(nextMap);
+      overworldRenderer.renderMap(nextMap, lookupMap);
       overworldHUD.updateRouteName(nextMap.name);
     }
     // Transitioning East
@@ -256,7 +269,7 @@ async function bootstrap() {
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = 0;
       targetY += conn.offset;
-      overworldRenderer.renderMap(nextMap);
+      overworldRenderer.renderMap(nextMap, lookupMap);
       overworldHUD.updateRouteName(nextMap.name);
     }
 
@@ -475,30 +488,41 @@ async function bootstrap() {
           // Check Building Door Warps (Poké Center, Poké Mart, Elm's Lab, Houses)
           const warp = mapManager.checkWarp(coord);
           if (warp) {
+            const targetMap = mapManager.setCurrentMap(warp.targetMapId);
+            const isEnteringIndoor = Object.keys(targetMap.connections || {}).length === 0;
             player.isMoving = false;
             player.progress = 0;
-            player.direction = 'DOWN';
-            // Step back onto the mat outside the door
-            player.y = coord.y + 1;
-            player.targetY = player.y;
-            player.renderY = player.y;
+            player.direction = isEnteringIndoor ? 'UP' : 'DOWN';
+            player.x = warp.targetX;
+            player.y = warp.targetY;
+            player.targetX = warp.targetX;
+            player.targetY = warp.targetY;
+            player.renderX = warp.targetX;
+            player.renderY = warp.targetY;
 
-            if (warp.targetMapId === 'cherrygrove_mart') {
-              overworldHUD.showToast('🏪 Welcome to Cherrygrove Poké Mart! Browse badge-gated Pokéballs.');
-              bagUI.openMart();
-            } else if (warp.targetMapId === 'cherrygrove_poke_center') {
-              healPlayerParty();
-              saveCurrentGame();
-              overworldHUD.showToast('💖 Cherrygrove Pokémon Center: Your party was restored to full HP & PP!');
-            } else if (warp.targetMapId === 'elms_lab') {
-              healPlayerParty();
-              overworldHUD.showToast('🔬 Prof. Elm: "Raikou, Entei & Suicune are roaming Johto! Use your Pokégear!"');
-            } else if (warp.targetMapId === 'players_house_1f') {
-              healPlayerParty();
-              saveCurrentGame();
-              overworldHUD.showToast('🏠 Mom: "Rest up, sweetheart! Your Pokémon are looking fit and energized!"');
-            } else {
-              overworldHUD.showToast('🏡 Neighbor: "Tip: Teach TM54 False Swipe & TM99 Mean Look from your Bag!"');
+            overworldRenderer.renderMap(targetMap, lookupMap);
+            overworldHUD.updateRouteName(targetMap.name);
+
+            if (isEnteringIndoor) {
+              if (warp.targetMapId === 'cherrygrove_mart') {
+                overworldHUD.showToast('🏪 Welcome to Cherrygrove Poké Mart! Browse badge-gated Pokéballs.');
+                bagUI.openMart();
+              } else if (warp.targetMapId === 'cherrygrove_poke_center') {
+                healPlayerParty();
+                saveCurrentGame();
+                overworldHUD.showToast('💖 Cherrygrove Pokémon Center: Your party was restored to full HP & PP!');
+              } else if (warp.targetMapId === 'elms_lab') {
+                healPlayerParty();
+                overworldHUD.showToast('🔬 Prof. Elm: "Raikou, Entei & Suicune are roaming Johto! Use your Pokégear!"');
+              } else if (warp.targetMapId === 'players_house_1f') {
+                healPlayerParty();
+                saveCurrentGame();
+                overworldHUD.showToast('🏠 Mom: "Rest up, sweetheart! Your Pokémon are looking fit and energized!"');
+              } else if (warp.targetMapId === 'guide_gents_house') {
+                overworldHUD.showToast('🗺️ Guide Gent: "Check your Pokégear Map to track the Legendary Beasts!"');
+              } else {
+                overworldHUD.showToast('🏡 Neighbor: "Tip: Teach TM54 False Swipe & TM99 Mean Look from your Bag!"');
+              }
             }
             return;
           }
@@ -538,7 +562,7 @@ async function bootstrap() {
         activeNpcs
       );
 
-      // Update NPCs with dtWorld (strictly 1.0x world speed), colliding with player
+      // Update NPCs with dtWorld (strictly 1.0x world speed), colliding with player and staying in bounds
       npcMoveTimer += dtWorld;
       if (npcMoveTimer > 2.0 && !npc.isMoving) {
         npcMoveTimer = 0;
@@ -550,7 +574,7 @@ async function bootstrap() {
           npc,
           dtWorld,
           npcHeldDir,
-          mapManager.isWalkable,
+          mapManager.isWalkableInBounds,
           mapManager.getTileType,
           undefined,
           playerObstacles

@@ -104,4 +104,42 @@ describe('MapData & Authentic Tile Integrity', () => {
       expect(mapData.collisionGrid[idx]).toBe(0);
     }
   });
+
+  it('validates all 9 authentic indoor maps, their tile PNGs, and exit warps', () => {
+    const indoorMapIds = [
+      'elms_lab',
+      'players_house_1f',
+      'players_neighbors_house',
+      'elms_house',
+      'cherrygrove_mart',
+      'cherrygrove_poke_center',
+      'guide_gents_house',
+      'cherrygrove_gym_speech_house',
+      'cherrygrove_evolution_speech_house',
+    ];
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+
+    for (const mapId of indoorMapIds) {
+      const mapPath = path.resolve(__dirname, `../public/assets/data/maps/${mapId}.json`);
+      expect(fs.existsSync(mapPath)).toBe(true);
+
+      const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+      expect(mapData.id).toBe(mapId);
+      expect(mapData.tileMap).toBeDefined();
+      expect(mapData.tileMap!.length).toBe(mapData.width * mapData.height);
+      expect(mapData.collisionGrid.length).toBe(mapData.width * mapData.height);
+
+      for (const tileName of new Set(mapData.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tileName}.png`))).toBe(true);
+      }
+
+      // Every indoor map has 2 exit carpet warps at the bottom row
+      expect(mapData.warps.length).toBe(2);
+      for (const warp of mapData.warps) {
+        const idx = warp.y * mapData.width + warp.x;
+        expect(mapData.collisionGrid[idx]).toBe(0);
+      }
+    }
+  });
 });
+

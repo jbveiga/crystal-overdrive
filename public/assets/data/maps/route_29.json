@@ -3261,15 +3261,7 @@
       "offset": 0
     }
   },
-  "warps": [
-    {
-      "x": 27,
-      "y": 1,
-      "targetMapId": "route_29_route_46_gate",
-      "targetX": 4,
-      "targetY": 7
-    }
-  ],
+  "warps": [],
   "grassEncounters": [
     {
       "speciesId": "pidgey",
