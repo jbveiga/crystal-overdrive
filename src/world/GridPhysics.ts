@@ -38,6 +38,25 @@ export class GridPhysics {
   }
 
   /**
+   * Zero-allocation check if a tile is currently occupied or reserved by another entity
+   */
+  public static isTileOccupiedByEntities(
+    x: number,
+    y: number,
+    self: GridEntity,
+    obstacles?: readonly GridEntity[]
+  ): boolean {
+    if (!obstacles) return false;
+    for (let i = 0; i < obstacles.length; i++) {
+      const other = obstacles[i];
+      if (other === self || other.id === self.id) continue;
+      if (other.x === x && other.y === y) return true;
+      if (other.isMoving && other.targetX === x && other.targetY === y) return true;
+    }
+    return false;
+  }
+
+  /**
    * Updates an entity's position, stepping through fractional progress and chaining overflow
    * without allocating intermediate objects.
    */
@@ -47,7 +66,8 @@ export class GridPhysics {
     heldDirection: Direction | null,
     isWalkable: CollisionCheck,
     getTileType: TileTypeLookup,
-    onTileEntered?: TileEnteredCallback
+    onTileEntered?: TileEnteredCallback,
+    obstacles?: readonly GridEntity[]
   ): void {
     if (dt <= 0) return;
 
@@ -59,7 +79,7 @@ export class GridPhysics {
         const nextX = entity.x + delta.dx;
         const nextY = entity.y + delta.dy;
 
-        if (isWalkable(nextX, nextY)) {
+        if (isWalkable(nextX, nextY) && !this.isTileOccupiedByEntities(nextX, nextY, entity, obstacles)) {
           entity.isMoving = true;
           entity.targetX = nextX;
           entity.targetY = nextY;
@@ -98,7 +118,7 @@ export class GridPhysics {
           const nextX = entity.x + delta.dx;
           const nextY = entity.y + delta.dy;
 
-          if (isWalkable(nextX, nextY)) {
+          if (isWalkable(nextX, nextY) && !this.isTileOccupiedByEntities(nextX, nextY, entity, obstacles)) {
             entity.targetX = nextX;
             entity.targetY = nextY;
             entity.progress = overflow;

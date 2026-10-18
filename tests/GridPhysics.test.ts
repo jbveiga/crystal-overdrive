@@ -106,4 +106,33 @@ describe('GridPhysics', () => {
     expect(entity.progress).toBe(0);
     expect(entity.renderY).toBe(6);
   });
+
+  it('prevents player and NPCs from walking into tiles occupied or targeted by another entity', () => {
+    const player = createMockEntity({ id: 'player', x: 5, y: 5, targetX: 5, targetY: 5 });
+    const npc = createMockEntity({
+      id: 'town_npc',
+      x: 5,
+      y: 6,
+      targetX: 5,
+      targetY: 6,
+      isPlayer: false,
+    });
+
+    // Player attempts to move DOWN into (5,6) where NPC is standing
+    GridPhysics.updateEntity(player, 0.1, 'DOWN', allWalkable, tileLookup, undefined, [npc]);
+    expect(player.isMoving).toBe(false);
+    expect(player.x).toBe(5);
+    expect(player.y).toBe(5);
+
+    // NPC starts moving RIGHT from (5,6) to (6,6); player at (6,5) tries to step DOWN into (6,6)
+    GridPhysics.updateEntity(npc, 0.05, 'RIGHT', allWalkable, tileLookup, undefined, [player]);
+    expect(npc.isMoving).toBe(true);
+    expect(npc.targetX).toBe(6);
+    expect(npc.targetY).toBe(6);
+
+    player.x = 6;
+    player.targetX = 6;
+    GridPhysics.updateEntity(player, 0.05, 'DOWN', allWalkable, tileLookup, undefined, [npc]);
+    expect(player.isMoving).toBe(false);
+  });
 });

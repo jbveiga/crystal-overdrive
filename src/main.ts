@@ -214,10 +214,11 @@ async function bootstrap() {
     isPlayer: false,
   };
 
-  // Pre-allocated NPC arrays for zero-allocation 60Hz ticker loop
+  // Pre-allocated NPC & obstacle arrays for zero-allocation 60Hz ticker loop
   const townNpcs: GridEntity[] = [npc];
   const route29Npcs: GridEntity[] = [joeyNpc];
   const emptyNpcs: GridEntity[] = [];
+  const playerObstacles: GridEntity[] = [player];
 
   let npcMoveTimer = 0;
   let npcHeldDir: Direction | null = null;
@@ -447,6 +448,14 @@ async function bootstrap() {
 
     if (gameState === 'OVERWORLD') {
       // Update Player with dtPlayer (1x / 2x / 3x)
+      // Active NPCs on this map (Zero per-frame array allocations)
+      const activeNpcs =
+        currentMap?.id === 'route_29'
+          ? route29Npcs
+          : currentMap?.id === 'new_bark_town'
+            ? townNpcs
+            : emptyNpcs;
+
       const heldDir = overworldHUD.getHeldDirection();
       GridPhysics.updateEntity(
         player,
@@ -519,10 +528,11 @@ async function bootstrap() {
               triggerBattle(wildPkmn, { isRoamer: encounter.isRoamer });
             }
           }
-        }
+        },
+        activeNpcs
       );
 
-      // Update NPCs with dtWorld (strictly 1.0x world speed)
+      // Update NPCs with dtWorld (strictly 1.0x world speed), colliding with player
       npcMoveTimer += dtWorld;
       if (npcMoveTimer > 2.0 && !npc.isMoving) {
         npcMoveTimer = 0;
@@ -535,15 +545,18 @@ async function bootstrap() {
           dtWorld,
           npcHeldDir,
           mapManager.isWalkable,
-          mapManager.getTileType
+          mapManager.getTileType,
+          undefined,
+          playerObstacles
         );
       }
 
-      // Active NPCs to render on this map (Zero per-frame array allocations)
+      // Render active map after any border transitions during this tick
+      const mapAfterMove = mapManager.getCurrentMap();
       const npcsToRender =
-        currentMap?.id === 'route_29'
+        mapAfterMove?.id === 'route_29'
           ? route29Npcs
-          : currentMap?.id === 'new_bark_town'
+          : mapAfterMove?.id === 'new_bark_town'
             ? townNpcs
             : emptyNpcs;
       overworldRenderer.update(player, npcsToRender);
