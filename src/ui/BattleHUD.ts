@@ -27,7 +27,7 @@ export class BattleHUD {
   private callbacks!: BattleHUDCallbacks;
   private speedMultiplier: SpeedMultiplier = 1;
 
-  constructor(containerId: string = 'ui-overlay') {
+  constructor(containerId: string = 'battle-hud-container') {
     const el = document.getElementById(containerId);
     if (!el) {
       throw new Error(`HUD Container #${containerId} not found in DOM`);

@@ -6,50 +6,64 @@
   "tileSize": 64,
   "groundLayer": [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
-    1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1,
-    1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 1,
-    1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1,
+    1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+    1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+    0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3,
+    1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3,
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3,
+    1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 3, 3, 3, 3,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3
   ],
   "objectLayer": [],
   "collisionGrid": [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1,
-    1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1,
-    1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 1,
-    1, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1,
+    1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+    1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+    0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3,
+    1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3,
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 3,
+    1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 3, 3, 3, 3,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3
+  ],
+  "tileMap": [
+    "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0", "tree_tall_0",
+    "tree_tall_1", "tree_tall_1", "lab_roof_tl", "lab_roof_top", "lab_roof_top", "lab_roof_tr", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "house_roof_tl", "house_roof_top", "house_roof_tr", "tree_tall_1", "tree_tall_1", "tree_tall_1",
+    "tree_tall_0", "tree_tall_0", "lab_roof_front_l", "lab_roof_front_m", "lab_roof_front_m", "lab_roof_front_r", "grass", "grass", "tree_tall_0", "fence_horizontal", "house_roof_front_l", "house_roof_front_m", "house_roof_front_r", "fence_horizontal", "tree_tall_0", "tree_tall_0",
+    "tree_tall_1", "tree_tall_1", "lab_wall", "lab_window", "lab_door", "lab_wall", "grass", "path", "tree_tall_1", "fence_horizontal", "house_wall", "house_window", "house_door", "mailbox", "tree_tall_1", "tree_tall_1",
+    "tree_tall_0", "tree_tall_0", "grass", "sign_lab", "path", "grass", "path", "path", "grass", "flower_yellow", "path", "path", "path", "flower_red", "tree_tall_0", "tree_tall_0",
+    "tree_tall_1", "tree_tall_1", "grass", "grass", "path", "sign_town", "path", "path", "path", "path", "path", "path", "path", "grass", "tree_tall_1", "tree_tall_1",
+    "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "grass", "flower_red", "tree_tall_0", "tree_tall_0",
+    "path", "path", "house_roof_tl", "house_roof_top", "house_roof_tr", "path", "path", "path", "path", "grass", "flower_yellow", "grass", "water_shore_nw", "water_shore_n", "water_shore_n", "water_shore_n",
+    "tree_tall_0", "tree_tall_0", "house_roof_front_l", "house_roof_front_m", "house_roof_front_r", "path", "path", "path", "path", "grass", "grass", "path_gravel", "water_shore_w", "water", "water", "water",
+    "tree_tall_1", "tree_tall_1", "house_wall", "house_window", "house_door", "path", "grass", "grass", "flower_red", "grass", "grass", "path_gravel", "water_shore_w", "water", "water", "water",
+    "tree_tall_0", "tree_tall_0", "fence_horizontal", "flower_yellow", "flower_red", "fence_horizontal", "grass", "grass", "grass", "grass", "grass", "fence_horizontal", "water_shore_w", "water", "water", "water",
+    "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "tree_tall_1", "water", "water", "water", "water"
   ],
   "connections": {
     "WEST": {
       "mapId": "route_29",
-      "offset": 0
+      "offset": -2
     }
   },
   "warps": [
     {
-      "x": 3,
-      "y": 4,
+      "x": 4,
+      "y": 3,
       "targetMapId": "elms_lab",
       "targetX": 4,
       "targetY": 7
     },
     {
-      "x": 13,
-      "y": 4,
+      "x": 12,
+      "y": 3,
       "targetMapId": "players_house_1f",
       "targetX": 3,
       "targetY": 6

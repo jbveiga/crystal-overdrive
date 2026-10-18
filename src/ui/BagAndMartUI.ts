@@ -48,7 +48,7 @@ export class BagAndMartUI {
   private onInventoryChanged?: () => void;
 
   constructor(
-    containerId: string = 'ui-overlay',
+    containerId: string = 'modal-container',
     inventory: BagInventory,
     party: PokemonInstance[],
     onInventoryChanged?: () => void

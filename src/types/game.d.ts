@@ -48,6 +48,8 @@ export interface MapData {
   groundLayer: number[];
   objectLayer: number[];
   collisionGrid: number[]; // 0 = walkable, 1 = solid, 2 = tall grass, 3 = water
+  tileMap?: string[];
+  overlayMap?: (string | null)[];
   connections: Partial<Record<'NORTH' | 'EAST' | 'SOUTH' | 'WEST', MapConnection>>;
   warps: WarpEvent[];
   grassEncounters: WildEncounterSlot[];

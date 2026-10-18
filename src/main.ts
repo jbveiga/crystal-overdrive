@@ -119,11 +119,11 @@ async function bootstrap() {
   };
 
   // 5. Initialize HUDs & Renderers
-  const bagUI = new BagAndMartUI('ui-overlay', inventory, playerParty, () => {
+  const bagUI = new BagAndMartUI('modal-container', inventory, playerParty, () => {
     saveCurrentGame();
   });
 
-  const overworldHUD = new OverworldHUD('ui-overlay', {
+  const overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
       const newSpeed = gameClock.cyclePlayerSpeed();
       eventBus.emit('player:speedChanged', { playerSpeed: newSpeed });
@@ -145,7 +145,7 @@ async function bootstrap() {
   overworldRenderer.renderMap(initialMap);
 
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
-  const battleHUD = new BattleHUD('ui-overlay');
+  const battleHUD = new BattleHUD('battle-hud-container');
 
   // 6. Initialize Entities
   const player: GridEntity = {
@@ -256,6 +256,7 @@ async function bootstrap() {
     options: { isRoamer?: boolean; isTrainer?: boolean; trainerName?: string } = {}
   ) => {
     gameState = 'BATTLE';
+    overworldHUD.hide();
     player.isMoving = false;
     player.progress = 0;
 
@@ -307,6 +308,7 @@ async function bootstrap() {
           battleRenderer.endBattle();
           battleHUD.hide();
           gameState = 'OVERWORLD';
+          overworldHUD.show();
           saveCurrentGame();
         } else {
           battleHUD.showActionMenu();
@@ -361,6 +363,7 @@ async function bootstrap() {
           battleRenderer.endBattle();
           battleHUD.hide();
           gameState = 'OVERWORLD';
+          overworldHUD.show();
           saveCurrentGame();
         } else {
           battleHUD.showActionMenu();
@@ -377,6 +380,7 @@ async function bootstrap() {
         battleRenderer.endBattle();
         battleHUD.hide();
         gameState = 'OVERWORLD';
+        overworldHUD.show();
       },
       onSpeedToggle: () => {
         const nextSpeed = gameClock.cycleBattleSpeed();

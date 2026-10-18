@@ -64,12 +64,39 @@ export class OverworldRenderer {
       'path_gravel',
       'water',
       'water_edge',
+      'water_shore_n',
+      'water_shore_w',
+      'water_shore_nw',
       'flower_0',
       'flower_1',
+      'flower_red',
+      'flower_yellow',
       'roof',
       'wall',
       'door',
       'sign',
+      'sign_town',
+      'sign_lab',
+      'mailbox',
+      'fence_horizontal',
+      'house_roof_tl',
+      'house_roof_top',
+      'house_roof_tr',
+      'house_roof_front_l',
+      'house_roof_front_m',
+      'house_roof_front_r',
+      'house_wall',
+      'house_window',
+      'house_door',
+      'lab_roof_tl',
+      'lab_roof_top',
+      'lab_roof_tr',
+      'lab_roof_front_l',
+      'lab_roof_front_m',
+      'lab_roof_front_r',
+      'lab_wall',
+      'lab_window',
+      'lab_door',
     ];
 
     for (const name of tileNames) {
@@ -141,6 +168,47 @@ export class OverworldRenderer {
     const wallTex = this.tileTextures.get('wall') || treeTallTex;
     const doorTex = this.tileTextures.get('door') || pathTex;
     const flowerTex = this.tileTextures.get('flower_0') || grassTex;
+
+    // 1. High-fidelity authentic TileMap rendering if defined
+    if (map.tileMap && map.tileMap.length === map.width * map.height) {
+      for (let y = 0; y < map.height; y++) {
+        for (let x = 0; x < map.width; x++) {
+          const index = y * map.width + x;
+          const tileName = map.tileMap[index];
+          const px = x * this.tileSize;
+          const py = y * this.tileSize;
+
+          // Always render base grass underneath, except for deep ocean water
+          const isDeepWater = tileName === 'water';
+          if (!isDeepWater) {
+            const baseSprite = new Sprite(grassTex);
+            baseSprite.position.set(px, py);
+            baseSprite.width = this.tileSize;
+            baseSprite.height = this.tileSize;
+            this.mapContainer.addChild(baseSprite);
+          }
+
+          const tex = this.tileTextures.get(tileName) || grassTex;
+          const featureSprite = new Sprite(tex);
+          featureSprite.position.set(px, py);
+          featureSprite.width = this.tileSize;
+          featureSprite.height = this.tileSize;
+          this.mapContainer.addChild(featureSprite);
+
+          if (map.overlayMap && map.overlayMap[index]) {
+            const overlayTex = this.tileTextures.get(map.overlayMap[index]!);
+            if (overlayTex) {
+              const overlaySprite = new Sprite(overlayTex);
+              overlaySprite.position.set(px, py);
+              overlaySprite.width = this.tileSize;
+              overlaySprite.height = this.tileSize;
+              this.mapContainer.addChild(overlaySprite);
+            }
+          }
+        }
+      }
+      return;
+    }
 
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {

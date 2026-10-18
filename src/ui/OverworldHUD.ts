@@ -12,11 +12,12 @@ export class OverworldHUD {
   private speedButton!: HTMLButtonElement;
   private routeBanner!: HTMLDivElement;
   private roamerAlertBanner!: HTMLDivElement;
+  private rootElement!: HTMLDivElement;
   private activeDirection: Direction | null = null;
   private heldKeys: Set<string> = new Set();
   private options: OverworldHUDOptions;
 
-  constructor(containerId: string = 'ui-overlay', options: OverworldHUDOptions = {}) {
+  constructor(containerId: string = 'overworld-hud-container', options: OverworldHUDOptions = {}) {
     const el = document.getElementById(containerId);
     if (!el) {
       throw new Error(`HUD Container #${containerId} not found in DOM`);
@@ -28,21 +29,32 @@ export class OverworldHUD {
     this.setupControls();
   }
 
+  public show(): void {
+    if (this.rootElement) this.rootElement.style.display = 'flex';
+  }
+
+  public hide(): void {
+    if (this.rootElement) this.rootElement.style.display = 'none';
+  }
+
   private createUI(): void {
-    this.container.innerHTML = `
-      <div id="hud-root" style="
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        pointer-events: none;
-        padding: 16px;
-        box-sizing: border-box;
-      ">
+    this.rootElement = document.createElement('div');
+    this.rootElement.id = 'hud-root';
+    this.rootElement.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: none;
+      padding: 16px;
+      box-sizing: border-box;
+    `;
+
+    this.rootElement.innerHTML = `
         <!-- Top bar -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
           <div id="route-banner" style="
@@ -172,15 +184,17 @@ export class OverworldHUD {
       </div>
     `;
 
-    this.speedButton = this.container.querySelector('#speed-toggle-btn') as HTMLButtonElement;
-    this.routeBanner = this.container.querySelector('#route-banner') as HTMLDivElement;
-    this.roamerAlertBanner = this.container.querySelector('#roamer-alert-banner') as HTMLDivElement;
-    const bagBtn = this.container.querySelector('#bag-btn') as HTMLButtonElement;
-    const saveBtn = this.container.querySelector('#save-btn') as HTMLButtonElement;
-    const pokegearBtn = this.container.querySelector('#pokegear-btn') as HTMLButtonElement;
-    const pokegearModal = this.container.querySelector('#pokegear-modal') as HTMLDivElement;
-    const closePokegearBtn = this.container.querySelector('#close-pokegear-btn') as HTMLButtonElement;
-    const roamerStatusList = this.container.querySelector('#roamer-status-list') as HTMLDivElement;
+    this.container.appendChild(this.rootElement);
+
+    this.speedButton = this.rootElement.querySelector('#speed-toggle-btn') as HTMLButtonElement;
+    this.routeBanner = this.rootElement.querySelector('#route-banner') as HTMLDivElement;
+    this.roamerAlertBanner = this.rootElement.querySelector('#roamer-alert-banner') as HTMLDivElement;
+    const bagBtn = this.rootElement.querySelector('#bag-btn') as HTMLButtonElement;
+    const saveBtn = this.rootElement.querySelector('#save-btn') as HTMLButtonElement;
+    const pokegearBtn = this.rootElement.querySelector('#pokegear-btn') as HTMLButtonElement;
+    const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
+    const closePokegearBtn = this.rootElement.querySelector('#close-pokegear-btn') as HTMLButtonElement;
+    const roamerStatusList = this.rootElement.querySelector('#roamer-status-list') as HTMLDivElement;
 
     bagBtn.addEventListener('click', () => {
       if (this.options.onBagOpen) this.options.onBagOpen();
