@@ -31,6 +31,9 @@ export class OverworldRenderer {
   private waterAnimStep: number = 0;
   private playerFrames!: CharacterFrames;
   private npcBoyFrames!: CharacterFrames;
+  private npcGirlFrames!: CharacterFrames;
+  private npcFatManFrames!: CharacterFrames;
+  private npcKrisFrames!: CharacterFrames;
 
   public async init(containerElement: HTMLElement): Promise<void> {
     this.app = new Application();
@@ -333,6 +336,18 @@ export class OverworldRenderer {
     const npcBoyTex = await Assets.load<Texture>('/assets/sprites/characters/npc_boy.png');
     npcBoyTex.source.scaleMode = 'nearest';
     this.npcBoyFrames = this.extractCharacterFrames(npcBoyTex);
+
+    const npcGirlTex = await Assets.load<Texture>('/assets/sprites/characters/npc_girl.png');
+    npcGirlTex.source.scaleMode = 'nearest';
+    this.npcGirlFrames = this.extractCharacterFrames(npcGirlTex);
+
+    const npcFatManTex = await Assets.load<Texture>('/assets/sprites/characters/npc_fat_man.png');
+    npcFatManTex.source.scaleMode = 'nearest';
+    this.npcFatManFrames = this.extractCharacterFrames(npcFatManTex);
+
+    const npcKrisTex = await Assets.load<Texture>('/assets/sprites/characters/kris_walk.png');
+    npcKrisTex.source.scaleMode = 'nearest';
+    this.npcKrisFrames = this.extractCharacterFrames(npcKrisTex);
   }
 
   private extractCharacterFrames(sheet: Texture): CharacterFrames {
@@ -633,9 +648,18 @@ export class OverworldRenderer {
 
     for (let i = 0; i < npcs.length; i++) {
       const npc = npcs[i];
+      const frames =
+        npc.spriteType === 'girl'
+          ? this.npcGirlFrames
+          : npc.spriteType === 'fat_man'
+            ? this.npcFatManFrames
+            : npc.spriteType === 'kris'
+              ? this.npcKrisFrames
+              : this.npcBoyFrames;
+
       let sprite = this.npcSprites.get(npc.id);
       if (!sprite) {
-        sprite = new Sprite(this.npcBoyFrames.downStand);
+        sprite = new Sprite(frames.downStand);
         sprite.anchor.set(0.5, 0.85);
         sprite.scale.set(scale, scale);
         this.entityContainer.addChild(sprite);
@@ -647,7 +671,7 @@ export class OverworldRenderer {
       const npcPxY = (npc.renderY + 0.85) * this.tileSize;
       sprite.position.set(npcPxX, npcPxY);
 
-      const npcTex = this.getFrameForEntity(this.npcBoyFrames, npc.direction, npc.isMoving, npc.progress);
+      const npcTex = this.getFrameForEntity(frames, npc.direction, npc.isMoving, npc.progress);
       sprite.texture = npcTex;
 
       if (npc.direction === 'RIGHT') {

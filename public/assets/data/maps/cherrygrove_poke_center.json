@@ -268,5 +268,16 @@
       "targetY": 4
     }
   ],
+  "bgEvents": [
+    {
+      "x": 9,
+      "y": 1,
+      "speaker": "💻 BILL'S PC",
+      "pages": [
+        "Accessed BILL'S PC!",
+        "POKéMON Storage System is online and synced."
+      ]
+    }
+  ],
   "grassEncounters": []
 }

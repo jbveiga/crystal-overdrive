@@ -2214,5 +2214,42 @@
       "targetY": 6
     }
   ],
+  "bgEvents": [
+    {
+      "x": 30,
+      "y": 8,
+      "speaker": "🪧 CHERRYGROVE CITY SIGN",
+      "pages": [
+        "CHERRYGROVE CITY",
+        "The City of Cute, Fragrant Flowers"
+      ]
+    },
+    {
+      "x": 23,
+      "y": 9,
+      "speaker": "🪧 HOUSE SIGN",
+      "pages": [
+        "GUIDE GENT'S HOUSE"
+      ]
+    },
+    {
+      "x": 24,
+      "y": 3,
+      "speaker": "🪧 POKéMON MART SIGN",
+      "pages": [
+        "Catch All Your POKéMON Needs!",
+        "POKéMON MART"
+      ]
+    },
+    {
+      "x": 30,
+      "y": 3,
+      "speaker": "🪧 POKéMON CENTER SIGN",
+      "pages": [
+        "Heal Your POKéMON!",
+        "POKéMON CENTER"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

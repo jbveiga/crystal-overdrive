@@ -1,5 +1,7 @@
 import type { Direction, TileCoord } from '../types/game';
 
+export type NpcSpriteType = 'boy' | 'girl' | 'fat_man' | 'kris';
+
 export interface GridEntity {
   id: string;
   x: number;
@@ -12,6 +14,12 @@ export interface GridEntity {
   isMoving: boolean;
   progress: number;
   isPlayer: boolean;
+  spriteType?: NpcSpriteType;
+  speaker?: string;
+  pages?: string[];
+  wanders?: boolean;
+  talkAcrossCounter?: boolean;
+  action?: 'HEAL_AND_SAVE' | 'OPEN_MART' | 'TRAINER_JOEY';
 }
 
 export type CollisionCheck = (x: number, y: number) => boolean;

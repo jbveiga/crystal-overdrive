@@ -6,6 +6,7 @@ export interface OverworldHUDOptions {
   onBagOpen?: () => void;
   onMartOpen?: () => void;
   onSaveGame?: () => void;
+  onInteract?: () => void;
 }
 
 export class OverworldHUD {
@@ -15,6 +16,16 @@ export class OverworldHUD {
   private roamerAlertBanner!: HTMLDivElement;
   private toastBanner!: HTMLDivElement;
   private toastTimeout?: ReturnType<typeof setTimeout>;
+  private dialogueBox!: HTMLDivElement;
+  private dialogueSpeaker!: HTMLDivElement;
+  private dialogueText!: HTMLDivElement;
+  private dialoguePrompt!: HTMLDivElement;
+  private dialoguePages: string[] = [];
+  private dialoguePageIndex: number = 0;
+  private dialogueCharIndex: number = 0;
+  private dialogueTypeTimer?: ReturnType<typeof setInterval>;
+  private dialogueOnComplete?: () => void;
+  private dialogueActive: boolean = false;
   private rootElement!: HTMLDivElement;
   private activeDirection: Direction | null = null;
   private heldKeys: Set<string> = new Set();
@@ -203,17 +214,95 @@ export class OverworldHUD {
           "></div>
         </div>
 
-        <!-- Bottom Controls / Help info -->
-        <div style="
-          background: rgba(18, 22, 28, 0.75);
-          backdrop-filter: blur(4px);
-          border-radius: 6px;
-          padding: 6px 12px;
-          font-size: 12px;
-          color: #94a3b8;
-          align-self: flex-start;
-        ">
-          Movement: <strong>WASD / Arrow Keys</strong> | Toggle Speed: <strong>Shift / Click</strong> | Step into Doors to Heal & Shop
+        <!-- Bottom Area: Classic Dialogue Box + Help Bar -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%;">
+          <!-- Classic Pokémon Dialogue Box -->
+          <div id="dialogue-box" style="
+            display: none;
+            width: min(680px, 94vw);
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.97) 0%, rgba(10, 15, 29, 0.99) 100%);
+            border: 3px solid #f8fafc;
+            outline: 3px solid #1e293b;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 0 0 2px #38bdf8;
+            border-radius: 10px;
+            padding: 16px 22px;
+            color: #f8fafc;
+            pointer-events: auto;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+          ">
+            <div id="dialogue-speaker" style="
+              display: none;
+              background: #0284c7;
+              border: 2px solid #f8fafc;
+              color: #ffffff;
+              font-size: 12px;
+              font-weight: 800;
+              letter-spacing: 0.6px;
+              padding: 3px 10px;
+              border-radius: 6px;
+              width: fit-content;
+              margin-bottom: 8px;
+              text-transform: uppercase;
+            "></div>
+            <div id="dialogue-text" style="
+              font-size: 17px;
+              font-weight: 600;
+              line-height: 1.5;
+              min-height: 52px;
+              color: #f8fafc;
+              letter-spacing: 0.2px;
+              white-space: pre-wrap;
+            "></div>
+            <div id="dialogue-prompt" style="
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
+              gap: 6px;
+              font-size: 12px;
+              font-weight: 800;
+              color: #38bdf8;
+              margin-top: 6px;
+            ">
+              <span>SPACE / CLICK</span>
+              <span style="font-size: 14px;">▼</span>
+            </div>
+          </div>
+
+          <!-- Bottom Controls / Help info -->
+          <div style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+          ">
+            <div style="
+              background: rgba(18, 22, 28, 0.8);
+              backdrop-filter: blur(4px);
+              border-radius: 6px;
+              padding: 6px 12px;
+              font-size: 12px;
+              color: #94a3b8;
+            ">
+              Move: <strong>WASD / Arrows</strong> | Talk / Read Signs: <strong>Space / Enter / Z</strong> | Speed: <strong>Shift</strong>
+            </div>
+
+            <button id="interact-btn" style="
+              pointer-events: auto;
+              background: #0284c7;
+              color: #ffffff;
+              border: 1px solid rgba(255, 255, 255, 0.25);
+              border-radius: 6px;
+              padding: 7px 14px;
+              font-size: 13px;
+              font-weight: 800;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
+            ">
+              💬 TALK / READ (Space)
+            </button>
+          </div>
         </div>
     `;
 
@@ -223,14 +312,31 @@ export class OverworldHUD {
     this.routeBanner = this.rootElement.querySelector('#route-banner') as HTMLDivElement;
     this.roamerAlertBanner = this.rootElement.querySelector('#roamer-alert-banner') as HTMLDivElement;
     this.toastBanner = this.rootElement.querySelector('#overworld-toast-banner') as HTMLDivElement;
+    this.dialogueBox = this.rootElement.querySelector('#dialogue-box') as HTMLDivElement;
+    this.dialogueSpeaker = this.rootElement.querySelector('#dialogue-speaker') as HTMLDivElement;
+    this.dialogueText = this.rootElement.querySelector('#dialogue-text') as HTMLDivElement;
+    this.dialoguePrompt = this.rootElement.querySelector('#dialogue-prompt') as HTMLDivElement;
 
     const bagBtn = this.rootElement.querySelector('#bag-btn') as HTMLButtonElement;
     const martBtn = this.rootElement.querySelector('#mart-btn') as HTMLButtonElement;
     const saveBtn = this.rootElement.querySelector('#save-btn') as HTMLButtonElement;
     const pokegearBtn = this.rootElement.querySelector('#pokegear-btn') as HTMLButtonElement;
+    const interactBtn = this.rootElement.querySelector('#interact-btn') as HTMLButtonElement;
     const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
     const closePokegearBtn = this.rootElement.querySelector('#close-pokegear-btn') as HTMLButtonElement;
     const roamerStatusList = this.rootElement.querySelector('#roamer-status-list') as HTMLDivElement;
+
+    this.dialogueBox.addEventListener('click', () => {
+      this.advanceDialogue();
+    });
+
+    interactBtn.addEventListener('click', () => {
+      if (this.dialogueActive) {
+        this.advanceDialogue();
+      } else if (this.options.onInteract) {
+        this.options.onInteract();
+      }
+    });
 
     bagBtn.addEventListener('click', () => {
       if (this.options.onBagOpen) this.options.onBagOpen();
@@ -272,6 +378,90 @@ export class OverworldHUD {
     eventBus.on('roamer:updated', ({ roamers }) => {
       this.updatePokegear(roamers, roamerStatusList);
     });
+  }
+
+  public isDialogueOpen(): boolean {
+    return this.dialogueActive;
+  }
+
+  public openDialogue(pages: string[], speaker?: string, onComplete?: () => void): void {
+    if (!pages || pages.length === 0) return;
+    if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
+
+    this.dialoguePages = pages;
+    this.dialoguePageIndex = 0;
+    this.dialogueOnComplete = onComplete;
+    this.dialogueActive = true;
+    this.activeDirection = null;
+
+    if (speaker) {
+      this.dialogueSpeaker.innerText = speaker;
+      this.dialogueSpeaker.style.display = 'block';
+    } else {
+      this.dialogueSpeaker.style.display = 'none';
+    }
+
+    this.dialogueBox.style.display = 'block';
+    this.startPageTypewriter();
+  }
+
+  private startPageTypewriter(): void {
+    if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
+    const fullText = this.dialoguePages[this.dialoguePageIndex] || '';
+    this.dialogueCharIndex = 0;
+    this.dialogueText.innerText = '';
+    const pageLabel =
+      this.dialoguePages.length > 1 ? `(${this.dialoguePageIndex + 1}/${this.dialoguePages.length}) ` : '';
+    this.dialoguePrompt.style.opacity = '0.4';
+
+    this.dialogueTypeTimer = setInterval(() => {
+      this.dialogueCharIndex++;
+      this.dialogueText.innerText = fullText.slice(0, this.dialogueCharIndex);
+      if (this.dialogueCharIndex >= fullText.length) {
+        if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
+        this.dialogueTypeTimer = undefined;
+        this.dialoguePrompt.innerHTML = `<span>${pageLabel}SPACE / CLICK</span><span style="font-size: 14px;">▼</span>`;
+        this.dialoguePrompt.style.opacity = '1';
+      }
+    }, 18);
+  }
+
+  public advanceDialogue(): void {
+    if (!this.dialogueActive) return;
+
+    const currentFullText = this.dialoguePages[this.dialoguePageIndex] || '';
+    // If typewriter is still revealing characters, complete the current page immediately
+    if (this.dialogueCharIndex < currentFullText.length) {
+      if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
+      this.dialogueTypeTimer = undefined;
+      this.dialogueCharIndex = currentFullText.length;
+      this.dialogueText.innerText = currentFullText;
+      const pageLabel =
+        this.dialoguePages.length > 1 ? `(${this.dialoguePageIndex + 1}/${this.dialoguePages.length}) ` : '';
+      this.dialoguePrompt.innerHTML = `<span>${pageLabel}SPACE / CLICK</span><span style="font-size: 14px;">▼</span>`;
+      this.dialoguePrompt.style.opacity = '1';
+      return;
+    }
+
+    // Move to next page if available
+    if (this.dialoguePageIndex + 1 < this.dialoguePages.length) {
+      this.dialoguePageIndex++;
+      this.startPageTypewriter();
+      return;
+    }
+
+    // Otherwise close dialogue box
+    if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
+    this.dialogueTypeTimer = undefined;
+    this.dialogueActive = false;
+    this.dialogueBox.style.display = 'none';
+    this.computeActiveDirection();
+
+    if (this.dialogueOnComplete) {
+      const cb = this.dialogueOnComplete;
+      this.dialogueOnComplete = undefined;
+      cb();
+    }
   }
 
   public showToast(message: string, durationMs: number = 3200): void {
@@ -378,6 +568,7 @@ export class OverworldHUD {
   }
 
   public getHeldDirection(): Direction | null {
+    if (this.dialogueActive) return null;
     return this.activeDirection;
   }
 
@@ -387,6 +578,18 @@ export class OverworldHUD {
         if (!e.repeat && this.isVisible() && this.options.onSpeedCycle) {
           const nextSpeed = this.options.onSpeedCycle();
           this.updateSpeedDisplay(nextSpeed);
+        }
+        return;
+      }
+
+      if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ' || e.code === 'KeyE') {
+        if (!e.repeat && this.isVisible()) {
+          e.preventDefault();
+          if (this.dialogueActive) {
+            this.advanceDialogue();
+          } else if (this.options.onInteract) {
+            this.options.onInteract();
+          }
         }
         return;
       }
@@ -407,6 +610,10 @@ export class OverworldHUD {
   }
 
   private computeActiveDirection(): void {
+    if (this.dialogueActive) {
+      this.activeDirection = null;
+      return;
+    }
     if (this.heldKeys.has('KeyW') || this.heldKeys.has('ArrowUp')) {
       this.activeDirection = 'UP';
     } else if (this.heldKeys.has('KeyS') || this.heldKeys.has('ArrowDown')) {

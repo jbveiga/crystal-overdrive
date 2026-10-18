@@ -268,5 +268,42 @@
       "targetY": 6
     }
   ],
+  "bgEvents": [
+    {
+      "x": 0,
+      "y": 1,
+      "speaker": "🍳 STOVE",
+      "pages": [
+        "Mom's specialty!",
+        "CINNABAR VOLCANO BURGER!"
+      ]
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "speaker": "🚰 SINK",
+      "pages": [
+        "The sink is spotless. Mom likes it clean."
+      ]
+    },
+    {
+      "x": 2,
+      "y": 1,
+      "speaker": "🧊 FRIDGE",
+      "pages": [
+        "Let's see what's in the fridge…",
+        "FRESH WATER and tasty LEMONADE!"
+      ]
+    },
+    {
+      "x": 4,
+      "y": 1,
+      "speaker": "📺 TELEVISION",
+      "pages": [
+        "There's a movie on TV: Stars dot the sky as two boys ride on a train…",
+        "I'd better get rolling too!"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

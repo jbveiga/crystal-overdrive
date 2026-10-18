@@ -39,6 +39,14 @@ export interface MapConnection {
   offset: number;
 }
 
+export interface BgEvent {
+  x: number;
+  y: number;
+  speaker?: string;
+  pages: string[];
+  action?: 'HEAL_AND_SAVE' | 'OPEN_MART' | 'OPEN_POKEGEAR';
+}
+
 export interface MapData {
   id: string;
   name: string;
@@ -52,6 +60,7 @@ export interface MapData {
   overlayMap?: (string | null)[];
   connections: Partial<Record<'NORTH' | 'EAST' | 'SOUTH' | 'WEST', MapConnection>>;
   warps: WarpEvent[];
+  bgEvents?: BgEvent[];
   grassEncounters: WildEncounterSlot[];
 }
 

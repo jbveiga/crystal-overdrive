@@ -3262,6 +3262,35 @@
     }
   },
   "warps": [],
+  "bgEvents": [
+    {
+      "x": 51,
+      "y": 7,
+      "speaker": "🪧 ROUTE 29 SIGN",
+      "pages": [
+        "ROUTE 29",
+        "CHERRYGROVE CITY - NEW BARK TOWN"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "speaker": "🪧 ROUTE 29 SIGN",
+      "pages": [
+        "ROUTE 29",
+        "CHERRYGROVE CITY - NEW BARK TOWN"
+      ]
+    },
+    {
+      "x": 12,
+      "y": 2,
+      "speaker": "🌳 FRUIT TREE",
+      "pages": [
+        "It's a fruit-bearing tree!",
+        "A fragrant PSNCUREBERRY is growing on the branches!"
+      ]
+    }
+  ],
   "grassEncounters": [
     {
       "speciesId": "pidgey",

@@ -388,5 +388,143 @@
       "targetY": 4
     }
   ],
+  "bgEvents": [
+    {
+      "x": 2,
+      "y": 1,
+      "speaker": "💊 HEALING MACHINE",
+      "pages": [
+        "Placed the POKé BALLS in the healing machine…",
+        "Your POKéMON were restored to full HP & PP!"
+      ],
+      "action": "HEAL_AND_SAVE"
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "speaker": "🪟 LAB WINDOW",
+      "pages": [
+        "The window's open.",
+        "A pleasant breeze is blowing in."
+      ]
+    },
+    {
+      "x": 9,
+      "y": 3,
+      "speaker": "🗑️ TRASH CAN",
+      "pages": [
+        "The wrapper from the snack PROF. ELM ate is in there…"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 5,
+      "speaker": "💻 LAB PC",
+      "pages": [
+        "OBSERVATIONS ON POKéMON EVOLUTION",
+        "…It says on the screen…"
+      ]
+    },
+    {
+      "x": 0,
+      "y": 7,
+      "speaker": "📘 TRAVEL TIP 1",
+      "pages": [
+        "GOLD opened a book.",
+        "Travel Tip 1: Press SPACE or ENTER to read signs and talk to people!"
+      ]
+    },
+    {
+      "x": 1,
+      "y": 7,
+      "speaker": "📘 TRAVEL TIP 2",
+      "pages": [
+        "GOLD opened a book.",
+        "Travel Tip 2: Record your trip with SAVE!"
+      ]
+    },
+    {
+      "x": 2,
+      "y": 7,
+      "speaker": "📘 TRAVEL TIP 3",
+      "pages": [
+        "GOLD opened a book.",
+        "Travel Tip 3: Open your BAG to teach TMs like False Swipe & Mean Look!"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "speaker": "📘 TRAVEL TIP 4",
+      "pages": [
+        "GOLD opened a book.",
+        "Travel Tip 4: Check your POKéGEAR Radar to track Raikou, Entei & Suicune!"
+      ]
+    },
+    {
+      "x": 6,
+      "y": 1,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's crammed full of difficult POKéMON research books!"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's crammed full of difficult POKéMON research books!"
+      ]
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's crammed full of difficult POKéMON research books!"
+      ]
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's crammed full of difficult POKéMON research books!"
+      ]
+    },
+    {
+      "x": 6,
+      "y": 7,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's crammed full of difficult POKéMON research books!"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's crammed full of difficult POKéMON research books!"
+      ]
+    },
+    {
+      "x": 8,
+      "y": 7,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's crammed full of difficult POKéMON research books!"
+      ]
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's crammed full of difficult POKéMON research books!"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

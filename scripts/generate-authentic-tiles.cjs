@@ -271,6 +271,7 @@ function buildMapFromBlk({
   roofGroup = 'nb',
   connections = {},
   warps = [],
+  bgEvents = [],
   grassEncounters = [],
 }) {
   const ts = TILESETS[tileset];
@@ -323,6 +324,7 @@ function buildMapFromBlk({
     tileMap,
     connections,
     warps,
+    bgEvents,
     grassEncounters,
   };
 
@@ -348,6 +350,32 @@ buildMapFromBlk({
     { x: 3, y: 11, targetMapId: 'players_neighbors_house', targetX: 2, targetY: 6 },
     { x: 11, y: 13, targetMapId: 'elms_house', targetX: 2, targetY: 6 },
   ],
+  bgEvents: [
+    {
+      x: 8,
+      y: 8,
+      speaker: '🪧 NEW BARK TOWN SIGN',
+      pages: ['NEW BARK TOWN', 'The Town Where the Winds of a New Beginning Blow'],
+    },
+    {
+      x: 11,
+      y: 5,
+      speaker: '🪧 HOUSE SIGN',
+      pages: ["GOLD's House"],
+    },
+    {
+      x: 3,
+      y: 3,
+      speaker: '🪧 LAB SIGN',
+      pages: ['ELM POKéMON LAB'],
+    },
+    {
+      x: 9,
+      y: 13,
+      speaker: '🪧 HOUSE SIGN',
+      pages: ["ELM'S HOUSE"],
+    },
+  ],
   grassEncounters: [],
 });
 
@@ -364,6 +392,26 @@ buildMapFromBlk({
     WEST: { mapId: 'cherrygrove_city', offset: 0 },
   },
   warps: [],
+  bgEvents: [
+    {
+      x: 51,
+      y: 7,
+      speaker: '🪧 ROUTE 29 SIGN',
+      pages: ['ROUTE 29', 'CHERRYGROVE CITY - NEW BARK TOWN'],
+    },
+    {
+      x: 3,
+      y: 5,
+      speaker: '🪧 ROUTE 29 SIGN',
+      pages: ['ROUTE 29', 'CHERRYGROVE CITY - NEW BARK TOWN'],
+    },
+    {
+      x: 12,
+      y: 2,
+      speaker: '🌳 FRUIT TREE',
+      pages: ["It's a fruit-bearing tree!", 'A fragrant PSNCUREBERRY is growing on the branches!'],
+    },
+  ],
   grassEncounters: [
     { speciesId: 'pidgey', minLevel: 2, maxLevel: 4, weight: 50 },
     { speciesId: 'sentret', minLevel: 2, maxLevel: 3, weight: 35 },
@@ -389,6 +437,32 @@ buildMapFromBlk({
     { x: 25, y: 9, targetMapId: 'guide_gents_house', targetX: 2, targetY: 6 },
     { x: 31, y: 11, targetMapId: 'cherrygrove_evolution_speech_house', targetX: 2, targetY: 6 },
   ],
+  bgEvents: [
+    {
+      x: 30,
+      y: 8,
+      speaker: '🪧 CHERRYGROVE CITY SIGN',
+      pages: ['CHERRYGROVE CITY', 'The City of Cute, Fragrant Flowers'],
+    },
+    {
+      x: 23,
+      y: 9,
+      speaker: '🪧 HOUSE SIGN',
+      pages: ["GUIDE GENT'S HOUSE"],
+    },
+    {
+      x: 24,
+      y: 3,
+      speaker: '🪧 POKéMON MART SIGN',
+      pages: ['Catch All Your POKéMON Needs!', 'POKéMON MART'],
+    },
+    {
+      x: 30,
+      y: 3,
+      speaker: '🪧 POKéMON CENTER SIGN',
+      pages: ['Heal Your POKéMON!', 'POKéMON CENTER'],
+    },
+  ],
   grassEncounters: [],
 });
 
@@ -404,6 +478,69 @@ buildMapFromBlk({
     { x: 4, y: 11, targetMapId: 'new_bark_town', targetX: 6, targetY: 4 },
     { x: 5, y: 11, targetMapId: 'new_bark_town', targetX: 6, targetY: 4 },
   ],
+  bgEvents: [
+    {
+      x: 2,
+      y: 1,
+      speaker: '💊 HEALING MACHINE',
+      pages: ['Placed the POKé BALLS in the healing machine…', 'Your POKéMON were restored to full HP & PP!'],
+      action: 'HEAL_AND_SAVE',
+    },
+    {
+      x: 5,
+      y: 0,
+      speaker: '🪟 LAB WINDOW',
+      pages: ["The window's open.", 'A pleasant breeze is blowing in.'],
+    },
+    {
+      x: 9,
+      y: 3,
+      speaker: '🗑️ TRASH CAN',
+      pages: ['The wrapper from the snack PROF. ELM ate is in there…'],
+    },
+    {
+      x: 3,
+      y: 5,
+      speaker: '💻 LAB PC',
+      pages: ['OBSERVATIONS ON POKéMON EVOLUTION', '…It says on the screen…'],
+    },
+    {
+      x: 0,
+      y: 7,
+      speaker: '📘 TRAVEL TIP 1',
+      pages: ['GOLD opened a book.', 'Travel Tip 1: Press SPACE or ENTER to read signs and talk to people!'],
+    },
+    {
+      x: 1,
+      y: 7,
+      speaker: '📘 TRAVEL TIP 2',
+      pages: ['GOLD opened a book.', 'Travel Tip 2: Record your trip with SAVE!'],
+    },
+    {
+      x: 2,
+      y: 7,
+      speaker: '📘 TRAVEL TIP 3',
+      pages: ['GOLD opened a book.', 'Travel Tip 3: Open your BAG to teach TMs like False Swipe & Mean Look!'],
+    },
+    {
+      x: 3,
+      y: 7,
+      speaker: '📘 TRAVEL TIP 4',
+      pages: ['GOLD opened a book.', 'Travel Tip 4: Check your POKéGEAR Radar to track Raikou, Entei & Suicune!'],
+    },
+    ...[6, 7, 8, 9].map((x) => ({
+      x,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ["It's crammed full of difficult POKéMON research books!"],
+    })),
+    ...[6, 7, 8, 9].map((x) => ({
+      x,
+      y: 7,
+      speaker: '📚 BOOKSHELF',
+      pages: ["It's crammed full of difficult POKéMON research books!"],
+    })),
+  ],
 });
 
 buildMapFromBlk({
@@ -416,6 +553,35 @@ buildMapFromBlk({
   warps: [
     { x: 6, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 6 },
     { x: 7, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 6 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '🍳 STOVE',
+      pages: ["Mom's specialty!", 'CINNABAR VOLCANO BURGER!'],
+    },
+    {
+      x: 1,
+      y: 1,
+      speaker: '🚰 SINK',
+      pages: ['The sink is spotless. Mom likes it clean.'],
+    },
+    {
+      x: 2,
+      y: 1,
+      speaker: '🧊 FRIDGE',
+      pages: ["Let's see what's in the fridge…", 'FRESH WATER and tasty LEMONADE!'],
+    },
+    {
+      x: 4,
+      y: 1,
+      speaker: '📺 TELEVISION',
+      pages: [
+        "There's a movie on TV: Stars dot the sky as two boys ride on a train…",
+        "I'd better get rolling too!",
+      ],
+    },
   ],
 });
 
@@ -430,6 +596,26 @@ buildMapFromBlk({
     { x: 2, y: 7, targetMapId: 'new_bark_town', targetX: 3, targetY: 12 },
     { x: 3, y: 7, targetMapId: 'new_bark_town', targetX: 3, targetY: 12 },
   ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+    {
+      x: 1,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+    {
+      x: 7,
+      y: 1,
+      speaker: '📻 RADIO',
+      pages: ["PROF. OAK'S POKéMON TALK! Please tune in next time!", 'This is DJ MARY, your co-host! POKéMON CHANNEL…'],
+    },
+  ],
 });
 
 buildMapFromBlk({
@@ -442,6 +628,30 @@ buildMapFromBlk({
   warps: [
     { x: 2, y: 7, targetMapId: 'new_bark_town', targetX: 11, targetY: 14 },
     { x: 3, y: 7, targetMapId: 'new_bark_town', targetX: 11, targetY: 14 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '💻 PROF. ELM PC',
+      pages: [
+        '"POKéMON. Where do they come from? Where are they going?"',
+        '"Why has no one ever witnessed a POKéMON\'s birth? I want to know! I will dedicate my life to the study of POKéMON!"',
+        "…It's a part of PROF. ELM's research papers.",
+      ],
+    },
+    {
+      x: 6,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ["It's crammed full of difficult POKéMON books."],
+    },
+    {
+      x: 7,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ["It's crammed full of difficult POKéMON books."],
+    },
   ],
 });
 
@@ -456,6 +666,7 @@ buildMapFromBlk({
     { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 23, targetY: 4 },
     { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 23, targetY: 4 },
   ],
+  bgEvents: [],
 });
 
 buildMapFromBlk({
@@ -468,6 +679,14 @@ buildMapFromBlk({
   warps: [
     { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 29, targetY: 4 },
     { x: 4, y: 7, targetMapId: 'cherrygrove_city', targetX: 29, targetY: 4 },
+  ],
+  bgEvents: [
+    {
+      x: 9,
+      y: 1,
+      speaker: "💻 BILL'S PC",
+      pages: ["Accessed BILL'S PC!", 'POKéMON Storage System is online and synced.'],
+    },
   ],
 });
 
@@ -482,6 +701,20 @@ buildMapFromBlk({
     { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 25, targetY: 10 },
     { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 25, targetY: 10 },
   ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+    {
+      x: 1,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+  ],
 });
 
 buildMapFromBlk({
@@ -495,6 +728,20 @@ buildMapFromBlk({
     { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 17, targetY: 8 },
     { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 17, targetY: 8 },
   ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+    {
+      x: 1,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+  ],
 });
 
 buildMapFromBlk({
@@ -507,6 +754,20 @@ buildMapFromBlk({
   warps: [
     { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 31, targetY: 12 },
     { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 31, targetY: 12 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+    {
+      x: 1,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
   ],
 });
 

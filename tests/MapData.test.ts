@@ -141,5 +141,23 @@ describe('MapData & Authentic Tile Integrity', () => {
       }
     }
   });
+
+  it('validates authentic street signs and indoor bgEvents across maps', () => {
+    const nbt: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/new_bark_town.json'), 'utf8')
+    );
+    expect(nbt.bgEvents).toBeDefined();
+    expect(nbt.bgEvents!.length).toBe(4);
+    const townSign = nbt.bgEvents!.find((bg) => bg.x === 8 && bg.y === 8);
+    expect(townSign).toBeDefined();
+    expect(townSign?.pages[0]).toContain('NEW BARK TOWN');
+
+    const lab: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/elms_lab.json'), 'utf8')
+    );
+    expect(lab.bgEvents).toBeDefined();
+    const healMachine = lab.bgEvents!.find((bg) => bg.x === 2 && bg.y === 1);
+    expect(healMachine?.action).toBe('HEAL_AND_SAVE');
+  });
 });
 

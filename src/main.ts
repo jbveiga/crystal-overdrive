@@ -141,6 +141,8 @@ async function bootstrap() {
     saveCurrentGame();
   });
 
+  let handleInteract = () => {};
+
   const overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
       const newSpeed = gameClock.cyclePlayerSpeed();
@@ -155,6 +157,9 @@ async function bootstrap() {
     },
     onSaveGame: () => {
       saveCurrentGame();
+    },
+    onInteract: () => {
+      handleInteract();
     },
   });
   overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
@@ -203,44 +208,268 @@ async function bootstrap() {
     isPlayer: true,
   };
 
-  // Town NPC (Authentic NewBarkTown.asm coordinate: 6, 8)
-  const npc: GridEntity = {
-    id: 'town_npc',
-    x: 6,
-    y: 8,
-    targetX: 6,
-    targetY: 8,
-    renderX: 6,
-    renderY: 8,
-    direction: 'DOWN',
+  const makeNpc = (
+    id: string,
+    x: number,
+    y: number,
+    direction: Direction,
+    spriteType: GridEntity['spriteType'],
+    speaker: string,
+    pages: string[],
+    opts: { wanders?: boolean; talkAcrossCounter?: boolean; action?: GridEntity['action'] } = {}
+  ): GridEntity => ({
+    id,
+    x,
+    y,
+    targetX: x,
+    targetY: y,
+    renderX: x,
+    renderY: y,
+    direction,
     isMoving: false,
     progress: 0,
     isPlayer: false,
+    spriteType,
+    speaker,
+    pages,
+    wanders: opts.wanders ?? false,
+    talkAcrossCounter: opts.talkAcrossCounter ?? false,
+    action: opts.action,
+  });
+
+  const npcsByMap: Record<string, GridEntity[]> = {
+    new_bark_town: [
+      makeNpc(
+        'nbt_teacher',
+        6,
+        8,
+        'DOWN',
+        'girl',
+        '👩‍🏫 TEACHER',
+        [
+          'Wow, your POKéGEAR is impressive! Did your mom get it for you?',
+          'Oh! Your POKéMON is adorable! I wish I had one!',
+        ],
+        { wanders: true }
+      ),
+      makeNpc(
+        'nbt_fisher',
+        12,
+        9,
+        'DOWN',
+        'fat_man',
+        '🎣 FISHER',
+        ['Yo, GOLD!', 'I hear PROF. ELM discovered some new POKéMON.'],
+        { wanders: true }
+      ),
+      makeNpc('nbt_rival', 3, 2, 'RIGHT', 'boy', '❓ RIVAL ???', [
+        '<……>\nSo this is the famous ELM POKéMON LAB…',
+        '…What are you staring at?',
+      ]),
+    ],
+    route_29: [
+      makeNpc('r29_dude', 50, 12, 'DOWN', 'boy', '🧢 CATCHING DUDE', [
+        "POKéMON hide in the grass. Who knows when they'll pop out…",
+        'If you weaken them first, POKéMON are much easier to catch!',
+      ]),
+      makeNpc(
+        'youngster_joey',
+        28,
+        6,
+        'DOWN',
+        'boy',
+        '👦 YOUNGSTER JOEY',
+        [
+          'Yo! My RATTATA is in the top percentage of all RATTATA!',
+          'If your POKéMON are weak and not ready for battle, keep out of the grass!',
+        ],
+        { action: 'TRAINER_JOEY' }
+      ),
+      makeNpc(
+        'r29_teacher',
+        15,
+        11,
+        'RIGHT',
+        'girl',
+        '👩‍🏫 TEACHER',
+        [
+          "See those ledges? It's scary to jump off them.",
+          'But you can go to NEW BARK without walking through the grass.',
+        ],
+        { wanders: true }
+      ),
+      makeNpc('r29_fisher', 25, 3, 'UP', 'fat_man', '🎣 FISHER', [
+        'I wanted to take a break, so I saved to record my progress.',
+      ]),
+    ],
+    cherrygrove_city: [
+      makeNpc('cg_guide_gent', 32, 6, 'DOWN', 'fat_man', '👴 GUIDE GENT', [
+        "You're a rookie trainer, aren't you? I can tell!",
+        "That's OK! Everyone is a rookie at some point!",
+        'POKéGEAR becomes more useful as you add CARDS. I wish you luck on your journey!',
+      ]),
+      makeNpc(
+        'cg_teacher',
+        27,
+        12,
+        'LEFT',
+        'girl',
+        '👩‍🏫 TEACHER',
+        [
+          'Did you talk to the old man by the POKéMON CENTER?',
+          "When you're with POKéMON, going anywhere is fun.",
+        ],
+        { wanders: true }
+      ),
+      makeNpc(
+        'cg_youngster',
+        23,
+        7,
+        'RIGHT',
+        'boy',
+        '👦 YOUNGSTER',
+        [
+          'I battled the trainers on the road.',
+          "My POKéMON lost. They're a mess! I must take them to a POKéMON CENTER.",
+        ],
+        { wanders: true }
+      ),
+      makeNpc('cg_fisher', 7, 12, 'RIGHT', 'fat_man', '🎣 MYSTIC WATER GUY', [
+        "A POKéMON I caught had an item. I think it's MYSTIC WATER.",
+        'Back to fishing for me, then.',
+      ]),
+    ],
+    elms_lab: [
+      makeNpc(
+        'elm_npc',
+        5,
+        2,
+        'DOWN',
+        'fat_man',
+        '🔬 PROF. ELM',
+        [
+          'Hi, GOLD! Raikou, Entei, and Suicune are roaming across Johto!',
+          'Check your POKéGEAR Roamer Radar whenever you change routes to track them.',
+          'Here—let me heal your POKéMON and record your research progress!',
+        ],
+        { action: 'HEAL_AND_SAVE' }
+      ),
+      makeNpc('elm_aide', 2, 9, 'UP', 'boy', '🥼 LAB AIDE', [
+        'There was a loud noise outside…',
+        'To add to your POKéDEX, you have to catch POKéMON. Throw POKé BALLS at wild POKéMON to get them!',
+      ]),
+    ],
+    players_house_1f: [
+      makeNpc(
+        'mom_npc',
+        7,
+        4,
+        'LEFT',
+        'girl',
+        '🏠 MOM',
+        [
+          'Oh, GOLD…! Your POKéMON GEAR is back from the repair shop.',
+          'Rest up for a moment, sweetheart! Your POKéMON are looking fit and energized!',
+        ],
+        { action: 'HEAL_AND_SAVE' }
+      ),
+      makeNpc('neighbor_visit_npc', 4, 4, 'RIGHT', 'kris', '🏡 NEIGHBOR', [
+        'Good day! PROF. ELM discovered that PIKACHU is an evolved POKéMON.',
+        "My daughter is adamant about becoming PROF. ELM's assistant. She really loves POKéMON!",
+      ]),
+    ],
+    players_neighbors_house: [
+      makeNpc('neighbor_daughter', 2, 3, 'RIGHT', 'kris', "👧 NEIGHBOR'S DAUGHTER", [
+        "PIKACHU is an evolved POKéMON. I was amazed by PROF. ELM's findings.",
+        "He's so famous for his research on POKéMON evolution… I wish I could be a researcher like him…",
+      ]),
+    ],
+    elms_house: [
+      makeNpc('elms_wife', 1, 5, 'RIGHT', 'girl', "👩 PROF. ELM'S WIFE", [
+        "Hi, GOLD! My husband's always so busy—I hope he's OK.",
+        "When he's caught up in his POKéMON research, he even forgets to eat.",
+      ]),
+      makeNpc('elms_son', 5, 4, 'UP', 'boy', "👦 PROF. ELM'S SON", [
+        "When I grow up, I'm going to help my dad!",
+        "I'm going to be a great POKéMON professor!",
+      ]),
+    ],
+    cherrygrove_poke_center: [
+      makeNpc(
+        'nurse_joy',
+        3,
+        1,
+        'DOWN',
+        'girl',
+        '👩‍⚕️ NURSE JOY',
+        [
+          'Welcome to our POKéMON CENTER!',
+          'We can heal your POKéMON to perfect health in no time at all.',
+          'Your fighting party has been restored to full HP & PP. We hope to see you again!',
+        ],
+        { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
+      ),
+      makeNpc('pc_fisher', 2, 3, 'UP', 'fat_man', '🎣 FISHER', [
+        "It's great. I can store any number of POKéMON, and it's all free.",
+      ]),
+      makeNpc('pc_gentleman', 8, 6, 'UP', 'fat_man', '🎩 GENTLEMAN', [
+        'That PC in the corner is free for any trainer to use.',
+      ]),
+      makeNpc('pc_teacher', 1, 6, 'RIGHT', 'girl', '👩‍🏫 TEACHER', [
+        'The COMMUNICATION CENTER upstairs was just built.',
+        'I traded POKéMON there already!',
+      ]),
+    ],
+    cherrygrove_mart: [
+      makeNpc(
+        'mart_clerk',
+        1,
+        3,
+        'RIGHT',
+        'fat_man',
+        '🏪 MART CLERK',
+        ['Welcome to CHERRYGROVE POKé MART! How may I serve you?'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+      makeNpc(
+        'mart_cooltrainer',
+        7,
+        6,
+        'LEFT',
+        'boy',
+        '🧢 COOLTRAINER',
+        ['POKé BALLS are in stock! Now I can catch POKéMON!'],
+        { wanders: true }
+      ),
+      makeNpc('mart_youngster', 2, 5, 'DOWN', 'boy', '👦 YOUNGSTER', [
+        'When I was walking in the grass, a bug POKéMON poisoned my POKéMON!',
+        'You should always keep an ANTIDOTE with you.',
+      ]),
+    ],
+    guide_gents_house: [
+      makeNpc('house_guide_gent', 2, 3, 'RIGHT', 'fat_man', '👴 GUIDE GENT', [
+        'When I was a wee lad, I was a hot-shot trainer!',
+        "Here's a word of advice: Catch lots of POKéMON! Treat them all with kindness!",
+      ]),
+    ],
+    cherrygrove_gym_speech_house: [
+      makeNpc('gym_speech_npc', 2, 3, 'RIGHT', 'boy', '👦 TRAINER', [
+        "You're trying to see how good you are as a POKéMON trainer?",
+        'You better visit the POKéMON GYMS all over JOHTO and collect BADGES!',
+      ]),
+    ],
+    cherrygrove_evolution_speech_house: [
+      makeNpc('evo_speech_npc', 3, 5, 'LEFT', 'girl', '👧 LASS', [
+        'POKéMON gain experience in battle and change their form.',
+        'Their appearance changes, and sometimes even their type!',
+      ]),
+    ],
   };
 
-  // Route 29 Trainer: Youngster Joey (standing on main path at 28, 6)
-  const joeyNpc: GridEntity = {
-    id: 'youngster_joey',
-    x: 28,
-    y: 6,
-    targetX: 28,
-    targetY: 6,
-    renderX: 28,
-    renderY: 6,
-    direction: 'DOWN',
-    isMoving: false,
-    progress: 0,
-    isPlayer: false,
-  };
-
-  // Pre-allocated NPC & obstacle arrays for zero-allocation 60Hz ticker loop
-  const townNpcs: GridEntity[] = [npc];
-  const route29Npcs: GridEntity[] = [joeyNpc];
   const emptyNpcs: GridEntity[] = [];
-  const playerObstacles: GridEntity[] = [player];
+  const npcObstaclesScratch: GridEntity[] = [];
 
   let npcMoveTimer = 0;
-  let npcHeldDir: Direction | null = null;
   const directions: Direction[] = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
 
   // Handle Map Border Transition Helper
@@ -459,6 +688,81 @@ async function bootstrap() {
     );
   };
 
+  const getOppositeDirection = (dir: Direction): Direction => {
+    switch (dir) {
+      case 'UP':
+        return 'DOWN';
+      case 'DOWN':
+        return 'UP';
+      case 'LEFT':
+        return 'RIGHT';
+      case 'RIGHT':
+        return 'LEFT';
+    }
+  };
+
+  handleInteract = () => {
+    if (gameState !== 'OVERWORLD' || player.isMoving || overworldHUD.isDialogueOpen()) return;
+    const currentMap = mapManager.getCurrentMap();
+    if (!currentMap) return;
+
+    const { dx, dy } = GridPhysics.getDirectionDelta(player.direction);
+    const facingX = player.x + dx;
+    const facingY = player.y + dy;
+    const acrossX = player.x + dx * 2;
+    const acrossY = player.y + dy * 2;
+
+    // 1. Check NPCs on current map (direct facing tile or across a counter)
+    const activeNpcs = npcsByMap[currentMap.id] || emptyNpcs;
+    for (let i = 0; i < activeNpcs.length; i++) {
+      const targetNpc = activeNpcs[i];
+      const isDirect = targetNpc.x === facingX && targetNpc.y === facingY;
+      const isAcrossCounter =
+        targetNpc.talkAcrossCounter === true && targetNpc.x === acrossX && targetNpc.y === acrossY;
+
+      if (isDirect || isAcrossCounter) {
+        // Turn NPC toward player if not mid-step
+        if (!targetNpc.isMoving) {
+          targetNpc.direction = getOppositeDirection(player.direction);
+        }
+
+        if (targetNpc.pages && targetNpc.pages.length > 0) {
+          overworldHUD.openDialogue(targetNpc.pages, targetNpc.speaker, () => {
+            if (targetNpc.action === 'HEAL_AND_SAVE') {
+              healPlayerParty();
+              saveCurrentGame();
+              overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
+            } else if (targetNpc.action === 'OPEN_MART') {
+              bagUI.openMart();
+            } else if (targetNpc.action === 'TRAINER_JOEY' && !defeatedTrainers.has('youngster_joey')) {
+              defeatedTrainers.add('youngster_joey');
+              const joeyRattata = PokemonFactory.create('rattata', 4, ['tackle', 'tailwhip', 'quickattack']);
+              triggerBattle(joeyRattata, {
+                isTrainer: true,
+                trainerName: 'Youngster Joey',
+              });
+            }
+          });
+        }
+        return;
+      }
+    }
+
+    // 2. Check Street Signs & Interactive Background Objects (bgEvents)
+    const bgEvent = mapManager.checkBgEvent(facingX, facingY);
+    if (bgEvent && bgEvent.pages.length > 0) {
+      overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
+        if (bgEvent.action === 'HEAL_AND_SAVE') {
+          healPlayerParty();
+          saveCurrentGame();
+          overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
+        } else if (bgEvent.action === 'OPEN_MART') {
+          bagUI.openMart();
+        }
+      });
+    }
+  };
+
   // 8. Decoupled Main Ticker Loop
   overworldRenderer.app.ticker.add((ticker) => {
     const rawDeltaSec = ticker.deltaMS / 1000;
@@ -466,14 +770,8 @@ async function bootstrap() {
     const currentMap = mapManager.getCurrentMap();
 
     if (gameState === 'OVERWORLD') {
-      // Update Player with dtPlayer (1x / 2x / 3x)
       // Active NPCs on this map (Zero per-frame array allocations)
-      const activeNpcs =
-        currentMap?.id === 'route_29'
-          ? route29Npcs
-          : currentMap?.id === 'new_bark_town'
-            ? townNpcs
-            : emptyNpcs;
+      const activeNpcs = currentMap ? npcsByMap[currentMap.id] || emptyNpcs : emptyNpcs;
 
       const heldDir = overworldHUD.getHeldDirection();
       GridPhysics.updateEntity(
@@ -502,28 +800,6 @@ async function bootstrap() {
 
             overworldRenderer.renderMap(targetMap, lookupMap);
             overworldHUD.updateRouteName(targetMap.name);
-
-            if (isEnteringIndoor) {
-              if (warp.targetMapId === 'cherrygrove_mart') {
-                overworldHUD.showToast('🏪 Welcome to Cherrygrove Poké Mart! Browse badge-gated Pokéballs.');
-                bagUI.openMart();
-              } else if (warp.targetMapId === 'cherrygrove_poke_center') {
-                healPlayerParty();
-                saveCurrentGame();
-                overworldHUD.showToast('💖 Cherrygrove Pokémon Center: Your party was restored to full HP & PP!');
-              } else if (warp.targetMapId === 'elms_lab') {
-                healPlayerParty();
-                overworldHUD.showToast('🔬 Prof. Elm: "Raikou, Entei & Suicune are roaming Johto! Use your Pokégear!"');
-              } else if (warp.targetMapId === 'players_house_1f') {
-                healPlayerParty();
-                saveCurrentGame();
-                overworldHUD.showToast('🏠 Mom: "Rest up, sweetheart! Your Pokémon are looking fit and energized!"');
-              } else if (warp.targetMapId === 'guide_gents_house') {
-                overworldHUD.showToast('🗺️ Guide Gent: "Check your Pokégear Map to track the Legendary Beasts!"');
-              } else {
-                overworldHUD.showToast('🏡 Neighbor: "Tip: Teach TM54 False Swipe & TM99 Mean Look from your Bag!"');
-              }
-            }
             return;
           }
 
@@ -535,11 +811,20 @@ async function bootstrap() {
             (player.y === 7 || player.y === 8)
           ) {
             defeatedTrainers.add('youngster_joey');
-            const joeyRattata = PokemonFactory.create('rattata', 4, ['tackle', 'tailwhip', 'quickattack']);
-            triggerBattle(joeyRattata, {
-              isTrainer: true,
-              trainerName: 'Youngster Joey',
-            });
+            overworldHUD.openDialogue(
+              [
+                'YOUNGSTER JOEY: I just lost, so I\'m trying to find more POKéMON!',
+                'Wait! You look weak! Come on, let\'s battle!',
+              ],
+              '👦 YOUNGSTER JOEY',
+              () => {
+                const joeyRattata = PokemonFactory.create('rattata', 4, ['tackle', 'tailwhip', 'quickattack']);
+                triggerBattle(joeyRattata, {
+                  isTrainer: true,
+                  trainerName: 'Youngster Joey',
+                });
+              }
+            );
             return;
           }
 
@@ -563,32 +848,44 @@ async function bootstrap() {
       );
 
       // Update NPCs with dtWorld (strictly 1.0x world speed), colliding with player and staying in bounds
-      npcMoveTimer += dtWorld;
-      if (npcMoveTimer > 2.0 && !npc.isMoving) {
-        npcMoveTimer = 0;
-        npcHeldDir = Math.random() < 0.6 ? directions[Math.floor(Math.random() * 4)] : null;
+      if (!overworldHUD.isDialogueOpen()) {
+        npcMoveTimer += dtWorld;
+        const triggerNewWanderStep = npcMoveTimer > 1.8;
+        if (triggerNewWanderStep) {
+          npcMoveTimer = 0;
+        }
+
+        // Populate shared obstacle scratch array with player + all active NPCs (zero allocation)
+        npcObstaclesScratch.length = 0;
+        npcObstaclesScratch.push(player);
+        for (let i = 0; i < activeNpcs.length; i++) {
+          npcObstaclesScratch.push(activeNpcs[i]);
+        }
+
+        for (let i = 0; i < activeNpcs.length; i++) {
+          const npcEntity = activeNpcs[i];
+          if (!npcEntity.wanders) continue;
+
+          const desiredDir =
+            triggerNewWanderStep && !npcEntity.isMoving && Math.random() < 0.55
+              ? directions[Math.floor(Math.random() * 4)]
+              : null;
+
+          GridPhysics.updateEntity(
+            npcEntity,
+            dtWorld,
+            desiredDir,
+            mapManager.isWalkableInBounds,
+            mapManager.getTileType,
+            undefined,
+            npcObstaclesScratch
+          );
+        }
       }
 
-      if (currentMap?.id === 'new_bark_town') {
-        GridPhysics.updateEntity(
-          npc,
-          dtWorld,
-          npcHeldDir,
-          mapManager.isWalkableInBounds,
-          mapManager.getTileType,
-          undefined,
-          playerObstacles
-        );
-      }
-
-      // Render active map after any border transitions during this tick
+      // Render active map after any border/warp transitions during this tick
       const mapAfterMove = mapManager.getCurrentMap();
-      const npcsToRender =
-        mapAfterMove?.id === 'route_29'
-          ? route29Npcs
-          : mapAfterMove?.id === 'new_bark_town'
-            ? townNpcs
-            : emptyNpcs;
+      const npcsToRender = mapAfterMove ? npcsByMap[mapAfterMove.id] || emptyNpcs : emptyNpcs;
       overworldRenderer.update(player, npcsToRender, dtWorld);
     }
   });

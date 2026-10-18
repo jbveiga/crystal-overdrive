@@ -220,5 +220,32 @@
       "targetY": 12
     }
   ],
+  "bgEvents": [
+    {
+      "x": 0,
+      "y": 1,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…"
+      ]
+    },
+    {
+      "x": 1,
+      "y": 1,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 1,
+      "speaker": "📻 RADIO",
+      "pages": [
+        "PROF. OAK'S POKéMON TALK! Please tune in next time!",
+        "This is DJ MARY, your co-host! POKéMON CHANNEL…"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

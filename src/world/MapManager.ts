@@ -1,4 +1,4 @@
-import type { MapData, TileCoord, WarpEvent } from '../types/game';
+import type { BgEvent, MapData, TileCoord, WarpEvent } from '../types/game';
 
 export interface WildEncounterResult {
   speciesId: string;
@@ -87,6 +87,14 @@ export class MapManager {
   checkWarp(coord: TileCoord): WarpEvent | undefined {
     if (!this.currentMap) return undefined;
     return this.currentMap.warps.find((w) => w.x === coord.x && w.y === coord.y);
+  }
+
+  /**
+   * Checks if coordinate has an interactive sign or background event
+   */
+  checkBgEvent(x: number, y: number): BgEvent | undefined {
+    if (!this.currentMap || !this.currentMap.bgEvents) return undefined;
+    return this.currentMap.bgEvents.find((bg) => bg.x === x && bg.y === y);
   }
 
   /**

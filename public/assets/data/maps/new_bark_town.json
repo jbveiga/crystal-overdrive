@@ -1127,5 +1127,40 @@
       "targetY": 6
     }
   ],
+  "bgEvents": [
+    {
+      "x": 8,
+      "y": 8,
+      "speaker": "🪧 NEW BARK TOWN SIGN",
+      "pages": [
+        "NEW BARK TOWN",
+        "The Town Where the Winds of a New Beginning Blow"
+      ]
+    },
+    {
+      "x": 11,
+      "y": 5,
+      "speaker": "🪧 HOUSE SIGN",
+      "pages": [
+        "GOLD's House"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 3,
+      "speaker": "🪧 LAB SIGN",
+      "pages": [
+        "ELM POKéMON LAB"
+      ]
+    },
+    {
+      "x": 9,
+      "y": 13,
+      "speaker": "🪧 HOUSE SIGN",
+      "pages": [
+        "ELM'S HOUSE"
+      ]
+    }
+  ],
   "grassEncounters": []
 }
