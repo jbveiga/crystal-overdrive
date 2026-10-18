@@ -342,8 +342,8 @@ export class OverworldRenderer {
     const playerTex = this.getFrameForEntity(this.playerFrames, player.direction, player.isMoving, player.progress);
     this.playerSprite.texture = playerTex;
 
-    // Flip side frame horizontally for LEFT
-    if (player.direction === 'LEFT') {
+    // Raw side frames naturally face LEFT; mirror horizontally for RIGHT
+    if (player.direction === 'RIGHT') {
       this.playerSprite.scale.set(-scale, scale);
     } else {
       this.playerSprite.scale.set(scale, scale);
@@ -373,7 +373,7 @@ export class OverworldRenderer {
       const npcTex = this.getFrameForEntity(this.npcBoyFrames, npc.direction, npc.isMoving, npc.progress);
       sprite.texture = npcTex;
 
-      if (npc.direction === 'LEFT') {
+      if (npc.direction === 'RIGHT') {
         sprite.scale.set(-scale, scale);
       } else {
         sprite.scale.set(scale, scale);
