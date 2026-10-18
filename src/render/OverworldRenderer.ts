@@ -131,16 +131,19 @@ export class OverworldRenderer {
     };
 
     return {
-      // Gen 2 sprite sheet layout per direction: walk1, stand, walk2
-      // Stand is the MIDDLE frame (idx 1, 4, 7), not the first
-      downStand: getFrame(1),
-      downWalk1: getFrame(0),
-      downWalk2: getFrame(2),
-      upStand: getFrame(4),
-      upWalk1: getFrame(3),
-      upWalk2: getFrame(5),
-      sideStand: getFrame(7),
-      sideWalk1: getFrame(6),
+      // Confirmed layout from raw pixel inspection:
+      // Indices 0, 1, 2: Stand frames (Down, Up, Side)
+      // Indices 3, 4: Down Walk frames (Left foot, Right foot)
+      // Indices 5, 6: Up Walk frames (Left foot, Right foot)
+      // Indices 7, 8: Side Walk frames (Left foot, Right foot)
+      downStand: getFrame(0),
+      upStand: getFrame(1),
+      sideStand: getFrame(2),
+      downWalk1: getFrame(3),
+      downWalk2: getFrame(4),
+      upWalk1: getFrame(5),
+      upWalk2: getFrame(6),
+      sideWalk1: getFrame(7),
       sideWalk2: getFrame(8),
     };
   }
@@ -347,6 +350,13 @@ export class OverworldRenderer {
     }
 
     // 2. Update NPCs
+    const activeNpcIds = new Set(npcs.map((n) => n.id));
+    for (const [id, sprite] of this.npcSprites.entries()) {
+      if (!activeNpcIds.has(id)) {
+        sprite.visible = false;
+      }
+    }
+
     for (const npc of npcs) {
       let sprite = this.npcSprites.get(npc.id);
       if (!sprite) {
@@ -356,6 +366,7 @@ export class OverworldRenderer {
         this.entityContainer.addChild(sprite);
         this.npcSprites.set(npc.id, sprite);
       }
+      sprite.visible = true;
 
       const npcPxX = (npc.renderX + 0.5) * this.tileSize;
       const npcPxY = (npc.renderY + 0.85) * this.tileSize;
