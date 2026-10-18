@@ -97,6 +97,73 @@ export class OverworldRenderer {
       'lab_wall',
       'lab_window',
       'lab_door',
+      // 66 Authentic pret/pokecrystal 64x64 Johto quadrant tiles
+      'jt_03_05_05_05',
+      'jt_04_04_04_04',
+      'jt_05_05_05_03',
+      'jt_05_05_05_05',
+      'jt_05_05_4c_4c',
+      'jt_05_3d_05_3d',
+      'jt_05_3d_4c_4d',
+      'jt_06_06_06_06',
+      'jt_07_07_02_02',
+      'jt_07_07_07_07',
+      'jt_07_07_07_26',
+      'jt_07_1c_02_16',
+      'jt_07_1c_07_1c',
+      'jt_07_1c_26_1c',
+      'jt_08_09_17_17',
+      'jt_0d_0e_0a_0b_cg',
+      'jt_0d_0e_0a_0b_nb',
+      'jt_0e_0e_0b_0b_cg',
+      'jt_0e_0e_0b_0b_nb',
+      'jt_0e_0f_0b_0c_cg',
+      'jt_0e_0f_0b_0c_nb',
+      'jt_10_11_0a_0b_cg',
+      'jt_10_11_0a_0b_nb',
+      'jt_10_11_0d_0e_cg',
+      'jt_10_11_0d_0e_nb',
+      'jt_11_11_0b_0b_cg',
+      'jt_11_11_0b_0b_nb',
+      'jt_11_11_0e_0e_cg',
+      'jt_11_11_0e_0e_nb',
+      'jt_11_12_0b_0c_cg',
+      'jt_11_12_0b_0c_nb',
+      'jt_11_12_0e_0f_cg',
+      'jt_11_12_0e_0f_nb',
+      'jt_13_15_45_1d',
+      'jt_14_14_14_14',
+      'jt_14_3b_14_3b',
+      'jt_14_4b_14_14',
+      'jt_18_19_17_17',
+      'jt_1a_07_01_02',
+      'jt_1a_07_1a_07',
+      'jt_1a_1b_01_02',
+      'jt_1a_1b_1a_1b',
+      'jt_1a_1b_1a_26',
+      'jt_1b_1b_02_02',
+      'jt_1b_1b_1b_1b',
+      'jt_1b_1b_1b_26',
+      'jt_1b_1b_26_1b',
+      'jt_1b_1c_02_16',
+      'jt_1b_1c_26_1c',
+      'jt_1e_1f_2e_2f',
+      'jt_1e_1f_3e_3f',
+      'jt_2b_2c_3b_3c',
+      'jt_2c_2d_3c_3d',
+      'jt_2e_2f_3e_3f',
+      'jt_37_38_39_3a',
+      'jt_3b_05_3b_05',
+      'jt_3b_05_4b_4c',
+      'jt_3b_3c_4b_4c',
+      'jt_3c_3c_3c_3c',
+      'jt_3c_3d_4c_4d',
+      'jt_3d_14_3d_14',
+      'jt_4c_4c_14_14',
+      'jt_4d_14_14_14',
+      'jt_4e_4f_5e_5f',
+      'jt_58_58_58_58',
+      'jt_5c_4c_3d_14',
     ];
 
     for (const name of tileNames) {
@@ -183,9 +250,9 @@ export class OverworldRenderer {
           const px = x * this.tileSize;
           const py = y * this.tileSize;
 
-          // Always render base grass underneath, except for deep ocean water
-          const isDeepWater = tileName === 'water';
-          if (!isDeepWater) {
+          // Authentic jt_* tiles are complete opaque 64x64 GBC quadrants; legacy tiles render over grass
+          const isOpaqueTile = tileName === 'water' || tileName.startsWith('jt_');
+          if (!isOpaqueTile) {
             const baseSprite = new Sprite(grassTex);
             baseSprite.position.set(px, py);
             baseSprite.width = this.tileSize;

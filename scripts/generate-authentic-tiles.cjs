@@ -3,41 +3,84 @@ const path = require('path');
 const zlib = require('zlib');
 
 const projectRoot = path.resolve(__dirname, '..');
+const RAW_DIR = '/Users/bernardo/.gemini/antigravity/brain/4243653b-22ad-4a20-bb03-8ed14dca67e2/scratch/pokecrystal_raw';
+const LOCAL_RAW_DIR = path.join(__dirname, 'pokecrystal_raw');
 const TILES_DIR = path.join(projectRoot, 'public/assets/tiles');
+const MAPS_DIR = path.join(projectRoot, 'public/assets/data/maps');
 
-if (!fs.existsSync(TILES_DIR)) {
-  fs.mkdirSync(TILES_DIR, { recursive: true });
+// Copy raw pokecrystal files into scripts/pokecrystal_raw if present in scratch
+if (fs.existsSync(RAW_DIR)) {
+  fs.mkdirSync(LOCAL_RAW_DIR, { recursive: true });
+  for (const f of fs.readdirSync(RAW_DIR)) {
+    fs.copyFileSync(path.join(RAW_DIR, f), path.join(LOCAL_RAW_DIR, f));
+  }
 }
 
-function hexToRgba(hex) {
-  if (hex === 'transparent' || hex === 'none') {
-    return [0, 0, 0, 0];
+const SOURCE_DIR = fs.existsSync(LOCAL_RAW_DIR) ? LOCAL_RAW_DIR : RAW_DIR;
+
+function decode2BitPng(filePath) {
+  const buf = fs.readFileSync(filePath);
+  const width = buf.readUInt32BE(16);
+  const height = buf.readUInt32BE(20);
+  let pos = 8;
+  const idat = [];
+  while (pos < buf.length) {
+    const len = buf.readUInt32BE(pos);
+    const type = buf.toString('ascii', pos + 4, pos + 8);
+    const data = buf.subarray(pos + 8, pos + 8 + len);
+    if (type === 'IDAT') idat.push(data);
+    pos += 12 + len;
   }
-  hex = hex.replace('#', '');
-  const num = parseInt(hex, 16);
-  if (hex.length === 8) {
-    return [(num >> 24) & 255, (num >> 16) & 255, (num >> 8) & 255, num & 255];
+  const raw = zlib.inflateSync(Buffer.concat(idat));
+  const rowBytes = Math.ceil((width * 2) / 8);
+  const stride = 1 + rowBytes;
+  const pixels = new Uint8Array(width * height);
+  const prevRow = new Uint8Array(rowBytes);
+  for (let y = 0; y < height; y++) {
+    const filter = raw[y * stride];
+    const row = new Uint8Array(rowBytes);
+    for (let i = 0; i < rowBytes; i++) {
+      const x = raw[y * stride + 1 + i];
+      const a = i >= 1 ? row[i - 1] : 0;
+      const b = prevRow[i];
+      const c = i >= 1 ? prevRow[i - 1] : 0;
+      let val = x;
+      if (filter === 1) val = (x + a) & 0xff;
+      else if (filter === 2) val = (x + b) & 0xff;
+      else if (filter === 3) val = (x + Math.floor((a + b) / 2)) & 0xff;
+      else if (filter === 4) {
+        const p = a + b - c;
+        const pa = Math.abs(p - a);
+        const pb = Math.abs(p - b);
+        const pc = Math.abs(p - c);
+        const pr = pa <= pb && pa <= pc ? a : pb <= pc ? b : c;
+        val = (x + pr) & 0xff;
+      }
+      row[i] = val;
+    }
+    prevRow.set(row);
+    for (let x = 0; x < width; x++) {
+      const byteIdx = Math.floor(x / 4);
+      const shift = 6 - (x % 4) * 2;
+      pixels[y * width + x] = (row[byteIdx] >> shift) & 0x03;
+    }
   }
-  return [(num >> 16) & 255, (num >> 8) & 255, num & 255, 255];
+  return { width, height, pixels };
 }
 
 function createPNG(width, height, rgbaBuffer) {
   const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-
   const table = new Uint32Array(256);
   for (let i = 0; i < 256; i++) {
     let c = i;
-    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
     table[i] = c >>> 0;
   }
   function crc32(buf) {
-    let crc = 0xFFFFFFFF;
-    for (let i = 0; i < buf.length; i++) {
-      crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
-    }
-    return (crc ^ 0xFFFFFFFF) >>> 0;
+    let crc = 0xffffffff;
+    for (let i = 0; i < buf.length; i++) crc = table[(crc ^ buf[i]) & 0xff] ^ (crc >>> 8);
+    return (crc ^ 0xffffffff) >>> 0;
   }
-
   function createChunk(type, data) {
     const len = Buffer.alloc(4);
     len.writeUInt32BE(data.length, 0);
@@ -47,22 +90,16 @@ function createPNG(width, height, rgbaBuffer) {
     crcBuf.writeUInt32BE(crc, 0);
     return Buffer.concat([len, typeBuf, data, crcBuf]);
   }
-
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(width, 0);
   ihdr.writeUInt32BE(height, 4);
   ihdr[8] = 8;
   ihdr[9] = 6;
-  ihdr[10] = 0;
-  ihdr[11] = 0;
-  ihdr[12] = 0;
-
   const raw = Buffer.alloc(height * (1 + width * 4));
   for (let y = 0; y < height; y++) {
     raw[y * (1 + width * 4)] = 0;
     rgbaBuffer.copy(raw, y * (1 + width * 4) + 1, y * width * 4, (y + 1) * width * 4);
   }
-
   return Buffer.concat([
     signature,
     createChunk('IHDR', ihdr),
@@ -71,1020 +108,263 @@ function createPNG(width, height, rgbaBuffer) {
   ]);
 }
 
-function render16x16To64(rows, palette) {
-  const buf = Buffer.alloc(64 * 64 * 4);
-  const rgbaPal = {};
-  for (const [k, v] of Object.entries(palette)) {
-    rgbaPal[k] = hexToRgba(v);
+// 1. Decode johto.png and patch new_bark.png roof tiles into 0x0a..0x12
+const johto = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__johto.png'));
+const roof = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__new_bark.png'));
+for (let i = 0; i < 9; i++) {
+  const tid = 0x0a + i;
+  const dstX = (tid % 16) * 8;
+  const dstY = Math.floor(tid / 16) * 8;
+  const srcX = (i % 3) * 8;
+  const srcY = Math.floor(i / 3) * 8;
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 8; x++) {
+      johto.pixels[(dstY + y) * johto.width + (dstX + x)] = roof.pixels[(srcY + y) * 24 + (srcX + x)];
+    }
   }
+}
 
-  for (let y16 = 0; y16 < 16; y16++) {
-    const row = rows[y16] || '';
-    for (let x16 = 0; x16 < 16; x16++) {
-      const char = row[x16] || '.';
-      const rgba = rgbaPal[char] || [0, 0, 0, 0];
-      for (let dy = 0; dy < 4; dy++) {
-        for (let dx = 0; dx < 4; dx++) {
-          const px = x16 * 4 + dx;
-          const py = y16 * 4 + dy;
-          const idx = (py * 64 + px) * 4;
-          buf[idx] = rgba[0];
-          buf[idx + 1] = rgba[1];
-          buf[idx + 2] = rgba[2];
-          buf[idx + 3] = rgba[3];
+// 2. Parse johto_palette_map.asm (bank 0)
+const palLines = fs
+  .readFileSync(path.join(SOURCE_DIR, 'gfx__tilesets__johto_palette_map.asm'), 'utf8')
+  .split('\n')
+  .map((l) => l.trim())
+  .filter((l) => l.startsWith('tilepal 0,'));
+const tilePalMap = [];
+for (const l of palLines) {
+  const parts = l
+    .replace('tilepal 0,', '')
+    .split(',')
+    .map((s) => s.trim());
+  tilePalMap.push(...parts);
+}
+
+// 3. Exact Game Boy Color Day Palettes (from gfx/tilesets/bg_tiles.pal & roofs.pal)
+const gbc5to8 = (v) => Math.round((v * 255) / 31);
+const makePal = (c0, c1, c2, c3) =>
+  [c0, c1, c2, c3].map((c) => [gbc5to8(c[0]), gbc5to8(c[1]), gbc5to8(c[2]), 255]);
+
+const BASE_PALETTES = {
+  GRAY: makePal([27, 31, 27], [21, 21, 21], [13, 13, 13], [7, 7, 7]),
+  RED: makePal([27, 31, 27], [31, 19, 24], [30, 10, 6], [7, 7, 7]),
+  GREEN: makePal([22, 31, 10], [12, 25, 1], [5, 14, 0], [7, 7, 7]),
+  WATER: makePal([23, 23, 31], [18, 19, 31], [13, 12, 31], [7, 7, 7]),
+  YELLOW: makePal([27, 31, 27], [31, 31, 7], [31, 16, 1], [7, 7, 7]),
+  BROWN: makePal([27, 31, 27], [24, 18, 7], [20, 15, 3], [7, 7, 7]),
+};
+
+const ROOF_PALETTES = {
+  // group 24 (New Bark & Route 29): green roofs
+  nb: makePal([27, 31, 27], [20, 31, 14], [11, 23, 5], [7, 7, 7]),
+  // group 26 (Cherrygrove City): pink/magenta roofs
+  cg: makePal([27, 31, 27], [31, 14, 28], [31, 5, 21], [7, 7, 7]),
+};
+
+// 4. Parse johto_collision.asm
+const collLines = fs
+  .readFileSync(path.join(SOURCE_DIR, 'data__tilesets__johto_collision.asm'), 'utf8')
+  .split('\n')
+  .map((l) => l.trim())
+  .filter((l) => l.startsWith('tilecoll'));
+
+function mapCollToken(token) {
+  if (
+    token === 'FLOOR' ||
+    token === 'DOOR' ||
+    token.startsWith('WARP_CARPET')
+  ) {
+    return 0; // Walkable
+  }
+  if (token === 'TALL_GRASS') {
+    return 2; // Tall grass (wild encounters)
+  }
+  if (token === 'WATER' || token === 'WHIRLPOOL') {
+    return 3; // Water
+  }
+  return 1; // Solid (WALL, HEADBUTT_TREE, CUT_TREE, BUOY, HOP_*, etc.)
+}
+
+const blockCollisions = collLines.map((line) => {
+  const body = line.split(';')[0].replace('tilecoll', '').trim();
+  const tokens = body.split(',').map((s) => s.trim());
+  return tokens.map(mapCollToken); // [TL, TR, BL, BR]
+});
+
+// 5. Render a 16x16 quadrant [tl, tr, bl, br] of 8x8 tiles to a 64x64 RGBA PNG (4x nearest-neighbor upscale)
+const meta = fs.readFileSync(path.join(SOURCE_DIR, 'data__tilesets__johto_metatiles.bin'));
+const generatedTiles = new Set();
+
+function renderQuadrant64(quad8x8, roofGroup) {
+  const hasRoof = quad8x8.some((tid) => tilePalMap[tid] === 'ROOF');
+  const suffix = hasRoof ? `_${roofGroup}` : '';
+  const tileName = `jt_${quad8x8.map((x) => x.toString(16).padStart(2, '0')).join('_')}${suffix}`;
+
+  if (!generatedTiles.has(tileName)) {
+    const rgba = Buffer.alloc(64 * 64 * 4);
+    for (let qy = 0; qy < 2; qy++) {
+      for (let qx = 0; qx < 2; qx++) {
+        const tid = quad8x8[qy * 2 + qx];
+        const palName = tilePalMap[tid] || 'GRAY';
+        const pal = palName === 'ROOF' ? ROOF_PALETTES[roofGroup] : BASE_PALETTES[palName] || BASE_PALETTES.GRAY;
+        const srcX = (tid % 16) * 8;
+        const srcY = Math.floor(tid / 16) * 8;
+
+        for (let py = 0; py < 8; py++) {
+          for (let px = 0; px < 8; px++) {
+            const val2b = johto.pixels[(srcY + py) * johto.width + (srcX + px)];
+            const color = pal[3 - val2b];
+            for (let dy = 0; dy < 4; dy++) {
+              for (let dx = 0; dx < 4; dx++) {
+                const outX = (qx * 8 + px) * 4 + dx;
+                const outY = (qy * 8 + py) * 4 + dy;
+                const idx = (outY * 64 + outX) * 4;
+                rgba[idx] = color[0];
+                rgba[idx + 1] = color[1];
+                rgba[idx + 2] = color[2];
+                rgba[idx + 3] = 255;
+              }
+            }
+          }
         }
       }
     }
+    fs.writeFileSync(path.join(TILES_DIR, `${tileName}.png`), createPNG(64, 64, rgba));
+    generatedTiles.add(tileName);
   }
-  return buf;
+
+  return tileName;
 }
 
-// ==========================================
-// PALETTES
-// ==========================================
-const G = {
-  g0: '#488828', // grass shadow
-  g1: '#60a838', // grass dark
-  g2: '#78c850', // grass base
-  g3: '#90e068', // grass light
-  g4: '#b0f088', // grass highlight
-};
+// 6. Build MapData JSON from .blk binary
+function buildMapFromBlk({
+  id,
+  name,
+  blkFile,
+  blocksW,
+  blocksH,
+  roofGroup,
+  connections,
+  warps,
+  grassEncounters,
+}) {
+  const blk = fs.readFileSync(path.join(SOURCE_DIR, blkFile));
+  const width = blocksW * 2;
+  const height = blocksH * 2;
+  const tileMap = new Array(width * height);
+  const collisionGrid = new Array(width * height);
 
-const P = {
-  p0: '#a0b890', // path shadow
-  p1: '#b8d0a8', // path dark
-  p2: '#d0e8c0', // path base (light mint)
-  p3: '#e0f4d0', // path light
-  p4: '#eef8e4', // path pebble highlight
-};
+  for (let by = 0; by < blocksH; by++) {
+    for (let bx = 0; bx < blocksW; bx++) {
+      const b = blk[by * blocksW + bx];
+      const t = [];
+      for (let i = 0; i < 16; i++) t.push(meta[b * 16 + i]);
 
-const T = {
-  t0: '#082810', // tree outline
-  t1: '#185018', // tree shadow
-  t2: '#288028', // tree mid dark
-  t3: '#48a838', // tree mid
-  t4: '#70d050', // tree light
-  t5: '#98f070', // tree leaf highlight
-  b0: '#382010', // bark shadow
-  b1: '#583818', // bark mid
-  b2: '#805028', // bark light
-};
+      const quads = [
+        [t[0], t[1], t[4], t[5]],   // TL (dx=0, dy=0)
+        [t[2], t[3], t[6], t[7]],   // TR (dx=1, dy=0)
+        [t[8], t[9], t[12], t[13]], // BL (dx=0, dy=1)
+        [t[10], t[11], t[14], t[15]], // BR (dx=1, dy=1)
+      ];
+      const colls = blockCollisions[b] || [1, 1, 1, 1];
 
-const HR = { // House Roof (GBC Crystal Green)
-  r0: '#203810', // outline
-  r1: '#406020', // deep shade
-  r2: '#588030', // shadow shingle
-  r3: '#78c040', // base shingle (bright GBC green)
-  r4: '#98e060', // light shingle
-  r5: '#c0f888', // highlight
-  c0: '#181810', // chimney dark
-  c1: '#484840', // chimney mid
-  c2: '#787870', // chimney light
-  c3: '#101010', // chimney cap
-};
+      for (let q = 0; q < 4; q++) {
+        const dx = q % 2;
+        const dy = Math.floor(q / 2);
+        const mx = bx * 2 + dx;
+        const my = by * 2 + dy;
+        const idx = my * width + mx;
+        tileMap[idx] = renderQuadrant64(quads[q], roofGroup);
+        collisionGrid[idx] = colls[q];
+      }
+    }
+  }
 
-const LR = { // Lab Roof (GBC Crystal Green - same palette as houses)
-  s0: '#203810', // outline
-  s1: '#406020', // deep shade
-  s2: '#508030', // shadow shingle
-  s3: '#70b838', // base shingle (GBC green, slightly different hue)
-  s4: '#90d858', // light shingle
-  s5: '#b8f880', // metallic highlight
-  v0: '#182018', // vent dark
-  v1: '#405040', // vent mid
-  v2: '#788870', // vent light
-};
+  // Ensure all warp door coordinates are walkable (0)
+  for (const w of warps) {
+    collisionGrid[w.y * width + w.x] = 0;
+  }
 
-const W = { // Wall & Door & Window
-  w0: '#484038', // wall shadow
-  w1: '#b8b0a0', // wall shade
-  w2: '#ded8c8', // wall clapboard light
-  w3: '#f4f0e4', // wall clapboard base
-  g0: '#183860', // glass dark
-  g1: '#3068a8', // glass mid
-  g2: '#68a8e8', // glass light
-  g3: '#b0d8f8', // glass glint
-  d0: '#301808', // door frame
-  d1: '#683818', // door dark
-  d2: '#985828', // door mid
-  d3: '#c88040', // door light
-  k0: '#f8d030', // gold knob
-  f0: '#908878', // stone step
-  f1: '#c0b8a8', // stone step light
-};
+  const mapData = {
+    id,
+    name,
+    width,
+    height,
+    tileSize: 64,
+    groundLayer: [...collisionGrid],
+    objectLayer: [],
+    collisionGrid,
+    tileMap,
+    connections,
+    warps,
+    grassEncounters,
+  };
 
-const O = { // Ocean Water
-  w0: '#102868', // deep ocean
-  w1: '#184098', // shadow water
-  w2: '#2860c8', // base water
-  w3: '#4888e8', // wave mid
-  w4: '#78b8f8', // wave light
-  w5: '#d8f0ff', // foam crest
-  s0: '#c0b080', // shore sand dark
-  s1: '#e0d098', // shore sand base
-};
-
-const propsPal = {
-  ...G, ...P, ...W,
-  fn0: '#383028', // fence dark
-  fn1: '#706858', // fence mid
-  fn2: '#b8b098', // fence light
-  fn3: '#f0e8d0', // fence white
-  mb0: '#183068', // mailbox blue dark
-  mb1: '#2858b8', // mailbox blue
-  mb2: '#e03030', // mailbox flag red
-  fl0: '#880820', // flower red dark
-  fl1: '#d82040', // flower red
-  fl2: '#f85070', // flower pink
-  fl3: '#f8d838', // flower eye yellow
-  fy0: '#887010', // flower yellow dark
-  fy1: '#e8b820', // flower yellow
-  fy2: '#f8e850', // flower yellow light
-  fy3: '#ffffff', // flower daisy white
-};
-
-// ==========================================
-// TILE DEFINITIONS (16x16 ASCII Art)
-// ==========================================
-const tiles = {};
-
-// 1. Grass
-tiles['grass'] = {
-  pal: { '.': G.g2, ':': G.g1, 'x': G.g0, '^': G.g3, '*': G.g4 },
-  rows: [
-    '..:.....^.......',
-    '....x.....:.....',
-    '..:.....*...:...',
-    '.....:.....x....',
-    '.^.......:......',
-    '....x.......:...',
-    '..:.....^.......',
-    '.....:.....x....',
-    '..:.....^.......',
-    '....x.....:.....',
-    '..:.....*.......',
-    '.....:.....x....',
-    '.^.......:......',
-    '....x.......:...',
-    '..:.....^.......',
-    '.....:.....x....',
-  ],
-};
-
-// 2. Tall Grass (Wild Encounters)
-tiles['tall_grass'] = {
-  pal: { '.': G.g2, ':': G.g1, 'x': G.g0, '^': G.g3, 'X': '#082808', 'L': '#287018', 'H': '#88e040' },
-  rows: [
-    '..X.X.....X.X...',
-    '.XL.LX...XL.LX..',
-    'XLLHLLX.XLLHLLX.',
-    'XLHHLHX.XLHHLHX.',
-    'XLLHLLX.XLLHLLX.',
-    '.XL.LX...XL.LX..',
-    '..X.X.X.X.X.X...',
-    '.....XL.LX......',
-    '..X.XLLHLLX.X...',
-    '.XL.XLHHLHX.LX..',
-    'XLLHXLLHLLXXLLX.',
-    'XLHHXXL.LXXLHHLX',
-    'XLLHL.X.X.LHLLX.',
-    '.XL.L.....L.LX..',
-    '..X.X.....X.X...',
-    '................',
-  ],
-};
-
-// 3. Path (Authentic Johto dirt)
-tiles['path'] = {
-  pal: { '.': P.p2, ':': P.p1, 'x': P.p0, '^': P.p3, '*': P.p4 },
-  rows: [
-    '..:.....^.......',
-    '....x.....:..*..',
-    '..:.....^.......',
-    '.....:.....x....',
-    '.^.......:......',
-    '....*.......:...',
-    '..:.....^.......',
-    '.....:.....x....',
-    '..:.....^.......',
-    '....x.....:.....',
-    '..:.....^....*..',
-    '.....:.....x....',
-    '.^.......:......',
-    '....x.......:...',
-    '..:.....^.......',
-    '.....:.....x....',
-  ],
-};
-
-// 4. Gravel Path
-tiles['path_gravel'] = {
-  pal: { '.': P.p2, ':': P.p1, 'x': P.p0, '^': P.p3, '*': P.p4, 'g': '#988870', 'w': '#c8b898' },
-  rows: [
-    '..g:....w^......',
-    '..w.x..g..:..*..',
-    '..:.....^..g....',
-    '.g...:..w..x.w..',
-    '.^..w....:......',
-    '....*...g...:...',
-    '..:..w..^..w....',
-    '..g..:.....x....',
-    '..:..g..^..g....',
-    '....x.....:..w..',
-    '.w:.....^....*..',
-    '.....:.w...x....',
-    '.^...g...:......',
-    '..w.x...w...:...',
-    '..:...g.^.......',
-    '.g...:.....x.w..',
-  ],
-};
-
-// 5. Tree Tall (Canopy - Top half)
-tiles['tree_tall_0'] = {
-  pal: { '.': G.g2, 'X': T.t0, 'D': T.t1, 'M': T.t2, 'L': T.t3, 'H': T.t4, '*': T.t5 },
-  rows: [
-    '.....XXXXXX.....',
-    '...XXLLHHLLXX...',
-    '..XLLHHHHHHLLX..',
-    '.XLLHH****HHLLX.',
-    '.XLHH******HHLLX',
-    'XLLHH******HHLLX',
-    'XLHH********HHLL',
-    'XLH**********HHL',
-    'XLLHH******HHLLX',
-    'XDLLHH****HLLLDX',
-    'XDDLLHHHHHHLLDDX',
-    'XDDDLLLLLLLLDDDX',
-    'XDDDDLLLLLLDDDDX',
-    '.XDDDDDDDDDDDDX.',
-    '..XXDDDDDDDDXX..',
-    '....XXXXXXXX....',
-  ],
-};
-
-// 6. Tree Tall (Trunk / Base - Bottom half)
-tiles['tree_tall_1'] = {
-  pal: { '.': G.g2, ':': G.g1, 'X': T.t0, 'D': T.t1, 'L': T.t3, 'H': T.t4, 'b': T.b0, 'B': T.b1, 'W': T.b2 },
-  rows: [
-    '....XXXXXXXX....',
-    '..XXLLHHLLHHXX..',
-    '.XLLHHHHHHHHLLX.',
-    'XLLHHHHHHHHHHLLX',
-    'XDLLLLLLLLLLLLDX',
-    'XDDDLLXbbXLLDDDX',
-    '.XXDDXbBBbXDDXX.',
-    '..XXXbBBBBbXXX..',
-    '....XbBBWWBbX...',
-    '....XbBBWWBbX...',
-    '....XbBBWWBbX...',
-    '....XbBBWWBbX...',
-    '....XbBBWWBbX...',
-    '...XbbBBWWBbbX..',
-    '..XbbbBBWWBbbbX.',
-    '..XXXXXXXXXXXX..',
-  ],
-};
-
-// 7. Tree Short (Shrub / Bush)
-tiles['tree_short_0'] = {
-  pal: { '.': G.g2, 'X': T.t0, 'D': T.t1, 'M': T.t2, 'L': T.t3, 'H': T.t4, '*': T.t5 },
-  rows: [
-    '.....XXXXXX.....',
-    '...XXLLHHLLXX...',
-    '..XLLHHHHHHLLX..',
-    '.XLLHH****HHLLX.',
-    '.XLHH******HHLLX',
-    'XLLHH******HHLLX',
-    'XLHH********HHLL',
-    'XLH**********HHL',
-    'XLLHH******HHLLX',
-    'XDLLHH****HLLLDX',
-    'XDDLLHHHHHHLLDDX',
-    'XDDDLLLLLLLLDDDX',
-    'XDDDDLLLLLLDDDDX',
-    '.XDDDDDDDDDDDDX.',
-    '..XXDDDDDDDDXX..',
-    '....XXXXXXXX....',
-  ],
-};
-
-// 8. House Roof Top-Left
-tiles['house_roof_tl'] = {
-  pal: { '.': G.g2, 'X': HR.r0, 'D': HR.r1, 'S': HR.r2, 'B': HR.r3, 'L': HR.r4, 'H': HR.r5 },
-  rows: [
-    '............XXXX',
-    '..........XXLLBB',
-    '........XXLLBBBB',
-    '......XXLLBBBBSS',
-    '....XXLLBBBBSSDD',
-    '..XXLLBBBBSSDDXX',
-    '.XLLBBBBSSDDXXXX',
-    '.XBBBBSSDDXXXX..',
-    'XBBSSDDXXXX.....',
-    'XSSDDXXXX.......',
-    'XDDXXXX.........',
-    'XXXX............',
-    '................',
-    '................',
-    '................',
-    '................',
-  ],
-};
-
-// 9. House Roof Top-Ridge
-tiles['house_roof_top'] = {
-  pal: { 'X': HR.r0, 'D': HR.r1, 'S': HR.r2, 'B': HR.r3, 'L': HR.r4, 'H': HR.r5 },
-  rows: [
-    'XXXXXXXXXXXXXXXX',
-    'LLLLLLLLLLLLLLLL',
-    'HHHHHHHHHHHHHHHH',
-    'LLLLLLLLLLLLLLLL',
-    'BBBBBBBBBBBBBBBB',
-    'BBBBBBBBBBBBBBBB',
-    'SSSSSSSSSSSSSSSS',
-    'SSSSSSSSSSSSSSSS',
-    'DDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'LLLLLLLLLLLLLLLL',
-    'BBBBBBBBBBBBBBBB',
-    'BBBBBBBBBBBBBBBB',
-    'SSSSSSSSSSSSSSSS',
-    'DDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-  ],
-};
-
-// 10. House Roof Top-Right (With Chimney)
-tiles['house_roof_tr'] = {
-  pal: {
-    '.': G.g2, 'X': HR.r0, 'D': HR.r1, 'S': HR.r2, 'B': HR.r3, 'L': HR.r4, 'H': HR.r5,
-    'C': HR.c3, 'c': HR.c0, 'm': HR.c1, 'l': HR.c2,
-  },
-  rows: [
-    'XXXX....CCCCCC..',
-    'BBLLXX..CclmmC..',
-    'BBBBLLXXCclmmC..',
-    'SSBBBBLLCclmmC..',
-    'DDSSBBBBXXXXXXXX',
-    'XXDDSSBBBBSSDDXX',
-    'XXXXDDSSBBBBSSDX',
-    '..XXXXDDSSBBBBXX',
-    '.....XXXXDDSSBXX',
-    '.......XXXXDDSXX',
-    '.........XXXXDXX',
-    '............XXXX',
-    '................',
-    '................',
-    '................',
-    '................',
-  ],
-};
-
-// 11. House Roof Front Left
-tiles['house_roof_front_l'] = {
-  pal: { 'X': HR.r0, 'D': HR.r1, 'S': HR.r2, 'B': HR.r3, 'L': HR.r4, 'H': HR.r5 },
-  rows: [
-    'XLLLLLLLLLLLLLLL',
-    'XHHHHHHHHHHHHHHH',
-    'XLLLLLLLLLLLLLLL',
-    'XBBBBBBBBBBBBBBB',
-    'XBBBBBBBBBBBBBBB',
-    'XSSSSSSSSSSSSSSS',
-    'XDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'XLLLLLLLLLLLLLLL',
-    'XHHHHHHHHHHHHHHH',
-    'XLLLLLLLLLLLLLLL',
-    'XBBBBBBBBBBBBBBB',
-    'XSSSSSSSSSSSSSSS',
-    'XDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'DDDDDDDDDDDDDDDD',
-  ],
-};
-
-// 12. House Roof Front Mid
-tiles['house_roof_front_m'] = {
-  pal: { 'X': HR.r0, 'D': HR.r1, 'S': HR.r2, 'B': HR.r3, 'L': HR.r4, 'H': HR.r5 },
-  rows: [
-    'LLLLLLLLLLLLLLLL',
-    'HHHHHHHHHHHHHHHH',
-    'LLLLLLLLLLLLLLLL',
-    'BBBBBBBBBBBBBBBB',
-    'BBBBBBBBBBBBBBBB',
-    'SSSSSSSSSSSSSSSS',
-    'DDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'LLLLLLLLLLLLLLLL',
-    'HHHHHHHHHHHHHHHH',
-    'LLLLLLLLLLLLLLLL',
-    'BBBBBBBBBBBBBBBB',
-    'SSSSSSSSSSSSSSSS',
-    'DDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'DDDDDDDDDDDDDDDD',
-  ],
-};
-
-// 13. House Roof Front Right
-tiles['house_roof_front_r'] = {
-  pal: { 'X': HR.r0, 'D': HR.r1, 'S': HR.r2, 'B': HR.r3, 'L': HR.r4, 'H': HR.r5 },
-  rows: [
-    'LLLLLLLLLLLLLLLX',
-    'HHHHHHHHHHHHHHHX',
-    'LLLLLLLLLLLLLLLX',
-    'BBBBBBBBBBBBBBBX',
-    'BBBBBBBBBBBBBBBX',
-    'SSSSSSSSSSSSSSSX',
-    'DDDDDDDDDDDDDDDX',
-    'XXXXXXXXXXXXXXXX',
-    'LLLLLLLLLLLLLLLX',
-    'HHHHHHHHHHHHHHHX',
-    'LLLLLLLLLLLLLLLX',
-    'BBBBBBBBBBBBBBBX',
-    'SSSSSSSSSSSSSSSX',
-    'DDDDDDDDDDDDDDDX',
-    'XXXXXXXXXXXXXXXX',
-    'DDDDDDDDDDDDDDDD',
-  ],
-};
-
-// 14. House Wall (Clapboard)
-tiles['house_wall'] = {
-  pal: { 'X': W.w0, 's': W.w1, 'l': W.w2, '.': W.w3 },
-  rows: [
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-  ],
-};
-
-// 15. House Window
-tiles['house_window'] = {
-  pal: {
-    'X': W.w0, 's': W.w1, 'l': W.w2, '.': W.w3,
-    'F': '#302820', 'd': W.g0, 'm': W.g1, 'g': W.g2, 'H': W.g3,
-  },
-  rows: [
-    '................',
-    '..FFFFFFFFFFFF..',
-    '..FddmFFmggHFF..',
-    'XXFddmFFmggHFFXX',
-    '..FmmgFFggHHFF..',
-    '..FFFFFFFFFFFF..',
-    '..FddmFFmggHFF..',
-    'XXFddmFFmggHFFXX',
-    '..FmmgFFggHHFF..',
-    '..FFFFFFFFFFFF..',
-    '..ssssssssssss..',
-    'XXXXXXXXXXXXXXXX',
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-  ],
-};
-
-// 16. House Door
-tiles['house_door'] = {
-  pal: {
-    'X': W.w0, 's': W.w1, '.': W.w3,
-    'F': W.d0, 'd': W.d1, 'm': W.d2, 'l': W.d3, 'K': W.k0,
-    'S': W.f0, 's2': W.f1,
-  },
-  rows: [
-    '..FFFFFFFFFFFF..',
-    '..FddddddddddF..',
-    '..FdmmmmmmmmdF..',
-    'XXFdmmllllmmdFXX',
-    '..FdmmllllmmdF..',
-    '..FdmmllllmmdF..',
-    '..FdmmmmmmmmdF..',
-    'XXFdmmKmmllmdFXX',
-    '..FdmmllllmmdF..',
-    '..FdmmllllmmdF..',
-    '..FdmmmmmmmmdF..',
-    'XXFdmmllllmmdFXX',
-    '..FdmmllllmmdF..',
-    '..FFFFFFFFFFFF..',
-    '.s2s2s2s2s2s2s2.',
-    'SSSSSSSSSSSSSSSS',
-  ],
-};
-
-// 17. Lab Roof Top-Left
-tiles['lab_roof_tl'] = {
-  pal: { '.': G.g2, 'X': LR.s0, 'D': LR.s1, 'S': LR.s2, 'B': LR.s3, 'L': LR.s4, 'H': LR.s5 },
-  rows: [
-    '............XXXX',
-    '..........XXLLBB',
-    '........XXLLBBBB',
-    '......XXLLBBBBSS',
-    '....XXLLBBBBSSDD',
-    '..XXLLBBBBSSDDXX',
-    '.XLLBBBBSSDDXXXX',
-    '.XBBBBSSDDXXXX..',
-    'XBBSSDDXXXX.....',
-    'XSSDDXXXX.......',
-    'XDDXXXX.........',
-    'XXXX............',
-    '................',
-    '................',
-    '................',
-    '................',
-  ],
-};
-
-// 18. Lab Roof Top (With Vent/Flue)
-tiles['lab_roof_top'] = {
-  pal: {
-    'X': LR.s0, 'D': LR.s1, 'S': LR.s2, 'B': LR.s3, 'L': LR.s4, 'H': LR.s5,
-    'v0': LR.v0, 'v1': LR.v1, 'v2': LR.v2,
-  },
-  rows: [
-    'XXXXXXXXXXXXXXXX',
-    'LLLLLLLLLLLLLLLL',
-    'HHHH..v2v2..HHHH',
-    'LLLL.v1v2v2.LLLL',
-    'BBBB.v0v1v1.BBBB',
-    'BBBB..v0v0..BBBB',
-    'SSSSSSSSSSSSSSSS',
-    'SSSSSSSSSSSSSSSS',
-    'DDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'LLLLLLLLLLLLLLLL',
-    'BBBBBBBBBBBBBBBB',
-    'BBBBBBBBBBBBBBBB',
-    'SSSSSSSSSSSSSSSS',
-    'DDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-  ],
-};
-
-// 19. Lab Roof Top-Right
-tiles['lab_roof_tr'] = {
-  pal: { '.': G.g2, 'X': LR.s0, 'D': LR.s1, 'S': LR.s2, 'B': LR.s3, 'L': LR.s4, 'H': LR.s5 },
-  rows: [
-    'XXXX............',
-    'BBLLXX..........',
-    'BBBBLLXX........',
-    'SSBBBBLLXX......',
-    'DDSSBBBBLLXX....',
-    'XXDDSSBBBBLLXX..',
-    'XXXXDDSSBBBBLLX.',
-    '..XXXXDDSSBBBBX.',
-    '.....XXXXDDSSBBX',
-    '.......XXXXDDSSX',
-    '.........XXXXDDX',
-    '............XXXX',
-    '................',
-    '................',
-    '................',
-    '................',
-  ],
-};
-
-// 20. Lab Roof Front Left
-tiles['lab_roof_front_l'] = {
-  pal: { 'X': LR.s0, 'D': LR.s1, 'S': LR.s2, 'B': LR.s3, 'L': LR.s4, 'H': LR.s5 },
-  rows: [
-    'XLLLLLLLLLLLLLLL',
-    'XHHHHHHHHHHHHHHH',
-    'XLLLLLLLLLLLLLLL',
-    'XBBBBBBBBBBBBBBB',
-    'XBBBBBBBBBBBBBBB',
-    'XSSSSSSSSSSSSSSS',
-    'XDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'XLLLLLLLLLLLLLLL',
-    'XHHHHHHHHHHHHHHH',
-    'XLLLLLLLLLLLLLLL',
-    'XBBBBBBBBBBBBBBB',
-    'XSSSSSSSSSSSSSSS',
-    'XDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'DDDDDDDDDDDDDDDD',
-  ],
-};
-
-// 21. Lab Roof Front Mid
-tiles['lab_roof_front_m'] = {
-  pal: { 'X': LR.s0, 'D': LR.s1, 'S': LR.s2, 'B': LR.s3, 'L': LR.s4, 'H': LR.s5 },
-  rows: [
-    'LLLLLLLLLLLLLLLL',
-    'HHHHHHHHHHHHHHHH',
-    'LLLLLLLLLLLLLLLL',
-    'BBBBBBBBBBBBBBBB',
-    'BBBBBBBBBBBBBBBB',
-    'SSSSSSSSSSSSSSSS',
-    'DDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'LLLLLLLLLLLLLLLL',
-    'HHHHHHHHHHHHHHHH',
-    'LLLLLLLLLLLLLLLL',
-    'BBBBBBBBBBBBBBBB',
-    'SSSSSSSSSSSSSSSS',
-    'DDDDDDDDDDDDDDDD',
-    'XXXXXXXXXXXXXXXX',
-    'DDDDDDDDDDDDDDDD',
-  ],
-};
-
-// 22. Lab Roof Front Right
-tiles['lab_roof_front_r'] = {
-  pal: { 'X': LR.s0, 'D': LR.s1, 'S': LR.s2, 'B': LR.s3, 'L': LR.s4, 'H': LR.s5 },
-  rows: [
-    'LLLLLLLLLLLLLLLX',
-    'HHHHHHHHHHHHHHHX',
-    'LLLLLLLLLLLLLLLX',
-    'BBBBBBBBBBBBBBBX',
-    'BBBBBBBBBBBBBBBX',
-    'SSSSSSSSSSSSSSSX',
-    'DDDDDDDDDDDDDDDX',
-    'XXXXXXXXXXXXXXXX',
-    'LLLLLLLLLLLLLLLX',
-    'HHHHHHHHHHHHHHHX',
-    'LLLLLLLLLLLLLLLX',
-    'BBBBBBBBBBBBBBBX',
-    'SSSSSSSSSSSSSSSX',
-    'DDDDDDDDDDDDDDDX',
-    'XXXXXXXXXXXXXXXX',
-    'DDDDDDDDDDDDDDDD',
-  ],
-};
-
-// 23. Lab Wall
-tiles['lab_wall'] = {
-  pal: { 'X': '#283038', 's': '#707880', 'l': '#b0b8c0', '.': '#d8e0e8' },
-  rows: [
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-  ],
-};
-
-// 24. Lab Window (Tech observation pane)
-tiles['lab_window'] = {
-  pal: {
-    'X': '#283038', 's': '#707880', '.': '#d8e0e8',
-    'F': '#182028', 'd': '#184878', 'm': '#2878b8', 'g': '#58b0f8', 'H': '#a0e0ff',
-  },
-  rows: [
-    '................',
-    '.FFFFFFFFFFFFFF.',
-    '.FddddmFFmggggF.',
-    'XFddddmFFmggggFX',
-    '.FmmmmgFFgHHHHF.',
-    '.FFFFFFFFFFFFFF.',
-    '.FddddmFFmggggF.',
-    'XFddddmFFmggggFX',
-    '.FmmmmgFFgHHHHF.',
-    '.FFFFFFFFFFFFFF.',
-    '.ssssssssssssss.',
-    'XXXXXXXXXXXXXXXX',
-    '................',
-    '................',
-    'ssssssssssssssss',
-    'XXXXXXXXXXXXXXXX',
-  ],
-};
-
-// 25. Lab Door (Automatic Glass Door)
-tiles['lab_door'] = {
-  pal: {
-    'X': '#283038', '.': '#d8e0e8',
-    'F': '#182028', 'm': '#3078b8', 'g': '#68c0f8', 'H': '#b8ecff',
-    'P': '#d03838', 'S': '#505860',
-  },
-  rows: [
-    '.FFFFFFFFFF.FFFF',
-    '.FmmggHFFHggmmF.',
-    '.FmmggHFFHggmmF.',
-    'XFmmggHFFHggmmFX',
-    '.FmmggHFFHggmmF.',
-    '.FmmggHFFHggmmF.',
-    '.FmmggHFFHggmmF.',
-    'XFmmggHFFHggmmFX',
-    '.FmmPPHFFHPPmmF.',
-    '.FmmggHFFHggmmF.',
-    '.FmmggHFFHggmmF.',
-    'XFmmggHFFHggmmFX',
-    '.FmmggHFFHggmmF.',
-    '.FFFFFFFFFF.FFFF',
-    'SSSSSSSSSSSSSSSS',
-    'XXXXXXXXXXXXXXXX',
-  ],
-};
-
-// 26. Wooden Fence Horizontal
-tiles['fence_horizontal'] = {
-  pal: {
-    '.': G.g2, ':': G.g1,
-    'X': propsPal.fn0, 'd': propsPal.fn1, 'm': propsPal.fn2, 'w': propsPal.fn3,
-  },
-  rows: [
-    '................',
-    '................',
-    '................',
-    '..XX........XX..',
-    '..XwX.XXXXXX.XwX',
-    '..XwmXwwwwwwXwmX',
-    '..XmddmmmmmmXmdd',
-    '..XXdXXXXXXXXdXX',
-    '..XX..XXXXXX..XX',
-    '..XwX.XwwwwX.XwX',
-    '..XwmXXmmmmXXwmX',
-    '..XmddXXXXXXmddX',
-    '..XXdXXXXXXXXdXX',
-    '..XX........XX..',
-    '................',
-    '................',
-  ],
-};
-
-// 27. Town Sign ("New Bark Town")
-tiles['sign_town'] = {
-  pal: {
-    '.': G.g2, ':': G.g1,
-    'X': '#281808', 'd': '#583818', 'm': '#885828', 'l': '#b88040', 't': '#e8b870',
-    'b': '#402810',
-  },
-  rows: [
-    '................',
-    '................',
-    '...XXXXXXXXXX...',
-    '..XllllllllllX..',
-    '..XlttttttttmX..',
-    '..XltmmmmmmtmX..',
-    '..XltmXXXXmtmX..',
-    '..XltmX..XmtmX..',
-    '..XltmmmmmmtmX..',
-    '..XmmmmmmmmmmX..',
-    '...XXXXXXXXXX...',
-    '......XbbX......',
-    '......XbbX......',
-    '......XbbX......',
-    '......XXXX......',
-    '................',
-  ],
-};
-
-// 28. Lab Sign ("Elm Pokémon Lab")
-tiles['sign_lab'] = {
-  pal: {
-    '.': G.g2, ':': G.g1,
-    'X': '#102038', 'd': '#204878', 'm': '#3878b8', 'l': '#60a8e8', 't': '#b8e0ff',
-    'P': '#e83838', 'W': '#ffffff', 'b': '#404850',
-  },
-  rows: [
-    '................',
-    '................',
-    '...XXXXXXXXXX...',
-    '..XllllllllllX..',
-    '..XlttttttttmX..',
-    '..XltmXPPXmtmX..',
-    '..XltmXWWXmtmX..',
-    '..XltmXXXXmtmX..',
-    '..XltmmmmmmtmX..',
-    '..XmmmmmmmmmmX..',
-    '...XXXXXXXXXX...',
-    '......XbbX......',
-    '......XbbX......',
-    '......XbbX......',
-    '......XXXX......',
-    '................',
-  ],
-};
-
-// 29. Mailbox
-tiles['mailbox'] = {
-  pal: {
-    '.': G.g2, ':': G.g1,
-    'X': '#101828', 'b': '#2858a8', 'l': '#4888e8', 'F': '#e02828', 'f': '#ff6060',
-    'p': '#583818',
-  },
-  rows: [
-    '................',
-    '................',
-    '.....XXXXX......',
-    '....XlllllX.FF..',
-    '...XlbbbbblX.F..',
-    '...XlbbbbblXFF..',
-    '...XlbbbbbllX...',
-    '...XXXXXXXXXX...',
-    '......XppX......',
-    '......XppX......',
-    '......XppX......',
-    '......XppX......',
-    '......XXXX......',
-    '................',
-    '................',
-    '................',
-  ],
-};
-
-// 30. Red Flowers in Grass
-tiles['flower_red'] = {
-  pal: {
-    '.': G.g2, ':': G.g1, 'x': G.g0,
-    'X': propsPal.fl0, 'r': propsPal.fl1, 'p': propsPal.fl2, 'y': propsPal.fl3,
-  },
-  rows: [
-    '..:.....^.......',
-    '..XppX...XppX...',
-    '.XprrX...XprrX..',
-    '.XryrX...XryrX..',
-    '..XrrX....XrrX..',
-    '...XX......XX...',
-    '.....x.......:..',
-    '........XppX....',
-    '..:....XprrX....',
-    '.......XryrX.x..',
-    '..:.....XrrX....',
-    '.........XX.....',
-    '....XppX...:....',
-    '...XprrX........',
-    '...XryrX....^...',
-    '....XrrX........',
-  ],
-};
-
-// 31. Yellow Flowers in Grass
-tiles['flower_yellow'] = {
-  pal: {
-    '.': G.g2, ':': G.g1, 'x': G.g0,
-    'X': propsPal.fy0, 'y': propsPal.fy1, 'l': propsPal.fy2, 'w': propsPal.fy3,
-  },
-  rows: [
-    '..:.....^.......',
-    '..XllX...XllX...',
-    '.XlyyX...XlyyX..',
-    '.XywyX...XywyX..',
-    '..XyyX....XyyX..',
-    '...XX......XX...',
-    '.....x.......:..',
-    '........XllX....',
-    '..:....XlyyX....',
-    '.......XywyX.x..',
-    '..:.....XyyX....',
-    '.........XX.....',
-    '....XllX...:....',
-    '...XlyyX........',
-    '...XywyX....^...',
-    '....XyyX........',
-  ],
-};
-
-// 32. Water (Ocean Deep)
-tiles['water'] = {
-  pal: { '.': O.w2, 'd': O.w1, 'x': O.w0, 'l': O.w3, 'w': O.w4, 'c': O.w5 },
-  rows: [
-    '..l.w.c.w.l.....',
-    '....d.x.d.......',
-    '..........l.w.l.',
-    '............d...',
-    '.l.w.l..........',
-    '...d............',
-    '........l.w.c.w.',
-    '..........d.x.d.',
-    '..l.w.c.w.l.....',
-    '....d.x.d.......',
-    '..........l.w.l.',
-    '............d...',
-    '.l.w.l..........',
-    '...d............',
-    '........l.w.c.w.',
-    '..........d.x.d.',
-  ],
-};
-
-// 33. Water Shore North (Grass/Sand Bank -> Water)
-tiles['water_shore_n'] = {
-  pal: {
-    'g': G.g2, 'd': G.g1, 's': O.s1, 'S': O.s0,
-    'c': O.w5, 'w': O.w4, 'm': O.w3, '.': O.w2, 'x': O.w1,
-  },
-  rows: [
-    'gggggggggggggggg',
-    'ggggddggggddgggg',
-    'ssssssssssssssss',
-    'SSSSSSSSSSSSSSSS',
-    'cccccccccccccccc',
-    'wwwwwwwwwwwwwwww',
-    'mmmmmmmmmmmmmmmm',
-    '................',
-    '..m.w.c.w.m.....',
-    '....x...x.......',
-    '..........m.w.m.',
-    '............x...',
-    '.m.w.m..........',
-    '...x............',
-    '........m.w.c.w.',
-    '..........x...x.',
-  ],
-};
-
-// 34. Water Shore West (Grass/Sand Bank on West -> Water on East)
-tiles['water_shore_w'] = {
-  pal: {
-    'g': G.g2, 's': O.s1, 'S': O.s0,
-    'c': O.w5, 'w': O.w4, 'm': O.w3, '.': O.w2, 'x': O.w1,
-  },
-  rows: [
-    'ggsSccw.m.w.c.w.',
-    'ggsSccw...x...x.',
-    'ggsSccw.........',
-    'ggsSccw.m.w.m...',
-    'ggsSccw...x.....',
-    'ggsSccw.........',
-    'ggsSccw..m.w.c.w',
-    'ggsSccw....x...x',
-    'ggsSccw.........',
-    'ggsSccw.m.w.m...',
-    'ggsSccw...x.....',
-    'ggsSccw.........',
-    'ggsSccw..m.w.c.w',
-    'ggsSccw....x...x',
-    'ggsSccw.........',
-    'ggsSccw.m.w.m...',
-  ],
-};
-
-// 35. Water Shore NW Corner
-tiles['water_shore_nw'] = {
-  pal: {
-    'g': G.g2, 's': O.s1, 'S': O.s0,
-    'c': O.w5, 'w': O.w4, 'm': O.w3, '.': O.w2, 'x': O.w1,
-  },
-  rows: [
-    'gggggggggggggggg',
-    'ggggddggggddgggg',
-    'ggssssssssssssss',
-    'ggsSSSSSSSSSSSSS',
-    'ggsScccccccccccc',
-    'ggsScwwwwwwwwwww',
-    'ggsScwmmmmmmmmmm',
-    'ggsScw..........',
-    'ggsScw.m.w.c.w.m',
-    'ggsScw...x...x..',
-    'ggsScw..........',
-    'ggsScw...m.w.m..',
-    'ggsScw.....x....',
-    'ggsScw..........',
-    'ggsScw..m.w.c.w.',
-    'ggsScw....x...x.',
-  ],
-};
-
-// Overwrite legacy aliases so older references also resolve to authentic tiles
-tiles['door'] = tiles['house_door'];
-tiles['wall'] = tiles['house_wall'];
-tiles['roof'] = tiles['house_roof_front_m'];
-tiles['sign'] = tiles['sign_town'];
-tiles['flower_0'] = tiles['flower_red'];
-tiles['flower_1'] = tiles['flower_yellow'];
-tiles['water_edge'] = tiles['water_shore_n'];
-
-console.log(`Generating ${Object.keys(tiles).length} authentic 64x64 Johto pixel art tiles...`);
-
-for (const [name, def] of Object.entries(tiles)) {
-  const buf = render16x16To64(def.rows, def.pal);
-  const png = createPNG(64, 64, buf);
-  const destPath = path.join(TILES_DIR, `${name}.png`);
-  fs.writeFileSync(destPath, png);
-  console.log(`✔ Generated ${name}.png (${png.length} bytes)`);
+  fs.writeFileSync(path.join(MAPS_DIR, `${id}.json`), JSON.stringify(mapData, null, 2) + '\n');
+  console.log(`Built authentic ${id}.json (${width}x${height} step tiles)`);
 }
 
-// Clean up test file if it exists
-if (fs.existsSync(path.join(TILES_DIR, 'test_grass.png'))) {
-  fs.unlinkSync(path.join(TILES_DIR, 'test_grass.png'));
-}
+// Build New Bark Town (10x9 blocks = 20x18 step tiles)
+buildMapFromBlk({
+  id: 'new_bark_town',
+  name: 'New Bark Town',
+  blkFile: 'maps__NewBarkTown.blk',
+  blocksW: 10,
+  blocksH: 9,
+  roofGroup: 'nb',
+  connections: {
+    WEST: { mapId: 'route_29', offset: 0 },
+  },
+  warps: [
+    { x: 6, y: 3, targetMapId: 'elms_lab', targetX: 4, targetY: 7 },
+    { x: 13, y: 5, targetMapId: 'players_house_1f', targetX: 3, targetY: 6 },
+    { x: 3, y: 11, targetMapId: 'players_neighbors_house', targetX: 3, targetY: 6 },
+    { x: 11, y: 13, targetMapId: 'elms_house', targetX: 3, targetY: 6 },
+  ],
+  grassEncounters: [],
+});
 
-console.log('✅ All authentic Pokémon Crystal tiles generated successfully!');
+// Build Route 29 (30x9 blocks = 60x18 step tiles)
+buildMapFromBlk({
+  id: 'route_29',
+  name: 'Route 29',
+  blkFile: 'maps__Route29.blk',
+  blocksW: 30,
+  blocksH: 9,
+  roofGroup: 'nb',
+  connections: {
+    EAST: { mapId: 'new_bark_town', offset: 0 },
+    WEST: { mapId: 'cherrygrove_city', offset: 0 },
+  },
+  warps: [
+    { x: 27, y: 1, targetMapId: 'route_29_route_46_gate', targetX: 4, targetY: 7 },
+  ],
+  grassEncounters: [
+    { speciesId: 'pidgey', minLevel: 2, maxLevel: 4, weight: 50 },
+    { speciesId: 'sentret', minLevel: 2, maxLevel: 3, weight: 35 },
+    { speciesId: 'rattata', minLevel: 2, maxLevel: 4, weight: 15 },
+  ],
+});
+
+// Build Cherrygrove City (20x9 blocks = 40x18 step tiles)
+buildMapFromBlk({
+  id: 'cherrygrove_city',
+  name: 'Cherrygrove City',
+  blkFile: 'maps__CherrygroveCity.blk',
+  blocksW: 20,
+  blocksH: 9,
+  roofGroup: 'cg',
+  connections: {
+    EAST: { mapId: 'route_29', offset: 0 },
+  },
+  warps: [
+    { x: 23, y: 3, targetMapId: 'cherrygrove_mart', targetX: 3, targetY: 7 },
+    { x: 29, y: 3, targetMapId: 'cherrygrove_poke_center', targetX: 3, targetY: 7 },
+    { x: 17, y: 7, targetMapId: 'cherrygrove_gym_speech_house', targetX: 3, targetY: 7 },
+    { x: 25, y: 9, targetMapId: 'guide_gents_house', targetX: 3, targetY: 7 },
+    { x: 31, y: 11, targetMapId: 'cherrygrove_evolution_speech_house', targetX: 3, targetY: 7 },
+  ],
+  grassEncounters: [],
+});
+
+console.log(`Total authentic 64x64 quadrant PNGs generated: ${generatedTiles.size}`);
+console.log('TILE_LIST_JSON=' + JSON.stringify(Array.from(generatedTiles).sort()));

@@ -11,8 +11,8 @@ describe('MapData & Authentic Tile Integrity', () => {
     const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
 
     expect(mapData.id).toBe('new_bark_town');
-    expect(mapData.width).toBe(16);
-    expect(mapData.height).toBe(12);
+    expect(mapData.width).toBe(20);
+    expect(mapData.height).toBe(18);
     expect(mapData.tileSize).toBe(64);
 
     const totalExpectedTiles = mapData.width * mapData.height;
@@ -29,17 +29,17 @@ describe('MapData & Authentic Tile Integrity', () => {
       expect(fs.existsSync(tileFile)).toBe(true);
     }
 
-    // Verify Warps
+    // Verify Warps (Authentic pret/pokecrystal coordinates)
     expect(mapData.warps.length).toBeGreaterThanOrEqual(4);
     const labWarp = mapData.warps.find((w) => w.targetMapId === 'elms_lab');
     expect(labWarp).toBeDefined();
-    expect(labWarp?.x).toBe(4);
+    expect(labWarp?.x).toBe(6);
     expect(labWarp?.y).toBe(3);
 
     const houseWarp = mapData.warps.find((w) => w.targetMapId === 'players_house_1f');
     expect(houseWarp).toBeDefined();
-    expect(houseWarp?.x).toBe(12);
-    expect(houseWarp?.y).toBe(3);
+    expect(houseWarp?.x).toBe(13);
+    expect(houseWarp?.y).toBe(5);
 
     // Ensure all warp door coordinates are walkable (collisionGrid === 0)
     for (const warp of mapData.warps) {
@@ -58,8 +58,8 @@ describe('MapData & Authentic Tile Integrity', () => {
 
     const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
     expect(mapData.id).toBe('route_29');
-    expect(mapData.width).toBe(30);
-    expect(mapData.height).toBe(10);
+    expect(mapData.width).toBe(60);
+    expect(mapData.height).toBe(18);
 
     const totalExpectedTiles = mapData.width * mapData.height;
     expect(mapData.collisionGrid.length).toBe(totalExpectedTiles);
@@ -81,8 +81,8 @@ describe('MapData & Authentic Tile Integrity', () => {
 
     const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
     expect(mapData.id).toBe('cherrygrove_city');
-    expect(mapData.width).toBe(16);
-    expect(mapData.height).toBe(14);
+    expect(mapData.width).toBe(40);
+    expect(mapData.height).toBe(18);
 
     const totalExpectedTiles = mapData.width * mapData.height;
     expect(mapData.collisionGrid.length).toBe(totalExpectedTiles);

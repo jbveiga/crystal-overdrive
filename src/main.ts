@@ -49,7 +49,7 @@ async function bootstrap() {
   const defeatedTrainers: Set<string> = new Set();
 
   let initialMapId = 'new_bark_town';
-  let initialPlayerX = 6;
+  let initialPlayerX = 13;
   let initialPlayerY = 6;
   let initialPlayerDir: Direction = 'DOWN';
 
@@ -89,7 +89,13 @@ async function bootstrap() {
   mapManager.registerMap(route29);
   mapManager.registerMap(cherrygrove);
 
-  const initialMap = mapManager.setCurrentMap(initialMapId);
+  let initialMap = mapManager.setCurrentMap(initialMapId);
+  if (!mapManager.isWalkable(initialPlayerX, initialPlayerY)) {
+    initialMapId = 'new_bark_town';
+    initialMap = mapManager.setCurrentMap(initialMapId);
+    initialPlayerX = 13;
+    initialPlayerY = 6;
+  }
 
   // 4. Save Game Helper
   const saveCurrentGame = async () => {
@@ -184,30 +190,30 @@ async function bootstrap() {
     isPlayer: true,
   };
 
-  // Town NPC
+  // Town NPC (Authentic NewBarkTown.asm coordinate: 6, 8)
   const npc: GridEntity = {
     id: 'town_npc',
-    x: 10,
-    y: 5,
-    targetX: 10,
-    targetY: 5,
-    renderX: 10,
-    renderY: 5,
+    x: 6,
+    y: 8,
+    targetX: 6,
+    targetY: 8,
+    renderX: 6,
+    renderY: 8,
     direction: 'DOWN',
     isMoving: false,
     progress: 0,
     isPlayer: false,
   };
 
-  // Route 29 Trainer: Youngster Joey
+  // Route 29 Trainer: Youngster Joey (standing on main path at 28, 6)
   const joeyNpc: GridEntity = {
     id: 'youngster_joey',
-    x: 18,
-    y: 3,
-    targetX: 18,
-    targetY: 3,
-    renderX: 18,
-    renderY: 3,
+    x: 28,
+    y: 6,
+    targetX: 28,
+    targetY: 6,
+    renderX: 28,
+    renderY: 6,
     direction: 'DOWN',
     isMoving: false,
     progress: 0,
@@ -497,12 +503,12 @@ async function bootstrap() {
             return;
           }
 
-          // Route 29: Line of sight check for Youngster Joey (x: 18, y: 4..5)
+          // Route 29: Line of sight check for Youngster Joey (x: 28, y: 7..8)
           if (
             currentMap?.id === 'route_29' &&
             !defeatedTrainers.has('youngster_joey') &&
-            player.x === 18 &&
-            (player.y === 4 || player.y === 5)
+            player.x === 28 &&
+            (player.y === 7 || player.y === 8)
           ) {
             defeatedTrainers.add('youngster_joey');
             const joeyRattata = PokemonFactory.create('rattata', 4, ['tackle', 'tailwhip', 'quickattack']);
