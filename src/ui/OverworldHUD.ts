@@ -1,6 +1,12 @@
 import type { Direction, SpeedMultiplier, RoamerState } from '../types/game';
 import { eventBus } from '../core/EventBus';
 
+export interface OverworldHUDOptions {
+  onSpeedCycle?: () => SpeedMultiplier;
+  onBagOpen?: () => void;
+  onSaveGame?: () => void;
+}
+
 export class OverworldHUD {
   private container: HTMLElement;
   private speedButton!: HTMLButtonElement;
@@ -8,15 +14,15 @@ export class OverworldHUD {
   private roamerAlertBanner!: HTMLDivElement;
   private activeDirection: Direction | null = null;
   private heldKeys: Set<string> = new Set();
-  private onSpeedCycle?: () => SpeedMultiplier;
+  private options: OverworldHUDOptions;
 
-  constructor(containerId: string = 'ui-overlay', onSpeedCycle?: () => SpeedMultiplier) {
+  constructor(containerId: string = 'ui-overlay', options: OverworldHUDOptions = {}) {
     const el = document.getElementById(containerId);
     if (!el) {
       throw new Error(`HUD Container #${containerId} not found in DOM`);
     }
     this.container = el;
-    this.onSpeedCycle = onSpeedCycle;
+    this.options = options;
 
     this.createUI();
     this.setupControls();
@@ -54,14 +60,40 @@ export class OverworldHUD {
             New Bark Town
           </div>
 
-          <div style="display: flex; gap: 10px; align-items: center; pointer-events: auto;">
+          <div style="display: flex; gap: 8px; align-items: center; pointer-events: auto;">
+            <button id="bag-btn" style="
+              background: #d97706;
+              color: #ffffff;
+              border: none;
+              border-radius: 6px;
+              padding: 8px 12px;
+              font-size: 13px;
+              font-weight: 700;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+            ">
+              🎒 BAG
+            </button>
+            <button id="save-btn" style="
+              background: #059669;
+              color: #ffffff;
+              border: none;
+              border-radius: 6px;
+              padding: 8px 12px;
+              font-size: 13px;
+              font-weight: 700;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
+            ">
+              💾 SAVE
+            </button>
             <button id="pokegear-btn" style="
               background: #0d9488;
               color: #ffffff;
               border: none;
               border-radius: 6px;
-              padding: 8px 14px;
-              font-size: 14px;
+              padding: 8px 12px;
+              font-size: 13px;
               font-weight: 700;
               cursor: pointer;
               box-shadow: 0 2px 8px rgba(13, 148, 136, 0.4);
@@ -73,8 +105,8 @@ export class OverworldHUD {
               color: #ffffff;
               border: none;
               border-radius: 6px;
-              padding: 8px 14px;
-              font-size: 14px;
+              padding: 8px 12px;
+              font-size: 13px;
               font-weight: 700;
               cursor: pointer;
               transition: background 0.15s ease, transform 0.1s ease;
@@ -143,10 +175,26 @@ export class OverworldHUD {
     this.speedButton = this.container.querySelector('#speed-toggle-btn') as HTMLButtonElement;
     this.routeBanner = this.container.querySelector('#route-banner') as HTMLDivElement;
     this.roamerAlertBanner = this.container.querySelector('#roamer-alert-banner') as HTMLDivElement;
+    const bagBtn = this.container.querySelector('#bag-btn') as HTMLButtonElement;
+    const saveBtn = this.container.querySelector('#save-btn') as HTMLButtonElement;
     const pokegearBtn = this.container.querySelector('#pokegear-btn') as HTMLButtonElement;
     const pokegearModal = this.container.querySelector('#pokegear-modal') as HTMLDivElement;
     const closePokegearBtn = this.container.querySelector('#close-pokegear-btn') as HTMLButtonElement;
     const roamerStatusList = this.container.querySelector('#roamer-status-list') as HTMLDivElement;
+
+    bagBtn.addEventListener('click', () => {
+      if (this.options.onBagOpen) this.options.onBagOpen();
+    });
+
+    saveBtn.addEventListener('click', () => {
+      if (this.options.onSaveGame) {
+        this.options.onSaveGame();
+        saveBtn.innerText = '✅ SAVED!';
+        setTimeout(() => {
+          saveBtn.innerText = '💾 SAVE';
+        }, 1500);
+      }
+    });
 
     pokegearBtn.addEventListener('click', () => {
       pokegearModal.style.display = pokegearModal.style.display === 'none' ? 'block' : 'none';
@@ -157,8 +205,8 @@ export class OverworldHUD {
     });
 
     this.speedButton.addEventListener('click', () => {
-      if (this.onSpeedCycle) {
-        const nextSpeed = this.onSpeedCycle();
+      if (this.options.onSpeedCycle) {
+        const nextSpeed = this.options.onSpeedCycle();
         this.updateSpeedDisplay(nextSpeed);
       }
     });
@@ -251,8 +299,8 @@ export class OverworldHUD {
   private setupControls(): void {
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Shift') {
-        if (!e.repeat && this.onSpeedCycle) {
-          const nextSpeed = this.onSpeedCycle();
+        if (!e.repeat && this.options.onSpeedCycle) {
+          const nextSpeed = this.options.onSpeedCycle();
           this.updateSpeedDisplay(nextSpeed);
         }
         return;
