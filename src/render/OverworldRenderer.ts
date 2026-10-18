@@ -1,15 +1,32 @@
-import { Application, Container, Graphics } from 'pixi.js';
-import type { MapData } from '../types/game';
+import { Application, Container, Sprite, Texture, Rectangle, Assets } from 'pixi.js';
+import type { MapData, Direction } from '../types/game';
 import type { GridEntity } from '../world/GridPhysics';
+
+interface CharacterFrames {
+  downStand: Texture;
+  downWalk1: Texture;
+  downWalk2: Texture;
+  upStand: Texture;
+  upWalk1: Texture;
+  upWalk2: Texture;
+  sideStand: Texture;
+  sideWalk1: Texture;
+  sideWalk2: Texture;
+}
 
 export class OverworldRenderer {
   public app!: Application;
   private stageContainer!: Container;
   private mapContainer!: Container;
   private entityContainer!: Container;
-  private playerGraphic!: Graphics;
-  private npcGraphics: Map<string, Graphics> = new Map();
+  private playerSprite!: Sprite;
+  private npcSprites: Map<string, Sprite> = new Map();
   private tileSize: number = 64;
+
+  // Textures
+  private tileTextures: Map<string, Texture> = new Map();
+  private playerFrames!: CharacterFrames;
+  private npcBoyFrames!: CharacterFrames;
 
   public async init(containerElement: HTMLElement): Promise<void> {
     this.app = new Application();
@@ -18,7 +35,7 @@ export class OverworldRenderer {
       backgroundColor: 0x0f172a,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
-      antialias: true,
+      antialias: false, // Crisp pixel art
     });
 
     containerElement.appendChild(this.app.canvas);
@@ -31,65 +48,99 @@ export class OverworldRenderer {
     this.stageContainer.addChild(this.entityContainer);
     this.app.stage.addChild(this.stageContainer);
 
-    this.createPlayerGraphic();
+    await this.loadAssets();
+    this.createPlayerSprite();
   }
 
-  private createPlayerGraphic(): void {
-    this.playerGraphic = new Graphics();
-    this.entityContainer.addChild(this.playerGraphic);
-    this.drawPlayerCharacter('DOWN');
-  }
+  private async loadAssets(): Promise<void> {
+    // 1. Load tiles
+    const tileNames = [
+      'grass',
+      'tall_grass',
+      'tree_tall_0',
+      'tree_tall_1',
+      'tree_short_0',
+      'path',
+      'path_gravel',
+      'water',
+      'water_edge',
+      'flower_0',
+      'flower_1',
+      'roof',
+      'wall',
+      'door',
+      'sign',
+    ];
 
-  private drawPlayerCharacter(direction: string): void {
-    this.playerGraphic.clear();
-
-    const size = this.tileSize;
-    const padding = size * 0.15;
-    const radius = (size - padding * 2) / 2;
-    const centerX = size / 2;
-    const centerY = size / 2;
-
-    // Shadow
-    this.playerGraphic.ellipse(centerX, size - 10, radius * 0.8, 6);
-    this.playerGraphic.fill({ color: 0x000000, alpha: 0.3 });
-
-    // Body (Gold / Ethan inspired red jacket & blue pants)
-    this.playerGraphic.circle(centerX, centerY - 2, radius);
-    this.playerGraphic.fill({ color: 0xdc2626 }); // Red cap/jacket
-    this.playerGraphic.stroke({ width: 3, color: 0x991b1b });
-
-    // Direction visor / eye indicator
-    let eyeX = centerX;
-    let eyeY = centerY - 4;
-    switch (direction) {
-      case 'UP':
-        eyeY -= 8;
-        break;
-      case 'DOWN':
-        eyeY += 8;
-        break;
-      case 'LEFT':
-        eyeX -= 8;
-        break;
-      case 'RIGHT':
-        eyeX += 8;
-        break;
+    for (const name of tileNames) {
+      try {
+        const tex = await Assets.load<Texture>(`/assets/tiles/${name}.png`);
+        tex.source.scaleMode = 'nearest';
+        this.tileTextures.set(name, tex);
+      } catch (err) {
+        console.warn(`Could not load tile ${name}:`, err);
+      }
     }
 
-    this.playerGraphic.circle(eyeX, eyeY, 5);
-    this.playerGraphic.fill({ color: 0xffffff });
-    this.playerGraphic.circle(eyeX, eyeY, 2.5);
-    this.playerGraphic.fill({ color: 0x1e293b });
+    // 2. Load character sheets (144x32 -> 9 frames of 16x32)
+    const goldWalkTex = await Assets.load<Texture>('/assets/sprites/characters/gold_walk.png');
+    goldWalkTex.source.scaleMode = 'nearest';
+    this.playerFrames = this.extractCharacterFrames(goldWalkTex);
+
+    const npcBoyTex = await Assets.load<Texture>('/assets/sprites/characters/npc_boy.png');
+    npcBoyTex.source.scaleMode = 'nearest';
+    this.npcBoyFrames = this.extractCharacterFrames(npcBoyTex);
+  }
+
+  private extractCharacterFrames(sheet: Texture): CharacterFrames {
+    const fw = 16;
+    const fh = 32;
+
+    const getFrame = (idx: number) => {
+      return new Texture({
+        source: sheet.source,
+        frame: new Rectangle(idx * fw, 0, fw, fh),
+      });
+    };
+
+    return {
+      downStand: getFrame(0),
+      downWalk1: getFrame(1),
+      downWalk2: getFrame(2),
+      upStand: getFrame(3),
+      upWalk1: getFrame(4),
+      upWalk2: getFrame(5),
+      sideStand: getFrame(6),
+      sideWalk1: getFrame(7),
+      sideWalk2: getFrame(8),
+    };
+  }
+
+  private createPlayerSprite(): void {
+    this.playerSprite = new Sprite(this.playerFrames.downStand);
+    this.playerSprite.anchor.set(0.5, 0.85);
+    // Scale 16x32 up to 48x96 (3x nearest-neighbor)
+    this.playerSprite.scale.set(3, 3);
+    this.entityContainer.addChild(this.playerSprite);
   }
 
   /**
-   * Rebuilds the visual tile representation for the current map
+   * Builds the textured overworld tilemap
    */
   public renderMap(map: MapData): void {
     this.mapContainer.removeChildren();
     this.tileSize = map.tileSize;
 
-    const g = new Graphics();
+    const grassTex = this.tileTextures.get('grass') || Texture.WHITE;
+    const tallGrassTex = this.tileTextures.get('tall_grass') || grassTex;
+    const pathTex = this.tileTextures.get('path') || grassTex;
+    const waterTex = this.tileTextures.get('water') || Texture.WHITE;
+    const treeTallTex = this.tileTextures.get('tree_tall_0') || Texture.WHITE;
+    const treeShortTex = this.tileTextures.get('tree_short_0') || treeTallTex;
+    const roofTex = this.tileTextures.get('roof') || treeTallTex;
+    const wallTex = this.tileTextures.get('wall') || treeTallTex;
+    const doorTex = this.tileTextures.get('door') || pathTex;
+    const flowerTex = this.tileTextures.get('flower_0') || grassTex;
 
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
@@ -98,86 +149,164 @@ export class OverworldRenderer {
         const px = x * this.tileSize;
         const py = y * this.tileSize;
 
-        // Base tile
+        // Base ground sprite (always render grass underneath)
+        const baseSprite = new Sprite(grassTex);
+        baseSprite.position.set(px, py);
+        baseSprite.width = this.tileSize;
+        baseSprite.height = this.tileSize;
+        this.mapContainer.addChild(baseSprite);
+
+        // Feature sprite
         if (collision === 1) {
-          // Solid Tree / Mountain / Building
-          g.rect(px, py, this.tileSize, this.tileSize);
-          g.fill({ color: 0x1e3a1e }); // Deep forest green
-          g.stroke({ width: 1, color: 0x142814 });
-
-          // Tree canopy detail
-          g.circle(px + this.tileSize / 2, py + this.tileSize / 2, this.tileSize * 0.38);
-          g.fill({ color: 0x2d5a27 });
+          // Solid: Buildings, Roofs, Walls, or Trees
+          let tex = treeTallTex;
+          if (map.id === 'new_bark_town' || map.id === 'cherrygrove_city') {
+            // Building areas in towns
+            if (y >= 2 && y <= 3 && ((x >= 2 && x <= 3) || (x >= 11 && x <= 13))) {
+              tex = roofTex;
+            } else if (y === 4 && ((x >= 2 && x <= 3) || (x >= 11 && x <= 13))) {
+              tex = wallTex;
+            } else if ((x === 5 || x === 6) && (y === 5 || y === 6)) {
+              tex = treeShortTex;
+            }
+          }
+          const featureSprite = new Sprite(tex);
+          featureSprite.position.set(px, py);
+          featureSprite.width = this.tileSize;
+          featureSprite.height = this.tileSize;
+          this.mapContainer.addChild(featureSprite);
         } else if (collision === 2) {
-          // Tall Grass (encounter zone)
-          g.rect(px, py, this.tileSize, this.tileSize);
-          g.fill({ color: 0x4d7c0f }); // Vibrant grass green
-          g.stroke({ width: 1, color: 0x3f6212 });
-
-          // Grass blade texture hints
-          g.rect(px + 12, py + 14, 8, 20);
-          g.fill({ color: 0x65a30d });
-          g.rect(px + 36, py + 26, 8, 24);
-          g.fill({ color: 0x65a30d });
-          g.rect(px + 24, py + 34, 8, 16);
-          g.fill({ color: 0x65a30d });
+          // Tall Grass
+          const grassOverlay = new Sprite(tallGrassTex);
+          grassOverlay.position.set(px, py);
+          grassOverlay.width = this.tileSize;
+          grassOverlay.height = this.tileSize;
+          this.mapContainer.addChild(grassOverlay);
         } else if (collision === 3) {
           // Water
-          g.rect(px, py, this.tileSize, this.tileSize);
-          g.fill({ color: 0x0284c7 });
-          g.stroke({ width: 1, color: 0x0369a1 });
-
-          // Water ripple
-          g.rect(px + 16, py + 20, 24, 4);
-          g.fill({ color: 0x38bdf8, alpha: 0.7 });
+          const waterSprite = new Sprite(waterTex);
+          waterSprite.position.set(px, py);
+          waterSprite.width = this.tileSize;
+          waterSprite.height = this.tileSize;
+          this.mapContainer.addChild(waterSprite);
         } else {
-          // Walkable Path / Normal Ground (0)
-          g.rect(px, py, this.tileSize, this.tileSize);
-          g.fill({ color: 0xd6c49e }); // Path beige
-          g.stroke({ width: 1, color: 0xc4b28c, alpha: 0.5 });
+          // Walkable ground (0): Path, Flowers, or Doors
+          if (map.warps.some((w) => w.x === x && w.y === y)) {
+            const doorSprite = new Sprite(doorTex);
+            doorSprite.position.set(px, py);
+            doorSprite.width = this.tileSize;
+            doorSprite.height = this.tileSize;
+            this.mapContainer.addChild(doorSprite);
+          } else if (
+            // Path detection
+            (map.id === 'route_29' && (y === 4 || y === 5)) ||
+            (map.id === 'new_bark_town' && (y === 6 || y === 7 || x === 8))
+          ) {
+            const pathSprite = new Sprite(pathTex);
+            pathSprite.position.set(px, py);
+            pathSprite.width = this.tileSize;
+            pathSprite.height = this.tileSize;
+            this.mapContainer.addChild(pathSprite);
+          } else if ((x + y * 7) % 11 === 0) {
+            // Scattered flowers
+            const flowerSprite = new Sprite(flowerTex);
+            flowerSprite.position.set(px, py);
+            flowerSprite.width = this.tileSize;
+            flowerSprite.height = this.tileSize;
+            this.mapContainer.addChild(flowerSprite);
+          }
         }
       }
     }
-
-    this.mapContainer.addChild(g);
   }
 
   /**
-   * Updates player sprite position & camera smoothly without allocating new objects
+   * Helper to pick current walking animation frame
+   */
+  private getFrameForEntity(frames: CharacterFrames, dir: Direction, isMoving: boolean, progress: number): Texture {
+    if (!isMoving) {
+      switch (dir) {
+        case 'UP':
+          return frames.upStand;
+        case 'DOWN':
+          return frames.downStand;
+        case 'LEFT':
+        case 'RIGHT':
+          return frames.sideStand;
+      }
+    }
+
+    // Walking animation cycle (Step 1 -> Stand -> Step 2 -> Stand)
+    const step = Math.floor((progress * 4) % 4);
+    switch (dir) {
+      case 'UP':
+        if (step === 0) return frames.upWalk1;
+        if (step === 2) return frames.upWalk2;
+        return frames.upStand;
+      case 'DOWN':
+        if (step === 0) return frames.downWalk1;
+        if (step === 2) return frames.downWalk2;
+        return frames.downStand;
+      case 'LEFT':
+      case 'RIGHT':
+        if (step === 0) return frames.sideWalk1;
+        if (step === 2) return frames.sideWalk2;
+        return frames.sideStand;
+    }
+  }
+
+  /**
+   * Updates player & NPC sprite animations and centers camera smoothly
    */
   public update(player: GridEntity, npcs: GridEntity[] = []): void {
-    // 1. Update player position & facing
-    const playerPixelX = player.renderX * this.tileSize;
-    const playerPixelY = player.renderY * this.tileSize;
-    this.playerGraphic.position.set(playerPixelX, playerPixelY);
-    this.drawPlayerCharacter(player.direction);
+    const scale = 3;
+
+    // 1. Update Player
+    const playerPxX = (player.renderX + 0.5) * this.tileSize;
+    const playerPxY = (player.renderY + 0.85) * this.tileSize;
+    this.playerSprite.position.set(playerPxX, playerPxY);
+
+    const playerTex = this.getFrameForEntity(this.playerFrames, player.direction, player.isMoving, player.progress);
+    this.playerSprite.texture = playerTex;
+
+    // Flip side frame horizontally for LEFT
+    if (player.direction === 'LEFT') {
+      this.playerSprite.scale.set(-scale, scale);
+    } else {
+      this.playerSprite.scale.set(scale, scale);
+    }
 
     // 2. Update NPCs
     for (const npc of npcs) {
-      let g = this.npcGraphics.get(npc.id);
-      if (!g) {
-        g = new Graphics();
-        this.entityContainer.addChild(g);
-        this.npcGraphics.set(npc.id, g);
+      let sprite = this.npcSprites.get(npc.id);
+      if (!sprite) {
+        sprite = new Sprite(this.npcBoyFrames.downStand);
+        sprite.anchor.set(0.5, 0.85);
+        sprite.scale.set(scale, scale);
+        this.entityContainer.addChild(sprite);
+        this.npcSprites.set(npc.id, sprite);
       }
-      g.clear();
-      const nSize = this.tileSize;
-      const nPx = npc.renderX * nSize;
-      const nPy = npc.renderY * nSize;
-      g.position.set(nPx, nPy);
 
-      // Simple friendly NPC sprite
-      g.circle(nSize / 2, nSize / 2, nSize * 0.35);
-      g.fill({ color: 0x3b82f6 }); // Blue outfit
-      g.stroke({ width: 2, color: 0x1d4ed8 });
+      const npcPxX = (npc.renderX + 0.5) * this.tileSize;
+      const npcPxY = (npc.renderY + 0.85) * this.tileSize;
+      sprite.position.set(npcPxX, npcPxY);
+
+      const npcTex = this.getFrameForEntity(this.npcBoyFrames, npc.direction, npc.isMoving, npc.progress);
+      sprite.texture = npcTex;
+
+      if (npc.direction === 'LEFT') {
+        sprite.scale.set(-scale, scale);
+      } else {
+        sprite.scale.set(scale, scale);
+      }
     }
 
-    // 3. Smooth Camera centering on player
+    // 3. Smooth Camera Centering
     const screenWidth = this.app.screen.width;
     const screenHeight = this.app.screen.height;
 
-    const cameraTargetX = screenWidth / 2 - playerPixelX - this.tileSize / 2;
-    const cameraTargetY = screenHeight / 2 - playerPixelY - this.tileSize / 2;
+    const cameraTargetX = screenWidth / 2 - (player.renderX + 0.5) * this.tileSize;
+    const cameraTargetY = screenHeight / 2 - (player.renderY + 0.5) * this.tileSize;
 
     this.stageContainer.position.set(cameraTargetX, cameraTargetY);
   }
