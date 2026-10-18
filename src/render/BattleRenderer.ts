@@ -144,6 +144,89 @@ export class BattleRenderer {
     });
   }
 
+  public animateThrowBall(): Promise<Graphics> {
+    return new Promise((resolve) => {
+      const width = this.app.screen.width;
+      const height = this.app.screen.height;
+
+      const ball = new Graphics();
+      // Upper half red
+      ball.arc(0, 0, 14, Math.PI, 0);
+      ball.fill({ color: 0xdc2626 });
+      // Lower half white
+      ball.arc(0, 0, 14, 0, Math.PI);
+      ball.fill({ color: 0xf8fafc });
+      // Center band & button
+      ball.rect(-14, -2, 28, 4);
+      ball.fill({ color: 0x1e293b });
+      ball.circle(0, 0, 4);
+      ball.fill({ color: 0xffffff });
+      ball.stroke({ width: 1.5, color: 0x1e293b });
+
+      ball.position.set(width * 0.28, height * 0.72);
+      this.arenaContainer.addChild(ball);
+
+      const dur = 0.4 / this.speedMultiplier;
+      const targetX = this.enemyPokemonSprite.x;
+      const targetY = this.enemyPokemonSprite.y - 20;
+
+      // Arc throw
+      gsap.to(ball, {
+        x: targetX,
+        y: targetY,
+        duration: dur,
+        ease: 'power1.out',
+        onComplete: () => {
+          // Shrink enemy sprite into ball
+          gsap.to(this.enemyPokemonSprite, {
+            alpha: 0,
+            scale: 0.1,
+            duration: 0.2 / this.speedMultiplier,
+            onComplete: () => {
+              // Ball drops down
+              gsap.to(ball, {
+                y: targetY + 30,
+                duration: 0.2 / this.speedMultiplier,
+                ease: 'bounce.out',
+                onComplete: () => resolve(ball),
+              });
+            },
+          });
+        },
+      });
+    });
+  }
+
+  public animateShake(ball: Graphics, shakes: 0 | 1 | 2 | 3 | 4, caught: boolean): Promise<void> {
+    return new Promise((resolve) => {
+      const shakeDur = 0.25 / this.speedMultiplier;
+      const tl = gsap.timeline({
+        onComplete: () => {
+          if (caught) {
+            // Flash caught glow
+            gsap.to(ball, {
+              alpha: 0.8,
+              yoyo: true,
+              repeat: 3,
+              duration: 0.1 / this.speedMultiplier,
+              onComplete: () => resolve(),
+            });
+          } else {
+            // Ball bursts open, enemy reappears
+            this.arenaContainer.removeChild(ball);
+            this.enemyPokemonSprite.alpha = 1;
+            this.enemyPokemonSprite.scale.set(2.4, 2.4);
+            resolve();
+          }
+        },
+      });
+
+      for (let i = 0; i < shakes; i++) {
+        tl.to(ball, { rotation: 0.35, duration: shakeDur * 0.5, yoyo: true, repeat: 1 });
+      }
+    });
+  }
+
   public endBattle(): void {
     this.container.visible = false;
     this.arenaContainer.removeChildren();

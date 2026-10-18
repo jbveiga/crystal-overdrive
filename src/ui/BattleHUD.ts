@@ -1,9 +1,10 @@
-import type { PokemonInstance, SpeedMultiplier } from '../types/game';
+import type { PokemonInstance, SpeedMultiplier, PokeballId } from '../types/game';
 import { EffectivenessHelper } from '../battle/EffectivenessHelper';
 import { PokemonFactory } from '../battle/PokemonFactory';
 
 export interface BattleHUDCallbacks {
   onMoveSelected: (moveId: string) => void;
+  onBagSelected: (ballId: PokeballId) => void;
   onRunSelected: () => void;
   onSpeedToggle: () => SpeedMultiplier;
 }
@@ -14,6 +15,7 @@ export class BattleHUD {
   private messageBox!: HTMLDivElement;
   private actionMenu!: HTMLDivElement;
   private fightMenu!: HTMLDivElement;
+  private bagMenu!: HTMLDivElement;
   private playerHpBar!: HTMLDivElement;
   private enemyHpBar!: HTMLDivElement;
   private playerHpText!: HTMLSpanElement;
@@ -209,6 +211,16 @@ export class BattleHUD {
           gap: 10px;
           flex: 2;
         "></div>
+
+        <!-- Bag Submenu (Pokéballs) -->
+        <div id="battle-bag-menu" style="
+          display: none;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          flex: 2;
+          max-height: 140px;
+          overflow-y: auto;
+        "></div>
       </div>
     `;
 
@@ -218,6 +230,7 @@ export class BattleHUD {
     this.messageBox = root.querySelector('#battle-message-box') as HTMLDivElement;
     this.actionMenu = root.querySelector('#battle-action-menu') as HTMLDivElement;
     this.fightMenu = root.querySelector('#battle-fight-menu') as HTMLDivElement;
+    this.bagMenu = root.querySelector('#battle-bag-menu') as HTMLDivElement;
     this.playerHpBar = root.querySelector('#player-hp-bar') as HTMLDivElement;
     this.enemyHpBar = root.querySelector('#enemy-hp-bar') as HTMLDivElement;
     this.playerHpText = root.querySelector('#player-hp-text') as HTMLSpanElement;
@@ -243,7 +256,7 @@ export class BattleHUD {
     });
 
     root.querySelector('#btn-bag')!.addEventListener('click', () => {
-      this.showMessage('You opened your Bag... (Modern Pokémarts in Phase 3)');
+      this.showBagMenu();
     });
 
     root.querySelector('#btn-pokemon')!.addEventListener('click', () => {
@@ -296,11 +309,6 @@ export class BattleHUD {
     if (pct > 50) bar.style.background = '#22c55e'; // Green
     else if (pct > 20) bar.style.background = '#eab308'; // Yellow
     else bar.style.background = '#ef4444'; // Red
-  }
-
-  public showActionMenu(): void {
-    this.fightMenu.style.display = 'none';
-    this.actionMenu.style.display = 'grid';
   }
 
   public showFightMenu(): void {
@@ -373,6 +381,64 @@ export class BattleHUD {
 
       this.fightMenu.appendChild(btn);
     }
+  }
+
+  public showActionMenu(): void {
+    this.fightMenu.style.display = 'none';
+    this.bagMenu.style.display = 'none';
+    this.actionMenu.style.display = 'grid';
+  }
+
+  public showBagMenu(): void {
+    this.actionMenu.style.display = 'none';
+    this.fightMenu.style.display = 'none';
+    this.bagMenu.style.display = 'grid';
+    this.bagMenu.innerHTML = '';
+
+    const balls: Array<{ id: PokeballId; name: string; desc: string; count: number; color: string }> = [
+      { id: 'quick-ball', name: 'Quick Ball', desc: '5x catch rate on Turn 1', count: 5, color: '#0284c7' },
+      { id: 'fast-ball', name: 'Fast Ball', desc: '4x if Base Speed >= 100', count: 5, color: '#ea580c' },
+      { id: 'net-ball', name: 'Net Ball', desc: '3.5x if Water or Bug', count: 5, color: '#059669' },
+      { id: 'ultra-ball', name: 'Ultra Ball', desc: '2x high catch rate', count: 10, color: '#ca8a04' },
+      { id: 'great-ball', name: 'Great Ball', desc: '1.5x moderate catch rate', count: 15, color: '#2563eb' },
+      { id: 'poke-ball', name: 'Poké Ball', desc: '1x standard catch rate', count: 30, color: '#dc2626' },
+      { id: 'master-ball', name: 'Master Ball', desc: '100% Guaranteed capture', count: 1, color: '#7c3aed' },
+    ];
+
+    for (const ball of balls) {
+      const btn = document.createElement('button');
+      btn.style.cssText = `
+        background: #1e293b;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        text-align: left;
+        transition: transform 0.1s ease;
+      `;
+
+      btn.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span style="font-weight: 700; font-size: 14px; color: ${ball.color};">🔴 ${ball.name}</span>
+          <span style="font-size: 12px; font-weight: 700; color: #94a3b8;">x${ball.count}</span>
+        </div>
+        <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">
+          ${ball.desc}
+        </div>
+      `;
+
+      btn.addEventListener('click', () => {
+        if (this.callbacks?.onBagSelected) {
+          this.callbacks.onBagSelected(ball.id);
+        }
+      });
+
+      this.bagMenu.appendChild(btn);
+    }
 
     // Back button
     const backBtn = document.createElement('button');
@@ -388,7 +454,7 @@ export class BattleHUD {
     `;
     backBtn.innerText = '← BACK';
     backBtn.addEventListener('click', () => this.showActionMenu());
-    this.fightMenu.appendChild(backBtn);
+    this.bagMenu.appendChild(backBtn);
   }
 
   public async showMessage(text: string): Promise<void> {

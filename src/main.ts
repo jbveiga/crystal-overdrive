@@ -8,7 +8,9 @@ import { BattleRenderer } from './render/BattleRenderer';
 import { BattleHUD } from './ui/BattleHUD';
 import { BattleStateMachine } from './battle/BattleStateMachine';
 import { PokemonFactory } from './battle/PokemonFactory';
-import type { MapData, Direction } from './types/game';
+import { RoamingManager } from './world/RoamingManager';
+import type { MapData, Direction, PokeballId } from './types/game';
+import type { Graphics } from 'pixi.js';
 
 async function bootstrap() {
   const canvasContainer = document.getElementById('canvas-container');
@@ -19,6 +21,7 @@ async function bootstrap() {
   // 1. Initialize Core Systems
   const gameClock = new GameClock();
   const mapManager = new MapManager();
+  const roamingManager = new RoamingManager();
   let gameState: 'OVERWORLD' | 'BATTLE' = 'OVERWORLD';
 
   // 2. Fetch and Register Vertical Slice Maps
@@ -45,6 +48,7 @@ async function bootstrap() {
     return newSpeed;
   });
   overworldHUD.updateRouteName(initialMap.name);
+  overworldHUD.updatePokegear(roamingManager.getAllRoamers());
 
   const overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer);
@@ -94,31 +98,49 @@ async function bootstrap() {
     const current = mapManager.getCurrentMap();
     if (!current) return;
 
+    let nextMapId: string | null = null;
+    let targetX = entity.x;
+    let targetY = entity.y;
+
     // Transitioning West
     if (entity.x < 0 && current.connections.WEST) {
       const conn = current.connections.WEST;
+      nextMapId = conn.mapId;
       const nextMap = mapManager.setCurrentMap(conn.mapId);
+      targetX = nextMap.width - 1;
+      targetY += conn.offset;
       overworldRenderer.renderMap(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
-      entity.x = nextMap.width - 1;
-      entity.targetX = entity.x;
-      entity.renderX = entity.x;
-      entity.y += conn.offset;
-      entity.targetY = entity.y;
-      entity.renderY = entity.y;
     }
     // Transitioning East
     else if (entity.x >= current.width && current.connections.EAST) {
       const conn = current.connections.EAST;
+      nextMapId = conn.mapId;
       const nextMap = mapManager.setCurrentMap(conn.mapId);
+      targetX = 0;
+      targetY += conn.offset;
       overworldRenderer.renderMap(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
-      entity.x = 0;
-      entity.targetX = 0;
-      entity.renderX = 0;
-      entity.y += conn.offset;
-      entity.targetY = entity.y;
-      entity.renderY = entity.y;
+    }
+
+    if (nextMapId) {
+      entity.x = targetX;
+      entity.targetX = targetX;
+      entity.renderX = targetX;
+      entity.y = targetY;
+      entity.targetY = targetY;
+      entity.renderY = targetY;
+
+      // Roaming Beast Markov Transition Roll on Route Change
+      roamingManager.onPlayerRouteChange(nextMapId);
+      eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+
+      const roamerOnRoute = roamingManager.getActiveRoamerOnRoute(nextMapId);
+      if (roamerOnRoute) {
+        overworldHUD.showRoamerAlert(roamerOnRoute.speciesId, nextMapId);
+      } else {
+        overworldHUD.hideRoamerAlert();
+      }
     }
   };
 
@@ -155,6 +177,46 @@ async function bootstrap() {
         }
 
         if (result.isBattleOver) {
+          if (result.winner === 'PLAYER' && isRoamer) {
+            roamingManager.markDefeated(wildPokemon.speciesId);
+            eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+            overworldHUD.hideRoamerAlert();
+          }
+          await battleHUD.showMessage('Battle concluded! Returning to overworld...');
+          battleRenderer.endBattle();
+          battleHUD.hide();
+          gameState = 'OVERWORLD';
+        } else {
+          battleHUD.showActionMenu();
+        }
+      },
+      onBagSelected: async (ballId: PokeballId) => {
+        const result = battleSM.executeRound({ type: 'BAG', ballId });
+        let ballGraphic: Graphics | null = null;
+
+        for (const ev of result.events) {
+          if (ev.type === 'MESSAGE') {
+            await battleHUD.showMessage(ev.text);
+          } else if (ev.type === 'THROW_BALL') {
+            ballGraphic = await battleRenderer.animateThrowBall();
+          } else if (ev.type === 'SHAKE' && ballGraphic) {
+            await battleRenderer.animateShake(ballGraphic, ev.shakes, ev.caught);
+          } else if (ev.type === 'ATTACK') {
+            await battleRenderer.animateAttack(false);
+          } else if (ev.type === 'DAMAGE') {
+            await battleRenderer.animateDamage(true);
+            battleHUD.updateHp(true, ev.remainingHp, playerStarter.stats.hp);
+          } else if (ev.type === 'FAINT') {
+            await battleRenderer.animateFaint(true);
+          }
+        }
+
+        if (result.isBattleOver) {
+          if (result.caught && isRoamer) {
+            roamingManager.markCaught(wildPokemon.speciesId);
+            eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+            overworldHUD.hideRoamerAlert();
+          }
           await battleHUD.showMessage('Battle concluded! Returning to overworld...');
           battleRenderer.endBattle();
           battleHUD.hide();
@@ -197,7 +259,10 @@ async function bootstrap() {
 
           // Wild Encounter Check in Tall Grass (tile type 2)
           if (tileType === 2) {
-            const encounter = mapManager.rollWildEncounter(tileType);
+            const currentMap = mapManager.getCurrentMap();
+            const roamer = currentMap ? roamingManager.getActiveRoamerOnRoute(currentMap.id) : undefined;
+            const encounter = mapManager.rollWildEncounter(tileType, roamer?.speciesId);
+
             if (encounter) {
               console.log(`[Wild Encounter] Wild ${encounter.speciesId} (Lv. ${encounter.level}) appeared!`);
               triggerBattle(encounter.speciesId, encounter.level, encounter.isRoamer);
@@ -225,7 +290,7 @@ async function bootstrap() {
     }
   });
 
-  console.log('⚡ Crystal Overdrive Phase 2 (Battle Engine + Pokémon Unbound UI) successfully booted!');
+  console.log('⚡ Crystal Overdrive Phase 3 (Roaming Beasts, Catching & Pokégear) successfully booted!');
 }
 
 window.addEventListener('DOMContentLoaded', bootstrap);

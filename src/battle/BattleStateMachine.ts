@@ -1,12 +1,14 @@
-import type { PokemonInstance, MoveData } from '../types/game';
+import type { PokemonInstance, MoveData, PokeballId } from '../types/game';
 import { DamageCalculator } from './DamageCalculator';
 import { PokemonFactory } from './PokemonFactory';
+import { CatchCalculator } from './CatchCalculator';
 
 export type BattleActionType = 'FIGHT' | 'RUN' | 'BAG';
 
 export interface BattleAction {
   type: BattleActionType;
   moveId?: string;
+  ballId?: PokeballId;
 }
 
 export interface BattleTurnResult {
@@ -14,6 +16,7 @@ export interface BattleTurnResult {
   events: BattleEvent[];
   isBattleOver: boolean;
   winner?: 'PLAYER' | 'ENEMY' | 'NONE';
+  caught?: boolean;
 }
 
 export type BattleEvent =
@@ -22,7 +25,10 @@ export type BattleEvent =
   | { type: 'DAMAGE'; targetId: string; damage: number; remainingHp: number; effectiveness: number; isCritical: boolean }
   | { type: 'FAINT'; targetId: string }
   | { type: 'FLEE'; runnerId: string; success: boolean }
-  | { type: 'STATUS'; targetId: string; status: string };
+  | { type: 'STATUS'; targetId: string; status: string }
+  | { type: 'THROW_BALL'; ballId: PokeballId }
+  | { type: 'SHAKE'; shakes: 0 | 1 | 2 | 3 | 4; caught: boolean }
+  | { type: 'CAUGHT'; targetId: string };
 
 export class BattleStateMachine {
   public playerPokemon: PokemonInstance;
@@ -61,7 +67,66 @@ export class BattleStateMachine {
       };
     }
 
-    // 2. Determine Enemy Action
+    // 2. Handle Bag (Pokéball Throw) action
+    if (playerAction.type === 'BAG') {
+      const ballId = playerAction.ballId || 'poke-ball';
+      events.push({ type: 'THROW_BALL', ballId });
+      events.push({ type: 'MESSAGE', text: `You threw a ${ballId.replace('-', ' ').toUpperCase()}!` });
+
+      const catchResult = CatchCalculator.attemptCatch(ballId, this.enemyPokemon, {
+        turnNumber: this.turnCount,
+      });
+
+      events.push({ type: 'SHAKE', shakes: catchResult.shakes, caught: catchResult.caught });
+
+      if (catchResult.caught) {
+        events.push({ type: 'CAUGHT', targetId: this.enemyPokemon.uid });
+        events.push({ type: 'MESSAGE', text: `Gotcha! ${this.enemyPokemon.nickname} was caught!` });
+        this.isBattleOver = true;
+        return {
+          turnNumber: this.turnCount,
+          events,
+          isBattleOver: true,
+          winner: 'PLAYER',
+          caught: true,
+        };
+      } else {
+        const shakeMessages = [
+          'Oh no! The Pokémon broke free!',
+          'Aww! It appeared to be caught!',
+          'Aargh! Almost had it!',
+          'Shoot! It was so close, too!',
+        ];
+        events.push({ type: 'MESSAGE', text: shakeMessages[catchResult.shakes] || shakeMessages[0] });
+
+        // Enemy gets to attack after failed catch
+        const enemyMoves = this.enemyPokemon.moves;
+        const enemyMoveId = enemyMoves[Math.floor(Math.random() * enemyMoves.length)].moveId;
+        const enemyMove = PokemonFactory.getMoveData(enemyMoveId);
+        this.executeMove(this.enemyPokemon, this.playerPokemon, enemyMove, events);
+
+        if (this.playerPokemon.currentHp <= 0) {
+          this.playerPokemon.currentHp = 0;
+          events.push({ type: 'FAINT', targetId: this.playerPokemon.uid });
+          events.push({ type: 'MESSAGE', text: `${this.playerPokemon.nickname} fainted!` });
+          this.isBattleOver = true;
+          return {
+            turnNumber: this.turnCount,
+            events,
+            isBattleOver: true,
+            winner: 'ENEMY',
+          };
+        }
+
+        return {
+          turnNumber: this.turnCount,
+          events,
+          isBattleOver: false,
+        };
+      }
+    }
+
+    // 3. Determine Enemy Action
     // Check Roaming Beast 2-turn grace window flee rule
     if (this.isRoamer && this.turnCount >= 3) {
       const canFlee = !this.enemyPokemon.isTrapped && this.enemyPokemon.status !== 'SLP' && this.enemyPokemon.status !== 'FRZ';
