@@ -565,7 +565,7 @@ async function bootstrap() {
           : mapAfterMove?.id === 'new_bark_town'
             ? townNpcs
             : emptyNpcs;
-      overworldRenderer.update(player, npcsToRender);
+      overworldRenderer.update(player, npcsToRender, dtWorld);
     }
   });
 

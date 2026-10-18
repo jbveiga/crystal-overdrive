@@ -25,6 +25,10 @@ export class OverworldRenderer {
 
   // Textures
   private tileTextures: Map<string, Texture> = new Map();
+  private waterAnimFrames: Map<string, [Texture, Texture, Texture, Texture]> = new Map();
+  private animatedWaterSprites: Array<{ sprite: Sprite; frames: [Texture, Texture, Texture, Texture] }> = [];
+  private waterAnimTimer: number = 0;
+  private waterAnimStep: number = 0;
   private playerFrames!: CharacterFrames;
   private npcBoyFrames!: CharacterFrames;
 
@@ -176,6 +180,31 @@ export class OverworldRenderer {
       }
     }
 
+    // Load 4-step authentic water animation frames (0 -> 1 -> 2 -> 1) from pret/pokecrystal water.png
+    const animatedWaterTileNames = [
+      'jt_14_14_14_14',
+      'jt_14_3b_14_3b',
+      'jt_14_4b_14_14',
+      'jt_3d_14_3d_14',
+      'jt_4c_4c_14_14',
+      'jt_4d_14_14_14',
+      'jt_5c_4c_3d_14',
+    ];
+
+    for (const wName of animatedWaterTileNames) {
+      const f0 = this.tileTextures.get(wName);
+      if (!f0) continue;
+      try {
+        const f1 = await Assets.load<Texture>(`/assets/tiles/${wName}__w1.png`);
+        const f2 = await Assets.load<Texture>(`/assets/tiles/${wName}__w2.png`);
+        f1.source.scaleMode = 'nearest';
+        f2.source.scaleMode = 'nearest';
+        this.waterAnimFrames.set(wName, [f0, f1, f2, f1]);
+      } catch (err) {
+        console.warn(`Could not load water animation frames for ${wName}:`, err);
+      }
+    }
+
     // 2. Load character sheets (144x32 -> 9 frames of 16x32)
     const goldWalkTex = await Assets.load<Texture>('/assets/sprites/characters/gold_walk.png');
     goldWalkTex.source.scaleMode = 'nearest';
@@ -228,6 +257,7 @@ export class OverworldRenderer {
    */
   public renderMap(map: MapData): void {
     this.mapContainer.removeChildren();
+    this.animatedWaterSprites.length = 0;
     this.tileSize = map.tileSize;
 
     const grassTex = this.tileTextures.get('grass') || Texture.WHITE;
@@ -260,12 +290,17 @@ export class OverworldRenderer {
             this.mapContainer.addChild(baseSprite);
           }
 
-          const tex = this.tileTextures.get(tileName) || grassTex;
+          const waterFrames = this.waterAnimFrames.get(tileName);
+          const tex = waterFrames ? waterFrames[this.waterAnimStep] : this.tileTextures.get(tileName) || grassTex;
           const featureSprite = new Sprite(tex);
           featureSprite.position.set(px, py);
           featureSprite.width = this.tileSize;
           featureSprite.height = this.tileSize;
           this.mapContainer.addChild(featureSprite);
+
+          if (waterFrames) {
+            this.animatedWaterSprites.push({ sprite: featureSprite, frames: waterFrames });
+          }
 
           if (map.overlayMap && map.overlayMap[index]) {
             const overlayTex = this.tileTextures.get(map.overlayMap[index]!);
@@ -396,10 +431,23 @@ export class OverworldRenderer {
   }
 
   /**
-   * Updates player & NPC sprite animations and centers camera smoothly
+   * Updates player & NPC sprite animations, ambient 1.0x water animations, and centers camera smoothly
    */
-  public update(player: GridEntity, npcs: GridEntity[] = []): void {
+  public update(player: GridEntity, npcs: GridEntity[] = [], dtWorld: number = 0): void {
     const scale = 3;
+
+    // 0. Update Ambient Water Tile Animations at 1.0x World Time (~0.26s per Gen 2 tick)
+    if (dtWorld > 0 && this.animatedWaterSprites.length > 0) {
+      this.waterAnimTimer += dtWorld;
+      if (this.waterAnimTimer >= 0.26) {
+        this.waterAnimTimer -= 0.26;
+        this.waterAnimStep = (this.waterAnimStep + 1) & 3;
+        for (let i = 0; i < this.animatedWaterSprites.length; i++) {
+          const entry = this.animatedWaterSprites[i];
+          entry.sprite.texture = entry.frames[this.waterAnimStep];
+        }
+      }
+    }
 
     // 1. Update Player
     const playerPxX = (player.renderX + 0.5) * this.tileSize;

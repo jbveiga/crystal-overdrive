@@ -108,9 +108,10 @@ function createPNG(width, height, rgbaBuffer) {
   ]);
 }
 
-// 1. Decode johto.png and patch new_bark.png roof tiles into 0x0a..0x12
+// 1. Decode johto.png, patch new_bark.png roof tiles into 0x0a..0x12, and decode water.png (4 frames of 8x8)
 const johto = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__johto.png'));
 const roof = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__new_bark.png'));
+const waterAnim = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__water__water.png'));
 for (let i = 0; i < 9; i++) {
   const tid = 0x0a + i;
   const dstX = (tid % 16) * 8;
@@ -193,43 +194,61 @@ const blockCollisions = collLines.map((line) => {
 // 5. Render a 16x16 quadrant [tl, tr, bl, br] of 8x8 tiles to a 64x64 RGBA PNG (4x nearest-neighbor upscale)
 const meta = fs.readFileSync(path.join(SOURCE_DIR, 'data__tilesets__johto_metatiles.bin'));
 const generatedTiles = new Set();
+const generatedWaterTiles = new Set();
 
-function renderQuadrant64(quad8x8, roofGroup) {
-  const hasRoof = quad8x8.some((tid) => tilePalMap[tid] === 'ROOF');
-  const suffix = hasRoof ? `_${roofGroup}` : '';
-  const tileName = `jt_${quad8x8.map((x) => x.toString(16).padStart(2, '0')).join('_')}${suffix}`;
+function buildQuadrantBuffer(quad8x8, roofGroup, waterFrameIdx = 0) {
+  const rgba = Buffer.alloc(64 * 64 * 4);
+  for (let qy = 0; qy < 2; qy++) {
+    for (let qx = 0; qx < 2; qx++) {
+      const tid = quad8x8[qy * 2 + qx];
+      const palName = tilePalMap[tid] || 'GRAY';
+      const pal = palName === 'ROOF' ? ROOF_PALETTES[roofGroup] : BASE_PALETTES[palName] || BASE_PALETTES.GRAY;
+      const srcX = (tid % 16) * 8;
+      const srcY = Math.floor(tid / 16) * 8;
 
-  if (!generatedTiles.has(tileName)) {
-    const rgba = Buffer.alloc(64 * 64 * 4);
-    for (let qy = 0; qy < 2; qy++) {
-      for (let qx = 0; qx < 2; qx++) {
-        const tid = quad8x8[qy * 2 + qx];
-        const palName = tilePalMap[tid] || 'GRAY';
-        const pal = palName === 'ROOF' ? ROOF_PALETTES[roofGroup] : BASE_PALETTES[palName] || BASE_PALETTES.GRAY;
-        const srcX = (tid % 16) * 8;
-        const srcY = Math.floor(tid / 16) * 8;
-
-        for (let py = 0; py < 8; py++) {
-          for (let px = 0; px < 8; px++) {
-            const val2b = johto.pixels[(srcY + py) * johto.width + (srcX + px)];
-            const color = pal[3 - val2b];
-            for (let dy = 0; dy < 4; dy++) {
-              for (let dx = 0; dx < 4; dx++) {
-                const outX = (qx * 8 + px) * 4 + dx;
-                const outY = (qy * 8 + py) * 4 + dy;
-                const idx = (outY * 64 + outX) * 4;
-                rgba[idx] = color[0];
-                rgba[idx + 1] = color[1];
-                rgba[idx + 2] = color[2];
-                rgba[idx + 3] = 255;
-              }
+      for (let py = 0; py < 8; py++) {
+        for (let px = 0; px < 8; px++) {
+          const val2b =
+            tid === 0x14
+              ? waterAnim.pixels[(waterFrameIdx * 8 + py) * 8 + px]
+              : johto.pixels[(srcY + py) * johto.width + (srcX + px)];
+          const color = pal[3 - val2b];
+          for (let dy = 0; dy < 4; dy++) {
+            for (let dx = 0; dx < 4; dx++) {
+              const outX = (qx * 8 + px) * 4 + dx;
+              const outY = (qy * 8 + py) * 4 + dy;
+              const idx = (outY * 64 + outX) * 4;
+              rgba[idx] = color[0];
+              rgba[idx + 1] = color[1];
+              rgba[idx + 2] = color[2];
+              rgba[idx + 3] = 255;
             }
           }
         }
       }
     }
-    fs.writeFileSync(path.join(TILES_DIR, `${tileName}.png`), createPNG(64, 64, rgba));
+  }
+  return rgba;
+}
+
+function renderQuadrant64(quad8x8, roofGroup) {
+  const hasRoof = quad8x8.some((tid) => tilePalMap[tid] === 'ROOF');
+  const hasWater = quad8x8.includes(0x14);
+  const suffix = hasRoof ? `_${roofGroup}` : '';
+  const tileName = `jt_${quad8x8.map((x) => x.toString(16).padStart(2, '0')).join('_')}${suffix}`;
+
+  if (!generatedTiles.has(tileName)) {
+    const rgba0 = buildQuadrantBuffer(quad8x8, roofGroup, 0);
+    fs.writeFileSync(path.join(TILES_DIR, `${tileName}.png`), createPNG(64, 64, rgba0));
     generatedTiles.add(tileName);
+
+    if (hasWater) {
+      const rgba1 = buildQuadrantBuffer(quad8x8, roofGroup, 1);
+      const rgba2 = buildQuadrantBuffer(quad8x8, roofGroup, 2);
+      fs.writeFileSync(path.join(TILES_DIR, `${tileName}__w1.png`), createPNG(64, 64, rgba1));
+      fs.writeFileSync(path.join(TILES_DIR, `${tileName}__w2.png`), createPNG(64, 64, rgba2));
+      generatedWaterTiles.add(tileName);
+    }
   }
 
   return tileName;
