@@ -111,11 +111,11 @@ const G = {
 };
 
 const P = {
-  p0: '#887048', // path shadow
-  p1: '#b09868', // path dark
-  p2: '#d8c088', // path base
-  p3: '#e8d4a0', // path light
-  p4: '#f8e8b8', // path pebble/highlight
+  p0: '#a0b890', // path shadow
+  p1: '#b8d0a8', // path dark
+  p2: '#d0e8c0', // path base (light mint)
+  p3: '#e0f4d0', // path light
+  p4: '#eef8e4', // path pebble highlight
 };
 
 const T = {
@@ -130,29 +130,29 @@ const T = {
   b2: '#805028', // bark light
 };
 
-const HR = { // House Roof (Terracotta / Red shingle)
-  r0: '#300808', // outline
-  r1: '#781818', // deep shade
-  r2: '#b82828', // shadow shingle
-  r3: '#d84038', // base shingle
-  r4: '#f06050', // light shingle
-  r5: '#f89080', // highlight
-  c0: '#402018', // chimney brick shadow
-  c1: '#884830', // chimney brick
-  c2: '#c07050', // chimney brick light
-  c3: '#201818', // chimney cap
+const HR = { // House Roof (GBC Crystal Green)
+  r0: '#203810', // outline
+  r1: '#406020', // deep shade
+  r2: '#588030', // shadow shingle
+  r3: '#78c040', // base shingle (bright GBC green)
+  r4: '#98e060', // light shingle
+  r5: '#c0f888', // highlight
+  c0: '#181810', // chimney dark
+  c1: '#484840', // chimney mid
+  c2: '#787870', // chimney light
+  c3: '#101010', // chimney cap
 };
 
-const LR = { // Lab Roof (Slate Blue Tech)
-  s0: '#101828', // outline
-  s1: '#203048', // deep shade
-  s2: '#385070', // shadow slate
-  s3: '#507098', // base slate
-  s4: '#7098c0', // light slate
-  s5: '#98c0e8', // metallic highlight
-  v0: '#182028', // vent dark
-  v1: '#404850', // vent mid
-  v2: '#808890', // vent light
+const LR = { // Lab Roof (GBC Crystal Green - same palette as houses)
+  s0: '#203810', // outline
+  s1: '#406020', // deep shade
+  s2: '#508030', // shadow shingle
+  s3: '#70b838', // base shingle (GBC green, slightly different hue)
+  s4: '#90d858', // light shingle
+  s5: '#b8f880', // metallic highlight
+  v0: '#182018', // vent dark
+  v1: '#405040', // vent mid
+  v2: '#788870', // vent light
 };
 
 const W = { // Wall & Door & Window

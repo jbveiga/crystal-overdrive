@@ -131,14 +131,16 @@ export class OverworldRenderer {
     };
 
     return {
-      downStand: getFrame(0),
-      downWalk1: getFrame(1),
+      // Gen 2 sprite sheet layout per direction: walk1, stand, walk2
+      // Stand is the MIDDLE frame (idx 1, 4, 7), not the first
+      downStand: getFrame(1),
+      downWalk1: getFrame(0),
       downWalk2: getFrame(2),
-      upStand: getFrame(3),
-      upWalk1: getFrame(4),
+      upStand: getFrame(4),
+      upWalk1: getFrame(3),
       upWalk2: getFrame(5),
-      sideStand: getFrame(6),
-      sideWalk1: getFrame(7),
+      sideStand: getFrame(7),
+      sideWalk1: getFrame(6),
       sideWalk2: getFrame(8),
     };
   }
