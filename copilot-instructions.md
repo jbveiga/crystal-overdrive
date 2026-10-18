@@ -67,6 +67,31 @@ To achieve a clean, non-pixelated 2D look without manually redrawing thousands o
 2. **Battle Arenas:** Layered 2D vector/painted backgrounds (Tall Grass, Cave, Water, Indoor, Gym) rendered in PixiJS.
 3. **Vector UI:** Crisp CSS Grid/Flexbox HUD with SVG elemental type icons, smooth CSS-transitioned HP/EXP bars, and modern sans-serif typography.
 
+### 3.3 Authentic 64x64 Johto Tile Catalog & 9-Frame Character Sprite Sheets
+1. **Explicit `tileMap` Rendering (`public/assets/tiles/*.png`):**
+   - Each `MapData` JSON file defines an explicit `tileMap?: string[]` array of length `width * height` referencing authentic 4x-upscaled 64x64 tiles (e.g., `grass`, `tall_grass`, `path`, `water`, `tree_tl`/`tr`/`bl`/`br`, `roof_red_*`, `roof_blue_*`, `wall_left`/`mid`/`right`, `wall_window`, `wall_door`, `sign`, `ledge_left`/`mid`/`right`, `flower_1`/`2`, `shore_*`).
+   - When `tileMap` is omitted (e.g., procedural or legacy test maps), `OverworldRenderer.ts` falls back deterministically to `collisionGrid` semantics.
+2. **9-Frame 32-Bit RGBA Character Sprite Sheet Layout (`144x32px`, nine `16x32px` frames):**
+   - Overworld character sprite sheets (`gold_walk.png`, `npc_boy.png`) use 32-bit RGBA PNG encoding with color index `0` set to fully transparent (`alpha = 0`) to prevent WebGL background box artifacts.
+   - Frame index mapping in `OverworldRenderer.ts`:
+     - `0`: Down Stand (`DOWN` idle)
+     - `1`: Up Stand (`UP` idle)
+     - `2`: Side Stand (`LEFT` idle; mirrored horizontally with `scale.x = -4` for `RIGHT` idle)
+     - `3, 4`: Down Walk cycle (`DOWN` stepping frames)
+     - `5, 6`: Up Walk cycle (`UP` stepping frames)
+     - `7, 8`: Side Walk cycle (`LEFT` stepping frames; mirrored horizontally with `scale.x = -4` for `RIGHT` stepping frames)
+
+### 3.4 DOM Overlay Layer Isolation & Interactive Building Warps
+1. **Dedicated UI Layer Mounts (`#ui-layer`):**
+   - To prevent modal dialogs or battle transitions from wiping sibling HUD elements via `innerHTML`, `#ui-layer` partitions into three dedicated sub-containers:
+     - `#overworld-hud-container` (`OverworldHUD.ts`: Player `1x/2x/3x` Speed Toggle, Pokégear Roamer Radar with persistent HP/Status bars, Bag & Poké Mart shortcuts, and toast notifications)
+     - `#battle-hud-container` (`BattleHUD.ts`: Pokémon Unbound live effectiveness move buttons, SVG Physical/Special/Status split icons, status/trapped pills, speed-scaled typewriter text, and live Pokéball inventory drawer)
+     - `#modal-container` (`BagAndMartUI.ts`: Badge-Gated Progressive Poké Mart at `0 / 1 / 3 / 5 / 8` badges and Infinite TMs drawer)
+2. **Interactive Building Door Warps:**
+   - Building door tiles (`wall_door`) with `WarpEvent` entries are configured with walkable collision (`0`) so stepping into a doorway triggers `onTileEntered` -> `mapManager.checkWarp(coord)`:
+     - `cherrygrove_mart`: Opens the Progressive Poké Mart overlay (`BagAndMartUI.open('mart')`).
+     - `cherrygrove_poke_center` / `players_house_1f` / `elms_lab`: Restores full party HP, clears status conditions, and displays an overworld toast notification.
+
 ---
 
 ## 4. Core Gameplay Systems & Mathematical Specifications
@@ -246,6 +271,7 @@ export interface MapData {
   width: number;
   height: number;
   tileSize: number; // 64 (16x16 original upscaled 4x)
+  tileMap?: string[]; // Explicit 64x64 tile names (length = width * height)
   groundLayer: number[];
   objectLayer: number[];
   collisionGrid: number[]; // 0 = walkable, 1 = solid, 2 = tall grass, 3 = water

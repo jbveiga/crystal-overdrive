@@ -67,6 +67,20 @@
       "targetMapId": "players_house_1f",
       "targetX": 3,
       "targetY": 6
+    },
+    {
+      "x": 4,
+      "y": 9,
+      "targetMapId": "players_house_1f",
+      "targetX": 3,
+      "targetY": 6
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "targetMapId": "elms_house",
+      "targetX": 3,
+      "targetY": 6
     }
   ],
   "grassEncounters": []

@@ -130,7 +130,10 @@ async function bootstrap() {
       return newSpeed;
     },
     onBagOpen: () => {
-      bagUI.open();
+      bagUI.open('TMS');
+    },
+    onMartOpen: () => {
+      bagUI.openMart();
     },
     onSaveGame: () => {
       saveCurrentGame();
@@ -146,6 +149,25 @@ async function bootstrap() {
 
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
   const battleHUD = new BattleHUD('battle-hud-container');
+
+  // Support Shift key to cycle Battle Speed while in Battle mode
+  window.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Shift' && !e.repeat && gameState === 'BATTLE') {
+      battleHUD.triggerSpeedToggle();
+    }
+  });
+
+  // Helper to heal the player's party to full HP, PP, and clear status
+  const healPlayerParty = () => {
+    for (const pkmn of playerParty) {
+      pkmn.currentHp = pkmn.stats.hp;
+      pkmn.status = 'NONE';
+      pkmn.isTrapped = false;
+      for (const m of pkmn.moves) {
+        m.currentPp = m.maxPp;
+      }
+    }
+  };
 
   // 6. Initialize Entities
   const player: GridEntity = {
@@ -191,6 +213,11 @@ async function bootstrap() {
     progress: 0,
     isPlayer: false,
   };
+
+  // Pre-allocated NPC arrays for zero-allocation 60Hz ticker loop
+  const townNpcs: GridEntity[] = [npc];
+  const route29Npcs: GridEntity[] = [joeyNpc];
+  const emptyNpcs: GridEntity[] = [];
 
   let npcMoveTimer = 0;
   let npcHeldDir: Direction | null = null;
@@ -260,7 +287,13 @@ async function bootstrap() {
     player.isMoving = false;
     player.progress = 0;
 
+    // Reset temporary trapping flag at the start of a new encounter while keeping persistent HP/Status
+    opponentPokemon.isTrapped = false;
+
     const leadPokemon = playerParty[0];
+    if (leadPokemon.currentHp <= 0) {
+      healPlayerParty();
+    }
     const battleSM = new BattleStateMachine(leadPokemon, opponentPokemon, options.isRoamer);
 
     battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
@@ -271,123 +304,139 @@ async function bootstrap() {
     if (options.isTrainer) {
       await battleHUD.showMessage(`${options.trainerName} would like to battle!`);
       await battleHUD.showMessage(`${options.trainerName} sent out ${opponentPokemon.nickname}!`);
+    } else if (options.isRoamer) {
+      await battleHUD.showMessage(`⚡ Legendary Beast ${opponentPokemon.nickname} appeared!`);
     }
 
-    battleHUD.initBattle(leadPokemon, opponentPokemon, {
-      onMoveSelected: async (moveId: string) => {
-        const result = battleSM.executeRound({ type: 'FIGHT', moveId });
+    battleHUD.initBattle(
+      leadPokemon,
+      opponentPokemon,
+      {
+        onMoveSelected: async (moveId: string) => {
+          const result = battleSM.executeRound({ type: 'FIGHT', moveId });
 
-        for (const ev of result.events) {
-          if (ev.type === 'MESSAGE') {
-            await battleHUD.showMessage(ev.text);
-          } else if (ev.type === 'ATTACK') {
-            await battleRenderer.animateAttack(ev.attackerId === leadPokemon.uid);
-          } else if (ev.type === 'DAMAGE') {
-            await battleRenderer.animateDamage(ev.targetId === leadPokemon.uid);
-            const maxHp = ev.targetId === leadPokemon.uid ? leadPokemon.stats.hp : opponentPokemon.stats.hp;
-            battleHUD.updateHp(ev.targetId === leadPokemon.uid, ev.remainingHp, maxHp);
-          } else if (ev.type === 'FAINT') {
-            await battleRenderer.animateFaint(ev.targetId === leadPokemon.uid);
+          for (const ev of result.events) {
+            if (ev.type === 'MESSAGE') {
+              await battleHUD.showMessage(ev.text);
+            } else if (ev.type === 'ATTACK') {
+              await battleRenderer.animateAttack(ev.attackerId === leadPokemon.uid);
+            } else if (ev.type === 'DAMAGE') {
+              await battleRenderer.animateDamage(ev.targetId === leadPokemon.uid);
+              const maxHp = ev.targetId === leadPokemon.uid ? leadPokemon.stats.hp : opponentPokemon.stats.hp;
+              battleHUD.updateHp(ev.targetId === leadPokemon.uid, ev.remainingHp, maxHp);
+            } else if (ev.type === 'STATUS') {
+              battleHUD.updateStatusBadges();
+            } else if (ev.type === 'FAINT') {
+              await battleRenderer.animateFaint(ev.targetId === leadPokemon.uid);
+            }
           }
-        }
 
-        if (result.isBattleOver) {
-          if (result.winner === 'PLAYER') {
+          if (result.isBattleOver) {
+            if (result.winner === 'PLAYER') {
+              if (options.isRoamer) {
+                roamingManager.markDefeated(opponentPokemon.speciesId);
+                overworldHUD.hideRoamerAlert();
+              }
+              if (options.isTrainer) {
+                inventory.money += 200;
+                await battleHUD.showMessage(`You defeated ${options.trainerName}!`);
+                await battleHUD.showMessage(`You got $200 for winning!`);
+              }
+            }
             if (options.isRoamer) {
-              roamingManager.markDefeated(opponentPokemon.speciesId);
               eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-              overworldHUD.hideRoamerAlert();
             }
-            if (options.isTrainer) {
-              inventory.money += 64;
-              await battleHUD.showMessage(`You defeated ${options.trainerName}!`);
-              await battleHUD.showMessage(`You got $64 for winning!`);
+            await battleHUD.showMessage('Battle concluded! Returning to overworld...');
+            battleRenderer.endBattle();
+            battleHUD.hide();
+            gameState = 'OVERWORLD';
+            overworldHUD.show();
+            saveCurrentGame();
+          } else {
+            battleHUD.showActionMenu();
+          }
+        },
+        onBagSelected: async (ballId: PokeballId) => {
+          if (options.isTrainer) {
+            await battleHUD.showMessage("The trainer blocked the ball! Don't be a thief!");
+            battleHUD.showActionMenu();
+            return;
+          }
+
+          // Decrement ball count
+          if (inventory.balls[ballId] && inventory.balls[ballId]! > 0) {
+            inventory.balls[ballId]!--;
+          }
+
+          const result = battleSM.executeRound({ type: 'BAG', ballId });
+          let ballGraphic: Graphics | null = null;
+
+          for (const ev of result.events) {
+            if (ev.type === 'MESSAGE') {
+              await battleHUD.showMessage(ev.text);
+            } else if (ev.type === 'THROW_BALL') {
+              ballGraphic = await battleRenderer.animateThrowBall();
+            } else if (ev.type === 'SHAKE' && ballGraphic) {
+              await battleRenderer.animateShake(ballGraphic, ev.shakes, ev.caught);
+            } else if (ev.type === 'ATTACK') {
+              await battleRenderer.animateAttack(false);
+            } else if (ev.type === 'DAMAGE') {
+              await battleRenderer.animateDamage(true);
+              battleHUD.updateHp(true, ev.remainingHp, leadPokemon.stats.hp);
+            } else if (ev.type === 'FAINT') {
+              await battleRenderer.animateFaint(true);
             }
           }
-          await battleHUD.showMessage('Battle concluded! Returning to overworld...');
+
+          if (result.isBattleOver) {
+            if (result.caught) {
+              if (options.isRoamer) {
+                roamingManager.markCaught(opponentPokemon.speciesId);
+                overworldHUD.hideRoamerAlert();
+              }
+              if (playerParty.length < 6) {
+                playerParty.push(opponentPokemon);
+              } else {
+                playerBox.push(opponentPokemon);
+              }
+            }
+            if (options.isRoamer) {
+              eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+            }
+            await battleHUD.showMessage('Battle concluded! Returning to overworld...');
+            battleRenderer.endBattle();
+            battleHUD.hide();
+            gameState = 'OVERWORLD';
+            overworldHUD.show();
+            saveCurrentGame();
+          } else {
+            battleHUD.showActionMenu();
+          }
+        },
+        onRunSelected: async () => {
+          if (options.isTrainer) {
+            await battleHUD.showMessage("No! There's no running from a Trainer battle!");
+            battleHUD.showActionMenu();
+            return;
+          }
+          battleSM.executeRound({ type: 'RUN' });
+          if (options.isRoamer) {
+            eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+          }
+          await battleHUD.showMessage('Got away safely!');
           battleRenderer.endBattle();
           battleHUD.hide();
           gameState = 'OVERWORLD';
           overworldHUD.show();
-          saveCurrentGame();
-        } else {
-          battleHUD.showActionMenu();
-        }
+        },
+        onSpeedToggle: () => {
+          const nextSpeed = gameClock.cycleBattleSpeed();
+          battleRenderer.setSpeedMultiplier(nextSpeed);
+          return nextSpeed;
+        },
       },
-      onBagSelected: async (ballId: PokeballId) => {
-        if (options.isTrainer) {
-          await battleHUD.showMessage("The trainer blocked the ball! Don't be a thief!");
-          battleHUD.showActionMenu();
-          return;
-        }
-
-        // Decrement ball count
-        if (inventory.balls[ballId] && inventory.balls[ballId]! > 0) {
-          inventory.balls[ballId]!--;
-        }
-
-        const result = battleSM.executeRound({ type: 'BAG', ballId });
-        let ballGraphic: Graphics | null = null;
-
-        for (const ev of result.events) {
-          if (ev.type === 'MESSAGE') {
-            await battleHUD.showMessage(ev.text);
-          } else if (ev.type === 'THROW_BALL') {
-            ballGraphic = await battleRenderer.animateThrowBall();
-          } else if (ev.type === 'SHAKE' && ballGraphic) {
-            await battleRenderer.animateShake(ballGraphic, ev.shakes, ev.caught);
-          } else if (ev.type === 'ATTACK') {
-            await battleRenderer.animateAttack(false);
-          } else if (ev.type === 'DAMAGE') {
-            await battleRenderer.animateDamage(true);
-            battleHUD.updateHp(true, ev.remainingHp, leadPokemon.stats.hp);
-          } else if (ev.type === 'FAINT') {
-            await battleRenderer.animateFaint(true);
-          }
-        }
-
-        if (result.isBattleOver) {
-          if (result.caught) {
-            if (options.isRoamer) {
-              roamingManager.markCaught(opponentPokemon.speciesId);
-              eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-              overworldHUD.hideRoamerAlert();
-            }
-            if (playerParty.length < 6) {
-              playerParty.push(opponentPokemon);
-            } else {
-              playerBox.push(opponentPokemon);
-            }
-          }
-          await battleHUD.showMessage('Battle concluded! Returning to overworld...');
-          battleRenderer.endBattle();
-          battleHUD.hide();
-          gameState = 'OVERWORLD';
-          overworldHUD.show();
-          saveCurrentGame();
-        } else {
-          battleHUD.showActionMenu();
-        }
-      },
-      onRunSelected: async () => {
-        if (options.isTrainer) {
-          await battleHUD.showMessage("No! There's no running from a Trainer battle!");
-          battleHUD.showActionMenu();
-          return;
-        }
-        battleSM.executeRound({ type: 'RUN' });
-        await battleHUD.showMessage('Got away safely!');
-        battleRenderer.endBattle();
-        battleHUD.hide();
-        gameState = 'OVERWORLD';
-        overworldHUD.show();
-      },
-      onSpeedToggle: () => {
-        const nextSpeed = gameClock.cycleBattleSpeed();
-        battleRenderer.setSpeedMultiplier(nextSpeed);
-        return nextSpeed;
-      },
-    });
+      inventory.balls
+    );
   };
 
   // 8. Decoupled Main Ticker Loop
@@ -405,8 +454,39 @@ async function bootstrap() {
         heldDir,
         mapManager.isWalkable,
         mapManager.getTileType,
-        (_entity, _coord, tileType) => {
+        (_entity, coord, tileType) => {
           handleMapTransition(player);
+
+          // Check Building Door Warps (Poké Center, Poké Mart, Elm's Lab, Houses)
+          const warp = mapManager.checkWarp(coord);
+          if (warp) {
+            player.isMoving = false;
+            player.progress = 0;
+            player.direction = 'DOWN';
+            // Step back onto the mat outside the door
+            player.y = coord.y + 1;
+            player.targetY = player.y;
+            player.renderY = player.y;
+
+            if (warp.targetMapId === 'cherrygrove_mart') {
+              overworldHUD.showToast('🏪 Welcome to Cherrygrove Poké Mart! Browse badge-gated Pokéballs.');
+              bagUI.openMart();
+            } else if (warp.targetMapId === 'cherrygrove_poke_center') {
+              healPlayerParty();
+              saveCurrentGame();
+              overworldHUD.showToast('💖 Cherrygrove Pokémon Center: Your party was restored to full HP & PP!');
+            } else if (warp.targetMapId === 'elms_lab') {
+              healPlayerParty();
+              overworldHUD.showToast('🔬 Prof. Elm: "Raikou, Entei & Suicune are roaming Johto! Use your Pokégear!"');
+            } else if (warp.targetMapId === 'players_house_1f') {
+              healPlayerParty();
+              saveCurrentGame();
+              overworldHUD.showToast('🏠 Mom: "Rest up, sweetheart! Your Pokémon are looking fit and energized!"');
+            } else {
+              overworldHUD.showToast('🏡 Neighbor: "Tip: Teach TM54 False Swipe & TM99 Mean Look from your Bag!"');
+            }
+            return;
+          }
 
           // Route 29: Line of sight check for Youngster Joey (x: 18, y: 4..5)
           if (
@@ -431,7 +511,11 @@ async function bootstrap() {
 
             if (encounter) {
               console.log(`[Wild Encounter] Wild ${encounter.speciesId} (Lv. ${encounter.level}) appeared!`);
-              const wildPkmn = PokemonFactory.create(encounter.speciesId, encounter.level);
+              // Use persistent Roamer instance if encountering a Legendary Beast (Specification 4.4.3)
+              const wildPkmn =
+                encounter.isRoamer && roamer
+                  ? roamer.pokemon
+                  : PokemonFactory.create(encounter.speciesId, encounter.level);
               triggerBattle(wildPkmn, { isRoamer: encounter.isRoamer });
             }
           }
@@ -445,16 +529,23 @@ async function bootstrap() {
         npcHeldDir = Math.random() < 0.6 ? directions[Math.floor(Math.random() * 4)] : null;
       }
 
-      GridPhysics.updateEntity(
-        npc,
-        dtWorld,
-        npcHeldDir,
-        mapManager.isWalkable,
-        mapManager.getTileType
-      );
+      if (currentMap?.id === 'new_bark_town') {
+        GridPhysics.updateEntity(
+          npc,
+          dtWorld,
+          npcHeldDir,
+          mapManager.isWalkable,
+          mapManager.getTileType
+        );
+      }
 
-      // Active NPCs to render on this map
-      const npcsToRender = currentMap?.id === 'route_29' ? [joeyNpc] : [npc];
+      // Active NPCs to render on this map (Zero per-frame array allocations)
+      const npcsToRender =
+        currentMap?.id === 'route_29'
+          ? route29Npcs
+          : currentMap?.id === 'new_bark_town'
+            ? townNpcs
+            : emptyNpcs;
       overworldRenderer.update(player, npcsToRender);
     }
   });

@@ -349,15 +349,13 @@ export class OverworldRenderer {
       this.playerSprite.scale.set(scale, scale);
     }
 
-    // 2. Update NPCs
-    const activeNpcIds = new Set(npcs.map((n) => n.id));
-    for (const [id, sprite] of this.npcSprites.entries()) {
-      if (!activeNpcIds.has(id)) {
-        sprite.visible = false;
-      }
+    // 2. Update NPCs (Zero-allocation visibility pass)
+    for (const sprite of this.npcSprites.values()) {
+      sprite.visible = false;
     }
 
-    for (const npc of npcs) {
+    for (let i = 0; i < npcs.length; i++) {
+      const npc = npcs[i];
       let sprite = this.npcSprites.get(npc.id);
       if (!sprite) {
         sprite = new Sprite(this.npcBoyFrames.downStand);
