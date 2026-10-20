@@ -891,6 +891,16 @@ buildMapFromBlk({
       speaker: '🌳 FRUIT TREE',
       pages: ["It's a fruit-bearing tree!", 'A crisp BITTER BERRY is growing on the branches!'],
     },
+    {
+      x: 34,
+      y: 5,
+      speaker: '🪨 DARK CAVE ENTRANCE',
+      pages: [
+        'It is pitch-black and eerily silent inside...',
+        'The cavern air is thick and damp. You cannot safely navigate without the HM move FLASH!',
+        'Wild and restless Pokémon stir in the deep darkness. It would be reckless to venture further without preparation!',
+      ],
+    },
   ],
   grassEncounters: [
     { speciesId: 'bellsprout', minLevel: 4, maxLevel: 5, weight: 35 },

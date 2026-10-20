@@ -470,6 +470,12 @@ async function bootstrap() {
       makeNpc('r29_fisher', 25, 3, 'UP', 'fisherman', '🎣 FISHER', [
         'I wanted to take a break, so I saved to record my progress.',
       ]),
+      makeNpc('r29_gate_officer', 27, 1, 'DOWN', 'teacher', '👮 GATE OFFICER', [
+        'OFFICER: Hold on, rookie!',
+        'The mountain path leading up to ROUTE 46 is steep and rugged.',
+        "You can't climb up those jagged cliff ledges, and the mountain Pokémon up there are fierce!",
+        'Get some more training under your belt before heading into the northern ridges!',
+      ]),
     ],
     cherrygrove_city: [
       makeNpc('cg_guide_gent', 32, 6, 'DOWN', 'fat_man', '👴 GUIDE GENT', [
@@ -621,6 +627,16 @@ async function bootstrap() {
         ],
         { wanders: true }
       ),
+      makeNpc('r31_gate_officer_north', 4, 6, 'RIGHT', 'teacher', '👮 GATE OFFICER', [
+        'OFFICER: Halt there, young trainer!',
+        'Beyond here lies VIOLET CITY, but the gate is temporarily closed while officials prepare for the upcoming festival.',
+        'Please explore ROUTE 30 and ROUTE 31 for now until the way ahead is cleared!',
+      ]),
+      makeNpc('r31_gate_officer_south', 4, 7, 'RIGHT', 'teacher', '👮 GATE OFFICER', [
+        'OFFICER: Halt there, young trainer!',
+        'Beyond here lies VIOLET CITY, but the gate is temporarily closed while officials prepare for the upcoming festival.',
+        'Please explore ROUTE 30 and ROUTE 31 for now until the way ahead is cleared!',
+      ]),
     ],
     mr_pokemons_house: [
       makeNpc(
@@ -1370,9 +1386,25 @@ async function bootstrap() {
         (_entity, coord, tileType) => {
           handleMapTransition(player);
 
-          // Check Building Door Warps (Poké Center, Poké Mart, Elm's Lab, Houses) with smooth fade
+          // Check Building Door Warps (Poké Center, Poké Mart, Elm's Lab, Houses) with smooth fade & Safe Warp Interceptor
           const warp = mapManager.checkWarp(coord);
           if (warp) {
+            const targetMapExists = mapManager.getMap(warp.targetMapId);
+            if (!targetMapExists) {
+              player.isMoving = false;
+              player.progress = 0;
+              isCutsceneLocked = false;
+              BattleAudio.playMenuSound('CANCEL');
+              overworldHUD.openDialogue(
+                [
+                  'The way ahead is closed for construction!',
+                  'Workers and road crews are currently preparing this route. Please check back later!',
+                ],
+                '🚧 ROADBLOCK'
+              );
+              return;
+            }
+
             const previousMapId = currentMap?.id;
             player.isMoving = false;
             player.progress = 0;
