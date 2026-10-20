@@ -319,5 +319,66 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(r31Codes.has(7)).toBe(true);
     expect(r31Codes.has(9)).toBe(true);
   });
+
+  it('validates authentic Pokéball sprites and in-battle attack animation VFX', () => {
+    const itemsDir = path.resolve(__dirname, '../public/assets/sprites/items');
+    const pokeballsDir = path.resolve(__dirname, '../public/assets/sprites/pokeballs');
+    const fxDir = path.resolve(__dirname, '../public/assets/sprites/fx');
+    const battleFxDir = path.resolve(__dirname, '../public/assets/sprites/battle_fx');
+
+    const expectedBalls = [
+      'poke-ball.png',
+      'great-ball.png',
+      'ultra-ball.png',
+      'master-ball.png',
+      'fast-ball.png',
+      'heavy-ball.png',
+      'level-ball.png',
+      'lure-ball.png',
+      'moon-ball.png',
+      'friend-ball.png',
+      'love-ball.png',
+      'dusk-ball.png',
+      'net-ball.png',
+      'quick-ball.png',
+      'timer-ball.png',
+      'repeat-ball.png',
+      'nest-ball.png',
+    ];
+
+    for (const b of expectedBalls) {
+      expect(fs.existsSync(path.join(itemsDir, b))).toBe(true);
+      expect(fs.existsSync(path.join(pokeballsDir, b))).toBe(true);
+    }
+
+    const expectedFx = [
+      'hit.png',
+      'cut.png',
+      'fire.png',
+      'water.png',
+      'bubble.png',
+      'lightning.png',
+      'ice.png',
+      'plant.png',
+      'rocks.png',
+      'smoke.png',
+      'shine.png',
+      'poison.png',
+      'wind.png',
+      'speed.png',
+      'impact_burst.png',
+      'scratch_slash.png',
+      'ember_flame.png',
+      'water_bubble.png',
+      'thunder_spark.png',
+      'razor_leaf.png',
+      'smoke_puff.png',
+    ];
+
+    for (const f of expectedFx) {
+      expect(fs.existsSync(path.join(fxDir, f))).toBe(true);
+      expect(fs.existsSync(path.join(battleFxDir, f))).toBe(true);
+    }
+  });
 });
 

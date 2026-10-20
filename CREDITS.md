@@ -17,6 +17,7 @@ This project is made possible thanks to the tireless preservation work, reverse-
   - Game Boy Color 15-bit RGB palette maps (`gfx/tilesets/*_palette_map.asm` and `.pal`).
   - Authentic warp triggers, NPC spawn coordinates, and movement path scripts (`maps/*.asm`).
   - Overworld signpost text and canonical character dialogue scripts.
+  - In-battle move attack animation VFX sprites (`gfx/battle_anims/*.png`: `hit`, `cut`, `fire`, `water`, `bubble`, `lightning`, `ice`, `plant`, `rocks`, `smoke`, `shine`, `poison`, `wind`, `speed`).
   - Supplemental tile references via [nikouu/Pokemon-gen-2-style-tilemap](https://github.com/nikouu/Pokemon-gen-2-style-tilemap).
 
 ---
@@ -45,6 +46,7 @@ This project is made possible thanks to the tireless preservation work, reverse-
 * **License:** BSD 3-Clause / CC-BY-SA 4.0
 * **Assets Utilized:**
   - Supplementary 2D Pokémon battle front and back renders.
+  - Authentic Pokéball item and throw sprites (`sprites/items/*.png`: Poké Ball, Great Ball, Ultra Ball, Master Ball, Fast, Heavy, Level, Lure, Moon, Friend, Love, Dusk, Net, Quick, Timer, Repeat, Nest Balls).
 
 ---
 
