@@ -255,6 +255,14 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(lab.bgEvents).toBeDefined();
     const healMachine = lab.bgEvents!.find((bg) => bg.x === 2 && bg.y === 1);
     expect(healMachine?.action).toBe('HEAL_AND_SAVE');
+
+    // Elm's Lab Starter Choice Pokéballs (Ticket 6.1)
+    const cyndaquilBall = lab.bgEvents!.find((bg) => bg.x === 6 && bg.y === 3);
+    const totodileBall = lab.bgEvents!.find((bg) => bg.x === 7 && bg.y === 3);
+    const chikoritaBall = lab.bgEvents!.find((bg) => bg.x === 8 && bg.y === 3);
+    expect(cyndaquilBall?.action).toBe('STARTER_CYNDAQUIL');
+    expect(totodileBall?.action).toBe('STARTER_TOTODILE');
+    expect(chikoritaBall?.action).toBe('STARTER_CHIKORITA');
   });
 
   it('validates Phase 4 Violet City, Violet Gym, Sprout Tower, and interior maps', () => {

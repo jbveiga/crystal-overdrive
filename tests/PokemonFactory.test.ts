@@ -39,4 +39,24 @@ describe('PokemonFactory & Egg Hatching System (Ticket 5.4)', () => {
       { moveId: 'charm', currentPp: 20, maxPp: 20 },
     ]);
   });
+
+  it('creates authentic Johto Starters at Lv. 5 with canonical starter moves (Ticket 6.1)', () => {
+    const cyndaquil = PokemonFactory.create('cyndaquil', 5, ['tackle', 'leer']);
+    expect(cyndaquil.speciesId).toBe('cyndaquil');
+    expect(cyndaquil.level).toBe(5);
+    expect(cyndaquil.currentHp).toBeGreaterThan(0);
+    expect(cyndaquil.moves.map((m) => m.moveId)).toEqual(['tackle', 'leer']);
+
+    const totodile = PokemonFactory.create('totodile', 5, ['scratch', 'leer']);
+    expect(totodile.speciesId).toBe('totodile');
+    expect(totodile.level).toBe(5);
+    expect(totodile.currentHp).toBeGreaterThan(0);
+    expect(totodile.moves.map((m) => m.moveId)).toEqual(['scratch', 'leer']);
+
+    const chikorita = PokemonFactory.create('chikorita', 5, ['tackle', 'growl']);
+    expect(chikorita.speciesId).toBe('chikorita');
+    expect(chikorita.level).toBe(5);
+    expect(chikorita.currentHp).toBeGreaterThan(0);
+    expect(chikorita.moves.map((m) => m.moveId)).toEqual(['tackle', 'growl']);
+  });
 });

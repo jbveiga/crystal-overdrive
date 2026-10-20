@@ -495,6 +495,33 @@
     },
     {
       "x": 6,
+      "y": 3,
+      "speaker": "🔴 POKé BALL",
+      "action": "STARTER_CYNDAQUIL",
+      "pages": [
+        "It's CYNDAQUIL, a FIRE POKéMON!"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 3,
+      "speaker": "🔴 POKé BALL",
+      "action": "STARTER_TOTODILE",
+      "pages": [
+        "It's TOTODILE, a WATER POKéMON!"
+      ]
+    },
+    {
+      "x": 8,
+      "y": 3,
+      "speaker": "🔴 POKé BALL",
+      "action": "STARTER_CHIKORITA",
+      "pages": [
+        "It's CHIKORITA, a GRASS POKéMON!"
+      ]
+    },
+    {
+      "x": 6,
       "y": 7,
       "speaker": "📚 BOOKSHELF",
       "pages": [

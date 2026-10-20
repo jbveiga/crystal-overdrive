@@ -75,7 +75,13 @@ export interface BgEvent {
   y: number;
   speaker?: string;
   pages: string[];
-  action?: 'HEAL_AND_SAVE' | 'OPEN_MART' | 'OPEN_POKEGEAR';
+  action?:
+    | 'HEAL_AND_SAVE'
+    | 'OPEN_MART'
+    | 'OPEN_POKEGEAR'
+    | 'STARTER_CYNDAQUIL'
+    | 'STARTER_TOTODILE'
+    | 'STARTER_CHIKORITA';
 }
 
 export interface MapData {

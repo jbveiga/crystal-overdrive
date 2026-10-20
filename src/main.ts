@@ -19,6 +19,7 @@ import { TitleScreenUI } from './ui/TitleScreenUI';
 import { IntroSequenceUI } from './ui/IntroSequenceUI';
 import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions } from './types/game';
 import type { Graphics } from 'pixi.js';
+import { createNpcsByMap } from './world/npcData';
 export { npcsByMap, createNpcsByMap } from './world/npcData';
 
 async function bootstrap() {
@@ -66,7 +67,7 @@ async function bootstrap() {
   };
   const defeatedTrainers: Set<string> = new Set();
   const storyFlags: Set<string> = new Set();
-  const seenSpecies: Set<string> = new Set(['cyndaquil']);
+  const seenSpecies: Set<string> = new Set();
 
   let initialMapId = 'new_bark_town';
   let initialPlayerX = 13;
@@ -113,8 +114,8 @@ async function bootstrap() {
       roamingManager.sleepBeasts();
     }
   } else {
-    // Default starter
-    playerParty = [PokemonFactory.create('cyndaquil', 5, ['tackle', 'leer', 'ember', 'smokescreen'])];
+    // Default empty party for fresh adventure (Starter partner chosen at Elm's Lab - Ticket 6.1)
+    playerParty = [];
   }
 
   // 3. Fetch and Register Outdoor & Indoor Maps (New Bark -> Cherrygrove -> Route 30/31 -> Violet City)
@@ -341,12 +342,9 @@ async function bootstrap() {
       playerGender = gender;
       overworldRenderer.setPlayerGender(gender);
 
-      // Reset fresh adventure state
+      // Reset fresh adventure state (Starter chosen at Elm's Lab - Ticket 6.1)
       playTimeSeconds = 0;
       playerParty.length = 0;
-      playerParty.push(
-        PokemonFactory.create('cyndaquil', 5, ['tackle', 'leer', 'ember', 'smokescreen'])
-      );
       playerBox.length = 0;
       inventory.balls = {
         'quick-ball': 5,
@@ -371,7 +369,6 @@ async function bootstrap() {
       defeatedTrainers.clear();
       storyFlags.clear();
       seenSpecies.clear();
-      seenSpecies.add('cyndaquil');
       roamingManager.sleepBeasts();
 
       gameClock.playerSpeed = gameOptions.playerSpeedDefault;
@@ -1484,6 +1481,24 @@ async function bootstrap() {
     // Transitioning West
     if (entity.x < 0 && current.connections.WEST) {
       const conn = current.connections.WEST;
+
+      // Prevent leaving New Bark Town into Route 29 without a partner Pokémon (Ticket 6.1)
+      if (current.id === 'new_bark_town' && conn.mapId === 'route_29' && playerParty.length === 0) {
+        entity.x = 0;
+        entity.progress = 0;
+        entity.isMoving = false;
+        BattleAudio.playMenuSound('CANCEL');
+        overworldHUD.openDialogue(
+          [
+            "Wait! Don't go out!",
+            "Wild POKéMON live in tall grass! It's dangerous to go out without a POKéMON of your own!",
+            "Visit PROF. ELM's LAB first to receive your partner POKéMON!",
+          ],
+          "PROF. ELM's AIDE"
+        );
+        return;
+      }
+
       nextMapId = conn.mapId;
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = nextMap.width - 1;
@@ -1577,6 +1592,7 @@ async function bootstrap() {
     seenSpecies.add(opponentPokemon.speciesId);
 
     // Reset temporary trapping flag at the start of a new encounter while keeping persistent HP/Status
+    if (playerParty.length === 0) return;
     opponentPokemon.isTrapped = false;
 
     let activePlayerPokemon =
@@ -1922,9 +1938,9 @@ async function bootstrap() {
           BattleAudio.playOverworldSound('KEY_ITEM');
           overworldHUD.openDialogue(
             [
-              'MR. POKéMON: Hello, hello! You must be GOLD, sent by PROF. ELM!',
-              'This is the rare egg I asked PROF. ELM to examine—GOLD received the MYSTERY EGG!',
-              'PROF. OAK: Aha! So you are GOLD! Your CYNDAQUIL seems very attached to you!',
+              `MR. POKéMON: Hello, hello! You must be ${playerName}, sent by PROF. ELM!`,
+              `This is the rare egg I asked PROF. ELM to examine—${playerName} received the MYSTERY EGG!`,
+              `PROF. OAK: Aha! So you are ${playerName}! Your ${playerParty[0]?.nickname || 'POKéMON'} seems very attached to you!`,
               'PROF. OAK: You look like a dependable trainer! Take this latest-model POKéDEX!',
               '🎩 MR. POKéMON also restored your party to full health before your journey back!',
             ],
@@ -2096,6 +2112,36 @@ async function bootstrap() {
           return;
         }
 
+        // Prof. Elm Lab Starter Dialogue & Errands (Ticket 6.1)
+        if (targetNpc.id === 'elm_npc') {
+          if (!storyFlags.has('starter_chosen')) {
+            overworldHUD.openDialogue(
+              [
+                `PROF. ELM: Hi, ${playerName}! I've been waiting for you!`,
+                'I want you to run an errand for me! MR. POKéMON beyond CHERRYGROVE CITY on ROUTE 30 sent word of a rare discovery.',
+                "I'd like you to go examine it for me. Choose one of the POKéMON in the BALLS on that table to accompany you!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          } else {
+            overworldHUD.openDialogue(
+              [
+                `PROF. ELM: Hi, ${playerName}! How is your partner POKéMON doing?`,
+                'MR. POKéMON lives a bit past CHERRYGROVE CITY on ROUTE 30. Take care on your way!',
+                'Here—let me heal your POKéMON and record your research progress!',
+              ],
+              targetNpc.speaker,
+              () => {
+                healPlayerParty();
+                saveCurrentGame();
+                overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
+              }
+            );
+            return;
+          }
+        }
+
         if (targetNpc.pages && targetNpc.pages.length > 0) {
           overworldHUD.openDialogue(targetNpc.pages, targetNpc.speaker, () => {
             if (targetNpc.action === 'HEAL_AND_SAVE') {
@@ -2114,6 +2160,62 @@ async function bootstrap() {
     // 2. Check Street Signs & Interactive Background Objects (bgEvents)
     const bgEvent = mapManager.checkBgEvent(facingX, facingY);
     if (bgEvent && bgEvent.pages.length > 0) {
+      // Starter Pokéball Selection in Elm's Lab (Ticket 6.1)
+      if (
+        bgEvent.action === 'STARTER_CYNDAQUIL' ||
+        bgEvent.action === 'STARTER_TOTODILE' ||
+        bgEvent.action === 'STARTER_CHIKORITA'
+      ) {
+        if (storyFlags.has('starter_chosen')) {
+          overworldHUD.openDialogue(["It's an empty POKé BALL."], bgEvent.speaker);
+          return;
+        }
+
+        const starterConfig: Record<string, { speciesId: string; name: string; type: string; moves: string[] }> = {
+          STARTER_CYNDAQUIL: {
+            speciesId: 'cyndaquil',
+            name: 'CYNDAQUIL',
+            type: 'Fire',
+            moves: ['tackle', 'leer'],
+          },
+          STARTER_TOTODILE: {
+            speciesId: 'totodile',
+            name: 'TOTODILE',
+            type: 'Water',
+            moves: ['scratch', 'leer'],
+          },
+          STARTER_CHIKORITA: {
+            speciesId: 'chikorita',
+            name: 'CHIKORITA',
+            type: 'Grass',
+            moves: ['tackle', 'growl'],
+          },
+        };
+
+        const chosen = starterConfig[bgEvent.action];
+        if (chosen) {
+          BattleAudio.playCry(chosen.speciesId);
+          overworldHUD.openDialogue(
+            [
+              `It contains ${chosen.name}, the ${chosen.type} POKéMON!`,
+              `Do you choose ${chosen.name}?`,
+              `${playerName} received ${chosen.name} from PROF. ELM!`,
+            ],
+            bgEvent.speaker,
+            () => {
+              const starterPokemon = PokemonFactory.create(chosen.speciesId, 5, chosen.moves);
+              playerParty.push(starterPokemon);
+              seenSpecies.add(chosen.speciesId);
+              storyFlags.add('starter_chosen');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              saveCurrentGame();
+              overworldHUD.showToast(`✨ Received ${chosen.name}!`);
+            }
+          );
+          return;
+        }
+      }
+
       overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
         if (bgEvent.action === 'HEAL_AND_SAVE') {
           healPlayerParty();
@@ -2276,7 +2378,7 @@ async function bootstrap() {
           }
 
           // Wild Encounter Check in Tall Grass (tile type 2)
-          if (tileType === 2) {
+          if (tileType === 2 && playerParty.length > 0) {
             const roamer = latestMap ? roamingManager.getActiveRoamerOnRoute(latestMap.id) : undefined;
             const encounter = mapManager.rollWildEncounter(tileType, roamer?.speciesId);
 
