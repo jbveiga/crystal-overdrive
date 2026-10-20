@@ -224,12 +224,12 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | :--- | :--- | :---: | :---: | :--- |
 | `GameClock.ts` | `tests/GameClock.test.ts` | 5 | ✅ Covered | Decoupled player vs world delta, pausing, time dilation. |
 | `GridPhysics.ts` | `tests/GridPhysics.test.ts` | 9 (+5 staged) | ✅ Covered | 1x/2x/3x speed, tile collision, bounds, fractional chaining, ledge hopping, trainer vision. |
-| `MapData.ts` | `tests/MapData.test.ts` | 9 | ✅ Covered | Binary map extraction schema, warp coords, NPC spawn data, seamless connections. |
+| `MapData.ts` | `tests/MapData.test.ts` | 10 | ✅ Covered | Binary map extraction schema, warp coords, NPC spawn data, seamless connections, directional hop codes. |
 | `RoamingManager.ts`| `tests/RoamingManager.test.ts` | 4 | ✅ Covered | Adjacency graph traversal, route weighting, active state, Burned Tower dormancy. |
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
 | `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 10 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6). |
 | `SaveManager.ts` | `tests/SaveManager.test.ts` | 2 | ✅ Covered | IndexedDB / localStorage serialization, round-trip state restoration. |
-| **Current Baseline** | **7 Suites** | **45 Tests (+5 Staged)** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| **Current Baseline** | **7 Suites** | **46 Tests (+5 Staged)** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.
