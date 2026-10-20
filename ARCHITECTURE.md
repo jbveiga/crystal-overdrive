@@ -86,7 +86,7 @@ src/
 │   └── BattleRenderer.ts     # 2.5D stage, custom Pokeball arcs, Physical/Special hit FX, camera shakes
 ├── ui/                    # Vector DOM Overlays & Interactivity (100dvh + Safe-Area Inset Aware + Device-Adaptive)
 │   ├── TitleScreenUI.ts      # Crystalline Title Screen, Audio Unlock Gate, SavePreview Card, Overwrite & Options Modals
-│   ├── IntroSequenceUI.ts    # 6-Stage Prof. Oak Intro, Gender Select (Boy/Girl), 7-Char Name Input & Presets, RTC Sync
+│   ├── IntroSequenceUI.ts    # 6-Stage Prof. Oak Intro, Authentic Marill Sprite, Gender Select (Boy/Girl), 15-Char Name Input & Presets, RTC Sync
 │   ├── OverworldHUD.ts       # Device-adaptive top menu capsule, Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
 │   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, device-adaptive Unbound 2x2 move matrix & hotkeys
 │   ├── StartMenuUI.ts        # Classic start menu (Pokedex, Pokemon, Bag, Save)
@@ -147,7 +147,8 @@ export interface MapData {
 
 export type NpcSpriteType =
   | 'boy' | 'girl' | 'fat_man' | 'kris'
-  | 'silver' | 'fisherman' | 'bug_catcher' | 'teacher' | 'mom' | 'prof_elm';
+  | 'silver' | 'fisherman' | 'bug_catcher' | 'teacher' | 'mom' | 'prof_elm'
+  | 'sage' | 'elder' | 'elder_li' | 'falkner' | 'bird_keeper' | 'earl';
 ```
 
 ### 3.3 Roaming Beast Markov Graph (`src/world/RoamingManager.ts`)
@@ -255,15 +256,15 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | :--- | :--- | :---: | :---: | :--- |
 | `GameClock.ts` | `tests/GameClock.test.ts` | 5 | ✅ Covered | Decoupled player vs world delta, pausing, time dilation. |
 | `GridPhysics.ts` | `tests/GridPhysics.test.ts` | 14 | ✅ Covered | 1x/2x/3x speed, tile collision, bounds, fractional chaining, multi-directional ledge hopping (4..9), trainer vision. |
-| `MapData.ts` | `tests/MapData.test.ts` | 12 | ✅ Covered | Binary map extraction schema, warp coords, reciprocal 1F/2F & Route 31/Gate/Violet/Sprout Tower warps, NPC spawn data, seamless connections, directional hop codes. |
+| `MapData.ts` | `tests/MapData.test.ts` | 13 | ✅ Covered | Binary map extraction schema, warp coords, reciprocal 1F/2F & Route 31/Gate/Violet/Sprout Tower warps, Sprout Tower 1F-3F Sages & Elder Li boss encounter, NPC spawn data, seamless connections, directional hop codes. |
 | `RoamingManager.ts`| `tests/RoamingManager.test.ts` | 4 | ✅ Covered | Adjacency graph traversal, route weighting, active state, Burned Tower dormancy. |
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
 | `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 11 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6), Unbound pill styles & hit shake specs. |
 | `SaveManager.ts` | `tests/SaveManager.test.ts` | 6 | ✅ Covered | IndexedDB / localStorage serialization, `SavePreview` extraction, `GameOptions` defaults, `formatPlayTime`, legacy save migration. |
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 5 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync, audio unlock & volume controls. |
 | `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
-| `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-7 char name validation/fallback, RTC period detection, `onComplete` payload. |
-| **Current Baseline** | **10 Suites** | **73 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-15 char name validation/fallback, RTC period detection, `onComplete` payload. |
+| **Current Baseline** | **10 Suites** | **74 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

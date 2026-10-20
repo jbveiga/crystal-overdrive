@@ -40,7 +40,7 @@ const POKEMON_REVEAL_PAGES: readonly string[] = [
  * Supports full browser DOM rendering with animated sprites/virtual keyboard and headless unit testing.
  */
 export class IntroSequenceUI {
-  public static readonly MAX_NAME_LENGTH = 7;
+  public static readonly MAX_NAME_LENGTH = 15;
 
   private container: HTMLElement | null = null;
   private rootElement: HTMLDivElement | null = null;
@@ -554,7 +554,7 @@ export class IntroSequenceUI {
     }
 
     if (this.stage === 'NAME_INPUT') {
-      this.dialogueTextElement.textContent = `Let's begin with your name. What is it?\n(Choose a Johto preset or type 1–7 characters, then press CONFIRM)`;
+      this.dialogueTextElement.textContent = `Let's begin with your name. What is it?\n(Choose a Johto preset or type 1–15 characters, then press CONFIRM)`;
       this.renderNameInputStage();
       return;
     }
@@ -625,18 +625,9 @@ export class IntroSequenceUI {
                 padding: 2px 8px;
                 margin-bottom: 4px;
               ">✨ MARILL!</div>
-              <div style="
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                background: radial-gradient(circle at 35% 35%, #60a5fa, #1d4ed8);
-                border: 3px solid #e0f2fe;
-                box-shadow: 0 0 18px rgba(56, 189, 248, 0.75);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 28px;
-              ">💧</div>
+              <img src="./assets/sprites/pokemon/marill_front.png"
+                   alt="Marill"
+                   style="width: 56px; height: 56px; image-rendering: pixelated; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));" />
             </div>
           `
               : ''
@@ -754,10 +745,10 @@ export class IntroSequenceUI {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 28px;
-        height: 36px;
+        width: clamp(16px, 4.2vw, 24px);
+        height: 32px;
         border-bottom: 3px solid ${idx < this.playerName.length ? '#38bdf8' : '#475569'};
-        font-size: 20px;
+        font-size: clamp(14px, 3.8vw, 18px);
         font-weight: 900;
         color: ${idx < this.playerName.length ? '#f8fafc' : '#64748b'};
       ">${ch}</span>`;
@@ -771,14 +762,14 @@ export class IntroSequenceUI {
         flex-direction: column;
         align-items: center;
         gap: 14px;
-        width: min(540px, 94vw);
+        width: min(560px, 94vw);
         background: rgba(15, 23, 42, 0.88);
         border: 2px solid rgba(56, 189, 248, 0.4);
         border-radius: 14px;
         padding: 16px;
       ">
-        <!-- Sprite + 7-Character Slot Readout -->
-        <div style="display: flex; align-items: center; gap: 18px;">
+        <!-- Sprite + 15-Character Slot Readout -->
+        <div style="display: flex; align-items: center; gap: 14px; width: 100%; justify-content: center; flex-wrap: wrap;">
           <div data-walk-sprite="name" class="intro-pixel-sprite" style="
             width: 48px;
             height: 96px;
@@ -786,9 +777,9 @@ export class IntroSequenceUI {
             background-size: 432px 96px;
             background-position: -144px 0px;
           "></div>
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 1px;">YOUR NAME (MAX 7 CHARS)</span>
-            <div style="display: flex; gap: 6px;">${slots}</div>
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; max-width: 100%;">
+            <span style="font-size: 11px; font-weight: 800; color: #94a3b8; letter-spacing: 1px;">YOUR NAME (1–15 CHARS)</span>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 100%;">${slots}</div>
           </div>
         </div>
 

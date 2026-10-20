@@ -489,6 +489,7 @@ async function bootstrap() {
       visionRange?: number;
       challengePages?: string[];
       trainerPokemon?: GridEntity['trainerPokemon'];
+      trainerTeam?: GridEntity['trainerTeam'];
     } = {}
   ): GridEntity => ({
     id,
@@ -513,6 +514,7 @@ async function bootstrap() {
     visionRange: opts.visionRange,
     challengePages: opts.challengePages,
     trainerPokemon: opts.trainerPokemon,
+    trainerTeam: opts.trainerTeam,
   });
 
   const npcsByMap: Record<string, GridEntity[]> = {
@@ -927,6 +929,212 @@ async function bootstrap() {
         'Their appearance changes, and sometimes even their type!',
       ]),
     ],
+    sprout_tower_1f: [
+      makeNpc(
+        'sage_chow',
+        14,
+        7,
+        'DOWN',
+        'sage',
+        '🙏 SAGE CHOW',
+        [
+          'We stand guard in this tower.',
+          'Here, we express our gratitude to honor all POKéMON.',
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sage_chow',
+          trainerName: 'Sage Chow',
+          visionRange: 3,
+          challengePages: [
+            'SAGE CHOW: We stand guard in this tower! Here, we express our gratitude to honor all POKéMON!',
+          ],
+          trainerPokemon: {
+            speciesId: 'bellsprout',
+            level: 3,
+            moves: ['vinewhip'],
+          },
+          trainerTeam: [
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+          ],
+        }
+      ),
+    ],
+    sprout_tower_2f: [
+      makeNpc(
+        'sage_nico',
+        12,
+        13,
+        'RIGHT',
+        'sage',
+        '🙏 SAGE NICO',
+        [
+          'However hard we battle, the TOWER will stand strong.',
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sage_nico',
+          trainerName: 'Sage Nico',
+          visionRange: 3,
+          challengePages: [
+            'SAGE NICO: However hard we battle, the TOWER will stand strong!',
+          ],
+          trainerPokemon: {
+            speciesId: 'bellsprout',
+            level: 3,
+            moves: ['vinewhip'],
+          },
+          trainerTeam: [
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'sage_edmond',
+        9,
+        4,
+        'LEFT',
+        'sage',
+        '🙏 SAGE EDMOND',
+        [
+          '…Sway like leaves in the wind…',
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sage_edmond',
+          trainerName: 'Sage Edmond',
+          visionRange: 3,
+          challengePages: [
+            'SAGE EDMOND: …Sway like leaves in the wind… Let us battle!',
+          ],
+          trainerPokemon: {
+            speciesId: 'bellsprout',
+            level: 3,
+            moves: ['vinewhip'],
+          },
+          trainerTeam: [
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+            { speciesId: 'bellsprout', level: 3, moves: ['vinewhip'] },
+          ],
+        }
+      ),
+    ],
+    sprout_tower_3f: [
+      makeNpc(
+        'sage_jin',
+        8,
+        11,
+        'RIGHT',
+        'sage',
+        '🙏 SAGE JIN',
+        [
+          'I train to find enlightenment in POKéMON!',
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sage_jin',
+          trainerName: 'Sage Jin',
+          visionRange: 3,
+          challengePages: [
+            'SAGE JIN: I train to find enlightenment in POKéMON!',
+          ],
+          trainerPokemon: {
+            speciesId: 'bellsprout',
+            level: 6,
+            moves: ['vinewhip', 'growth'],
+          },
+        }
+      ),
+      makeNpc(
+        'sage_neal',
+        11,
+        11,
+        'LEFT',
+        'sage',
+        '🙏 SAGE NEAL',
+        [
+          'The ELDER\'s HM illuminates even the pitch-black darkness.',
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sage_neal',
+          trainerName: 'Sage Neal',
+          visionRange: 3,
+          challengePages: [
+            'SAGE NEAL: The ELDER\'s HM illuminates even the pitch-black darkness!',
+          ],
+          trainerPokemon: {
+            speciesId: 'bellsprout',
+            level: 6,
+            moves: ['vinewhip', 'growth'],
+          },
+        }
+      ),
+      makeNpc(
+        'sage_troy',
+        6,
+        3,
+        'DOWN',
+        'sage',
+        '🙏 SAGE TROY',
+        [
+          'It is not far to the ELDER.',
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sage_troy',
+          trainerName: 'Sage Troy',
+          visionRange: 3,
+          challengePages: [
+            'SAGE TROY: Let me see how much you trust your POKéMON!',
+          ],
+          trainerPokemon: {
+            speciesId: 'bellsprout',
+            level: 7,
+            moves: ['vinewhip', 'growth'],
+          },
+          trainerTeam: [
+            { speciesId: 'bellsprout', level: 7, moves: ['vinewhip', 'growth'] },
+            { speciesId: 'hoot-hoot', level: 7, moves: ['tackle', 'growl', 'peck'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'elder_li',
+        10,
+        3,
+        'DOWN',
+        'elder_li',
+        '🏮 ELDER LI',
+        [
+          'ELDER LI: You care deeply for your POKéMON. With TM70 / HM05 FLASH, even the darkest caves will shine bright.',
+          'Go forth and challenge FALKNER at the VIOLET CITY GYM!',
+        ],
+        {
+          action: 'ELDER_LI_EVENT',
+          trainerId: 'elder_li',
+          trainerName: 'Elder Li',
+          challengePages: [
+            'ELDER LI: So, you have come seeking enlightenment with your POKéMON. As the ELDER of SPROUT TOWER, I shall test the bond between you and your partners!',
+          ],
+          trainerPokemon: {
+            speciesId: 'bellsprout',
+            level: 7,
+            moves: ['vinewhip', 'growth'],
+          },
+          trainerTeam: [
+            { speciesId: 'bellsprout', level: 7, moves: ['vinewhip', 'growth'] },
+            { speciesId: 'bellsprout', level: 7, moves: ['vinewhip', 'wrap'] },
+            { speciesId: 'hoot-hoot', level: 10, moves: ['tackle', 'hypnosis', 'peck'] },
+          ],
+        }
+      ),
+    ],
   };
 
   const emptyNpcs: GridEntity[] = [];
@@ -1084,16 +1292,31 @@ async function bootstrap() {
     }
   };
 
-  // 7. Start Battle (Wild or Trainer)
+  // 7. Start Battle (Wild or Trainer, including Multi-Pokémon Trainer Teams)
   const triggerBattle = async (
-    opponentPokemon: PokemonInstance,
-    options: { isRoamer?: boolean; isTrainer?: boolean; trainerName?: string } = {}
+    initialOpponentPokemon: PokemonInstance,
+    options: {
+      isRoamer?: boolean;
+      isTrainer?: boolean;
+      isGymLeader?: boolean;
+      trainerName?: string;
+      trainerTeam?: PokemonInstance[];
+      onVictory?: () => Promise<void> | void;
+    } = {}
   ) => {
+    let opponentPokemon = initialOpponentPokemon;
+    const remainingTrainerParty: PokemonInstance[] =
+      options.trainerTeam && options.trainerTeam.length > 1
+        ? options.trainerTeam.slice(1)
+        : [];
+
     gameState = 'BATTLE';
     overworldHUD.hide();
     player.isMoving = false;
     player.progress = 0;
-    audioManager.playBattleBgm(options.isTrainer ? 'trainer' : 'wild');
+    audioManager.playBattleBgm(
+      options.isGymLeader ? 'gym_leader' : options.isTrainer ? 'trainer' : 'wild'
+    );
 
     // Record species as SEEN in Pokédex
     seenSpecies.add(opponentPokemon.speciesId);
@@ -1106,7 +1329,7 @@ async function bootstrap() {
       healPlayerParty();
       activePlayerPokemon = playerParty[0];
     }
-    const battleSM = new BattleStateMachine(activePlayerPokemon, opponentPokemon, options.isRoamer);
+    let battleSM = new BattleStateMachine(activePlayerPokemon, opponentPokemon, options.isRoamer);
 
     battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
     battleHUD.updateSpeedDisplay(gameClock.battleSpeed);
@@ -1126,6 +1349,62 @@ async function bootstrap() {
     } else {
       await battleHUD.showMessage(`Wild ${opponentPokemon.nickname} appeared!`);
     }
+
+    const bindBattleHudForActiveFoe = () => {
+      battleHUD.initBattle(
+        activePlayerPokemon,
+        opponentPokemon,
+        {
+          onMoveSelected: async (moveId: string) => {
+            const result = battleSM.executeRound({ type: 'FIGHT', moveId });
+            await playTurnEventsAndFinishCheck(result);
+          },
+          onPokemonSelected: async (targetPokemon: PokemonInstance) => {
+            const result = battleSM.executeRound({ type: 'SWITCH', switchPokemon: targetPokemon });
+            await playTurnEventsAndFinishCheck(result);
+          },
+          onBagSelected: async (ballId: PokeballId) => {
+            if (options.isTrainer) {
+              await battleHUD.showMessage("The trainer blocked the ball! Don't be a thief!");
+              battleHUD.showActionMenu();
+              return;
+            }
+
+            if (inventory.balls[ballId] && inventory.balls[ballId]! > 0) {
+              inventory.balls[ballId]!--;
+            }
+
+            const result = battleSM.executeRound({ type: 'BAG', ballId });
+            await playTurnEventsAndFinishCheck(result);
+          },
+          onRunSelected: async () => {
+            if (options.isTrainer) {
+              await battleHUD.showMessage("No! There's no running from a Trainer battle!");
+              battleHUD.showActionMenu();
+              return;
+            }
+            battleSM.executeRound({ type: 'RUN' });
+            if (options.isRoamer) {
+              eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+            }
+            await battleHUD.showMessage('Got away safely!');
+            battleRenderer.endBattle();
+            battleHUD.hide();
+            gameState = 'OVERWORLD';
+            audioManager.restoreOverworldBgm(0.6);
+            overworldHUD.show();
+          },
+          onSpeedToggle: () => {
+            const nextSpeed = gameClock.cycleBattleSpeed();
+            battleRenderer.setSpeedMultiplier(nextSpeed);
+            return nextSpeed;
+          },
+        },
+        inventory.balls,
+        playerParty,
+        caughtSpeciesIds
+      );
+    };
 
     const playTurnEventsAndFinishCheck = async (result: BattleTurnResult) => {
       let ballGraphic: Graphics | null = null;
@@ -1200,6 +1479,18 @@ async function bootstrap() {
             );
           }
 
+          // Multi-Pokémon Trainer Team continuation
+          if (options.isTrainer && remainingTrainerParty.length > 0) {
+            opponentPokemon = remainingTrainerParty.shift()!;
+            opponentPokemon.isTrapped = false;
+            seenSpecies.add(opponentPokemon.speciesId);
+            battleSM = new BattleStateMachine(activePlayerPokemon, opponentPokemon, false);
+            await battleHUD.showMessage(`${options.trainerName} sent out ${opponentPokemon.nickname}!`);
+            await battleRenderer.startBattle(activePlayerPokemon, opponentPokemon);
+            bindBattleHudForActiveFoe();
+            return;
+          }
+
           if (options.isTrainer) {
             inventory.money += 200;
             await battleHUD.showMessage(`You defeated ${options.trainerName}!`);
@@ -1216,65 +1507,34 @@ async function bootstrap() {
         audioManager.restoreOverworldBgm(0.6);
         overworldHUD.show();
         saveCurrentGame();
+
+        if (result.winner === 'PLAYER' && options.onVictory) {
+          await options.onVictory();
+        }
       } else {
         battleHUD.showActionMenu();
       }
     };
 
-    battleHUD.initBattle(
-      activePlayerPokemon,
-      opponentPokemon,
-      {
-        onMoveSelected: async (moveId: string) => {
-          const result = battleSM.executeRound({ type: 'FIGHT', moveId });
-          await playTurnEventsAndFinishCheck(result);
-        },
-        onPokemonSelected: async (targetPokemon: PokemonInstance) => {
-          const result = battleSM.executeRound({ type: 'SWITCH', switchPokemon: targetPokemon });
-          await playTurnEventsAndFinishCheck(result);
-        },
-        onBagSelected: async (ballId: PokeballId) => {
-          if (options.isTrainer) {
-            await battleHUD.showMessage("The trainer blocked the ball! Don't be a thief!");
-            battleHUD.showActionMenu();
-            return;
-          }
+    bindBattleHudForActiveFoe();
+  };
 
-          // Decrement ball count
-          if (inventory.balls[ballId] && inventory.balls[ballId]! > 0) {
-            inventory.balls[ballId]!--;
-          }
-
-          const result = battleSM.executeRound({ type: 'BAG', ballId });
-          await playTurnEventsAndFinishCheck(result);
-        },
-        onRunSelected: async () => {
-          if (options.isTrainer) {
-            await battleHUD.showMessage("No! There's no running from a Trainer battle!");
-            battleHUD.showActionMenu();
-            return;
-          }
-          battleSM.executeRound({ type: 'RUN' });
-          if (options.isRoamer) {
-            eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-          }
-          await battleHUD.showMessage('Got away safely!');
-          battleRenderer.endBattle();
-          battleHUD.hide();
-          gameState = 'OVERWORLD';
-          audioManager.restoreOverworldBgm(0.6);
-          overworldHUD.show();
-        },
-        onSpeedToggle: () => {
-          const nextSpeed = gameClock.cycleBattleSpeed();
-          battleRenderer.setSpeedMultiplier(nextSpeed);
-          return nextSpeed;
-        },
-      },
-      inventory.balls,
-      playerParty,
-      caughtSpeciesIds
-    );
+  const buildTrainerTeamInstances = (trainer: GridEntity): PokemonInstance[] => {
+    if (trainer.trainerTeam && trainer.trainerTeam.length > 0) {
+      return trainer.trainerTeam.map((spec) =>
+        PokemonFactory.create(spec.speciesId, spec.level, spec.moves)
+      );
+    }
+    if (trainer.trainerPokemon) {
+      return [
+        PokemonFactory.create(
+          trainer.trainerPokemon.speciesId,
+          trainer.trainerPokemon.level,
+          trainer.trainerPokemon.moves
+        ),
+      ];
+    }
+    return [];
   };
 
   const getOppositeDirection = (dir: Direction): Direction => {
@@ -1357,14 +1617,12 @@ async function bootstrap() {
 
     overworldHUD.openDialogue(dialoguePages, trainer.speaker, () => {
       isCutsceneLocked = false;
-      const foe = PokemonFactory.create(
-        trainer.trainerPokemon!.speciesId,
-        trainer.trainerPokemon!.level,
-        trainer.trainerPokemon!.moves
-      );
-      triggerBattle(foe, {
+      const team = buildTrainerTeamInstances(trainer);
+      if (team.length === 0) return;
+      triggerBattle(team[0], {
         isTrainer: true,
         trainerName: trainer.trainerName || trainer.speaker || 'Trainer',
+        trainerTeam: team,
       });
     });
   };
@@ -1432,6 +1690,43 @@ async function bootstrap() {
           return;
         }
 
+        // Sprout Tower 3F Boss: Elder Li (Ticket 5.2)
+        if (targetNpc.action === 'ELDER_LI_EVENT' && !storyFlags.has('sprout_tower_cleared')) {
+          const introPages =
+            targetNpc.challengePages && targetNpc.challengePages.length > 0
+              ? targetNpc.challengePages
+              : [
+                  'ELDER LI: So, you have come seeking enlightenment with your POKéMON. As the ELDER of SPROUT TOWER, I shall test the bond between you and your partners!',
+                ];
+          overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              trainerName: targetNpc.trainerName || 'Elder Li',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('elder_li');
+                storyFlags.add('sprout_tower_cleared');
+                if (!inventory.tms.includes('HM05')) inventory.tms.push('HM05');
+                if (!inventory.tms.includes('TM70')) inventory.tms.push('TM70');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    'ELDER LI: Ah, splendid! You truly possess the heart of a true trainer! As proof of your mastery, take this TECHNICAL MACHINE: TM70 FLASH!',
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('⚡ Defeated Elder Li & received HM05 / TM70 FLASH!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
         // Trainer NPC spoken to directly before being defeated
         if (
           targetNpc.action === 'TRAINER_BATTLE' &&
@@ -1445,14 +1740,12 @@ async function bootstrap() {
               ? targetNpc.challengePages
               : targetNpc.pages || [];
           overworldHUD.openDialogue(pagesToUse, targetNpc.speaker, () => {
-            const foe = PokemonFactory.create(
-              targetNpc.trainerPokemon!.speciesId,
-              targetNpc.trainerPokemon!.level,
-              targetNpc.trainerPokemon!.moves
-            );
-            triggerBattle(foe, {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
               isTrainer: true,
               trainerName: targetNpc.trainerName || targetNpc.speaker || 'Trainer',
+              trainerTeam: team,
             });
           });
           return;

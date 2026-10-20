@@ -410,6 +410,8 @@ describe('MapData & Authentic Tile Integrity', () => {
       'poliwag_back.png',
       'poliwhirl_front.png',
       'poliwhirl_back.png',
+      'marill_front.png',
+      'marill_back.png',
     ];
     for (const p of expectedPokemon) {
       expect(fs.existsSync(path.join(pokemonDir, p))).toBe(true);
@@ -515,6 +517,30 @@ describe('MapData & Authentic Tile Integrity', () => {
       expect(fs.existsSync(path.join(fxDir, f))).toBe(true);
       expect(fs.existsSync(path.join(battleFxDir, f))).toBe(true);
     }
+  });
+
+  it('validates Ticket 5.2 Sprout Tower 1F-3F Sages and Elder Li boss encounter registration in main.ts', () => {
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+
+    const expectedTrainerIds = [
+      'sage_chow',
+      'sage_nico',
+      'sage_edmond',
+      'sage_jin',
+      'sage_neal',
+      'sage_troy',
+      'elder_li',
+    ];
+    for (const id of expectedTrainerIds) {
+      expect(mainSrc).toContain(`trainerId: '${id}'`);
+    }
+
+    expect(mainSrc).toContain("action: 'ELDER_LI_EVENT'");
+    expect(mainSrc).toContain("speciesId: 'bellsprout', level: 7");
+    expect(mainSrc).toContain("speciesId: 'hoot-hoot', level: 10");
+    expect(mainSrc).toContain("inventory.tms.push('HM05')");
+    expect(mainSrc).toContain("inventory.tms.push('TM70')");
+    expect(mainSrc).toContain("storyFlags.add('sprout_tower_cleared')");
   });
 });
 

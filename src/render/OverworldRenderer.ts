@@ -486,6 +486,12 @@ export class OverworldRenderer {
       teacher: './assets/sprites/characters/teacher.png',
       mom: './assets/sprites/characters/mom.png',
       prof_elm: './assets/sprites/characters/prof_elm.png',
+      sage: './assets/sprites/characters/sage.png',
+      elder: './assets/sprites/characters/elder.png',
+      elder_li: './assets/sprites/characters/elder_li.png',
+      falkner: './assets/sprites/characters/falkner.png',
+      bird_keeper: './assets/sprites/characters/bird_keeper.png',
+      earl: './assets/sprites/characters/earl.png',
     };
 
     await Promise.all(

@@ -10,7 +10,19 @@ export type NpcSpriteType =
   | 'bug_catcher'
   | 'teacher'
   | 'mom'
-  | 'prof_elm';
+  | 'prof_elm'
+  | 'sage'
+  | 'elder'
+  | 'elder_li'
+  | 'falkner'
+  | 'bird_keeper'
+  | 'earl';
+
+export interface TrainerPokemonSpec {
+  speciesId: string;
+  level: number;
+  moves?: string[];
+}
 
 export interface GridEntity {
   id: string;
@@ -38,16 +50,14 @@ export interface GridEntity {
     | 'TRAINER_BATTLE'
     | 'TRAINER_JOEY'
     | 'MR_POKEMON_EVENT'
-    | 'BERRY_MAN_EVENT';
+    | 'BERRY_MAN_EVENT'
+    | 'ELDER_LI_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;
   challengePages?: string[];
-  trainerPokemon?: {
-    speciesId: string;
-    level: number;
-    moves?: string[];
-  };
+  trainerPokemon?: TrainerPokemonSpec;
+  trainerTeam?: TrainerPokemonSpec[];
 }
 
 export type CollisionCheck = (x: number, y: number) => boolean;

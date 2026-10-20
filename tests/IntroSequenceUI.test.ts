@@ -75,7 +75,7 @@ describe('IntroSequenceUI (Ticket 4.3)', () => {
     expect(GIRL_NAME_PRESETS).toContain('AMANDA');
   });
 
-  it('enforces 1-7 character limit, uppercase normalization, backspace, and empty fallback', () => {
+  it('enforces 1-15 character limit, uppercase normalization, backspace, and empty fallback', () => {
     const intro = new IntroSequenceUI('modal-container');
     intro.start();
 
@@ -88,17 +88,17 @@ describe('IntroSequenceUI (Ticket 4.3)', () => {
     intro.setPlayerName('   ');
     expect(intro.getValidatedName()).toBe('KRIS');
 
-    // Typing characters up to 7 chars max
+    // Typing characters up to 15 chars max
     intro.setPlayerName('');
     for (const ch of 'crystaloverdrive') {
       intro.appendNameChar(ch);
     }
-    expect(intro.getPlayerName()).toBe('CRYSTAL');
-    expect(intro.getPlayerName().length).toBe(7);
+    expect(intro.getPlayerName()).toBe('CRYSTALOVERDRIV');
+    expect(intro.getPlayerName().length).toBe(15);
 
     // Backspace removes last character
     intro.backspaceName();
-    expect(intro.getPlayerName()).toBe('CRYSTA');
+    expect(intro.getPlayerName()).toBe('CRYSTALOVERDRI');
   });
 
   it('computes accurate Morning, Day, and Night RTC periods in getClockStatus()', () => {
