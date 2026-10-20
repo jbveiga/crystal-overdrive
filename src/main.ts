@@ -122,6 +122,7 @@ async function bootstrap() {
     'route_31',
     'elms_lab',
     'players_house_1f',
+    'players_house_2f',
     'players_neighbors_house',
     'elms_house',
     'cherrygrove_mart',
@@ -1436,7 +1437,7 @@ async function bootstrap() {
               .playDoorwayFade(() => {
                 const targetMap = mapManager.setCurrentMap(warp.targetMapId);
                 const isEnteringIndoor = Object.keys(targetMap.connections || {}).length === 0;
-                player.direction = isEnteringIndoor ? 'UP' : 'DOWN';
+                player.direction = warp.targetY <= 1 ? 'DOWN' : isEnteringIndoor ? 'UP' : 'DOWN';
                 player.x = warp.targetX;
                 player.y = warp.targetY;
                 player.targetX = warp.targetX;

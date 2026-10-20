@@ -135,13 +135,65 @@ describe('MapData & Authentic Tile Integrity', () => {
         expect(fs.existsSync(path.join(tilesDir, `${tileName}.png`))).toBe(true);
       }
 
-      // Every indoor map has 2 exit carpet warps at the bottom row
-      expect(mapData.warps.length).toBe(2);
+      // Every indoor map has at least 2 exit carpet warps at the bottom row (plus staircase warps where applicable)
+      expect(mapData.warps.length).toBeGreaterThanOrEqual(2);
       for (const warp of mapData.warps) {
         const idx = warp.y * mapData.width + warp.x;
         expect(mapData.collisionGrid[idx]).toBe(0);
       }
     }
+  });
+
+  it('validates players_house_2f.json bedroom schema, bgEvents, and reciprocal staircase warps with players_house_1f', () => {
+    const h1Path = path.resolve(__dirname, '../public/assets/data/maps/players_house_1f.json');
+    const h2Path = path.resolve(__dirname, '../public/assets/data/maps/players_house_2f.json');
+    expect(fs.existsSync(h1Path)).toBe(true);
+    expect(fs.existsSync(h2Path)).toBe(true);
+
+    const h1: MapData = JSON.parse(fs.readFileSync(h1Path, 'utf8'));
+    const h2: MapData = JSON.parse(fs.readFileSync(h2Path, 'utf8'));
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+
+    expect(h2.id).toBe('players_house_2f');
+    expect(h2.width).toBe(8);
+    expect(h2.height).toBe(6);
+    expect(h2.tileSize).toBe(64);
+    expect(h2.groundLayer.length).toBe(48);
+    expect(h2.collisionGrid.length).toBe(48);
+    expect(h2.tileMap?.length).toBe(48);
+
+    for (const tileName of new Set(h2.tileMap!)) {
+      expect(fs.existsSync(path.join(tilesDir, `${tileName}.png`))).toBe(true);
+    }
+
+    // Reciprocal staircase warps: 1F (9, 0) -> 2F (7, 1) and 2F (7, 0) -> 1F (9, 1)
+    const warpUp = h1.warps.find((w) => w.x === 9 && w.y === 0);
+    expect(warpUp).toEqual({
+      x: 9,
+      y: 0,
+      targetMapId: 'players_house_2f',
+      targetX: 7,
+      targetY: 1,
+    });
+    expect(h1.collisionGrid[0 * h1.width + 9]).toBe(0); // Walkable staircase on 1F
+
+    const warpDown = h2.warps.find((w) => w.x === 7 && w.y === 0);
+    expect(warpDown).toEqual({
+      x: 7,
+      y: 0,
+      targetMapId: 'players_house_1f',
+      targetX: 9,
+      targetY: 1,
+    });
+    expect(h2.collisionGrid[0 * h2.width + 7]).toBe(0); // Walkable staircase on 2F
+    expect(h2.collisionGrid[1 * h2.width + 7]).toBe(0); // Walkable arrival tile (7, 1) on 2F
+
+    // Verify 2F interactive bedroom objects (PC, Radio, Bookshelf, Nintendo 64)
+    expect(h2.bgEvents?.length).toBe(4);
+    expect(h2.bgEvents?.find((e) => e.x === 2 && e.y === 1)?.speaker).toContain('PC');
+    expect(h2.bgEvents?.find((e) => e.x === 3 && e.y === 1)?.speaker).toContain('RADIO');
+    expect(h2.bgEvents?.find((e) => e.x === 5 && e.y === 1)?.speaker).toContain('BOOKSHELF');
+    expect(h2.bgEvents?.find((e) => e.x === 4 && e.y === 2)?.speaker).toContain('NINTENDO 64');
   });
 
   it('validates route_30.json and route_31.json dimensions, tiles, ledges, warps, and NORTH/SOUTH connections', () => {

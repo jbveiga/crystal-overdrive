@@ -1,0 +1,129 @@
+{
+  "id": "players_house_2f",
+  "name": "Player's Room",
+  "width": 8,
+  "height": 6,
+  "tileSize": 64,
+  "groundLayer": [
+    1, 1, 1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 1, 0, 0,
+    1, 1, 0, 0, 1, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+  ],
+  "objectLayer": [
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+  ],
+  "collisionGrid": [
+    1, 1, 1, 1, 1, 1, 1, 0,
+    1, 1, 1, 1, 1, 1, 0, 0,
+    1, 1, 0, 0, 1, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+  ],
+  "tileMap": [
+    "in_players_house_11_11_11_11",
+    "in_players_house_2c_2d_11_11",
+    "in_players_house_11_11_20_21",
+    "in_players_house_11_11_11_11",
+    "in_players_house_11_11_06_07",
+    "in_players_house_0e_0f_1e_1f",
+    "in_players_house_11_11_11_11",
+    "in_players_house_4c_4d_5c_5d",
+    "in_players_house_28_29_38_39",
+    "in_players_house_28_29_38_39",
+    "in_players_house_30_31_0c_0d",
+    "in_players_house_26_27_36_37",
+    "in_players_house_16_17_08_09",
+    "in_players_house_2e_2f_18_19",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_48_49_58_59",
+    "in_players_house_48_49_58_59",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_4a_4b_5a_5b",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_05_05_05_05",
+    "in_players_house_05_05_05_05",
+    "in_players_house_05_05_05_05",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_05_05_05_05",
+    "in_players_house_05_05_05_05",
+    "in_players_house_05_05_05_05",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01",
+    "in_players_house_01_01_01_01"
+  ],
+  "connections": {},
+  "warps": [
+    {
+      "x": 7,
+      "y": 0,
+      "targetMapId": "players_house_1f",
+      "targetX": 9,
+      "targetY": 1
+    }
+  ],
+  "bgEvents": [
+    {
+      "x": 2,
+      "y": 1,
+      "speaker": "💻 PLAYER'S PC",
+      "pages": [
+        "Turned on the PC!",
+        "Item Storage: Withdrew 1 POTION from Item Mailbox!"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "speaker": "📻 RADIO",
+      "pages": [
+        "PROF. OAK'S POKéMON TALK!",
+        "DJ MARY: Tuning into the POKéMON CHANNEL!"
+      ]
+    },
+    {
+      "x": 5,
+      "y": 1,
+      "speaker": "📚 BOOKSHELF",
+      "pages": [
+        "It's packed with POKéMON picture books and adventure journals!"
+      ]
+    },
+    {
+      "x": 4,
+      "y": 2,
+      "speaker": "🎮 NINTENDO 64",
+      "pages": [
+        "A Nintendo 64! Stars dot the sky as two boys ride on a train…",
+        "Better get rolling soon!"
+      ]
+    }
+  ],
+  "grassEncounters": []
+}

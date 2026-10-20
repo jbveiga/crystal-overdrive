@@ -574,6 +574,7 @@ buildMapFromBlk({
   warps: [
     { x: 6, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 6 },
     { x: 7, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 6 },
+    { x: 9, y: 0, targetMapId: 'players_house_2f', targetX: 7, targetY: 1 },
   ],
   bgEvents: [
     {

@@ -14,6 +14,7 @@ describe('AudioManager (Ticket 3.8)', () => {
     // New Bark Town & Houses
     expect(audioManager.getTrackForMap('new_bark_town')).toBe('bgm_new_bark_town');
     expect(audioManager.getTrackForMap('players_house_1f')).toBe('bgm_new_bark_town');
+    expect(audioManager.getTrackForMap('players_house_2f')).toBe('bgm_new_bark_town');
     expect(audioManager.getTrackForMap('players_neighbors_house')).toBe('bgm_new_bark_town');
     expect(audioManager.getTrackForMap('elms_house')).toBe('bgm_new_bark_town');
 

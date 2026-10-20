@@ -48,6 +48,7 @@ const SAVE_KEY = 'main-save';
 const LOCATION_NAME_TABLE: Record<string, string> = {
   new_bark_town: 'New Bark Town',
   players_house_1f: "Player's House",
+  players_house_2f: "Player's Room",
   players_neighbors_house: "Neighbor's House",
   elms_lab: "Elm's Lab",
   elms_house: "Elm's House",

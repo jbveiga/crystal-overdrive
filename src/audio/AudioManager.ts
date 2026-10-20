@@ -21,6 +21,7 @@ const MAP_BGM_TABLE: Record<string, BgmTrackId> = {
   // New Bark Town & Houses
   new_bark_town: 'bgm_new_bark_town',
   players_house_1f: 'bgm_new_bark_town',
+  players_house_2f: 'bgm_new_bark_town',
   players_neighbors_house: 'bgm_new_bark_town',
   elms_house: 'bgm_new_bark_town',
 
