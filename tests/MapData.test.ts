@@ -542,5 +542,26 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("inventory.tms.push('TM70')");
     expect(mainSrc).toContain("storyFlags.add('sprout_tower_cleared')");
   });
+
+  it('validates Ticket 5.3 Violet Gym minions, Leader Falkner boss encounter, Zephyr Badge, and TM31 Mud-Slap', () => {
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const startMenuSrc = fs.readFileSync(path.resolve(__dirname, '../src/ui/StartMenuUI.ts'), 'utf8');
+
+    expect(mainSrc).toContain("'gym_guide'");
+    expect(mainSrc).toContain("trainerId: 'bird_keeper_abe'");
+    expect(mainSrc).toContain("trainerId: 'bird_keeper_rod'");
+    expect(mainSrc).toContain("trainerId: 'falkner'");
+    expect(mainSrc).toContain("action: 'FALKNER_EVENT'");
+    expect(mainSrc).toContain("speciesId: 'spearow', level: 9");
+    expect(mainSrc).toContain("speciesId: 'pidgey', level: 9, moves: ['tackle', 'sandattack', 'mudslap']");
+    expect(mainSrc).toContain("speciesId: 'pidgeotto', level: 13, moves: ['gust', 'tackle', 'mudslap', 'roost']");
+    expect(mainSrc).toContain("isGymLeader: true");
+    expect(mainSrc).toContain("inventory.badges.push('zephyr')");
+    expect(mainSrc).toContain("inventory.tms.push('TM31')");
+    expect(mainSrc).toContain("storyFlags.add('falkner_defeated')");
+
+    // StartMenuUI Trainer Card Zephyr Badge entry
+    expect(startMenuSrc).toContain("{ id: 'zephyr', name: 'Zephyr', leader: 'Falkner', icon: '🦅' }");
+  });
 });
 

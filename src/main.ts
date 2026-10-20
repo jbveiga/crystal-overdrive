@@ -1135,6 +1135,106 @@ async function bootstrap() {
         }
       ),
     ],
+    violet_gym: [
+      makeNpc(
+        'gym_guide',
+        7,
+        13,
+        'DOWN',
+        'fat_man',
+        '🕶️ GYM GUIDE',
+        [
+          "Yo! I'm no trainer, but I can give some advice! Believe me! If you believe, a championship dream can come true. You believe? Then listen.",
+          'The grass-type is weak against the flying-type. Keep this in mind.',
+        ]
+      ),
+      makeNpc(
+        'bird_keeper_abe',
+        2,
+        10,
+        'RIGHT',
+        'bird_keeper',
+        '🦅 BIRD KEEPER ABE',
+        [
+          "This can't be true!",
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bird_keeper_abe',
+          trainerName: 'Bird Keeper Abe',
+          visionRange: 3,
+          challengePages: [
+            'BIRD KEEPER ABE: Let me see if you are good enough to face FALKNER!',
+          ],
+          trainerPokemon: {
+            speciesId: 'spearow',
+            level: 9,
+            moves: ['peck', 'growl', 'leer'],
+          },
+          trainerTeam: [
+            { speciesId: 'spearow', level: 9, moves: ['peck', 'growl', 'leer'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'bird_keeper_rod',
+        7,
+        6,
+        'LEFT',
+        'bird_keeper',
+        '🦅 BIRD KEEPER ROD',
+        [
+          "FALKNER's skills are for real! Don't get cocky just because you beat me!",
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bird_keeper_rod',
+          trainerName: 'Bird Keeper Rod',
+          visionRange: 3,
+          challengePages: [
+            'BIRD KEEPER ROD: The keyword is guts! Those here are training night and day to become bird POKéMON masters. Come on!',
+          ],
+          trainerPokemon: {
+            speciesId: 'pidgey',
+            level: 7,
+            moves: ['tackle', 'sandattack'],
+          },
+          trainerTeam: [
+            { speciesId: 'pidgey', level: 7, moves: ['tackle', 'sandattack'] },
+            { speciesId: 'pidgey', level: 7, moves: ['tackle', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'falkner',
+        5,
+        1,
+        'DOWN',
+        'falkner',
+        '🦅 LEADER FALKNER',
+        [
+          "FALKNER: …Darn! My dad's cherished bird POKéMON… All right. Take this. It's the official POKéMON LEAGUE ZEPHYRBADGE!",
+          'There are POKéMON GYMS in cities and towns ahead. You should test your skills at these GYMS. I\'m going to train harder to become the greatest bird master!',
+        ],
+        {
+          action: 'FALKNER_EVENT',
+          trainerId: 'falkner',
+          trainerName: 'Leader Falkner',
+          challengePages: [
+            "FALKNER: I'm FALKNER, the VIOLET CITY POKéMON GYM leader! People say you can clip flying-type wings with a jolt of electricity… I won't allow such insults to bird POKéMON! I'll show you the real power of the magnificent bird POKéMON!",
+          ],
+          trainerPokemon: {
+            speciesId: 'pidgey',
+            level: 9,
+            moves: ['tackle', 'sandattack', 'mudslap'],
+          },
+          trainerTeam: [
+            { speciesId: 'pidgey', level: 9, moves: ['tackle', 'sandattack', 'mudslap'] },
+            { speciesId: 'pidgeotto', level: 13, moves: ['gust', 'tackle', 'mudslap', 'roost'] },
+          ],
+        }
+      ),
+    ],
   };
 
   const emptyNpcs: GridEntity[] = [];
@@ -1719,6 +1819,46 @@ async function bootstrap() {
                   () => {
                     saveCurrentGame();
                     overworldHUD.showToast('⚡ Defeated Elder Li & received HM05 / TM70 FLASH!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Violet Gym Leader Boss: Falkner (Ticket 5.3)
+        if (targetNpc.action === 'FALKNER_EVENT' && !storyFlags.has('falkner_defeated')) {
+          const introPages =
+            targetNpc.challengePages && targetNpc.challengePages.length > 0
+              ? targetNpc.challengePages
+              : [
+                  "FALKNER: I'm FALKNER, the VIOLET CITY POKéMON GYM leader! People say you can clip flying-type wings with a jolt of electricity… I won't allow such insults to bird POKéMON! I'll show you the real power of the magnificent bird POKéMON!",
+                ];
+          overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Leader Falkner',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('falkner');
+                storyFlags.add('falkner_defeated');
+                if (!inventory.badges.includes('zephyr')) inventory.badges.push('zephyr');
+                if (!inventory.tms.includes('TM31')) inventory.tms.push('TM31');
+                audioManager.playSfx('sfx_badge_get');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    "FALKNER: …Darn! My dad's cherished bird POKéMON… All right. Take this. It's the official POKéMON LEAGUE ZEPHYRBADGE!",
+                    "FALKNER: Here—take this too. It's TM31 MUD-SLAP! By using a TM, a POKéMON will instantly learn a new move. Think before you act—a TM can be used only once!",
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('🦅 Received ZEPHYR BADGE & TM31 MUD-SLAP from Leader Falkner!');
                   }
                 );
               },

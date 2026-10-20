@@ -406,4 +406,22 @@ export class AudioManager {
     const clamped = Math.max(0, Math.min(1, volume));
     this.sfxGain = Number((AudioManager.SFX_GAIN * (clamped / 0.7)).toFixed(4));
   }
+
+  /**
+   * Plays a one-shot authentic SFX audio asset (e.g. `sfx_badge_get`).
+   */
+  public playSfx(sfxId: 'sfx_badge_get'): void {
+    if (this.muted || !this.isBrowserAudioAvailable()) return;
+    try {
+      const sfx = new Howl({
+        src: [`./assets/audio/sfx/${sfxId}.webm`, `./assets/audio/sfx/${sfxId}.mp3`],
+        loop: false,
+        volume: this.getEffectiveSfxVolume(),
+        html5: false,
+      });
+      sfx.play();
+    } catch {
+      // Ignore in headless test contexts
+    }
+  }
 }

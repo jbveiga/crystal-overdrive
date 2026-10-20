@@ -5,6 +5,8 @@ const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = 
   { id: 'cyndaquil', name: 'Cyndaquil', types: ['Fire'] },
   { id: 'sentret', name: 'Sentret', types: ['Normal'] },
   { id: 'pidgey', name: 'Pidgey', types: ['Normal', 'Flying'] },
+  { id: 'pidgeotto', name: 'Pidgeotto', types: ['Normal', 'Flying'] },
+  { id: 'spearow', name: 'Spearow', types: ['Normal', 'Flying'] },
   { id: 'rattata', name: 'Rattata', types: ['Normal'] },
   { id: 'hoot-hoot', name: 'Hoothoot', types: ['Normal', 'Flying'] },
   { id: 'hoppip', name: 'Hoppip', types: ['Grass', 'Flying'] },
@@ -13,6 +15,9 @@ const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = 
   { id: 'ledyba', name: 'Ledyba', types: ['Bug', 'Flying'] },
   { id: 'spinarak', name: 'Spinarak', types: ['Bug', 'Poison'] },
   { id: 'bellsprout', name: 'Bellsprout', types: ['Grass', 'Poison'] },
+  { id: 'poliwag', name: 'Poliwag', types: ['Water'] },
+  { id: 'poliwhirl', name: 'Poliwhirl', types: ['Water'] },
+  { id: 'marill', name: 'Marill', types: ['Water'] },
   { id: 'geodude', name: 'Geodude', types: ['Rock', 'Ground'] },
   { id: 'gastly', name: 'Gastly', types: ['Ghost', 'Poison'] },
   { id: 'smeargle', name: 'Smeargle', types: ['Normal'] },
@@ -44,14 +49,14 @@ export interface StartMenuCallbacks {
 }
 
 const JOHTO_BADGES = [
-  { name: 'Zephyr', leader: 'Falkner', icon: '🪽' },
-  { name: 'Hive', leader: 'Bugsy', icon: '🐞' },
-  { name: 'Plain', leader: 'Whitney', icon: '🩷' },
-  { name: 'Fog', leader: 'Morty', icon: '👻' },
-  { name: 'Storm', leader: 'Chuck', icon: '👊' },
-  { name: 'Mineral', leader: 'Jasmine', icon: '⚙️' },
-  { name: 'Glacier', leader: 'Pryce', icon: '❄️' },
-  { name: 'Rising', leader: 'Clair', icon: '🐉' },
+  { id: 'zephyr', name: 'Zephyr', leader: 'Falkner', icon: '🦅' },
+  { id: 'hive', name: 'Hive', leader: 'Bugsy', icon: '🐞' },
+  { id: 'plain', name: 'Plain', leader: 'Whitney', icon: '🩷' },
+  { id: 'fog', name: 'Fog', leader: 'Morty', icon: '👻' },
+  { id: 'storm', name: 'Storm', leader: 'Chuck', icon: '👊' },
+  { id: 'mineral', name: 'Mineral', leader: 'Jasmine', icon: '⚙️' },
+  { id: 'glacier', name: 'Glacier', leader: 'Pryce', icon: '❄️' },
+  { id: 'rising', name: 'Rising', leader: 'Clair', icon: '🐉' },
 ];
 
 export class StartMenuUI {
@@ -542,11 +547,13 @@ export class StartMenuUI {
     const playTime = this.formatPlayTime(this.stateProvider.getPlayTimeSeconds());
 
     const badgesHtml = JOHTO_BADGES.map((b, i) => {
-      const earned = i < badges.length;
+      const earned =
+        badges.some((badge) => badge.toLowerCase().includes(b.id)) || i < badges.length;
       return `
-        <div style="
-          background: ${earned ? 'rgba(250, 204, 21, 0.18)' : 'rgba(15, 23, 42, 0.65)'};
+        <div data-badge-id="${b.id}" data-earned="${earned}" style="
+          background: ${earned ? 'rgba(250, 204, 21, 0.22)' : 'rgba(15, 23, 42, 0.65)'};
           border: 1.5px solid ${earned ? '#facc15' : 'rgba(255, 255, 255, 0.12)'};
+          box-shadow: ${earned ? '0 0 12px rgba(250, 204, 21, 0.45)' : 'none'};
           border-radius: 8px;
           padding: 6px 4px;
           display: flex;
@@ -556,7 +563,7 @@ export class StartMenuUI {
           opacity: ${earned ? '1' : '0.45'};
         ">
           <span style="font-size: 16px;">${earned ? b.icon : '🔒'}</span>
-          <span style="font-size: 9px; font-weight: 800; color: ${earned ? '#fef08a' : '#94a3b8'};">${b.name.toUpperCase()}</span>
+          <span style="font-size: 9px; font-weight: 800; color: ${earned ? '#fef08a' : '#94a3b8'};">${earned ? `${b.icon} ${b.name.toUpperCase()}` : b.name.toUpperCase()}</span>
         </div>
       `;
     }).join('');
