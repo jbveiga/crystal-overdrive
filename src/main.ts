@@ -6,8 +6,9 @@ import { OverworldRenderer } from './render/OverworldRenderer';
 import { OverworldHUD } from './ui/OverworldHUD';
 import { BattleRenderer } from './render/BattleRenderer';
 import { BattleHUD } from './ui/BattleHUD';
-import { BattleStateMachine } from './battle/BattleStateMachine';
+import { BattleStateMachine, type BattleTurnResult } from './battle/BattleStateMachine';
 import { PokemonFactory } from './battle/PokemonFactory';
+import { BattleAudio } from './audio/BattleAudio';
 import { RoamingManager } from './world/RoamingManager';
 import { SaveManager, type SaveData } from './core/SaveManager';
 import { BagAndMartUI, type BagInventory } from './ui/BagAndMartUI';
@@ -611,71 +612,136 @@ async function bootstrap() {
     // Reset temporary trapping flag at the start of a new encounter while keeping persistent HP/Status
     opponentPokemon.isTrapped = false;
 
-    const leadPokemon = playerParty[0];
-    if (leadPokemon.currentHp <= 0) {
+    let activePlayerPokemon = playerParty.find((p) => p.currentHp > 0) || playerParty[0];
+    if (activePlayerPokemon.currentHp <= 0) {
       healPlayerParty();
+      activePlayerPokemon = playerParty[0];
     }
-    const battleSM = new BattleStateMachine(leadPokemon, opponentPokemon, options.isRoamer);
+    const battleSM = new BattleStateMachine(activePlayerPokemon, opponentPokemon, options.isRoamer);
 
     battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
     battleHUD.updateSpeedDisplay(gameClock.battleSpeed);
 
-    await battleRenderer.startBattle(leadPokemon, opponentPokemon);
+    const caughtSpeciesIds = new Set<string>([
+      ...playerParty.map((p) => p.speciesId),
+      ...playerBox.map((p) => p.speciesId),
+    ]);
+
+    await battleRenderer.startBattle(activePlayerPokemon, opponentPokemon);
 
     if (options.isTrainer) {
       await battleHUD.showMessage(`${options.trainerName} would like to battle!`);
       await battleHUD.showMessage(`${options.trainerName} sent out ${opponentPokemon.nickname}!`);
     } else if (options.isRoamer) {
       await battleHUD.showMessage(`⚡ Legendary Beast ${opponentPokemon.nickname} appeared!`);
+    } else {
+      await battleHUD.showMessage(`Wild ${opponentPokemon.nickname} appeared!`);
     }
 
+    const playTurnEventsAndFinishCheck = async (result: BattleTurnResult) => {
+      let ballGraphic: Graphics | null = null;
+
+      for (const ev of result.events) {
+        if (ev.type === 'MESSAGE') {
+          await battleHUD.showMessage(ev.text);
+        } else if (ev.type === 'SWITCH') {
+          activePlayerPokemon = ev.newPokemon;
+          await battleRenderer.animateSwitchPlayerPokemon(activePlayerPokemon);
+          battleHUD.setActivePlayerPokemon(activePlayerPokemon);
+        } else if (ev.type === 'THROW_BALL') {
+          ballGraphic = await battleRenderer.animateThrowBall();
+        } else if (ev.type === 'SHAKE' && ballGraphic) {
+          await battleRenderer.animateShake(ballGraphic, ev.shakes, ev.caught);
+        } else if (ev.type === 'ATTACK') {
+          await battleRenderer.animateAttack(
+            ev.attackerId === activePlayerPokemon.uid,
+            ev.moveType,
+            ev.moveCategory
+          );
+        } else if (ev.type === 'DAMAGE') {
+          const isPlayerTarget = ev.targetId === activePlayerPokemon.uid;
+          await battleRenderer.animateDamage(isPlayerTarget, ev.effectiveness, ev.isCritical);
+          const maxHp = isPlayerTarget ? activePlayerPokemon.stats.hp : opponentPokemon.stats.hp;
+          battleHUD.updateHp(isPlayerTarget, ev.remainingHp, maxHp);
+        } else if (ev.type === 'RESIDUAL_DAMAGE') {
+          const isPlayerTarget = ev.targetId === activePlayerPokemon.uid;
+          await battleRenderer.animateDamage(isPlayerTarget, 1, false);
+          const maxHp = isPlayerTarget ? activePlayerPokemon.stats.hp : opponentPokemon.stats.hp;
+          battleHUD.updateHp(isPlayerTarget, ev.remainingHp, maxHp);
+        } else if (ev.type === 'STAT_CHANGE') {
+          const isPlayerTarget = ev.targetId === activePlayerPokemon.uid;
+          await battleRenderer.animateStatChange(isPlayerTarget, ev.stages > 0);
+          battleHUD.updateStatusBadges();
+        } else if (ev.type === 'STATUS') {
+          battleHUD.updateStatusBadges();
+        } else if (ev.type === 'FAINT') {
+          const isPlayerTarget = ev.targetId === activePlayerPokemon.uid;
+          BattleAudio.playCry(isPlayerTarget ? activePlayerPokemon.speciesId : opponentPokemon.speciesId, true);
+          await battleRenderer.animateFaint(isPlayerTarget);
+        }
+      }
+
+      if (result.isBattleOver) {
+        if (result.caught) {
+          if (options.isRoamer) {
+            roamingManager.markCaught(opponentPokemon.speciesId);
+            overworldHUD.hideRoamerAlert();
+          }
+          if (playerParty.length < 6) {
+            playerParty.push(opponentPokemon);
+          } else {
+            playerBox.push(opponentPokemon);
+          }
+        } else if (result.winner === 'PLAYER') {
+          if (options.isRoamer) {
+            roamingManager.markDefeated(opponentPokemon.speciesId);
+            overworldHUD.hideRoamerAlert();
+          }
+
+          // Award EXP & Check Level-Up
+          const expGained = PokemonFactory.calculateExpGain(opponentPokemon, Boolean(options.isTrainer));
+          await battleHUD.showMessage(`${activePlayerPokemon.nickname} gained ${expGained} EXP. Points!`);
+          const levelResult = PokemonFactory.gainExp(activePlayerPokemon, expGained);
+          battleHUD.updateExp(activePlayerPokemon);
+          battleHUD.updateHp(true, activePlayerPokemon.currentHp, activePlayerPokemon.stats.hp);
+          if (levelResult.leveledUp) {
+            BattleAudio.playBallEvent('LEVEL_UP');
+            await battleHUD.showMessage(
+              `🎉 ${activePlayerPokemon.nickname} grew to Lv. ${levelResult.newLevel}!`
+            );
+          }
+
+          if (options.isTrainer) {
+            inventory.money += 200;
+            await battleHUD.showMessage(`You defeated ${options.trainerName}!`);
+            await battleHUD.showMessage(`You got $200 for winning!`);
+          }
+        }
+        if (options.isRoamer) {
+          eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+        }
+        await battleHUD.showMessage('Battle concluded! Returning to overworld...');
+        battleRenderer.endBattle();
+        battleHUD.hide();
+        gameState = 'OVERWORLD';
+        overworldHUD.show();
+        saveCurrentGame();
+      } else {
+        battleHUD.showActionMenu();
+      }
+    };
+
     battleHUD.initBattle(
-      leadPokemon,
+      activePlayerPokemon,
       opponentPokemon,
       {
         onMoveSelected: async (moveId: string) => {
           const result = battleSM.executeRound({ type: 'FIGHT', moveId });
-
-          for (const ev of result.events) {
-            if (ev.type === 'MESSAGE') {
-              await battleHUD.showMessage(ev.text);
-            } else if (ev.type === 'ATTACK') {
-              await battleRenderer.animateAttack(ev.attackerId === leadPokemon.uid);
-            } else if (ev.type === 'DAMAGE') {
-              await battleRenderer.animateDamage(ev.targetId === leadPokemon.uid);
-              const maxHp = ev.targetId === leadPokemon.uid ? leadPokemon.stats.hp : opponentPokemon.stats.hp;
-              battleHUD.updateHp(ev.targetId === leadPokemon.uid, ev.remainingHp, maxHp);
-            } else if (ev.type === 'STATUS') {
-              battleHUD.updateStatusBadges();
-            } else if (ev.type === 'FAINT') {
-              await battleRenderer.animateFaint(ev.targetId === leadPokemon.uid);
-            }
-          }
-
-          if (result.isBattleOver) {
-            if (result.winner === 'PLAYER') {
-              if (options.isRoamer) {
-                roamingManager.markDefeated(opponentPokemon.speciesId);
-                overworldHUD.hideRoamerAlert();
-              }
-              if (options.isTrainer) {
-                inventory.money += 200;
-                await battleHUD.showMessage(`You defeated ${options.trainerName}!`);
-                await battleHUD.showMessage(`You got $200 for winning!`);
-              }
-            }
-            if (options.isRoamer) {
-              eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-            }
-            await battleHUD.showMessage('Battle concluded! Returning to overworld...');
-            battleRenderer.endBattle();
-            battleHUD.hide();
-            gameState = 'OVERWORLD';
-            overworldHUD.show();
-            saveCurrentGame();
-          } else {
-            battleHUD.showActionMenu();
-          }
+          await playTurnEventsAndFinishCheck(result);
+        },
+        onPokemonSelected: async (targetPokemon: PokemonInstance) => {
+          const result = battleSM.executeRound({ type: 'SWITCH', switchPokemon: targetPokemon });
+          await playTurnEventsAndFinishCheck(result);
         },
         onBagSelected: async (ballId: PokeballId) => {
           if (options.isTrainer) {
@@ -690,49 +756,7 @@ async function bootstrap() {
           }
 
           const result = battleSM.executeRound({ type: 'BAG', ballId });
-          let ballGraphic: Graphics | null = null;
-
-          for (const ev of result.events) {
-            if (ev.type === 'MESSAGE') {
-              await battleHUD.showMessage(ev.text);
-            } else if (ev.type === 'THROW_BALL') {
-              ballGraphic = await battleRenderer.animateThrowBall();
-            } else if (ev.type === 'SHAKE' && ballGraphic) {
-              await battleRenderer.animateShake(ballGraphic, ev.shakes, ev.caught);
-            } else if (ev.type === 'ATTACK') {
-              await battleRenderer.animateAttack(false);
-            } else if (ev.type === 'DAMAGE') {
-              await battleRenderer.animateDamage(true);
-              battleHUD.updateHp(true, ev.remainingHp, leadPokemon.stats.hp);
-            } else if (ev.type === 'FAINT') {
-              await battleRenderer.animateFaint(true);
-            }
-          }
-
-          if (result.isBattleOver) {
-            if (result.caught) {
-              if (options.isRoamer) {
-                roamingManager.markCaught(opponentPokemon.speciesId);
-                overworldHUD.hideRoamerAlert();
-              }
-              if (playerParty.length < 6) {
-                playerParty.push(opponentPokemon);
-              } else {
-                playerBox.push(opponentPokemon);
-              }
-            }
-            if (options.isRoamer) {
-              eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-            }
-            await battleHUD.showMessage('Battle concluded! Returning to overworld...');
-            battleRenderer.endBattle();
-            battleHUD.hide();
-            gameState = 'OVERWORLD';
-            overworldHUD.show();
-            saveCurrentGame();
-          } else {
-            battleHUD.showActionMenu();
-          }
+          await playTurnEventsAndFinishCheck(result);
         },
         onRunSelected: async () => {
           if (options.isTrainer) {
@@ -756,7 +780,9 @@ async function bootstrap() {
           return nextSpeed;
         },
       },
-      inventory.balls
+      inventory.balls,
+      playerParty,
+      caughtSpeciesIds
     );
   };
 

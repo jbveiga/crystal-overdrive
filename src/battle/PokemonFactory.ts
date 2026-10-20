@@ -1,7 +1,11 @@
 import { Dex } from '@pkmn/dex';
-import type { PokemonInstance, MoveData, PokemonType, MoveCategory, StatusCondition } from '../types/game';
+import type { PokemonInstance, MoveData, PokemonType, MoveCategory, StatusCondition, StatStages } from '../types/game';
 
 export class PokemonFactory {
+  public static createDefaultStatStages(): StatStages {
+    return { atk: 0, def: 0, spa: 0, spd: 0, spe: 0, acc: 0, eva: 0 };
+  }
+
   /**
    * Looks up MoveData from Showdown Dex
    */
@@ -17,6 +21,8 @@ export class PokemonFactory {
     let leavesOneHp = false;
     let trapsTarget = false;
     let inflictsStatus: StatusCondition | undefined = undefined;
+    let secondaryStatus: MoveData['secondaryStatus'] = undefined;
+    let statChanges: MoveData['statChanges'] = undefined;
 
     if (dexMove.id === 'falseswipe') {
       leavesOneHp = true;
@@ -28,6 +34,26 @@ export class PokemonFactory {
       inflictsStatus = 'PAR';
     } else if (dexMove.id === 'spore' || dexMove.id === 'hypnosis' || dexMove.id === 'sleeppowder') {
       inflictsStatus = 'SLP';
+    } else if (dexMove.id === 'poisonpowder') {
+      inflictsStatus = 'PSN';
+    }
+
+    if (dexMove.id === 'ember' || dexMove.id === 'flamethrower' || dexMove.id === 'firepunch') {
+      secondaryStatus = { status: 'BRN', chance: 0.1 };
+    } else if (dexMove.id === 'thundershock') {
+      secondaryStatus = { status: 'PAR', chance: 0.1 };
+    } else if (dexMove.id === 'spark') {
+      secondaryStatus = { status: 'PAR', chance: 0.3 };
+    }
+
+    if (dexMove.id === 'leer' || dexMove.id === 'tailwhip') {
+      statChanges = { target: 'foe', stat: 'def', stages: -1 };
+    } else if (dexMove.id === 'growl') {
+      statChanges = { target: 'foe', stat: 'atk', stages: -1 };
+    } else if (dexMove.id === 'sandattack' || dexMove.id === 'smokescreen') {
+      statChanges = { target: 'foe', stat: 'acc', stages: -1 };
+    } else if (dexMove.id === 'defensecurl') {
+      statChanges = { target: 'self', stat: 'def', stages: 1 };
     }
 
     return {
@@ -42,6 +68,8 @@ export class PokemonFactory {
       leavesOneHp,
       trapsTarget,
       inflictsStatus,
+      secondaryStatus,
+      statChanges,
     };
   }
 
@@ -119,9 +147,66 @@ export class PokemonFactory {
       stats,
       currentHp: maxHp,
       status: 'NONE',
+      statStages: this.createDefaultStatStages(),
+      exp: level * level * level,
+      nextLevelExp: (level + 1) * (level + 1) * (level + 1),
       isTrapped: false,
       moves,
       catchRate,
     };
+  }
+
+  /**
+   * Classic EXP Yield formula: (BaseEXP * DefeatedLevel * TrainerBonus) / 7
+   */
+  public static calculateExpGain(defeated: PokemonInstance, isTrainer: boolean = false): number {
+    const baseExpSum =
+      defeated.baseStats.hp +
+      defeated.baseStats.attack +
+      defeated.baseStats.defense +
+      defeated.baseStats.spAttack +
+      defeated.baseStats.spDefense +
+      defeated.baseStats.speed;
+    const baseYield = Math.max(45, Math.floor(baseExpSum * 0.25));
+    const trainerMult = isTrainer ? 1.5 : 1.0;
+    return Math.max(12, Math.floor((baseYield * defeated.level * trainerMult) / 5));
+  }
+
+  /**
+   * Awards EXP to a Pokémon and recalculates stats if it levels up
+   */
+  public static gainExp(pokemon: PokemonInstance, amount: number): { leveledUp: boolean; newLevel: number } {
+    if (pokemon.exp === undefined) {
+      pokemon.exp = pokemon.level * pokemon.level * pokemon.level;
+    }
+    if (pokemon.nextLevelExp === undefined) {
+      pokemon.nextLevelExp = (pokemon.level + 1) * (pokemon.level + 1) * (pokemon.level + 1);
+    }
+
+    pokemon.exp += amount;
+    let leveledUp = false;
+    const iv = 15;
+
+    while (pokemon.exp >= pokemon.nextLevelExp && pokemon.level < 100) {
+      pokemon.level++;
+      leveledUp = true;
+      pokemon.nextLevelExp = (pokemon.level + 1) * (pokemon.level + 1) * (pokemon.level + 1);
+
+      const oldMaxHp = pokemon.stats.hp;
+      const newMaxHp = Math.floor(((2 * pokemon.baseStats.hp + iv) * pokemon.level) / 100) + pokemon.level + 10;
+      const hpDiff = Math.max(1, newMaxHp - oldMaxHp);
+
+      pokemon.stats = {
+        hp: newMaxHp,
+        attack: Math.floor(((2 * pokemon.baseStats.attack + iv) * pokemon.level) / 100) + 5,
+        defense: Math.floor(((2 * pokemon.baseStats.defense + iv) * pokemon.level) / 100) + 5,
+        spAttack: Math.floor(((2 * pokemon.baseStats.spAttack + iv) * pokemon.level) / 100) + 5,
+        spDefense: Math.floor(((2 * pokemon.baseStats.spDefense + iv) * pokemon.level) / 100) + 5,
+        speed: Math.floor(((2 * pokemon.baseStats.speed + iv) * pokemon.level) / 100) + 5,
+      };
+      pokemon.currentHp = Math.min(newMaxHp, pokemon.currentHp + hpDiff);
+    }
+
+    return { leveledUp, newLevel: pokemon.level };
   }
 }

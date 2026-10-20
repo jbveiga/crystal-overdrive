@@ -8,6 +8,8 @@ export type PokemonType =
 
 export type MoveCategory = 'Physical' | 'Special' | 'Status';
 export type StatusCondition = 'NONE' | 'PAR' | 'SLP' | 'FRZ' | 'BRN' | 'PSN' | 'TOX';
+export type StatId = 'atk' | 'def' | 'spa' | 'spd' | 'spe' | 'acc' | 'eva';
+export type StatStages = Record<StatId, number>;
 
 export type PokeballId =
   | 'poke-ball' | 'great-ball' | 'ultra-ball' | 'master-ball'
@@ -76,6 +78,15 @@ export interface MoveData {
   trapsTarget?: boolean;
   leavesOneHp?: boolean;
   inflictsStatus?: StatusCondition;
+  secondaryStatus?: {
+    status: StatusCondition;
+    chance: number;
+  };
+  statChanges?: {
+    target: 'self' | 'foe';
+    stat: StatId;
+    stages: number;
+  };
 }
 
 export interface EffectivenessBadge {
@@ -103,6 +114,10 @@ export interface PokemonInstance {
   stats: BaseStats;
   currentHp: number;
   status: StatusCondition;
+  sleepTurns?: number;
+  statStages?: StatStages;
+  exp?: number;
+  nextLevelExp?: number;
   isTrapped: boolean;
   moves: Array<{ moveId: string; currentPp: number; maxPp: number }>;
   catchRate: number;

@@ -1,10 +1,11 @@
-import type { PokemonInstance, SpeedMultiplier, PokeballId, PokemonType } from '../types/game';
+import type { PokemonInstance, SpeedMultiplier, PokeballId, PokemonType, StatId } from '../types/game';
 import { EffectivenessHelper } from '../battle/EffectivenessHelper';
 import { PokemonFactory } from '../battle/PokemonFactory';
 
 export interface BattleHUDCallbacks {
   onMoveSelected: (moveId: string) => void;
   onBagSelected: (ballId: PokeballId) => void;
+  onPokemonSelected?: (pokemon: PokemonInstance) => void;
   onRunSelected: () => void;
   onSpeedToggle: () => SpeedMultiplier;
 }
@@ -45,14 +46,18 @@ export class BattleHUD {
   private actionMenu!: HTMLDivElement;
   private fightMenu!: HTMLDivElement;
   private bagMenu!: HTMLDivElement;
+  private partyMenu!: HTMLDivElement;
   private playerHpBar!: HTMLDivElement;
   private enemyHpBar!: HTMLDivElement;
+  private playerExpBar!: HTMLDivElement;
   private playerHpText!: HTMLSpanElement;
   private enemyHpText!: HTMLSpanElement;
   private speedButton!: HTMLButtonElement;
 
   private playerPokemon!: PokemonInstance;
   private enemyPokemon!: PokemonInstance;
+  private playerParty: PokemonInstance[] = [];
+  private caughtSpeciesIds: Set<string> = new Set();
   private ballsInventory: Partial<Record<PokeballId, number>> = {};
   private callbacks!: BattleHUDCallbacks;
   private speedMultiplier: SpeedMultiplier = 1;
@@ -68,23 +73,30 @@ export class BattleHUD {
 
   private getCategorySvg(category: 'Physical' | 'Special' | 'Status'): string {
     if (category === 'Physical') {
-      // Explosion / Starburst SVG
       return `<svg width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="#dc2626" stroke-width="1.5" title="Physical Move">
         <polygon points="12,2 14.8,8.5 22,9.2 16.5,14 18.2,21 12,17.3 5.8,21 7.5,14 2,9.2 9.2,8.5"/>
       </svg>`;
     }
     if (category === 'Special') {
-      // Concentric Rings SVG
       return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" title="Special Move">
         <circle cx="12" cy="12" r="9"/>
         <circle cx="12" cy="12" r="5"/>
         <circle cx="12" cy="12" r="1.5" fill="#38bdf8"/>
       </svg>`;
     }
-    // Status Wave / Shield SVG
     return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" title="Status Move">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
     </svg>`;
+  }
+
+  private getGenderOrLegendBadge(speciesId: string): string {
+    if (['raikou', 'entei', 'suicune'].includes(speciesId)) {
+      return `<span style="color: #facc15; font-size: 13px;" title="Legendary Beast">★</span>`;
+    }
+    const isFemale = ['chikorita', 'sentret', 'pidgey'].includes(speciesId);
+    return isFemale
+      ? `<span style="color: #f43f5e; font-size: 13px; font-weight: 800;">♀</span>`
+      : `<span style="color: #38bdf8; font-size: 13px; font-weight: 800;">♂</span>`;
   }
 
   private createUI(): void {
@@ -106,30 +118,33 @@ export class BattleHUD {
     `;
 
     root.innerHTML = `
-      <!-- Top Area: Enemy Info & Speed Toggle -->
+      <!-- Top Area: Asymmetric Enemy HUD Card (Top-Left) & Speed Toggle (Top-Right) -->
       <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
         <div id="enemy-card" style="
-          background: rgba(15, 23, 42, 0.9);
+          background: rgba(15, 23, 42, 0.92);
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          border-radius: 10px;
+          border: 2px solid rgba(226, 232, 240, 0.25);
+          border-bottom: 4px solid #334155;
+          border-radius: 10px 10px 18px 10px;
           padding: 12px 20px;
-          min-width: 280px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+          min-width: 295px;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
         ">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span id="enemy-caught-icon" style="display: none; font-size: 12px;" title="Already Caught">🔴</span>
               <span id="enemy-name">Wild Pidgey</span>
-              <span id="enemy-status-badges" style="display: flex; gap: 4px;"></span>
+              <span id="enemy-gender"></span>
+              <span id="enemy-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap;"></span>
             </div>
-            <span id="enemy-level" style="color: #94a3b8; font-size: 14px;">Lv. 3</span>
+            <span id="enemy-level" style="color: #facc15; font-size: 14px; font-weight: 800;">Lv. 3</span>
           </div>
           <div style="margin-top: 8px;">
-            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 600;">
-              <span>HP</span>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 700;">
+              <span style="color: #facc15; letter-spacing: 0.5px;">HP</span>
               <span id="enemy-hp-text">16 / 16</span>
             </div>
-            <div style="width: 100%; height: 8px; background: #334155; border-radius: 4px; overflow: hidden;">
+            <div style="width: 100%; height: 9px; background: #1e293b; border: 1px solid #475569; border-radius: 5px; overflow: hidden;">
               <div id="enemy-hp-bar" style="width: 100%; height: 100%; background: #22c55e; transition: width 0.3s ease;"></div>
             </div>
           </div>
@@ -152,44 +167,53 @@ export class BattleHUD {
         </div>
       </div>
 
-      <!-- Mid-Lower Area: Player Info -->
+      <!-- Mid-Lower Area: Asymmetric Player HUD Card (Bottom-Right) with Cyan EXP Bar -->
       <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;">
         <div id="player-card" style="
-          background: rgba(15, 23, 42, 0.9);
+          background: rgba(15, 23, 42, 0.92);
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          border-radius: 10px;
-          padding: 12px 20px;
-          min-width: 290px;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+          border: 2px solid rgba(226, 232, 240, 0.25);
+          border-bottom: 4px solid #334155;
+          border-radius: 18px 10px 10px 10px;
+          padding: 12px 20px 10px 20px;
+          min-width: 310px;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
         ">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
               <span id="player-name">Cyndaquil</span>
-              <span id="player-status-badges" style="display: flex; gap: 4px;"></span>
+              <span id="player-gender"></span>
+              <span id="player-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap;"></span>
             </div>
-            <span id="player-level" style="color: #94a3b8; font-size: 14px;">Lv. 5</span>
+            <span id="player-level" style="color: #facc15; font-size: 14px; font-weight: 800;">Lv. 5</span>
           </div>
           <div style="margin-top: 8px;">
-            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 600;">
-              <span>HP</span>
-              <span id="player-hp-text">20 / 20</span>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 700;">
+              <span style="color: #facc15; letter-spacing: 0.5px;">HP</span>
+              <span id="player-hp-text" style="color: #f8fafc; font-weight: 800;">20 / 20</span>
             </div>
-            <div style="width: 100%; height: 8px; background: #334155; border-radius: 4px; overflow: hidden;">
+            <div style="width: 100%; height: 9px; background: #1e293b; border: 1px solid #475569; border-radius: 5px; overflow: hidden;">
               <div id="player-hp-bar" style="width: 100%; height: 100%; background: #22c55e; transition: width 0.3s ease;"></div>
+            </div>
+          </div>
+          <!-- Classic Cyan EXP Bar along the bottom edge -->
+          <div style="margin-top: 7px; display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 9px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">EXP</span>
+            <div style="flex: 1; height: 5px; background: #0f172a; border: 1px solid #334155; border-radius: 3px; overflow: hidden;">
+              <div id="player-exp-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.35s ease;"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Bottom Control & Dialogue Panel -->
+      <!-- Bottom Control & Classic Double-Framed Dialogue Panel -->
       <div style="
-        background: rgba(15, 23, 42, 0.94);
+        background: rgba(15, 23, 42, 0.95);
         backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        border: 2px solid rgba(255, 255, 255, 0.24);
         border-radius: 12px;
         padding: 16px;
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
         pointer-events: auto;
         min-height: 125px;
         display: flex;
@@ -208,7 +232,7 @@ export class BattleHUD {
           What will Cyndaquil do?
         </div>
 
-        <!-- Main Action Menu (FIGHT / BAG / POKEMON / RUN) -->
+        <!-- Main 2x2 Command Menu (FIGHT / BAG / POKEMON / RUN) -->
         <div id="battle-action-menu" style="
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -218,10 +242,10 @@ export class BattleHUD {
           <button id="btn-fight" style="
             background: #dc2626;
             color: white;
-            border: none;
+            border: 2px solid #f87171;
             border-radius: 8px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 800;
             padding: 12px;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
@@ -229,10 +253,10 @@ export class BattleHUD {
           <button id="btn-bag" style="
             background: #d97706;
             color: white;
-            border: none;
+            border: 2px solid #fbbf24;
             border-radius: 8px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 800;
             padding: 12px;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
@@ -240,24 +264,24 @@ export class BattleHUD {
           <button id="btn-pokemon" style="
             background: #16a34a;
             color: white;
-            border: none;
+            border: 2px solid #4ade80;
             border-radius: 8px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 800;
             padding: 12px;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
           ">POKÉMON</button>
           <button id="btn-run" style="
-            background: #475569;
+            background: #2563eb;
             color: white;
-            border: none;
+            border: 2px solid #60a5fa;
             border-radius: 8px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 800;
             padding: 12px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(71, 85, 105, 0.4);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
           ">RUN</button>
         </div>
 
@@ -278,6 +302,16 @@ export class BattleHUD {
           max-height: 140px;
           overflow-y: auto;
         "></div>
+
+        <!-- Party Submenu (Switch Pokémon) -->
+        <div id="battle-party-menu" style="
+          display: none;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          flex: 2;
+          max-height: 140px;
+          overflow-y: auto;
+        "></div>
       </div>
     `;
 
@@ -288,8 +322,10 @@ export class BattleHUD {
     this.actionMenu = root.querySelector('#battle-action-menu') as HTMLDivElement;
     this.fightMenu = root.querySelector('#battle-fight-menu') as HTMLDivElement;
     this.bagMenu = root.querySelector('#battle-bag-menu') as HTMLDivElement;
+    this.partyMenu = root.querySelector('#battle-party-menu') as HTMLDivElement;
     this.playerHpBar = root.querySelector('#player-hp-bar') as HTMLDivElement;
     this.enemyHpBar = root.querySelector('#enemy-hp-bar') as HTMLDivElement;
+    this.playerExpBar = root.querySelector('#player-exp-bar') as HTMLDivElement;
     this.playerHpText = root.querySelector('#player-hp-text') as HTMLSpanElement;
     this.enemyHpText = root.querySelector('#enemy-hp-text') as HTMLSpanElement;
     this.speedButton = root.querySelector('#battle-speed-btn') as HTMLButtonElement;
@@ -313,7 +349,7 @@ export class BattleHUD {
     });
 
     root.querySelector('#btn-pokemon')!.addEventListener('click', () => {
-      this.showMessage(`${this.playerPokemon.nickname} (Lv. ${this.playerPokemon.level}) is fighting!`);
+      this.showPartyMenu();
     });
   }
 
@@ -328,27 +364,61 @@ export class BattleHUD {
     playerPokemon: PokemonInstance,
     enemyPokemon: PokemonInstance,
     callbacks: BattleHUDCallbacks,
-    ballsInventory: Partial<Record<PokeballId, number>> = {}
+    ballsInventory: Partial<Record<PokeballId, number>> = {},
+    playerParty: PokemonInstance[] = [],
+    caughtSpeciesIds: Set<string> = new Set()
   ): void {
     this.playerPokemon = playerPokemon;
     this.enemyPokemon = enemyPokemon;
     this.callbacks = callbacks;
     this.ballsInventory = ballsInventory;
+    this.playerParty = playerParty.length > 0 ? playerParty : [playerPokemon];
+    this.caughtSpeciesIds = caughtSpeciesIds;
     this.rootElement.style.display = 'flex';
 
     // Populate Player Card
-    (this.rootElement.querySelector('#player-name') as HTMLElement).innerText = playerPokemon.nickname;
-    (this.rootElement.querySelector('#player-level') as HTMLElement).innerText = `Lv. ${playerPokemon.level}`;
-    this.updateHp(true, playerPokemon.currentHp, playerPokemon.stats.hp);
-    this.updateStatusBadges();
+    this.setActivePlayerPokemon(playerPokemon);
 
     // Populate Enemy Card
     (this.rootElement.querySelector('#enemy-name') as HTMLElement).innerText = enemyPokemon.nickname;
+    (this.rootElement.querySelector('#enemy-gender') as HTMLElement).innerHTML = this.getGenderOrLegendBadge(
+      enemyPokemon.speciesId
+    );
     (this.rootElement.querySelector('#enemy-level') as HTMLElement).innerText = `Lv. ${enemyPokemon.level}`;
+    const caughtIcon = this.rootElement.querySelector('#enemy-caught-icon') as HTMLElement;
+    if (caughtIcon) {
+      caughtIcon.style.display = this.caughtSpeciesIds.has(enemyPokemon.speciesId) ? 'inline' : 'none';
+    }
     this.updateHp(false, enemyPokemon.currentHp, enemyPokemon.stats.hp);
 
     this.showActionMenu();
     this.messageBox.innerText = `What will ${playerPokemon.nickname} do?`;
+  }
+
+  public setActivePlayerPokemon(playerPokemon: PokemonInstance): void {
+    this.playerPokemon = playerPokemon;
+    (this.rootElement.querySelector('#player-name') as HTMLElement).innerText = playerPokemon.nickname;
+    (this.rootElement.querySelector('#player-gender') as HTMLElement).innerHTML = this.getGenderOrLegendBadge(
+      playerPokemon.speciesId
+    );
+    (this.rootElement.querySelector('#player-level') as HTMLElement).innerText = `Lv. ${playerPokemon.level}`;
+    this.updateHp(true, playerPokemon.currentHp, playerPokemon.stats.hp);
+    this.updateExp(playerPokemon);
+    this.updateStatusBadges();
+  }
+
+  public updateExp(pokemon: PokemonInstance = this.playerPokemon): void {
+    if (!this.playerExpBar || !pokemon) return;
+    const baseExp = pokemon.level * pokemon.level * pokemon.level;
+    const nextExp = pokemon.nextLevelExp ?? (pokemon.level + 1) * (pokemon.level + 1) * (pokemon.level + 1);
+    const currentExp = pokemon.exp ?? baseExp;
+    const span = Math.max(1, nextExp - baseExp);
+    const pct = Math.max(0, Math.min(100, ((currentExp - baseExp) / span) * 100));
+
+    const drainSec = (0.35 / this.speedMultiplier).toFixed(2);
+    this.playerExpBar.style.transition = `width ${drainSec}s ease`;
+    this.playerExpBar.style.width = `${pct}%`;
+    (this.rootElement.querySelector('#player-level') as HTMLElement).innerText = `Lv. ${pokemon.level}`;
   }
 
   public updateStatusBadges(): void {
@@ -362,6 +432,24 @@ export class BattleHUD {
       }
       if (pkmn.isTrapped) {
         html += `<span style="background: #7c3aed; color: white; font-size: 10px; font-weight: 800; padding: 2px 5px; border-radius: 4px;">🔒 TRAPPED</span>`;
+      }
+      if (pkmn.statStages) {
+        const shortLabels: Record<StatId, string> = {
+          atk: 'ATK',
+          def: 'DEF',
+          spa: 'SPA',
+          spd: 'SPD',
+          spe: 'SPE',
+          acc: 'ACC',
+          eva: 'EVA',
+        };
+        for (const [k, v] of Object.entries(pkmn.statStages) as Array<[StatId, number]>) {
+          if (v !== 0) {
+            const color = v > 0 ? '#0284c7' : '#e11d48';
+            const sign = v > 0 ? `+${v}` : `${v}`;
+            html += `<span style="background: ${color}; color: white; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px;">${shortLabels[k]}${sign}</span>`;
+          }
+        }
       }
       el.innerHTML = html;
     };
@@ -400,10 +488,11 @@ export class BattleHUD {
 
   public showFightMenu(): void {
     this.actionMenu.style.display = 'none';
+    this.bagMenu.style.display = 'none';
+    this.partyMenu.style.display = 'none';
     this.fightMenu.style.display = 'grid';
     this.fightMenu.innerHTML = '';
 
-    // Render Unbound Move Buttons
     for (const moveSlot of this.playerPokemon.moves) {
       const moveData = PokemonFactory.getMoveData(moveSlot.moveId);
       const badge = EffectivenessHelper.evaluate(moveData, this.enemyPokemon);
@@ -423,7 +512,6 @@ export class BattleHUD {
         transition: transform 0.1s ease, background 0.15s ease;
       `;
 
-      // Unbound Badge styling + directional indicator per Specification 4.3
       let badgeBg = '#64748b';
       let badgeGlow = 'none';
       let badgePrefix = '';
@@ -480,7 +568,6 @@ export class BattleHUD {
       this.fightMenu.appendChild(btn);
     }
 
-    // Back button
     const backBtn = document.createElement('button');
     backBtn.style.cssText = `
       background: #334155;
@@ -501,13 +588,91 @@ export class BattleHUD {
   public showActionMenu(): void {
     this.fightMenu.style.display = 'none';
     this.bagMenu.style.display = 'none';
+    this.partyMenu.style.display = 'none';
     this.actionMenu.style.display = 'grid';
+    this.messageBox.innerText = `What will ${this.playerPokemon.nickname} do?`;
     this.updateStatusBadges();
+  }
+
+  public showPartyMenu(): void {
+    this.actionMenu.style.display = 'none';
+    this.fightMenu.style.display = 'none';
+    this.bagMenu.style.display = 'none';
+    this.partyMenu.style.display = 'grid';
+    this.partyMenu.innerHTML = '';
+
+    for (const pkmn of this.playerParty) {
+      const isActive = pkmn.uid === this.playerPokemon.uid;
+      const isFainted = pkmn.currentHp <= 0;
+      const pct = Math.max(0, Math.min(100, (pkmn.currentHp / pkmn.stats.hp) * 100));
+      const hpColor = pct > 50 ? '#22c55e' : pct > 20 ? '#eab308' : '#ef4444';
+
+      const btn = document.createElement('button');
+      btn.style.cssText = `
+        background: ${isActive ? '#0f172a' : '#1e293b'};
+        color: ${isFainted ? '#64748b' : 'white'};
+        border: 1px solid ${isActive ? '#38bdf8' : 'rgba(255, 255, 255, 0.14)'};
+        border-radius: 8px;
+        padding: 8px 12px;
+        cursor: ${isActive || isFainted ? 'default' : 'pointer'};
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        text-align: left;
+      `;
+
+      btn.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <span style="font-weight: 700; font-size: 14px;">${pkmn.nickname} ${isActive ? '(OUT)' : ''}</span>
+          <span style="font-size: 11px; color: #facc15; font-weight: 700;">Lv.${pkmn.level}</span>
+        </div>
+        <div style="width: 100%; height: 6px; background: #334155; border-radius: 3px; overflow: hidden; margin-top: 6px;">
+          <div style="width: ${pct}%; height: 100%; background: ${hpColor};"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px;">
+          <span>HP ${pkmn.currentHp}/${pkmn.stats.hp}</span>
+          <span>${pkmn.status !== 'NONE' ? pkmn.status : ''}</span>
+        </div>
+      `;
+
+      btn.addEventListener('click', () => {
+        if (isActive) {
+          this.showMessage(`${pkmn.nickname} is already in battle!`);
+          return;
+        }
+        if (isFainted) {
+          this.showMessage(`${pkmn.nickname} has no energy left to battle!`);
+          return;
+        }
+        if (this.callbacks?.onPokemonSelected) {
+          this.callbacks.onPokemonSelected(pkmn);
+        }
+      });
+
+      this.partyMenu.appendChild(btn);
+    }
+
+    const backBtn = document.createElement('button');
+    backBtn.style.cssText = `
+      background: #334155;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px;
+      cursor: pointer;
+      grid-column: span 2;
+    `;
+    backBtn.innerText = '← BACK';
+    backBtn.addEventListener('click', () => this.showActionMenu());
+    this.partyMenu.appendChild(backBtn);
   }
 
   public showBagMenu(): void {
     this.actionMenu.style.display = 'none';
     this.fightMenu.style.display = 'none';
+    this.partyMenu.style.display = 'none';
     this.bagMenu.style.display = 'grid';
     this.bagMenu.innerHTML = '';
 
@@ -564,7 +729,6 @@ export class BattleHUD {
       this.bagMenu.appendChild(btn);
     }
 
-    // Back button
     const backBtn = document.createElement('button');
     backBtn.style.cssText = `
       background: #334155;

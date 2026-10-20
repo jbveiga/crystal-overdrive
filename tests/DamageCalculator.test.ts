@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { DamageCalculator } from '../src/battle/DamageCalculator';
 import { EffectivenessHelper } from '../src/battle/EffectivenessHelper';
 import { PokemonFactory } from '../src/battle/PokemonFactory';
+import { BattleStateMachine } from '../src/battle/BattleStateMachine';
 
 describe('EffectivenessHelper', () => {
   it('identifies super effective moves correctly (Fire vs Grass = 2x)', () => {
@@ -114,5 +115,58 @@ describe('DamageCalculator', () => {
 
     // Defender had 10 HP, so max damage allowed is 10 - 1 = 9
     expect(result.damage).toBe(9);
+  });
+
+  it('applies stat stage modifiers (-6 to +6) and ignores unfavorable stages on critical hits', () => {
+    const attacker = PokemonFactory.create('cyndaquil', 20);
+    const defender = PokemonFactory.create('sentret', 20);
+    const tackle = PokemonFactory.getMoveData('tackle');
+
+    const baseRes = DamageCalculator.calculate(attacker, defender, tackle, {
+      rng: () => 1.0,
+      forceCritical: false,
+    });
+
+    // Drop defender's Defense by 2 stages (0.5x defense -> ~2x damage)
+    defender.statStages!.def = -2;
+    const boostedRes = DamageCalculator.calculate(attacker, defender, tackle, {
+      rng: () => 1.0,
+      forceCritical: false,
+    });
+    expect(boostedRes.damage).toBeGreaterThan(baseRes.damage * 1.5);
+
+    // Raise defender's Defense to +6, but Critical Hit ignores positive defense stage
+    defender.statStages!.def = 6;
+    const critVsWall = DamageCalculator.calculate(attacker, defender, tackle, {
+      rng: () => 1.0,
+      forceCritical: true,
+    });
+    expect(critVsWall.damage).toBeGreaterThan(baseRes.damage);
+  });
+
+  it('applies stat-modifying moves (Leer), Burn/Poison residuals, Party Switching, and EXP Level-Up', () => {
+    const cyndaquil = PokemonFactory.create('cyndaquil', 5, ['leer', 'tackle']);
+    const totodile = PokemonFactory.create('totodile', 5, ['scratch']);
+    const enemy = PokemonFactory.create('sentret', 4, ['defensecurl']);
+    enemy.status = 'BRN';
+
+    const sm = new BattleStateMachine(cyndaquil, enemy);
+
+    // Round 1: Cyndaquil uses Leer -> lowers enemy Defense stage to -1, plus enemy takes 1/8 Burn residual damage
+    const r1 = sm.executeRound({ type: 'FIGHT', moveId: 'leer' });
+    expect(enemy.statStages?.def).toBe(0); // Leer (-1) + enemy Defense Curl (+1) = 0
+    expect(r1.events.some((e) => e.type === 'STAT_CHANGE')).toBe(true);
+    expect(r1.events.some((e) => e.type === 'RESIDUAL_DAMAGE')).toBe(true);
+
+    // Round 2: Switch active Pokémon to Totodile
+    const r2 = sm.executeRound({ type: 'SWITCH', switchPokemon: totodile });
+    expect(sm.playerPokemon.uid).toBe(totodile.uid);
+    expect(r2.events.some((e) => e.type === 'SWITCH')).toBe(true);
+
+    // EXP & Level-Up check
+    const expNeeded = (totodile.nextLevelExp ?? 216) - (totodile.exp ?? 125);
+    const lvlRes = PokemonFactory.gainExp(totodile, expNeeded + 10);
+    expect(lvlRes.leveledUp).toBe(true);
+    expect(lvlRes.newLevel).toBe(6);
   });
 });
