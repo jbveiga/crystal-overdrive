@@ -127,7 +127,7 @@ export interface MapData {
   width: number;
   height: number;
   tileMap?: string[];           // Array of 64x64 metatile IDs (length = width * height)
-  collisionGrid: number[][];    // 0 = Walkable, 1 = Solid, 2 = Tall Grass, 3 = Water, 4 = Ledge
+  collisionGrid: number[][];    // 0 = Walkable, 1 = Solid, 2 = Tall Grass, 3 = Water, 4 = Ledge DOWN, 5 = Ledge UP, 6 = Ledge LEFT, 7 = Ledge RIGHT
   warps: WarpEvent[];           // Warp triggers to interior/exterior maps
   entities: EntitySpawn[];      // NPC spawns with dialogue, direction, and sight range
   wildEncounters?: WildEncounterTable; // Morning, Day, and Night spawn tables
@@ -164,12 +164,13 @@ In `GridPhysics.updateEntity`:
 4. Render coordinates interpolate smoothly:
    $$\text{renderX} = x + (\text{targetX} - x) \cdot p$$
 
-### 4.2 Ledge Hopping Mechanics
-When facing a Ledge tile (`collision === 4`):
-1. Destination is checked 2 tiles ahead $(x, y + 2)$.
-2. If walkable, a parabolic jump is executed:
-   $$\text{renderY} = y + 2p - 16 \cdot \sin(\pi \cdot p)$$
-3. An elliptical ground shadow is drawn at ground level during the arc.
+### 4.2 Multi-Directional Ledge Hopping Mechanics
+When facing a Ledge tile in its permitted traversal direction (`collision === 4 (DOWN)`, `5 (UP)`, `6 (LEFT)`, `7 (RIGHT)`):
+1. Destination is checked 2 tiles ahead in the movement direction $(x + 2\Delta x, y + 2\Delta y)$.
+2. If walkable and unoccupied, a 2-tile parabolic jump is executed:
+   - For vertical hops (DOWN/UP): $\text{renderY} = y + 2\Delta y \cdot p - 16 \cdot \sin(\pi \cdot p)$
+   - For horizontal hops (LEFT/RIGHT): $\text{renderX} = x + 2\Delta x \cdot p, \quad \text{renderY} = y - 16 \cdot \sin(\pi \cdot p)$
+3. An elliptical ground shadow is drawn at ground level during the arc, and `BattleAudio.playOverworldSound('HOP')` plays.
 
 ### 4.3 Battle Turn Event Stream
 `BattleStateMachine.executeRound` processes round inputs (`FIGHT`, `BAG`, `SWITCH`, `RUN`) and returns a deterministic event stream:
