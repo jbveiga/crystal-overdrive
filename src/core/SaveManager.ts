@@ -1,9 +1,10 @@
 import { openDB, type IDBPDatabase } from 'idb';
-import type { PokemonInstance, RoamerState, SpeedMultiplier, Direction, PokeballId } from '../types/game';
+import type { PokemonInstance, RoamerState, SpeedMultiplier, Direction, PokeballId, MedicineId } from '../types/game';
 
 export interface SaveData {
   version: number;
   timestamp: number;
+  playTimeSeconds?: number;
   player: {
     mapId: string;
     x: number;
@@ -17,6 +18,7 @@ export interface SaveData {
   box: PokemonInstance[];
   inventory: {
     balls: Partial<Record<PokeballId, number>>;
+    items?: Partial<Record<MedicineId, number>>;
     tms: string[];
   };
   roamers: RoamerState[];

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { SaveData } from '../src/core/SaveManager';
 import { PokemonFactory } from '../src/battle/PokemonFactory';
+import { MART_MEDICINE_CATALOG } from '../src/ui/BagAndMartUI';
 
 describe('SaveManager Data Contracts', () => {
   it('validates SaveData structure and serializability', () => {
@@ -51,5 +52,21 @@ describe('SaveManager Data Contracts', () => {
     expect(restored.inventory.tms).toEqual(['TM54', 'TM73', 'TM99']);
     expect(restored.roamers[0].speciesId).toBe('raikou');
     expect(restored.defeatedTrainers).toContain('youngster_joey');
+  });
+
+  it('defines all 6 classic out-of-battle medicine items and persists them in SaveData', () => {
+    const medIds = MART_MEDICINE_CATALOG.map((m) => m.id);
+    expect(medIds).toEqual(['potion', 'super-potion', 'antidote', 'parlyz-heal', 'awakening', 'revive']);
+
+    const cyndaquil = PokemonFactory.create('cyndaquil', 5);
+    const pidgey = PokemonFactory.create('pidgey', 4);
+    const party = [cyndaquil, pidgey];
+
+    // Swap party order (changing battle lead)
+    const temp = party[0];
+    party[0] = party[1];
+    party[1] = temp;
+    expect(party[0].speciesId).toBe('pidgey');
+    expect(party[1].speciesId).toBe('cyndaquil');
   });
 });

@@ -3,11 +3,14 @@ import { eventBus } from '../core/EventBus';
 
 export interface OverworldHUDOptions {
   onSpeedCycle?: () => SpeedMultiplier;
+  onMenuToggle?: () => void;
+  onPartyOpen?: () => void;
   onBagOpen?: () => void;
   onMartOpen?: () => void;
   onSaveGame?: () => void;
   onInteract?: () => void;
   onToggleBurnedTower?: () => void;
+  isModalOpen?: () => boolean;
 }
 
 export class OverworldHUD {
@@ -91,7 +94,33 @@ export class OverworldHUD {
             New Bark Town
           </div>
 
-          <div style="display: flex; gap: 8px; align-items: center; pointer-events: auto;">
+          <div style="display: flex; gap: 8px; align-items: center; pointer-events: auto; flex-wrap: wrap;">
+            <button id="start-menu-btn" style="
+              background: #0f172a;
+              color: #facc15;
+              border: 2px solid #facc15;
+              border-radius: 6px;
+              padding: 7px 12px;
+              font-size: 13px;
+              font-weight: 800;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            ">
+              ☰ MENU (M / Esc)
+            </button>
+            <button id="party-btn" style="
+              background: #16a34a;
+              color: #ffffff;
+              border: none;
+              border-radius: 6px;
+              padding: 8px 12px;
+              font-size: 13px;
+              font-weight: 700;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
+            ">
+              🟢 PARTY
+            </button>
             <button id="bag-btn" style="
               background: #d97706;
               color: #ffffff;
@@ -318,6 +347,8 @@ export class OverworldHUD {
     this.dialogueText = this.rootElement.querySelector('#dialogue-text') as HTMLDivElement;
     this.dialoguePrompt = this.rootElement.querySelector('#dialogue-prompt') as HTMLDivElement;
 
+    const startMenuBtn = this.rootElement.querySelector('#start-menu-btn') as HTMLButtonElement;
+    const partyBtn = this.rootElement.querySelector('#party-btn') as HTMLButtonElement;
     const bagBtn = this.rootElement.querySelector('#bag-btn') as HTMLButtonElement;
     const martBtn = this.rootElement.querySelector('#mart-btn') as HTMLButtonElement;
     const saveBtn = this.rootElement.querySelector('#save-btn') as HTMLButtonElement;
@@ -326,6 +357,14 @@ export class OverworldHUD {
     const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
     const closePokegearBtn = this.rootElement.querySelector('#close-pokegear-btn') as HTMLButtonElement;
     const roamerStatusList = this.rootElement.querySelector('#roamer-status-list') as HTMLDivElement;
+
+    startMenuBtn.addEventListener('click', () => {
+      if (this.options.onMenuToggle) this.options.onMenuToggle();
+    });
+
+    partyBtn.addEventListener('click', () => {
+      if (this.options.onPartyOpen) this.options.onPartyOpen();
+    });
 
     this.dialogueBox.addEventListener('click', () => {
       this.advanceDialogue();
@@ -612,8 +651,20 @@ export class OverworldHUD {
     }
   }
 
+  public openPokegear(): void {
+    const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
+    if (pokegearModal) {
+      pokegearModal.style.display = 'block';
+    }
+  }
+
+  public isPokegearOpen(): boolean {
+    const pokegearModal = this.rootElement?.querySelector('#pokegear-modal') as HTMLDivElement | null;
+    return pokegearModal?.style.display === 'block';
+  }
+
   public getHeldDirection(): Direction | null {
-    if (this.dialogueActive) return null;
+    if (this.dialogueActive || this.options.isModalOpen?.() || this.isPokegearOpen()) return null;
     return this.activeDirection;
   }
 
@@ -624,6 +675,23 @@ export class OverworldHUD {
           const nextSpeed = this.options.onSpeedCycle();
           this.updateSpeedDisplay(nextSpeed);
         }
+        return;
+      }
+
+      if ((e.code === 'Escape' || e.code === 'KeyM') && !e.repeat && this.isVisible() && !this.dialogueActive) {
+        if (this.isPokegearOpen()) {
+          const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
+          pokegearModal.style.display = 'none';
+          return;
+        }
+        if (this.options.onMenuToggle) {
+          e.preventDefault();
+          this.options.onMenuToggle();
+          return;
+        }
+      }
+
+      if (this.options.isModalOpen?.()) {
         return;
       }
 

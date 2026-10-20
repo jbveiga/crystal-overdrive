@@ -257,4 +257,79 @@ export class BattleAudio {
       }
     }
   }
+
+  /**
+   * Plays retro Game Boy / GBA UI menu sound effects (Cursor, Confirm, Cancel, Heal, Save)
+   */
+  public static playMenuSound(type: 'CURSOR' | 'CONFIRM' | 'CANCEL' | 'HEAL' | 'SAVE'): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    if (type === 'CURSOR') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(740, now);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.045);
+    } else if (type === 'CONFIRM') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(659.25, now);
+      osc.frequency.setValueAtTime(987.77, now + 0.045);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.11);
+    } else if (type === 'CANCEL') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.setValueAtTime(349.23, now + 0.05);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.11);
+    } else if (type === 'HEAL') {
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, now + i * 0.065);
+        gain.gain.setValueAtTime(0.07, now + i * 0.065);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (i + 1) * 0.075);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.065);
+        osc.stop(now + (i + 1) * 0.075);
+      });
+    } else if (type === 'SAVE') {
+      const notes = [587.33, 783.99, 987.77, 1174.66];
+      notes.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(f, now + i * 0.06);
+        gain.gain.setValueAtTime(0.06, now + i * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (i + 1) * 0.07);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.06);
+        osc.stop(now + (i + 1) * 0.07);
+      });
+    }
+  }
 }

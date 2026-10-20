@@ -16,6 +16,14 @@ export type PokeballId =
   | 'quick-ball' | 'dusk-ball' | 'net-ball' | 'nest-ball'
   | 'timer-ball' | 'repeat-ball' | 'fast-ball' | 'dream-ball';
 
+export type MedicineId =
+  | 'potion'
+  | 'super-potion'
+  | 'antidote'
+  | 'parlyz-heal'
+  | 'awakening'
+  | 'revive';
+
 export interface TileCoord {
   x: number;
   y: number;

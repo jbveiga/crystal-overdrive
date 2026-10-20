@@ -12,6 +12,8 @@ import { BattleAudio } from './audio/BattleAudio';
 import { RoamingManager } from './world/RoamingManager';
 import { SaveManager, type SaveData } from './core/SaveManager';
 import { BagAndMartUI, type BagInventory } from './ui/BagAndMartUI';
+import { PartyManagementUI } from './ui/PartyManagementUI';
+import { StartMenuUI } from './ui/StartMenuUI';
 import type { MapData, Direction, PokeballId, PokemonInstance } from './types/game';
 import type { Graphics } from 'pixi.js';
 
@@ -33,6 +35,7 @@ async function bootstrap() {
 
   let playerParty: PokemonInstance[] = [];
   let playerBox: PokemonInstance[] = [];
+  let playTimeSeconds = 0;
   const inventory: BagInventory = {
     balls: {
       'quick-ball': 5,
@@ -42,6 +45,14 @@ async function bootstrap() {
       'great-ball': 15,
       'poke-ball': 30,
       'master-ball': 1,
+    },
+    items: {
+      potion: 5,
+      'super-potion': 2,
+      antidote: 3,
+      'parlyz-heal': 2,
+      awakening: 2,
+      revive: 1,
     },
     tms: ['TM54', 'TM73', 'TM99'],
     money: 3000,
@@ -58,7 +69,11 @@ async function bootstrap() {
     console.log('📦 Restoring save state from IndexedDB...');
     playerParty = existingSave.party;
     playerBox = existingSave.box || [];
+    playTimeSeconds = existingSave.playTimeSeconds || 0;
     inventory.balls = existingSave.inventory.balls;
+    if (existingSave.inventory.items) {
+      inventory.items = existingSave.inventory.items;
+    }
     inventory.tms = existingSave.inventory.tms;
     inventory.money = existingSave.player.money;
     inventory.badges = existingSave.player.badges;
@@ -122,6 +137,7 @@ async function bootstrap() {
     const saveData: SaveData = {
       version: 1,
       timestamp: Date.now(),
+      playTimeSeconds: Math.floor(playTimeSeconds),
       player: {
         mapId: mapManager.getCurrentMap()?.id || 'new_bark_town',
         x: player.x,
@@ -135,6 +151,7 @@ async function bootstrap() {
       box: playerBox,
       inventory: {
         balls: inventory.balls,
+        items: inventory.items,
         tms: inventory.tms,
       },
       roamers: roamingManager.getAllRoamers(),
@@ -144,23 +161,89 @@ async function bootstrap() {
     console.log('💾 Game state successfully saved to IndexedDB.');
   };
 
-  // 5. Initialize HUDs & Renderers
+  // 5. Initialize HUDs, Party Management, Start Menu & Renderers
   const bagUI = new BagAndMartUI('modal-container', inventory, playerParty, () => {
+    saveCurrentGame();
+  });
+
+  const partyUI = new PartyManagementUI('modal-container', playerParty, () => {
     saveCurrentGame();
   });
 
   let handleInteract = () => {};
 
+  const startMenuUI = new StartMenuUI(
+    'modal-container',
+    {
+      getTrainerName: () => 'BERNARDO',
+      getMoney: () => inventory.money,
+      getBadges: () => inventory.badges,
+      getPartyCount: () => playerParty.length,
+      getCaughtCount: () =>
+        new Set([...playerParty.map((p) => p.speciesId), ...playerBox.map((p) => p.speciesId)]).size,
+      getPlayTimeSeconds: () => playTimeSeconds,
+      getMapName: () => mapManager.getCurrentMap()?.name || 'New Bark Town',
+    },
+    {
+      onOpenParty: () => {
+        bagUI.hide();
+        partyUI.open();
+      },
+      onOpenBag: () => {
+        partyUI.hide();
+        bagUI.open('ITEMS');
+      },
+      onOpenPokegear: () => {
+        partyUI.hide();
+        bagUI.hide();
+        overworldHUD.openPokegear();
+      },
+      onSaveGame: async () => {
+        await saveCurrentGame();
+      },
+    }
+  );
+
+  bagUI.setSpeedMultiplier(gameClock.playerSpeed);
+  partyUI.setSpeedMultiplier(gameClock.playerSpeed);
+  startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
+
+  const isAnyOverworldModalOpen = () =>
+    startMenuUI.isOpen() || partyUI.isOpen() || bagUI.isOpen();
+
   const overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
       const newSpeed = gameClock.cyclePlayerSpeed();
+      bagUI.setSpeedMultiplier(newSpeed);
+      partyUI.setSpeedMultiplier(newSpeed);
+      startMenuUI.setSpeedMultiplier(newSpeed);
       eventBus.emit('player:speedChanged', { playerSpeed: newSpeed });
       return newSpeed;
     },
+    onMenuToggle: () => {
+      if (partyUI.isOpen()) {
+        partyUI.hide();
+        return;
+      }
+      if (bagUI.isOpen()) {
+        bagUI.hide();
+        return;
+      }
+      startMenuUI.toggle();
+    },
+    onPartyOpen: () => {
+      startMenuUI.closeAll();
+      bagUI.hide();
+      partyUI.open();
+    },
     onBagOpen: () => {
-      bagUI.open('TMS');
+      startMenuUI.closeAll();
+      partyUI.hide();
+      bagUI.open('ITEMS');
     },
     onMartOpen: () => {
+      startMenuUI.closeAll();
+      partyUI.hide();
       bagUI.openMart();
     },
     onSaveGame: () => {
@@ -169,6 +252,7 @@ async function bootstrap() {
     onInteract: () => {
       handleInteract();
     },
+    isModalOpen: isAnyOverworldModalOpen,
     onToggleBurnedTower: () => {
       if (roamingManager.areBeastsAwakened()) {
         roamingManager.sleepBeasts();
@@ -201,10 +285,14 @@ async function bootstrap() {
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
   const battleHUD = new BattleHUD('battle-hud-container');
 
-  // Support Shift key to cycle Battle Speed while in Battle mode
+  // Support Shift key to cycle Battle Speed while in Battle mode, and Start Menu keyboard navigation in Overworld
   window.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key === 'Shift' && !e.repeat && gameState === 'BATTLE') {
       battleHUD.triggerSpeedToggle();
+      return;
+    }
+    if (gameState === 'OVERWORLD' && startMenuUI.isOpen()) {
+      startMenuUI.handleKeyDown(e);
     }
   });
 
@@ -867,6 +955,7 @@ async function bootstrap() {
   overworldRenderer.app.ticker.add((ticker) => {
     const rawDeltaSec = ticker.deltaMS / 1000;
     const { dtWorld, dtPlayer } = gameClock.tick(rawDeltaSec);
+    playTimeSeconds += dtWorld;
     const currentMap = mapManager.getCurrentMap();
 
     if (gameState === 'OVERWORLD') {
