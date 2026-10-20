@@ -301,25 +301,6 @@ async function bootstrap() {
       handleInteract();
     },
     isModalOpen: isAnyOverworldModalOpen,
-    onToggleBurnedTower: () => {
-      if (roamingManager.areBeastsAwakened()) {
-        roamingManager.sleepBeasts();
-        overworldHUD.hideRoamerAlert();
-        overworldHUD.showToast('💤 Raikou, Entei & Suicune returned to slumber in Ecruteak\'s Burned Tower.');
-      } else {
-        roamingManager.awakenBeasts();
-        overworldHUD.showToast('🔥 Burned Tower Awakening! Raikou, Entei & Suicune bolted across Johto!');
-        const currentId = mapManager.getCurrentMap()?.id;
-        if (currentId) {
-          const roamerHere = roamingManager.getActiveRoamerOnRoute(currentId);
-          if (roamerHere) {
-            overworldHUD.showRoamerAlert(roamerHere.speciesId, currentId);
-          }
-        }
-      }
-      overworldHUD.updatePokegear(roamingManager.getAllRoamers());
-      saveCurrentGame();
-    },
   });
   overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
   overworldHUD.updateMuteDisplay(audioManager.isMuted());

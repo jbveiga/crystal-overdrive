@@ -10,7 +10,6 @@ export interface OverworldHUDOptions {
   onMartOpen?: () => void;
   onSaveGame?: () => void;
   onInteract?: () => void;
-  onToggleBurnedTower?: () => void;
   isModalOpen?: () => boolean;
 }
 
@@ -18,6 +17,9 @@ export class OverworldHUD {
   private container: HTMLElement;
   private speedButton!: HTMLButtonElement;
   private muteButton!: HTMLButtonElement;
+  private gamepadToggleButton!: HTMLButtonElement;
+  private menuDrawer!: HTMLDivElement;
+  private isDrawerExpanded: boolean = false;
   private routeBanner!: HTMLDivElement;
   private roamerAlertBanner!: HTMLDivElement;
   private toastBanner!: HTMLDivElement;
@@ -33,7 +35,11 @@ export class OverworldHUD {
   private dialogueOnComplete?: () => void;
   private dialogueActive: boolean = false;
   private rootElement!: HTMLDivElement;
+  private gamepadContainer!: HTMLDivElement;
+  private dpadSegments: Partial<Record<Direction, HTMLDivElement>> = {};
+  private isGamepadVisible: boolean = false;
   private activeDirection: Direction | null = null;
+  private touchDirection: Direction | null = null;
   private heldKeys: Set<string> = new Set();
   private options: OverworldHUDOptions;
 
@@ -44,9 +50,13 @@ export class OverworldHUD {
     }
     this.container = el;
     this.options = options;
+    this.isGamepadVisible =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0));
 
     this.createUI();
     this.setupControls();
+    this.setupTouchGamepad();
   }
 
   public show(): void {
@@ -59,6 +69,36 @@ export class OverworldHUD {
 
   public isVisible(): boolean {
     return this.rootElement?.style.display !== 'none';
+  }
+
+  private setDrawerExpanded(expanded: boolean): void {
+    this.isDrawerExpanded = expanded;
+    if (!this.menuDrawer) return;
+    if (expanded) {
+      this.menuDrawer.style.maxWidth = '520px';
+      this.menuDrawer.style.opacity = '1';
+      this.menuDrawer.style.pointerEvents = 'auto';
+      this.menuDrawer.style.marginRight = '4px';
+    } else {
+      this.menuDrawer.style.maxWidth = '0px';
+      this.menuDrawer.style.opacity = '0';
+      this.menuDrawer.style.pointerEvents = 'none';
+      this.menuDrawer.style.marginRight = '0px';
+    }
+  }
+
+  public toggleMenuDrawer(): void {
+    this.setDrawerExpanded(!this.isDrawerExpanded);
+  }
+
+  private updateGamepadVisibility(): void {
+    if (this.gamepadContainer) {
+      this.gamepadContainer.style.display = this.isGamepadVisible ? 'block' : 'none';
+    }
+    if (this.gamepadToggleButton) {
+      this.gamepadToggleButton.style.background = this.isGamepadVisible ? '#0284c7' : '#334155';
+      this.gamepadToggleButton.style.borderColor = this.isGamepadVisible ? '#38bdf8' : 'rgba(255,255,255,0.18)';
+    }
   }
 
   private createUI(): void {
@@ -79,8 +119,8 @@ export class OverworldHUD {
     `;
 
     this.rootElement.innerHTML = `
-        <!-- Top bar -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+        <!-- Top bar: Route Banner + Collapsible Top Menu Capsule -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px;">
           <div id="route-banner" style="
             background: rgba(18, 22, 28, 0.85);
             backdrop-filter: blur(8px);
@@ -96,112 +136,144 @@ export class OverworldHUD {
             New Bark Town
           </div>
 
-          <div style="display: flex; gap: 8px; align-items: center; pointer-events: auto; flex-wrap: wrap;">
-            <button id="start-menu-btn" style="
-              background: #0f172a;
-              color: #facc15;
-              border: 2px solid #facc15;
-              border-radius: 6px;
-              padding: 7px 12px;
-              font-size: 13px;
-              font-weight: 800;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+          <!-- Collapsible Top Menu Dock Capsule -->
+          <div id="top-menu-capsule" style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 999px;
+            padding: 5px 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+          ">
+            <!-- Expandable Action Drawer -->
+            <div id="top-menu-drawer" style="
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              max-width: 0px;
+              opacity: 0;
+              overflow: hidden;
+              pointer-events: none;
+              white-space: nowrap;
+              transition: max-width 0.28s ease, opacity 0.2s ease, margin-right 0.2s ease;
             ">
-              ☰ MENU (M / Esc)
-            </button>
-            <button id="party-btn" style="
-              background: #16a34a;
+              <button id="party-btn" style="
+                background: #16a34a;
+                color: #ffffff;
+                border: none;
+                border-radius: 999px;
+                padding: 6px 11px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+              ">
+                🟢 PARTY
+              </button>
+              <button id="bag-btn" style="
+                background: #d97706;
+                color: #ffffff;
+                border: none;
+                border-radius: 999px;
+                padding: 6px 11px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+              ">
+                🎒 BAG
+              </button>
+              <button id="mart-btn" style="
+                background: #7c3aed;
+                color: #ffffff;
+                border: none;
+                border-radius: 999px;
+                padding: 6px 11px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+              ">
+                🏪 MART
+              </button>
+              <button id="save-btn" style="
+                background: #059669;
+                color: #ffffff;
+                border: none;
+                border-radius: 999px;
+                padding: 6px 11px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+              ">
+                💾 SAVE
+              </button>
+              <button id="pokegear-btn" style="
+                background: #0d9488;
+                color: #ffffff;
+                border: none;
+                border-radius: 999px;
+                padding: 6px 11px;
+                font-size: 12px;
+                font-weight: 700;
+                cursor: pointer;
+              ">
+                📻 POKÉGEAR
+              </button>
+            </div>
+
+            <!-- Always-Visible Capsule Controls -->
+            <button id="gamepad-toggle-btn" title="Toggle Touch Gamepad" style="
+              background: #334155;
               color: #ffffff;
-              border: none;
-              border-radius: 6px;
-              padding: 8px 12px;
-              font-size: 13px;
+              border: 1px solid rgba(255, 255, 255, 0.18);
+              border-radius: 999px;
+              padding: 6px 10px;
+              font-size: 12px;
               font-weight: 700;
               cursor: pointer;
-              box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
             ">
-              🟢 PARTY
-            </button>
-            <button id="bag-btn" style="
-              background: #d97706;
-              color: #ffffff;
-              border: none;
-              border-radius: 6px;
-              padding: 8px 12px;
-              font-size: 13px;
-              font-weight: 700;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
-            ">
-              🎒 BAG
-            </button>
-            <button id="mart-btn" style="
-              background: #7c3aed;
-              color: #ffffff;
-              border: none;
-              border-radius: 6px;
-              padding: 8px 12px;
-              font-size: 13px;
-              font-weight: 700;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
-            ">
-              🏪 MART
-            </button>
-            <button id="save-btn" style="
-              background: #059669;
-              color: #ffffff;
-              border: none;
-              border-radius: 6px;
-              padding: 8px 12px;
-              font-size: 13px;
-              font-weight: 700;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4);
-            ">
-              💾 SAVE
-            </button>
-            <button id="pokegear-btn" style="
-              background: #0d9488;
-              color: #ffffff;
-              border: none;
-              border-radius: 6px;
-              padding: 8px 12px;
-              font-size: 13px;
-              font-weight: 700;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(13, 148, 136, 0.4);
-            ">
-              📻 POKÉGEAR
-            </button>
-            <button id="speed-toggle-btn" style="
-              background: #2563eb;
-              color: #ffffff;
-              border: none;
-              border-radius: 6px;
-              padding: 8px 12px;
-              font-size: 13px;
-              font-weight: 700;
-              cursor: pointer;
-              transition: background 0.15s ease, transform 0.1s ease;
-              box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
-            ">
-              SPEED: 1x (Shift)
+              🎮
             </button>
             <button id="mute-toggle-btn" style="
               background: #334155;
               color: #ffffff;
               border: none;
-              border-radius: 6px;
-              padding: 8px 12px;
-              font-size: 13px;
+              border-radius: 999px;
+              padding: 6px 11px;
+              font-size: 12px;
               font-weight: 700;
               cursor: pointer;
               transition: background 0.15s ease;
-              box-shadow: 0 2px 8px rgba(15, 23, 42, 0.4);
             ">
               🔊 SOUND: ON
+            </button>
+            <button id="speed-toggle-btn" style="
+              background: #2563eb;
+              color: #ffffff;
+              border: none;
+              border-radius: 999px;
+              padding: 6px 12px;
+              font-size: 12px;
+              font-weight: 800;
+              cursor: pointer;
+              transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+              box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+            ">
+              ⚡ SPEED: 1x (Shift)
+            </button>
+            <button id="start-menu-btn" style="
+              background: #0f172a;
+              color: #facc15;
+              border: 2px solid #facc15;
+              border-radius: 999px;
+              padding: 5px 12px;
+              font-size: 12px;
+              font-weight: 800;
+              cursor: pointer;
+            ">
+              ☰ MENU (M / Esc)
             </button>
           </div>
         </div>
@@ -260,8 +332,151 @@ export class OverworldHUD {
           "></div>
         </div>
 
+        <!-- Responsive Mobile Touch Gamepad Overlay (Virtual D-Pad + A/B Action Buttons) -->
+        <div id="mobile-gamepad-overlay" style="
+          display: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 30;
+        ">
+          <!-- Virtual D-Pad (Bottom-Left, 140x140px) -->
+          <div id="virtual-dpad-base" style="
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(6px);
+            border: 2px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+            pointer-events: auto;
+            touch-action: none;
+          ">
+            <div id="dpad-seg-up" style="
+              position: absolute;
+              top: 6px;
+              left: 46px;
+              width: 48px;
+              height: 44px;
+              border-radius: 8px 8px 4px 4px;
+              background: rgba(30, 41, 59, 0.9);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #e2e8f0;
+              font-size: 16px;
+              font-weight: 900;
+              transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+            ">▲</div>
+            <div id="dpad-seg-down" style="
+              position: absolute;
+              bottom: 6px;
+              left: 46px;
+              width: 48px;
+              height: 44px;
+              border-radius: 4px 4px 8px 8px;
+              background: rgba(30, 41, 59, 0.9);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #e2e8f0;
+              font-size: 16px;
+              font-weight: 900;
+              transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+            ">▼</div>
+            <div id="dpad-seg-left" style="
+              position: absolute;
+              top: 46px;
+              left: 6px;
+              width: 44px;
+              height: 48px;
+              border-radius: 8px 4px 4px 8px;
+              background: rgba(30, 41, 59, 0.9);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #e2e8f0;
+              font-size: 16px;
+              font-weight: 900;
+              transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+            ">◀</div>
+            <div id="dpad-seg-right" style="
+              position: absolute;
+              top: 46px;
+              right: 6px;
+              width: 44px;
+              height: 48px;
+              border-radius: 4px 8px 8px 4px;
+              background: rgba(30, 41, 59, 0.9);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #e2e8f0;
+              font-size: 16px;
+              font-weight: 900;
+              transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+            ">▶</div>
+            <div style="
+              position: absolute;
+              top: 52px;
+              left: 52px;
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              background: rgba(15, 23, 42, 0.95);
+              border: 1px solid rgba(255, 255, 255, 0.12);
+            "></div>
+          </div>
+
+          <!-- Virtual Action Buttons (Bottom-Right: A & B) -->
+          <button id="virtual-btn-b" style="
+            position: absolute;
+            bottom: 54px;
+            right: 92px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #dc2626;
+            color: #ffffff;
+            border: 2px solid #fca5a5;
+            font-size: 18px;
+            font-weight: 900;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.55);
+            pointer-events: auto;
+            touch-action: none;
+            cursor: pointer;
+          ">B</button>
+          <button id="virtual-btn-a" style="
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #16a34a;
+            color: #ffffff;
+            border: 2px solid #86efac;
+            font-size: 20px;
+            font-weight: 900;
+            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.6);
+            pointer-events: auto;
+            touch-action: none;
+            cursor: pointer;
+          ">A</button>
+        </div>
+
         <!-- Bottom Area: Classic Dialogue Box + Help Bar -->
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; z-index: 40;">
           <!-- Classic Pokémon Dialogue Box -->
           <div id="dialogue-box" style="
             display: none;
@@ -356,6 +571,8 @@ export class OverworldHUD {
 
     this.speedButton = this.rootElement.querySelector('#speed-toggle-btn') as HTMLButtonElement;
     this.muteButton = this.rootElement.querySelector('#mute-toggle-btn') as HTMLButtonElement;
+    this.gamepadToggleButton = this.rootElement.querySelector('#gamepad-toggle-btn') as HTMLButtonElement;
+    this.menuDrawer = this.rootElement.querySelector('#top-menu-drawer') as HTMLDivElement;
     this.routeBanner = this.rootElement.querySelector('#route-banner') as HTMLDivElement;
     this.roamerAlertBanner = this.rootElement.querySelector('#roamer-alert-banner') as HTMLDivElement;
     this.toastBanner = this.rootElement.querySelector('#overworld-toast-banner') as HTMLDivElement;
@@ -363,6 +580,15 @@ export class OverworldHUD {
     this.dialogueSpeaker = this.rootElement.querySelector('#dialogue-speaker') as HTMLDivElement;
     this.dialogueText = this.rootElement.querySelector('#dialogue-text') as HTMLDivElement;
     this.dialoguePrompt = this.rootElement.querySelector('#dialogue-prompt') as HTMLDivElement;
+    this.gamepadContainer = this.rootElement.querySelector('#mobile-gamepad-overlay') as HTMLDivElement;
+
+    this.dpadSegments = {
+      UP: this.rootElement.querySelector('#dpad-seg-up') as HTMLDivElement,
+      DOWN: this.rootElement.querySelector('#dpad-seg-down') as HTMLDivElement,
+      LEFT: this.rootElement.querySelector('#dpad-seg-left') as HTMLDivElement,
+      RIGHT: this.rootElement.querySelector('#dpad-seg-right') as HTMLDivElement,
+    };
+    this.updateGamepadVisibility();
 
     const startMenuBtn = this.rootElement.querySelector('#start-menu-btn') as HTMLButtonElement;
     const partyBtn = this.rootElement.querySelector('#party-btn') as HTMLButtonElement;
@@ -375,11 +601,21 @@ export class OverworldHUD {
     const closePokegearBtn = this.rootElement.querySelector('#close-pokegear-btn') as HTMLButtonElement;
     const roamerStatusList = this.rootElement.querySelector('#roamer-status-list') as HTMLDivElement;
 
-    startMenuBtn.addEventListener('click', () => {
+    this.gamepadToggleButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.isGamepadVisible = !this.isGamepadVisible;
+      this.updateGamepadVisibility();
+    });
+
+    startMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleMenuDrawer();
       if (this.options.onMenuToggle) this.options.onMenuToggle();
     });
 
-    partyBtn.addEventListener('click', () => {
+    partyBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.setDrawerExpanded(false);
       if (this.options.onPartyOpen) this.options.onPartyOpen();
     });
 
@@ -388,6 +624,7 @@ export class OverworldHUD {
     });
 
     interactBtn.addEventListener('click', () => {
+      this.setDrawerExpanded(false);
       if (this.dialogueActive) {
         this.advanceDialogue();
       } else if (this.options.onInteract) {
@@ -395,25 +632,33 @@ export class OverworldHUD {
       }
     });
 
-    bagBtn.addEventListener('click', () => {
+    bagBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.setDrawerExpanded(false);
       if (this.options.onBagOpen) this.options.onBagOpen();
     });
 
-    martBtn.addEventListener('click', () => {
+    martBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.setDrawerExpanded(false);
       if (this.options.onMartOpen) this.options.onMartOpen();
     });
 
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (this.options.onSaveGame) {
         this.options.onSaveGame();
         saveBtn.innerText = '✅ SAVED!';
         setTimeout(() => {
           saveBtn.innerText = '💾 SAVE';
-        }, 1500);
+          this.setDrawerExpanded(false);
+        }, 1200);
       }
     });
 
-    pokegearBtn.addEventListener('click', () => {
+    pokegearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.setDrawerExpanded(false);
       pokegearModal.style.display = pokegearModal.style.display === 'none' ? 'block' : 'none';
     });
 
@@ -421,17 +666,27 @@ export class OverworldHUD {
       pokegearModal.style.display = 'none';
     });
 
-    this.speedButton.addEventListener('click', () => {
+    this.speedButton.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (this.options.onSpeedCycle) {
         const nextSpeed = this.options.onSpeedCycle();
         this.updateSpeedDisplay(nextSpeed);
       }
     });
 
-    this.muteButton.addEventListener('click', () => {
+    this.muteButton.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (this.options.onMuteToggle) {
         const muted = this.options.onMuteToggle();
         this.updateMuteDisplay(muted);
+      }
+    });
+
+    // Auto-collapse top menu drawer on outside click/tap
+    window.addEventListener('pointerdown', (e) => {
+      const capsule = this.rootElement.querySelector('#top-menu-capsule');
+      if (this.isDrawerExpanded && capsule && !capsule.contains(e.target as Node)) {
+        this.setDrawerExpanded(false);
       }
     });
 
@@ -441,6 +696,144 @@ export class OverworldHUD {
 
     eventBus.on('roamer:updated', ({ roamers }) => {
       this.updatePokegear(roamers, roamerStatusList);
+    });
+  }
+
+  private setupTouchGamepad(): void {
+    const dpadBase = this.rootElement.querySelector('#virtual-dpad-base') as HTMLDivElement;
+    const btnA = this.rootElement.querySelector('#virtual-btn-a') as HTMLButtonElement;
+    const btnB = this.rootElement.querySelector('#virtual-btn-b') as HTMLButtonElement;
+
+    const highlightDpadSegment = (dir: Direction | null) => {
+      (['UP', 'DOWN', 'LEFT', 'RIGHT'] as Direction[]).forEach((d) => {
+        const seg = this.dpadSegments[d];
+        if (!seg) return;
+        if (d === dir) {
+          seg.style.transform = 'scale(0.92)';
+          seg.style.background = '#0284c7';
+          seg.style.boxShadow = '0 0 12px #38bdf8';
+          seg.style.color = '#ffffff';
+        } else {
+          seg.style.transform = 'scale(1)';
+          seg.style.background = 'rgba(30, 41, 59, 0.9)';
+          seg.style.boxShadow = 'none';
+          seg.style.color = '#e2e8f0';
+        }
+      });
+    };
+
+    const resolveDirectionFromPoint = (clientX: number, clientY: number): Direction | null => {
+      const rect = dpadBase.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = clientX - cx;
+      const dy = clientY - cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 10) return null;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        return dx > 0 ? 'RIGHT' : 'LEFT';
+      }
+      return dy > 0 ? 'DOWN' : 'UP';
+    };
+
+    const updateTouchDir = (dir: Direction | null) => {
+      this.touchDirection = dir;
+      if (dir && this.isDrawerExpanded) {
+        this.setDrawerExpanded(false);
+      }
+      highlightDpadSegment(dir);
+      this.computeActiveDirection();
+    };
+
+    dpadBase.addEventListener(
+      'touchstart',
+      (e: TouchEvent) => {
+        e.preventDefault();
+        if (e.touches.length > 0) {
+          const t = e.touches[0];
+          updateTouchDir(resolveDirectionFromPoint(t.clientX, t.clientY));
+        }
+      },
+      { passive: false }
+    );
+
+    dpadBase.addEventListener(
+      'touchmove',
+      (e: TouchEvent) => {
+        e.preventDefault();
+        if (e.touches.length > 0) {
+          const t = e.touches[0];
+          updateTouchDir(resolveDirectionFromPoint(t.clientX, t.clientY));
+        }
+      },
+      { passive: false }
+    );
+
+    const endTouch = (e: TouchEvent) => {
+      e.preventDefault();
+      updateTouchDir(null);
+    };
+    dpadBase.addEventListener('touchend', endTouch, { passive: false });
+    dpadBase.addEventListener('touchcancel', endTouch, { passive: false });
+
+    // Pointer fallback for desktop gamepad testing
+    let isPointerDownOnDpad = false;
+    dpadBase.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (e.pointerType === 'touch') return;
+      isPointerDownOnDpad = true;
+      updateTouchDir(resolveDirectionFromPoint(e.clientX, e.clientY));
+    });
+    window.addEventListener('pointermove', (e: PointerEvent) => {
+      if (!isPointerDownOnDpad || e.pointerType === 'touch') return;
+      updateTouchDir(resolveDirectionFromPoint(e.clientX, e.clientY));
+    });
+    window.addEventListener('pointerup', (e: PointerEvent) => {
+      if (!isPointerDownOnDpad || e.pointerType === 'touch') return;
+      isPointerDownOnDpad = false;
+      updateTouchDir(null);
+    });
+
+    // Virtual A Button (Confirm / Interact)
+    const triggerButtonA = (e: Event) => {
+      e.preventDefault();
+      this.setDrawerExpanded(false);
+      if (this.dialogueActive) {
+        this.advanceDialogue();
+      } else if (this.options.onInteract) {
+        this.options.onInteract();
+      }
+    };
+    btnA.addEventListener('touchstart', triggerButtonA, { passive: false });
+    btnA.addEventListener('click', (e) => {
+      if ('ontouchstart' in window) return;
+      triggerButtonA(e);
+    });
+
+    // Virtual B Button (Cancel / Fast-Forward)
+    const triggerButtonB = (e: Event) => {
+      e.preventDefault();
+      if (this.dialogueActive) {
+        this.advanceDialogue();
+        return;
+      }
+      if (this.isPokegearOpen()) {
+        const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
+        pokegearModal.style.display = 'none';
+        return;
+      }
+      if (this.isDrawerExpanded) {
+        this.setDrawerExpanded(false);
+        return;
+      }
+      if (this.options.isModalOpen?.() && this.options.onMenuToggle) {
+        this.options.onMenuToggle();
+      }
+    };
+    btnB.addEventListener('touchstart', triggerButtonB, { passive: false });
+    btnB.addEventListener('click', (e) => {
+      if ('ontouchstart' in window) return;
+      triggerButtonB(e);
     });
   }
 
@@ -494,7 +887,6 @@ export class OverworldHUD {
     if (!this.dialogueActive) return;
 
     const currentFullText = this.dialoguePages[this.dialoguePageIndex] || '';
-    // If typewriter is still revealing characters, complete the current page immediately
     if (this.dialogueCharIndex < currentFullText.length) {
       if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
       this.dialogueTypeTimer = undefined;
@@ -507,14 +899,12 @@ export class OverworldHUD {
       return;
     }
 
-    // Move to next page if available
     if (this.dialoguePageIndex + 1 < this.dialoguePages.length) {
       this.dialoguePageIndex++;
       this.startPageTypewriter();
       return;
     }
 
-    // Otherwise close dialogue box
     if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
     this.dialogueTypeTimer = undefined;
     this.dialogueActive = false;
@@ -538,6 +928,10 @@ export class OverworldHUD {
     }, durationMs);
   }
 
+  /**
+   * Updates the Pokégear Roamer Radar modal.
+   * Redacts all Legendary Beast data when roamers have not yet been awakened in the story (Ticket 4.15).
+   */
   public updatePokegear(roamers: RoamerState[], listElement?: HTMLDivElement): void {
     const list = listElement || (this.container.querySelector('#roamer-status-list') as HTMLDivElement);
     if (!list) return;
@@ -545,22 +939,18 @@ export class OverworldHUD {
     list.innerHTML = '';
     const anyAwakened = roamers.some((r) => r.isAwakened);
 
-    const storyBanner = document.createElement('div');
-    storyBanner.style.cssText = `
-      background: ${anyAwakened ? 'rgba(37, 99, 235, 0.18)' : 'rgba(71, 85, 105, 0.35)'};
-      border: 1px solid ${anyAwakened ? 'rgba(56, 189, 248, 0.35)' : 'rgba(148, 163, 184, 0.25)'};
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 12px;
-      line-height: 1.45;
-      color: #cbd5e1;
-    `;
-    storyBanner.innerHTML = anyAwakened
-      ? `⚡ <strong>Burned Tower Event Active:</strong> Raikou, Entei & Suicune have awakened and are roaming Johto routes!`
-      : `📜 <strong>Story Status (Pre-Ecruteak):</strong> The Legendary Beasts are slumbering inside Ecruteak City's <strong>Burned Tower</strong> and will not appear in the wild until awakened.`;
-    list.appendChild(storyBanner);
+    if (!anyAwakened) {
+      list.innerHTML = `
+        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px; padding: 14px; text-align: center; color: #94a3b8; font-size: 13px; line-height: 1.5;">
+          📡 <strong>ROAMER RADAR:</strong> Inactive.<br/>No anomalous electromagnetic signatures detected across Johto.
+        </div>
+      `;
+      return;
+    }
 
     for (const r of roamers) {
+      if (!r.isAwakened) continue;
+
       const card = document.createElement('div');
       card.style.cssText = `
         background: #1e293b;
@@ -570,18 +960,13 @@ export class OverworldHUD {
         flex-direction: column;
         gap: 8px;
         border: 1px solid rgba(255, 255, 255, 0.08);
-        opacity: ${r.isAwakened ? '1' : '0.72'};
       `;
 
       const formattedName = r.speciesId.toUpperCase();
-      const formattedRoute = r.isAwakened
-        ? r.currentMapId.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
-        : 'Burned Tower (Ecruteak City)';
+      const formattedRoute = r.currentMapId.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
       let statusBadge = `<span style="background: #2563eb; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">ROAMING</span>`;
-      if (!r.isAwakened) {
-        statusBadge = `<span style="background: #475569; color: #cbd5e1; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">SLUMBERING</span>`;
-      } else if (r.isCaught) {
+      if (r.isCaught) {
         statusBadge = `<span style="background: #16a34a; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">CAUGHT</span>`;
       } else if (r.isDefeated) {
         statusBadge = `<span style="background: #dc2626; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">DEFEATED</span>`;
@@ -618,39 +1003,23 @@ export class OverworldHUD {
 
       list.appendChild(card);
     }
-
-    if (this.options.onToggleBurnedTower) {
-      const toggleBtn = document.createElement('button');
-      toggleBtn.style.cssText = `
-        margin-top: 4px;
-        background: ${anyAwakened ? '#334155' : '#b45309'};
-        color: #f8fafc;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 6px;
-        padding: 8px 12px;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
-      `;
-      toggleBtn.innerText = anyAwakened
-        ? '💤 Return Beasts to Burned Tower (Pre-Story State)'
-        : '🔥 Awaken Beasts (Burned Tower Story Event)';
-      toggleBtn.addEventListener('click', () => {
-        if (this.options.onToggleBurnedTower) this.options.onToggleBurnedTower();
-      });
-      list.appendChild(toggleBtn);
-    }
   }
 
   public updateSpeedDisplay(speed: SpeedMultiplier): void {
     if (this.speedButton) {
-      this.speedButton.innerText = `SPEED: ${speed}x (Shift)`;
+      this.speedButton.innerText = `⚡ SPEED: ${speed}x (Shift)`;
       if (speed === 1) {
         this.speedButton.style.background = '#2563eb';
+        this.speedButton.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.4)';
       } else if (speed === 2) {
         this.speedButton.style.background = '#d97706';
-      } else {
+        this.speedButton.style.boxShadow = '0 2px 8px rgba(217, 119, 6, 0.4)';
+      } else if (speed === 3) {
         this.speedButton.style.background = '#dc2626';
+        this.speedButton.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.4)';
+      } else {
+        this.speedButton.style.background = 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)';
+        this.speedButton.style.boxShadow = '0 0 16px rgba(236, 72, 153, 0.65)';
       }
     }
   }
@@ -715,6 +1084,7 @@ export class OverworldHUD {
           pokegearModal.style.display = 'none';
           return;
         }
+        this.toggleMenuDrawer();
         if (this.options.onMenuToggle) {
           e.preventDefault();
           this.options.onMenuToggle();
@@ -739,6 +1109,9 @@ export class OverworldHUD {
       }
 
       this.heldKeys.add(e.code);
+      if (this.isDrawerExpanded && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        this.setDrawerExpanded(false);
+      }
       this.computeActiveDirection();
     });
 
@@ -749,6 +1122,7 @@ export class OverworldHUD {
 
     window.addEventListener('blur', () => {
       this.heldKeys.clear();
+      this.touchDirection = null;
       this.activeDirection = null;
     });
   }
@@ -756,6 +1130,10 @@ export class OverworldHUD {
   private computeActiveDirection(): void {
     if (this.dialogueActive) {
       this.activeDirection = null;
+      return;
+    }
+    if (this.touchDirection) {
+      this.activeDirection = this.touchDirection;
       return;
     }
     if (this.heldKeys.has('KeyW') || this.heldKeys.has('ArrowUp')) {

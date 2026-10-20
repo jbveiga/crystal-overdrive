@@ -21,7 +21,7 @@ export class GameClock {
   }
 
   set playerSpeed(speed: SpeedMultiplier) {
-    if (speed === 1 || speed === 2 || speed === 3) {
+    if (speed === 1 || speed === 2 || speed === 3 || speed === 4) {
       this._playerSpeed = speed;
     }
   }
@@ -31,24 +31,24 @@ export class GameClock {
   }
 
   set battleSpeed(speed: SpeedMultiplier) {
-    if (speed === 1 || speed === 2 || speed === 3) {
+    if (speed === 1 || speed === 2 || speed === 3 || speed === 4) {
       this._battleSpeed = speed;
     }
   }
 
   /**
-   * Cycles player speed between 1x -> 2x -> 3x -> 1x
+   * Cycles player speed between 1x -> 2x -> 3x -> 4x -> 1x
    */
   cyclePlayerSpeed(): SpeedMultiplier {
-    this._playerSpeed = ((this._playerSpeed % 3) + 1) as SpeedMultiplier;
+    this._playerSpeed = ((this._playerSpeed % 4) + 1) as SpeedMultiplier;
     return this._playerSpeed;
   }
 
   /**
-   * Cycles battle speed between 1x -> 2x -> 3x -> 1x
+   * Cycles battle speed between 1x -> 2x -> 3x -> 4x -> 1x
    */
   cycleBattleSpeed(): SpeedMultiplier {
-    this._battleSpeed = ((this._battleSpeed % 3) + 1) as SpeedMultiplier;
+    this._battleSpeed = ((this._battleSpeed % 4) + 1) as SpeedMultiplier;
     return this._battleSpeed;
   }
 

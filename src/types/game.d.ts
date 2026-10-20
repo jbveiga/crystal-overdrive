@@ -1,4 +1,4 @@
-export type SpeedMultiplier = 1 | 2 | 3;
+export type SpeedMultiplier = 1 | 2 | 3 | 4;
 export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 export type PlayerGender = 'BOY' | 'GIRL';
 

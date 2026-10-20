@@ -566,9 +566,19 @@ export class BattleHUD {
     this.speedMultiplier = speed;
     if (this.speedButton) {
       this.speedButton.innerText = `⚡ SPEED: ${speed}x (Shift)`;
-      if (speed === 1) this.speedButton.style.background = '#2563eb';
-      else if (speed === 2) this.speedButton.style.background = '#d97706';
-      else this.speedButton.style.background = '#dc2626';
+      if (speed === 1) {
+        this.speedButton.style.background = '#2563eb';
+        this.speedButton.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.4)';
+      } else if (speed === 2) {
+        this.speedButton.style.background = '#d97706';
+        this.speedButton.style.boxShadow = '0 2px 8px rgba(217, 119, 6, 0.4)';
+      } else if (speed === 3) {
+        this.speedButton.style.background = '#dc2626';
+        this.speedButton.style.boxShadow = '0 2px 8px rgba(220, 38, 38, 0.4)';
+      } else {
+        this.speedButton.style.background = 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)';
+        this.speedButton.style.boxShadow = '0 0 16px rgba(236, 72, 153, 0.65)';
+      }
     }
   }
 

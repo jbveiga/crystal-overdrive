@@ -26,7 +26,7 @@ flowchart TD
     end
 
     subgraph Pure_Logic["Pure TypeScript Engine (Zero DOM / Zero PixiJS Dependencies)"]
-        GC["GameClock (Decoupled 1x/2x/3x)"]
+        GC["GameClock (Decoupled 1x/2x/3x/4x)"]
         GP["GridPhysics (Zero-Alloc, Ledge Hop, Trainer Sight)"]
         MM["MapManager (pret/pokecrystal .blk & Warps)"]
         RM["RoamingManager (Markov Beast Adjacency)"]
@@ -52,10 +52,10 @@ flowchart TD
    - Modules in `src/core/`, `src/world/`, and `src/battle/` are **pure TypeScript** with zero imports from `pixi.js` or the browser DOM. This guarantees 100% headless testability in Vitest.
    - `src/render/` handles all GPU canvas operations.
    - `src/ui/` renders vector DOM overlays for crisp high-DPI typography and flexible layouts.
-2. **Decoupled Speed Scaling (`1x` / `2x` / `3x`):**
+2. **Decoupled Speed Scaling (`1x` / `2x` / `3x` / `4x Overdrive`):**
    - **World Clock (`1.0x` fixed):** Ambient water animations, NPC wander steps, and time-of-day transitions always progress at real-time 1.0x speed.
-   - **Player Movement (`1x | 2x | 3x`):** Player movement speed scales by `playerSpeedMultiplier` using fractional progress overflow chaining so fast movement never clips collision boundaries.
-   - **Battle Speed (`1x | 2x | 3x`):** All battle animations, HP bar drain tweens, and typewriter text delays divide by `battleSpeedMultiplier`.
+   - **Player Movement (`1x | 2x | 3x | 4x`):** Player movement speed scales by `playerSpeedMultiplier` using fractional progress overflow chaining so fast movement never clips collision boundaries.
+   - **Battle Speed (`1x | 2x | 3x | 4x`):** All battle animations, HP bar drain tweens, and typewriter text delays divide by `battleSpeedMultiplier`.
 3. **Zero-Allocation Physics & Rendering:**
    - The game loop avoids garbage collection spikes by reusing coordinate scratch objects, array iterators, and continuous interpolation math.
 
@@ -83,7 +83,7 @@ src/
 │   ├── OverworldRenderer.ts  # 64x64 tiles, tall grass tufts, day/night tints, culling
 │   └── BattleRenderer.ts     # 2.5D stage, custom Pokeball arcs, Physical/Special hit FX, camera shakes
 ├── ui/                    # Vector DOM Overlays & Interactivity
-│   ├── OverworldHUD.ts       # Speed controls, Roamer radar, dialogue typewriter
+│   ├── OverworldHUD.ts       # Collapsible menu dock, Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
 │   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, Unbound 2x2 move matrix & hotkeys
 │   ├── StartMenuUI.ts        # Classic start menu (Pokedex, Pokemon, Bag, Save)
 │   ├── PartyManagementUI.ts  # Full party inspector, lead reordering, summaries

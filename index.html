@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Crystal Overdrive</title>
     <style>
       * {
@@ -10,6 +10,8 @@
         margin: 0;
         padding: 0;
         user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
       }
       html, body {
         width: 100%;
@@ -18,6 +20,7 @@
         background-color: #111418;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         color: #ffffff;
+        touch-action: manipulation;
       }
       #app-container {
         position: relative;
@@ -37,6 +40,7 @@
         align-items: center;
         justify-content: center;
         z-index: 1;
+        touch-action: none;
       }
       #ui-overlay {
         position: absolute;
