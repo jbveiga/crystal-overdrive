@@ -184,6 +184,26 @@ export class PartyManagementUI {
 
     this.contentEl.innerHTML = '';
 
+    if (this.party.length === 0) {
+      this.bannerEl.style.borderColor = '#facc15';
+      this.bannerEl.style.color = '#fef08a';
+      this.bannerEl.innerText = 'No POKéMON in your party yet! Visit PROF. ELM in his LAB to choose a starter!';
+      const emptyBox = document.createElement('div');
+      emptyBox.style.cssText = `
+        padding: 32px 16px;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 700;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+      `;
+      emptyBox.innerText = '🔴 Your party is currently empty. Inspect the Poké Balls on Prof. Elm\'s table!';
+      this.contentEl.appendChild(emptyBox);
+      return;
+    }
+
     const grid = document.createElement('div');
     grid.style.cssText = `
       display: grid;

@@ -63,6 +63,7 @@ export interface WildEncounterSlot {
   minLevel: number;
   maxLevel: number;
   weight: number;
+  timeOfDay?: 'MORNING' | 'DAY' | 'NIGHT' | 'ANY';
 }
 
 export interface MapConnection {
@@ -87,6 +88,7 @@ export interface BgEvent {
 export interface MapData {
   id: string;
   name: string;
+  isIndoor?: boolean;
   width: number;
   height: number;
   tileSize: number; // 64 (16x16 original upscaled 4x)

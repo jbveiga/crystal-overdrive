@@ -3296,19 +3296,50 @@
       "speciesId": "pidgey",
       "minLevel": 2,
       "maxLevel": 4,
-      "weight": 50
+      "weight": 50,
+      "timeOfDay": "DAY"
     },
     {
       "speciesId": "sentret",
       "minLevel": 2,
       "maxLevel": 3,
-      "weight": 35
+      "weight": 40,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 2,
+      "maxLevel": 4,
+      "weight": 50,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "sentret",
+      "minLevel": 2,
+      "maxLevel": 3,
+      "weight": 40,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 2,
+      "maxLevel": 4,
+      "weight": 60,
+      "timeOfDay": "NIGHT"
     },
     {
       "speciesId": "rattata",
       "minLevel": 2,
       "maxLevel": 4,
-      "weight": 15
+      "weight": 40,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 2,
+      "maxLevel": 4,
+      "weight": 10,
+      "timeOfDay": "ANY"
     }
   ]
 }

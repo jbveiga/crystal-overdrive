@@ -145,7 +145,8 @@ export class MapManager {
   rollWildEncounter(
     tileType: number,
     activeRoamerSpeciesId?: string,
-    rng: () => number = Math.random
+    rng: () => number = Math.random,
+    timeOfDay?: 'MORNING' | 'DAY' | 'NIGHT'
   ): WildEncounterResult | null {
     if (tileType !== 2 || !this.currentMap) {
       return null;
@@ -169,9 +170,18 @@ export class MapManager {
       }
     }
 
-    const slots = this.currentMap.grassEncounters;
+    let slots = this.currentMap.grassEncounters;
     if (!slots || slots.length === 0) {
       return null;
+    }
+
+    if (timeOfDay) {
+      const timeFiltered = slots.filter(
+        (s) => !s.timeOfDay || s.timeOfDay === 'ANY' || s.timeOfDay === timeOfDay
+      );
+      if (timeFiltered.length > 0) {
+        slots = timeFiltered;
+      }
     }
 
     // Weighted random selection
@@ -250,5 +260,24 @@ export class MapManager {
     }
 
     return false;
+  }
+
+  public static isOutdoorMap(mapId: string): boolean {
+    return [
+      'new_bark_town',
+      'route_29',
+      'cherrygrove_city',
+      'route_30',
+      'route_31',
+      'violet_city',
+    ].includes(mapId);
+  }
+
+  public isCurrentMapOutdoor(): boolean {
+    if (!this.currentMap) return true;
+    if (typeof this.currentMap.isIndoor === 'boolean') {
+      return !this.currentMap.isIndoor;
+    }
+    return MapManager.isOutdoorMap(this.currentMap.id);
   }
 }

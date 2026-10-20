@@ -19,7 +19,6 @@ import { TitleScreenUI } from './ui/TitleScreenUI';
 import { IntroSequenceUI } from './ui/IntroSequenceUI';
 import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions } from './types/game';
 import type { Graphics } from 'pixi.js';
-import { createNpcsByMap } from './world/npcData';
 export { npcsByMap, createNpcsByMap } from './world/npcData';
 
 async function bootstrap() {
@@ -1485,16 +1484,18 @@ async function bootstrap() {
       // Prevent leaving New Bark Town into Route 29 without a partner Pokémon (Ticket 6.1)
       if (current.id === 'new_bark_town' && conn.mapId === 'route_29' && playerParty.length === 0) {
         entity.x = 0;
+        entity.targetX = 0;
+        entity.renderX = 0;
         entity.progress = 0;
         entity.isMoving = false;
-        BattleAudio.playMenuSound('CANCEL');
+        BattleAudio.playOverworldSound('EXCLAMATION');
         overworldHUD.openDialogue(
           [
-            "Wait! Don't go out!",
+            `Wait, ${playerName}!`,
             "Wild POKéMON live in tall grass! It's dangerous to go out without a POKéMON of your own!",
             "Visit PROF. ELM's LAB first to receive your partner POKéMON!",
           ],
-          "PROF. ELM's AIDE"
+          "🔬 PROF. ELM'S AIDE"
         );
         return;
       }
@@ -2166,50 +2167,59 @@ async function bootstrap() {
         bgEvent.action === 'STARTER_TOTODILE' ||
         bgEvent.action === 'STARTER_CHIKORITA'
       ) {
-        if (storyFlags.has('starter_chosen')) {
+        if (storyFlags.has('starter_chosen') || playerParty.length > 0) {
           overworldHUD.openDialogue(["It's an empty POKé BALL."], bgEvent.speaker);
           return;
         }
 
-        const starterConfig: Record<string, { speciesId: string; name: string; type: string; moves: string[] }> = {
+        const starterConfig: Record<
+          string,
+          { speciesId: 'cyndaquil' | 'totodile' | 'chikorita'; name: string; type: string }
+        > = {
           STARTER_CYNDAQUIL: {
             speciesId: 'cyndaquil',
             name: 'CYNDAQUIL',
-            type: 'Fire',
-            moves: ['tackle', 'leer'],
+            type: 'FIRE',
           },
           STARTER_TOTODILE: {
             speciesId: 'totodile',
             name: 'TOTODILE',
-            type: 'Water',
-            moves: ['scratch', 'leer'],
+            type: 'WATER',
           },
           STARTER_CHIKORITA: {
             speciesId: 'chikorita',
             name: 'CHIKORITA',
-            type: 'Grass',
-            moves: ['tackle', 'growl'],
+            type: 'GRASS',
           },
         };
 
         const chosen = starterConfig[bgEvent.action];
         if (chosen) {
           BattleAudio.playCry(chosen.speciesId);
-          overworldHUD.openDialogue(
-            [
-              `It contains ${chosen.name}, the ${chosen.type} POKéMON!`,
-              `Do you choose ${chosen.name}?`,
-              `${playerName} received ${chosen.name} from PROF. ELM!`,
-            ],
-            bgEvent.speaker,
+          overworldHUD.openStarterChoiceModal(
+            chosen.speciesId,
+            chosen.name,
+            chosen.type,
             () => {
-              const starterPokemon = PokemonFactory.create(chosen.speciesId, 5, chosen.moves);
+              const starterPokemon = PokemonFactory.create(chosen.speciesId, 5);
               playerParty.push(starterPokemon);
               seenSpecies.add(chosen.speciesId);
               storyFlags.add('starter_chosen');
               BattleAudio.playOverworldSound('KEY_ITEM');
-              saveCurrentGame();
-              overworldHUD.showToast(`✨ Received ${chosen.name}!`);
+              overworldHUD.openDialogue(
+                [
+                  `${playerName} received ${chosen.name} from PROF. ELM!`,
+                  "PROF. ELM: Excellent choice! That POKéMON is really energetic! Now, please visit MR. POKéMON's house on ROUTE 30 to retrieve the MYSTERY EGG!",
+                ],
+                '🔬 PROF. ELM',
+                () => {
+                  saveCurrentGame();
+                  overworldHUD.showToast(`✨ Received ${chosen.name} (Lv. 5)!`);
+                }
+              );
+            },
+            () => {
+              BattleAudio.playMenuSound('CANCEL');
             }
           );
           return;
@@ -2236,6 +2246,9 @@ async function bootstrap() {
       playTimeSeconds += dtWorld;
     }
     const currentMap = mapManager.getCurrentMap();
+    const isOutdoor = mapManager.isCurrentMapOutdoor();
+    const currentTimeOfDay = gameClock.getTimeOfDay();
+    overworldRenderer.updateAmbientLighting(currentTimeOfDay, isOutdoor);
 
     if (gameState === 'OVERWORLD') {
       // Active NPCs on this map (Zero per-frame array allocations)
@@ -2380,7 +2393,12 @@ async function bootstrap() {
           // Wild Encounter Check in Tall Grass (tile type 2)
           if (tileType === 2 && playerParty.length > 0) {
             const roamer = latestMap ? roamingManager.getActiveRoamerOnRoute(latestMap.id) : undefined;
-            const encounter = mapManager.rollWildEncounter(tileType, roamer?.speciesId);
+            const encounter = mapManager.rollWildEncounter(
+              tileType,
+              roamer?.speciesId,
+              Math.random,
+              currentTimeOfDay
+            );
 
             if (encounter) {
               console.log(`[Wild Encounter] Wild ${encounter.speciesId} (Lv. ${encounter.level}) appeared!`);

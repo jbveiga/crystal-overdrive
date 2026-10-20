@@ -607,5 +607,33 @@ describe('MapData & Authentic Tile Integrity', () => {
       }
     }
   });
+
+  it("validates Ticket 6.1 Elm's Lab starter Poké Ball bgEvents, Route 29 roadblock, and starter choice modal", () => {
+    const labPath = path.resolve(__dirname, '../public/assets/data/maps/elms_lab.json');
+    const labData: MapData = JSON.parse(fs.readFileSync(labPath, 'utf8'));
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+
+    const cyndaquilBall = labData.bgEvents?.find((e) => e.x === 6 && e.y === 3);
+    const totodileBall = labData.bgEvents?.find((e) => e.x === 7 && e.y === 3);
+    const chikoritaBall = labData.bgEvents?.find((e) => e.x === 8 && e.y === 3);
+
+    expect(cyndaquilBall?.action).toBe('STARTER_CYNDAQUIL');
+    expect(cyndaquilBall?.pages[0]).toContain("It's CYNDAQUIL, a FIRE POKéMON!");
+    expect(totodileBall?.action).toBe('STARTER_TOTODILE');
+    expect(totodileBall?.pages[0]).toContain("It's TOTODILE, a WATER POKéMON!");
+    expect(chikoritaBall?.action).toBe('STARTER_CHIKORITA');
+    expect(chikoritaBall?.pages[0]).toContain("It's CHIKORITA, a GRASS POKéMON!");
+
+    // Walkable floor tiles directly in front of the table at (6, 4), (7, 4), (8, 4)
+    expect(labData.collisionGrid[4 * labData.width + 6]).toBe(0);
+    expect(labData.collisionGrid[4 * labData.width + 7]).toBe(0);
+    expect(labData.collisionGrid[4 * labData.width + 8]).toBe(0);
+
+    // Starter modal & Route 29 roadblock checks
+    expect(mainSrc).toContain('overworldHUD.openStarterChoiceModal');
+    expect(mainSrc).toContain("storyFlags.add('starter_chosen')");
+    expect(mainSrc).toContain("It's an empty POKé BALL.");
+    expect(mainSrc).toContain("current.id === 'new_bark_town' && conn.mapId === 'route_29' && playerParty.length === 0");
+  });
 });
 

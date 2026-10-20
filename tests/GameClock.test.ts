@@ -50,4 +50,45 @@ describe('GameClock', () => {
     expect(deltas.dtPlayer).toBe(0.1);
     expect(deltas.dtBattle).toBe(0.1);
   });
+
+  it('calculates authentic Johto time of day and simulated hours (Ticket 6.2)', () => {
+    const clock = new GameClock();
+
+    // Morning: 04:00 - 09:59
+    clock.setSimulatedHour(4);
+    expect(clock.getTimeOfDay()).toBe('MORNING');
+    clock.setSimulatedHour(9);
+    expect(clock.getTimeOfDay()).toBe('MORNING');
+
+    // Day: 10:00 - 17:59
+    clock.setSimulatedHour(10);
+    expect(clock.getTimeOfDay()).toBe('DAY');
+    clock.setSimulatedHour(14);
+    expect(clock.getTimeOfDay()).toBe('DAY');
+    clock.setSimulatedHour(17);
+    expect(clock.getTimeOfDay()).toBe('DAY');
+
+    // Night: 18:00 - 03:59
+    clock.setSimulatedHour(18);
+    expect(clock.getTimeOfDay()).toBe('NIGHT');
+    clock.setSimulatedHour(23);
+    expect(clock.getTimeOfDay()).toBe('NIGHT');
+    clock.setSimulatedHour(0);
+    expect(clock.getTimeOfDay()).toBe('NIGHT');
+    clock.setSimulatedHour(3);
+    expect(clock.getTimeOfDay()).toBe('NIGHT');
+  });
+
+  it('provides ambient lighting tint parameters for morning, day, and night (Ticket 6.2)', () => {
+    const morningTint = GameClock.getAmbientTint('MORNING');
+    expect(morningTint.color).toBe(0xfbbf24);
+    expect(morningTint.alpha).toBeCloseTo(0.12);
+
+    const dayTint = GameClock.getAmbientTint('DAY');
+    expect(dayTint.alpha).toBe(0.0);
+
+    const nightTint = GameClock.getAmbientTint('NIGHT');
+    expect(nightTint.color).toBe(0x0f172a);
+    expect(nightTint.alpha).toBeCloseTo(0.38);
+  });
 });

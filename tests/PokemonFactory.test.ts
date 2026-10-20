@@ -41,22 +41,22 @@ describe('PokemonFactory & Egg Hatching System (Ticket 5.4)', () => {
   });
 
   it('creates authentic Johto Starters at Lv. 5 with canonical starter moves (Ticket 6.1)', () => {
-    const cyndaquil = PokemonFactory.create('cyndaquil', 5, ['tackle', 'leer']);
+    const cyndaquil = PokemonFactory.create('cyndaquil', 5);
     expect(cyndaquil.speciesId).toBe('cyndaquil');
     expect(cyndaquil.level).toBe(5);
     expect(cyndaquil.currentHp).toBeGreaterThan(0);
-    expect(cyndaquil.moves.map((m) => m.moveId)).toEqual(['tackle', 'leer']);
+    expect(cyndaquil.moves.map((m) => m.moveId)).toEqual(['tackle', 'leer', 'smokescreen', 'ember']);
 
-    const totodile = PokemonFactory.create('totodile', 5, ['scratch', 'leer']);
+    const totodile = PokemonFactory.create('totodile', 5);
     expect(totodile.speciesId).toBe('totodile');
     expect(totodile.level).toBe(5);
     expect(totodile.currentHp).toBeGreaterThan(0);
-    expect(totodile.moves.map((m) => m.moveId)).toEqual(['scratch', 'leer']);
+    expect(totodile.moves.map((m) => m.moveId)).toEqual(['scratch', 'leer', 'rage', 'watergun']);
 
-    const chikorita = PokemonFactory.create('chikorita', 5, ['tackle', 'growl']);
+    const chikorita = PokemonFactory.create('chikorita', 5);
     expect(chikorita.speciesId).toBe('chikorita');
     expect(chikorita.level).toBe(5);
     expect(chikorita.currentHp).toBeGreaterThan(0);
-    expect(chikorita.moves.map((m) => m.moveId)).toEqual(['tackle', 'growl']);
+    expect(chikorita.moves.map((m) => m.moveId)).toEqual(['tackle', 'growl', 'razorleaf', 'poisonpowder']);
   });
 });

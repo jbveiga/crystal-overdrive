@@ -35,6 +35,7 @@ export class OverworldRenderer {
   private npcGrassMasks: Map<string, Graphics> = new Map();
   private grassParticles: GrassParticle[] = [];
   private exclamationContainer: Container | null = null;
+  private ambientOverlay!: Graphics;
   private fadeOverlay!: Graphics;
   private currentRenderedMap: MapData | null = null;
   private tileSize: number = 64;
@@ -66,6 +67,9 @@ export class OverworldRenderer {
     this.mapContainer = new Container();
     this.entityContainer = new Container();
     this.foregroundContainer = new Container();
+    this.ambientOverlay = new Graphics();
+    this.ambientOverlay.visible = false;
+    this.ambientOverlay.eventMode = 'none';
     this.fadeOverlay = new Graphics();
     this.fadeOverlay.visible = false;
 
@@ -73,6 +77,7 @@ export class OverworldRenderer {
     this.stageContainer.addChild(this.entityContainer);
     this.stageContainer.addChild(this.foregroundContainer);
     this.app.stage.addChild(this.stageContainer);
+    this.app.stage.addChild(this.ambientOverlay);
     this.app.stage.addChild(this.fadeOverlay);
 
     await this.loadAssets();
@@ -1145,6 +1150,44 @@ export class OverworldRenderer {
         mask.visible = true;
         mask.position.set(npcPxX, npcPxY);
       }
+    }
+  }
+
+  /**
+   * Updates ambient day/night color tint overlay (Ticket 6.2).
+   * Automatically disables on indoor maps.
+   */
+  public updateAmbientLighting(timeOfDay: 'MORNING' | 'DAY' | 'NIGHT', isOutdoor: boolean): void {
+    if (!this.ambientOverlay) return;
+
+    if (!isOutdoor) {
+      this.ambientOverlay.visible = false;
+      return;
+    }
+
+    const screenW = this.app.screen?.width || 800;
+    const screenH = this.app.screen?.height || 600;
+
+    let color = 0x000000;
+    let alpha = 0.0;
+
+    if (timeOfDay === 'MORNING') {
+      // Warm golden morning amber
+      color = 0xfbbf24;
+      alpha = 0.12;
+    } else if (timeOfDay === 'NIGHT') {
+      // Atmospheric nocturnal navy tint
+      color = 0x0f172a;
+      alpha = 0.38;
+    }
+
+    if (alpha <= 0) {
+      this.ambientOverlay.visible = false;
+    } else {
+      this.ambientOverlay.clear();
+      this.ambientOverlay.rect(0, 0, screenW, screenH);
+      this.ambientOverlay.fill({ color, alpha });
+      this.ambientOverlay.visible = true;
     }
   }
 }

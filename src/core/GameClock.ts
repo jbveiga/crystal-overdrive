@@ -6,14 +6,54 @@ export interface ClockDeltas {
   dtBattle: number;
 }
 
+export type TimeOfDay = 'MORNING' | 'DAY' | 'NIGHT';
+
+export interface AmbientTint {
+  color: number;
+  alpha: number;
+}
+
 export class GameClock {
   private _playerSpeed: SpeedMultiplier = 1;
   private _battleSpeed: SpeedMultiplier = 1;
+  private _simulatedHour?: number;
   private readonly maxDelta: number = 0.1; // Max 100ms clamp to prevent spiral of death
 
   constructor(initialPlayerSpeed: SpeedMultiplier = 1, initialBattleSpeed: SpeedMultiplier = 1) {
     this._playerSpeed = initialPlayerSpeed;
     this._battleSpeed = initialBattleSpeed;
+  }
+
+  public setSimulatedHour(hour: number | undefined): void {
+    this._simulatedHour = hour;
+  }
+
+  public getSimulatedHour(): number | undefined {
+    return this._simulatedHour;
+  }
+
+  /**
+   * Returns Johto time of day (Morning 4:00-9:59, Day 10:00-17:59, Night 18:00-3:59)
+   */
+  public getTimeOfDay(date: Date = new Date()): TimeOfDay {
+    const hour = this._simulatedHour !== undefined ? this._simulatedHour : date.getHours();
+    if (hour >= 4 && hour < 10) return 'MORNING';
+    if (hour >= 10 && hour < 18) return 'DAY';
+    return 'NIGHT';
+  }
+
+  /**
+   * Returns color and opacity tint for ambient lighting (Ticket 6.2)
+   */
+  public static getAmbientTint(timeOfDay: TimeOfDay): AmbientTint {
+    switch (timeOfDay) {
+      case 'MORNING':
+        return { color: 0xfbbf24, alpha: 0.12 };
+      case 'DAY':
+        return { color: 0x000000, alpha: 0.0 };
+      case 'NIGHT':
+        return { color: 0x0f172a, alpha: 0.38 };
+    }
   }
 
   get playerSpeed(): SpeedMultiplier {

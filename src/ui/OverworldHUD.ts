@@ -753,7 +753,130 @@ export class OverworldHUD {
   }
 
   public isDialogueOpen(): boolean {
-    return this.dialogueActive;
+    const starterModal = this.rootElement.querySelector('#starter-choice-modal') as HTMLElement | null;
+    const starterOpen = starterModal ? starterModal.style.display === 'flex' : false;
+    return this.dialogueActive || starterOpen;
+  }
+
+  /**
+   * Opens an interactive starter Pokémon confirmation modal with pixel sprite preview and [YES] / [NO] choice (Ticket 6.1).
+   */
+  public openStarterChoiceModal(
+    speciesId: 'cyndaquil' | 'totodile' | 'chikorita',
+    speciesLabel: string,
+    typeLabel: string,
+    onConfirm: () => void,
+    onCancel?: () => void
+  ): void {
+    this.activeDirection = null;
+    let modal = this.rootElement.querySelector('#starter-choice-modal') as HTMLDivElement | null;
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'starter-choice-modal';
+      modal.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(420px, 92vw);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 29, 0.99) 100%);
+        border: 3px solid #f8fafc;
+        outline: 3px solid #1e293b;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), inset 0 0 0 2px #38bdf8;
+        border-radius: 12px;
+        padding: 18px 20px;
+        color: #f8fafc;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        z-index: 60;
+        pointer-events: auto;
+      `;
+      this.rootElement.appendChild(modal);
+    }
+
+    const accentColor =
+      speciesId === 'cyndaquil' ? '#ef4444' : speciesId === 'totodile' ? '#38bdf8' : '#22c55e';
+
+    modal.innerHTML = `
+      <div style="font-size: 11px; font-weight: 800; color: ${accentColor}; letter-spacing: 1px;">🔴 PROF. ELM'S STARTER POKé BALL</div>
+      <div style="
+        width: 88px;
+        height: 88px;
+        background: rgba(30, 41, 59, 0.85);
+        border: 2px solid ${accentColor};
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 18px ${accentColor}55;
+      ">
+        <img src="./assets/sprites/pokemon/${speciesId}_front.png" alt="${speciesLabel}" style="width: 68px; height: 68px; image-rendering: pixelated; object-fit: contain;" />
+      </div>
+      <div style="font-size: 15px; font-weight: 700; text-align: center; line-height: 1.45;">
+        It's <strong>${speciesLabel}</strong>, a <strong>${typeLabel}</strong> POKéMON!<br/>
+        Do you want this POKéMON?
+      </div>
+      <div style="display: flex; gap: 12px; width: 100%; margin-top: 4px;">
+        <button id="starter-confirm-yes" style="
+          flex: 1;
+          background: #16a34a;
+          color: #ffffff;
+          border: 2px solid #86efac;
+          border-radius: 8px;
+          padding: 10px;
+          font-size: 14px;
+          font-weight: 800;
+          cursor: pointer;
+        ">YES</button>
+        <button id="starter-confirm-no" style="
+          flex: 1;
+          background: #475569;
+          color: #ffffff;
+          border: 2px solid #94a3b8;
+          border-radius: 8px;
+          padding: 10px;
+          font-size: 14px;
+          font-weight: 800;
+          cursor: pointer;
+        ">NO</button>
+      </div>
+    `;
+
+    modal.style.display = 'flex';
+
+    const close = () => {
+      if (modal) modal.style.display = 'none';
+      window.removeEventListener('keydown', keyHandler);
+    };
+
+    const keyHandler = (e: KeyboardEvent) => {
+      if (!modal || modal.style.display !== 'flex') return;
+      if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyZ') {
+        e.preventDefault();
+        close();
+        onConfirm();
+      } else if (e.code === 'Escape' || e.code === 'KeyX') {
+        e.preventDefault();
+        close();
+        if (onCancel) onCancel();
+      }
+    };
+    setTimeout(() => {
+      if (modal && modal.style.display === 'flex') {
+        window.addEventListener('keydown', keyHandler);
+      }
+    }, 0);
+
+    modal.querySelector('#starter-confirm-yes')!.addEventListener('click', () => {
+      close();
+      onConfirm();
+    });
+    modal.querySelector('#starter-confirm-no')!.addEventListener('click', () => {
+      close();
+      if (onCancel) onCancel();
+    });
   }
 
   public openDialogue(pages: string[], speaker?: string, onComplete?: () => void): void {
@@ -980,7 +1103,7 @@ export class OverworldHUD {
   }
 
   public getHeldDirection(): Direction | null {
-    if (this.dialogueActive || this.options.isModalOpen?.() || this.isPokegearOpen()) return null;
+    if (this.isDialogueOpen() || this.options.isModalOpen?.() || this.isPokegearOpen()) return null;
     return this.activeDirection;
   }
 
@@ -994,7 +1117,7 @@ export class OverworldHUD {
         return;
       }
 
-      if ((e.code === 'Escape' || e.code === 'KeyM') && !e.repeat && this.isVisible() && !this.dialogueActive) {
+      if ((e.code === 'Escape' || e.code === 'KeyM') && !e.repeat && this.isVisible() && !this.isDialogueOpen()) {
         if (this.isPokegearOpen()) {
           const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
           pokegearModal.style.display = 'none';
@@ -1013,10 +1136,11 @@ export class OverworldHUD {
 
       if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ' || e.code === 'KeyE') {
         if (!e.repeat && this.isVisible()) {
-          e.preventDefault();
           if (this.dialogueActive) {
+            e.preventDefault();
             this.advanceDialogue();
-          } else if (this.options.onInteract) {
+          } else if (!this.isDialogueOpen() && this.options.onInteract) {
+            e.preventDefault();
             this.options.onInteract();
           }
         }
