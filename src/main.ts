@@ -19,6 +19,7 @@ import { TitleScreenUI } from './ui/TitleScreenUI';
 import { IntroSequenceUI } from './ui/IntroSequenceUI';
 import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions } from './types/game';
 import type { Graphics } from 'pixi.js';
+export { npcsByMap, createNpcsByMap } from './world/npcData';
 
 async function bootstrap() {
   const canvasContainer = document.getElementById('canvas-container');
@@ -711,7 +712,7 @@ async function bootstrap() {
       makeNpc(
         'bug_catcher_wade',
         21,
-        7,
+        8,
         'LEFT',
         'bug_catcher',
         '🐞 BUG CATCHER WADE',
@@ -742,7 +743,7 @@ async function bootstrap() {
       makeNpc(
         'r31_mail_guy',
         28,
-        12,
+        9,
         'DOWN',
         'boy',
         '📬 KENYA DELIVERER',
@@ -763,8 +764,8 @@ async function bootstrap() {
       makeNpc(
         'mr_pokemon_npc',
         3,
-        5,
-        'RIGHT',
+        3,
+        'DOWN',
         'fat_man',
         '🎩 MR. POKéMON',
         [
@@ -776,9 +777,9 @@ async function bootstrap() {
       ),
       makeNpc(
         'prof_oak_npc',
-        6,
         5,
-        'UP',
+        3,
+        'DOWN',
         'fat_man',
         '🎓 PROF. OAK',
         [
@@ -966,7 +967,7 @@ async function bootstrap() {
       makeNpc(
         'sage_nico',
         12,
-        13,
+        12,
         'RIGHT',
         'sage',
         '🙏 SAGE NICO',
@@ -1267,13 +1268,126 @@ async function bootstrap() {
     violet_mart: [
       makeNpc(
         'mart_clerk_violet',
-        2,
+        1,
         3,
         'RIGHT',
         'boy',
         '🛒 MART CLERK',
         ['Welcome to the VIOLET CITY POKéMON MART! How may I serve you?'],
         { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+    ],
+    violet_city: [
+      makeNpc(
+        'earl',
+        28,
+        18,
+        'DOWN',
+        'earl',
+        '🎓 EARL DERVISH',
+        [
+          'Twirl! Twirl! Did you beat FALKNER at the GYM? Magnificent!',
+          'I am EARL! I teach young trainers all about POKéMON at the POKéMON ACADEMY right behind me!',
+        ],
+        { wanders: true }
+      ),
+      makeNpc(
+        'violet_girl',
+        14,
+        20,
+        'RIGHT',
+        'girl',
+        '👧 VIOLET LASS',
+        [
+          'Ghosts are rumored to appear in SPROUT TOWER at night.',
+          'Wait—you already climbed to the top and defeated ELDER LI?! Amazing!',
+        ],
+        { wanders: true }
+      ),
+      makeNpc(
+        'violet_bird_trainer',
+        26,
+        25,
+        'LEFT',
+        'bird_keeper',
+        '🦅 BIRD FAN',
+        [
+          'Hey, are you a POKéMON trainer? PIDGEY and SPEAROW are both Flying-types, but SPEAROW has a much fiercer Attack stat!',
+        ]
+      ),
+    ],
+    earls_pokemon_academy: [
+      makeNpc(
+        'earl_teacher',
+        4,
+        3,
+        'UP',
+        'earl',
+        '🎓 PROFESSOR EARL',
+        [
+          "Twirl! Welcome to EARL'S POKéMON ACADEMY!",
+          "In battle, a move matching your POKéMON's own type deals 1.5x damage! That's Same-Type Attack Bonus!",
+        ]
+      ),
+      makeNpc(
+        'academy_boy',
+        3,
+        5,
+        'UP',
+        'boy',
+        '👦 STUDENT',
+        [
+          "I'm taking notes from the blackboard! PARALYSIS cuts a POKéMON's Speed in half and may prevent it from moving!",
+        ]
+      ),
+      makeNpc(
+        'academy_girl',
+        5,
+        5,
+        'UP',
+        'girl',
+        '👧 STUDENT',
+        [
+          "Electric- and Rock-type moves are super effective against Flying-types like FALKNER's bird POKéMON!",
+        ]
+      ),
+    ],
+    violet_kyles_house: [
+      makeNpc(
+        'kyle',
+        2,
+        4,
+        'RIGHT',
+        'boy',
+        '👦 KYLE',
+        [
+          'A POKéMON you get in a trade grows quickly, even if it can be willful if you lack GYM BADGES!',
+          'I love BELLSPROUT and POLIWAG!',
+        ]
+      ),
+      makeNpc(
+        'kyle_mom',
+        5,
+        4,
+        'LEFT',
+        'mom',
+        "👩 KYLE'S MOM",
+        [
+          'Do you collect different kinds of POKéMON? My son KYLE is always looking to trade with other trainers!',
+        ]
+      ),
+    ],
+    violet_nickname_speech_house: [
+      makeNpc(
+        'nickname_teacher',
+        2,
+        4,
+        'RIGHT',
+        'teacher',
+        '👩 NICKNAME FAN',
+        [
+          'She gives her POKéMON nicknames like STRAWBERRY! Giving a POKéMON a thoughtful nickname makes your bond even stronger!',
+        ]
       ),
     ],
   };
@@ -1560,6 +1674,7 @@ async function bootstrap() {
           activePlayerPokemon = ev.newPokemon;
           await battleRenderer.animateSwitchPlayerPokemon(activePlayerPokemon);
           battleHUD.setActivePlayerPokemon(activePlayerPokemon);
+          battleHUD.slideInHealthCard(true);
         } else if (ev.type === 'THROW_BALL') {
           ballGraphic = await battleRenderer.animateThrowBall(ev.ballId);
         } else if (ev.type === 'SHAKE' && ballGraphic) {
@@ -1623,15 +1738,16 @@ async function bootstrap() {
             );
           }
 
-          // Multi-Pokémon Trainer Team continuation
+          // Multi-Pokémon Trainer Team continuation (Ticket 5.5)
           if (options.isTrainer && remainingTrainerParty.length > 0) {
             opponentPokemon = remainingTrainerParty.shift()!;
             opponentPokemon.isTrapped = false;
             seenSpecies.add(opponentPokemon.speciesId);
             battleSM = new BattleStateMachine(activePlayerPokemon, opponentPokemon, false);
             await battleHUD.showMessage(`${options.trainerName} sent out ${opponentPokemon.nickname}!`);
-            await battleRenderer.startBattle(activePlayerPokemon, opponentPokemon);
+            await battleRenderer.animateSendOutNextPokemon(false, opponentPokemon);
             bindBattleHudForActiveFoe();
+            battleHUD.slideInHealthCard(false);
             return;
           }
 

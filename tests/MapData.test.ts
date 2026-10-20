@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import type { MapData } from '../src/types/game';
+import { npcsByMap } from '../src/world/npcData';
 
 describe('MapData & Authentic Tile Integrity', () => {
   it('validates new_bark_town.json structure, tileMap dimensions, and asset presence', () => {
@@ -575,6 +576,28 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("storyFlags.add('togepi_egg_received')");
     expect(mainSrc).toContain("p.nickname = 'TOGEPI'");
     expect(mainSrc).toContain("Huh? The EGG hatched! ... A lively TOGEPI hatched from the EGG!");
+  });
+
+  it('asserts that every NPC across all maps stands on a strictly walkable tile (0 or 2) and Violet City interiors are populated (Ticket 5.5)', () => {
+    expect(npcsByMap.violet_city?.length).toBeGreaterThanOrEqual(3);
+    expect(npcsByMap.earls_pokemon_academy?.length).toBeGreaterThanOrEqual(3);
+    expect(npcsByMap.violet_kyles_house?.length).toBeGreaterThanOrEqual(2);
+    expect(npcsByMap.violet_nickname_speech_house?.length).toBeGreaterThanOrEqual(1);
+
+    for (const [mapId, npcs] of Object.entries(npcsByMap)) {
+      const mapPath = path.resolve(__dirname, `../public/assets/data/maps/${mapId}.json`);
+      expect(fs.existsSync(mapPath), `Map file for ${mapId} must exist`).toBe(true);
+      const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+      for (const npc of npcs) {
+        const gx = npc.gridX ?? npc.x;
+        const gy = npc.gridY ?? npc.y;
+        const tileVal = mapData.collisionGrid[gy * mapData.width + gx];
+        expect(
+          [0, 2],
+          `NPC ${npc.id} in ${mapId} at (${gx}, ${gy}) must be on a walkable tile (0 or 2) but found ${tileVal}`
+        ).toContain(tileVal);
+      }
+    }
   });
 });
 

@@ -28,6 +28,8 @@ export interface GridEntity {
   id: string;
   x: number;
   y: number;
+  gridX?: number;
+  gridY?: number;
   targetX: number;
   targetY: number;
   renderX: number;

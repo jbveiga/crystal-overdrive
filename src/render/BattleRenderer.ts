@@ -470,42 +470,190 @@ export class BattleRenderer {
   }
 
   /**
-   * Animates switching out current player Pokémon and sending in a new party member
+   * Sends out the next Pokémon (player or trainer foe) with a parabolic Pokéball toss,
+   * expanding radial light/particle burst, authentic emergence scale-up, and cry (Ticket 5.5).
+   */
+  public async animateSendOutNextPokemon(
+    targetIsPlayer: boolean,
+    newPokemon: PokemonInstance
+  ): Promise<void> {
+    const sprite = targetIsPlayer ? this.playerPokemonSprite : this.enemyPokemonSprite;
+    if (targetIsPlayer && this.playerIdleTween) {
+      this.playerIdleTween.kill();
+    } else if (!targetIsPlayer && this.enemyIdleTween) {
+      this.enemyIdleTween.kill();
+    }
+    gsap.killTweensOf(sprite);
+    gsap.killTweensOf(sprite.scale);
+
+    const width = this.app.screen.width;
+    const height = this.app.screen.height;
+    const platformX = targetIsPlayer ? width * 0.28 : width * 0.72;
+    const platformY = targetIsPlayer ? height * 0.73 : height * 0.39;
+    const anchorY = targetIsPlayer ? platformY + 15 : platformY + 10;
+    const targetScale = targetIsPlayer ? 3.2 : 2.4;
+
+    // 1. Construct custom Pokéball graphic and toss along a parabolic arc onto the platform
+    BattleAudio.playBallEvent('THROW');
+    const palette = EffectivenessHelper.getPokeballPalette('poke-ball');
+    const ball = new Graphics();
+    ball.arc(0, 0, 13, Math.PI, 0);
+    ball.fill({ color: palette.topColor });
+    ball.arc(0, 0, 13, 0, Math.PI);
+    ball.fill({ color: palette.bottomColor });
+    ball.rect(-13, -2, 26, 4);
+    ball.fill({ color: 0x1e293b });
+    ball.circle(0, 0, 4);
+    ball.fill({ color: 0xffffff });
+    ball.stroke({ width: 1.5, color: 0x1e293b });
+
+    const startX = targetIsPlayer ? width * 0.06 : width * 0.94;
+    const startY = targetIsPlayer ? height * 0.82 : height * 0.22;
+    ball.position.set(startX, startY);
+    this.fxContainer.addChild(ball);
+
+    const tossDur = 0.32 / this.speedMultiplier;
+    await new Promise<void>((resolve) => {
+      const arcState = { t: 0 };
+      gsap.to(arcState, {
+        t: 1,
+        duration: tossDur,
+        ease: 'none',
+        onUpdate: () => {
+          const p = arcState.t;
+          ball.x = startX + (platformX - startX) * p;
+          ball.y = startY + (platformY - startY) * p - Math.sin(p * Math.PI) * 95;
+          ball.rotation = p * Math.PI * 2 * (targetIsPlayer ? 1 : -1);
+        },
+        onComplete: () => {
+          this.fxContainer.removeChild(ball);
+          resolve();
+        },
+      });
+    });
+
+    // 2. Platform touchdown: Pokéball pop + expanding light/particle burst in fxContainer
+    BattleAudio.playBallEvent('BREAK');
+    const burstGroup = new Container();
+    this.fxContainer.addChild(burstGroup);
+
+    const flashRing = new Graphics();
+    flashRing.circle(0, 0, 18);
+    flashRing.fill({ color: 0xffffff, alpha: 0.9 });
+    flashRing.stroke({ width: 3, color: 0xfacc15 });
+    flashRing.position.set(platformX, platformY - 12);
+    burstGroup.addChild(flashRing);
+
+    gsap.to(flashRing.scale, {
+      x: 3.4,
+      y: 3.4,
+      duration: 0.24 / this.speedMultiplier,
+      ease: 'power2.out',
+    });
+    gsap.to(flashRing, {
+      alpha: 0,
+      duration: 0.24 / this.speedMultiplier,
+      ease: 'power2.out',
+    });
+
+    const rayCount = 8;
+    for (let i = 0; i < rayCount; i++) {
+      const spark = new Graphics();
+      spark.star(0, 0, 4, 8, 3);
+      spark.fill({ color: i % 2 === 0 ? 0xffffff : 0xfef08a });
+      spark.position.set(platformX, platformY - 12);
+      burstGroup.addChild(spark);
+
+      const angle = (i / rayCount) * Math.PI * 2;
+      gsap.to(spark, {
+        x: platformX + Math.cos(angle) * 58,
+        y: platformY - 12 + Math.sin(angle) * 42,
+        alpha: 0,
+        scale: 0.4,
+        duration: 0.26 / this.speedMultiplier,
+        ease: 'power2.out',
+      });
+    }
+
+    // 3. Load new Pokémon texture, reset platform anchor, scale up with back.out(1.6) + cry
+    const suffix = targetIsPlayer ? 'back' : 'front';
+    const newTex = await Assets.load<Texture>(
+      `./assets/sprites/pokemon/${newPokemon.speciesId}_${suffix}.png`
+    );
+    newTex.source.scaleMode = 'nearest';
+    sprite.texture = newTex;
+    sprite.position.set(platformX, anchorY);
+    sprite.alpha = 1;
+    sprite.tint = 0xffffff;
+    sprite.scale.set(0.1, 0.1);
+
+    BattleAudio.playCry(newPokemon.speciesId);
+
+    const emergeDur = 0.28 / this.speedMultiplier;
+    await new Promise<void>((resolve) => {
+      gsap.to(sprite.scale, {
+        x: targetScale,
+        y: targetScale,
+        duration: emergeDur,
+        ease: 'back.out(1.6)',
+        onComplete: () => {
+          this.fxContainer.removeChild(burstGroup);
+          this.startIdleBreathing(sprite, targetScale, targetIsPlayer);
+          resolve();
+        },
+      });
+    });
+  }
+
+  /**
+   * Animates switching out current player Pokémon (crimson/white recall beam)
+   * and sending in a new party member via Pokéball arc & light burst (Ticket 5.5).
    */
   public async animateSwitchPlayerPokemon(newPokemon: PokemonInstance): Promise<void> {
     if (this.playerIdleTween) {
       this.playerIdleTween.kill();
     }
+    gsap.killTweensOf(this.playerPokemonSprite);
+    gsap.killTweensOf(this.playerPokemonSprite.scale);
 
+    BattleAudio.playBallEvent('THROW');
     const dur = 0.22 / this.speedMultiplier;
+    this.playerPokemonSprite.tint = 0xff4d6d;
+
+    const beamFlash = new Graphics();
+    beamFlash.circle(0, 0, 32);
+    beamFlash.fill({ color: 0xff4d6d, alpha: 0.55 });
+    beamFlash.position.set(this.playerPokemonSprite.x, this.playerPokemonSprite.y - 24);
+    this.fxContainer.addChild(beamFlash);
+
+    gsap.to(beamFlash.scale, { x: 0.1, y: 0.1, duration: dur, ease: 'power2.in' });
+    gsap.to(beamFlash, {
+      alpha: 0,
+      duration: dur,
+      onComplete: () => {
+        this.fxContainer.removeChild(beamFlash);
+      },
+    });
+
     await new Promise<void>((resolve) => {
       gsap.to(this.playerPokemonSprite.scale, {
         x: 0.1,
         y: 0.1,
         duration: dur,
         ease: 'power2.in',
-        onComplete: () => resolve(),
       });
-    });
-
-    const newTex = await Assets.load<Texture>(`./assets/sprites/pokemon/${newPokemon.speciesId}_back.png`);
-    newTex.source.scaleMode = 'nearest';
-    this.playerPokemonSprite.texture = newTex;
-
-    BattleAudio.playCry(newPokemon.speciesId);
-
-    await new Promise<void>((resolve) => {
-      gsap.to(this.playerPokemonSprite.scale, {
-        x: 3.2,
-        y: 3.2,
+      gsap.to(this.playerPokemonSprite, {
+        alpha: 0,
         duration: dur,
-        ease: 'back.out(1.6)',
+        ease: 'power2.in',
         onComplete: () => {
-          this.startIdleBreathing(this.playerPokemonSprite, 3.2, true);
+          this.playerPokemonSprite.tint = 0xffffff;
           resolve();
         },
       });
     });
+
+    await this.animateSendOutNextPokemon(true, newPokemon);
   }
 
   public animateFaint(targetIsPlayer: boolean): Promise<void> {
@@ -517,10 +665,12 @@ export class BattleRenderer {
 
     return new Promise((resolve) => {
       const sprite = targetIsPlayer ? this.playerPokemonSprite : this.enemyPokemonSprite;
-      const dur = 0.3 / this.speedMultiplier;
+      gsap.killTweensOf(sprite);
+      gsap.killTweensOf(sprite.scale);
+      const dur = 0.32 / this.speedMultiplier;
 
       gsap.to(sprite, {
-        y: '+=60',
+        y: '+=68',
         alpha: 0,
         duration: dur,
         ease: 'power2.in',

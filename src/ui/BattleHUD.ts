@@ -503,6 +503,27 @@ export class BattleHUD {
     this.updatePartyDock();
   }
 
+  /**
+   * Smoothly slides in the player or opponent health card upon send-out (Ticket 5.5).
+   */
+  public slideInHealthCard(isPlayer: boolean): void {
+    const cardSelector = isPlayer ? '#player-card' : '#enemy-card';
+    const card = this.rootElement.querySelector(cardSelector) as HTMLElement | null;
+    if (!card) return;
+
+    const startOffset = isPlayer ? '100%' : '-100%';
+    const durSec = (0.28 / this.speedMultiplier).toFixed(2);
+    card.style.transition = 'none';
+    card.style.transform = `translateX(${startOffset})`;
+    card.style.opacity = '0';
+
+    requestAnimationFrame(() => {
+      card.style.transition = `transform ${durSec}s cubic-bezier(0.22, 1, 0.36, 1), opacity ${durSec}s ease-out`;
+      card.style.transform = 'translateX(0)';
+      card.style.opacity = '1';
+    });
+  }
+
   public updatePartyDock(): void {
     if (!this.playerPartyDock) return;
     let html = '';

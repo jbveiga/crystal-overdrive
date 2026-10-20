@@ -74,7 +74,8 @@ src/
 ├── world/                 # Overworld Mechanics & Spatial Partitioning
 │   ├── GridPhysics.ts     # Collision detection, ledges, and trainer line-of-sight
 │   ├── MapManager.ts      # Binary map loader (.blk), seamless neighbor connections
-│   └── RoamingManager.ts  # Markov transition adjacency for Raikou, Entei, Suicune
+│   ├── RoamingManager.ts  # Markov transition adjacency for Raikou, Entei, Suicune
+│   └── npcData.ts         # Canonical Johto NPC & Trainer placements across all maps
 ├── battle/                # Turn-Based Tactical Combat System
 │   ├── BattleStateMachine.ts # Round execution, turn-order resolution, and residuals
 │   ├── DamageCalculator.ts   # Gen 4+ split, STAB, criticals, stat stages (-6 to +6)
@@ -258,7 +259,7 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | :--- | :--- | :---: | :---: | :--- |
 | `GameClock.ts` | `tests/GameClock.test.ts` | 5 | ✅ Covered | Decoupled player vs world delta, pausing, time dilation. |
 | `GridPhysics.ts` | `tests/GridPhysics.test.ts` | 14 | ✅ Covered | 1x/2x/3x speed, tile collision, bounds, fractional chaining, multi-directional ledge hopping (4..9), trainer vision. |
-| `MapData.ts` | `tests/MapData.test.ts` | 15 | ✅ Covered | Binary map extraction schema, warp coords, reciprocal 1F/2F & Route 31/Gate/Violet/Sprout Tower warps, Sprout Tower 1F-3F Sages & Elder Li, Violet Gym & Falkner, Post-Gym Togepi Egg Aide, NPC spawn data, seamless connections, directional hop codes. |
+| `MapData.ts` | `tests/MapData.test.ts` | 16 | ✅ Covered | Binary map extraction schema, warp coords, reciprocal 1F/2F & Route 31/Gate/Violet/Sprout Tower warps, Sprout Tower 1F-3F Sages & Elder Li, Violet Gym & Falkner, Post-Gym Togepi Egg Aide, 100% NPC walkability guard (`0`/`2`), seamless connections, directional hop codes. |
 | `RoamingManager.ts`| `tests/RoamingManager.test.ts` | 4 | ✅ Covered | Adjacency graph traversal, route weighting, active state, Burned Tower dormancy. |
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
 | `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 11 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6), Unbound pill styles & hit shake specs. |
@@ -267,7 +268,7 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 5 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync, audio unlock & volume controls. |
 | `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
 | `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-15 char name validation/fallback, RTC period detection, `onComplete` payload. |
-| **Current Baseline** | **11 Suites** | **79 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| **Current Baseline** | **11 Suites** | **80 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.
