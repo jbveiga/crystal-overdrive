@@ -281,6 +281,31 @@ async function bootstrap() {
     'dragon_shrine',
     'route_45',
     'route_46',
+    // Phase 12: Johto endgame
+    'route_27',
+    'route_27_sandstorm_house',
+    'route_26',
+    'route_26_heal_house',
+    'tohjo_falls',
+    'victory_road_gate',
+    'victory_road',
+    'route_22',
+    'route_23',
+    'indigo_plateau_poke_center',
+    'wills_room',
+    'kogas_room',
+    'brunos_room',
+    'karens_room',
+    'lances_room',
+    'hall_of_fame',
+    'route_28',
+    'route_28_steel_wing_house',
+    'silver_cave_outside',
+    'silver_cave_poke_center',
+    'silver_cave_room_1',
+    'silver_cave_room_2',
+    'silver_cave_room_3',
+    'silver_cave_item_rooms',
   ];
 
   const loadedMaps: MapData[] = await Promise.all(
@@ -2530,6 +2555,41 @@ async function bootstrap() {
                     () => {
                       saveCurrentGame();
                       overworldHUD.showToast('🐉 Received RISING BADGE & TM24 from Leader Clair!');
+                    }
+                  );
+                },
+              });
+            }
+          );
+          return;
+        }
+
+        // Elite Four, Champion Lance & Red
+        if (targetNpc.action === 'E4_EVENT' && !storyFlags.has(`${targetNpc.trainerId}_defeated`)) {
+          overworldHUD.openDialogue(
+            targetNpc.challengePages && targetNpc.challengePages.length > 0 ? targetNpc.challengePages : ['Prepare yourself!'],
+            targetNpc.speaker,
+            () => {
+              const team = buildTrainerTeamInstances(targetNpc);
+              if (team.length === 0) return;
+              triggerBattle(team[0], {
+                isTrainer: true,
+                isGymLeader: true,
+                trainerName: targetNpc.trainerName || 'Elite Trainer',
+                trainerTeam: team,
+                onVictory: () => {
+                  defeatedTrainers.add(targetNpc.trainerId || 'e4');
+                  storyFlags.add(`${targetNpc.trainerId}_defeated`);
+                  audioManager.playSfx('sfx_badge_get');
+                  BattleAudio.playOverworldSound('KEY_ITEM');
+                  const champion = targetNpc.trainerId === 'lance';
+                  if (champion) storyFlags.add('champion_defeated');
+                  overworldHUD.openDialogue(
+                    [champion ? 'LANCE: ...It is over. You are the new POKéMON LEAGUE CHAMPION!' : `${targetNpc.speaker}: You have defeated me!`],
+                    targetNpc.speaker,
+                    () => {
+                      saveCurrentGame();
+                      overworldHUD.showToast(champion ? '🏆 You are the new CHAMPION!' : '⭐ Challenger victorious!');
                     }
                   );
                 },

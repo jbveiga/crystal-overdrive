@@ -62,6 +62,7 @@ export interface GridEntity {
     | 'CHUCK_EVENT'
     | 'PRYCE_EVENT'
     | 'CLAIR_EVENT'
+    | 'E4_EVENT'
     | 'AMPHY_EVENT'
     | 'PHARMACY_SECRET_POTION_EVENT'
     | 'ELMS_AIDE_EVENT';

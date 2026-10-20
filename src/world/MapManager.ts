@@ -296,6 +296,12 @@ export class MapManager {
       'blackthorn_city',
       'route_45',
       'route_46',
+      'route_26',
+      'route_27',
+      'route_22',
+      'route_23',
+      'route_28',
+      'silver_cave_outside',
     ].includes(mapId);
   }
 

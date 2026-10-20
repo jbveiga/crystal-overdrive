@@ -36,7 +36,7 @@ const attrText = read('data/maps/attributes.asm');
 const constText = read('constants/map_constants.asm');
 const blocksText = read('data/maps/blocks.asm');
 const partiesText = read('data/trainers/parties.asm');
-const grassText = read('data/wild/johto_grass.asm');
+const grassText = read('data/wild/johto_grass.asm') + '\n' + (fs.existsSync(rawPath('data/wild/kanto_grass.asm')) ? read('data/wild/kanto_grass.asm') : '');
 
 // asm name -> CONST, CONST -> asm name
 const constOf = {};
@@ -149,6 +149,7 @@ const FAT = ['POKEFAN_M', 'FAT_MAN', 'GENTLEMAN', 'BLACK_BELT', 'SUPER_NERD', 'H
 const PEOPLE = new Set([
   ...GIRL, ...TEACH, ...FISH, ...FAT, 'YOUNGSTER', 'STANDING_YOUNGSTER', 'COOLTRAINER_M', 'BUG_CATCHER', 'BIRD_KEEPER', 'SAGE', 'ROCKER',
   'SKIER', 'BOARDER', 'GUITARIST', 'FIREBREATHER', 'JUGGLER', 'PSYCHIC', 'CAMPER', 'BIKER', 'POKEMANIAC', 'GRUNT', 'ROCKET', 'CLERK',
+  'WILL', 'KOGA', 'BRUNO', 'KAREN', 'LANCE', 'RED',
   'SCIENTIST', 'MYSTICALMAN', 'GYM_GUIDE', 'SILVER', 'COOLTRAINER', 'BLACKBELT', 'MANIA', 'BURGLAR', 'EUSINE', 'CLAIR', 'PRYCE', 'DRAGON_TAMER', 'ELDER', 'SCHOOLBOY', 'BLUE', 'SUPER', 'POKEFAN',
 ]);
 function spriteInfo(sp) {
@@ -174,6 +175,8 @@ function dirOf(mv) {
   return 'DOWN';
 }
 
+const E4 = { WILL: ['WILL', 'WILL'], KOGA: ['KOGA', 'KOGA'], BRUNO: ['BRUNO', 'BRUNO'], KAREN: ['KAREN', 'KAREN'], LANCE: ['CHAMPION', 'LANCE'], RED: ['RED', 'RED'] };
+
 function npcsOf(asm, id, grid) {
   const t = read(`maps/${asm}.asm`);
   const i = t.indexOf('def_object_events');
@@ -197,6 +200,13 @@ function npcsOf(asm, id, grid) {
     if (info.n === 'NURSE') Object.assign(npc, { action: 'HEAL_AND_SAVE', counter: true, pages: ['Welcome to our POKéMON CENTER!', 'We can heal your POKéMON to full health.'], speaker: '👩‍⚕️ NURSE JOY' });
     else if (info.n === 'CLERK') Object.assign(npc, { action: 'OPEN_MART', counter: true, pages: ['Welcome! How may I help you?'], speaker: '🏪 CLERK' });
     else if (info.n === 'GYM_GUIDE') npc.speaker = '🏆 GYM GUIDE';
+    else if (E4[info.n]) {
+      const [grp, nm] = E4[info.n];
+      const team = partyFor(grp, nm);
+      if (!team) continue;
+      const pretty = nm[0] + nm.slice(1).toLowerCase();
+      Object.assign(npc, { action: 'E4_EVENT', trainerId: nm.toLowerCase(), trainerName: `${info.n === 'LANCE' ? 'Champion' : info.n === 'RED' ? 'Trainer' : 'Elite Four'} ${pretty}`, team, speaker: `🏆 ${nm}`, challenge: [`${nm}: I have been waiting for a challenger. Show me your strength!`], pages: [`${nm}: You are truly strong. Go on!`] });
+    }
     else if (otype === 'OBJECTTYPE_TRAINER') {
       const ln = t.match(new RegExp(`^${script}:\\n\\s*trainer (\\w+), (\\w+),`, 'm'));
       if (!ln) continue;
@@ -220,6 +230,7 @@ function npcsOf(asm, id, grid) {
 
 (async () => {
   // 1. fetch sources
+  await fetchRaw('data/wild/kanto_grass.asm');
   for (const t of phase.tilesets || []) {
     for (const f of [`gfx/tilesets/${t}.png`, `gfx/tilesets/${t}_palette_map.asm`, `data/tilesets/${t}_metatiles.bin`, `data/tilesets/${t}_collision.asm`]) await fetchRaw(f);
   }

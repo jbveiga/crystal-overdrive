@@ -2233,5 +2233,1144 @@
         "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
       ]
     }
+  ],
+  "route_27": [
+    {
+      "id": "route_27_cooltrainer_m_0",
+      "x": 48,
+      "y": 7,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "⚔️ BLAKE",
+      "pages": [
+        "Blake: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_27_blake",
+      "trainerName": "Cooltrainerm Blake",
+      "vision": 3,
+      "challenge": [
+        "BLAKE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "magneton",
+          "level": 33,
+          "moves": [
+            "thunderbolt",
+            "supersonic",
+            "swift",
+            "screech"
+          ]
+        },
+        {
+          "speciesId": "quagsire",
+          "level": 31,
+          "moves": [
+            "watergun",
+            "slam",
+            "amnesia",
+            "earthquake"
+          ]
+        },
+        {
+          "speciesId": "exeggcute",
+          "level": 31,
+          "moves": [
+            "leechseed",
+            "confusion",
+            "sleeppowder",
+            "solarbeam"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "route_27_cooltrainer_m_1",
+      "x": 58,
+      "y": 6,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "⚔️ BRIAN",
+      "pages": [
+        "Brian: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_27_brian",
+      "trainerName": "Cooltrainerm Brian",
+      "vision": 4,
+      "challenge": [
+        "BRIAN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "sandslash",
+          "level": 35,
+          "moves": [
+            "sandattack",
+            "poisonsting",
+            "slash",
+            "swift"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "route_27_cooltrainer_f_2",
+      "x": 72,
+      "y": 10,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "⚔️ REENA",
+      "pages": [
+        "Reena: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_27_reena",
+      "trainerName": "Cooltrainerf Reena",
+      "vision": 4,
+      "challenge": [
+        "REENA: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "starmie",
+          "level": 31
+        },
+        {
+          "speciesId": "nidoqueen",
+          "level": 33
+        },
+        {
+          "speciesId": "starmie",
+          "level": 31
+        }
+      ]
+    },
+    {
+      "id": "route_27_cooltrainer_f_3",
+      "x": 37,
+      "y": 6,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "⚔️ MEGAN",
+      "pages": [
+        "Megan: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_27_megan",
+      "trainerName": "Cooltrainerf Megan",
+      "vision": 2,
+      "challenge": [
+        "MEGAN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "bulbasaur",
+          "level": 32,
+          "moves": [
+            "growl",
+            "leechseed",
+            "poisonpowder",
+            "razorleaf"
+          ]
+        },
+        {
+          "speciesId": "ivysaur",
+          "level": 32,
+          "moves": [
+            "growl",
+            "leechseed",
+            "poisonpowder",
+            "razorleaf"
+          ]
+        },
+        {
+          "speciesId": "venusaur",
+          "level": 32,
+          "moves": [
+            "bodyslam",
+            "sleeppowder",
+            "razorleaf",
+            "sweetscent"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "route_27_youngster_4",
+      "x": 65,
+      "y": 7,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "⚔️ GILBERT",
+      "pages": [
+        "Gilbert: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_27_gilbert",
+      "trainerName": "Psychic T Gilbert",
+      "vision": 3,
+      "challenge": [
+        "GILBERT: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "starmie",
+          "level": 30
+        },
+        {
+          "speciesId": "exeggcute",
+          "level": 30
+        },
+        {
+          "speciesId": "girafarig",
+          "level": 34
+        }
+      ]
+    },
+    {
+      "id": "route_27_youngster_5",
+      "x": 58,
+      "y": 13,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "⚔️ JOSE",
+      "pages": [
+        "Jose: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_27_jose",
+      "trainerName": "Bird Keeper Jose",
+      "vision": 3,
+      "challenge": [
+        "JOSE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "farfetchd",
+          "level": 36
+        }
+      ]
+    },
+    {
+      "id": "route_27_fisher_6",
+      "x": 21,
+      "y": 10,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "FISHER",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    }
+  ],
+  "route_27_sandstorm_house": [
+    {
+      "id": "route_27_sandstorm_house_granny_0",
+      "x": 2,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "GRANNY",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    }
+  ],
+  "route_26": [
+    {
+      "id": "route_26_cooltrainer_m_0",
+      "x": 14,
+      "y": 24,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "⚔️ JAKE",
+      "pages": [
+        "Jake: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_26_jake",
+      "trainerName": "Cooltrainerm Jake",
+      "vision": 2,
+      "challenge": [
+        "JAKE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "parasect",
+          "level": 33,
+          "moves": [
+            "leechlife",
+            "spore",
+            "slash",
+            "swordsdance"
+          ]
+        },
+        {
+          "speciesId": "golduck",
+          "level": 35,
+          "moves": [
+            "confusion",
+            "screech",
+            "psychup",
+            "furyswipes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "route_26_cooltrainer_m_1",
+      "x": 9,
+      "y": 38,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "⚔️ GAVEN",
+      "pages": [
+        "Gaven: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_26_gaven",
+      "trainerName": "Cooltrainerm Gaven",
+      "vision": 3,
+      "challenge": [
+        "GAVEN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "victreebel",
+          "level": 35,
+          "moves": [
+            "wrap",
+            "toxic",
+            "acid",
+            "razorleaf"
+          ]
+        },
+        {
+          "speciesId": "kingler",
+          "level": 35,
+          "moves": [
+            "bubblebeam",
+            "stomp",
+            "guillotine",
+            "protect"
+          ]
+        },
+        {
+          "speciesId": "flareon",
+          "level": 35,
+          "moves": [
+            "sandattack",
+            "quickattack",
+            "bite",
+            "firespin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "route_26_cooltrainer_f_2",
+      "x": 10,
+      "y": 56,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "⚔️ JOYCE",
+      "pages": [
+        "Joyce: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_26_joyce",
+      "trainerName": "Cooltrainerf Joyce",
+      "vision": 3,
+      "challenge": [
+        "JOYCE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "pikachu",
+          "level": 36,
+          "moves": [
+            "quickattack",
+            "doubleteam",
+            "thunderbolt",
+            "thunder"
+          ]
+        },
+        {
+          "speciesId": "blastoise",
+          "level": 32,
+          "moves": [
+            "bite",
+            "curse",
+            "surf",
+            "raindance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "route_26_cooltrainer_f_3",
+      "x": 5,
+      "y": 8,
+      "dir": "RIGHT",
+      "sprite": "girl",
+      "speaker": "⚔️ BETH",
+      "pages": [
+        "Beth: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_26_beth",
+      "trainerName": "Cooltrainerf Beth",
+      "vision": 4,
+      "challenge": [
+        "BETH: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "rapidash",
+          "level": 36,
+          "moves": [
+            "stomp",
+            "firespin",
+            "furyattack",
+            "agility"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "route_26_youngster_4",
+      "x": 13,
+      "y": 79,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "⚔️ RICHARD",
+      "pages": [
+        "Richard: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_26_richard",
+      "trainerName": "Psychic T Richard",
+      "vision": 2,
+      "challenge": [
+        "RICHARD: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "espeon",
+          "level": 36
+        }
+      ]
+    },
+    {
+      "id": "route_26_fisher_5",
+      "x": 10,
+      "y": 92,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "⚔️ SCOTT",
+      "pages": [
+        "Scott: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_26_scott",
+      "trainerName": "Fisher Scott",
+      "vision": 3,
+      "challenge": [
+        "SCOTT: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "qwilfish",
+          "level": 30
+        },
+        {
+          "speciesId": "qwilfish",
+          "level": 30
+        },
+        {
+          "speciesId": "seaking",
+          "level": 34
+        }
+      ]
+    }
+  ],
+  "route_26_heal_house": [
+    {
+      "id": "route_26_heal_house_teacher_0",
+      "x": 2,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "TEACHER",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    }
+  ],
+  "victory_road_gate": [
+    {
+      "id": "victory_road_gate_officer_0",
+      "x": 8,
+      "y": 11,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "OFFICER",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    },
+    {
+      "id": "victory_road_gate_black_belt_1",
+      "x": 7,
+      "y": 5,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "BLACK BELT",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    },
+    {
+      "id": "victory_road_gate_black_belt_2",
+      "x": 12,
+      "y": 5,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "BLACK BELT",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    }
+  ],
+  "indigo_plateau_poke_center": [
+    {
+      "id": "indigo_plateau_poke_center_nurse_0",
+      "x": 3,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ],
+      "action": "HEAL_AND_SAVE",
+      "counter": true
+    },
+    {
+      "id": "indigo_plateau_poke_center_clerk_1",
+      "x": 11,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "pages": [
+        "Welcome! How may I help you?"
+      ],
+      "action": "OPEN_MART",
+      "counter": true
+    },
+    {
+      "id": "indigo_plateau_poke_center_cooltrainer_m_2",
+      "x": 11,
+      "y": 11,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "COOLTRAINER M",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    },
+    {
+      "id": "indigo_plateau_poke_center_gramps_3",
+      "x": 1,
+      "y": 9,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    }
+  ],
+  "wills_room": [
+    {
+      "id": "wills_room_will_0",
+      "x": 5,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 WILL",
+      "pages": [
+        "WILL: You are truly strong. Go on!"
+      ],
+      "action": "E4_EVENT",
+      "trainerId": "will",
+      "trainerName": "Elite Four Will",
+      "team": [
+        {
+          "speciesId": "xatu",
+          "level": 40,
+          "moves": [
+            "quickattack",
+            "futuresight",
+            "confuseray",
+            "psychic"
+          ]
+        },
+        {
+          "speciesId": "jynx",
+          "level": 41,
+          "moves": [
+            "doubleslap",
+            "lovelykiss",
+            "icepunch",
+            "psychic"
+          ]
+        },
+        {
+          "speciesId": "exeggutor",
+          "level": 41,
+          "moves": [
+            "reflect",
+            "leechseed",
+            "eggbomb",
+            "psychic"
+          ]
+        },
+        {
+          "speciesId": "slowbro",
+          "level": 41,
+          "moves": [
+            "curse",
+            "amnesia",
+            "bodyslam",
+            "psychic"
+          ]
+        },
+        {
+          "speciesId": "xatu",
+          "level": 42,
+          "moves": [
+            "quickattack",
+            "futuresight",
+            "confuseray",
+            "psychic"
+          ]
+        }
+      ],
+      "challenge": [
+        "WILL: I have been waiting for a challenger. Show me your strength!"
+      ]
+    }
+  ],
+  "kogas_room": [
+    {
+      "id": "kogas_room_koga_0",
+      "x": 5,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 KOGA",
+      "pages": [
+        "KOGA: You are truly strong. Go on!"
+      ],
+      "action": "E4_EVENT",
+      "trainerId": "koga",
+      "trainerName": "Elite Four Koga",
+      "team": [
+        {
+          "speciesId": "ariados",
+          "level": 40,
+          "moves": [
+            "doubleteam",
+            "spiderweb",
+            "batonpass",
+            "gigadrain"
+          ]
+        },
+        {
+          "speciesId": "venomoth",
+          "level": 41,
+          "moves": [
+            "supersonic",
+            "gust",
+            "psychic",
+            "toxic"
+          ]
+        },
+        {
+          "speciesId": "forretress",
+          "level": 43,
+          "moves": [
+            "protect",
+            "swift",
+            "explosion",
+            "spikes"
+          ]
+        },
+        {
+          "speciesId": "muk",
+          "level": 42,
+          "moves": [
+            "minimize",
+            "acidarmor",
+            "sludgebomb",
+            "toxic"
+          ]
+        },
+        {
+          "speciesId": "crobat",
+          "level": 44,
+          "moves": [
+            "doubleteam",
+            "quickattack",
+            "wingattack",
+            "toxic"
+          ]
+        }
+      ],
+      "challenge": [
+        "KOGA: I have been waiting for a challenger. Show me your strength!"
+      ]
+    }
+  ],
+  "brunos_room": [
+    {
+      "id": "brunos_room_bruno_0",
+      "x": 5,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 BRUNO",
+      "pages": [
+        "BRUNO: You are truly strong. Go on!"
+      ],
+      "action": "E4_EVENT",
+      "trainerId": "bruno",
+      "trainerName": "Elite Four Bruno",
+      "team": [
+        {
+          "speciesId": "hitmontop",
+          "level": 42,
+          "moves": [
+            "pursuit",
+            "quickattack",
+            "dig",
+            "detect"
+          ]
+        },
+        {
+          "speciesId": "hitmonlee",
+          "level": 42,
+          "moves": [
+            "swagger",
+            "doublekick",
+            "hijumpkick",
+            "foresight"
+          ]
+        },
+        {
+          "speciesId": "hitmonchan",
+          "level": 42,
+          "moves": [
+            "thunderpunch",
+            "icepunch",
+            "firepunch",
+            "machpunch"
+          ]
+        },
+        {
+          "speciesId": "onix",
+          "level": 43,
+          "moves": [
+            "bind",
+            "earthquake",
+            "sandstorm",
+            "rockslide"
+          ]
+        },
+        {
+          "speciesId": "machamp",
+          "level": 46,
+          "moves": [
+            "rockslide",
+            "foresight",
+            "vitalthrow",
+            "crosschop"
+          ]
+        }
+      ],
+      "challenge": [
+        "BRUNO: I have been waiting for a challenger. Show me your strength!"
+      ]
+    }
+  ],
+  "karens_room": [
+    {
+      "id": "karens_room_karen_0",
+      "x": 5,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 KAREN",
+      "pages": [
+        "KAREN: You are truly strong. Go on!"
+      ],
+      "action": "E4_EVENT",
+      "trainerId": "karen",
+      "trainerName": "Elite Four Karen",
+      "team": [
+        {
+          "speciesId": "umbreon",
+          "level": 42,
+          "moves": [
+            "sandattack",
+            "confuseray",
+            "faintattack",
+            "meanlook"
+          ]
+        },
+        {
+          "speciesId": "vileplume",
+          "level": 42,
+          "moves": [
+            "stunspore",
+            "acid",
+            "moonlight",
+            "petaldance"
+          ]
+        },
+        {
+          "speciesId": "gengar",
+          "level": 45,
+          "moves": [
+            "lick",
+            "spite",
+            "curse",
+            "destinybond"
+          ]
+        },
+        {
+          "speciesId": "murkrow",
+          "level": 44,
+          "moves": [
+            "quickattack",
+            "whirlwind",
+            "pursuit",
+            "faintattack"
+          ]
+        },
+        {
+          "speciesId": "houndoom",
+          "level": 47,
+          "moves": [
+            "roar",
+            "pursuit",
+            "flamethrower",
+            "crunch"
+          ]
+        }
+      ],
+      "challenge": [
+        "KAREN: I have been waiting for a challenger. Show me your strength!"
+      ]
+    }
+  ],
+  "lances_room": [
+    {
+      "id": "lances_room_lance_0",
+      "x": 5,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 LANCE",
+      "pages": [
+        "LANCE: You are truly strong. Go on!"
+      ],
+      "action": "E4_EVENT",
+      "trainerId": "lance",
+      "trainerName": "Champion Lance",
+      "team": [
+        {
+          "speciesId": "gyarados",
+          "level": 44,
+          "moves": [
+            "flail",
+            "raindance",
+            "surf",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "dragonite",
+          "level": 47,
+          "moves": [
+            "thunderwave",
+            "twister",
+            "thunder",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "dragonite",
+          "level": 47,
+          "moves": [
+            "thunderwave",
+            "twister",
+            "blizzard",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "aerodactyl",
+          "level": 46,
+          "moves": [
+            "wingattack",
+            "ancientpower",
+            "rockslide",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "charizard",
+          "level": 46,
+          "moves": [
+            "flamethrower",
+            "wingattack",
+            "slash",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "dragonite",
+          "level": 50,
+          "moves": [
+            "fireblast",
+            "safeguard",
+            "outrage",
+            "hyperbeam"
+          ]
+        }
+      ],
+      "challenge": [
+        "LANCE: I have been waiting for a challenger. Show me your strength!"
+      ]
+    },
+    {
+      "id": "lances_room_teacher_1",
+      "x": 4,
+      "y": 7,
+      "dir": "UP",
+      "sprite": "teacher",
+      "speaker": "TEACHER",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    }
+  ],
+  "hall_of_fame": [
+    {
+      "id": "hall_of_fame_lance_0",
+      "x": 4,
+      "y": 12,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "🏆 LANCE",
+      "pages": [
+        "LANCE: You are truly strong. Go on!"
+      ],
+      "action": "E4_EVENT",
+      "trainerId": "lance",
+      "trainerName": "Champion Lance",
+      "team": [
+        {
+          "speciesId": "gyarados",
+          "level": 44,
+          "moves": [
+            "flail",
+            "raindance",
+            "surf",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "dragonite",
+          "level": 47,
+          "moves": [
+            "thunderwave",
+            "twister",
+            "thunder",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "dragonite",
+          "level": 47,
+          "moves": [
+            "thunderwave",
+            "twister",
+            "blizzard",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "aerodactyl",
+          "level": 46,
+          "moves": [
+            "wingattack",
+            "ancientpower",
+            "rockslide",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "charizard",
+          "level": 46,
+          "moves": [
+            "flamethrower",
+            "wingattack",
+            "slash",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "dragonite",
+          "level": 50,
+          "moves": [
+            "fireblast",
+            "safeguard",
+            "outrage",
+            "hyperbeam"
+          ]
+        }
+      ],
+      "challenge": [
+        "LANCE: I have been waiting for a challenger. Show me your strength!"
+      ]
+    }
+  ],
+  "route_28_steel_wing_house": [
+    {
+      "id": "route_28_steel_wing_house_cooltrainer_f_0",
+      "x": 2,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    }
+  ],
+  "silver_cave_poke_center": [
+    {
+      "id": "silver_cave_poke_center_nurse_0",
+      "x": 3,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ],
+      "action": "HEAL_AND_SAVE",
+      "counter": true
+    },
+    {
+      "id": "silver_cave_poke_center_granny_1",
+      "x": 1,
+      "y": 5,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "GRANNY",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    }
+  ],
+  "silver_cave_room_3": [
+    {
+      "id": "silver_cave_room_3_red_0",
+      "x": 9,
+      "y": 10,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "🏆 RED",
+      "pages": [
+        "RED: You are truly strong. Go on!"
+      ],
+      "action": "E4_EVENT",
+      "trainerId": "red",
+      "trainerName": "Trainer Red",
+      "team": [
+        {
+          "speciesId": "pikachu",
+          "level": 81,
+          "moves": [
+            "charm",
+            "quickattack",
+            "thunderbolt",
+            "thunder"
+          ]
+        },
+        {
+          "speciesId": "espeon",
+          "level": 73,
+          "moves": [
+            "mudslap",
+            "reflect",
+            "swift",
+            "psychic"
+          ]
+        },
+        {
+          "speciesId": "snorlax",
+          "level": 75,
+          "moves": [
+            "amnesia",
+            "snore",
+            "rest",
+            "bodyslam"
+          ]
+        },
+        {
+          "speciesId": "venusaur",
+          "level": 77,
+          "moves": [
+            "sunnyday",
+            "gigadrain",
+            "synthesis",
+            "solarbeam"
+          ]
+        },
+        {
+          "speciesId": "charizard",
+          "level": 77,
+          "moves": [
+            "flamethrower",
+            "wingattack",
+            "slash",
+            "firespin"
+          ]
+        },
+        {
+          "speciesId": "blastoise",
+          "level": 77,
+          "moves": [
+            "raindance",
+            "surf",
+            "blizzard",
+            "whirlpool"
+          ]
+        }
+      ],
+      "challenge": [
+        "RED: I have been waiting for a challenger. Show me your strength!"
+      ]
+    }
   ]
 }

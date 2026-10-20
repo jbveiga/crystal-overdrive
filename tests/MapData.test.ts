@@ -1170,4 +1170,32 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("inventory.badges.includes('glacier')");
     expect(mainSrc).toContain("inventory.badges.includes('rising')");
   });
+  it('validates Phase 12 Johto endgame maps: Routes 26/27, Victory Road, Indigo Plateau, Elite Four, Mt. Silver', () => {
+    const phase12Maps = ['route_27', 'route_27_sandstorm_house', 'route_26', 'route_26_heal_house', 'tohjo_falls', 'victory_road_gate', 'victory_road', 'route_22', 'route_23', 'indigo_plateau_poke_center', 'wills_room', 'kogas_room', 'brunos_room', 'karens_room', 'lances_room', 'hall_of_fame', 'route_28', 'route_28_steel_wing_house', 'silver_cave_outside', 'silver_cave_poke_center', 'silver_cave_room_1', 'silver_cave_room_2', 'silver_cave_room_3', 'silver_cave_item_rooms'];
+    const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+    const load = (id: string): MapData => JSON.parse(fs.readFileSync(path.join(mapsDir, `${id}.json`), 'utf8'));
+    for (const mapId of phase12Maps) {
+      const m = load(mapId);
+      expect(m.collisionGrid.length).toBe(m.width * m.height);
+      for (const tile of new Set(m.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png for ${mapId}`).toBe(true);
+      }
+      for (const w of m.warps) {
+        const target = load(w.targetMapId);
+        expect([0, 2], `${mapId} -> ${w.targetMapId}`).toContain(target.collisionGrid[w.targetY * target.width + w.targetX]);
+      }
+    }
+    expect(load('new_bark_town').connections.EAST?.mapId).toBe('route_27');
+    expect(load('route_27').connections.WEST?.mapId).toBe('new_bark_town');
+    expect(load('route_26').connections.WEST?.mapId).toBe('route_27');
+    expect(load('route_28').connections.WEST?.mapId).toBe('silver_cave_outside');
+    expect(load('silver_cave_outside').connections.EAST?.mapId).toBe('route_28');
+    const lance = npcsByMap.lances_room.find((n) => n.action === 'E4_EVENT');
+    expect(lance?.trainerId).toBe('lance');
+    for (const room of ['wills_room', 'kogas_room', 'brunos_room', 'karens_room']) {
+      expect(npcsByMap[room].some((n) => n.action === 'E4_EVENT')).toBe(true);
+    }
+    expect(fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8')).toContain("action === 'E4_EVENT'");
+  });
 });
