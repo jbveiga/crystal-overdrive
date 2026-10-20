@@ -53,7 +53,7 @@ This project is made possible thanks to the tireless preservation work, reverse-
 The artistic soul and musical heritage of Johto belong to the original creators at **GAME FREAK inc.**:
 * **Satoshi Tajiri:** Series Creator & Executive Direction.
 * **Ken Sugimori:** Original Pokémon Designs, Character Concept Art, and Visual Direction.
-* **Junichi Masuda & Go Ichinose:** Original Johto Soundtrack & Sound Effects Composition (including Violet City, Sprout Tower, Gym Leader Battles, and Victory Fanfares transcribed via `pret/pokecrystal`).
+* **Junichi Masuda & Go Ichinose:** Original Johto Soundtrack & Sound Effects Composition (including New Bark Town, Route 29/30/31, Cherrygrove City, Elm's Lab, Wild Battle, Trainer Battle, Violet City, Sprout Tower, Gym Leader Battles, and Fanfares transcribed via `pret/pokecrystal`).
 
 ---
 

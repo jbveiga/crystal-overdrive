@@ -279,7 +279,18 @@ describe('MapData & Authentic Tile Integrity', () => {
       expect(fs.existsSync(path.join(pokemonDir, p))).toBe(true);
     }
 
-    const expectedBgm = ['bgm_violet_city', 'bgm_sprout_tower', 'bgm_gym', 'bgm_gym_leader_battle'];
+    const expectedBgm = [
+      'bgm_new_bark_town',
+      'bgm_route_29',
+      'bgm_cherrygrove_city',
+      'bgm_elms_lab',
+      'bgm_wild_battle',
+      'bgm_trainer_battle',
+      'bgm_violet_city',
+      'bgm_sprout_tower',
+      'bgm_gym',
+      'bgm_gym_leader_battle',
+    ];
     for (const b of expectedBgm) {
       expect(fs.existsSync(path.join(bgmDir, `${b}.mp3`))).toBe(true);
       expect(fs.existsSync(path.join(bgmDir, `${b}.webm`))).toBe(true);
@@ -287,6 +298,26 @@ describe('MapData & Authentic Tile Integrity', () => {
 
     expect(fs.existsSync(path.join(sfxDir, 'sfx_badge_get.mp3'))).toBe(true);
     expect(fs.existsSync(path.join(sfxDir, 'sfx_badge_get.webm'))).toBe(true);
+  });
+
+  it('validates directional ledge/fence hop collision codes in Route 29 and Route 31', () => {
+    const r29Path = path.resolve(__dirname, '../public/assets/data/maps/route_29.json');
+    const r29Data: MapData = JSON.parse(fs.readFileSync(r29Path, 'utf8'));
+    const r29Codes = new Set(r29Data.collisionGrid);
+
+    // Route 29 has HOP_DOWN (4), HOP_LEFT (6), HOP_RIGHT (7), HOP_DOWN_LEFT (8), HOP_DOWN_RIGHT (9)
+    expect(r29Codes.has(4)).toBe(true);
+    expect(r29Codes.has(6)).toBe(true);
+    expect(r29Codes.has(7)).toBe(true);
+    expect(r29Codes.has(8)).toBe(true);
+    expect(r29Codes.has(9)).toBe(true);
+
+    const r31Path = path.resolve(__dirname, '../public/assets/data/maps/route_31.json');
+    const r31Data: MapData = JSON.parse(fs.readFileSync(r31Path, 'utf8'));
+    const r31Codes = new Set(r31Data.collisionGrid);
+    expect(r31Codes.has(4)).toBe(true);
+    expect(r31Codes.has(7)).toBe(true);
+    expect(r31Codes.has(9)).toBe(true);
   });
 });
 

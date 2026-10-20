@@ -127,13 +127,18 @@ const INDOOR_PALETTES = {
 };
 
 function mapCollToken(token) {
+  if (token === 'HOP_DOWN') return 4;
+  if (token === 'HOP_UP') return 5;
+  if (token === 'HOP_LEFT') return 6;
+  if (token === 'HOP_RIGHT') return 7;
+  if (token === 'HOP_DOWN_LEFT') return 8;
+  if (token === 'HOP_DOWN_RIGHT') return 9;
   if (
     token === 'FLOOR' ||
     token === 'DOOR' ||
     token.startsWith('WARP_CARPET') ||
     token === 'LADDER' ||
-    token === 'STAIRCASE' ||
-    token.startsWith('HOP_')
+    token === 'STAIRCASE'
   ) {
     return 0; // Walkable
   }
@@ -313,7 +318,11 @@ function buildMapFromBlk({
           ts.isOutdoor &&
           (quads[q][2] === 0x4b || quads[q][2] === 0x4c || quads[q][2] === 0x4d) &&
           (quads[q][3] === 0x4b || quads[q][3] === 0x4c || quads[q][3] === 0x4d);
-        collisionGrid[idx] = isSouthLedgeRim ? 4 : colls[q];
+        let coll = colls[q];
+        if (coll === 0 && isSouthLedgeRim) {
+          coll = 4;
+        }
+        collisionGrid[idx] = coll;
       }
     }
   }
