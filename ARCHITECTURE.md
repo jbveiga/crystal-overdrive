@@ -138,6 +138,10 @@ export interface MapData {
     west?: { mapId: string; offset: number };
   };
 }
+
+export type NpcSpriteType =
+  | 'boy' | 'girl' | 'fat_man' | 'kris'
+  | 'silver' | 'fisherman' | 'bug_catcher' | 'teacher' | 'mom' | 'prof_elm';
 ```
 
 ### 3.3 Roaming Beast Markov Graph (`src/world/RoamingManager.ts`)
