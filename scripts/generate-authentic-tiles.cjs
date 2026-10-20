@@ -131,7 +131,8 @@ function mapCollToken(token) {
     token === 'DOOR' ||
     token.startsWith('WARP_CARPET') ||
     token === 'LADDER' ||
-    token === 'STAIRCASE'
+    token === 'STAIRCASE' ||
+    token.startsWith('HOP_')
   ) {
     return 0; // Walkable
   }
@@ -302,7 +303,12 @@ function buildMapFromBlk({
         const my = by * 2 + dy;
         const idx = my * width + mx;
         tileMap[idx] = renderQuadrant64(ts, quads[q], roofGroup);
-        collisionGrid[idx] = colls[q];
+        // Mark South-facing one-way ledge cliff tiles (bottom 8x8 tiles 0x4b/0x4c/0x4d) as collision 4
+        const isSouthLedgeRim =
+          ts.isOutdoor &&
+          (quads[q][2] === 0x4b || quads[q][2] === 0x4c || quads[q][2] === 0x4d) &&
+          (quads[q][3] === 0x4b || quads[q][3] === 0x4c || quads[q][3] === 0x4d);
+        collisionGrid[idx] = isSouthLedgeRim ? 4 : colls[q];
       }
     }
   }
@@ -429,6 +435,7 @@ buildMapFromBlk({
   roofGroup: 'cg',
   connections: {
     EAST: { mapId: 'route_29', offset: 0 },
+    NORTH: { mapId: 'route_30', offset: 10 },
   },
   warps: [
     { x: 23, y: 3, targetMapId: 'cherrygrove_mart', targetX: 2, targetY: 6 },
@@ -754,6 +761,183 @@ buildMapFromBlk({
   warps: [
     { x: 2, y: 7, targetMapId: 'cherrygrove_city', targetX: 31, targetY: 12 },
     { x: 3, y: 7, targetMapId: 'cherrygrove_city', targetX: 31, targetY: 12 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+    {
+      x: 1,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_30',
+  name: 'Route 30',
+  tileset: 'johto',
+  blkFile: 'maps__Route30.blk',
+  blocksW: 10,
+  blocksH: 27,
+  roofGroup: 'cg',
+  connections: {
+    SOUTH: { mapId: 'cherrygrove_city', offset: -10 },
+    NORTH: { mapId: 'route_31', offset: -20 },
+  },
+  warps: [
+    { x: 7, y: 39, targetMapId: 'route_30_berry_house', targetX: 2, targetY: 6 },
+    { x: 17, y: 5, targetMapId: 'mr_pokemons_house', targetX: 2, targetY: 6 },
+  ],
+  bgEvents: [
+    {
+      x: 9,
+      y: 43,
+      speaker: '🪧 ROUTE 30 SIGN',
+      pages: ['ROUTE 30', 'VIOLET CITY - CHERRYGROVE CITY'],
+    },
+    {
+      x: 13,
+      y: 29,
+      speaker: '🪧 DIRECTION SIGN',
+      pages: ["MR. POKéMON'S HOUSE", 'STRAIGHT AHEAD!'],
+    },
+    {
+      x: 15,
+      y: 5,
+      speaker: '🪧 HOUSE SIGN',
+      pages: ["MR. POKéMON'S HOUSE"],
+    },
+    {
+      x: 3,
+      y: 21,
+      speaker: '🪧 TRAINER TIPS',
+      pages: [
+        'TRAINER TIPS',
+        "No stealing other people's POKéMON! POKé BALLS are to be thrown only at wild POKéMON!",
+      ],
+    },
+    {
+      x: 5,
+      y: 39,
+      speaker: '🌳 FRUIT TREE',
+      pages: ["It's a fruit-bearing tree!", 'A fresh BERRY is growing on the branches!'],
+    },
+    {
+      x: 11,
+      y: 5,
+      speaker: '🌳 FRUIT TREE',
+      pages: ["It's a fruit-bearing tree!", 'A fragrant PSNCUREBERRY is growing on the branches!'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'pidgey', minLevel: 3, maxLevel: 5, weight: 40 },
+    { speciesId: 'caterpie', minLevel: 3, maxLevel: 4, weight: 35 },
+    { speciesId: 'rattata', minLevel: 3, maxLevel: 4, weight: 15 },
+    { speciesId: 'hoothoot', minLevel: 4, maxLevel: 5, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_31',
+  name: 'Route 31',
+  tileset: 'johto',
+  blkFile: 'maps__Route31.blk',
+  blocksW: 20,
+  blocksH: 9,
+  roofGroup: 'cg',
+  connections: {
+    SOUTH: { mapId: 'route_30', offset: 20 },
+  },
+  warps: [],
+  bgEvents: [
+    {
+      x: 7,
+      y: 5,
+      speaker: '🪧 ROUTE 31 SIGN',
+      pages: ['ROUTE 31', 'VIOLET CITY - CHERRYGROVE CITY'],
+    },
+    {
+      x: 31,
+      y: 5,
+      speaker: '🪧 DARK CAVE SIGN',
+      pages: ['DARK CAVE', 'If a POKéMON could light it up, you could explore inside!'],
+    },
+    {
+      x: 16,
+      y: 7,
+      speaker: '🌳 FRUIT TREE',
+      pages: ["It's a fruit-bearing tree!", 'A crisp BITTER BERRY is growing on the branches!'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'bellsprout', minLevel: 4, maxLevel: 5, weight: 35 },
+    { speciesId: 'pidgey', minLevel: 4, maxLevel: 5, weight: 30 },
+    { speciesId: 'caterpie', minLevel: 4, maxLevel: 5, weight: 20 },
+    { speciesId: 'gastly', minLevel: 4, maxLevel: 5, weight: 15 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'mr_pokemons_house',
+  name: "Mr. Pokémon's House",
+  tileset: 'players_house',
+  blkFile: 'maps__House2.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'route_30', targetX: 17, targetY: 6 },
+    { x: 3, y: 7, targetMapId: 'route_30', targetX: 17, targetY: 6 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 FOREIGN MAGAZINES',
+      pages: ["It's packed with foreign magazines.", "Can't even read their titles…"],
+    },
+    {
+      x: 1,
+      y: 1,
+      speaker: '📚 FOREIGN MAGAZINES',
+      pages: ["It's packed with foreign magazines.", "Can't even read their titles…"],
+    },
+    {
+      x: 6,
+      y: 1,
+      speaker: '💻 BROKEN COMPUTER',
+      pages: ["It's a big computer. Hmm. It's broken."],
+    },
+    {
+      x: 7,
+      y: 1,
+      speaker: '💻 BROKEN COMPUTER',
+      pages: ["It's a big computer. Hmm. It's broken."],
+    },
+    {
+      x: 6,
+      y: 4,
+      speaker: '🪙 STRANGE COINS',
+      pages: ['A whole pile of strange coins!', "Maybe they're from another country…"],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_30_berry_house',
+  name: 'Route 30 Berry House',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'route_30', targetX: 7, targetY: 40 },
+    { x: 3, y: 7, targetMapId: 'route_30', targetX: 7, targetY: 40 },
   ],
   bgEvents: [
     {

@@ -117,6 +117,22 @@ export class MapManager {
       }
       return undefined;
     }
+    if (y < 0 && this.currentMap.connections.NORTH) {
+      const conn = this.currentMap.connections.NORTH;
+      const northMap = this.maps.get(conn.mapId);
+      if (northMap?.bgEvents) {
+        return northMap.bgEvents.find((bg) => bg.x === x - conn.offset && bg.y === y + northMap.height);
+      }
+      return undefined;
+    }
+    if (y >= this.currentMap.height && this.currentMap.connections.SOUTH) {
+      const conn = this.currentMap.connections.SOUTH;
+      const southMap = this.maps.get(conn.mapId);
+      if (southMap?.bgEvents) {
+        return southMap.bgEvents.find((bg) => bg.x === x - conn.offset && bg.y === y - this.currentMap!.height);
+      }
+      return undefined;
+    }
     if (!this.currentMap.bgEvents) return undefined;
     return this.currentMap.bgEvents.find((bg) => bg.x === x && bg.y === y);
   }
@@ -191,8 +207,10 @@ export class MapManager {
       const targetMap = this.maps.get(conn.mapId);
       if (!targetMap) return false;
       const targetX = targetMap.width - 1;
-      const targetY = y + conn.offset;
-      return targetY >= 0 && targetY < targetMap.height && targetMap.collisionGrid[targetY * targetMap.width + targetX] !== 1;
+      const targetY = y - conn.offset;
+      if (targetY < 0 || targetY >= targetMap.height) return false;
+      const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
+      return tileType === 0 || tileType === 2;
     }
 
     // Check East
@@ -201,8 +219,10 @@ export class MapManager {
       const targetMap = this.maps.get(conn.mapId);
       if (!targetMap) return false;
       const targetX = 0;
-      const targetY = y + conn.offset;
-      return targetY >= 0 && targetY < targetMap.height && targetMap.collisionGrid[targetY * targetMap.width + targetX] !== 1;
+      const targetY = y - conn.offset;
+      if (targetY < 0 || targetY >= targetMap.height) return false;
+      const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
+      return tileType === 0 || tileType === 2;
     }
 
     // Check North
@@ -210,9 +230,11 @@ export class MapManager {
       const conn = this.currentMap.connections.NORTH;
       const targetMap = this.maps.get(conn.mapId);
       if (!targetMap) return false;
-      const targetX = x + conn.offset;
+      const targetX = x - conn.offset;
       const targetY = targetMap.height - 1;
-      return targetX >= 0 && targetX < targetMap.width && targetMap.collisionGrid[targetY * targetMap.width + targetX] !== 1;
+      if (targetX < 0 || targetX >= targetMap.width) return false;
+      const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
+      return tileType === 0 || tileType === 2;
     }
 
     // Check South
@@ -220,9 +242,11 @@ export class MapManager {
       const conn = this.currentMap.connections.SOUTH;
       const targetMap = this.maps.get(conn.mapId);
       if (!targetMap) return false;
-      const targetX = x + conn.offset;
+      const targetX = x - conn.offset;
       const targetY = 0;
-      return targetX >= 0 && targetX < targetMap.width && targetMap.collisionGrid[targetY * targetMap.width + targetX] !== 1;
+      if (targetX < 0 || targetX >= targetMap.width) return false;
+      const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
+      return tileType === 0 || tileType === 2;
     }
 
     return false;

@@ -59,6 +59,12 @@ const FILES = [
   'maps/CherrygroveMart.asm',
   'maps/CherrygrovePokecenter1F.asm',
   'maps/GuideGentsHouse.asm',
+  'maps/Route30.blk',
+  'maps/Route30.asm',
+  'maps/Route31.blk',
+  'maps/Route31.asm',
+  'maps/MrPokemonsHouse.asm',
+  'maps/Route30BerryHouse.asm',
 ];
 
 async function main() {

@@ -59,6 +59,8 @@ async function bootstrap() {
     badges: [],
   };
   const defeatedTrainers: Set<string> = new Set();
+  const storyFlags: Set<string> = new Set();
+  const seenSpecies: Set<string> = new Set(['cyndaquil']);
 
   let initialMapId = 'new_bark_town';
   let initialPlayerX = 13;
@@ -78,6 +80,10 @@ async function bootstrap() {
     inventory.money = existingSave.player.money;
     inventory.badges = existingSave.player.badges;
     existingSave.defeatedTrainers.forEach((t) => defeatedTrainers.add(t));
+    existingSave.storyFlags?.forEach((f) => storyFlags.add(f));
+    existingSave.seenSpecies?.forEach((s) => seenSpecies.add(s));
+    playerParty.forEach((p) => seenSpecies.add(p.speciesId));
+    playerBox.forEach((p) => seenSpecies.add(p.speciesId));
 
     initialMapId = existingSave.player.mapId;
     initialPlayerX = existingSave.player.x;
@@ -102,6 +108,8 @@ async function bootstrap() {
     'new_bark_town',
     'route_29',
     'cherrygrove_city',
+    'route_30',
+    'route_31',
     'elms_lab',
     'players_house_1f',
     'players_neighbors_house',
@@ -111,6 +119,8 @@ async function bootstrap() {
     'guide_gents_house',
     'cherrygrove_gym_speech_house',
     'cherrygrove_evolution_speech_house',
+    'mr_pokemons_house',
+    'route_30_berry_house',
   ];
 
   const loadedMaps: MapData[] = await Promise.all(
@@ -156,6 +166,8 @@ async function bootstrap() {
       },
       roamers: roamingManager.getAllRoamers(),
       defeatedTrainers: Array.from(defeatedTrainers),
+      storyFlags: Array.from(storyFlags),
+      seenSpecies: Array.from(seenSpecies),
     };
     await saveManager.saveGame(saveData);
     console.log('💾 Game state successfully saved to IndexedDB.');
@@ -172,6 +184,9 @@ async function bootstrap() {
 
   let handleInteract = () => {};
 
+  const getCaughtSpeciesSet = () =>
+    new Set([...playerParty.map((p) => p.speciesId), ...playerBox.map((p) => p.speciesId)]);
+
   const startMenuUI = new StartMenuUI(
     'modal-container',
     {
@@ -179,8 +194,19 @@ async function bootstrap() {
       getMoney: () => inventory.money,
       getBadges: () => inventory.badges,
       getPartyCount: () => playerParty.length,
-      getCaughtCount: () =>
-        new Set([...playerParty.map((p) => p.speciesId), ...playerBox.map((p) => p.speciesId)]).size,
+      getCaughtCount: () => getCaughtSpeciesSet().size,
+      getCaughtSpeciesIds: () => getCaughtSpeciesSet(),
+      getSeenSpeciesIds: () => {
+        const set = new Set(seenSpecies);
+        for (const id of getCaughtSpeciesSet()) set.add(id);
+        return set;
+      },
+      getKeyItems: () => {
+        const items = ['POKéGEAR'];
+        if (storyFlags.has('HAS_MYSTERY_EGG')) items.push('🥚 MYSTERY EGG');
+        if (storyFlags.has('HAS_POKEDEX')) items.push('📕 POKéDEX');
+        return items;
+      },
       getPlayTimeSeconds: () => playTimeSeconds,
       getMapName: () => mapManager.getCurrentMap()?.name || 'New Bark Town',
     },
@@ -331,7 +357,16 @@ async function bootstrap() {
     spriteType: GridEntity['spriteType'],
     speaker: string,
     pages: string[],
-    opts: { wanders?: boolean; talkAcrossCounter?: boolean; action?: GridEntity['action'] } = {}
+    opts: {
+      wanders?: boolean;
+      talkAcrossCounter?: boolean;
+      action?: GridEntity['action'];
+      trainerId?: string;
+      trainerName?: string;
+      visionRange?: number;
+      challengePages?: string[];
+      trainerPokemon?: GridEntity['trainerPokemon'];
+    } = {}
   ): GridEntity => ({
     id,
     x,
@@ -350,6 +385,11 @@ async function bootstrap() {
     wanders: opts.wanders ?? false,
     talkAcrossCounter: opts.talkAcrossCounter ?? false,
     action: opts.action,
+    trainerId: opts.trainerId,
+    trainerName: opts.trainerName,
+    visionRange: opts.visionRange,
+    challengePages: opts.challengePages,
+    trainerPokemon: opts.trainerPokemon,
   });
 
   const npcsByMap: Record<string, GridEntity[]> = {
@@ -398,7 +438,21 @@ async function bootstrap() {
           'Yo! My RATTATA is in the top percentage of all RATTATA!',
           'If your POKéMON are weak and not ready for battle, keep out of the grass!',
         ],
-        { action: 'TRAINER_JOEY' }
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'youngster_joey',
+          trainerName: 'Youngster Joey',
+          visionRange: 3,
+          challengePages: [
+            "YOUNGSTER JOEY: I just lost, so I'm trying to find more POKéMON!",
+            "Wait! You look weak! Come on, let's battle!",
+          ],
+          trainerPokemon: {
+            speciesId: 'rattata',
+            level: 4,
+            moves: ['tackle', 'tailwhip', 'quickattack'],
+          },
+        }
       ),
       makeNpc(
         'r29_teacher',
@@ -421,7 +475,7 @@ async function bootstrap() {
       makeNpc('cg_guide_gent', 32, 6, 'DOWN', 'fat_man', '👴 GUIDE GENT', [
         "You're a rookie trainer, aren't you? I can tell!",
         "That's OK! Everyone is a rookie at some point!",
-        'POKéGEAR becomes more useful as you add CARDS. I wish you luck on your journey!',
+        'POKéGEAR becomes more useful as you add CARDS. Head NORTH up ROUTE 30 to visit MR. POKéMON!',
       ]),
       makeNpc(
         'cg_teacher',
@@ -444,8 +498,8 @@ async function bootstrap() {
         'boy',
         '👦 YOUNGSTER',
         [
-          'I battled the trainers on the road.',
-          "My POKéMON lost. They're a mess! I must take them to a POKéMON CENTER.",
+          'MR. POKéMON\'s house is still farther up ahead on ROUTE 30.',
+          "Be careful—trainers on ROUTE 30 will challenge you if you cross their line of sight!",
         ],
         { wanders: true }
       ),
@@ -453,6 +507,165 @@ async function bootstrap() {
         "A POKéMON I caught had an item. I think it's MYSTIC WATER.",
         'Back to fishing for me, then.',
       ]),
+    ],
+    route_30: [
+      makeNpc(
+        'youngster_mikey',
+        4,
+        26,
+        'RIGHT',
+        'boy',
+        '👦 YOUNGSTER MIKEY',
+        [
+          "Becoming a good trainer is really tough.",
+          "I'm going to battle other people to get better.",
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'youngster_mikey',
+          trainerName: 'Youngster Mikey',
+          visionRange: 3,
+          challengePages: [
+            "YOUNGSTER MIKEY: You're a POKéMON trainer, right?",
+            'Then you have to battle!',
+          ],
+          trainerPokemon: {
+            speciesId: 'hoot-hoot',
+            level: 4,
+            moves: ['tackle', 'growl', 'peck', 'hypnosis'],
+          },
+        }
+      ),
+      makeNpc(
+        'bug_catcher_don',
+        2,
+        18,
+        'RIGHT',
+        'boy',
+        '🐞 BUG CATCHER DON',
+        [
+          'I ran out of POKé BALLS while I was catching bugs.',
+          'You should buy extra at CHERRYGROVE MART!',
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bug_catcher_don',
+          trainerName: 'Bug Catcher Don',
+          visionRange: 3,
+          challengePages: [
+            'BUG CATCHER DON: Instead of a bug POKéMON, I found a trainer!',
+          ],
+          trainerPokemon: {
+            speciesId: 'caterpie',
+            level: 3,
+            moves: ['tackle', 'stringshot'],
+          },
+        }
+      ),
+      makeNpc(
+        'r30_cooltrainer',
+        11,
+        40,
+        'UP',
+        'girl',
+        '🧢 COOLTRAINER',
+        [
+          'MR. POKéMON\'s house is straight ahead on the right fork!',
+          'The left path leads north to ROUTE 31 and VIOLET CITY.',
+        ],
+        { wanders: true }
+      ),
+    ],
+    route_31: [
+      makeNpc(
+        'bug_catcher_wade',
+        21,
+        7,
+        'LEFT',
+        'boy',
+        '🐞 BUG CATCHER WADE',
+        [
+          'You can catch POKéMON even if you already have six with you.',
+          "They're automatically transferred to your BOX!",
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bug_catcher_wade',
+          trainerName: 'Bug Catcher Wade',
+          visionRange: 4,
+          challengePages: [
+            'BUG CATCHER WADE: I caught a bunch of POKéMON. Let me battle with you!',
+          ],
+          trainerPokemon: {
+            speciesId: 'weedle',
+            level: 4,
+            moves: ['poisonsting', 'stringshot', 'tackle'],
+          },
+        }
+      ),
+      makeNpc('r31_sleepy_man', 17, 7, 'DOWN', 'fat_man', '😴 SLEEPY MAN', [
+        '… Hnuurg… Huh?',
+        'I walked too far today looking for POKéMON in DARK CAVE.',
+        'My feet hurt and I\'m sleepy… Zzz…',
+      ]),
+      makeNpc(
+        'r31_mail_guy',
+        28,
+        12,
+        'DOWN',
+        'boy',
+        '📬 KENYA DELIVERER',
+        [
+          'I found a good POKéMON in DARK CAVE.',
+          "I'm going to raise it to take on FALKNER at VIOLET GYM!",
+        ],
+        { wanders: true }
+      ),
+    ],
+    mr_pokemons_house: [
+      makeNpc(
+        'mr_pokemon_npc',
+        3,
+        5,
+        'RIGHT',
+        'fat_man',
+        '🎩 MR. POKéMON',
+        [
+          'Hello, hello! You must be GOLD, sent by PROF. ELM!',
+          'This is the rare egg I asked PROF. ELM to examine—the MYSTERY EGG!',
+          'I know a couple who run a POKéMON DAY-CARE. They gave me that EGG.',
+        ],
+        { action: 'MR_POKEMON_EVENT' }
+      ),
+      makeNpc(
+        'prof_oak_npc',
+        6,
+        5,
+        'UP',
+        'fat_man',
+        '🎓 PROF. OAK',
+        [
+          'Aha! So you are GOLD! I am OAK, a POKéMON researcher.',
+          'I was just visiting my old friend MR. POKéMON.',
+          'Your CYNDQUIL seems very attached to you! Here, take this latest-model POKéDEX!',
+        ],
+        { action: 'MR_POKEMON_EVENT' }
+      ),
+    ],
+    route_30_berry_house: [
+      makeNpc(
+        'berry_man_npc',
+        2,
+        3,
+        'DOWN',
+        'fat_man',
+        '🍎 BERRY HOUSE MAN',
+        [
+          'You know, POKéMON eat BERRIES.',
+          'Well, my POKéMON got healthier by eating a BERRY! Here, share this POTION for the road!',
+        ],
+        { action: 'BERRY_MAN_EVENT' }
+      ),
     ],
     elms_lab: [
       makeNpc(
@@ -464,7 +677,7 @@ async function bootstrap() {
         '🔬 PROF. ELM',
         [
           "Hi, GOLD! I've been researching unusual POKéMON evolutions here in NEW BARK TOWN.",
-          "MR. POKéMON beyond CHERRYGROVE CITY sent word of a rare discovery, and legends speak of three Legendary Beasts slumbering in ECRUTEAK's BURNED TOWER.",
+          "MR. POKéMON beyond CHERRYGROVE CITY on ROUTE 30 sent word of a rare discovery, and legends speak of three Legendary Beasts slumbering in ECRUTEAK's BURNED TOWER.",
           'Here—let me heal your POKéMON and record your research progress!',
         ],
         { action: 'HEAL_AND_SAVE' }
@@ -627,6 +840,34 @@ async function bootstrap() {
       }
     }
 
+    if (map.connections.NORTH) {
+      const conn = map.connections.NORTH;
+      const northMap = mapManager.getMap(conn.mapId);
+      const northList = northMap ? npcsByMap[northMap.id] : undefined;
+      if (northMap && northList) {
+        for (let i = 0; i < northList.length; i++) {
+          const n = northList[i];
+          n.worldOffsetX = conn.offset;
+          n.worldOffsetY = -northMap.height;
+          worldNpcsScratch.push(n);
+        }
+      }
+    }
+
+    if (map.connections.SOUTH) {
+      const conn = map.connections.SOUTH;
+      const southMap = mapManager.getMap(conn.mapId);
+      const southList = southMap ? npcsByMap[southMap.id] : undefined;
+      if (southMap && southList) {
+        for (let i = 0; i < southList.length; i++) {
+          const n = southList[i];
+          n.worldOffsetX = conn.offset;
+          n.worldOffsetY = map.height;
+          worldNpcsScratch.push(n);
+        }
+      }
+    }
+
     return worldNpcsScratch;
   };
 
@@ -648,7 +889,7 @@ async function bootstrap() {
       nextMapId = conn.mapId;
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = nextMap.width - 1;
-      targetY += conn.offset;
+      targetY -= conn.offset;
       overworldRenderer.renderMap(nextMap, lookupMap);
       overworldHUD.updateRouteName(nextMap.name);
     }
@@ -658,7 +899,27 @@ async function bootstrap() {
       nextMapId = conn.mapId;
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = 0;
-      targetY += conn.offset;
+      targetY -= conn.offset;
+      overworldRenderer.renderMap(nextMap, lookupMap);
+      overworldHUD.updateRouteName(nextMap.name);
+    }
+    // Transitioning North
+    else if (entity.y < 0 && current.connections.NORTH) {
+      const conn = current.connections.NORTH;
+      nextMapId = conn.mapId;
+      const nextMap = mapManager.setCurrentMap(conn.mapId);
+      targetX -= conn.offset;
+      targetY = nextMap.height - 1;
+      overworldRenderer.renderMap(nextMap, lookupMap);
+      overworldHUD.updateRouteName(nextMap.name);
+    }
+    // Transitioning South
+    else if (entity.y >= current.height && current.connections.SOUTH) {
+      const conn = current.connections.SOUTH;
+      nextMapId = conn.mapId;
+      const nextMap = mapManager.setCurrentMap(conn.mapId);
+      targetX -= conn.offset;
+      targetY = 0;
       overworldRenderer.renderMap(nextMap, lookupMap);
       overworldHUD.updateRouteName(nextMap.name);
     }
@@ -696,6 +957,9 @@ async function bootstrap() {
     overworldHUD.hide();
     player.isMoving = false;
     player.progress = 0;
+
+    // Record species as SEEN in Pokédex
+    seenSpecies.add(opponentPokemon.speciesId);
 
     // Reset temporary trapping flag at the start of a new encounter while keeping persistent HP/Status
     opponentPokemon.isTrapped = false;
@@ -887,8 +1151,87 @@ async function bootstrap() {
     }
   };
 
+  let isCutsceneLocked = false;
+
+  /**
+   * Executes an authentic Gen 2 Line-of-Sight Trainer Encounter:
+   * 1. Locks player input & pops bouncy `[!]` balloon above trainer's head
+   * 2. Walks trainer tile-by-tile up to 1 tile away from the player
+   * 3. Turns player toward trainer, displays challenge dialogue, and starts Trainer Battle
+   */
+  const runTrainerSightSequence = async (trainer: GridEntity) => {
+    if (!trainer.trainerId || !trainer.trainerPokemon) return;
+    isCutsceneLocked = true;
+    defeatedTrainers.add(trainer.trainerId);
+    player.isMoving = false;
+    player.progress = 0;
+
+    BattleAudio.playOverworldSound('EXCLAMATION');
+    await overworldRenderer.showExclamationBubble(trainer, Math.round(520 / gameClock.playerSpeed));
+
+    // Walk trainer up to 1 tile away from player
+    const delta = GridPhysics.getDirectionDelta(trainer.direction);
+    const stepsToWalk = Math.max(
+      0,
+      Math.abs(player.x - trainer.x) + Math.abs(player.y - trainer.y) - 1
+    );
+
+    for (let s = 0; s < stepsToWalk; s++) {
+      const startX = trainer.x;
+      const startY = trainer.y;
+      const nextX = startX + delta.dx;
+      const nextY = startY + delta.dy;
+      trainer.targetX = nextX;
+      trainer.targetY = nextY;
+      trainer.isMoving = true;
+      trainer.progress = 0;
+
+      const stepMs = (GridPhysics.BASE_TRAVERSAL_TIME * 1000) / gameClock.playerSpeed;
+      await new Promise<void>((resolve) => {
+        const t0 = performance.now();
+        const animateStep = (now: number) => {
+          const p = Math.min(1, (now - t0) / stepMs);
+          trainer.progress = p;
+          trainer.renderX = startX + (nextX - startX) * p;
+          trainer.renderY = startY + (nextY - startY) * p;
+          if (p < 1) {
+            requestAnimationFrame(animateStep);
+          } else {
+            trainer.x = nextX;
+            trainer.y = nextY;
+            trainer.renderX = nextX;
+            trainer.renderY = nextY;
+            trainer.isMoving = false;
+            trainer.progress = 0;
+            resolve();
+          }
+        };
+        requestAnimationFrame(animateStep);
+      });
+    }
+
+    player.direction = getOppositeDirection(trainer.direction);
+    const dialoguePages =
+      trainer.challengePages && trainer.challengePages.length > 0
+        ? trainer.challengePages
+        : trainer.pages || ['Let us battle!'];
+
+    overworldHUD.openDialogue(dialoguePages, trainer.speaker, () => {
+      isCutsceneLocked = false;
+      const foe = PokemonFactory.create(
+        trainer.trainerPokemon!.speciesId,
+        trainer.trainerPokemon!.level,
+        trainer.trainerPokemon!.moves
+      );
+      triggerBattle(foe, {
+        isTrainer: true,
+        trainerName: trainer.trainerName || trainer.speaker || 'Trainer',
+      });
+    });
+  };
+
   handleInteract = () => {
-    if (gameState !== 'OVERWORLD' || player.isMoving || overworldHUD.isDialogueOpen()) return;
+    if (gameState !== 'OVERWORLD' || isCutsceneLocked || player.isMoving || overworldHUD.isDialogueOpen()) return;
     const currentMap = mapManager.getCurrentMap();
     if (!currentMap) return;
 
@@ -914,6 +1257,68 @@ async function bootstrap() {
           targetNpc.direction = getOppositeDirection(player.direction);
         }
 
+        // Special scripted quest inside Mr. Pokémon's House (Mystery Egg + Prof. Oak's Pokédex)
+        if (targetNpc.action === 'MR_POKEMON_EVENT' && !storyFlags.has('HAS_MYSTERY_EGG')) {
+          storyFlags.add('HAS_MYSTERY_EGG');
+          storyFlags.add('HAS_POKEDEX');
+          healPlayerParty();
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          overworldHUD.openDialogue(
+            [
+              'MR. POKéMON: Hello, hello! You must be GOLD, sent by PROF. ELM!',
+              'This is the rare egg I asked PROF. ELM to examine—GOLD received the MYSTERY EGG!',
+              'PROF. OAK: Aha! So you are GOLD! Your CYNDAQUIL seems very attached to you!',
+              'PROF. OAK: You look like a dependable trainer! Take this latest-model POKéDEX!',
+              '🎩 MR. POKéMON also restored your party to full health before your journey back!',
+            ],
+            '🎩 MR. POKéMON & 🎓 PROF. OAK',
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('🥚 Received MYSTERY EGG & 📕 POKéDEX! (Check START MENU -> POKéDEX)');
+            }
+          );
+          return;
+        }
+
+        // Route 30 Berry House gift
+        if (targetNpc.action === 'BERRY_MAN_EVENT' && !storyFlags.has('RECEIVED_ROUTE30_BERRY_POTION')) {
+          storyFlags.add('RECEIVED_ROUTE30_BERRY_POTION');
+          if (!inventory.items) inventory.items = {};
+          inventory.items.potion = (inventory.items.potion || 0) + 1;
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          overworldHUD.openDialogue(targetNpc.pages || [], targetNpc.speaker, () => {
+            saveCurrentGame();
+            overworldHUD.showToast('🧪 Received POTION from the Route 30 Berry House!');
+          });
+          return;
+        }
+
+        // Trainer NPC spoken to directly before being defeated
+        if (
+          targetNpc.action === 'TRAINER_BATTLE' &&
+          targetNpc.trainerId &&
+          !defeatedTrainers.has(targetNpc.trainerId) &&
+          targetNpc.trainerPokemon
+        ) {
+          defeatedTrainers.add(targetNpc.trainerId);
+          const pagesToUse =
+            targetNpc.challengePages && targetNpc.challengePages.length > 0
+              ? targetNpc.challengePages
+              : targetNpc.pages || [];
+          overworldHUD.openDialogue(pagesToUse, targetNpc.speaker, () => {
+            const foe = PokemonFactory.create(
+              targetNpc.trainerPokemon!.speciesId,
+              targetNpc.trainerPokemon!.level,
+              targetNpc.trainerPokemon!.moves
+            );
+            triggerBattle(foe, {
+              isTrainer: true,
+              trainerName: targetNpc.trainerName || targetNpc.speaker || 'Trainer',
+            });
+          });
+          return;
+        }
+
         if (targetNpc.pages && targetNpc.pages.length > 0) {
           overworldHUD.openDialogue(targetNpc.pages, targetNpc.speaker, () => {
             if (targetNpc.action === 'HEAL_AND_SAVE') {
@@ -922,13 +1327,6 @@ async function bootstrap() {
               overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
             } else if (targetNpc.action === 'OPEN_MART') {
               bagUI.openMart();
-            } else if (targetNpc.action === 'TRAINER_JOEY' && !defeatedTrainers.has('youngster_joey')) {
-              defeatedTrainers.add('youngster_joey');
-              const joeyRattata = PokemonFactory.create('rattata', 4, ['tackle', 'tailwhip', 'quickattack']);
-              triggerBattle(joeyRattata, {
-                isTrainer: true,
-                trainerName: 'Youngster Joey',
-              });
             }
           });
         }
@@ -962,7 +1360,7 @@ async function bootstrap() {
       // Active NPCs on this map (Zero per-frame array allocations)
       const activeNpcs = currentMap ? npcsByMap[currentMap.id] || emptyNpcs : emptyNpcs;
 
-      const heldDir = overworldHUD.getHeldDirection();
+      const heldDir = isCutsceneLocked ? null : overworldHUD.getHeldDirection();
       GridPhysics.updateEntity(
         player,
         dtPlayer,
@@ -972,54 +1370,80 @@ async function bootstrap() {
         (_entity, coord, tileType) => {
           handleMapTransition(player);
 
-          // Check Building Door Warps (Poké Center, Poké Mart, Elm's Lab, Houses)
+          // Check Building Door Warps (Poké Center, Poké Mart, Elm's Lab, Houses) with smooth fade
           const warp = mapManager.checkWarp(coord);
           if (warp) {
-            const targetMap = mapManager.setCurrentMap(warp.targetMapId);
-            const isEnteringIndoor = Object.keys(targetMap.connections || {}).length === 0;
+            const previousMapId = currentMap?.id;
             player.isMoving = false;
             player.progress = 0;
-            player.direction = isEnteringIndoor ? 'UP' : 'DOWN';
-            player.x = warp.targetX;
-            player.y = warp.targetY;
-            player.targetX = warp.targetX;
-            player.targetY = warp.targetY;
-            player.renderX = warp.targetX;
-            player.renderY = warp.targetY;
+            isCutsceneLocked = true;
+            BattleAudio.playOverworldSound('DOOR');
 
-            overworldRenderer.renderMap(targetMap, lookupMap);
-            overworldHUD.updateRouteName(targetMap.name);
+            overworldRenderer
+              .playDoorwayFade(() => {
+                const targetMap = mapManager.setCurrentMap(warp.targetMapId);
+                const isEnteringIndoor = Object.keys(targetMap.connections || {}).length === 0;
+                player.direction = isEnteringIndoor ? 'UP' : 'DOWN';
+                player.x = warp.targetX;
+                player.y = warp.targetY;
+                player.targetX = warp.targetX;
+                player.targetY = warp.targetY;
+                player.renderX = warp.targetX;
+                player.renderY = warp.targetY;
+
+                overworldRenderer.renderMap(targetMap, lookupMap);
+                overworldHUD.updateRouteName(targetMap.name);
+              })
+              .then(() => {
+                isCutsceneLocked = false;
+
+                // Trigger Prof. Elm's emergency Pokégear phone call upon stepping out of Mr. Pokémon's House with the Mystery Egg
+                if (
+                  previousMapId === 'mr_pokemons_house' &&
+                  storyFlags.has('HAS_MYSTERY_EGG') &&
+                  !storyFlags.has('ELM_CALLED_ABOUT_THEFT')
+                ) {
+                  storyFlags.add('ELM_CALLED_ABOUT_THEFT');
+                  BattleAudio.playOverworldSound('PHONE_RING');
+                  overworldHUD.openDialogue(
+                    [
+                      '📻 *BEEP! BEEP! Your POKéGEAR is ringing!*',
+                      "PROF. ELM: H-hello? GOLD? It's a disaster here at the LAB!",
+                      'A red-haired boy broke in! Please bring that MYSTERY EGG back to NEW BARK TOWN when you can!',
+                    ],
+                    '📻 PROF. ELM (POKéGEAR)',
+                    () => {
+                      saveCurrentGame();
+                    }
+                  );
+                }
+              });
             return;
           }
 
-          // Route 29: Line of sight check for Youngster Joey (x: 28, y: 7..8)
-          if (
-            currentMap?.id === 'route_29' &&
-            !defeatedTrainers.has('youngster_joey') &&
-            player.x === 28 &&
-            (player.y === 7 || player.y === 8)
-          ) {
-            defeatedTrainers.add('youngster_joey');
-            overworldHUD.openDialogue(
-              [
-                'YOUNGSTER JOEY: I just lost, so I\'m trying to find more POKéMON!',
-                'Wait! You look weak! Come on, let\'s battle!',
-              ],
-              '👦 YOUNGSTER JOEY',
-              () => {
-                const joeyRattata = PokemonFactory.create('rattata', 4, ['tackle', 'tailwhip', 'quickattack']);
-                triggerBattle(joeyRattata, {
-                  isTrainer: true,
-                  trainerName: 'Youngster Joey',
-                });
-              }
-            );
+          // Tall Grass Rustle FX + Sound
+          if (tileType === 2) {
+            overworldRenderer.spawnGrassRustle(coord.x, coord.y);
+            BattleAudio.playOverworldSound('RUSTLE');
+          }
+
+          // Check Line-of-Sight Trainer Encounters on active map
+          const latestMap = mapManager.getCurrentMap();
+          const latestNpcs = latestMap ? npcsByMap[latestMap.id] || emptyNpcs : emptyNpcs;
+          const spottedTrainer = GridPhysics.checkTrainerLineOfSight(
+            player,
+            latestNpcs,
+            defeatedTrainers,
+            mapManager.getTileType
+          );
+          if (spottedTrainer) {
+            runTrainerSightSequence(spottedTrainer);
             return;
           }
 
           // Wild Encounter Check in Tall Grass (tile type 2)
           if (tileType === 2) {
-            const roamer = currentMap ? roamingManager.getActiveRoamerOnRoute(currentMap.id) : undefined;
+            const roamer = latestMap ? roamingManager.getActiveRoamerOnRoute(latestMap.id) : undefined;
             const encounter = mapManager.rollWildEncounter(tileType, roamer?.speciesId);
 
             if (encounter) {
@@ -1033,11 +1457,14 @@ async function bootstrap() {
             }
           }
         },
-        activeNpcs
+        activeNpcs,
+        () => {
+          BattleAudio.playOverworldSound('HOP');
+        }
       );
 
       // Update NPCs with dtWorld (strictly 1.0x world speed), colliding with player and staying in bounds
-      if (!overworldHUD.isDialogueOpen()) {
+      if (!overworldHUD.isDialogueOpen() && !isCutsceneLocked) {
         npcMoveTimer += dtWorld;
         const triggerNewWanderStep = npcMoveTimer > 1.8;
         if (triggerNewWanderStep) {
@@ -1071,7 +1498,7 @@ async function bootstrap() {
           );
         }
 
-        // Also update wandering NPCs on connected West/East neighbor maps at 1.0x world time
+        // Also update wandering NPCs on connected West/East/North/South neighbor maps at 1.0x world time
         const updateNeighborMapNpcs = (neighborMapId: string | undefined) => {
           if (!neighborMapId) return;
           const neighborMap = mapManager.getMap(neighborMapId);
@@ -1101,6 +1528,8 @@ async function bootstrap() {
 
         updateNeighborMapNpcs(currentMap?.connections.WEST?.mapId);
         updateNeighborMapNpcs(currentMap?.connections.EAST?.mapId);
+        updateNeighborMapNpcs(currentMap?.connections.NORTH?.mapId);
+        updateNeighborMapNpcs(currentMap?.connections.SOUTH?.mapId);
       }
 
       // Render active & connected map NPCs after any border/warp transitions during this tick (viewport-culled)

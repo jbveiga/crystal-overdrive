@@ -23,6 +23,8 @@ export interface SaveData {
   };
   roamers: RoamerState[];
   defeatedTrainers: string[];
+  storyFlags?: string[];
+  seenSpecies?: string[];
 }
 
 const DB_NAME = 'crystal-overdrive-db';

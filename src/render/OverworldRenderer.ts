@@ -1,4 +1,4 @@
-import { Application, Container, Sprite, Texture, Rectangle, Assets } from 'pixi.js';
+import { Application, Container, Sprite, Texture, Rectangle, Assets, Graphics, Text, TextStyle } from 'pixi.js';
 import type { MapData, Direction } from '../types/game';
 import type { GridEntity } from '../world/GridPhysics';
 
@@ -14,13 +14,29 @@ interface CharacterFrames {
   sideWalk2: Texture;
 }
 
+interface GrassParticle {
+  graphic: Graphics;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+}
+
 export class OverworldRenderer {
   public app!: Application;
   private stageContainer!: Container;
   private mapContainer!: Container;
   private entityContainer!: Container;
+  private foregroundContainer!: Container;
+  private playerShadow!: Graphics;
   private playerSprite!: Sprite;
+  private playerGrassMask!: Graphics;
   private npcSprites: Map<string, Sprite> = new Map();
+  private npcGrassMasks: Map<string, Graphics> = new Map();
+  private grassParticles: GrassParticle[] = [];
+  private exclamationContainer: Container | null = null;
+  private fadeOverlay!: Graphics;
+  private currentRenderedMap: MapData | null = null;
   private tileSize: number = 64;
 
   // Textures
@@ -50,10 +66,15 @@ export class OverworldRenderer {
     this.stageContainer = new Container();
     this.mapContainer = new Container();
     this.entityContainer = new Container();
+    this.foregroundContainer = new Container();
+    this.fadeOverlay = new Graphics();
+    this.fadeOverlay.visible = false;
 
     this.stageContainer.addChild(this.mapContainer);
     this.stageContainer.addChild(this.entityContainer);
+    this.stageContainer.addChild(this.foregroundContainer);
     this.app.stage.addChild(this.stageContainer);
+    this.app.stage.addChild(this.fadeOverlay);
 
     await this.loadAssets();
     this.createPlayerSprite();
@@ -289,6 +310,25 @@ export class OverworldRenderer {
       'jt_4e_4f_5e_5f',
       'jt_58_58_58_58',
       'jt_5c_4c_3d_14',
+      // Route 30 & Route 31 additional authentic quadrant tiles
+      'jt_06_06_4c_4c',
+      'jt_06_3d_06_3d',
+      'jt_07_07_26_07',
+      'jt_1a_07_1a_26',
+      'jt_31_36_41_48',
+      'jt_36_34_48_44',
+      'jt_36_36_48_48',
+      'jt_3b_3b_3b_3b',
+      'jt_3b_4b_4b_4c',
+      'jt_3d_3d_3d_3d',
+      'jt_40_40_40_40',
+      'jt_41_48_51_52',
+      'jt_46_47_56_57',
+      'jt_48_44_52_54',
+      'jt_48_48_52_52',
+      'jt_4c_4c_4c_4c',
+      'jt_4c_5d_14_3b',
+      'jt_4d_3d_4c_4d',
     ];
 
     await Promise.all(
@@ -311,6 +351,7 @@ export class OverworldRenderer {
       'jt_3d_14_3d_14',
       'jt_4c_4c_14_14',
       'jt_4d_14_14_14',
+      'jt_4c_5d_14_3b',
       'jt_5c_4c_3d_14',
     ];
 
@@ -374,14 +415,175 @@ export class OverworldRenderer {
     };
   }
 
+  private createGrassWadingGraphic(): Graphics {
+    const g = new Graphics();
+    // Draw authentic Gen 2 grass blades overlapping the lower 14px of the character sprite
+    g.rect(-22, -12, 44, 14).fill({ color: 0x3b8a3e, alpha: 0.92 });
+    // Dark green pixel blade tips
+    for (let bx = -20; bx <= 16; bx += 8) {
+      g.moveTo(bx, -12)
+        .lineTo(bx + 4, -20)
+        .lineTo(bx + 8, -12)
+        .fill({ color: 0x1e5926 });
+      g.moveTo(bx + 2, -10)
+        .lineTo(bx + 5, -16)
+        .lineTo(bx + 8, -10)
+        .fill({ color: 0x65c458 });
+    }
+    g.visible = false;
+    return g;
+  }
+
   private createPlayerSprite(): void {
+    this.playerShadow = new Graphics();
+    this.playerShadow.ellipse(0, 0, 18, 7).fill({ color: 0x000000, alpha: 0.38 });
+    this.playerShadow.visible = false;
+    this.entityContainer.addChild(this.playerShadow);
+
     this.playerSprite = new Sprite(this.playerFrames.downStand);
     this.playerSprite.anchor.set(0.5, 0.85);
     this.playerSprite.scale.set(3, 3);
     this.entityContainer.addChild(this.playerSprite);
+
+    this.playerGrassMask = this.createGrassWadingGraphic();
+    this.foregroundContainer.addChild(this.playerGrassMask);
   }
 
-  private renderMapChunk(map: MapData, offsetTileX: number, offsetTileY: number): void {
+  /**
+   * Returns authentic Gen 2 Real-Time Clock (RTC) outdoor tint:
+   * - Morning (04:00 - 09:59): warm golden-amber (0xfff4db)
+   * - Day     (10:00 - 17:59): crisp daylight (0xffffff)
+   * - Night   (18:00 - 03:59): cool nocturnal indigo (0x9aa8f8)
+   */
+  public getTimeOfDayTint(): { period: 'MORNING' | 'DAY' | 'NIGHT'; tint: number } {
+    const hour = new Date().getHours();
+    if (hour >= 4 && hour < 10) {
+      return { period: 'MORNING', tint: 0xfff4db };
+    }
+    if (hour >= 10 && hour < 18) {
+      return { period: 'DAY', tint: 0xffffff };
+    }
+    return { period: 'NIGHT', tint: 0x9aa8f8 };
+  }
+
+  /**
+   * Spawns 4 fluttering grass leaf particles when an entity steps onto a tall_grass tile
+   */
+  public spawnGrassRustle(tileX: number, tileY: number): void {
+    const centerX = (tileX + 0.5) * this.tileSize;
+    const centerY = (tileY + 0.65) * this.tileSize;
+    const angles = [-2.4, -1.9, -1.2, -0.7];
+    for (let i = 0; i < 4; i++) {
+      const leaf = new Graphics();
+      leaf.rect(-4, -3, 8, 6).fill({ color: i % 2 === 0 ? 0x65c458 : 0x2a7a32 });
+      leaf.rect(-2, -1, 4, 2).fill({ color: 0xb4f09c });
+      leaf.position.set(centerX + (i - 1.5) * 8, centerY);
+      this.foregroundContainer.addChild(leaf);
+      this.grassParticles.push({
+        graphic: leaf,
+        vx: Math.cos(angles[i]) * 52,
+        vy: Math.sin(angles[i]) * 64,
+        life: 0,
+        maxLife: 0.28,
+      });
+    }
+  }
+
+  /**
+   * Displays a classic Gen 2 `[!]` exclamation balloon above an NPC trainer's head
+   */
+  public async showExclamationBubble(npc: GridEntity, durationMs: number = 600): Promise<void> {
+    if (this.exclamationContainer) {
+      this.exclamationContainer.destroy({ children: true });
+      this.exclamationContainer = null;
+    }
+
+    const offsetX = npc.worldOffsetX || 0;
+    const offsetY = npc.worldOffsetY || 0;
+    const npcPxX = (npc.renderX + offsetX + 0.5) * this.tileSize;
+    const npcPxY = (npc.renderY + offsetY + 0.85) * this.tileSize;
+
+    const bubble = new Container();
+    bubble.position.set(npcPxX, npcPxY - 102);
+
+    const bg = new Graphics();
+    bg.roundRect(-18, -22, 36, 36, 6)
+      .fill({ color: 0xffffff })
+      .stroke({ color: 0x111827, width: 3 });
+    // Speech pointer triangle
+    bg.moveTo(-5, 14).lineTo(0, 22).lineTo(5, 14).fill({ color: 0x111827 });
+    bubble.addChild(bg);
+
+    const bang = new Text({
+      text: '!',
+      style: new TextStyle({
+        fontFamily: ' monospace',
+        fontSize: 26,
+        fontWeight: '900',
+        fill: 0xdc2626,
+      }),
+    });
+    bang.anchor.set(0.5);
+    bang.position.set(0, -4);
+    bubble.addChild(bang);
+
+    this.foregroundContainer.addChild(bubble);
+    this.exclamationContainer = bubble;
+
+    await new Promise<void>((resolve) => {
+      const start = performance.now();
+      const step = (now: number) => {
+        const elapsed = now - start;
+        const t = Math.min(1, elapsed / durationMs);
+        // Quick pop bounce on entry
+        const bounce = t < 0.25 ? Math.sin((t / 0.25) * Math.PI) * 10 : 0;
+        bubble.position.set(npcPxX, npcPxY - 102 - bounce);
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          if (this.exclamationContainer === bubble) {
+            bubble.destroy({ children: true });
+            this.exclamationContainer = null;
+          }
+          resolve();
+        }
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  /**
+   * Plays a crisp 0.15s doorway fade-to-black / fade-in transition
+   */
+  public async playDoorwayFade(onMidpoint: () => void): Promise<void> {
+    const w = this.app.screen.width;
+    const h = this.app.screen.height;
+    this.fadeOverlay.clear().rect(0, 0, w, h).fill({ color: 0x000000 });
+    this.fadeOverlay.alpha = 0;
+    this.fadeOverlay.visible = true;
+
+    const animateAlpha = (from: number, to: number, durationMs: number) =>
+      new Promise<void>((resolve) => {
+        const start = performance.now();
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / durationMs);
+          this.fadeOverlay.alpha = from + (to - from) * t;
+          if (t < 1) {
+            requestAnimationFrame(tick);
+          } else {
+            resolve();
+          }
+        };
+        requestAnimationFrame(tick);
+      });
+
+    await animateAlpha(0, 1, 140);
+    onMidpoint();
+    await animateAlpha(1, 0, 140);
+    this.fadeOverlay.visible = false;
+  }
+
+  private renderMapChunk(map: MapData, offsetTileX: number, offsetTileY: number, isNight: boolean = false): void {
     const grassTex = this.tileTextures.get('grass') || Texture.WHITE;
     if (!map.tileMap || map.tileMap.length !== map.width * map.height) return;
 
@@ -413,6 +615,19 @@ export class OverworldRenderer {
           this.animatedWaterSprites.push({ sprite: featureSprite, frames: waterFrames });
         }
 
+        // At night, give outdoor building window tiles a warm lantern glow
+        if (
+          isNight &&
+          (tileName.includes('10_11') || tileName.includes('11_12') || tileName.includes('18_19'))
+        ) {
+          const glow = new Graphics();
+          glow.rect(px + 8, py + 12, this.tileSize - 16, this.tileSize - 24).fill({
+            color: 0xfde047,
+            alpha: 0.22,
+          });
+          this.mapContainer.addChild(glow);
+        }
+
         if (map.overlayMap && map.overlayMap[index]) {
           const overlayTex = this.tileTextures.get(map.overlayMap[index]!);
           if (overlayTex) {
@@ -428,11 +643,12 @@ export class OverworldRenderer {
   }
 
   /**
-   * Builds the textured overworld tilemap, including seamlessly connected neighbor maps and outdoor border blocks
+   * Builds the textured overworld tilemap, including seamlessly connected neighbor maps (W/E/N/S) and outdoor border blocks
    */
   public renderMap(map: MapData, lookupMap?: (mapId: string) => MapData | undefined): void {
     this.mapContainer.removeChildren();
     this.animatedWaterSprites.length = 0;
+    this.currentRenderedMap = map;
     this.tileSize = map.tileSize;
 
     const grassTex = this.tileTextures.get('grass') || Texture.WHITE;
@@ -446,28 +662,72 @@ export class OverworldRenderer {
     const doorTex = this.tileTextures.get('door') || pathTex;
     const flowerTex = this.tileTextures.get('flower_0') || grassTex;
 
+    const isOutdoor = Object.keys(map.connections || {}).length > 0;
+    const rtc = this.getTimeOfDayTint();
+    this.mapContainer.tint = isOutdoor ? rtc.tint : 0xffffff;
+    const isNight = isOutdoor && rtc.period === 'NIGHT';
+
     // 1. High-fidelity authentic TileMap rendering if defined
     if (map.tileMap && map.tileMap.length === map.width * map.height) {
-      const isOutdoor = Object.keys(map.connections || {}).length > 0;
-
       if (isOutdoor) {
         // Render surrounding Johto pine tree border blocks (border_block 0x05) so the camera never shows empty black void
         const treeTopTex = this.tileTextures.get('jt_1e_1f_2e_2f') || treeTallTex;
         const treeBotTex = this.tileTextures.get('jt_2e_2f_3e_3f') || treeTallTex;
         const padX = 16;
-        const padY = 10;
+        const padY = 12;
 
         const westConn = map.connections.WEST && lookupMap ? lookupMap(map.connections.WEST.mapId) : undefined;
         const eastConn = map.connections.EAST && lookupMap ? lookupMap(map.connections.EAST.mapId) : undefined;
+        const northConn = map.connections.NORTH && lookupMap ? lookupMap(map.connections.NORTH.mapId) : undefined;
+        const southConn = map.connections.SOUTH && lookupMap ? lookupMap(map.connections.SOUTH.mapId) : undefined;
+
+        const westOff = map.connections.WEST?.offset ?? 0;
+        const eastOff = map.connections.EAST?.offset ?? 0;
+        const northOff = map.connections.NORTH?.offset ?? 0;
+        const southOff = map.connections.SOUTH?.offset ?? 0;
 
         for (let ty = -padY; ty < map.height + padY; ty++) {
           for (let tx = -padX; tx < map.width + padX; tx++) {
             // Skip tiles inside current map
             if (tx >= 0 && tx < map.width && ty >= 0 && ty < map.height) continue;
             // Skip tiles inside connected West map
-            if (westConn && tx >= -westConn.width && tx < 0 && ty >= 0 && ty < westConn.height) continue;
+            if (
+              westConn &&
+              tx >= -westConn.width &&
+              tx < 0 &&
+              ty >= westOff &&
+              ty < westOff + westConn.height
+            ) {
+              continue;
+            }
             // Skip tiles inside connected East map
-            if (eastConn && tx >= map.width && tx < map.width + eastConn.width && ty >= 0 && ty < eastConn.height) {
+            if (
+              eastConn &&
+              tx >= map.width &&
+              tx < map.width + eastConn.width &&
+              ty >= eastOff &&
+              ty < eastOff + eastConn.height
+            ) {
+              continue;
+            }
+            // Skip tiles inside connected North map
+            if (
+              northConn &&
+              tx >= northOff &&
+              tx < northOff + northConn.width &&
+              ty >= -northConn.height &&
+              ty < 0
+            ) {
+              continue;
+            }
+            // Skip tiles inside connected South map
+            if (
+              southConn &&
+              tx >= southOff &&
+              tx < southOff + southConn.width &&
+              ty >= map.height &&
+              ty < map.height + southConn.height
+            ) {
               continue;
             }
 
@@ -482,15 +742,21 @@ export class OverworldRenderer {
 
         // Render connected neighbor maps seamlessly adjacent to the active map
         if (westConn && map.connections.WEST) {
-          this.renderMapChunk(westConn, -westConn.width, map.connections.WEST.offset);
+          this.renderMapChunk(westConn, -westConn.width, westOff, isNight);
         }
         if (eastConn && map.connections.EAST) {
-          this.renderMapChunk(eastConn, map.width, map.connections.EAST.offset);
+          this.renderMapChunk(eastConn, map.width, eastOff, isNight);
+        }
+        if (northConn && map.connections.NORTH) {
+          this.renderMapChunk(northConn, northOff, -northConn.height, isNight);
+        }
+        if (southConn && map.connections.SOUTH) {
+          this.renderMapChunk(southConn, southOff, map.height, isNight);
         }
       }
 
       // Render active map at (0, 0)
-      this.renderMapChunk(map, 0, 0);
+      this.renderMapChunk(map, 0, 0, isNight);
       return;
     }
 
@@ -607,8 +873,17 @@ export class OverworldRenderer {
     }
   }
 
+  private isEntityOnTallGrass(entity: GridEntity): boolean {
+    const map = this.currentRenderedMap;
+    if (!map || entity.isJumping) return false;
+    const tx = Math.round(entity.renderX);
+    const ty = Math.round(entity.renderY);
+    if (tx < 0 || tx >= map.width || ty < 0 || ty >= map.height) return false;
+    return map.collisionGrid[ty * map.width + tx] === 2;
+  }
+
   /**
-   * Updates player & NPC sprite animations, ambient 1.0x water animations, and centers camera smoothly
+   * Updates player & NPC sprite animations, grass wading overlays, ledge jump arcs, ambient 1.0x water animations, and camera
    */
   public update(player: GridEntity, npcs: GridEntity[] = [], dtWorld: number = 0): void {
     const scale = 3;
@@ -626,10 +901,36 @@ export class OverworldRenderer {
       }
     }
 
-    // 1. Update Player
+    // 0b. Update active Grass Rustle Leaf Particles
+    if (dtWorld > 0 && this.grassParticles.length > 0) {
+      for (let i = this.grassParticles.length - 1; i >= 0; i--) {
+        const p = this.grassParticles[i];
+        p.life += dtWorld;
+        if (p.life >= p.maxLife) {
+          p.graphic.destroy();
+          this.grassParticles.splice(i, 1);
+          continue;
+        }
+        p.graphic.x += p.vx * dtWorld;
+        p.graphic.y += p.vy * dtWorld;
+        p.vy += 150 * dtWorld; // gravity
+        p.graphic.alpha = 1 - p.life / p.maxLife;
+      }
+    }
+
+    // 1. Update Player (including parabolic Ledge Hop arc & ground shadow)
     const playerPxX = (player.renderX + 0.5) * this.tileSize;
     const playerPxY = (player.renderY + 0.85) * this.tileSize;
-    this.playerSprite.position.set(playerPxX, playerPxY);
+    const jumpArcOffset = player.isJumping ? Math.sin(player.progress * Math.PI) * 30 : 0;
+
+    if (player.isJumping) {
+      this.playerShadow.visible = true;
+      this.playerShadow.position.set(playerPxX, playerPxY - 4);
+    } else {
+      this.playerShadow.visible = false;
+    }
+
+    this.playerSprite.position.set(playerPxX, playerPxY - jumpArcOffset);
 
     const playerTex = this.getFrameForEntity(this.playerFrames, player.direction, player.isMoving, player.progress);
     this.playerSprite.texture = playerTex;
@@ -639,6 +940,14 @@ export class OverworldRenderer {
       this.playerSprite.scale.set(-scale, scale);
     } else {
       this.playerSprite.scale.set(scale, scale);
+    }
+
+    // Tall Grass Wading Overlay on Player's feet
+    if (this.isEntityOnTallGrass(player)) {
+      this.playerGrassMask.visible = true;
+      this.playerGrassMask.position.set(playerPxX, playerPxY);
+    } else {
+      this.playerGrassMask.visible = false;
     }
 
     // 2. Smooth Camera Centering
@@ -653,6 +962,9 @@ export class OverworldRenderer {
     // 3. Update NPCs across active & connected maps with playing-window viewport culling (Zero-allocation pass)
     for (const sprite of this.npcSprites.values()) {
       sprite.visible = false;
+    }
+    for (const mask of this.npcGrassMasks.values()) {
+      mask.visible = false;
     }
 
     const cullMargin = this.tileSize;
@@ -701,6 +1013,17 @@ export class OverworldRenderer {
         sprite.scale.set(-scale, scale);
       } else {
         sprite.scale.set(scale, scale);
+      }
+
+      if (offsetX === 0 && offsetY === 0 && this.isEntityOnTallGrass(npc)) {
+        let mask = this.npcGrassMasks.get(npc.id);
+        if (!mask) {
+          mask = this.createGrassWadingGraphic();
+          this.foregroundContainer.addChild(mask);
+          this.npcGrassMasks.set(npc.id, mask);
+        }
+        mask.visible = true;
+        mask.position.set(npcPxX, npcPxY);
       }
     }
   }

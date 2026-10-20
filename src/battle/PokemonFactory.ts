@@ -42,18 +42,24 @@ export class PokemonFactory {
       secondaryStatus = { status: 'BRN', chance: 0.1 };
     } else if (dexMove.id === 'thundershock') {
       secondaryStatus = { status: 'PAR', chance: 0.1 };
-    } else if (dexMove.id === 'spark') {
+    } else if (dexMove.id === 'spark' || dexMove.id === 'lick') {
       secondaryStatus = { status: 'PAR', chance: 0.3 };
+    } else if (dexMove.id === 'poisonsting') {
+      secondaryStatus = { status: 'PSN', chance: 0.3 };
     }
 
     if (dexMove.id === 'leer' || dexMove.id === 'tailwhip') {
       statChanges = { target: 'foe', stat: 'def', stages: -1 };
     } else if (dexMove.id === 'growl') {
       statChanges = { target: 'foe', stat: 'atk', stages: -1 };
+    } else if (dexMove.id === 'stringshot') {
+      statChanges = { target: 'foe', stat: 'spe', stages: -1 };
     } else if (dexMove.id === 'sandattack' || dexMove.id === 'smokescreen') {
       statChanges = { target: 'foe', stat: 'acc', stages: -1 };
     } else if (dexMove.id === 'defensecurl') {
       statChanges = { target: 'self', stat: 'def', stages: 1 };
+    } else if (dexMove.id === 'growth') {
+      statChanges = { target: 'self', stat: 'spa', stages: 1 };
     }
 
     return {
@@ -112,6 +118,13 @@ export class PokemonFactory {
       sentret: ['scratch', 'defensecurl', 'quickattack'],
       rattata: ['tackle', 'tailwhip', 'quickattack', 'bite'],
       hoothoot: ['tackle', 'growl', 'hypnosis', 'peck'],
+      caterpie: ['tackle', 'stringshot'],
+      weedle: ['poisonsting', 'stringshot'],
+      bellsprout: ['vinewhip', 'growth'],
+      gastly: ['lick', 'hypnosis', 'spite'],
+      geodude: ['tackle', 'defensecurl', 'rockthrow'],
+      ledyba: ['tackle', 'supersonic'],
+      spinarak: ['poisonsting', 'stringshot'],
       raikou: ['thundershock', 'quickattack', 'spark', 'bite'],
       entei: ['ember', 'firespin', 'stomp', 'bite'],
       suicune: ['watergun', 'gust', 'aurorabeam', 'bubblebeam'],

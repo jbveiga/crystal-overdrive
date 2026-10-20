@@ -105,7 +105,7 @@ describe('MapData & Authentic Tile Integrity', () => {
     }
   });
 
-  it('validates all 9 authentic indoor maps, their tile PNGs, and exit warps', () => {
+  it('validates all 11 authentic indoor maps, their tile PNGs, and exit warps', () => {
     const indoorMapIds = [
       'elms_lab',
       'players_house_1f',
@@ -116,6 +116,8 @@ describe('MapData & Authentic Tile Integrity', () => {
       'guide_gents_house',
       'cherrygrove_gym_speech_house',
       'cherrygrove_evolution_speech_house',
+      'mr_pokemons_house',
+      'route_30_berry_house',
     ];
     const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
 
@@ -139,6 +141,41 @@ describe('MapData & Authentic Tile Integrity', () => {
         const idx = warp.y * mapData.width + warp.x;
         expect(mapData.collisionGrid[idx]).toBe(0);
       }
+    }
+  });
+
+  it('validates route_30.json and route_31.json dimensions, tiles, ledges, warps, and NORTH/SOUTH connections', () => {
+    const r30Path = path.resolve(__dirname, '../public/assets/data/maps/route_30.json');
+    const r31Path = path.resolve(__dirname, '../public/assets/data/maps/route_31.json');
+    expect(fs.existsSync(r30Path)).toBe(true);
+    expect(fs.existsSync(r31Path)).toBe(true);
+
+    const r30: MapData = JSON.parse(fs.readFileSync(r30Path, 'utf8'));
+    const r31: MapData = JSON.parse(fs.readFileSync(r31Path, 'utf8'));
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+
+    expect(r30.width).toBe(20);
+    expect(r30.height).toBe(54);
+    expect(r30.connections.SOUTH?.mapId).toBe('cherrygrove_city');
+    expect(r30.connections.NORTH?.mapId).toBe('route_31');
+    expect(r30.collisionGrid.includes(4)).toBe(true); // South Ledge tiles present
+
+    for (const tileName of new Set(r30.tileMap!)) {
+      expect(fs.existsSync(path.join(tilesDir, `${tileName}.png`))).toBe(true);
+    }
+
+    const mrPkmnWarp = r30.warps.find((w) => w.targetMapId === 'mr_pokemons_house');
+    const berryWarp = r30.warps.find((w) => w.targetMapId === 'route_30_berry_house');
+    expect(mrPkmnWarp).toBeDefined();
+    expect(berryWarp).toBeDefined();
+
+    expect(r31.width).toBe(40);
+    expect(r31.height).toBe(18);
+    expect(r31.connections.SOUTH?.mapId).toBe('route_30');
+    expect(r31.collisionGrid.includes(4)).toBe(true);
+
+    for (const tileName of new Set(r31.tileMap!)) {
+      expect(fs.existsSync(path.join(tilesDir, `${tileName}.png`))).toBe(true);
     }
   });
 

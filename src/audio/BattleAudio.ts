@@ -332,4 +332,101 @@ export class BattleAudio {
       });
     }
   }
+
+  /**
+   * Plays authentic Game Boy Color overworld sound effects (Tall grass rustle, Ledge hop, Trainer '!' alert, Doorway, Key Item, Pokégear ring)
+   */
+  public static playOverworldSound(
+    type: 'RUSTLE' | 'HOP' | 'EXCLAMATION' | 'DOOR' | 'KEY_ITEM' | 'PHONE_RING'
+  ): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    if (type === 'RUSTLE') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(680, now);
+      osc.frequency.exponentialRampToValueAtTime(1120, now + 0.065);
+      gain.gain.setValueAtTime(0.035, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.075);
+    } else if (type === 'HOP') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(640, now + 0.11);
+      osc.frequency.exponentialRampToValueAtTime(240, now + 0.22);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.23);
+    } else if (type === 'EXCLAMATION') {
+      // Classic 2-tone Trainer Spotted '!' chime (B5 -> E6)
+      const notes = [
+        { f: 987.77, t: 0, d: 0.07 },
+        { f: 1318.51, t: 0.075, d: 0.22 },
+      ];
+      for (const n of notes) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(n.f, now + n.t);
+        gain.gain.setValueAtTime(0.08, now + n.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + n.t);
+        osc.stop(now + n.t + n.d);
+      }
+    } else if (type === 'DOOR') {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(380, now);
+      osc.frequency.exponentialRampToValueAtTime(160, now + 0.12);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.13);
+    } else if (type === 'KEY_ITEM') {
+      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
+      notes.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(f, now + i * 0.08);
+        gain.gain.setValueAtTime(0.07, now + i * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (i + 1) * 0.09);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.08);
+        osc.stop(now + (i + 1) * 0.09);
+      });
+    } else if (type === 'PHONE_RING') {
+      const notes = [880, 1174.66, 880, 1174.66, 880, 1174.66];
+      notes.forEach((f, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(f, now + i * 0.055);
+        gain.gain.setValueAtTime(0.06, now + i * 0.055);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (i + 1) * 0.055);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.055);
+        osc.stop(now + (i + 1) * 0.055);
+      });
+    }
+  }
 }
