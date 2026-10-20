@@ -208,6 +208,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
   1. `npm test` (All Vitest suites must pass with zero warnings).
   2. `npm run build` (`tsc` strict static type-check + Vite production bundle validation).
   3. Static boundary scan ensuring pure logic directories remain free of DOM/PixiJS imports.
+  4. **Documentation Invariant:** Update `CREDITS.md` if any new external assets, audio, sprites, or tools are added.
+  5. **Architecture Invariant:** Update `ARCHITECTURE.md` if any data schemas, engine lifecycles, or interfaces are modified.
 
 ### 6.1 Current Test Coverage Matrix
 
@@ -215,12 +217,12 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | :--- | :--- | :---: | :---: | :--- |
 | `GameClock.ts` | `tests/GameClock.test.ts` | 5 | ✅ Covered | Decoupled player vs world delta, pausing, time dilation. |
 | `GridPhysics.ts` | `tests/GridPhysics.test.ts` | 8 | ✅ Covered | 1x/2x/3x speed, tile collision, bounds, fractional chaining, ledge hopping, trainer vision. |
-| `MapData.ts` | `tests/MapData.test.ts` | 6 | ✅ Covered | Binary map extraction schema, warp coords, NPC spawn data, seamless connections. |
+| `MapData.ts` | `tests/MapData.test.ts` | 8 | ✅ Covered | Binary map extraction schema, warp coords, NPC spawn data, seamless connections. |
 | `RoamingManager.ts`| `tests/RoamingManager.test.ts` | 4 | ✅ Covered | Adjacency graph traversal, route weighting, active state, Burned Tower dormancy. |
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
 | `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 10 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6). |
 | `SaveManager.ts` | `tests/SaveManager.test.ts` | 2 | ✅ Covered | IndexedDB / localStorage serialization, round-trip state restoration. |
-| **Current Baseline** | **7 Suites** | **41 Tests** | **100% Pass** | **All Tests Passing (`npm test`)** |
+| **Current Baseline** | **7 Suites** | **43 Tests** | **100% Pass** | **All Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.
