@@ -113,9 +113,9 @@ export class GridPhysics {
         const tx = npc.x + delta.dx * dist;
         const ty = npc.y + delta.dy * dist;
 
-        // Vision is blocked by solid walls/trees (1), water (3), or ledges (4)
+        // Vision is blocked by solid walls/trees (1), water (3), or ledges/fences (4..9)
         const tileType = getTileType(tx, ty);
-        if (tileType === 1 || tileType === 3 || tileType === 4) {
+        if (tileType === 1 || tileType === 3 || (tileType >= 4 && tileType <= 9)) {
           break;
         }
 
@@ -128,8 +128,25 @@ export class GridPhysics {
   }
 
   /**
+   * Checks whether a given ledge/fence tileType (4..9) allows hopping in heldDirection
+   * 4 = HOP_DOWN, 5 = HOP_UP, 6 = HOP_LEFT, 7 = HOP_RIGHT, 8 = HOP_DOWN_LEFT, 9 = HOP_DOWN_RIGHT
+   */
+  public static canJumpLedge(heldDirection: Direction, ledgeTileType: number): boolean {
+    switch (heldDirection) {
+      case 'DOWN':
+        return ledgeTileType === 4 || ledgeTileType === 8 || ledgeTileType === 9;
+      case 'UP':
+        return ledgeTileType === 5;
+      case 'LEFT':
+        return ledgeTileType === 6 || ledgeTileType === 8;
+      case 'RIGHT':
+        return ledgeTileType === 7 || ledgeTileType === 9;
+    }
+  }
+
+  /**
    * Updates an entity's position, stepping through fractional progress and chaining overflow
-   * without allocating intermediate objects. Supports 2-tile one-way ledge hops (tileType === 4).
+   * without allocating intermediate objects. Supports 2-tile one-way ledge hops in all directions (tileType 4..9).
    */
   public static updateEntity(
     entity: GridEntity,
@@ -150,6 +167,8 @@ export class GridPhysics {
         const delta = this.getDirectionDelta(heldDirection);
         const nextX = entity.x + delta.dx;
         const nextY = entity.y + delta.dy;
+        const jumpTargetX = entity.x + delta.dx * 2;
+        const jumpTargetY = entity.y + delta.dy * 2;
 
         if (isWalkable(nextX, nextY) && !this.isTileOccupiedByEntities(nextX, nextY, entity, obstacles)) {
           entity.isMoving = true;
@@ -159,16 +178,15 @@ export class GridPhysics {
           entity.progress = 0.0;
         } else if (
           entity.isPlayer &&
-          heldDirection === 'DOWN' &&
-          getTileType(nextX, nextY) === 4 &&
-          isWalkable(nextX, nextY + 1) &&
-          !this.isTileOccupiedByEntities(nextX, nextY + 1, entity, obstacles)
+          this.canJumpLedge(heldDirection, getTileType(nextX, nextY)) &&
+          isWalkable(jumpTargetX, jumpTargetY) &&
+          !this.isTileOccupiedByEntities(jumpTargetX, jumpTargetY, entity, obstacles)
         ) {
-          // One-way South Ledge Hop (jumps 2 tiles over the cliff edge)
+          // One-way Ledge Hop (jumps 2 tiles over the cliff edge / fence)
           entity.isMoving = true;
           entity.isJumping = true;
-          entity.targetX = nextX;
-          entity.targetY = nextY + 1;
+          entity.targetX = jumpTargetX;
+          entity.targetY = jumpTargetY;
           entity.progress = 0.0;
           if (onLedgeJump) onLedgeJump(entity);
         }
@@ -206,6 +224,8 @@ export class GridPhysics {
           const delta = this.getDirectionDelta(heldDirection);
           const nextX = entity.x + delta.dx;
           const nextY = entity.y + delta.dy;
+          const jumpTargetX = entity.x + delta.dx * 2;
+          const jumpTargetY = entity.y + delta.dy * 2;
 
           if (isWalkable(nextX, nextY) && !this.isTileOccupiedByEntities(nextX, nextY, entity, obstacles)) {
             entity.targetX = nextX;
@@ -214,13 +234,12 @@ export class GridPhysics {
             entity.progress = overflow;
           } else if (
             entity.isPlayer &&
-            heldDirection === 'DOWN' &&
-            getTileType(nextX, nextY) === 4 &&
-            isWalkable(nextX, nextY + 1) &&
-            !this.isTileOccupiedByEntities(nextX, nextY + 1, entity, obstacles)
+            this.canJumpLedge(heldDirection, getTileType(nextX, nextY)) &&
+            isWalkable(jumpTargetX, jumpTargetY) &&
+            !this.isTileOccupiedByEntities(jumpTargetX, jumpTargetY, entity, obstacles)
           ) {
-            entity.targetX = nextX;
-            entity.targetY = nextY + 1;
+            entity.targetX = jumpTargetX;
+            entity.targetY = jumpTargetY;
             entity.isJumping = true;
             entity.progress = overflow;
             if (onLedgeJump) onLedgeJump(entity);

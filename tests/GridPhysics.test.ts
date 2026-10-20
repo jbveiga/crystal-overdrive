@@ -192,7 +192,7 @@ describe('GridPhysics', () => {
     // Collision 6: West Ledge / Fence (jump LEFT to x - 2)
     // Collision 7: East Ledge / Fence (jump RIGHT to x + 2)
 
-    it.skip('performs a 2-tile ledge hop UP over collision 5 into clear target (x, y-2)', () => {
+    it('performs a 2-tile ledge hop UP over collision 5 into clear target (x, y-2)', () => {
       const player = createMockEntity({ x: 5, y: 5, targetX: 5, targetY: 5 });
       const isWalkable = (_x: number, y: number) => y !== 4; // ledge at (5,4) is not directly walkable
       const ledgeLookup = (_x: number, y: number) => (y === 4 ? 5 : 0);
@@ -213,7 +213,7 @@ describe('GridPhysics', () => {
       expect(player.y).toBe(3);
     });
 
-    it.skip('performs a 2-tile ledge hop LEFT over collision 6 into clear target (x-2, y)', () => {
+    it('performs a 2-tile ledge hop LEFT over collision 6 into clear target (x-2, y)', () => {
       const player = createMockEntity({ x: 5, y: 5, targetX: 5, targetY: 5 });
       const isWalkable = (x: number, _y: number) => x !== 4; // ledge at (4,5)
       const ledgeLookup = (x: number, _y: number) => (x === 4 ? 6 : 0);
@@ -234,7 +234,7 @@ describe('GridPhysics', () => {
       expect(player.y).toBe(5);
     });
 
-    it.skip('performs a 2-tile ledge hop RIGHT over collision 7 into clear target (x+2, y)', () => {
+    it('performs a 2-tile ledge hop RIGHT over collision 7 into clear target (x+2, y)', () => {
       const player = createMockEntity({ x: 5, y: 5, targetX: 5, targetY: 5 });
       const isWalkable = (x: number, _y: number) => x !== 6; // ledge at (6,5)
       const ledgeLookup = (x: number, _y: number) => (x === 6 ? 7 : 0);
@@ -255,7 +255,7 @@ describe('GridPhysics', () => {
       expect(player.y).toBe(5);
     });
 
-    it.skip('blocks ledge jumping UP (5), LEFT (6), and RIGHT (7) when target tile is non-walkable or occupied', () => {
+    it('blocks ledge jumping UP (5), LEFT (6), and RIGHT (7) when target tile is non-walkable or occupied', () => {
       // 1. UP over 5 blocked by solid landing (5,3)
       const playerUp = createMockEntity({ x: 5, y: 5 });
       const isWalkableUpSolid = (_x: number, y: number) => y !== 4 && y !== 3;
@@ -279,7 +279,7 @@ describe('GridPhysics', () => {
       expect(playerRight.isMoving).toBe(false);
     });
 
-    it.skip('blocks when approaching ledge from the reverse direction for UP (5), LEFT (6), and RIGHT (7)', () => {
+    it('blocks when approaching ledge from the reverse direction for UP (5), LEFT (6), and RIGHT (7)', () => {
       // Reverse UP ledge (tile 5 at 5,4): walking DOWN from (5,3) towards (5,4) must be blocked
       const p1 = createMockEntity({ x: 5, y: 3 });
       const isWalkableUp = (_x: number, y: number) => y !== 4;
