@@ -15,7 +15,7 @@ import { SaveManager, type SaveData } from './core/SaveManager';
 import { BagAndMartUI, type BagInventory } from './ui/BagAndMartUI';
 import { PartyManagementUI } from './ui/PartyManagementUI';
 import { StartMenuUI } from './ui/StartMenuUI';
-import type { MapData, Direction, PokeballId, PokemonInstance } from './types/game';
+import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions } from './types/game';
 import type { Graphics } from 'pixi.js';
 
 async function bootstrap() {
@@ -68,9 +68,17 @@ async function bootstrap() {
   let initialPlayerX = 13;
   let initialPlayerY = 6;
   let initialPlayerDir: Direction = 'DOWN';
+  let playerName = 'GOLD';
+  let playerGender: PlayerGender = 'BOY';
+  let gameOptions: GameOptions = SaveManager.getDefaultOptions();
 
   if (existingSave) {
     console.log('📦 Restoring save state from IndexedDB...');
+    playerName = existingSave.player.name || 'GOLD';
+    playerGender = existingSave.player.gender || 'BOY';
+    if (existingSave.options) {
+      gameOptions = existingSave.options;
+    }
     playerParty = existingSave.party;
     playerBox = existingSave.box || [];
     playTimeSeconds = existingSave.playTimeSeconds || 0;
@@ -151,6 +159,8 @@ async function bootstrap() {
       timestamp: Date.now(),
       playTimeSeconds: Math.floor(playTimeSeconds),
       player: {
+        name: playerName,
+        gender: playerGender,
         mapId: mapManager.getCurrentMap()?.id || 'new_bark_town',
         x: player.x,
         y: player.y,
@@ -170,6 +180,7 @@ async function bootstrap() {
       defeatedTrainers: Array.from(defeatedTrainers),
       storyFlags: Array.from(storyFlags),
       seenSpecies: Array.from(seenSpecies),
+      options: gameOptions,
     };
     await saveManager.saveGame(saveData);
     console.log('💾 Game state successfully saved to IndexedDB.');
@@ -192,7 +203,7 @@ async function bootstrap() {
   const startMenuUI = new StartMenuUI(
     'modal-container',
     {
-      getTrainerName: () => 'BERNARDO',
+      getTrainerName: () => playerName,
       getMoney: () => inventory.money,
       getBadges: () => inventory.badges,
       getPartyCount: () => playerParty.length,

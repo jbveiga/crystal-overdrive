@@ -1,5 +1,26 @@
 export type SpeedMultiplier = 1 | 2 | 3;
 export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+export type PlayerGender = 'BOY' | 'GIRL';
+
+export interface GameOptions {
+  soundVolume: number;      // 0.0 - 1.0 (default: 0.7)
+  bgmVolume: number;        // 0.0 - 1.0 (default: 0.7)
+  textSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT'; // (default: 'MID')
+  battleAnimations: boolean; // (default: true)
+  playerSpeedDefault: SpeedMultiplier; // (default: 1)
+}
+
+export interface SavePreview {
+  playerName: string;
+  gender: PlayerGender;
+  badgeCount: number;
+  pokedexCount: number;
+  playTimeFormatted: string; // "HH:MM" e.g. "01:24"
+  currentLocationName: string; // e.g. "Player's House" or "New Bark Town"
+  partyLeadSpeciesId?: string;
+  partyLeadLevel?: number;
+  timestamp: number;
+}
 
 export type PokemonType =
   | 'Normal' | 'Fire' | 'Water' | 'Grass' | 'Electric' | 'Ice'

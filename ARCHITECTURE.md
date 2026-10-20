@@ -152,6 +152,31 @@ The three legendary beasts (*Raikou*, *Entei*, *Suicune*) stay dormant in Ecrute
 - $P(\text{Move to Adjacent Route}) = 0.35$
 - $P(\text{Converge toward Player}) = 0.15$
 
+### 3.4 Save State, Options & Title Preview (`src/core/SaveManager.ts`, `src/types/game.d.ts`)
+```typescript
+export type PlayerGender = 'BOY' | 'GIRL';
+
+export interface GameOptions {
+  soundVolume: number;      // 0.0 - 1.0 (default: 0.7)
+  bgmVolume: number;        // 0.0 - 1.0 (default: 0.7)
+  textSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT'; // (default: 'MID')
+  battleAnimations: boolean; // (default: true)
+  playerSpeedDefault: SpeedMultiplier; // (default: 1)
+}
+
+export interface SavePreview {
+  playerName: string;
+  gender: PlayerGender;
+  badgeCount: number;
+  pokedexCount: number;
+  playTimeFormatted: string; // "HH:MM" e.g. "01:24"
+  currentLocationName: string; // e.g. "Player's House" or "New Bark Town"
+  partyLeadSpeciesId?: string;
+  partyLeadLevel?: number;
+  timestamp: number;
+}
+```
+
 ---
 
 ## 4. Key Engine Lifecycles
@@ -230,9 +255,9 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `RoamingManager.ts`| `tests/RoamingManager.test.ts` | 4 | ✅ Covered | Adjacency graph traversal, route weighting, active state, Burned Tower dormancy. |
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
 | `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 11 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6), Unbound pill styles & hit shake specs. |
-| `SaveManager.ts` | `tests/SaveManager.test.ts` | 2 | ✅ Covered | IndexedDB / localStorage serialization, round-trip state restoration. |
+| `SaveManager.ts` | `tests/SaveManager.test.ts` | 6 | ✅ Covered | IndexedDB / localStorage serialization, `SavePreview` extraction, `GameOptions` defaults, `formatPlayTime`, legacy save migration. |
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 5 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync. |
-| **Current Baseline** | **8 Suites** | **57 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| **Current Baseline** | **8 Suites** | **61 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.
