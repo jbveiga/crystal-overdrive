@@ -190,6 +190,22 @@ async function bootstrap() {
     'radio_tower_3f',
     'radio_tower_4f',
     'radio_tower_5f',
+    'route_35',
+    'route_35_national_park_gate',
+    'national_park',
+    'route_36_national_park_gate',
+    'route_36',
+    'route_36_ruins_of_alph_gate',
+    'route_37',
+    'ecruteak_city',
+    'ecruteak_poke_center',
+    'ecruteak_mart',
+    'ecruteak_gym',
+    'dance_theater',
+    'ecruteak_itemfinder_house',
+    'burned_tower_1f',
+    'burned_tower_b1f',
+    'tin_tower_1f',
   ];
 
   const loadedMaps: MapData[] = await Promise.all(
@@ -2209,6 +2225,46 @@ async function bootstrap() {
                   () => {
                     saveCurrentGame();
                     overworldHUD.showToast('🎀 Received PLAIN BADGE & TM45 ATTRACT from Leader Whitney!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Ecruteak Gym Leader Boss: Morty
+        if (targetNpc.action === 'MORTY_EVENT' && !storyFlags.has('morty_defeated')) {
+          const introPages =
+            targetNpc.challengePages && targetNpc.challengePages.length > 0
+              ? targetNpc.challengePages
+              : [
+                  "MORTY: Where is the legendary rainbow bird? I have meditated with ghost POKéMON in solitude waiting for its arrival. I see a shadow of greatness within you… Let us test your spirit!",
+                ];
+          overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Leader Morty',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('morty');
+                storyFlags.add('morty_defeated');
+                if (!inventory.badges.includes('fog')) inventory.badges.push('fog');
+                if (!inventory.tms.includes('TM30')) inventory.tms.push('TM30');
+                audioManager.playSfx('sfx_badge_get');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    "MORTY: I see… I was not the chosen one. Your bond with your POKéMON has guided you beyond my spectral realm. Take the official POKéMON LEAGUE FOGBADGE!",
+                    "MORTY: By holding the FOGBADGE, POKéMON up to Lv. 50 will obey your every command. Your POKéMON will also be able to use SURF to cross open waters! Take this TM30 SHADOW BALL as well!",
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('👻 Received FOG BADGE & TM30 SHADOW BALL from Leader Morty!');
                   }
                 );
               },

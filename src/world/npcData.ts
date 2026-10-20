@@ -2337,6 +2337,653 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         ]
       ),
     ],
+    route_35: [
+      makeNpc(
+        'camper_ivan',
+        12,
+        9,
+        'DOWN',
+        'boy',
+        '⛺ CAMPER IVAN',
+        ['I’ve been practicing ground maneuvers in the grass!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'camper_ivan',
+          trainerName: 'Camper Ivan',
+          visionRange: 3,
+          challengePages: ['CAMPER IVAN: The path between the big city and the park is packed with strong trainers!'],
+          trainerPokemon: { speciesId: 'diglett', level: 14, moves: ['scratch', 'sandattack', 'growl'] },
+          trainerTeam: [
+            { speciesId: 'diglett', level: 14, moves: ['scratch', 'sandattack', 'growl'] },
+            { speciesId: 'zubat', level: 14, moves: ['leechlife', 'bite', 'confuseray'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'picnicker_kim',
+        10,
+        22,
+        'LEFT',
+        'girl',
+        '👧 PICNICKER KIM',
+        ['My VULPIX loves sunbathing by the roadside!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'picnicker_kim',
+          trainerName: 'Picnicker Kim',
+          visionRange: 3,
+          challengePages: ['PICNICKER KIM: Are you heading to the NATIONAL PARK? Let’s battle first!'],
+          trainerPokemon: { speciesId: 'vulpix', level: 15, moves: ['ember', 'tailwhip', 'quickattack'] },
+          trainerTeam: [
+            { speciesId: 'vulpix', level: 15, moves: ['ember', 'tailwhip', 'quickattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'bird_keeper_bryan',
+        14,
+        28,
+        'LEFT',
+        'bird_keeper',
+        '🦅 BIRD KEEPER BRYAN',
+        ['Bird POKéMON glide high above the Goldenrod skyline!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bird_keeper_bryan',
+          trainerName: 'Bird Keeper Bryan',
+          visionRange: 3,
+          challengePages: ['BIRD KEEPER BRYAN: Check out the wingspan of my trained birds!'],
+          trainerPokemon: { speciesId: 'pidgey', level: 12, moves: ['tackle', 'sandattack', 'gust'] },
+          trainerTeam: [
+            { speciesId: 'pidgey', level: 12, moves: ['tackle', 'sandattack', 'gust'] },
+            { speciesId: 'pidgeotto', level: 14, moves: ['gust', 'tackle', 'quickattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'firebreather_walt',
+        3,
+        14,
+        'RIGHT',
+        'fat_man',
+        '🔥 FIREBREATHER WALT',
+        ['I blow fiery embers into the night sky!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'firebreather_walt',
+          trainerName: 'Firebreather Walt',
+          visionRange: 3,
+          challengePages: ['FIREBREATHER WALT: Breathe deep and ignite the flame!'],
+          trainerPokemon: { speciesId: 'magmar', level: 14, moves: ['ember', 'smog', 'leer'] },
+          trainerTeam: [
+            { speciesId: 'magmar', level: 14, moves: ['ember', 'smog', 'leer'] },
+          ],
+        }
+      ),
+    ],
+    route_35_national_park_gate: [
+      makeNpc(
+        'park_gate_officer',
+        2,
+        3,
+        'DOWN',
+        'fat_man',
+        '👮 PARK OFFICER',
+        [
+          'Welcome to the NATIONAL PARK!',
+          'The Bug-Catching Contest is held every Tuesday, Thursday, and Saturday! You could win a rare SUN STONE!',
+        ]
+      ),
+    ],
+    national_park: [
+      makeNpc(
+        'schoolboy_jack',
+        18,
+        30,
+        'UP',
+        'boy',
+        '👦 SCHOOLBOY JACK',
+        ['I read all about electric and grass types in my academy textbooks!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'schoolboy_jack',
+          trainerName: 'Schoolboy Jack',
+          visionRange: 3,
+          challengePages: ['SCHOOLBOY JACK: The Bug-Catching Contest is thrilling, but regular battles are great too!'],
+          trainerPokemon: { speciesId: 'oddish', level: 14, moves: ['absorb', 'sweetscent', 'poisonpowder'] },
+          trainerTeam: [
+            { speciesId: 'oddish', level: 14, moves: ['absorb', 'sweetscent', 'poisonpowder'] },
+            { speciesId: 'voltorb', level: 14, moves: ['tackle', 'screech', 'sonicboom'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'pokefan_beverly',
+        24,
+        40,
+        'LEFT',
+        'girl',
+        '🎀 POKéFAN BEVERLY',
+        ['My SNUBBULL has the best manners!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokefan_beverly',
+          trainerName: 'Pokefan Beverly',
+          visionRange: 3,
+          challengePages: ['POKéFAN BEVERLY: My darling POKéMON loves greeting new trainers!'],
+          trainerPokemon: { speciesId: 'snubbull', level: 14, moves: ['tackle', 'scaryface', 'charm'] },
+          trainerTeam: [
+            { speciesId: 'snubbull', level: 14, moves: ['tackle', 'scaryface', 'charm'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'lass_kril',
+        13,
+        17,
+        'RIGHT',
+        'girl',
+        '👧 LASS KRIL',
+        ['Water-type POKéMON love playing near the fountain!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'lass_kril',
+          trainerName: 'Lass Kril',
+          visionRange: 3,
+          challengePages: ['LASS KRIL: Watch out for my round blue companion!'],
+          trainerPokemon: { speciesId: 'marill', level: 15, moves: ['watergun', 'tackle', 'tailwhip', 'rollout'] },
+          trainerTeam: [
+            { speciesId: 'marill', level: 15, moves: ['watergun', 'tackle', 'tailwhip', 'rollout'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'game_host',
+        11,
+        44,
+        'DOWN',
+        'fat_man',
+        '🎤 CONTEST OFFICIAL',
+        [
+          'The Bug-Catching Contest tests your skill at finding high-level, rare insect POKéMON like SCYTHER and PINSIR!',
+        ]
+      ),
+    ],
+    route_36_national_park_gate: [
+      makeNpc(
+        'gate_guard',
+        4,
+        2,
+        'DOWN',
+        'fat_man',
+        '👮 GATE OFFICER',
+        [
+          'ROUTE 36 is straight ahead to the east.',
+          'There’s an odd tree blocking the road intersection that wiggles whenever it rains!',
+        ]
+      ),
+    ],
+    route_36: [
+      makeNpc(
+        'sudowoodo',
+        35,
+        9,
+        'DOWN',
+        'fat_man',
+        '🌳 SUDOWOODO',
+        [
+          'The strange tree is shaking vigorously…',
+          'SUDOWOODO: Gwoh-oh-oh! It’s actually a ROCK-type POKéMON masquerading as timber!',
+        ]
+      ),
+      makeNpc(
+        'psychic_mark',
+        25,
+        12,
+        'UP',
+        'boy',
+        '🔮 PSYCHIC MARK',
+        ['I foresaw that you would approach this intersection!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'psychic_mark',
+          trainerName: 'Psychic Mark',
+          visionRange: 3,
+          challengePages: ['PSYCHIC MARK: Can you outthink the power of telekinesis?'],
+          trainerPokemon: { speciesId: 'abra', level: 14, moves: ['teleport'] },
+          trainerTeam: [
+            { speciesId: 'abra', level: 14, moves: ['teleport'] },
+            { speciesId: 'kadabra', level: 16, moves: ['confusion', 'kinesis', 'disable'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'schoolboy_alan',
+        30,
+        4,
+        'DOWN',
+        'boy',
+        '👦 SCHOOLBOY ALAN',
+        ['TANGELA vines are remarkably stretchy!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'schoolboy_alan',
+          trainerName: 'Schoolboy Alan',
+          visionRange: 3,
+          challengePages: ['SCHOOLBOY ALAN: My grass POKéMON loves sunny days on Route 36!'],
+          trainerPokemon: { speciesId: 'tangela', level: 16, moves: ['constrict', 'vinewhip', 'absorb'] },
+          trainerTeam: [
+            { speciesId: 'tangela', level: 16, moves: ['constrict', 'vinewhip', 'absorb'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'hard_rock_guy',
+        42,
+        9,
+        'LEFT',
+        'fat_man',
+        '🪨 GEOLOGIST',
+        [
+          'That tree blocking the junction hates water because it’s made of solid mineral stone!',
+          'If you use a SQUIRTBOTTLE on it, it will jump right out of the ground!',
+        ]
+      ),
+    ],
+    route_36_ruins_of_alph_gate: [
+      makeNpc(
+        'alph_gate_guard',
+        4,
+        2,
+        'DOWN',
+        'fat_man',
+        '👮 OFFICER',
+        ['The northern chamber entrance to RUINS OF ALPH is down these stairs.']
+      ),
+    ],
+    route_37: [
+      makeNpc(
+        'twins_ann_anne',
+        7,
+        6,
+        'DOWN',
+        'girl',
+        '👭 TWINS ANN & ANNE',
+        ['We train together every single afternoon!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'twins_ann_anne',
+          trainerName: 'Twins Ann & Anne',
+          visionRange: 2,
+          challengePages: ['TWINS ANN & ANNE: Double the cuteness, double the battle power!'],
+          trainerPokemon: { speciesId: 'clefairy', level: 16, moves: ['pound', 'doubleslap', 'sing'] },
+          trainerTeam: [
+            { speciesId: 'clefairy', level: 16, moves: ['pound', 'doubleslap', 'sing'] },
+            { speciesId: 'jigglypuff', level: 16, moves: ['sing', 'pound', 'defensecurl'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'sunny_of_sunday',
+        14,
+        10,
+        'LEFT',
+        'girl',
+        '⚡ SUNNY OF SUNDAY',
+        [
+          "SUNNY: Hi! I'm SUNNY of Sunday! Nice to meet you!",
+          'Here is a MAGNET to power up ELECTRIC-type moves!',
+        ]
+      ),
+    ],
+    ecruteak_city: [
+      makeNpc(
+        'ecruteak_sage',
+        22,
+        14,
+        'DOWN',
+        'sage',
+        '🏮 ECRUTEAK SAGE',
+        [
+          'ECRUTEAK CITY is steeped in ancient lore.',
+          'Long ago, two magnificent towers stood tall to honor the great silver bird LUGIA and rainbow bird HO-OH.',
+        ]
+      ),
+      makeNpc(
+        'ecruteak_girl',
+        10,
+        20,
+        'RIGHT',
+        'girl',
+        '👧 TOWN GIRL',
+        [
+          'The KIMONO GIRLS in the DANCE THEATER dance gracefully with their five evolved EEVEE partners!',
+        ]
+      ),
+      makeNpc(
+        'ecruteak_gramps',
+        32,
+        26,
+        'DOWN',
+        'elder',
+        '👴 ELDER CITIZEN',
+        [
+          'MORTY is our GYM LEADER. His spectral powers allow him to communicate with GHOST POKéMON across generations.',
+        ]
+      ),
+    ],
+    ecruteak_poke_center: [
+      makeNpc(
+        'ecruteak_nurse_joy',
+        3,
+        1,
+        'DOWN',
+        'teacher',
+        '👩‍⚕️ NURSE JOY',
+        [
+          'Welcome to the ECRUTEAK CITY POKéMON CENTER!',
+          'We heal your POKéMON to full health in no time.',
+          'Your team is fully restored. We hope to see you again!',
+        ],
+        { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
+      ),
+      makeNpc(
+        'bill_cameo',
+        6,
+        4,
+        'DOWN',
+        'boy',
+        '💻 BILL',
+        [
+          'BILL: Hey Gold! I just finished setting up the TIME CAPSULE upstairs!',
+          'Come visit my family in GOLDENROD CITY sometime—I might have an EEVEE looking for a good home!',
+        ]
+      ),
+    ],
+    ecruteak_mart: [
+      makeNpc(
+        'ecruteak_clerk',
+        1,
+        3,
+        'RIGHT',
+        'fat_man',
+        '🏪 MART CLERK',
+        ['Welcome to ECRUTEAK MART! Stock up on AWAKENINGS and HYPER POTIONS before entering the towers!'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+      makeNpc(
+        'mart_trainer',
+        6,
+        6,
+        'UP',
+        'boy',
+        '🧢 TRAINER',
+        ['GHOST POKéMON love putting opponents to sleep with HYPNOSIS! Always carry AWAKENING!']
+      ),
+    ],
+    ecruteak_gym: [
+      makeNpc(
+        'morty',
+        4,
+        3,
+        'DOWN',
+        'sage',
+        '👻 LEADER MORTY',
+        [
+          'MORTY: The FOGBADGE is proof of your extraordinary spiritual bond with your partners.',
+          'Continue on your journey with courage and quiet contemplation.',
+        ],
+        {
+          action: 'MORTY_EVENT',
+          trainerId: 'morty',
+          trainerName: 'Leader Morty',
+          challengePages: [
+            "MORTY: Where is the legendary rainbow bird? I have meditated with ghost POKéMON in solitude waiting for its arrival. I see a shadow of greatness within you… Let us test your spirit!",
+          ],
+          trainerPokemon: { speciesId: 'gengar', level: 25, moves: ['shadowball', 'hypnosis', 'dreameater', 'meanlook'] },
+          trainerTeam: [
+            { speciesId: 'gastly', level: 21, moves: ['lick', 'spite', 'curse', 'meanlook'] },
+            { speciesId: 'haunter', level: 21, moves: ['hypnosis', 'dreameater', 'curse', 'nightshade'] },
+            { speciesId: 'gengar', level: 25, moves: ['shadowball', 'hypnosis', 'dreameater', 'meanlook'] },
+            { speciesId: 'haunter', level: 23, moves: ['spite', 'curse', 'nightshade', 'confuseray'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'medium_martha',
+        2,
+        7,
+        'RIGHT',
+        'girl',
+        '🔮 MEDIUM MARTHA',
+        ['I communicate with wandering spirits in the mist!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'medium_martha',
+          trainerName: 'Medium Martha',
+          visionRange: 3,
+          challengePages: ['MEDIUM MARTHA: Can you find the invisible path through our gym?'],
+          trainerPokemon: { speciesId: 'gastly', level: 20, moves: ['lick', 'spite', 'nightshade'] },
+          trainerTeam: [
+            { speciesId: 'gastly', level: 20, moves: ['lick', 'spite', 'nightshade'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'sage_ping',
+        7,
+        9,
+        'LEFT',
+        'sage',
+        '🙏 SAGE PING',
+        ['Our gym floor hides an abyss beneath invisible glass tiles!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sage_ping',
+          trainerName: 'Sage Ping',
+          visionRange: 3,
+          challengePages: ['SAGE PING: Step carefully, challenger! Fear makes the spirit falter!'],
+          trainerPokemon: { speciesId: 'haunter', level: 22, moves: ['nightshade', 'curse', 'hypnosis'] },
+          trainerTeam: [
+            { speciesId: 'haunter', level: 22, moves: ['nightshade', 'curse', 'hypnosis'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'ecruteak_gym_guide',
+        2,
+        16,
+        'UP',
+        'fat_man',
+        '🥊 GYM GUIDE',
+        [
+          'Yo! CHAMP in the making!',
+          'MORTY uses GHOST-type POKéMON! NORMAL and FIGHTING moves cannot damage them at all!',
+          'Bring PSYCHIC, GROUND, or GHOST moves to banish their spooky illusions!',
+        ]
+      ),
+    ],
+    dance_theater: [
+      makeNpc(
+        'kimono_naoko',
+        2,
+        5,
+        'DOWN',
+        'girl',
+        '👘 KIMONO NAOKO',
+        ['My FLAREON’s flame burns bright!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'kimono_naoko',
+          trainerName: 'Kimono Girl Naoko',
+          visionRange: 2,
+          challengePages: ['KIMONO NAOKO: Welcome to our stage! Watch our traditional dance of fire!'],
+          trainerPokemon: { speciesId: 'flareon', level: 17, moves: ['ember', 'quickattack', 'sandattack'] },
+          trainerTeam: [
+            { speciesId: 'flareon', level: 17, moves: ['ember', 'quickattack', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'kimono_sayo',
+        4,
+        5,
+        'DOWN',
+        'girl',
+        '👘 KIMONO SAYO',
+        ['My ESPEON sees the dance of the sun!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'kimono_sayo',
+          trainerName: 'Kimono Girl Sayo',
+          visionRange: 2,
+          challengePages: ['KIMONO SAYO: Psychic power and graceful steps flow together!'],
+          trainerPokemon: { speciesId: 'espeon', level: 17, moves: ['confusion', 'quickattack', 'tailwhip'] },
+          trainerTeam: [
+            { speciesId: 'espeon', level: 17, moves: ['confusion', 'quickattack', 'tailwhip'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'kimono_zuki',
+        6,
+        5,
+        'DOWN',
+        'girl',
+        '👘 KIMONO ZUKI',
+        ['My UMBREON dances beneath the moon!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'kimono_zuki',
+          trainerName: 'Kimono Girl Zuki',
+          visionRange: 2,
+          challengePages: ['KIMONO ZUKI: Moonlight reveals the true bond of friendship!'],
+          trainerPokemon: { speciesId: 'umbreon', level: 17, moves: ['pursuit', 'quickattack', 'sandattack'] },
+          trainerTeam: [
+            { speciesId: 'umbreon', level: 17, moves: ['pursuit', 'quickattack', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'kimono_kuni',
+        8,
+        5,
+        'DOWN',
+        'girl',
+        '👘 KIMONO KUNI',
+        ['My VAPOREON melts into pure water!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'kimono_kuni',
+          trainerName: 'Kimono Girl Kuni',
+          visionRange: 2,
+          challengePages: ['KIMONO KUNI: Flow gracefully like a sparkling stream!'],
+          trainerPokemon: { speciesId: 'vaporeon', level: 17, moves: ['watergun', 'quickattack', 'sandattack'] },
+          trainerTeam: [
+            { speciesId: 'vaporeon', level: 17, moves: ['watergun', 'quickattack', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'kimono_miki',
+        10,
+        4,
+        'DOWN',
+        'girl',
+        '👘 KIMONO MIKI',
+        ['My JOLTEON strikes like a crack of lightning!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'kimono_miki',
+          trainerName: 'Kimono Girl Miki',
+          visionRange: 2,
+          challengePages: ['KIMONO MIKI: Feel the electric pulse of our sacred dance!'],
+          trainerPokemon: { speciesId: 'jolteon', level: 17, moves: ['thundershock', 'quickattack', 'sandattack'] },
+          trainerTeam: [
+            { speciesId: 'jolteon', level: 17, moves: ['thundershock', 'quickattack', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'surf_gentleman',
+        9,
+        10,
+        'UP',
+        'fat_man',
+        '🎩 ADMIRER',
+        [
+          'Bravo! Magnificent! You defeated all five KIMONO GIRLS with peerless grace!',
+          'Take this HM03 SURF! With the FOGBADGE, your POKéMON can carry you across oceans and lakes!',
+        ]
+      ),
+    ],
+    ecruteak_itemfinder_house: [
+      makeNpc(
+        'item_man',
+        3,
+        3,
+        'DOWN',
+        'fat_man',
+        '🔍 ITEM COLLECTOR',
+        [
+          'Take this ITEMFINDER! It beeps whenever valuable items are buried underground near you!',
+        ]
+      ),
+    ],
+    burned_tower_1f: [
+      makeNpc(
+        'eusine',
+        10,
+        12,
+        'DOWN',
+        'silver',
+        '🎩 EUSINE',
+        [
+          "I'm EUSINE! I’ve spent my entire life pursuing the legendary SUICUNE across the world!",
+          'It is said to represent the north wind and pure water!',
+        ]
+      ),
+      makeNpc(
+        'silver_burned',
+        10,
+        10,
+        'DOWN',
+        'silver',
+        '❓ RIVAL SILVER',
+        [
+          'SILVER: …Hmph! What are you doing here?',
+          'Only weak trainers talk about legendaries. I only care about strong, ruthless POKéMON!',
+        ]
+      ),
+    ],
+    burned_tower_b1f: [
+      makeNpc(
+        'beasts',
+        10,
+        3,
+        'DOWN',
+        'fat_man',
+        '⚡ LEGENDARY BEASTS',
+        [
+          'Three majestic beasts stand petrified in stone: RAIKOU, ENTEI, and SUICUNE!',
+          'As you approach, their eyes glow with ancient celestial energy!',
+          'They roar and leap from the subterranean cavern, scattering across the Johto overworld!',
+        ]
+      ),
+    ],
+    tin_tower_1f: [
+      makeNpc(
+        'tin_tower_sage',
+        9,
+        9,
+        'DOWN',
+        'sage',
+        '🏮 TOWER SAGE',
+        [
+          'Only those who carry the CLEAR BELL and RAINBOW WING may ascend the sacred staircase to the summit of TIN TOWER!',
+        ]
+      ),
+    ],
   };
 }
 

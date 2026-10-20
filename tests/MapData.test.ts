@@ -885,5 +885,88 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("inventory.badges.includes('plain')");
     expect(mainSrc).toContain("inventory.tms.includes('TM45')");
   });
+
+  it('validates Phase 9 Central Johto maps, connections, reciprocal warps, and Leader Morty', () => {
+    const phase9Maps = [
+      'route_35',
+      'route_35_national_park_gate',
+      'national_park',
+      'route_36_national_park_gate',
+      'route_36',
+      'route_36_ruins_of_alph_gate',
+      'route_37',
+      'ecruteak_city',
+      'ecruteak_poke_center',
+      'ecruteak_mart',
+      'ecruteak_gym',
+      'dance_theater',
+      'ecruteak_itemfinder_house',
+      'burned_tower_1f',
+      'burned_tower_b1f',
+      'tin_tower_1f',
+    ];
+
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+
+    for (const mapId of phase9Maps) {
+      const mapPath = path.resolve(__dirname, `../public/assets/data/maps/${mapId}.json`);
+      expect(fs.existsSync(mapPath), `Map file for ${mapId} must exist`).toBe(true);
+
+      const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+      expect(mapData.width).toBeGreaterThan(0);
+      expect(mapData.height).toBeGreaterThan(0);
+      expect(mapData.collisionGrid.length).toBe(mapData.width * mapData.height);
+      expect(mapData.tileMap?.length).toBe(mapData.width * mapData.height);
+
+      for (const tile of new Set(mapData.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png must exist for ${mapId}`).toBe(true);
+      }
+    }
+
+    // Outdoor classification verification
+    expect(MapManager.isOutdoorMap('route_35')).toBe(true);
+    expect(MapManager.isOutdoorMap('national_park')).toBe(true);
+    expect(MapManager.isOutdoorMap('route_36')).toBe(true);
+    expect(MapManager.isOutdoorMap('route_37')).toBe(true);
+    expect(MapManager.isOutdoorMap('ecruteak_city')).toBe(true);
+    expect(MapManager.isOutdoorMap('ecruteak_gym')).toBe(false);
+    expect(MapManager.isOutdoorMap('burned_tower_1f')).toBe(false);
+
+    // Multi-route seamless overworld connections
+    const r35Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_35.json'), 'utf8'));
+    const r36Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_36.json'), 'utf8'));
+    const r37Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_37.json'), 'utf8'));
+    const ecruteakData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/ecruteak_city.json'), 'utf8'));
+    const violetData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/violet_city.json'), 'utf8'));
+
+    // Route 35 <-> Route 36
+    expect(r35Data.connections.NORTH?.mapId).toBe('route_36');
+    expect(r36Data.connections.SOUTH?.mapId).toBe('route_35');
+
+    // Route 36 <-> Violet City
+    expect(r36Data.connections.EAST?.mapId).toBe('violet_city');
+    expect(violetData.connections.WEST?.mapId).toBe('route_36');
+
+    // Route 36 <-> Route 37
+    expect(r36Data.connections.NORTH?.mapId).toBe('route_37');
+    expect(r37Data.connections.SOUTH?.mapId).toBe('route_36');
+
+    // Route 37 <-> Ecruteak City
+    expect(r37Data.connections.NORTH?.mapId).toBe('ecruteak_city');
+    expect(ecruteakData.connections.SOUTH?.mapId).toBe('route_37');
+
+    // Ecruteak Gym & Leader Morty verification
+    const mortyNpc = npcsByMap.ecruteak_gym.find((npc) => npc.id === 'morty');
+    expect(mortyNpc).toBeDefined();
+    expect(mortyNpc?.action).toBe('MORTY_EVENT');
+    expect(mortyNpc?.trainerId).toBe('morty');
+    expect(mortyNpc?.trainerPokemon?.speciesId).toBe('gengar');
+    expect(mortyNpc?.trainerTeam?.length).toBe(4);
+
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    expect(mainSrc).toContain("action === 'MORTY_EVENT'");
+    expect(mainSrc).toContain("inventory.badges.includes('fog')");
+    expect(mainSrc).toContain("inventory.tms.includes('TM30')");
+  });
 });
 

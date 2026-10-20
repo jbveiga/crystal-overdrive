@@ -4332,6 +4332,10 @@
     "jt_06_06_06_06"
   ],
   "connections": {
+    "NORTH": {
+      "mapId": "route_35",
+      "offset": 10
+    },
     "SOUTH": {
       "mapId": "route_34",
       "offset": 10

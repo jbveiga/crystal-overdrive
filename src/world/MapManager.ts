@@ -277,6 +277,11 @@ export class MapManager {
       'route_34',
       'goldenrod_city',
       'goldenrod_dept_store_roof',
+      'route_35',
+      'national_park',
+      'route_36',
+      'route_37',
+      'ecruteak_city',
     ].includes(mapId);
   }
 

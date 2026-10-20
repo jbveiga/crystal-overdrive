@@ -144,10 +144,10 @@ function mapCollToken(token) {
   ) {
     return 0; // Walkable
   }
-  if (token === 'TALL_GRASS') {
+  if (token === 'TALL_GRASS' || token === 'LONG_GRASS') {
     return 2; // Tall grass
   }
-  if (token === 'WATER' || token === 'WHIRLPOOL') {
+  if (token.startsWith('WATER') || token === 'WHIRLPOOL') {
     return 3; // Water
   }
   return 1; // Solid
@@ -207,6 +207,7 @@ const TILESETS = {
   radio_tower: loadTileset('radio_tower', false),
   underground: loadTileset('underground', false),
   game_corner: loadTileset('game_corner', false),
+  park: loadTileset('park', true),
 };
 
 const generatedTiles = new Set();
@@ -2273,6 +2274,401 @@ buildMapFromBlk({
   blocksH: 4,
   warps: [
     { x: 0, y: 0, targetMapId: 'radio_tower_4f', targetX: 0, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+// ==========================================
+// PHASE 9: CENTRAL JOHTO & ECRUTEAK CITY
+// ==========================================
+
+buildMapFromBlk({
+  id: 'route_35',
+  name: 'Route 35',
+  tileset: 'johto',
+  blkFile: 'maps__Route35.blk',
+  blocksW: 10,
+  blocksH: 18,
+  roofGroup: 'gr',
+  connections: {
+    NORTH: { mapId: 'route_36', offset: 0 },
+    SOUTH: { mapId: 'goldenrod_city', offset: -10 },
+  },
+  warps: [
+    { x: 3, y: 5, targetMapId: 'route_35_national_park_gate', targetX: 3, targetY: 7 },
+  ],
+  bgEvents: [
+    {
+      x: 1,
+      y: 7,
+      speaker: '🚏 ROUTE 35 SIGN',
+      pages: ['ROUTE 35', 'NATIONAL PARK SOUTH GATE'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'pidgey', minLevel: 12, maxLevel: 14, weight: 30 },
+    { speciesId: 'nidoran-m', minLevel: 12, maxLevel: 12, weight: 15 },
+    { speciesId: 'nidoran-f', minLevel: 12, maxLevel: 12, weight: 15 },
+    { speciesId: 'drowzee', minLevel: 12, maxLevel: 14, weight: 20 },
+    { speciesId: 'ditto', minLevel: 10, maxLevel: 14, weight: 10 },
+    { speciesId: 'abra', minLevel: 10, maxLevel: 12, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_35_national_park_gate',
+  name: 'Route 35 National Park Gate',
+  tileset: 'gate',
+  blkFile: 'maps__NorthSouthGate.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 0, targetMapId: 'national_park', targetX: 10, targetY: 47 },
+    { x: 4, y: 0, targetMapId: 'national_park', targetX: 11, targetY: 47 },
+    { x: 3, y: 7, targetMapId: 'route_35', targetX: 3, targetY: 5 },
+    { x: 4, y: 7, targetMapId: 'route_35', targetX: 3, targetY: 5 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'national_park',
+  name: 'National Park',
+  tileset: 'park',
+  blkFile: 'maps__NationalPark.blk',
+  blocksW: 20,
+  blocksH: 27,
+  warps: [
+    { x: 33, y: 18, targetMapId: 'route_36_national_park_gate', targetX: 0, targetY: 4 },
+    { x: 33, y: 19, targetMapId: 'route_36_national_park_gate', targetX: 0, targetY: 5 },
+    { x: 10, y: 47, targetMapId: 'route_35_national_park_gate', targetX: 3, targetY: 0 },
+    { x: 11, y: 47, targetMapId: 'route_35_national_park_gate', targetX: 4, targetY: 0 },
+  ],
+  bgEvents: [
+    {
+      x: 14,
+      y: 44,
+      speaker: '🌳 NATIONAL PARK SIGN',
+      pages: ['NATIONAL PARK', 'Home of the Bug-Catching Contest!'],
+    },
+    {
+      x: 27,
+      y: 17,
+      speaker: '🚏 PARK SIGN',
+      pages: ['RELAXATION SQUARE', 'Please do not battle outside the contest area.'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'caterpie', minLevel: 10, maxLevel: 14, weight: 20 },
+    { speciesId: 'weedle', minLevel: 10, maxLevel: 14, weight: 20 },
+    { speciesId: 'butterfree', minLevel: 12, maxLevel: 15, weight: 10 },
+    { speciesId: 'beedrill', minLevel: 12, maxLevel: 15, weight: 10 },
+    { speciesId: 'scyther', minLevel: 13, maxLevel: 15, weight: 10 },
+    { speciesId: 'pinsir', minLevel: 13, maxLevel: 15, weight: 10 },
+    { speciesId: 'sunkern', minLevel: 10, maxLevel: 14, weight: 20 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_36_national_park_gate',
+  name: 'Route 36 National Park Gate',
+  tileset: 'gate',
+  blkFile: 'maps__NorthSouthGate.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 0, y: 4, targetMapId: 'national_park', targetX: 33, targetY: 18 },
+    { x: 0, y: 5, targetMapId: 'national_park', targetX: 33, targetY: 19 },
+    { x: 9, y: 4, targetMapId: 'route_36', targetX: 18, targetY: 8 },
+    { x: 9, y: 5, targetMapId: 'route_36', targetX: 18, targetY: 9 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'route_36',
+  name: 'Route 36',
+  tileset: 'johto',
+  blkFile: 'maps__Route36.blk',
+  blocksW: 30,
+  blocksH: 9,
+  roofGroup: 'vc',
+  connections: {
+    NORTH: { mapId: 'route_37', offset: 20 },
+    SOUTH: { mapId: 'route_35', offset: 0 },
+    EAST: { mapId: 'violet_city', offset: 0 },
+  },
+  warps: [
+    { x: 18, y: 8, targetMapId: 'route_36_national_park_gate', targetX: 9, targetY: 4 },
+    { x: 18, y: 9, targetMapId: 'route_36_national_park_gate', targetX: 9, targetY: 5 },
+    { x: 47, y: 13, targetMapId: 'route_36_ruins_of_alph_gate', targetX: 4, targetY: 0 },
+    { x: 48, y: 13, targetMapId: 'route_36_ruins_of_alph_gate', targetX: 5, targetY: 0 },
+  ],
+  bgEvents: [
+    {
+      x: 55,
+      y: 7,
+      speaker: '🚏 ROUTE 36 SIGN',
+      pages: ['ROUTE 36', 'EAST TO VIOLET CITY, WEST TO NATIONAL PARK'],
+    },
+    {
+      x: 35,
+      y: 7,
+      speaker: '🌳 STRANGE TREE',
+      pages: ['A weird tree is wiggling slightly in place… It seems to dislike water!'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'pidgey', minLevel: 13, maxLevel: 15, weight: 30 },
+    { speciesId: 'nidoran-m', minLevel: 13, maxLevel: 13, weight: 15 },
+    { speciesId: 'nidoran-f', minLevel: 13, maxLevel: 13, weight: 15 },
+    { speciesId: 'growlithe', minLevel: 13, maxLevel: 15, weight: 20 },
+    { speciesId: 'vulpix', minLevel: 13, maxLevel: 15, weight: 20 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_36_ruins_of_alph_gate',
+  name: 'Route 36 Ruins of Alph Gate',
+  tileset: 'gate',
+  blkFile: 'maps__NorthSouthGate.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 4, y: 0, targetMapId: 'route_36', targetX: 47, targetY: 13 },
+    { x: 5, y: 0, targetMapId: 'route_36', targetX: 48, targetY: 13 },
+    { x: 4, y: 7, targetMapId: 'ruins_of_alph_outside', targetX: 7, targetY: 1 },
+    { x: 5, y: 7, targetMapId: 'ruins_of_alph_outside', targetX: 8, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'route_37',
+  name: 'Route 37',
+  tileset: 'johto',
+  blkFile: 'maps__Route37.blk',
+  blocksW: 10,
+  blocksH: 9,
+  roofGroup: 'vc',
+  connections: {
+    NORTH: { mapId: 'ecruteak_city', offset: -10 },
+    SOUTH: { mapId: 'route_36', offset: -20 },
+  },
+  warps: [],
+  bgEvents: [
+    {
+      x: 5,
+      y: 3,
+      speaker: '🚏 ROUTE 37 SIGN',
+      pages: ['ROUTE 37', 'NORTH TO ECRUTEAK CITY'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'pidgey', minLevel: 13, maxLevel: 15, weight: 25 },
+    { speciesId: 'pidgeotto', minLevel: 15, maxLevel: 17, weight: 15 },
+    { speciesId: 'growlithe', minLevel: 14, maxLevel: 16, weight: 25 },
+    { speciesId: 'vulpix', minLevel: 14, maxLevel: 16, weight: 25 },
+    { speciesId: 'stantler', minLevel: 15, maxLevel: 17, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'ecruteak_city',
+  name: 'Ecruteak City',
+  tileset: 'johto',
+  blkFile: 'maps__EcruteakCity.blk',
+  blocksW: 20,
+  blocksH: 18,
+  roofGroup: 'vc',
+  connections: {
+    SOUTH: { mapId: 'route_37', offset: 10 },
+  },
+  warps: [
+    { x: 23, y: 27, targetMapId: 'ecruteak_poke_center', targetX: 3, targetY: 7 },
+    { x: 29, y: 21, targetMapId: 'ecruteak_mart', targetX: 2, targetY: 7 },
+    { x: 6, y: 27, targetMapId: 'ecruteak_gym', targetX: 4, targetY: 17 },
+    { x: 23, y: 21, targetMapId: 'dance_theater', targetX: 5, targetY: 13 },
+    { x: 13, y: 27, targetMapId: 'ecruteak_itemfinder_house', targetX: 3, targetY: 7 },
+    { x: 5, y: 5, targetMapId: 'burned_tower_1f', targetX: 9, targetY: 15 },
+    { x: 37, y: 7, targetMapId: 'tin_tower_1f', targetX: 9, targetY: 15 },
+  ],
+  bgEvents: [
+    {
+      x: 18,
+      y: 28,
+      speaker: '🏮 ECRUTEAK CITY',
+      pages: ['ECRUTEAK CITY', 'A Historical City Where the Past Meets the Present'],
+    },
+    {
+      x: 8,
+      y: 27,
+      speaker: '🏆 ECRUTEAK GYM',
+      pages: ['ECRUTEAK CITY POKéMON GYM', 'LEADER: MORTY', 'The Mystic Seer of the Future!'],
+    },
+    {
+      x: 27,
+      y: 21,
+      speaker: '🎭 DANCE THEATER',
+      pages: ['ECRUTEAK DANCE THEATER', 'Kimono Girls Dance Troupe'],
+    },
+    {
+      x: 2,
+      y: 10,
+      speaker: '🔥 BURNED TOWER SIGN',
+      pages: ['BURNED TOWER', 'It was destroyed by a mysterious fire 150 years ago.'],
+    },
+    {
+      x: 34,
+      y: 7,
+      speaker: '🔔 TIN TOWER SIGN',
+      pages: ['TIN TOWER', 'A legendary POKéMON is said to roost at the summit.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'ecruteak_poke_center',
+  name: 'Ecruteak Pokémon Center',
+  tileset: 'pokecenter',
+  blkFile: 'maps__Pokecenter1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'ecruteak_city', targetX: 23, targetY: 27 },
+    { x: 4, y: 7, targetMapId: 'ecruteak_city', targetX: 23, targetY: 27 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'ecruteak_mart',
+  name: 'Ecruteak Mart',
+  tileset: 'mart',
+  blkFile: 'maps__Mart.blk',
+  blocksW: 6,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'ecruteak_city', targetX: 29, targetY: 21 },
+    { x: 3, y: 7, targetMapId: 'ecruteak_city', targetX: 29, targetY: 21 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'ecruteak_gym',
+  name: 'Ecruteak Gym',
+  tileset: 'tower',
+  blkFile: 'maps__EcruteakGym.blk',
+  blocksW: 5,
+  blocksH: 9,
+  warps: [
+    { x: 4, y: 17, targetMapId: 'ecruteak_city', targetX: 6, targetY: 27 },
+    { x: 5, y: 17, targetMapId: 'ecruteak_city', targetX: 6, targetY: 27 },
+  ],
+  bgEvents: [
+    {
+      x: 3,
+      y: 15,
+      speaker: '🏆 ECRUTEAK GYM STATUE',
+      pages: ['ECRUTEAK CITY POKéMON GYM', 'LEADER: MORTY'],
+    },
+    {
+      x: 6,
+      y: 15,
+      speaker: '🏆 ECRUTEAK GYM STATUE',
+      pages: ['ECRUTEAK CITY POKéMON GYM', 'LEADER: MORTY'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'dance_theater',
+  name: 'Dance Theater',
+  tileset: 'traditional_house',
+  blkFile: 'maps__DanceTheater.blk',
+  blocksW: 6,
+  blocksH: 7,
+  warps: [
+    { x: 5, y: 13, targetMapId: 'ecruteak_city', targetX: 23, targetY: 21 },
+    { x: 6, y: 13, targetMapId: 'ecruteak_city', targetX: 23, targetY: 21 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'ecruteak_itemfinder_house',
+  name: 'Ecruteak Itemfinder House',
+  tileset: 'traditional_house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'ecruteak_city', targetX: 13, targetY: 27 },
+    { x: 4, y: 7, targetMapId: 'ecruteak_city', targetX: 13, targetY: 27 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'burned_tower_1f',
+  name: 'Burned Tower 1F',
+  tileset: 'tower',
+  blkFile: 'maps__BurnedTower1F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 9, y: 15, targetMapId: 'ecruteak_city', targetX: 5, targetY: 5 },
+    { x: 10, y: 15, targetMapId: 'ecruteak_city', targetX: 5, targetY: 5 },
+    { x: 10, y: 9, targetMapId: 'burned_tower_b1f', targetX: 10, targetY: 9 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'rattata', minLevel: 13, maxLevel: 15, weight: 40 },
+    { speciesId: 'koffing', minLevel: 13, maxLevel: 16, weight: 40 },
+    { speciesId: 'zubat', minLevel: 13, maxLevel: 15, weight: 20 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'burned_tower_b1f',
+  name: 'Burned Tower B1F',
+  tileset: 'cave',
+  blkFile: 'maps__BurnedTowerB1F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 10, y: 9, targetMapId: 'burned_tower_1f', targetX: 10, targetY: 9 },
+  ],
+  bgEvents: [
+    {
+      x: 10,
+      y: 3,
+      speaker: '⚡ RAIKOU, ENTEI & SUICUNE',
+      pages: [
+        'Three legendary beasts stand frozen like statues…',
+        'As you approach, their eyes gleam with divine energy!',
+        'With a mighty roar, they awaken and leap into the skies of Johto!',
+      ],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'koffing', minLevel: 14, maxLevel: 16, weight: 50 },
+    { speciesId: 'zubat', minLevel: 14, maxLevel: 16, weight: 30 },
+    { speciesId: 'magmar', minLevel: 14, maxLevel: 16, weight: 20 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'tin_tower_1f',
+  name: 'Tin Tower 1F',
+  tileset: 'tower',
+  blkFile: 'maps__TinTower1F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 9, y: 15, targetMapId: 'ecruteak_city', targetX: 37, targetY: 7 },
+    { x: 10, y: 15, targetMapId: 'ecruteak_city', targetX: 37, targetY: 7 },
   ],
   bgEvents: [],
 });

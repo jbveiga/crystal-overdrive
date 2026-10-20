@@ -154,6 +154,40 @@ const PHASE8_MAP_FILES = [
   'maps/RadioTower5F.asm',
 ];
 
+const PHASE9_MAP_FILES = [
+  // Route 35, National Park, Route 36, Route 37
+  'maps/Route35.blk',
+  'maps/Route35.asm',
+  'maps/Route35NationalParkGate.asm',
+  'maps/Route36NationalParkGate.asm',
+  'maps/NationalPark.blk',
+  'maps/NationalPark.asm',
+  'maps/Route36.blk',
+  'maps/Route36.asm',
+  'maps/Route36RuinsOfAlphGate.asm',
+  'maps/Route37.blk',
+  'maps/Route37.asm',
+  // Ecruteak City
+  'maps/EcruteakCity.blk',
+  'maps/EcruteakCity.asm',
+  'maps/EcruteakPokecenter1F.asm',
+  'maps/EcruteakMart.asm',
+  'maps/EcruteakGym.blk',
+  'maps/EcruteakGym.asm',
+  'maps/DanceTheater.blk',
+  'maps/DanceTheater.asm',
+  'maps/EcruteakItemfinderHouse.asm',
+  // Burned Tower & Tin Tower
+  'maps/BurnedTower1F.blk',
+  'maps/BurnedTower1F.asm',
+  'maps/BurnedTowerB1F.blk',
+  'maps/BurnedTowerB1F.asm',
+  'maps/TinTower1F.blk',
+  'maps/TinTower1F.asm',
+  'maps/TinTowerRoof.blk',
+  'maps/TinTowerRoof.asm',
+];
+
 async function download(relPath) {
   const dest = path.join(OUT_DIR, relPath.replace(/\//g, '__'));
   if (fs.existsSync(dest)) return;
@@ -173,8 +207,8 @@ async function download(relPath) {
 }
 
 async function main() {
-  console.log('Downloading Phase 7 & 8 tilesets and map files from pret/pokecrystal...');
-  for (const f of [...TILESET_FILES, ...PHASE7_MAP_FILES, ...PHASE8_MAP_FILES]) {
+  console.log('Downloading Phase 7, 8 & 9 tilesets and map files from pret/pokecrystal...');
+  for (const f of [...TILESET_FILES, ...PHASE7_MAP_FILES, ...PHASE8_MAP_FILES, ...PHASE9_MAP_FILES]) {
     await download(f);
   }
   console.log('Downloads complete.');

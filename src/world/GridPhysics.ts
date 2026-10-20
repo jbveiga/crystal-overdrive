@@ -57,6 +57,7 @@ export interface GridEntity {
     | 'FALKNER_EVENT'
     | 'BUGSY_EVENT'
     | 'WHITNEY_EVENT'
+    | 'MORTY_EVENT'
     | 'ELMS_AIDE_EVENT';
   trainerId?: string;
   trainerName?: string;
