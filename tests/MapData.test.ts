@@ -1428,4 +1428,24 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(blaine).toBeDefined();
     expect(blaine?.trainerId).toBe('blaine');
   });
+
+  it('validates Sprint 09 Animated Retro GBC Loader and single-payload world_maps.json consolidation', () => {
+    const htmlSrc = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
+    expect(htmlSrc).toContain('id="retro-loader"');
+    expect(htmlSrc).toContain('class="loader-pokeball"');
+    expect(htmlSrc).toContain('id="loader-progress-fill"');
+    expect(htmlSrc).toContain('id="loader-status-text"');
+    expect(htmlSrc).toContain('window.updateLoaderProgress');
+    expect(htmlSrc).toContain('window.dismissLoader');
+
+    const worldMapsPath = path.resolve(__dirname, '../public/assets/data/world_maps.json');
+    expect(fs.existsSync(worldMapsPath)).toBe(true);
+    const bundledMaps: MapData[] = JSON.parse(fs.readFileSync(worldMapsPath, 'utf8'));
+    expect(bundledMaps.length).toBeGreaterThanOrEqual(315);
+
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    expect(mainSrc).toContain('./assets/data/world_maps.json');
+    expect(mainSrc).toContain('window.updateLoaderProgress?.(');
+    expect(mainSrc).toContain('window.dismissLoader?.()');
+  });
 });

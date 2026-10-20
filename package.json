@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build:maps": "node scripts/build-world-maps.cjs",
+    "build": "node scripts/build-world-maps.cjs && tsc && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "review": "node scripts/project-optimization-review.cjs"

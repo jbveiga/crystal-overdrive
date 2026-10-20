@@ -22,6 +22,13 @@ import type { Graphics } from 'pixi.js';
 import { createNpcsByMap } from './world/npcData';
 export { npcsByMap, createNpcsByMap } from './world/npcData';
 
+declare global {
+  interface Window {
+    updateLoaderProgress?: (pct: number, label: string) => void;
+    dismissLoader?: () => void;
+  }
+}
+
 async function bootstrap() {
   const canvasContainer = document.getElementById('canvas-container');
   if (!canvasContainer) {
@@ -448,12 +455,23 @@ async function bootstrap() {
     'route_21',
   ];
 
-  const loadedMaps: MapData[] = await Promise.all(
-    mapIds.map(async (id) => {
-      const res = await fetch(`./assets/data/maps/${id}.json`);
-      return res.json();
-    })
-  );
+  window.updateLoaderProgress?.(20, 'Loading Johto & Kanto maps...');
+  let loadedMaps: MapData[] = [];
+  try {
+    const bundleRes = await fetch('./assets/data/world_maps.json');
+    if (bundleRes.ok) {
+      loadedMaps = await bundleRes.json();
+    } else {
+      throw new Error(`HTTP ${bundleRes.status}`);
+    }
+  } catch {
+    loadedMaps = await Promise.all(
+      mapIds.map(async (id) => {
+        const res = await fetch(`./assets/data/maps/${id}.json`);
+        return res.json();
+      })
+    );
+  }
 
   for (const m of loadedMaps) {
     mapManager.registerMap(m);
@@ -640,6 +658,7 @@ async function bootstrap() {
   overworldHUD.updatePokegear(roamingManager.getAllRoamers());
   overworldHUD.hide();
 
+  window.updateLoaderProgress?.(70, 'Mounting overworld engine...');
   const overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer);
   overworldRenderer.setPlayerGender(playerGender);
@@ -648,6 +667,8 @@ async function bootstrap() {
 
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
   const battleHUD = new BattleHUD('battle-hud-container');
+  window.updateLoaderProgress?.(100, 'Ready!');
+  window.dismissLoader?.();
 
   // 5b. Mount Professor Oak Intro Sequence (Ticket 4.3) & Title Screen UI (Ticket 4.2)
   const introSequenceUI = new IntroSequenceUI('modal-container', {
