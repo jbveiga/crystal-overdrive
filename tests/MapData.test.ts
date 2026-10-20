@@ -187,6 +187,13 @@ describe('MapData & Authentic Tile Integrity', () => {
     });
     expect(h2.collisionGrid[0 * h2.width + 7]).toBe(0); // Walkable staircase on 2F
     expect(h2.collisionGrid[1 * h2.width + 7]).toBe(0); // Walkable arrival tile (7, 1) on 2F
+    // Single canonical bed at x=0 (solid) and walkable floor beside bed at x=1 (1, 1) and (1, 2)
+    expect(h2.collisionGrid[1 * h2.width + 0]).toBe(1);
+    expect(h2.collisionGrid[2 * h2.width + 0]).toBe(1);
+    expect(h2.collisionGrid[1 * h2.width + 1]).toBe(0);
+    expect(h2.collisionGrid[2 * h2.width + 1]).toBe(0);
+    expect(h2.tileMap![1 * h2.width + 1]).toBe('in_players_house_01_01_01_01');
+    expect(h2.tileMap![2 * h2.width + 1]).toBe('in_players_house_01_01_01_01');
 
     // Verify 2F interactive bedroom objects (PC, Radio, Bookshelf, Nintendo 64)
     expect(h2.bgEvents?.length).toBe(4);

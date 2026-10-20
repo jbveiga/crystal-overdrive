@@ -6,8 +6,8 @@
   "tileSize": 64,
   "groundLayer": [
     1, 1, 1, 1, 1, 1, 1, 0,
-    1, 1, 1, 1, 1, 1, 0, 0,
-    1, 1, 0, 0, 1, 0, 0, 0,
+    1, 0, 1, 1, 1, 1, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0
@@ -22,8 +22,8 @@
   ],
   "collisionGrid": [
     1, 1, 1, 1, 1, 1, 1, 0,
-    1, 1, 1, 1, 1, 1, 0, 0,
-    1, 1, 0, 0, 1, 0, 0, 0,
+    1, 0, 1, 1, 1, 1, 0, 0,
+    1, 0, 0, 0, 1, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0
@@ -38,7 +38,7 @@
     "in_players_house_11_11_11_11",
     "in_players_house_4c_4d_5c_5d",
     "in_players_house_28_29_38_39",
-    "in_players_house_28_29_38_39",
+    "in_players_house_01_01_01_01",
     "in_players_house_30_31_0c_0d",
     "in_players_house_26_27_36_37",
     "in_players_house_16_17_08_09",
@@ -46,7 +46,7 @@
     "in_players_house_01_01_01_01",
     "in_players_house_01_01_01_01",
     "in_players_house_48_49_58_59",
-    "in_players_house_48_49_58_59",
+    "in_players_house_01_01_01_01",
     "in_players_house_01_01_01_01",
     "in_players_house_01_01_01_01",
     "in_players_house_4a_4b_5a_5b",

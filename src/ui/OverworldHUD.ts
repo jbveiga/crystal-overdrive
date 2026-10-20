@@ -18,8 +18,7 @@ export class OverworldHUD {
   private speedButton!: HTMLButtonElement;
   private muteButton!: HTMLButtonElement;
   private gamepadToggleButton!: HTMLButtonElement;
-  private menuDrawer!: HTMLDivElement;
-  private isDrawerExpanded: boolean = false;
+  private desktopControlsBar!: HTMLDivElement;
   private routeBanner!: HTMLDivElement;
   private roamerAlertBanner!: HTMLDivElement;
   private toastBanner!: HTMLDivElement;
@@ -71,29 +70,27 @@ export class OverworldHUD {
     return this.rootElement?.style.display !== 'none';
   }
 
-  private setDrawerExpanded(expanded: boolean): void {
-    this.isDrawerExpanded = expanded;
-    if (!this.menuDrawer) return;
-    if (expanded) {
-      this.menuDrawer.style.maxWidth = '520px';
-      this.menuDrawer.style.opacity = '1';
-      this.menuDrawer.style.pointerEvents = 'auto';
-      this.menuDrawer.style.marginRight = '4px';
-    } else {
-      this.menuDrawer.style.maxWidth = '0px';
-      this.menuDrawer.style.opacity = '0';
-      this.menuDrawer.style.pointerEvents = 'none';
-      this.menuDrawer.style.marginRight = '0px';
-    }
-  }
-
-  public toggleMenuDrawer(): void {
-    this.setDrawerExpanded(!this.isDrawerExpanded);
+  private injectResponsiveStyles(): void {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('crystal-overworld-hud-responsive-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'crystal-overworld-hud-responsive-styles';
+    style.textContent = `
+      @media (max-width: 768px), (pointer: coarse) {
+        #desktop-controls-bar {
+          display: none !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   private updateGamepadVisibility(): void {
     if (this.gamepadContainer) {
       this.gamepadContainer.style.display = this.isGamepadVisible ? 'block' : 'none';
+    }
+    if (this.desktopControlsBar) {
+      this.desktopControlsBar.style.display = this.isGamepadVisible ? 'none' : 'flex';
     }
     if (this.gamepadToggleButton) {
       this.gamepadToggleButton.style.background = this.isGamepadVisible ? '#0284c7' : '#334155';
@@ -102,6 +99,7 @@ export class OverworldHUD {
   }
 
   private createUI(): void {
+    this.injectResponsiveStyles();
     this.rootElement = document.createElement('div');
     this.rootElement.id = 'hud-root';
     this.rootElement.style.cssText = `
@@ -136,7 +134,7 @@ export class OverworldHUD {
             New Bark Town
           </div>
 
-          <!-- Collapsible Top Menu Dock Capsule -->
+          <!-- Top Menu Dock Capsule -->
           <div id="top-menu-capsule" style="
             display: flex;
             align-items: center;
@@ -149,80 +147,6 @@ export class OverworldHUD {
             padding: 5px 8px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
           ">
-            <!-- Expandable Action Drawer -->
-            <div id="top-menu-drawer" style="
-              display: flex;
-              align-items: center;
-              gap: 6px;
-              max-width: 0px;
-              opacity: 0;
-              overflow: hidden;
-              pointer-events: none;
-              white-space: nowrap;
-              transition: max-width 0.28s ease, opacity 0.2s ease, margin-right 0.2s ease;
-            ">
-              <button id="party-btn" style="
-                background: #16a34a;
-                color: #ffffff;
-                border: none;
-                border-radius: 999px;
-                padding: 6px 11px;
-                font-size: 12px;
-                font-weight: 700;
-                cursor: pointer;
-              ">
-                🟢 PARTY
-              </button>
-              <button id="bag-btn" style="
-                background: #d97706;
-                color: #ffffff;
-                border: none;
-                border-radius: 999px;
-                padding: 6px 11px;
-                font-size: 12px;
-                font-weight: 700;
-                cursor: pointer;
-              ">
-                🎒 BAG
-              </button>
-              <button id="mart-btn" style="
-                background: #7c3aed;
-                color: #ffffff;
-                border: none;
-                border-radius: 999px;
-                padding: 6px 11px;
-                font-size: 12px;
-                font-weight: 700;
-                cursor: pointer;
-              ">
-                🏪 MART
-              </button>
-              <button id="save-btn" style="
-                background: #059669;
-                color: #ffffff;
-                border: none;
-                border-radius: 999px;
-                padding: 6px 11px;
-                font-size: 12px;
-                font-weight: 700;
-                cursor: pointer;
-              ">
-                💾 SAVE
-              </button>
-              <button id="pokegear-btn" style="
-                background: #0d9488;
-                color: #ffffff;
-                border: none;
-                border-radius: 999px;
-                padding: 6px 11px;
-                font-size: 12px;
-                font-weight: 700;
-                cursor: pointer;
-              ">
-                📻 POKÉGEAR
-              </button>
-            </div>
-
             <!-- Always-Visible Capsule Controls -->
             <button id="gamepad-toggle-btn" title="Toggle Touch Gamepad" style="
               background: #334155;
@@ -533,8 +457,8 @@ export class OverworldHUD {
             </div>
           </div>
 
-          <!-- Bottom Controls / Help info -->
-          <div style="
+          <!-- Bottom Controls / Help info (Desktop Only; hidden when Touch Gamepad is active) -->
+          <div id="desktop-controls-bar" style="
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -574,7 +498,7 @@ export class OverworldHUD {
     this.speedButton = this.rootElement.querySelector('#speed-toggle-btn') as HTMLButtonElement;
     this.muteButton = this.rootElement.querySelector('#mute-toggle-btn') as HTMLButtonElement;
     this.gamepadToggleButton = this.rootElement.querySelector('#gamepad-toggle-btn') as HTMLButtonElement;
-    this.menuDrawer = this.rootElement.querySelector('#top-menu-drawer') as HTMLDivElement;
+    this.desktopControlsBar = this.rootElement.querySelector('#desktop-controls-bar') as HTMLDivElement;
     this.routeBanner = this.rootElement.querySelector('#route-banner') as HTMLDivElement;
     this.roamerAlertBanner = this.rootElement.querySelector('#roamer-alert-banner') as HTMLDivElement;
     this.toastBanner = this.rootElement.querySelector('#overworld-toast-banner') as HTMLDivElement;
@@ -593,11 +517,6 @@ export class OverworldHUD {
     this.updateGamepadVisibility();
 
     const startMenuBtn = this.rootElement.querySelector('#start-menu-btn') as HTMLButtonElement;
-    const partyBtn = this.rootElement.querySelector('#party-btn') as HTMLButtonElement;
-    const bagBtn = this.rootElement.querySelector('#bag-btn') as HTMLButtonElement;
-    const martBtn = this.rootElement.querySelector('#mart-btn') as HTMLButtonElement;
-    const saveBtn = this.rootElement.querySelector('#save-btn') as HTMLButtonElement;
-    const pokegearBtn = this.rootElement.querySelector('#pokegear-btn') as HTMLButtonElement;
     const interactBtn = this.rootElement.querySelector('#interact-btn') as HTMLButtonElement;
     const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
     const closePokegearBtn = this.rootElement.querySelector('#close-pokegear-btn') as HTMLButtonElement;
@@ -611,14 +530,7 @@ export class OverworldHUD {
 
     startMenuBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      this.toggleMenuDrawer();
       if (this.options.onMenuToggle) this.options.onMenuToggle();
-    });
-
-    partyBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.setDrawerExpanded(false);
-      if (this.options.onPartyOpen) this.options.onPartyOpen();
     });
 
     this.dialogueBox.addEventListener('click', () => {
@@ -626,42 +538,11 @@ export class OverworldHUD {
     });
 
     interactBtn.addEventListener('click', () => {
-      this.setDrawerExpanded(false);
       if (this.dialogueActive) {
         this.advanceDialogue();
       } else if (this.options.onInteract) {
         this.options.onInteract();
       }
-    });
-
-    bagBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.setDrawerExpanded(false);
-      if (this.options.onBagOpen) this.options.onBagOpen();
-    });
-
-    martBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.setDrawerExpanded(false);
-      if (this.options.onMartOpen) this.options.onMartOpen();
-    });
-
-    saveBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (this.options.onSaveGame) {
-        this.options.onSaveGame();
-        saveBtn.innerText = '✅ SAVED!';
-        setTimeout(() => {
-          saveBtn.innerText = '💾 SAVE';
-          this.setDrawerExpanded(false);
-        }, 1200);
-      }
-    });
-
-    pokegearBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.setDrawerExpanded(false);
-      pokegearModal.style.display = pokegearModal.style.display === 'none' ? 'block' : 'none';
     });
 
     closePokegearBtn.addEventListener('click', () => {
@@ -681,14 +562,6 @@ export class OverworldHUD {
       if (this.options.onMuteToggle) {
         const muted = this.options.onMuteToggle();
         this.updateMuteDisplay(muted);
-      }
-    });
-
-    // Auto-collapse top menu drawer on outside click/tap
-    window.addEventListener('pointerdown', (e) => {
-      const capsule = this.rootElement.querySelector('#top-menu-capsule');
-      if (this.isDrawerExpanded && capsule && !capsule.contains(e.target as Node)) {
-        this.setDrawerExpanded(false);
       }
     });
 
@@ -741,9 +614,6 @@ export class OverworldHUD {
 
     const updateTouchDir = (dir: Direction | null) => {
       this.touchDirection = dir;
-      if (dir && this.isDrawerExpanded) {
-        this.setDrawerExpanded(false);
-      }
       highlightDpadSegment(dir);
       this.computeActiveDirection();
     };
@@ -799,7 +669,6 @@ export class OverworldHUD {
     // Virtual A Button (Confirm / Interact)
     const triggerButtonA = (e: Event) => {
       e.preventDefault();
-      this.setDrawerExpanded(false);
       if (this.dialogueActive) {
         this.advanceDialogue();
       } else if (this.options.onInteract) {
@@ -822,10 +691,6 @@ export class OverworldHUD {
       if (this.isPokegearOpen()) {
         const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
         pokegearModal.style.display = 'none';
-        return;
-      }
-      if (this.isDrawerExpanded) {
-        this.setDrawerExpanded(false);
         return;
       }
       if (this.options.isModalOpen?.() && this.options.onMenuToggle) {
@@ -1086,7 +951,6 @@ export class OverworldHUD {
           pokegearModal.style.display = 'none';
           return;
         }
-        this.toggleMenuDrawer();
         if (this.options.onMenuToggle) {
           e.preventDefault();
           this.options.onMenuToggle();
@@ -1111,9 +975,6 @@ export class OverworldHUD {
       }
 
       this.heldKeys.add(e.code);
-      if (this.isDrawerExpanded && ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
-        this.setDrawerExpanded(false);
-      }
       this.computeActiveDirection();
     });
 

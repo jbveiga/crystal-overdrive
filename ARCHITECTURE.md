@@ -87,7 +87,7 @@ src/
 ├── ui/                    # Vector DOM Overlays & Interactivity (100dvh + Safe-Area Inset Aware)
 │   ├── TitleScreenUI.ts      # Crystalline Title Screen, Audio Unlock Gate, SavePreview Card, Overwrite & Options Modals
 │   ├── IntroSequenceUI.ts    # 6-Stage Prof. Oak Intro, Gender Select (Boy/Girl), 7-Char Name Input & Presets, RTC Sync
-│   ├── OverworldHUD.ts       # Collapsible menu dock, Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
+│   ├── OverworldHUD.ts       # Top menu capsule (single StartMenuUI trigger), Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
 │   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, Unbound 2x2 move matrix & hotkeys
 │   ├── StartMenuUI.ts        # Classic start menu (Pokedex, Pokemon, Bag, Save)
 │   ├── PartyManagementUI.ts  # Full party inspector, lead reordering, summaries
