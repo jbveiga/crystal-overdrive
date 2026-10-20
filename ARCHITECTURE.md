@@ -37,7 +37,8 @@ flowchart TD
         EB["EventBus (Decoupled Pub/Sub)"]
     end
 
-    subgraph Audio_Layer["Audio Layer (Web Audio API)"]
+    subgraph Audio_Layer["Audio Layer (Howler.js & Web Audio API)"]
+        AM["AudioManager (BGM Crossfading, Battle Ducking, Mute Sync)"]
         BA["BattleAudio (Synthesized 8-Bit Cries, Cues, Fanfares)"]
     end
 
@@ -88,6 +89,7 @@ src/
 │   ├── PartyManagementUI.ts  # Full party inspector, lead reordering, summaries
 │   └── BagAndMartUI.ts       # Progressive Mart inventory, out-of-battle medicine
 ├── audio/                 # Audio Engine
+│   ├── AudioManager.ts       # Seamless BGM crossfader (.webm/.mp3), battle ducking, and mute persistence
 │   └── BattleAudio.ts        # Pure Web Audio synthesized 8-bit cries and sound effects
 └── types/                 # Shared Data Models & Interfaces
     └── game.d.ts          # Strongly-typed schemas for maps, entities, and battle state
@@ -229,7 +231,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
 | `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 10 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6). |
 | `SaveManager.ts` | `tests/SaveManager.test.ts` | 2 | ✅ Covered | IndexedDB / localStorage serialization, round-trip state restoration. |
-| **Current Baseline** | **7 Suites** | **51 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `AudioManager.ts` | `tests/AudioManager.test.ts` | 5 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync. |
+| **Current Baseline** | **8 Suites** | **56 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

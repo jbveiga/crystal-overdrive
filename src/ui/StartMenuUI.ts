@@ -32,6 +32,7 @@ export interface StartMenuStateProvider {
   getKeyItems?: () => string[];
   getPlayTimeSeconds: () => number;
   getMapName: () => string;
+  isMuted?: () => boolean;
 }
 
 export interface StartMenuCallbacks {
@@ -39,6 +40,7 @@ export interface StartMenuCallbacks {
   onOpenBag: () => void;
   onOpenPokegear: () => void;
   onSaveGame: () => Promise<void>;
+  onToggleMute?: () => boolean;
 }
 
 const JOHTO_BADGES = [
@@ -125,6 +127,20 @@ export class StartMenuUI {
         icon: '💾',
         action: () => {
           this.openSaveConfirm();
+        },
+      },
+      {
+        id: 'start-opt-sound',
+        label: 'SOUND: ON',
+        icon: '🔊',
+        action: () => {
+          if (this.callbacks.onToggleMute) {
+            const muted = this.callbacks.onToggleMute();
+            if (!muted) {
+              BattleAudio.playMenuSound('CONFIRM');
+            }
+          }
+          this.renderMenuItems();
         },
       },
       {
@@ -376,6 +392,11 @@ export class StartMenuUI {
     this.menuPanel.appendChild(header);
 
     this.menuItems.forEach((item, idx) => {
+      if (item.id === 'start-opt-sound' && this.stateProvider.isMuted) {
+        const muted = this.stateProvider.isMuted();
+        item.label = muted ? 'SOUND: OFF' : 'SOUND: ON';
+        item.icon = muted ? '🔇' : '🔊';
+      }
       const isSelected = idx === this.cursorIndex;
       const btn = document.createElement('button');
       btn.id = item.id;

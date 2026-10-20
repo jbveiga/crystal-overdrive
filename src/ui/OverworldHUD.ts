@@ -3,6 +3,7 @@ import { eventBus } from '../core/EventBus';
 
 export interface OverworldHUDOptions {
   onSpeedCycle?: () => SpeedMultiplier;
+  onMuteToggle?: () => boolean;
   onMenuToggle?: () => void;
   onPartyOpen?: () => void;
   onBagOpen?: () => void;
@@ -16,6 +17,7 @@ export interface OverworldHUDOptions {
 export class OverworldHUD {
   private container: HTMLElement;
   private speedButton!: HTMLButtonElement;
+  private muteButton!: HTMLButtonElement;
   private routeBanner!: HTMLDivElement;
   private roamerAlertBanner!: HTMLDivElement;
   private toastBanner!: HTMLDivElement;
@@ -187,6 +189,20 @@ export class OverworldHUD {
             ">
               SPEED: 1x (Shift)
             </button>
+            <button id="mute-toggle-btn" style="
+              background: #334155;
+              color: #ffffff;
+              border: none;
+              border-radius: 6px;
+              padding: 8px 12px;
+              font-size: 13px;
+              font-weight: 700;
+              cursor: pointer;
+              transition: background 0.15s ease;
+              box-shadow: 0 2px 8px rgba(15, 23, 42, 0.4);
+            ">
+              🔊 SOUND: ON
+            </button>
           </div>
         </div>
 
@@ -339,6 +355,7 @@ export class OverworldHUD {
     this.container.appendChild(this.rootElement);
 
     this.speedButton = this.rootElement.querySelector('#speed-toggle-btn') as HTMLButtonElement;
+    this.muteButton = this.rootElement.querySelector('#mute-toggle-btn') as HTMLButtonElement;
     this.routeBanner = this.rootElement.querySelector('#route-banner') as HTMLDivElement;
     this.roamerAlertBanner = this.rootElement.querySelector('#roamer-alert-banner') as HTMLDivElement;
     this.toastBanner = this.rootElement.querySelector('#overworld-toast-banner') as HTMLDivElement;
@@ -408,6 +425,13 @@ export class OverworldHUD {
       if (this.options.onSpeedCycle) {
         const nextSpeed = this.options.onSpeedCycle();
         this.updateSpeedDisplay(nextSpeed);
+      }
+    });
+
+    this.muteButton.addEventListener('click', () => {
+      if (this.options.onMuteToggle) {
+        const muted = this.options.onMuteToggle();
+        this.updateMuteDisplay(muted);
       }
     });
 
@@ -628,6 +652,13 @@ export class OverworldHUD {
       } else {
         this.speedButton.style.background = '#dc2626';
       }
+    }
+  }
+
+  public updateMuteDisplay(muted: boolean): void {
+    if (this.muteButton) {
+      this.muteButton.innerText = muted ? '🔇 SOUND: OFF' : '🔊 SOUND: ON';
+      this.muteButton.style.background = muted ? '#7f1d1d' : '#334155';
     }
   }
 

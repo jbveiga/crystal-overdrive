@@ -9,6 +9,7 @@ import { BattleHUD } from './ui/BattleHUD';
 import { BattleStateMachine, type BattleTurnResult } from './battle/BattleStateMachine';
 import { PokemonFactory } from './battle/PokemonFactory';
 import { BattleAudio } from './audio/BattleAudio';
+import { AudioManager } from './audio/AudioManager';
 import { RoamingManager } from './world/RoamingManager';
 import { SaveManager, type SaveData } from './core/SaveManager';
 import { BagAndMartUI, type BagInventory } from './ui/BagAndMartUI';
@@ -28,6 +29,7 @@ async function bootstrap() {
   const mapManager = new MapManager();
   const roamingManager = new RoamingManager();
   const saveManager = new SaveManager();
+  const audioManager = new AudioManager();
   let gameState: 'OVERWORLD' | 'BATTLE' = 'OVERWORLD';
 
   // 2. Load or Initialize Game State
@@ -209,6 +211,7 @@ async function bootstrap() {
       },
       getPlayTimeSeconds: () => playTimeSeconds,
       getMapName: () => mapManager.getCurrentMap()?.name || 'New Bark Town',
+      isMuted: () => audioManager.isMuted(),
     },
     {
       onOpenParty: () => {
@@ -226,6 +229,11 @@ async function bootstrap() {
       },
       onSaveGame: async () => {
         await saveCurrentGame();
+      },
+      onToggleMute: () => {
+        const muted = audioManager.toggleMute();
+        overworldHUD.updateMuteDisplay(muted);
+        return muted;
       },
     }
   );
@@ -245,6 +253,9 @@ async function bootstrap() {
       startMenuUI.setSpeedMultiplier(newSpeed);
       eventBus.emit('player:speedChanged', { playerSpeed: newSpeed });
       return newSpeed;
+    },
+    onMuteToggle: () => {
+      return audioManager.toggleMute();
     },
     onMenuToggle: () => {
       if (partyUI.isOpen()) {
@@ -300,8 +311,22 @@ async function bootstrap() {
     },
   });
   overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
+  overworldHUD.updateMuteDisplay(audioManager.isMuted());
   overworldHUD.updateRouteName(initialMap.name);
   overworldHUD.updatePokegear(roamingManager.getAllRoamers());
+  audioManager.playMapBgm(initialMap.id, 0);
+
+  // Unlock / resume BGM on first user gesture if browser autoplay was initially deferred
+  const unlockAudioOnGesture = () => {
+    const activeMap = mapManager.getCurrentMap();
+    if (gameState === 'OVERWORLD' && activeMap) {
+      audioManager.playMapBgm(activeMap.id, 0);
+    }
+    window.removeEventListener('pointerdown', unlockAudioOnGesture);
+    window.removeEventListener('keydown', unlockAudioOnGesture);
+  };
+  window.addEventListener('pointerdown', unlockAudioOnGesture);
+  window.addEventListener('keydown', unlockAudioOnGesture);
 
   const overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer);
@@ -951,6 +976,7 @@ async function bootstrap() {
       // Roaming Beast Markov Transition Roll on Route Change
       roamingManager.onPlayerRouteChange(nextMapId);
       eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+      audioManager.playMapBgm(nextMapId, 0.8);
 
       const roamerOnRoute = roamingManager.getActiveRoamerOnRoute(nextMapId);
       if (roamerOnRoute) {
@@ -973,6 +999,7 @@ async function bootstrap() {
     overworldHUD.hide();
     player.isMoving = false;
     player.progress = 0;
+    audioManager.playBattleBgm(options.isTrainer ? 'trainer' : 'wild');
 
     // Record species as SEEN in Pokédex
     seenSpecies.add(opponentPokemon.speciesId);
@@ -1092,6 +1119,7 @@ async function bootstrap() {
         battleRenderer.endBattle();
         battleHUD.hide();
         gameState = 'OVERWORLD';
+        audioManager.restoreOverworldBgm(0.6);
         overworldHUD.show();
         saveCurrentGame();
       } else {
@@ -1140,6 +1168,7 @@ async function bootstrap() {
           battleRenderer.endBattle();
           battleHUD.hide();
           gameState = 'OVERWORLD';
+          audioManager.restoreOverworldBgm(0.6);
           overworldHUD.show();
         },
         onSpeedToggle: () => {
@@ -1425,6 +1454,7 @@ async function bootstrap() {
 
                 overworldRenderer.renderMap(targetMap, lookupMap);
                 overworldHUD.updateRouteName(targetMap.name);
+                audioManager.playMapBgm(targetMap.id, 0.8);
               })
               .then(() => {
                 isCutsceneLocked = false;
