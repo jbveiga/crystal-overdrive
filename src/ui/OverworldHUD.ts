@@ -114,7 +114,7 @@ export class OverworldHUD {
       flex-direction: column;
       justify-content: space-between;
       pointer-events: none;
-      padding: 16px;
+      padding: max(12px, env(safe-area-inset-top, 12px)) max(12px, env(safe-area-inset-right, 12px)) max(12px, env(safe-area-inset-bottom, 12px)) max(12px, env(safe-area-inset-left, 12px));
       box-sizing: border-box;
     `;
 
@@ -329,6 +329,7 @@ export class OverworldHUD {
             font-weight: 700;
             font-size: 14px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+            margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
           "></div>
         </div>
 
@@ -346,8 +347,8 @@ export class OverworldHUD {
           <!-- Virtual D-Pad (Bottom-Left, 140x140px) -->
           <div id="virtual-dpad-base" style="
             position: absolute;
-            bottom: 24px;
-            left: 24px;
+            bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+            left: calc(16px + env(safe-area-inset-left, 0px));
             width: 140px;
             height: 140px;
             border-radius: 50%;
@@ -441,8 +442,8 @@ export class OverworldHUD {
           <!-- Virtual Action Buttons (Bottom-Right: A & B) -->
           <button id="virtual-btn-b" style="
             position: absolute;
-            bottom: 54px;
-            right: 92px;
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+            right: calc(68px + env(safe-area-inset-right, 0px));
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -458,8 +459,8 @@ export class OverworldHUD {
           ">B</button>
           <button id="virtual-btn-a" style="
             position: absolute;
-            bottom: 24px;
-            right: 24px;
+            bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+            right: calc(16px + env(safe-area-inset-right, 0px));
             width: 56px;
             height: 56px;
             border-radius: 50%;
@@ -476,7 +477,7 @@ export class OverworldHUD {
         </div>
 
         <!-- Bottom Area: Classic Dialogue Box + Help Bar -->
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; z-index: 40;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; z-index: 40; margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));">
           <!-- Classic Pokémon Dialogue Box -->
           <div id="dialogue-box" style="
             display: none;
@@ -492,6 +493,7 @@ export class OverworldHUD {
             cursor: pointer;
             user-select: none;
             position: relative;
+            margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
           ">
             <div id="dialogue-speaker" style="
               display: none;

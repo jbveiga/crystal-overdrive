@@ -15,6 +15,7 @@ import { SaveManager, type SaveData } from './core/SaveManager';
 import { BagAndMartUI, type BagInventory } from './ui/BagAndMartUI';
 import { PartyManagementUI } from './ui/PartyManagementUI';
 import { StartMenuUI } from './ui/StartMenuUI';
+import { TitleScreenUI } from './ui/TitleScreenUI';
 import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions } from './types/game';
 import type { Graphics } from 'pixi.js';
 
@@ -30,10 +31,11 @@ async function bootstrap() {
   const roamingManager = new RoamingManager();
   const saveManager = new SaveManager();
   const audioManager = new AudioManager();
-  let gameState: 'OVERWORLD' | 'BATTLE' = 'OVERWORLD';
+  let gameState: 'TITLE' | 'OVERWORLD' | 'BATTLE' = 'TITLE';
 
   // 2. Load or Initialize Game State
   const existingSave = await saveManager.loadGame();
+  const initialSavePreview = await saveManager.getSavePreview();
 
   let playerParty: PokemonInstance[] = [];
   let playerBox: PokemonInstance[] = [];
@@ -255,7 +257,7 @@ async function bootstrap() {
   startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
 
   const isAnyOverworldModalOpen = () =>
-    startMenuUI.isOpen() || partyUI.isOpen() || bagUI.isOpen();
+    gameState === 'TITLE' || startMenuUI.isOpen() || partyUI.isOpen() || bagUI.isOpen();
 
   const overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
@@ -307,19 +309,7 @@ async function bootstrap() {
   overworldHUD.updateMuteDisplay(audioManager.isMuted());
   overworldHUD.updateRouteName(initialMap.name);
   overworldHUD.updatePokegear(roamingManager.getAllRoamers());
-  audioManager.playMapBgm(initialMap.id, 0);
-
-  // Unlock / resume BGM on first user gesture if browser autoplay was initially deferred
-  const unlockAudioOnGesture = () => {
-    const activeMap = mapManager.getCurrentMap();
-    if (gameState === 'OVERWORLD' && activeMap) {
-      audioManager.playMapBgm(activeMap.id, 0);
-    }
-    window.removeEventListener('pointerdown', unlockAudioOnGesture);
-    window.removeEventListener('keydown', unlockAudioOnGesture);
-  };
-  window.addEventListener('pointerdown', unlockAudioOnGesture);
-  window.addEventListener('keydown', unlockAudioOnGesture);
+  overworldHUD.hide();
 
   const overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer);
@@ -328,6 +318,97 @@ async function bootstrap() {
 
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
   const battleHUD = new BattleHUD('battle-hud-container');
+
+  // 5b. Mount Title Screen UI (Ticket 4.2)
+  const titleScreenUI = new TitleScreenUI('modal-container', initialSavePreview, gameOptions, {
+    onUnlockAudio: async () => {
+      await audioManager.unlockAudio();
+    },
+    onContinue: async () => {
+      titleScreenUI.hide();
+      gameState = 'OVERWORLD';
+      overworldHUD.show();
+      const activeMap = mapManager.getCurrentMap();
+      if (activeMap) {
+        overworldHUD.updateRouteName(activeMap.name);
+        audioManager.playMapBgm(activeMap.id, 0.6);
+      }
+    },
+    onNewGame: async () => {
+      await saveManager.deleteSave();
+      titleScreenUI.hide();
+
+      // Reset fresh adventure state
+      playerName = 'GOLD';
+      playerGender = 'BOY';
+      playTimeSeconds = 0;
+      playerParty.length = 0;
+      playerParty.push(
+        PokemonFactory.create('cyndaquil', 5, ['tackle', 'leer', 'ember', 'smokescreen'])
+      );
+      playerBox.length = 0;
+      inventory.balls = {
+        'quick-ball': 5,
+        'fast-ball': 5,
+        'net-ball': 5,
+        'ultra-ball': 10,
+        'great-ball': 15,
+        'poke-ball': 30,
+        'master-ball': 1,
+      };
+      inventory.items = {
+        potion: 5,
+        'super-potion': 2,
+        antidote: 3,
+        'parlyz-heal': 2,
+        awakening: 2,
+        revive: 1,
+      };
+      inventory.tms = ['TM54', 'TM73', 'TM99'];
+      inventory.money = 3000;
+      inventory.badges = [];
+      defeatedTrainers.clear();
+      storyFlags.clear();
+      seenSpecies.clear();
+      seenSpecies.add('cyndaquil');
+      roamingManager.sleepBeasts();
+
+      gameClock.playerSpeed = gameOptions.playerSpeedDefault;
+      overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
+      bagUI.setSpeedMultiplier(gameClock.playerSpeed);
+      partyUI.setSpeedMultiplier(gameClock.playerSpeed);
+      startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
+
+      // Spawn in Player's 2F Bedroom at (7, 1) facing DOWN
+      const startMap = mapManager.setCurrentMap('players_house_2f');
+      player.x = 7;
+      player.y = 1;
+      player.targetX = 7;
+      player.targetY = 1;
+      player.renderX = 7;
+      player.renderY = 1;
+      player.direction = 'DOWN';
+      player.isMoving = false;
+      player.progress = 0;
+
+      overworldRenderer.renderMap(startMap, lookupMap);
+      overworldHUD.updateRouteName(startMap.name);
+      overworldHUD.updatePokegear(roamingManager.getAllRoamers());
+      gameState = 'OVERWORLD';
+      overworldHUD.show();
+      audioManager.playMapBgm(startMap.id, 0.6);
+    },
+    onOptionsChanged: (updatedOptions) => {
+      gameOptions = updatedOptions;
+      audioManager.setBgmVolume(updatedOptions.bgmVolume);
+      audioManager.setSfxVolume(updatedOptions.soundVolume);
+      gameClock.playerSpeed = updatedOptions.playerSpeedDefault;
+      overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
+      bagUI.setSpeedMultiplier(gameClock.playerSpeed);
+      partyUI.setSpeedMultiplier(gameClock.playerSpeed);
+      startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
+    },
+  });
 
   // Support Shift key to cycle Battle Speed while in Battle mode, and Start Menu keyboard navigation in Overworld
   window.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -1391,7 +1472,9 @@ async function bootstrap() {
   overworldRenderer.app.ticker.add((ticker) => {
     const rawDeltaSec = ticker.deltaMS / 1000;
     const { dtWorld, dtPlayer } = gameClock.tick(rawDeltaSec);
-    playTimeSeconds += dtWorld;
+    if (gameState !== 'TITLE') {
+      playTimeSeconds += dtWorld;
+    }
     const currentMap = mapManager.getCurrentMap();
 
     if (gameState === 'OVERWORLD') {

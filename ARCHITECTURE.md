@@ -13,6 +13,7 @@
 ```mermaid
 flowchart TD
     subgraph UI_Layer["UI & Presentation Layer (HTML5 / CSS3 DOM)"]
+        TSUI["TitleScreenUI"]
         OHUD["OverworldHUD"]
         BHUD["BattleHUD"]
         SM["StartMenuUI"]
@@ -82,8 +83,9 @@ src/
 ├── render/                # GPU Canvas Graphics (PixiJS v8)
 │   ├── OverworldRenderer.ts  # 64x64 tiles, tall grass tufts, day/night tints, culling
 │   └── BattleRenderer.ts     # 2.5D stage, custom Pokeball arcs, Physical/Special hit FX, camera shakes
-├── ui/                    # Vector DOM Overlays & Interactivity
-│   ├── OverworldHUD.ts       # Collapsible menu dock, Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
+├── ui/                    # Vector DOM Overlays & Interactivity (100dvh + Safe-Area Inset Aware)
+│   ├── TitleScreenUI.ts      # Crystalline Title Screen, Audio Unlock Gate, SavePreview Card, Overwrite & Options Modals
+│   ├── OverworldHUD.ts       # Collapsible menu dock, Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
 │   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, Unbound 2x2 move matrix & hotkeys
 │   ├── StartMenuUI.ts        # Classic start menu (Pokedex, Pokemon, Bag, Save)
 │   ├── PartyManagementUI.ts  # Full party inspector, lead reordering, summaries
@@ -256,8 +258,9 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
 | `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 11 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6), Unbound pill styles & hit shake specs. |
 | `SaveManager.ts` | `tests/SaveManager.test.ts` | 6 | ✅ Covered | IndexedDB / localStorage serialization, `SavePreview` extraction, `GameOptions` defaults, `formatPlayTime`, legacy save migration. |
-| `AudioManager.ts` | `tests/AudioManager.test.ts` | 5 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync. |
-| **Current Baseline** | **8 Suites** | **62 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `AudioManager.ts` | `tests/AudioManager.test.ts` | 5 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync, audio unlock & volume controls. |
+| `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
+| **Current Baseline** | **9 Suites** | **68 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

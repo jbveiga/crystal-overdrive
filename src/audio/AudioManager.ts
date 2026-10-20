@@ -358,4 +358,52 @@ export class AudioManager {
   public isMuted(): boolean {
     return this.muted;
   }
+
+  /**
+   * Unlocks browser WebAudio / Howler AudioContext on first user interaction
+   * and starts the Title Screen BGM loop (Ticket 4.2).
+   */
+  public async unlockAudio(): Promise<void> {
+    if (this.isBrowserAudioAvailable()) {
+      try {
+        if (Howler.ctx && Howler.ctx.state === 'suspended') {
+          await Howler.ctx.resume();
+        }
+      } catch {
+        // Ignore resume errors in headless or restricted contexts
+      }
+    }
+    this.playTitleBgm();
+  }
+
+  /**
+   * Starts the Title Screen BGM loop (`bgm_new_bark_town`).
+   */
+  public playTitleBgm(): void {
+    this.lastOverworldTrackId = 'bgm_new_bark_town';
+    this.inBattle = false;
+    this.crossfadeTo('bgm_new_bark_town', 0.4);
+  }
+
+  /**
+   * Updates BGM volume gain (0.0 - 1.0) and refreshes active track volume.
+   */
+  public setBgmVolume(volume: number): void {
+    const clamped = Math.max(0, Math.min(1, volume));
+    this.bgmGain = Number((AudioManager.BGM_GAIN * (clamped / 0.7)).toFixed(4));
+    if (this.currentTrackId) {
+      const activeHowl = this.howls.get(this.currentTrackId);
+      if (activeHowl) {
+        activeHowl.volume(this.getEffectiveBgmVolume());
+      }
+    }
+  }
+
+  /**
+   * Updates SFX volume gain (0.0 - 1.0).
+   */
+  public setSfxVolume(volume: number): void {
+    const clamped = Math.max(0, Math.min(1, volume));
+    this.sfxGain = Number((AudioManager.SFX_GAIN * (clamped / 0.7)).toFixed(4));
+  }
 }

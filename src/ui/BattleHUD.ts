@@ -140,7 +140,7 @@ export class BattleHUD {
       flex-direction: column;
       justify-content: space-between;
       pointer-events: none;
-      padding: 20px;
+      padding: max(12px, env(safe-area-inset-top, 12px)) max(12px, env(safe-area-inset-right, 12px)) max(12px, env(safe-area-inset-bottom, 12px)) max(12px, env(safe-area-inset-left, 12px));
       box-sizing: border-box;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     `;
