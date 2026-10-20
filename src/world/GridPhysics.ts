@@ -14,6 +14,8 @@ export interface GridEntity {
   isMoving: boolean;
   progress: number;
   isPlayer: boolean;
+  worldOffsetX?: number;
+  worldOffsetY?: number;
   spriteType?: NpcSpriteType;
   speaker?: string;
   pages?: string[];

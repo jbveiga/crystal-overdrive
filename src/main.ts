@@ -494,6 +494,52 @@ async function bootstrap() {
 
   const emptyNpcs: GridEntity[] = [];
   const npcObstaclesScratch: GridEntity[] = [];
+  const worldNpcsScratch: GridEntity[] = [];
+
+  const populateWorldNpcs = (map: MapData | null): GridEntity[] => {
+    worldNpcsScratch.length = 0;
+    if (!map) return worldNpcsScratch;
+
+    const currentList = npcsByMap[map.id];
+    if (currentList) {
+      for (let i = 0; i < currentList.length; i++) {
+        const n = currentList[i];
+        n.worldOffsetX = 0;
+        n.worldOffsetY = 0;
+        worldNpcsScratch.push(n);
+      }
+    }
+
+    if (map.connections.WEST) {
+      const conn = map.connections.WEST;
+      const westMap = mapManager.getMap(conn.mapId);
+      const westList = westMap ? npcsByMap[westMap.id] : undefined;
+      if (westMap && westList) {
+        for (let i = 0; i < westList.length; i++) {
+          const n = westList[i];
+          n.worldOffsetX = -westMap.width;
+          n.worldOffsetY = conn.offset;
+          worldNpcsScratch.push(n);
+        }
+      }
+    }
+
+    if (map.connections.EAST) {
+      const conn = map.connections.EAST;
+      const eastMap = mapManager.getMap(conn.mapId);
+      const eastList = eastMap ? npcsByMap[eastMap.id] : undefined;
+      if (eastMap && eastList) {
+        for (let i = 0; i < eastList.length; i++) {
+          const n = eastList[i];
+          n.worldOffsetX = map.width;
+          n.worldOffsetY = conn.offset;
+          worldNpcsScratch.push(n);
+        }
+      }
+    }
+
+    return worldNpcsScratch;
+  };
 
   let npcMoveTimer = 0;
   const directions: Direction[] = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
@@ -738,13 +784,15 @@ async function bootstrap() {
     const acrossX = player.x + dx * 2;
     const acrossY = player.y + dy * 2;
 
-    // 1. Check NPCs on current map (direct facing tile or across a counter)
-    const activeNpcs = npcsByMap[currentMap.id] || emptyNpcs;
-    for (let i = 0; i < activeNpcs.length; i++) {
-      const targetNpc = activeNpcs[i];
-      const isDirect = targetNpc.x === facingX && targetNpc.y === facingY;
+    // 1. Check NPCs on current or connected neighbor maps (direct facing tile or across a counter)
+    const visibleWorldNpcs = populateWorldNpcs(currentMap);
+    for (let i = 0; i < visibleWorldNpcs.length; i++) {
+      const targetNpc = visibleWorldNpcs[i];
+      const npcWorldX = targetNpc.x + (targetNpc.worldOffsetX || 0);
+      const npcWorldY = targetNpc.y + (targetNpc.worldOffsetY || 0);
+      const isDirect = npcWorldX === facingX && npcWorldY === facingY;
       const isAcrossCounter =
-        targetNpc.talkAcrossCounter === true && targetNpc.x === acrossX && targetNpc.y === acrossY;
+        targetNpc.talkAcrossCounter === true && npcWorldX === acrossX && npcWorldY === acrossY;
 
       if (isDirect || isAcrossCounter) {
         // Turn NPC toward player if not mid-step
@@ -907,11 +955,42 @@ async function bootstrap() {
             npcObstaclesScratch
           );
         }
+
+        // Also update wandering NPCs on connected West/East neighbor maps at 1.0x world time
+        const updateNeighborMapNpcs = (neighborMapId: string | undefined) => {
+          if (!neighborMapId) return;
+          const neighborMap = mapManager.getMap(neighborMapId);
+          const neighborNpcs = neighborMap ? npcsByMap[neighborMap.id] : undefined;
+          if (!neighborMap || !neighborNpcs) return;
+
+          for (let i = 0; i < neighborNpcs.length; i++) {
+            const npcEntity = neighborNpcs[i];
+            if (!npcEntity.wanders) continue;
+
+            const desiredDir =
+              triggerNewWanderStep && !npcEntity.isMoving && Math.random() < 0.55
+                ? directions[Math.floor(Math.random() * 4)]
+                : null;
+
+            GridPhysics.updateEntity(
+              npcEntity,
+              dtWorld,
+              desiredDir,
+              (x, y) => mapManager.isWalkableInMapBounds(neighborMap, x, y),
+              mapManager.getTileType,
+              undefined,
+              neighborNpcs
+            );
+          }
+        };
+
+        updateNeighborMapNpcs(currentMap?.connections.WEST?.mapId);
+        updateNeighborMapNpcs(currentMap?.connections.EAST?.mapId);
       }
 
-      // Render active map after any border/warp transitions during this tick
+      // Render active & connected map NPCs after any border/warp transitions during this tick (viewport-culled)
       const mapAfterMove = mapManager.getCurrentMap();
-      const npcsToRender = mapAfterMove ? npcsByMap[mapAfterMove.id] || emptyNpcs : emptyNpcs;
+      const npcsToRender = populateWorldNpcs(mapAfterMove);
       overworldRenderer.update(player, npcsToRender, dtWorld);
     }
   });

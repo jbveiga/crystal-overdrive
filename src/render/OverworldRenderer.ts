@@ -641,13 +641,39 @@ export class OverworldRenderer {
       this.playerSprite.scale.set(scale, scale);
     }
 
-    // 2. Update NPCs (Zero-allocation visibility pass)
+    // 2. Smooth Camera Centering
+    const screenWidth = this.app.screen.width;
+    const screenHeight = this.app.screen.height;
+
+    const cameraTargetX = screenWidth / 2 - (player.renderX + 0.5) * this.tileSize;
+    const cameraTargetY = screenHeight / 2 - (player.renderY + 0.5) * this.tileSize;
+
+    this.stageContainer.position.set(cameraTargetX, cameraTargetY);
+
+    // 3. Update NPCs across active & connected maps with playing-window viewport culling (Zero-allocation pass)
     for (const sprite of this.npcSprites.values()) {
       sprite.visible = false;
     }
 
+    const cullMargin = this.tileSize;
+
     for (let i = 0; i < npcs.length; i++) {
       const npc = npcs[i];
+      const offsetX = npc.worldOffsetX || 0;
+      const offsetY = npc.worldOffsetY || 0;
+      const npcPxX = (npc.renderX + offsetX + 0.5) * this.tileSize;
+      const npcPxY = (npc.renderY + offsetY + 0.85) * this.tileSize;
+
+      const screenX = cameraTargetX + npcPxX;
+      const screenY = cameraTargetY + npcPxY;
+      const isInPlayingWindow =
+        screenX >= -cullMargin &&
+        screenX <= screenWidth + cullMargin &&
+        screenY >= -cullMargin &&
+        screenY <= screenHeight + cullMargin;
+
+      if (!isInPlayingWindow) continue;
+
       const frames =
         npc.spriteType === 'girl'
           ? this.npcGirlFrames
@@ -666,9 +692,6 @@ export class OverworldRenderer {
         this.npcSprites.set(npc.id, sprite);
       }
       sprite.visible = true;
-
-      const npcPxX = (npc.renderX + 0.5) * this.tileSize;
-      const npcPxY = (npc.renderY + 0.85) * this.tileSize;
       sprite.position.set(npcPxX, npcPxY);
 
       const npcTex = this.getFrameForEntity(frames, npc.direction, npc.isMoving, npc.progress);
@@ -680,14 +703,5 @@ export class OverworldRenderer {
         sprite.scale.set(scale, scale);
       }
     }
-
-    // 3. Smooth Camera Centering
-    const screenWidth = this.app.screen.width;
-    const screenHeight = this.app.screen.height;
-
-    const cameraTargetX = screenWidth / 2 - (player.renderX + 0.5) * this.tileSize;
-    const cameraTargetY = screenHeight / 2 - (player.renderY + 0.5) * this.tileSize;
-
-    this.stageContainer.position.set(cameraTargetX, cameraTargetY);
   }
 }

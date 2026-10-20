@@ -51,20 +51,27 @@ export class MapManager {
   };
 
   /**
-   * Returns whether a tile coordinate is walkable for NPCs (strictly within current map bounds, excluding warp doors).
+   * Returns whether a tile coordinate is walkable for NPCs on a specific map (strictly within map bounds, excluding warp doors).
+   */
+  isWalkableInMapBounds(map: MapData, x: number, y: number): boolean {
+    if (x <= 0 || x >= map.width - 1 || y <= 0 || y >= map.height - 1) {
+      return false;
+    }
+    for (let i = 0; i < map.warps.length; i++) {
+      const w = map.warps[i];
+      if (w.x === x && w.y === y) return false;
+    }
+    const index = y * map.width + x;
+    const tileType = map.collisionGrid[index];
+    return tileType === 0 || tileType === 2;
+  }
+
+  /**
+   * Returns whether a tile coordinate is walkable for NPCs on the current map (strictly within current map bounds, excluding warp doors).
    */
   isWalkableInBounds = (x: number, y: number): boolean => {
     if (!this.currentMap) return false;
-    if (x <= 0 || x >= this.currentMap.width - 1 || y <= 0 || y >= this.currentMap.height - 1) {
-      return false;
-    }
-    for (let i = 0; i < this.currentMap.warps.length; i++) {
-      const w = this.currentMap.warps[i];
-      if (w.x === x && w.y === y) return false;
-    }
-    const index = y * this.currentMap.width + x;
-    const tileType = this.currentMap.collisionGrid[index];
-    return tileType === 0 || tileType === 2;
+    return this.isWalkableInMapBounds(this.currentMap, x, y);
   };
 
   /**
@@ -90,10 +97,27 @@ export class MapManager {
   }
 
   /**
-   * Checks if coordinate has an interactive sign or background event
+   * Checks if coordinate has an interactive sign or background event (including across connected map borders)
    */
   checkBgEvent(x: number, y: number): BgEvent | undefined {
-    if (!this.currentMap || !this.currentMap.bgEvents) return undefined;
+    if (!this.currentMap) return undefined;
+    if (x < 0 && this.currentMap.connections.WEST) {
+      const conn = this.currentMap.connections.WEST;
+      const westMap = this.maps.get(conn.mapId);
+      if (westMap?.bgEvents) {
+        return westMap.bgEvents.find((bg) => bg.x === x + westMap.width && bg.y === y - conn.offset);
+      }
+      return undefined;
+    }
+    if (x >= this.currentMap.width && this.currentMap.connections.EAST) {
+      const conn = this.currentMap.connections.EAST;
+      const eastMap = this.maps.get(conn.mapId);
+      if (eastMap?.bgEvents) {
+        return eastMap.bgEvents.find((bg) => bg.x === x - this.currentMap!.width && bg.y === y - conn.offset);
+      }
+      return undefined;
+    }
+    if (!this.currentMap.bgEvents) return undefined;
     return this.currentMap.bgEvents.find((bg) => bg.x === x && bg.y === y);
   }
 
