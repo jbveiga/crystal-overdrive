@@ -770,5 +770,120 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("inventory.badges.includes('hive')");
     expect(mainSrc).toContain("inventory.tms.includes('TM49')");
   });
+
+  it('validates Phase 8 Goldenrod Metropolis & Day-Care Route 34 maps, reciprocal warps, and Leader Whitney', () => {
+    const phase8Maps = [
+      'ilex_forest',
+      'route_34_ilex_forest_gate',
+      'route_34',
+      'day_care',
+      'goldenrod_city',
+      'goldenrod_gym',
+      'goldenrod_poke_center',
+      'goldenrod_bike_shop',
+      'goldenrod_game_corner',
+      'goldenrod_flower_shop',
+      'goldenrod_name_rater',
+      'goldenrod_bill_house',
+      'goldenrod_magnet_train_station',
+      'goldenrod_underground',
+      'goldenrod_dept_store_1f',
+      'goldenrod_dept_store_2f',
+      'goldenrod_dept_store_3f',
+      'goldenrod_dept_store_4f',
+      'goldenrod_dept_store_5f',
+      'goldenrod_dept_store_6f',
+      'goldenrod_dept_store_roof',
+      'radio_tower_1f',
+      'radio_tower_2f',
+      'radio_tower_3f',
+      'radio_tower_4f',
+      'radio_tower_5f',
+    ];
+
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+
+    for (const mapId of phase8Maps) {
+      const mapPath = path.resolve(__dirname, `../public/assets/data/maps/${mapId}.json`);
+      expect(fs.existsSync(mapPath), `Map file for ${mapId} must exist`).toBe(true);
+
+      const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+      expect(mapData.width).toBeGreaterThan(0);
+      expect(mapData.height).toBeGreaterThan(0);
+      expect(mapData.collisionGrid.length).toBe(mapData.width * mapData.height);
+      expect(mapData.tileMap?.length).toBe(mapData.width * mapData.height);
+
+      for (const tile of new Set(mapData.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png must exist for ${mapId}`).toBe(true);
+      }
+    }
+
+    // Outdoor classification verification
+    expect(MapManager.isOutdoorMap('route_34')).toBe(true);
+    expect(MapManager.isOutdoorMap('goldenrod_city')).toBe(true);
+    expect(MapManager.isOutdoorMap('goldenrod_dept_store_roof')).toBe(true);
+    expect(MapManager.isOutdoorMap('goldenrod_gym')).toBe(false);
+    expect(MapManager.isOutdoorMap('goldenrod_underground')).toBe(false);
+
+    // Route 34 <-> Goldenrod City boundary connection
+    const r34Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_34.json'), 'utf8'));
+    const goldenrodData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/goldenrod_city.json'), 'utf8'));
+    expect(r34Data.connections.NORTH?.mapId).toBe('goldenrod_city');
+    expect(r34Data.connections.NORTH?.offset).toBe(-10);
+    expect(goldenrodData.connections.SOUTH?.mapId).toBe('route_34');
+    expect(goldenrodData.connections.SOUTH?.offset).toBe(10);
+
+    // Azalea Town <-> Ilex Forest <-> Route 34 Gate <-> Route 34
+    const azaleaData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/azalea_town.json'), 'utf8'));
+    const ilexData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/ilex_forest.json'), 'utf8'));
+    const gateData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_34_ilex_forest_gate.json'), 'utf8'));
+
+    const azaleaToIlex = azaleaData.warps.find((w) => w.targetMapId === 'ilex_forest');
+    expect(azaleaToIlex).toBeDefined();
+
+    const ilexToAzalea = ilexData.warps.find((w) => w.targetMapId === 'azalea_town');
+    expect(ilexToAzalea).toBeDefined();
+
+    const ilexToGate = ilexData.warps.find((w) => w.targetMapId === 'route_34_ilex_forest_gate');
+    expect(ilexToGate).toBeDefined();
+
+    const gateToR34 = gateData.warps.find((w) => w.targetMapId === 'route_34');
+    expect(gateToR34).toBeDefined();
+
+    // Goldenrod City <-> Gym
+    const cityToGym = goldenrodData.warps.find((w) => w.targetMapId === 'goldenrod_gym');
+    expect(cityToGym).toBeDefined();
+    expect(cityToGym?.x).toBe(24);
+    expect(cityToGym?.y).toBe(7);
+
+    const gymData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/goldenrod_gym.json'), 'utf8'));
+    const gymExit = gymData.warps.find((w) => w.targetMapId === 'goldenrod_city');
+    expect(gymExit).toBeDefined();
+
+    // Dept Store vertical progression
+    const dept1F: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/goldenrod_dept_store_1f.json'), 'utf8'));
+    const dept2F: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/goldenrod_dept_store_2f.json'), 'utf8'));
+    expect(dept1F.warps.find((w) => w.targetMapId === 'goldenrod_dept_store_2f')).toBeDefined();
+    expect(dept2F.warps.find((w) => w.targetMapId === 'goldenrod_dept_store_1f')).toBeDefined();
+
+    // Radio Tower vertical progression
+    const rt1F: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/radio_tower_1f.json'), 'utf8'));
+    const rt2F: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/radio_tower_2f.json'), 'utf8'));
+    expect(rt1F.warps.find((w) => w.targetMapId === 'radio_tower_2f')).toBeDefined();
+    expect(rt2F.warps.find((w) => w.targetMapId === 'radio_tower_1f')).toBeDefined();
+
+    // Leader Whitney boss registration in npcsByMap and main.ts
+    const whitneyNpc = npcsByMap.goldenrod_gym.find((npc) => npc.id === 'whitney');
+    expect(whitneyNpc).toBeDefined();
+    expect(whitneyNpc?.action).toBe('WHITNEY_EVENT');
+    expect(whitneyNpc?.trainerId).toBe('whitney');
+    expect(whitneyNpc?.trainerPokemon?.speciesId).toBe('miltank');
+    expect(whitneyNpc?.trainerTeam?.length).toBe(2);
+
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    expect(mainSrc).toContain("action === 'WHITNEY_EVENT'");
+    expect(mainSrc).toContain("inventory.badges.includes('plain')");
+    expect(mainSrc).toContain("inventory.tms.includes('TM45')");
+  });
 });
 

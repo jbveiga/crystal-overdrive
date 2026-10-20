@@ -90,6 +90,70 @@ const PHASE7_MAP_FILES = [
   'maps/SlowpokeWellB2F.asm',
 ];
 
+const PHASE8_MAP_FILES = [
+  // Ilex Forest & Route 34
+  'maps/IlexForest.blk',
+  'maps/IlexForest.asm',
+  'maps/Route34.blk',
+  'maps/Route34.asm',
+  'maps/Route34IlexForestGate.blk',
+  'maps/Route34IlexForestGate.asm',
+  'maps/DayCare.blk',
+  'maps/DayCare.asm',
+  // Goldenrod City
+  'maps/GoldenrodCity.blk',
+  'maps/GoldenrodCity.asm',
+  'maps/GoldenrodPokecenter1F.blk',
+  'maps/GoldenrodPokecenter1F.asm',
+  'maps/GoldenrodGym.blk',
+  'maps/GoldenrodGym.asm',
+  'maps/GoldenrodBikeShop.blk',
+  'maps/GoldenrodBikeShop.asm',
+  'maps/GoldenrodGameCorner.blk',
+  'maps/GoldenrodGameCorner.asm',
+  'maps/GoldenrodFlowerShop.blk',
+  'maps/GoldenrodFlowerShop.asm',
+  'maps/GoldenrodNameRater.blk',
+  'maps/GoldenrodNameRater.asm',
+  'maps/GoldenrodMagnetTrainStation.blk',
+  'maps/GoldenrodMagnetTrainStation.asm',
+  'maps/GoldenrodBillsHouse.blk',
+  'maps/GoldenrodBillsHouse.asm',
+  // Goldenrod Underground
+  'maps/GoldenrodUnderground.blk',
+  'maps/GoldenrodUnderground.asm',
+  'maps/GoldenrodUndergroundSwitchRoomEntrances.blk',
+  'maps/GoldenrodUndergroundSwitchRoomEntrances.asm',
+  // Goldenrod Dept Store
+  'maps/GoldenrodDeptStore1F.blk',
+  'maps/GoldenrodDeptStore1F.asm',
+  'maps/GoldenrodDeptStore2F.blk',
+  'maps/GoldenrodDeptStore2F.asm',
+  'maps/GoldenrodDeptStore3F.blk',
+  'maps/GoldenrodDeptStore3F.asm',
+  'maps/GoldenrodDeptStore4F.blk',
+  'maps/GoldenrodDeptStore4F.asm',
+  'maps/GoldenrodDeptStore5F.blk',
+  'maps/GoldenrodDeptStore5F.asm',
+  'maps/GoldenrodDeptStore6F.blk',
+  'maps/GoldenrodDeptStore6F.asm',
+  'maps/GoldenrodDeptStoreElevator.blk',
+  'maps/GoldenrodDeptStoreElevator.asm',
+  'maps/GoldenrodDeptStoreRoof.blk',
+  'maps/GoldenrodDeptStoreRoof.asm',
+  // Radio Tower
+  'maps/RadioTower1F.blk',
+  'maps/RadioTower1F.asm',
+  'maps/RadioTower2F.blk',
+  'maps/RadioTower2F.asm',
+  'maps/RadioTower3F.blk',
+  'maps/RadioTower3F.asm',
+  'maps/RadioTower4F.blk',
+  'maps/RadioTower4F.asm',
+  'maps/RadioTower5F.blk',
+  'maps/RadioTower5F.asm',
+];
+
 async function download(relPath) {
   const dest = path.join(OUT_DIR, relPath.replace(/\//g, '__'));
   if (fs.existsSync(dest)) return;
@@ -109,11 +173,11 @@ async function download(relPath) {
 }
 
 async function main() {
-  console.log('Downloading Phase 7 tilesets and map files from pret/pokecrystal...');
-  for (const f of [...TILESET_FILES, ...PHASE7_MAP_FILES]) {
+  console.log('Downloading Phase 7 & 8 tilesets and map files from pret/pokecrystal...');
+  for (const f of [...TILESET_FILES, ...PHASE7_MAP_FILES, ...PHASE8_MAP_FILES]) {
     await download(f);
   }
-  console.log('Phase 7 downloads complete.');
+  console.log('Downloads complete.');
 }
 
 main().catch(console.error);

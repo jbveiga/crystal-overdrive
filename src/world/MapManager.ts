@@ -274,6 +274,9 @@ export class MapManager {
       'ruins_of_alph_outside',
       'route_33',
       'azalea_town',
+      'route_34',
+      'goldenrod_city',
+      'goldenrod_dept_store_roof',
     ].includes(mapId);
   }
 

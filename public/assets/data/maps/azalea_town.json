@@ -2219,6 +2219,20 @@
       "targetMapId": "slowpoke_well_b1f",
       "targetX": 17,
       "targetY": 15
+    },
+    {
+      "x": 2,
+      "y": 10,
+      "targetMapId": "ilex_forest",
+      "targetX": 3,
+      "targetY": 42
+    },
+    {
+      "x": 2,
+      "y": 11,
+      "targetMapId": "ilex_forest",
+      "targetX": 3,
+      "targetY": 43
     }
   ],
   "bgEvents": [

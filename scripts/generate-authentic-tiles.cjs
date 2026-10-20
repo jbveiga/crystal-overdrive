@@ -137,6 +137,7 @@ function mapCollToken(token) {
     token === 'FLOOR' ||
     token === 'DOOR' ||
     token.startsWith('WARP_CARPET') ||
+    token === 'WARP_PANEL' ||
     token === 'LADDER' ||
     token === 'STAIRCASE' ||
     token === 'CAVE'
@@ -156,12 +157,14 @@ const waterAnim = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__water__wat
 const roofNewBark = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__new_bark.png'));
 const roofViolet = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__violet.png'));
 const roofAzalea = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__azalea.png'));
+const roofGoldenrod = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__goldenrod.png'));
 
 const ROOF_GRAPHICS = {
   nb: roofNewBark,
   cg: roofNewBark,
   vc: roofViolet,
   az: roofAzalea,
+  gr: roofGoldenrod,
 };
 
 function loadTileset(tsName, isOutdoor = false) {
@@ -200,6 +203,10 @@ const TILESETS = {
   tower: loadTileset('tower', false),
   elite_four_room: loadTileset('elite_four_room', false),
   cave: loadTileset('cave', false),
+  forest: loadTileset('forest', false),
+  radio_tower: loadTileset('radio_tower', false),
+  underground: loadTileset('underground', false),
+  game_corner: loadTileset('game_corner', false),
 };
 
 const generatedTiles = new Set();
@@ -1787,6 +1794,487 @@ buildMapFromBlk({
     { speciesId: 'slowpoke', minLevel: 14, maxLevel: 18, weight: 50 },
     { speciesId: 'zubat', minLevel: 14, maxLevel: 18, weight: 50 },
   ],
+});
+
+// ==========================================
+// PHASE 8: GOLDENROD METROPOLIS & ROUTE 34
+// ==========================================
+
+buildMapFromBlk({
+  id: 'ilex_forest',
+  name: 'Ilex Forest',
+  tileset: 'forest',
+  blkFile: 'maps__IlexForest.blk',
+  blocksW: 15,
+  blocksH: 27,
+  warps: [
+    { x: 1, y: 5, targetMapId: 'route_34_ilex_forest_gate', targetX: 4, targetY: 7 },
+    { x: 3, y: 42, targetMapId: 'azalea_town', targetX: 2, targetY: 10 },
+    { x: 3, y: 43, targetMapId: 'azalea_town', targetX: 2, targetY: 11 },
+  ],
+  bgEvents: [
+    {
+      x: 8,
+      y: 22,
+      speaker: '⛩️ ILEX FOREST SHRINE',
+      pages: ['ILEX FOREST SHRINE…', "It's in honor of the forest's protector: CELEBI!"],
+    },
+    {
+      x: 3,
+      y: 17,
+      speaker: '🌲 FOREST SIGN',
+      pages: ["ILEX FOREST is so overgrown with trees that you can't see the sky. Please watch out for dropped items."],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'caterpie', minLevel: 5, maxLevel: 6, weight: 20 },
+    { speciesId: 'weedle', minLevel: 5, maxLevel: 6, weight: 20 },
+    { speciesId: 'metapod', minLevel: 6, maxLevel: 7, weight: 15 },
+    { speciesId: 'kakuna', minLevel: 6, maxLevel: 7, weight: 15 },
+    { speciesId: 'paras', minLevel: 6, maxLevel: 8, weight: 15 },
+    { speciesId: 'zubat', minLevel: 5, maxLevel: 7, weight: 15 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_34_ilex_forest_gate',
+  name: 'Route 34 Ilex Forest Gate',
+  tileset: 'gate',
+  blkFile: 'maps__NorthSouthGate.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 4, y: 0, targetMapId: 'route_34', targetX: 13, targetY: 37 },
+    { x: 5, y: 0, targetMapId: 'route_34', targetX: 14, targetY: 37 },
+    { x: 4, y: 7, targetMapId: 'ilex_forest', targetX: 1, targetY: 5 },
+    { x: 5, y: 7, targetMapId: 'ilex_forest', targetX: 1, targetY: 5 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'route_34',
+  name: 'Route 34',
+  tileset: 'johto',
+  blkFile: 'maps__Route34.blk',
+  blocksW: 10,
+  blocksH: 27,
+  roofGroup: 'gr',
+  connections: {
+    NORTH: { mapId: 'goldenrod_city', offset: -10 },
+  },
+  warps: [
+    { x: 13, y: 37, targetMapId: 'route_34_ilex_forest_gate', targetX: 4, targetY: 0 },
+    { x: 14, y: 37, targetMapId: 'route_34_ilex_forest_gate', targetX: 5, targetY: 0 },
+    { x: 11, y: 14, targetMapId: 'day_care', targetX: 2, targetY: 7 },
+    { x: 11, y: 15, targetMapId: 'day_care', targetX: 3, targetY: 7 },
+  ],
+  bgEvents: [
+    {
+      x: 12,
+      y: 6,
+      speaker: '🚏 ROUTE SIGN',
+      pages: ['ROUTE 34', 'NORTH TO GOLDENROD CITY'],
+    },
+    {
+      x: 10,
+      y: 13,
+      speaker: '🏡 DAY-CARE SIGN',
+      pages: ['POKéMON DAY-CARE', 'LET US RAISE YOUR POKéMON!'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'rattata', minLevel: 10, maxLevel: 12, weight: 30 },
+    { speciesId: 'abra', minLevel: 10, maxLevel: 12, weight: 10 },
+    { speciesId: 'drowzee', minLevel: 10, maxLevel: 12, weight: 30 },
+    { speciesId: 'ditto', minLevel: 10, maxLevel: 10, weight: 10 },
+    { speciesId: 'pidgey', minLevel: 11, maxLevel: 13, weight: 20 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'day_care',
+  name: 'Day-Care',
+  tileset: 'house',
+  blkFile: 'maps__DayCare.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'route_34', targetX: 11, targetY: 15 },
+    { x: 3, y: 7, targetMapId: 'route_34', targetX: 11, targetY: 15 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_city',
+  name: 'Goldenrod City',
+  tileset: 'johto',
+  blkFile: 'maps__GoldenrodCity.blk',
+  blocksW: 20,
+  blocksH: 18,
+  roofGroup: 'gr',
+  connections: {
+    SOUTH: { mapId: 'route_34', offset: 10 },
+  },
+  warps: [
+    { x: 24, y: 7, targetMapId: 'goldenrod_gym', targetX: 2, targetY: 17 },
+    { x: 29, y: 29, targetMapId: 'goldenrod_bike_shop', targetX: 2, targetY: 7 },
+    { x: 5, y: 25, targetMapId: 'goldenrod_bill_house', targetX: 2, targetY: 7 },
+    { x: 9, y: 13, targetMapId: 'goldenrod_magnet_train_station', targetX: 8, targetY: 17 },
+    { x: 29, y: 5, targetMapId: 'goldenrod_flower_shop', targetX: 2, targetY: 7 },
+    { x: 15, y: 7, targetMapId: 'goldenrod_name_rater', targetX: 2, targetY: 7 },
+    { x: 24, y: 27, targetMapId: 'goldenrod_dept_store_1f', targetX: 7, targetY: 7 },
+    { x: 14, y: 21, targetMapId: 'goldenrod_game_corner', targetX: 2, targetY: 13 },
+    { x: 5, y: 15, targetMapId: 'radio_tower_1f', targetX: 2, targetY: 7 },
+    { x: 15, y: 27, targetMapId: 'goldenrod_poke_center', targetX: 3, targetY: 7 },
+    { x: 11, y: 29, targetMapId: 'goldenrod_underground', targetX: 3, targetY: 2 },
+  ],
+  bgEvents: [
+    {
+      x: 22,
+      y: 18,
+      speaker: '🏙️ GOLDENROD CITY',
+      pages: ['GOLDENROD CITY', 'The Festive City of Opulent Charm'],
+    },
+    {
+      x: 22,
+      y: 9,
+      speaker: '🏆 GOLDENROD GYM',
+      pages: ['GOLDENROD CITY POKéMON GYM', 'LEADER: WHITNEY', 'The Incredibly Pretty Girl!'],
+    },
+    {
+      x: 8,
+      y: 15,
+      speaker: '📻 RADIO TOWER',
+      pages: ['GOLDENROD RADIO TOWER'],
+    },
+    {
+      x: 28,
+      y: 27,
+      speaker: '🏬 DEPT. STORE',
+      pages: ['Full Selection of POKéMON Goods! GOLDENROD DEPT. STORE'],
+    },
+    {
+      x: 26,
+      y: 29,
+      speaker: '🚲 BIKE SHOP',
+      pages: ['The World is a Cycle Path! MIRACLE CYCLE'],
+    },
+    {
+      x: 18,
+      y: 21,
+      speaker: '🎰 GAME CORNER',
+      pages: ['Your Playground! GOLDENROD GAME CORNER'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_gym',
+  name: 'Goldenrod Gym',
+  tileset: 'elite_four_room',
+  blkFile: 'maps__GoldenrodGym.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 2, y: 17, targetMapId: 'goldenrod_city', targetX: 24, targetY: 7 },
+    { x: 3, y: 17, targetMapId: 'goldenrod_city', targetX: 24, targetY: 7 },
+  ],
+  bgEvents: [
+    {
+      x: 1,
+      y: 15,
+      speaker: '🏆 GOLDENROD GYM STATUE',
+      pages: ['GOLDENROD CITY POKéMON GYM', 'LEADER: WHITNEY'],
+    },
+    {
+      x: 4,
+      y: 15,
+      speaker: '🏆 GOLDENROD GYM STATUE',
+      pages: ['GOLDENROD CITY POKéMON GYM', 'LEADER: WHITNEY'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_poke_center',
+  name: 'Goldenrod Pokémon Center',
+  tileset: 'pokecenter',
+  blkFile: 'maps__Pokecenter1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'goldenrod_city', targetX: 15, targetY: 27 },
+    { x: 4, y: 7, targetMapId: 'goldenrod_city', targetX: 15, targetY: 27 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_bike_shop',
+  name: 'Goldenrod Bike Shop',
+  tileset: 'house',
+  blkFile: 'maps__GoldenrodBikeShop.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'goldenrod_city', targetX: 29, targetY: 29 },
+    { x: 3, y: 7, targetMapId: 'goldenrod_city', targetX: 29, targetY: 29 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_game_corner',
+  name: 'Goldenrod Game Corner',
+  tileset: 'game_corner',
+  blkFile: 'maps__GoldenrodGameCorner.blk',
+  blocksW: 10,
+  blocksH: 7,
+  warps: [
+    { x: 2, y: 13, targetMapId: 'goldenrod_city', targetX: 14, targetY: 21 },
+    { x: 3, y: 13, targetMapId: 'goldenrod_city', targetX: 14, targetY: 21 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_flower_shop',
+  name: 'Goldenrod Flower Shop',
+  tileset: 'house',
+  blkFile: 'maps__GoldenrodFlowerShop.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'goldenrod_city', targetX: 29, targetY: 5 },
+    { x: 3, y: 7, targetMapId: 'goldenrod_city', targetX: 29, targetY: 5 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_name_rater',
+  name: 'Goldenrod Name Rater',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'goldenrod_city', targetX: 15, targetY: 7 },
+    { x: 3, y: 7, targetMapId: 'goldenrod_city', targetX: 15, targetY: 7 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_bill_house',
+  name: "Bill's House",
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'goldenrod_city', targetX: 5, targetY: 25 },
+    { x: 3, y: 7, targetMapId: 'goldenrod_city', targetX: 5, targetY: 25 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_magnet_train_station',
+  name: 'Goldenrod Magnet Train Station',
+  tileset: 'gate',
+  blkFile: 'maps__GoldenrodMagnetTrainStation.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 8, y: 17, targetMapId: 'goldenrod_city', targetX: 9, targetY: 13 },
+    { x: 9, y: 17, targetMapId: 'goldenrod_city', targetX: 9, targetY: 13 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_underground',
+  name: 'Goldenrod Underground',
+  tileset: 'underground',
+  blkFile: 'maps__GoldenrodUnderground.blk',
+  blocksW: 15,
+  blocksH: 18,
+  warps: [
+    { x: 3, y: 2, targetMapId: 'goldenrod_city', targetX: 11, targetY: 29 },
+    { x: 3, y: 33, targetMapId: 'goldenrod_city', targetX: 9, targetY: 5 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_dept_store_1f',
+  name: 'Goldenrod Dept Store 1F',
+  tileset: 'mart',
+  blkFile: 'maps__DeptStore1F.blk',
+  blocksW: 8,
+  blocksH: 4,
+  warps: [
+    { x: 7, y: 7, targetMapId: 'goldenrod_city', targetX: 24, targetY: 27 },
+    { x: 8, y: 7, targetMapId: 'goldenrod_city', targetX: 24, targetY: 27 },
+    { x: 15, y: 0, targetMapId: 'goldenrod_dept_store_2f', targetX: 15, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_dept_store_2f',
+  name: 'Goldenrod Dept Store 2F',
+  tileset: 'mart',
+  blkFile: 'maps__DeptStore2F.blk',
+  blocksW: 8,
+  blocksH: 4,
+  warps: [
+    { x: 15, y: 0, targetMapId: 'goldenrod_dept_store_1f', targetX: 15, targetY: 1 },
+    { x: 12, y: 0, targetMapId: 'goldenrod_dept_store_3f', targetX: 12, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_dept_store_3f',
+  name: 'Goldenrod Dept Store 3F',
+  tileset: 'mart',
+  blkFile: 'maps__DeptStore3F.blk',
+  blocksW: 8,
+  blocksH: 4,
+  warps: [
+    { x: 12, y: 0, targetMapId: 'goldenrod_dept_store_2f', targetX: 12, targetY: 1 },
+    { x: 15, y: 0, targetMapId: 'goldenrod_dept_store_4f', targetX: 15, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_dept_store_4f',
+  name: 'Goldenrod Dept Store 4F',
+  tileset: 'mart',
+  blkFile: 'maps__DeptStore4F.blk',
+  blocksW: 8,
+  blocksH: 4,
+  warps: [
+    { x: 15, y: 0, targetMapId: 'goldenrod_dept_store_3f', targetX: 15, targetY: 1 },
+    { x: 12, y: 0, targetMapId: 'goldenrod_dept_store_5f', targetX: 12, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_dept_store_5f',
+  name: 'Goldenrod Dept Store 5F',
+  tileset: 'mart',
+  blkFile: 'maps__DeptStore5F.blk',
+  blocksW: 8,
+  blocksH: 4,
+  warps: [
+    { x: 12, y: 0, targetMapId: 'goldenrod_dept_store_4f', targetX: 12, targetY: 1 },
+    { x: 15, y: 0, targetMapId: 'goldenrod_dept_store_6f', targetX: 15, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_dept_store_6f',
+  name: 'Goldenrod Dept Store 6F',
+  tileset: 'mart',
+  blkFile: 'maps__DeptStore6F.blk',
+  blocksW: 8,
+  blocksH: 4,
+  warps: [
+    { x: 15, y: 0, targetMapId: 'goldenrod_dept_store_5f', targetX: 15, targetY: 1 },
+    { x: 13, y: 0, targetMapId: 'goldenrod_dept_store_roof', targetX: 13, targetY: 2 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_dept_store_roof',
+  name: 'Goldenrod Dept Store Roof',
+  tileset: 'mart',
+  blkFile: 'maps__GoldenrodDeptStoreRoof.blk',
+  blocksW: 8,
+  blocksH: 4,
+  warps: [
+    { x: 13, y: 1, targetMapId: 'goldenrod_dept_store_6f', targetX: 13, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'radio_tower_1f',
+  name: 'Radio Tower 1F',
+  tileset: 'radio_tower',
+  blkFile: 'maps__RadioTower1F.blk',
+  blocksW: 9,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'goldenrod_city', targetX: 5, targetY: 15 },
+    { x: 3, y: 7, targetMapId: 'goldenrod_city', targetX: 5, targetY: 15 },
+    { x: 15, y: 0, targetMapId: 'radio_tower_2f', targetX: 15, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'radio_tower_2f',
+  name: 'Radio Tower 2F',
+  tileset: 'radio_tower',
+  blkFile: 'maps__RadioTower2F.blk',
+  blocksW: 9,
+  blocksH: 4,
+  warps: [
+    { x: 15, y: 0, targetMapId: 'radio_tower_1f', targetX: 15, targetY: 1 },
+    { x: 0, y: 0, targetMapId: 'radio_tower_3f', targetX: 0, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'radio_tower_3f',
+  name: 'Radio Tower 3F',
+  tileset: 'radio_tower',
+  blkFile: 'maps__RadioTower3F.blk',
+  blocksW: 9,
+  blocksH: 4,
+  warps: [
+    { x: 0, y: 0, targetMapId: 'radio_tower_2f', targetX: 0, targetY: 1 },
+    { x: 7, y: 0, targetMapId: 'radio_tower_4f', targetX: 7, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'radio_tower_4f',
+  name: 'Radio Tower 4F',
+  tileset: 'radio_tower',
+  blkFile: 'maps__RadioTower4F.blk',
+  blocksW: 9,
+  blocksH: 4,
+  warps: [
+    { x: 9, y: 0, targetMapId: 'radio_tower_3f', targetX: 7, targetY: 1 },
+    { x: 0, y: 0, targetMapId: 'radio_tower_5f', targetX: 0, targetY: 1 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'radio_tower_5f',
+  name: 'Radio Tower 5F',
+  tileset: 'radio_tower',
+  blkFile: 'maps__RadioTower5F.blk',
+  blocksW: 9,
+  blocksH: 4,
+  warps: [
+    { x: 0, y: 0, targetMapId: 'radio_tower_4f', targetX: 0, targetY: 1 },
+  ],
+  bgEvents: [],
 });
 
 console.log(`Total authentic 64x64 quadrant PNGs generated: ${generatedTiles.size}`);

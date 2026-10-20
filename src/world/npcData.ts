@@ -1686,6 +1686,657 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         ]
       ),
     ],
+    ilex_forest: [
+      makeNpc(
+        'forest_apprentice',
+        14,
+        30,
+        'UP',
+        'boy',
+        '👦 APPRENTICE',
+        [
+          "The boss's FARFETCH'D escaped deeper into the forest! Can you help me find it?",
+          'If you sneak up behind it, you might be able to steer it back toward the charcoal kiln!',
+        ]
+      ),
+      makeNpc(
+        'forest_farfetchd',
+        15,
+        23,
+        'DOWN',
+        'fat_man',
+        '🦆 FARFETCH’D',
+        [
+          'FARFETCH’D: Kwaaa! It clutches its fresh green onion stalk proudly!',
+          'It seems ready to return to the kiln now.',
+        ]
+      ),
+      makeNpc(
+        'cut_master',
+        8,
+        23,
+        'DOWN',
+        'elder',
+        '🧔 CHARCOAL MASTER',
+        [
+          'Thank you for finding our FARFETCH’D! Without it, we couldn’t collect wood for the kiln!',
+          'As a reward, take HM01 CUT! With the HIVEBADGE, you can cut down small thorny trees blocking paths!',
+        ]
+      ),
+    ],
+    route_34_ilex_forest_gate: [
+      makeNpc(
+        'gate_teacher',
+        3,
+        3,
+        'RIGHT',
+        'teacher',
+        '👩‍🏫 TEACHER',
+        [
+          'Leaving the deep woods? Here, take TM12 SWEET SCENT! It lures wild POKéMON right to you!',
+          'Use it in tall grass to instantly trigger wild encounters without walking!',
+        ]
+      ),
+    ],
+    route_34: [
+      makeNpc(
+        'camper_todd',
+        11,
+        48,
+        'RIGHT',
+        'boy',
+        '⛺ CAMPER TODD',
+        ['I’m saving up for a WATER STONE to evolve my water POKéMON!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'camper_todd',
+          trainerName: 'Camper Todd',
+          visionRange: 3,
+          challengePages: ['CAMPER TODD: Goldenrod City is just ahead, but you have to pass my team first!'],
+          trainerPokemon: { speciesId: 'psyduck', level: 12, moves: ['scratch', 'watergun', 'tailwhip'] },
+          trainerTeam: [
+            { speciesId: 'psyduck', level: 12, moves: ['scratch', 'watergun', 'tailwhip'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'picnicker_gina',
+        14,
+        28,
+        'LEFT',
+        'girl',
+        '👧 PICNICKER GINA',
+        ['My HOPPIP floats on the breeze! Isn’t it cute?'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'picnicker_gina',
+          trainerName: 'Picnicker Gina',
+          visionRange: 3,
+          challengePages: ['PICNICKER GINA: Are you raising POKéMON with lots of love? Let’s find out!'],
+          trainerPokemon: { speciesId: 'hoppip', level: 11, moves: ['splash', 'tailwhip', 'tackle'] },
+          trainerTeam: [
+            { speciesId: 'hoppip', level: 11, moves: ['splash', 'tailwhip', 'tackle'] },
+            { speciesId: 'bulbasaur', level: 12, moves: ['tackle', 'growl', 'leechseed', 'vinewhip'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'officer_keith',
+        10,
+        4,
+        'DOWN',
+        'fat_man',
+        '👮 OFFICER KEITH',
+        ['I keep watch over the route day and night to protect travelers!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'officer_keith',
+          trainerName: 'Officer Keith',
+          visionRange: 3,
+          challengePages: ['OFFICER KEITH: Halt! Who goes there? Let me verify your trainer credentials!'],
+          trainerPokemon: { speciesId: 'growlithe', level: 13, moves: ['bite', 'roar', 'ember'] },
+          trainerTeam: [
+            { speciesId: 'growlithe', level: 13, moves: ['bite', 'roar', 'ember'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'pokefan_brandon',
+        15,
+        18,
+        'LEFT',
+        'fat_man',
+        '🎀 POKéFAN BRANDON',
+        ['My SNUBBULL might look grumpy, but it has the gentlest heart!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokefan_brandon',
+          trainerName: 'Pokefan Brandon',
+          visionRange: 3,
+          challengePages: ['POKéFAN BRANDON: My adorable fairy dog wants to show off its strength!'],
+          trainerPokemon: { speciesId: 'snubbull', level: 13, moves: ['tackle', 'scaryface', 'bite'] },
+          trainerTeam: [
+            { speciesId: 'snubbull', level: 13, moves: ['tackle', 'scaryface', 'bite'] },
+          ],
+        }
+      ),
+    ],
+    day_care: [
+      makeNpc(
+        'day_care_lady',
+        2,
+        3,
+        'DOWN',
+        'mom',
+        '👵 DAY-CARE LADY',
+        [
+          "I'm the DAY-CARE LADY. We raise POKéMON for busy trainers!",
+          'Leave your POKéMON with us and they’ll gain experience as you travel the world.',
+        ],
+        { talkAcrossCounter: true }
+      ),
+      makeNpc(
+        'day_care_man',
+        5,
+        3,
+        'LEFT',
+        'elder',
+        '👴 DAY-CARE MAN',
+        [
+          "If you leave two compatible POKéMON with us, sometimes an EGG appears in the yard!",
+          'Raising POKéMON from EGGS creates unbreakable bonds.',
+        ]
+      ),
+    ],
+    goldenrod_city: [
+      makeNpc(
+        'goldenrod_pokefan',
+        18,
+        14,
+        'DOWN',
+        'fat_man',
+        '🎩 GENTLEMAN',
+        [
+          'GOLDENROD CITY is the grandest metropolis in JOHTO!',
+          'We have a 6-story DEPT. STORE, a bustling GAME CORNER, and the famous RADIO TOWER!',
+        ],
+        { wanders: true }
+      ),
+      makeNpc(
+        'goldenrod_lass',
+        30,
+        18,
+        'LEFT',
+        'girl',
+        '👧 LASS',
+        [
+          'WHITNEY at the GYM is super cute, but her MILTANK’s ROLLOUT attack is terrifying!',
+          'It builds up speed and power every single turn!',
+        ],
+        { wanders: true }
+      ),
+      makeNpc(
+        'goldenrod_cooltrainer',
+        28,
+        22,
+        'UP',
+        'boy',
+        '🧢 COOLTRAINER',
+        [
+          'The MAGNET TRAIN station is just north of here! It connects JOHTO directly to KANTO at 340 miles per hour!',
+        ]
+      ),
+      makeNpc(
+        'goldenrod_fisher',
+        12,
+        9,
+        'DOWN',
+        'fisherman',
+        '🎣 FISHER',
+        [
+          'You can take the UNDERGROUND tunnel to cross under town, browse the herb shop, and groom your POKéMON!',
+        ]
+      ),
+    ],
+    goldenrod_gym: [
+      makeNpc(
+        'whitney',
+        10,
+        3,
+        'DOWN',
+        'girl',
+        '🎀 LEADER WHITNEY',
+        [
+          "WHITNEY: You're really amazing! The PLAINBADGE proves your strength!",
+          'NORMAL-type POKéMON have so much versatility. Keep believing in your team!',
+        ],
+        {
+          action: 'WHITNEY_EVENT',
+          trainerId: 'whitney',
+          trainerName: 'Leader Whitney',
+          challengePages: [
+            "WHITNEY: Hi! I'm WHITNEY! Everyone was into POKéMON, so I got into it too! POKéMON are super cute! You think you can beat mine? Don't cry if you lose!",
+          ],
+          trainerPokemon: { speciesId: 'miltank', level: 20, moves: ['rollout', 'attract', 'stomp', 'milkdrink'] },
+          trainerTeam: [
+            { speciesId: 'clefairy', level: 18, moves: ['doubleslap', 'mimic', 'encore', 'metronome'] },
+            { speciesId: 'miltank', level: 20, moves: ['rollout', 'attract', 'stomp', 'milkdrink'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'lass_carrie',
+        9,
+        6,
+        'DOWN',
+        'girl',
+        '👧 LASS CARRIE',
+        ['Don’t underestimate our cute POKéMON!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'lass_carrie',
+          trainerName: 'Lass Carrie',
+          visionRange: 3,
+          challengePages: ['LASS CARRIE: You want to see WHITNEY? You have to get through me first!'],
+          trainerPokemon: { speciesId: 'snubbull', level: 17, moves: ['tackle', 'scaryface', 'bite'] },
+          trainerTeam: [
+            { speciesId: 'snubbull', level: 17, moves: ['tackle', 'scaryface', 'bite'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'beauty_victoria',
+        13,
+        8,
+        'LEFT',
+        'girl',
+        '💄 BEAUTY VICTORIA',
+        ['SENTRET is so fluffy and quick!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'beauty_victoria',
+          trainerName: 'Beauty Victoria',
+          visionRange: 3,
+          challengePages: ['BEAUTY VICTORIA: Oh, what a cute challenger! Let’s have a lovely battle!'],
+          trainerPokemon: { speciesId: 'sentret', level: 15, moves: ['tackle', 'defensecurl', 'quickattack'] },
+          trainerTeam: [
+            { speciesId: 'sentret', level: 15, moves: ['tackle', 'defensecurl', 'quickattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'beauty_samantha',
+        5,
+        9,
+        'RIGHT',
+        'girl',
+        '💄 BEAUTY SAMANTHA',
+        ['MEOWTH loves shiny coins and quick scratches!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'beauty_samantha',
+          trainerName: 'Beauty Samantha',
+          visionRange: 3,
+          challengePages: ['BEAUTY SAMANTHA: Don’t blink or my MEOWTH will take your prize money!'],
+          trainerPokemon: { speciesId: 'meowth', level: 16, moves: ['scratch', 'growl', 'bite', 'payday'] },
+          trainerTeam: [
+            { speciesId: 'meowth', level: 16, moves: ['scratch', 'growl', 'bite', 'payday'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'goldenrod_gym_guide',
+        3,
+        15,
+        'UP',
+        'fat_man',
+        '🥊 GYM GUIDE',
+        [
+          'Yo! CHAMP in the making!',
+          'WHITNEY uses NORMAL-type POKéMON! FIGHTING-type moves are super effective against them!',
+          'Beware of MILTANK’s MILK DRINK and ROLLOUT—if it rolls consecutively, it hits like a freight train!',
+        ]
+      ),
+    ],
+    goldenrod_poke_center: [
+      makeNpc(
+        'goldenrod_nurse_joy',
+        3,
+        1,
+        'DOWN',
+        'teacher',
+        '👩‍⚕️ NURSE JOY',
+        [
+          'Welcome to the GOLDENROD POKéMON CENTER!',
+          'We heal your POKéMON to full health in no time.',
+          'Your team is fully restored. We hope to see you again!',
+        ],
+        { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
+      ),
+      makeNpc(
+        'goldenrod_pc_clerk',
+        1,
+        6,
+        'RIGHT',
+        'fat_man',
+        '👨‍💼 NETWORK CLERK',
+        ['This POKéMON CENTER connects trainers across the globe through high-speed mobile communications!']
+      ),
+      makeNpc(
+        'goldenrod_pc_lass',
+        6,
+        4,
+        'LEFT',
+        'girl',
+        '👧 LASS',
+        ['A boy on the 5th floor of the DEPT. STORE traded me a MACHOP named MUSCLE!']
+      ),
+    ],
+    goldenrod_bike_shop: [
+      makeNpc(
+        'bike_shop_owner',
+        2,
+        3,
+        'DOWN',
+        'fat_man',
+        '🚲 BIKE SHOP OWNER',
+        [
+          'Welcome to MIRACLE CYCLE! I moved here from CERULEAN CITY, but nobody knows my bikes yet!',
+          'Would you take one of our BICYCLES and ride it everywhere to advertise for me? It’ll double your travel speed!',
+        ]
+      ),
+    ],
+    goldenrod_flower_shop: [
+      makeNpc(
+        'florist',
+        2,
+        3,
+        'DOWN',
+        'girl',
+        '🌸 FLORIST',
+        [
+          'Have you seen that weird, wiggling tree on ROUTE 36? Whenever anyone splashes water on it, it gets furious!',
+          'Take this SQUIRTBOTTLE! Use it on that tree and see what happens!',
+        ]
+      ),
+    ],
+    goldenrod_game_corner: [
+      makeNpc(
+        'coin_guy',
+        14,
+        6,
+        'LEFT',
+        'fat_man',
+        '🎰 PRIZE CLERK',
+        ['You can trade GAME CORNER coins for valuable TMs like BLIZZARD, FIRE BLAST, and THUNDER, or rare POKéMON!']
+      ),
+      makeNpc(
+        'slot_player',
+        5,
+        8,
+        'UP',
+        'boy',
+        '👦 SLOT PLAYER',
+        ['7-7-7! Come on! Just one more match! The slot machines here are so addictive!']
+      ),
+    ],
+    goldenrod_name_rater: [
+      makeNpc(
+        'name_rater',
+        2,
+        3,
+        'DOWN',
+        'elder',
+        '👴 NAME RATER',
+        [
+          'Hello, hello! I am the official NAME RATER! I evaluate the nicknames of POKéMON!',
+          'A fine nickname deepens the friendship between you and your companion!',
+        ]
+      ),
+    ],
+    goldenrod_bill_house: [
+      makeNpc(
+        'bills_mother',
+        2,
+        3,
+        'DOWN',
+        'mom',
+        "👩 BILL'S MOM",
+        [
+          'My son BILL created the POKéMON STORAGE SYSTEM! He’s in ECRUTEAK CITY right now helping friends with the TIME CAPSULE.',
+        ]
+      ),
+      makeNpc(
+        'bills_sister',
+        5,
+        4,
+        'LEFT',
+        'girl',
+        "👧 BILL'S SISTER",
+        ['My big brother loves EEVEE! If you visit our family in Ecruteak, he might have a gift for you!']
+      ),
+    ],
+    goldenrod_magnet_train_station: [
+      makeNpc(
+        'station_officer',
+        9,
+        9,
+        'DOWN',
+        'fat_man',
+        '👮 STATION OFFICER',
+        [
+          'The MAGNET TRAIN reaches speeds over 340 mph between GOLDENROD and SAFFRON CITY!',
+          'Only authorized travelers with a RAIL PASS may board the train.',
+        ]
+      ),
+      makeNpc(
+        'train_passenger',
+        5,
+        14,
+        'RIGHT',
+        'boy',
+        '👦 PASSENGER',
+        ['I can’t wait to ride the bullet train all the way to KANTO!']
+      ),
+    ],
+    goldenrod_underground: [
+      makeNpc(
+        'super_nerd_eric',
+        8,
+        12,
+        'DOWN',
+        'boy',
+        '🤓 SUPER NERD ERIC',
+        ['My electric and poison POKéMON thrive in the subterranean tunnels!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'super_nerd_eric',
+          trainerName: 'Super Nerd Eric',
+          visionRange: 3,
+          challengePages: ['SUPER NERD ERIC: The underground is my secret laboratory! Prepare for a shock!'],
+          trainerPokemon: { speciesId: 'grimer', level: 12, moves: ['pound', 'poisongas', 'harden'] },
+          trainerTeam: [
+            { speciesId: 'grimer', level: 12, moves: ['pound', 'poisongas', 'harden'] },
+            { speciesId: 'magnemite', level: 12, moves: ['tackle', 'thundershock', 'supersonic'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'pokemaniac_donald',
+        8,
+        24,
+        'UP',
+        'boy',
+        '🎒 POKÉMANIAC DONALD',
+        ['SLOWPOKE may be slow, but its psychic power is immense!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokemaniac_donald',
+          trainerName: 'Pokemaniac Donald',
+          visionRange: 3,
+          challengePages: ['POKÉMANIAC DONALD: Underground trainers have the best costume parties! Battle me!'],
+          trainerPokemon: { speciesId: 'slowpoke', level: 13, moves: ['confusion', 'tackle', 'growl'] },
+          trainerTeam: [
+            { speciesId: 'slowpoke', level: 13, moves: ['confusion', 'tackle', 'growl'] },
+          ],
+        }
+      ),
+    ],
+    goldenrod_dept_store_1f: [
+      makeNpc(
+        'dept_rec',
+        7,
+        2,
+        'DOWN',
+        'teacher',
+        '👩‍💼 RECEPTIONIST',
+        [
+          'Welcome to GOLDENROD DEPT. STORE!',
+          '1F Service Counter, 2F Trainer’s Market, 3F Battle Collection, 4F Medicine Box, 5F TM Corner, 6F Rooftop Square!',
+        ],
+        { talkAcrossCounter: true }
+      ),
+    ],
+    goldenrod_dept_store_2f: [
+      makeNpc(
+        'dept_clerk_2f',
+        13,
+        5,
+        'DOWN',
+        'fat_man',
+        '🏪 2F CLERK',
+        ['Welcome to the 2F TRAINER’S MARKET! Stock up on GREAT BALLS, SUPER POTIONS, and REVIVES!'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+    ],
+    goldenrod_dept_store_3f: [
+      makeNpc(
+        'dept_clerk_3f',
+        13,
+        5,
+        'DOWN',
+        'fat_man',
+        '🏪 3F CLERK',
+        ['Welcome to the 3F BATTLE COLLECTION! X ATTACK, X DEFEND, and DIRE HIT give you the edge in GYM battles!'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+    ],
+    goldenrod_dept_store_4f: [
+      makeNpc(
+        'dept_clerk_4f',
+        13,
+        5,
+        'DOWN',
+        'fat_man',
+        '🏪 4F CLERK',
+        ['Welcome to the 4F MEDICINE BOX! PROTEIN, IRON, CARBOS, and HP UP permanently boost your POKéMON stats!'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+    ],
+    goldenrod_dept_store_5f: [
+      makeNpc(
+        'dept_clerk_5f',
+        13,
+        5,
+        'DOWN',
+        'fat_man',
+        '🏪 5F CLERK',
+        ['Welcome to the 5F TM CORNER! Teach your POKéMON game-changing moves like HEADBUTT, ROCK SMASH, and REFLECT!'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+    ],
+    goldenrod_dept_store_6f: [
+      makeNpc(
+        'dept_girl_6f',
+        6,
+        2,
+        'DOWN',
+        'girl',
+        '👧 VENDING MACHINE FAN',
+        [
+          'The rooftop vending machines dispense FRESH WATER, SODA POP, and LEMONADE! They restore more HP than regular POTIONS!',
+        ]
+      ),
+    ],
+    goldenrod_dept_store_roof: [
+      makeNpc(
+        'rooftop_camper',
+        7,
+        4,
+        'DOWN',
+        'boy',
+        '⛺ ROOFTOP CAMPER',
+        [
+          'You can see the entire skyline of GOLDENROD CITY and the RADIO TOWER from up here! It’s breathtaking!',
+        ]
+      ),
+    ],
+    radio_tower_1f: [
+      makeNpc(
+        'radio_rec',
+        5,
+        6,
+        'DOWN',
+        'teacher',
+        '📻 QUIZ RECEPTIONIST',
+        [
+          'Welcome to GOLDENROD RADIO TOWER! Tune your POKéGEAR to our broadcast frequencies to hear daily music and tips!',
+        ]
+      ),
+    ],
+    radio_tower_2f: [
+      makeNpc(
+        'buena',
+        6,
+        6,
+        'DOWN',
+        'girl',
+        '🎙️ BUENA',
+        [
+          "I'm BUENA! Tune into BUENA'S PASSWORD every night on the radio to earn points on your BLUE CARD!",
+        ]
+      ),
+    ],
+    radio_tower_3f: [
+      makeNpc(
+        'sound_engineer',
+        6,
+        5,
+        'RIGHT',
+        'fat_man',
+        '🎧 SOUND ENGINEER',
+        [
+          'We broadcast the POKéMON MARCH to energize traveling trainers, and POKéMON LULLABY to soothe wild monsters!',
+        ]
+      ),
+    ],
+    radio_tower_4f: [
+      makeNpc(
+        'dj_mary',
+        7,
+        4,
+        'DOWN',
+        'girl',
+        '🎙️ DJ MARY',
+        [
+          'PROF. OAK and I host the POKéMON TALK radio show every day! We announce where rare POKéMON are swarming in Johto!',
+        ]
+      ),
+    ],
+    radio_tower_5f: [
+      makeNpc(
+        'radio_director',
+        5,
+        4,
+        'DOWN',
+        'elder',
+        '📻 RADIO DIRECTOR',
+        [
+          "I'm the DIRECTOR of the GOLDENROD RADIO TOWER. Our broadcast tower reaches every corner of JOHTO and KANTO!",
+          'Music and news unite trainers across all regions.',
+        ]
+      ),
+    ],
   };
 }
 

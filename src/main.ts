@@ -164,6 +164,32 @@ async function bootstrap() {
     'charcoal_kiln',
     'slowpoke_well_b1f',
     'slowpoke_well_b2f',
+    'ilex_forest',
+    'route_34_ilex_forest_gate',
+    'route_34',
+    'day_care',
+    'goldenrod_city',
+    'goldenrod_gym',
+    'goldenrod_poke_center',
+    'goldenrod_bike_shop',
+    'goldenrod_game_corner',
+    'goldenrod_flower_shop',
+    'goldenrod_name_rater',
+    'goldenrod_bill_house',
+    'goldenrod_magnet_train_station',
+    'goldenrod_underground',
+    'goldenrod_dept_store_1f',
+    'goldenrod_dept_store_2f',
+    'goldenrod_dept_store_3f',
+    'goldenrod_dept_store_4f',
+    'goldenrod_dept_store_5f',
+    'goldenrod_dept_store_6f',
+    'goldenrod_dept_store_roof',
+    'radio_tower_1f',
+    'radio_tower_2f',
+    'radio_tower_3f',
+    'radio_tower_4f',
+    'radio_tower_5f',
   ];
 
   const loadedMaps: MapData[] = await Promise.all(
@@ -2142,6 +2168,47 @@ async function bootstrap() {
                   () => {
                     saveCurrentGame();
                     overworldHUD.showToast('🐞 Received HIVE BADGE & TM49 FURY CUTTER from Leader Bugsy!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Goldenrod Gym Leader Boss: Whitney
+        if (targetNpc.action === 'WHITNEY_EVENT' && !storyFlags.has('whitney_defeated')) {
+          const introPages =
+            targetNpc.challengePages && targetNpc.challengePages.length > 0
+              ? targetNpc.challengePages
+              : [
+                  "WHITNEY: Hi! I'm WHITNEY! Everyone was into POKéMON, so I got into it too! POKéMON are super cute! You think you can beat mine? Don't cry if you lose!",
+                ];
+          overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Leader Whitney',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('whitney');
+                storyFlags.add('whitney_defeated');
+                if (!inventory.badges.includes('plain')) inventory.badges.push('plain');
+                if (!inventory.tms.includes('TM45')) inventory.tms.push('TM45');
+                audioManager.playSfx('sfx_badge_get');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    "WHITNEY: …Sniff… …Waaaaah! What a meanie! I lost! You're horrible!",
+                    "WHITNEY: …Sniff… …Sigh… It's okay. You won fair and square. Take the PLAINBADGE!",
+                    "WHITNEY: The PLAINBADGE boosts your POKéMON's SPEED stat! It also lets your POKéMON use STRENGTH outside of battle. Oh, and take this too—it's TM45 ATTRACT!",
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('🎀 Received PLAIN BADGE & TM45 ATTRACT from Leader Whitney!');
                   }
                 );
               },
