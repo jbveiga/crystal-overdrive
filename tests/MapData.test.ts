@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import type { MapData } from '../src/types/game';
+import { MapManager } from '../src/world/MapManager';
 import { npcsByMap } from '../src/world/npcData';
 
 describe('MapData & Authentic Tile Integrity', () => {
@@ -634,6 +635,29 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("storyFlags.add('starter_chosen')");
     expect(mainSrc).toContain("It's an empty POKé BALL.");
     expect(mainSrc).toContain("current.id === 'new_bark_town' && conn.mapId === 'route_29' && playerParty.length === 0");
+  });
+
+  it('validates Ticket 6.2 Real-Time Day / Night wild encounters & outdoor classification in MapManager', () => {
+    const route29Path = path.resolve(__dirname, '../public/assets/data/maps/route_29.json');
+    const route29Data: MapData = JSON.parse(fs.readFileSync(route29Path, 'utf8'));
+
+    const mm = new MapManager();
+    mm.registerMap(route29Data);
+    mm.setCurrentMap('route_29');
+
+    expect(mm.isCurrentMapOutdoor()).toBe(true);
+    expect(MapManager.isOutdoorMap('route_29')).toBe(true);
+    expect(MapManager.isOutdoorMap('elms_lab')).toBe(false);
+
+    // Guaranteed encounter trigger (rng = 0.05 < 0.125)
+    // Force slot selection with rng = 0.0
+    const morningRoll = mm.rollWildEncounter(2, undefined, () => 0.05, 'MORNING');
+    expect(morningRoll).not.toBeNull();
+    expect(['pidgey', 'sentret']).toContain(morningRoll?.speciesId);
+
+    const nightRoll = mm.rollWildEncounter(2, undefined, () => 0.05, 'NIGHT');
+    expect(nightRoll).not.toBeNull();
+    expect(['hoothoot', 'rattata']).toContain(nightRoll?.speciesId);
   });
 });
 
