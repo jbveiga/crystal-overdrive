@@ -659,5 +659,116 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(nightRoll).not.toBeNull();
     expect(['hoothoot', 'rattata']).toContain(nightRoll?.speciesId);
   });
+
+  it('validates Phase 7 South Johto authentic maps, tile PNGs, reciprocal warps, and Azalea Gym Leader Bugsy', () => {
+    const phase7Maps = [
+      'route_32',
+      'route_32_poke_center',
+      'route_32_ruins_of_alph_gate',
+      'ruins_of_alph_outside',
+      'ruins_of_alph_research_center',
+      'union_cave_1f',
+      'union_cave_b1f',
+      'union_cave_b2f',
+      'route_33',
+      'azalea_town',
+      'azalea_poke_center',
+      'azalea_mart',
+      'azalea_gym',
+      'kurts_house',
+      'charcoal_kiln',
+      'slowpoke_well_b1f',
+      'slowpoke_well_b2f',
+    ];
+
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+
+    for (const mapId of phase7Maps) {
+      const mapPath = path.resolve(__dirname, `../public/assets/data/maps/${mapId}.json`);
+      expect(fs.existsSync(mapPath), `Map file for ${mapId} must exist`).toBe(true);
+
+      const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+      expect(mapData.width).toBeGreaterThan(0);
+      expect(mapData.height).toBeGreaterThan(0);
+      expect(mapData.collisionGrid.length).toBe(mapData.width * mapData.height);
+      expect(mapData.tileMap?.length).toBe(mapData.width * mapData.height);
+
+      // Verify referenced tiles exist on disk
+      for (const tile of new Set(mapData.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png must exist for ${mapId}`).toBe(true);
+      }
+    }
+
+    // Outdoor classification verification
+    expect(MapManager.isOutdoorMap('route_32')).toBe(true);
+    expect(MapManager.isOutdoorMap('ruins_of_alph_outside')).toBe(true);
+    expect(MapManager.isOutdoorMap('route_33')).toBe(true);
+    expect(MapManager.isOutdoorMap('azalea_town')).toBe(true);
+    expect(MapManager.isOutdoorMap('azalea_gym')).toBe(false);
+    expect(MapManager.isOutdoorMap('union_cave_1f')).toBe(false);
+
+    // Reciprocal Warp Verifications
+    const r32Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_32.json'), 'utf8'));
+    const uc1fData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/union_cave_1f.json'), 'utf8'));
+    const r33Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_33.json'), 'utf8'));
+    const azaleaData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/azalea_town.json'), 'utf8'));
+    const gymData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/azalea_gym.json'), 'utf8'));
+    const wellB1fData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/slowpoke_well_b1f.json'), 'utf8'));
+
+    // Route 32 <-> Union Cave 1F
+    const r32ToUc = r32Data.warps.find((w) => w.targetMapId === 'union_cave_1f');
+    expect(r32ToUc).toBeDefined();
+    expect(r32ToUc?.x).toBe(6);
+    expect(r32ToUc?.y).toBe(79);
+
+    const ucToR32 = uc1fData.warps.find((w) => w.targetMapId === 'route_32');
+    expect(ucToR32).toBeDefined();
+    expect(ucToR32?.x).toBe(17);
+    expect(ucToR32?.y).toBe(3);
+
+    // Union Cave 1F <-> Route 33
+    const ucToR33 = uc1fData.warps.find((w) => w.targetMapId === 'route_33');
+    expect(ucToR33).toBeDefined();
+    expect(ucToR33?.x).toBe(17);
+    expect(ucToR33?.y).toBe(31);
+
+    const r33ToUc = r33Data.warps.find((w) => w.targetMapId === 'union_cave_1f');
+    expect(r33ToUc).toBeDefined();
+    expect(r33ToUc?.x).toBe(11);
+    expect(r33ToUc?.y).toBe(1);
+
+    // Azalea Town <-> Azalea Gym
+    const azaleaToGym = azaleaData.warps.find((w) => w.targetMapId === 'azalea_gym');
+    expect(azaleaToGym).toBeDefined();
+    expect(azaleaToGym?.x).toBe(10);
+    expect(azaleaToGym?.y).toBe(15);
+
+    const gymExit = gymData.warps.find((w) => w.targetMapId === 'azalea_town');
+    expect(gymExit).toBeDefined();
+
+    // Azalea Town <-> Slowpoke Well B1F
+    const azaleaToWell = azaleaData.warps.find((w) => w.targetMapId === 'slowpoke_well_b1f');
+    expect(azaleaToWell).toBeDefined();
+    expect(azaleaToWell?.x).toBe(31);
+    expect(azaleaToWell?.y).toBe(7);
+
+    const wellExit = wellB1fData.warps.find((w) => w.targetMapId === 'azalea_town');
+    expect(wellExit).toBeDefined();
+    expect(wellExit?.x).toBe(17);
+    expect(wellExit?.y).toBe(15);
+
+    // Leader Bugsy boss registration in npcsByMap and main.ts
+    const bugsyNpc = npcsByMap.azalea_gym.find((npc) => npc.id === 'bugsy');
+    expect(bugsyNpc).toBeDefined();
+    expect(bugsyNpc?.action).toBe('BUGSY_EVENT');
+    expect(bugsyNpc?.trainerId).toBe('bugsy');
+    expect(bugsyNpc?.trainerPokemon?.speciesId).toBe('scyther');
+    expect(bugsyNpc?.trainerTeam?.length).toBe(3);
+
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    expect(mainSrc).toContain("action === 'BUGSY_EVENT'");
+    expect(mainSrc).toContain("inventory.badges.includes('hive')");
+    expect(mainSrc).toContain("inventory.tms.includes('TM49')");
+  });
 });
 

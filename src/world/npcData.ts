@@ -921,6 +921,771 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         ]
       ),
     ],
+    route_32: [
+      makeNpc(
+        'youngster_albert',
+        12,
+        22,
+        'DOWN',
+        'boy',
+        '👦 YOUNGSTER ALBERT',
+        ['I gave it my all, but your POKéMON were too tough!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'youngster_albert',
+          trainerName: 'Youngster Albert',
+          visionRange: 3,
+          challengePages: ["YOUNGSTER ALBERT: I haven't seen you around before! Let's see how good you are!"],
+          trainerPokemon: { speciesId: 'rattata', level: 6, moves: ['tackle', 'quickattack'] },
+          trainerTeam: [
+            { speciesId: 'rattata', level: 6, moves: ['tackle', 'quickattack'] },
+            { speciesId: 'zubat', level: 8, moves: ['leechlife', 'bite'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'picnicker_liz',
+        10,
+        30,
+        'LEFT',
+        'girl',
+        '👧 PICNICKER LIZ',
+        ['My NIDORAN is the cutest! Be gentle with her!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'picnicker_liz',
+          trainerName: 'Picnicker Liz',
+          visionRange: 3,
+          challengePages: ['PICNICKER LIZ: Uh-oh, a trainer! My NIDORAN wants to play!'],
+          trainerPokemon: { speciesId: 'nidoran-f', level: 9, moves: ['tackle', 'growl', 'scratch'] },
+          trainerTeam: [
+            { speciesId: 'nidoran-f', level: 9, moves: ['tackle', 'growl', 'scratch'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'camper_roland',
+        3,
+        45,
+        'RIGHT',
+        'boy',
+        '⛺ CAMPER ROLAND',
+        ['Camping out here with my POKéMON is the best feeling in the world!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'camper_roland',
+          trainerName: 'Camper Roland',
+          visionRange: 3,
+          challengePages: ["CAMPER ROLAND: Hey! Don't sneak up on my campsite! Let's battle!"],
+          trainerPokemon: { speciesId: 'nidoran-m', level: 9, moves: ['tackle', 'leer', 'hornattack'] },
+          trainerTeam: [
+            { speciesId: 'nidoran-m', level: 9, moves: ['tackle', 'leer', 'hornattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'fisher_justin',
+        8,
+        49,
+        'LEFT',
+        'fisherman',
+        '🎣 FISHER JUSTIN',
+        ['Fish are biting, but you bit harder!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'fisher_justin',
+          trainerName: 'Fisher Justin',
+          visionRange: 3,
+          challengePages: ['FISHER JUSTIN: Whoa! You startled the fish! You owe me a battle!'],
+          trainerPokemon: { speciesId: 'magikarp', level: 5, moves: ['splash', 'tackle'] },
+          trainerTeam: [
+            { speciesId: 'magikarp', level: 5, moves: ['splash', 'tackle'] },
+            { speciesId: 'poliwhirl', level: 10, moves: ['watergun', 'hypnosis', 'doubleslap'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'fisher_ralph',
+        12,
+        56,
+        'LEFT',
+        'fisherman',
+        '🎣 FISHER RALPH',
+        ["I'm saving up for a SUPER ROD! Then I'll catch giant water POKéMON!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'fisher_ralph',
+          trainerName: 'Fisher Ralph',
+          visionRange: 3,
+          challengePages: ["FISHER RALPH: I'm not just good at fishing, I'm good at battling too!"],
+          trainerPokemon: { speciesId: 'goldeen', level: 10, moves: ['peck', 'tailwhip', 'supersonic'] },
+          trainerTeam: [
+            { speciesId: 'goldeen', level: 10, moves: ['peck', 'tailwhip', 'supersonic'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'frieda',
+        12,
+        67,
+        'DOWN',
+        'girl',
+        '🎀 FRIEDA OF FRIDAY',
+        [
+          "FRIEDA: Yahoo! It's Friday! I'm FRIEDA of Friday! Nice to meet you!",
+          "Here's a POISON BARB to power up POISON-type moves!",
+        ]
+      ),
+      makeNpc(
+        'salesman',
+        11,
+        82,
+        'DOWN',
+        'fat_man',
+        '🕴️ SUSPICIOUS MAN',
+        [
+          'How would you like some tasty, nutritious SLOWPOKETAIL?',
+          "It's only ¥9,800,000! What, you don't want it? Then step aside, kid!",
+        ]
+      ),
+    ],
+    route_32_poke_center: [
+      makeNpc(
+        'r32_nurse_joy',
+        3,
+        1,
+        'DOWN',
+        'teacher',
+        '👩‍⚕️ NURSE JOY',
+        [
+          'Welcome to the ROUTE 32 POKéMON CENTER!',
+          'We heal your POKéMON to full health in no time.',
+          'Your team is fully restored. We hope to see you again!',
+        ],
+        { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
+      ),
+      makeNpc(
+        'r32_cooltrainer',
+        1,
+        6,
+        'RIGHT',
+        'boy',
+        '🧢 COOLTRAINER',
+        ['UNION CAVE ahead is labyrinthine! Make sure your team is rested and you have POTIONS ready!']
+      ),
+      makeNpc(
+        'r32_gentleman',
+        6,
+        4,
+        'LEFT',
+        'fat_man',
+        '🎩 GENTLEMAN',
+        ['A fisherman gave me an OLD ROD here. It works on MAGIKARP, but you can find rarer fish deeper in caves!']
+      ),
+    ],
+    route_32_ruins_of_alph_gate: [
+      makeNpc(
+        'alph_gate_officer',
+        5,
+        2,
+        'DOWN',
+        'fat_man',
+        '👮 OFFICER',
+        ['RUINS OF ALPH are to the west. Strange radio signals and patterns have been reported inside!']
+      ),
+      makeNpc(
+        'alph_gate_youngster',
+        1,
+        4,
+        'RIGHT',
+        'boy',
+        '👦 TOURIST',
+        ['Have you heard the weird sounds on the POKéGEAR radio near the ruins? It gives me goosebumps!']
+      ),
+    ],
+    ruins_of_alph_outside: [
+      makeNpc(
+        'alph_scientist',
+        11,
+        15,
+        'DOWN',
+        'sage',
+        '🔬 ARCHEOLOGIST',
+        ['The stone chambers contain sliding tile puzzles that awakened ancient hieroglyphic beings known as UNOWN!']
+      ),
+      makeNpc(
+        'alph_youngster',
+        7,
+        20,
+        'UP',
+        'boy',
+        '👦 BOY',
+        ['I heard there are secret chambers behind hidden walls that open only if you use FLASH or ESCAPE ROPE!'],
+        { wanders: true }
+      ),
+    ],
+    ruins_of_alph_research_center: [
+      makeNpc(
+        'research_scientist1',
+        3,
+        2,
+        'DOWN',
+        'sage',
+        '🔬 HEAD RESEARCHER',
+        ['We are compiling the UNOWN DEX! Each UNOWN matches one letter of our alphabet!']
+      ),
+      makeNpc(
+        'research_scientist2',
+        5,
+        4,
+        'LEFT',
+        'sage',
+        '🔬 RESEARCH ASSISTANT',
+        ['The past and future intertwine in these ancient stones. They date back over 1,500 years!']
+      ),
+    ],
+    union_cave_1f: [
+      makeNpc(
+        'hiker_daniel',
+        3,
+        6,
+        'RIGHT',
+        'fat_man',
+        '🥾 HIKER DANIEL',
+        ['Whoa! You broke through my rock defenses!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'hiker_daniel',
+          trainerName: 'Hiker Daniel',
+          visionRange: 3,
+          challengePages: ['HIKER DANIEL: Whoa! A traveler! My rock POKéMON love tough challenges!'],
+          trainerPokemon: { speciesId: 'onix', level: 11, moves: ['tackle', 'screech', 'rockthrow'] },
+          trainerTeam: [
+            { speciesId: 'onix', level: 11, moves: ['tackle', 'screech', 'rockthrow'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'pokemaniac_larry',
+        4,
+        21,
+        'RIGHT',
+        'boy',
+        '🎒 POKÉMANIAC LARRY',
+        ['My rare collection... beaten?! No way!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokemaniac_larry',
+          trainerName: 'Pokemaniac Larry',
+          visionRange: 3,
+          challengePages: ['POKÉMANIAC LARRY: I scour dark caves to find the rarest monsters! Check mine out!'],
+          trainerPokemon: { speciesId: 'slowpoke', level: 10, moves: ['confusion', 'tackle', 'yawn'] },
+          trainerTeam: [
+            { speciesId: 'slowpoke', level: 10, moves: ['confusion', 'tackle', 'yawn'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'firebreather_ray',
+        15,
+        27,
+        'LEFT',
+        'fat_man',
+        '🔥 FIREBREATHER RAY',
+        ['Whew! You totally quenched my flames!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'firebreather_ray',
+          trainerName: 'Firebreather Ray',
+          visionRange: 3,
+          challengePages: ['FIREBREATHER RAY: In dark caves, a blazing flame keeps away the cold! Taste this heat!'],
+          trainerPokemon: { speciesId: 'vulpix', level: 9, moves: ['ember', 'tailwhip', 'quickattack'] },
+          trainerTeam: [
+            { speciesId: 'vulpix', level: 9, moves: ['ember', 'tailwhip', 'quickattack'] },
+            { speciesId: 'magmar', level: 11, moves: ['ember', 'smog', 'leer'] },
+          ],
+        }
+      ),
+    ],
+    union_cave_b1f: [
+      makeNpc(
+        'hiker_phillip',
+        4,
+        14,
+        'RIGHT',
+        'fat_man',
+        '🥾 HIKER PHILLIP',
+        ['I need to train harder in the subterranean depths!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'hiker_phillip',
+          trainerName: 'Hiker Phillip',
+          visionRange: 3,
+          challengePages: ['HIKER PHILLIP: The lower you go, the tougher the rocks! Are you ready?!'],
+          trainerPokemon: { speciesId: 'geodude', level: 10, moves: ['tackle', 'defensecurl', 'rockthrow'] },
+          trainerTeam: [
+            { speciesId: 'geodude', level: 10, moves: ['tackle', 'defensecurl', 'rockthrow'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'pokemaniac_andrew',
+        15,
+        23,
+        'LEFT',
+        'boy',
+        '🎒 POKÉMANIAC ANDREW',
+        ['My MARILL is totally out of energy!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokemaniac_andrew',
+          trainerName: 'Pokemaniac Andrew',
+          visionRange: 3,
+          challengePages: ['POKÉMANIAC ANDREW: Look at my adorable round water buddy! Go MARILL!'],
+          trainerPokemon: { speciesId: 'marill', level: 11, moves: ['watergun', 'tackle', 'tailwhip', 'defensecurl'] },
+          trainerTeam: [
+            { speciesId: 'marill', level: 11, moves: ['watergun', 'tackle', 'tailwhip', 'defensecurl'] },
+          ],
+        }
+      ),
+    ],
+    union_cave_b2f: [
+      makeNpc(
+        'ace_trainer_nick',
+        13,
+        8,
+        'DOWN',
+        'boy',
+        '⭐ ACE TRAINER NICK',
+        ["Incredible skill! You're ready for anything the LEAGUE can throw at you!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'ace_trainer_nick',
+          trainerName: 'Ace Trainer Nick',
+          visionRange: 3,
+          challengePages: ['ACE TRAINER NICK: Only elite trainers explore the deepest cavern waters! Battle with me!'],
+          trainerPokemon: { speciesId: 'charmander', level: 12, moves: ['scratch', 'ember', 'smokescreen'] },
+          trainerTeam: [
+            { speciesId: 'charmander', level: 12, moves: ['scratch', 'ember', 'smokescreen'] },
+            { speciesId: 'squirtle', level: 12, moves: ['tackle', 'watergun', 'tailwhip', 'withdraw'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'lapras_fan',
+        6,
+        26,
+        'UP',
+        'girl',
+        '🌊 LAPRAS ENTHUSIAST',
+        [
+          'Every Friday, a beautiful wild LAPRAS swims up in this underground lake!',
+          'If you use SURF, you can meet it yourself!',
+        ]
+      ),
+    ],
+    route_33: [
+      makeNpc(
+        'hiker_anthony',
+        13,
+        11,
+        'LEFT',
+        'fat_man',
+        '🥾 HIKER ANTHONY',
+        ["A rainstorm or a tough loss won't stop me from hiking through Johto!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'hiker_anthony',
+          trainerName: 'Hiker Anthony',
+          visionRange: 3,
+          challengePages: ['HIKER ANTHONY: Route 33 is known for sudden rainstorms! Let\'s strike like lightning!'],
+          trainerPokemon: { speciesId: 'geodude', level: 11, moves: ['tackle', 'rockthrow', 'magnitude'] },
+          trainerTeam: [
+            { speciesId: 'geodude', level: 11, moves: ['tackle', 'rockthrow', 'magnitude'] },
+            { speciesId: 'machop', level: 11, moves: ['lowkick', 'leer', 'focusenergy'] },
+          ],
+        }
+      ),
+    ],
+    azalea_town: [
+      makeNpc(
+        'azalea_kurt',
+        9,
+        6,
+        'DOWN',
+        'elder',
+        '👴 KURT',
+        [
+          'KURT: Those dastardly TEAM ROCKET villains are chopping off SLOWPOKE tails in the well!',
+          "I'm going in there to drive them off myself! Stay back, kid!",
+        ]
+      ),
+      makeNpc(
+        'azalea_slowpoke',
+        21,
+        10,
+        'DOWN',
+        'fat_man',
+        '🦛 SLOWPOKE',
+        [
+          'SLOWPOKE: ... ... ...',
+          'Yaaawn? It seems peaceful and blissfully unbothered.',
+        ]
+      ),
+      makeNpc(
+        'azalea_apprentice',
+        17,
+        10,
+        'UP',
+        'boy',
+        '👦 APPRENTICE',
+        ['The master charcoal-maker uses wood from ILEX FOREST to fire the kiln.'],
+        { wanders: true }
+      ),
+      makeNpc(
+        'azalea_gramps',
+        8,
+        11,
+        'DOWN',
+        'elder',
+        '👴 AZALEA ELDER',
+        ["KURT creates handmade custom POKé BALLS from APRICORNS gathered from trees. No factory can match his touch!"]
+      ),
+    ],
+    azalea_poke_center: [
+      makeNpc(
+        'azalea_nurse_joy',
+        3,
+        1,
+        'DOWN',
+        'teacher',
+        '👩‍⚕️ NURSE JOY',
+        [
+          'Welcome to the AZALEA TOWN POKéMON CENTER!',
+          'We heal your POKéMON to full health.',
+          'Your team is fully restored. We hope to see you again!',
+        ],
+        { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
+      ),
+      makeNpc(
+        'azalea_pc_lass',
+        8,
+        4,
+        'LEFT',
+        'girl',
+        '👧 LASS',
+        ['KURT will make special POKé BALLS like FAST BALL, LURE BALL, or FRIEND BALL if you bring him APRICORNS!']
+      ),
+    ],
+    azalea_mart: [
+      makeNpc(
+        'azalea_mart_clerk',
+        1,
+        3,
+        'RIGHT',
+        'fat_man',
+        '🏪 MART CLERK',
+        ['Welcome to AZALEA MART! Stock up on POTIONS and POKé BALLS before venturing into ILEX FOREST!'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+      makeNpc(
+        'azalea_mart_bug_catcher',
+        6,
+        6,
+        'UP',
+        'bug_catcher',
+        '🐞 BUG CATCHER',
+        ["CHARCOAL boosts FIRE-type moves! It's great against BUGSY's bug POKéMON in the GYM!"]
+      ),
+    ],
+    azalea_gym: [
+      makeNpc(
+        'bugsy',
+        5,
+        7,
+        'DOWN',
+        'bug_catcher',
+        '🐞 LEADER BUGSY',
+        [
+          'BUGSY: My research is complete! The HIVEBADGE proves your incredible bond with POKéMON!',
+          'BUG POKéMON are deep and complex. Keep exploring and learning with your team!',
+        ],
+        {
+          action: 'BUGSY_EVENT',
+          trainerId: 'bugsy',
+          trainerName: 'Leader Bugsy',
+          challengePages: [
+            "BUGSY: I'm BUGSY! I never lose when it comes to bug POKéMON. My research is going to make me an authority on bug POKéMON! Let me demonstrate what I've learned from my studies!",
+          ],
+          trainerPokemon: { speciesId: 'scyther', level: 16, moves: ['furycutter', 'quickattack', 'leer'] },
+          trainerTeam: [
+            { speciesId: 'metapod', level: 14, moves: ['tackle', 'stringshot'] },
+            { speciesId: 'kakuna', level: 14, moves: ['poisonsting', 'harden'] },
+            { speciesId: 'scyther', level: 16, moves: ['furycutter', 'quickattack', 'leer'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'bug_catcher_benny',
+        5,
+        3,
+        'DOWN',
+        'bug_catcher',
+        '🐞 BUG CATCHER BENNY',
+        ["Bug POKéMON evolve super fast! That's their secret strength!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bug_catcher_benny',
+          trainerName: 'Bug Catcher Benny',
+          visionRange: 3,
+          challengePages: ['BUG CATCHER BENNY: BUGSY taught me all about insect evolution! Check this out!'],
+          trainerPokemon: { speciesId: 'weedle', level: 12, moves: ['poisonsting', 'stringshot'] },
+          trainerTeam: [
+            { speciesId: 'weedle', level: 12, moves: ['poisonsting', 'stringshot'] },
+            { speciesId: 'kakuna', level: 12, moves: ['poisonsting', 'harden'] },
+            { speciesId: 'beedrill', level: 12, moves: ['furyattack', 'poisonsting'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'bug_catcher_al',
+        8,
+        8,
+        'LEFT',
+        'bug_catcher',
+        '🐞 BUG CATCHER AL',
+        ['They might look squishy, but bugs have strong determination!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bug_catcher_al',
+          trainerName: 'Bug Catcher Al',
+          visionRange: 3,
+          challengePages: ['BUG CATCHER AL: They may be caterpillars now, but they will become magnificent!'],
+          trainerPokemon: { speciesId: 'caterpie', level: 12, moves: ['tackle', 'stringshot'] },
+          trainerTeam: [
+            { speciesId: 'caterpie', level: 12, moves: ['tackle', 'stringshot'] },
+            { speciesId: 'metapod', level: 12, moves: ['harden', 'tackle'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'bug_catcher_josh',
+        0,
+        2,
+        'RIGHT',
+        'bug_catcher',
+        '🐞 BUG CATCHER JOSH',
+        ['PARAS mushrooms hold mysterious powers!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bug_catcher_josh',
+          trainerName: 'Bug Catcher Josh',
+          visionRange: 3,
+          challengePages: ["BUG CATCHER JOSH: You won't get past my spooky forest bug!"],
+          trainerPokemon: { speciesId: 'paras', level: 13, moves: ['scratch', 'stunspore', 'poisonpowder'] },
+          trainerTeam: [
+            { speciesId: 'paras', level: 13, moves: ['scratch', 'stunspore', 'poisonpowder'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'twins_amy',
+        4,
+        10,
+        'DOWN',
+        'girl',
+        '👭 TWIN AMY',
+        ['MAY and I battle together with our companion bugs!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'twins_amy',
+          trainerName: 'Twin Amy',
+          visionRange: 2,
+          challengePages: ["TWIN AMY: Hi! I'm AMY! We love spider and ladybug POKéMON!"],
+          trainerPokemon: { speciesId: 'spinarak', level: 10, moves: ['poisonsting', 'stringshot', 'scaryface'] },
+          trainerTeam: [
+            { speciesId: 'spinarak', level: 10, moves: ['poisonsting', 'stringshot', 'scaryface'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'twins_may',
+        5,
+        10,
+        'DOWN',
+        'girl',
+        '👭 TWIN MAY',
+        ['AMY and I share all our berries and POKéMON secrets!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'twins_may',
+          trainerName: 'Twin May',
+          visionRange: 2,
+          challengePages: ["TWIN MAY: Hi! I'm MAY! Let me show you how strong LEDYBA is!"],
+          trainerPokemon: { speciesId: 'ledyba', level: 10, moves: ['tackle', 'supersonic', 'cometpunch'] },
+          trainerTeam: [
+            { speciesId: 'ledyba', level: 10, moves: ['tackle', 'supersonic', 'cometpunch'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'azalea_gym_guide',
+        7,
+        13,
+        'UP',
+        'fat_man',
+        '🥊 GYM GUIDE',
+        [
+          'Yo! CHAMP in the making!',
+          'BUGSY is young, but his knowledge of BUG-type POKéMON is real!',
+          "BUG POKéMON hate FIRE and FLYING moves! Bring those and you'll breeze right through!",
+        ]
+      ),
+    ],
+    kurts_house: [
+      makeNpc(
+        'kurt_house_kurt',
+        3,
+        2,
+        'DOWN',
+        'elder',
+        '👴 KURT',
+        [
+          'KURT: You drove off TEAM ROCKET from SLOWPOKE WELL? You\'re a wonderful trainer!',
+          "Bring me any APRICORNS you find on trees, and I'll gladly craft custom POKé BALLS for you free of charge!",
+        ]
+      ),
+      makeNpc(
+        'kurt_granddaughter',
+        5,
+        3,
+        'LEFT',
+        'girl',
+        '👧 GRANDDAUGHTER',
+        ['Grandpa makes the most reliable POKé BALLS in the whole world! Everyone in Johto knows his name!']
+      ),
+    ],
+    charcoal_kiln: [
+      makeNpc(
+        'kiln_boss',
+        2,
+        3,
+        'DOWN',
+        'elder',
+        '🧔 KILN BOSS',
+        ['The kiln burns day and night to cure authentic AZALEA CHARCOAL. It boosts the power of FIRE-type moves!']
+      ),
+      makeNpc(
+        'kiln_apprentice',
+        5,
+        3,
+        'LEFT',
+        'boy',
+        '👦 APPRENTICE',
+        ["Our FARFETCH'D ran off into ILEX FOREST! We need it back so we can continue collecting firewood!"]
+      ),
+    ],
+    slowpoke_well_b1f: [
+      makeNpc(
+        'rocket_grunt_1',
+        5,
+        2,
+        'DOWN',
+        'silver',
+        '⚡ ROCKET GRUNT',
+        ['Hyuck! The BOSS will hear about this!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'rocket_grunt_1',
+          trainerName: 'Rocket Grunt',
+          visionRange: 3,
+          challengePages: ["ROCKET GRUNT: Hey, kid! What do you think you're doing meddling in TEAM ROCKET business?!"],
+          trainerPokemon: { speciesId: 'rattata', level: 9, moves: ['tackle', 'quickattack'] },
+          trainerTeam: [
+            { speciesId: 'rattata', level: 9, moves: ['tackle', 'quickattack'] },
+            { speciesId: 'zubat', level: 9, moves: ['leechlife', 'bite'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'rocket_grunt_2',
+        5,
+        6,
+        'RIGHT',
+        'silver',
+        '⚡ ROCKET GRUNT',
+        ["Don't think you've stopped TEAM ROCKET! We are everywhere!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'rocket_grunt_2',
+          trainerName: 'Rocket Grunt',
+          visionRange: 3,
+          challengePages: ['ROCKET GRUNT: Quit snooping around! Those tails will make us a fortune!'],
+          trainerPokemon: { speciesId: 'koffing', level: 11, moves: ['tackle', 'smog', 'poisongas'] },
+          trainerTeam: [
+            { speciesId: 'koffing', level: 11, moves: ['tackle', 'smog', 'poisongas'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'rocket_grunt_3',
+        10,
+        4,
+        'LEFT',
+        'girl',
+        '⚡ ROCKET GRUNT',
+        ["A child defeated me?! The EXECUTIVES won't be pleased!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'rocket_grunt_3',
+          trainerName: 'Rocket Grunt',
+          visionRange: 3,
+          challengePages: ["ROCKET GRUNT: You think you're a hero? Team Rocket will crush you!"],
+          trainerPokemon: { speciesId: 'ekans', level: 11, moves: ['wrap', 'leer', 'poisonsting'] },
+          trainerTeam: [
+            { speciesId: 'ekans', level: 11, moves: ['wrap', 'leer', 'poisonsting'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'well_kurt',
+        16,
+        14,
+        'UP',
+        'elder',
+        '👴 KURT',
+        [
+          'KURT: Oof... my back! I rushed in and tumbled down the well ledge!',
+          'Please, Gold! Chase those TEAM ROCKET scoundrels out and save our SLOWPOKE!',
+        ]
+      ),
+      makeNpc(
+        'well_slowpoke',
+        6,
+        2,
+        'DOWN',
+        'fat_man',
+        '🦛 RESCUED SLOWPOKE',
+        [
+          'SLOWPOKE: ... ... ...',
+          'It rubs gently against your leg with relief and gratitude.',
+        ]
+      ),
+    ],
+    slowpoke_well_b2f: [
+      makeNpc(
+        'well_guide',
+        16,
+        5,
+        'DOWN',
+        'fat_man',
+        '🔦 CAVERN EXPLORER',
+        [
+          'Deep underground springs feed this lower level. If you bring STRENGTH and SURF, you can explore the depths!',
+          "A quiet man living down here gave me the KING'S ROCK, an item that evolves SLOWPOKE into SLOWKING!",
+        ]
+      ),
+    ],
   };
 }
 

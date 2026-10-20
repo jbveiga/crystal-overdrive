@@ -270,6 +270,10 @@ export class MapManager {
       'route_30',
       'route_31',
       'violet_city',
+      'route_32',
+      'ruins_of_alph_outside',
+      'route_33',
+      'azalea_town',
     ].includes(mapId);
   }
 

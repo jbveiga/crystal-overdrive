@@ -4331,7 +4331,12 @@
     "jt_2e_2f_3e_3f",
     "jt_2e_2f_3e_3f"
   ],
-  "connections": {},
+  "connections": {
+    "SOUTH": {
+      "mapId": "route_32",
+      "offset": 0
+    }
+  },
   "warps": [
     {
       "x": 9,

@@ -147,6 +147,23 @@ async function bootstrap() {
     'sprout_tower_2f',
     'sprout_tower_3f',
     'violet_gym',
+    'route_32',
+    'route_32_poke_center',
+    'route_32_ruins_of_alph_gate',
+    'ruins_of_alph_outside',
+    'ruins_of_alph_research_center',
+    'union_cave_1f',
+    'union_cave_b1f',
+    'union_cave_b2f',
+    'route_33',
+    'azalea_town',
+    'azalea_poke_center',
+    'azalea_mart',
+    'azalea_gym',
+    'kurts_house',
+    'charcoal_kiln',
+    'slowpoke_well_b1f',
+    'slowpoke_well_b2f',
   ];
 
   const loadedMaps: MapData[] = await Promise.all(
@@ -2085,6 +2102,46 @@ async function bootstrap() {
                   () => {
                     saveCurrentGame();
                     overworldHUD.showToast('🦅 Received ZEPHYR BADGE & TM31 MUD-SLAP from Leader Falkner!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Azalea Gym Leader Boss: Bugsy
+        if (targetNpc.action === 'BUGSY_EVENT' && !storyFlags.has('bugsy_defeated')) {
+          const introPages =
+            targetNpc.challengePages && targetNpc.challengePages.length > 0
+              ? targetNpc.challengePages
+              : [
+                  "BUGSY: I'm BUGSY! I never lose when it comes to bug POKéMON. My research is going to make me an authority on bug POKéMON! Let me demonstrate what I've learned from my studies!",
+                ];
+          overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Leader Bugsy',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('bugsy');
+                storyFlags.add('bugsy_defeated');
+                if (!inventory.badges.includes('hive')) inventory.badges.push('hive');
+                if (!inventory.tms.includes('TM49')) inventory.tms.push('TM49');
+                audioManager.playSfx('sfx_badge_get');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    "BUGSY: Whoa, amazing! You're an expert on POKéMON! My research isn't complete yet, but you're definitely strong. Take the official POKéMON LEAGUE HIVEBADGE!",
+                    "BUGSY: Do you know the benefits of the HIVEBADGE? If you have it, POKéMON up to Lv. 30 will obey you, even traded ones. POKéMON that know CUT will also be able to use it outside of battle. Here, take this too—it's TM49 FURY CUTTER!",
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('🐞 Received HIVE BADGE & TM49 FURY CUTTER from Leader Bugsy!');
                   }
                 );
               },

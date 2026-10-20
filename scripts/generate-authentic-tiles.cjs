@@ -138,7 +138,8 @@ function mapCollToken(token) {
     token === 'DOOR' ||
     token.startsWith('WARP_CARPET') ||
     token === 'LADDER' ||
-    token === 'STAIRCASE'
+    token === 'STAIRCASE' ||
+    token === 'CAVE'
   ) {
     return 0; // Walkable
   }
@@ -154,11 +155,13 @@ function mapCollToken(token) {
 const waterAnim = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__water__water.png'));
 const roofNewBark = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__new_bark.png'));
 const roofViolet = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__violet.png'));
+const roofAzalea = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__azalea.png'));
 
 const ROOF_GRAPHICS = {
   nb: roofNewBark,
   cg: roofNewBark,
   vc: roofViolet,
+  az: roofAzalea,
 };
 
 function loadTileset(tsName, isOutdoor = false) {
@@ -190,11 +193,13 @@ const TILESETS = {
   lab: loadTileset('lab', false),
   players_house: loadTileset('players_house', false),
   house: loadTileset('house', false),
+  traditional_house: loadTileset('traditional_house', false),
   pokecenter: loadTileset('pokecenter', false),
   mart: loadTileset('mart', false),
   gate: loadTileset('gate', false),
   tower: loadTileset('tower', false),
   elite_four_room: loadTileset('elite_four_room', false),
+  cave: loadTileset('cave', false),
 };
 
 const generatedTiles = new Set();
@@ -285,6 +290,10 @@ function buildMapFromBlk({
   bgEvents = [],
   grassEncounters = [],
 }) {
+  const filter = process.argv.slice(2);
+  if (filter.length > 0 && !filter.includes(id)) {
+    return;
+  }
   const ts = TILESETS[tileset];
   const blk = fs.readFileSync(path.join(SOURCE_DIR, blkFile));
   const width = blocksW * 2;
@@ -995,7 +1004,9 @@ buildMapFromBlk({
   blocksW: 20,
   blocksH: 18,
   roofGroup: 'vc',
-  connections: {},
+  connections: {
+    SOUTH: { mapId: 'route_32', offset: 0 },
+  },
   warps: [
     { x: 9, y: 17, targetMapId: 'violet_mart', targetX: 2, targetY: 7 },
     { x: 18, y: 17, targetMapId: 'violet_gym', targetX: 4, targetY: 15 },
@@ -1340,6 +1351,442 @@ buildMapFromBlk({
     { x: 9, y: 5, targetMapId: 'route_31', targetX: 5, targetY: 7 },
   ],
   bgEvents: [],
+});
+
+// ==========================================
+// Phase 7: South Johto (Route 32, Ruins of Alph, Union Cave to Azalea Town)
+// ==========================================
+
+buildMapFromBlk({
+  id: 'route_32',
+  name: 'Route 32',
+  tileset: 'johto',
+  blkFile: 'maps__Route32.blk',
+  blocksW: 10,
+  blocksH: 45,
+  roofGroup: 'vc',
+  connections: {
+    NORTH: { mapId: 'violet_city', offset: 0 },
+    SOUTH: { mapId: 'route_33', offset: 0 },
+  },
+  warps: [
+    { x: 11, y: 73, targetMapId: 'route_32_poke_center', targetX: 3, targetY: 7 },
+    { x: 4, y: 2, targetMapId: 'route_32_ruins_of_alph_gate', targetX: 9, targetY: 4 },
+    { x: 4, y: 3, targetMapId: 'route_32_ruins_of_alph_gate', targetX: 9, targetY: 5 },
+    { x: 6, y: 79, targetMapId: 'union_cave_1f', targetX: 17, targetY: 3 },
+  ],
+  bgEvents: [
+    {
+      x: 13,
+      y: 5,
+      speaker: '🪧 ROUTE 32 SIGN',
+      pages: ['ROUTE 32', 'VIOLET CITY - AZALEA TOWN'],
+    },
+    {
+      x: 9,
+      y: 1,
+      speaker: '🪧 RUINS SIGN',
+      pages: ['RUINS OF ALPH', 'EAST ENTRANCE'],
+    },
+    {
+      x: 10,
+      y: 84,
+      speaker: '🪧 UNION CAVE SIGN',
+      pages: ['UNION CAVE', 'AHEAD'],
+    },
+    {
+      x: 12,
+      y: 73,
+      speaker: '🏥 POKéMON CENTER',
+      pages: ['Heal your POKéMON before exploring UNION CAVE!'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'bellsprout', minLevel: 6, maxLevel: 7, weight: 35, timeOfDay: 'ANY' },
+    { speciesId: 'ekans', minLevel: 4, maxLevel: 6, weight: 30, timeOfDay: 'DAY' },
+    { speciesId: 'pidgey', minLevel: 6, maxLevel: 8, weight: 25, timeOfDay: 'MORNING' },
+    { speciesId: 'hoppip', minLevel: 6, maxLevel: 7, weight: 20, timeOfDay: 'DAY' },
+    { speciesId: 'wooper', minLevel: 4, maxLevel: 6, weight: 40, timeOfDay: 'NIGHT' },
+    { speciesId: 'zubat', minLevel: 5, maxLevel: 7, weight: 30, timeOfDay: 'NIGHT' },
+    { speciesId: 'gastly', minLevel: 6, maxLevel: 8, weight: 20, timeOfDay: 'NIGHT' },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_32_poke_center',
+  name: 'Route 32 Pokémon Center',
+  tileset: 'pokecenter',
+  blkFile: 'maps__Pokecenter1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'route_32', targetX: 11, targetY: 73 },
+    { x: 4, y: 7, targetMapId: 'route_32', targetX: 11, targetY: 73 },
+  ],
+  bgEvents: [
+    {
+      x: 9,
+      y: 1,
+      speaker: "💻 BILL'S PC",
+      pages: ["Accessed BILL'S PC!", 'POKéMON Storage System is online and synced.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_32_ruins_of_alph_gate',
+  name: 'Route 32 / Ruins of Alph Gate',
+  tileset: 'gate',
+  blkFile: 'maps__EastWestGate.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 0, y: 4, targetMapId: 'ruins_of_alph_outside', targetX: 13, targetY: 20 },
+    { x: 0, y: 5, targetMapId: 'ruins_of_alph_outside', targetX: 13, targetY: 21 },
+    { x: 9, y: 4, targetMapId: 'route_32', targetX: 4, targetY: 2 },
+    { x: 9, y: 5, targetMapId: 'route_32', targetX: 4, targetY: 3 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'ruins_of_alph_outside',
+  name: 'Ruins of Alph',
+  tileset: 'johto',
+  blkFile: 'maps__RuinsOfAlphOutside.blk',
+  blocksW: 10,
+  blocksH: 18,
+  roofGroup: 'vc',
+  warps: [
+    { x: 17, y: 11, targetMapId: 'ruins_of_alph_research_center', targetX: 2, targetY: 7 },
+    { x: 13, y: 20, targetMapId: 'route_32_ruins_of_alph_gate', targetX: 0, targetY: 4 },
+    { x: 13, y: 21, targetMapId: 'route_32_ruins_of_alph_gate', targetX: 0, targetY: 5 },
+  ],
+  bgEvents: [
+    {
+      x: 12,
+      y: 16,
+      speaker: '🪧 RUINS OF ALPH',
+      pages: ['RUINS OF ALPH', 'Explore the ancient mysteries!'],
+    },
+    {
+      x: 18,
+      y: 12,
+      speaker: '🪧 RESEARCH CENTER',
+      pages: ['RUINS OF ALPH RESEARCH CENTER'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'unown', minLevel: 5, maxLevel: 5, weight: 100 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'ruins_of_alph_research_center',
+  name: 'Ruins Research Center',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'ruins_of_alph_outside', targetX: 17, targetY: 11 },
+    { x: 3, y: 7, targetMapId: 'ruins_of_alph_outside', targetX: 17, targetY: 11 },
+  ],
+  bgEvents: [
+    {
+      x: 3,
+      y: 4,
+      speaker: '🖥️ ARCHAEOLOGY TERMINAL',
+      pages: ['An elaborate academic research terminal decoding ancient UNOWN symbols.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'union_cave_1f',
+  name: 'Union Cave 1F',
+  tileset: 'cave',
+  blkFile: 'maps__UnionCave1F.blk',
+  blocksW: 10,
+  blocksH: 18,
+  warps: [
+    { x: 17, y: 3, targetMapId: 'route_32', targetX: 6, targetY: 79 },
+    { x: 17, y: 31, targetMapId: 'route_33', targetX: 11, targetY: 1 },
+    { x: 5, y: 19, targetMapId: 'union_cave_b1f', targetX: 3, targetY: 3 },
+    { x: 3, y: 33, targetMapId: 'union_cave_b1f', targetX: 3, targetY: 33 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'geodude', minLevel: 6, maxLevel: 8, weight: 35 },
+    { speciesId: 'zubat', minLevel: 5, maxLevel: 7, weight: 35 },
+    { speciesId: 'sandshrew', minLevel: 6, maxLevel: 7, weight: 20 },
+    { speciesId: 'onix', minLevel: 6, maxLevel: 8, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'union_cave_b1f',
+  name: 'Union Cave B1F',
+  tileset: 'cave',
+  blkFile: 'maps__UnionCaveB1F.blk',
+  blocksW: 10,
+  blocksH: 18,
+  warps: [
+    { x: 3, y: 3, targetMapId: 'union_cave_1f', targetX: 5, targetY: 19 },
+    { x: 3, y: 33, targetMapId: 'union_cave_1f', targetX: 3, targetY: 33 },
+    { x: 17, y: 31, targetMapId: 'union_cave_b2f', targetX: 5, targetY: 3 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'geodude', minLevel: 7, maxLevel: 9, weight: 35 },
+    { speciesId: 'zubat', minLevel: 7, maxLevel: 9, weight: 35 },
+    { speciesId: 'onix', minLevel: 8, maxLevel: 10, weight: 20 },
+    { speciesId: 'wooper', minLevel: 7, maxLevel: 9, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'union_cave_b2f',
+  name: 'Union Cave B2F',
+  tileset: 'cave',
+  blkFile: 'maps__UnionCaveB2F.blk',
+  blocksW: 10,
+  blocksH: 18,
+  warps: [
+    { x: 5, y: 3, targetMapId: 'union_cave_b1f', targetX: 17, targetY: 31 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'lapras', minLevel: 20, maxLevel: 20, weight: 20 },
+    { speciesId: 'wooper', minLevel: 18, maxLevel: 22, weight: 35 },
+    { speciesId: 'quagsire', minLevel: 20, maxLevel: 24, weight: 25 },
+    { speciesId: 'golbat', minLevel: 20, maxLevel: 22, weight: 20 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_33',
+  name: 'Route 33',
+  tileset: 'johto',
+  blkFile: 'maps__Route33.blk',
+  blocksW: 10,
+  blocksH: 9,
+  roofGroup: 'az',
+  connections: {
+    NORTH: { mapId: 'route_32', offset: 0 },
+    WEST: { mapId: 'azalea_town', offset: 0 },
+  },
+  warps: [
+    { x: 11, y: 1, targetMapId: 'union_cave_1f', targetX: 17, targetY: 31 },
+  ],
+  bgEvents: [
+    {
+      x: 13,
+      y: 11,
+      speaker: '🪧 ROUTE 33 SIGN',
+      pages: ['ROUTE 33', 'UNION CAVE - AZALEA TOWN'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'spearow', minLevel: 6, maxLevel: 8, weight: 35, timeOfDay: 'DAY' },
+    { speciesId: 'geodude', minLevel: 6, maxLevel: 8, weight: 35, timeOfDay: 'ANY' },
+    { speciesId: 'ekans', minLevel: 6, maxLevel: 7, weight: 30, timeOfDay: 'DAY' },
+    { speciesId: 'zubat', minLevel: 6, maxLevel: 8, weight: 40, timeOfDay: 'NIGHT' },
+    { speciesId: 'rattata', minLevel: 6, maxLevel: 7, weight: 30, timeOfDay: 'NIGHT' },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'azalea_town',
+  name: 'Azalea Town',
+  tileset: 'johto',
+  blkFile: 'maps__AzaleaTown.blk',
+  blocksW: 20,
+  blocksH: 9,
+  roofGroup: 'az',
+  connections: {
+    EAST: { mapId: 'route_33', offset: 0 },
+  },
+  warps: [
+    { x: 15, y: 9, targetMapId: 'azalea_poke_center', targetX: 3, targetY: 7 },
+    { x: 21, y: 13, targetMapId: 'charcoal_kiln', targetX: 2, targetY: 7 },
+    { x: 21, y: 5, targetMapId: 'azalea_mart', targetX: 2, targetY: 7 },
+    { x: 9, y: 5, targetMapId: 'kurts_house', targetX: 3, targetY: 7 },
+    { x: 10, y: 15, targetMapId: 'azalea_gym', targetX: 4, targetY: 15 },
+    { x: 31, y: 7, targetMapId: 'slowpoke_well_b1f', targetX: 17, targetY: 15 },
+  ],
+  bgEvents: [
+    {
+      x: 19,
+      y: 9,
+      speaker: '🪧 AZALEA TOWN SIGN',
+      pages: ['AZALEA TOWN', 'Where People and POKéMON Live in Happy Harmony'],
+    },
+    {
+      x: 10,
+      y: 9,
+      speaker: '🪧 KURT’S HOUSE',
+      pages: ["KURT'S HOUSE"],
+    },
+    {
+      x: 14,
+      y: 15,
+      speaker: '🪧 AZALEA GYM',
+      pages: ['AZALEA TOWN POKéMON GYM', 'LEADER: BUGSY'],
+    },
+    {
+      x: 29,
+      y: 7,
+      speaker: '🪧 SLOWPOKE WELL',
+      pages: ['SLOWPOKE WELL', 'Also known as the RAINMAKER WELL'],
+    },
+    {
+      x: 19,
+      y: 13,
+      speaker: '🪧 CHARCOAL KILN',
+      pages: ['CHARCOAL KILN'],
+    },
+  ],
+  grassEncounters: [],
+});
+
+buildMapFromBlk({
+  id: 'azalea_poke_center',
+  name: 'Azalea Pokémon Center',
+  tileset: 'pokecenter',
+  blkFile: 'maps__Pokecenter1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'azalea_town', targetX: 15, targetY: 9 },
+    { x: 4, y: 7, targetMapId: 'azalea_town', targetX: 15, targetY: 9 },
+  ],
+  bgEvents: [
+    {
+      x: 9,
+      y: 1,
+      speaker: "💻 BILL'S PC",
+      pages: ["Accessed BILL'S PC!", 'POKéMON Storage System is online and synced.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'azalea_mart',
+  name: 'Azalea Poké Mart',
+  tileset: 'mart',
+  blkFile: 'maps__Mart.blk',
+  blocksW: 6,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'azalea_town', targetX: 21, targetY: 5 },
+    { x: 3, y: 7, targetMapId: 'azalea_town', targetX: 21, targetY: 5 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'azalea_gym',
+  name: 'Azalea Gym',
+  tileset: 'elite_four_room',
+  blkFile: 'maps__AzaleaGym.blk',
+  blocksW: 5,
+  blocksH: 8,
+  warps: [
+    { x: 4, y: 15, targetMapId: 'azalea_town', targetX: 10, targetY: 15 },
+    { x: 5, y: 15, targetMapId: 'azalea_town', targetX: 10, targetY: 15 },
+  ],
+  bgEvents: [
+    {
+      x: 3,
+      y: 13,
+      speaker: '🏆 AZALEA GYM STATUE',
+      pages: ['AZALEA TOWN POKéMON GYM', 'LEADER: BUGSY'],
+    },
+    {
+      x: 6,
+      y: 13,
+      speaker: '🏆 AZALEA GYM STATUE',
+      pages: ['AZALEA TOWN POKéMON GYM', 'LEADER: BUGSY'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'kurts_house',
+  name: "Kurt's House",
+  tileset: 'traditional_house',
+  blkFile: 'maps__KurtsHouse.blk',
+  blocksW: 8,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'azalea_town', targetX: 9, targetY: 5 },
+    { x: 4, y: 7, targetMapId: 'azalea_town', targetX: 9, targetY: 5 },
+  ],
+  bgEvents: [
+    {
+      x: 4,
+      y: 1,
+      speaker: '⛩️ CELEBI STATUE',
+      pages: ['A small wooden statue honoring the Guardian of the Forest, CELEBI.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'charcoal_kiln',
+  name: 'Charcoal Kiln',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'azalea_town', targetX: 21, targetY: 13 },
+    { x: 3, y: 7, targetMapId: 'azalea_town', targetX: 21, targetY: 13 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '🔥 CHARCOAL KILN',
+      pages: ['High-quality CHARCOAL made from ILEX FOREST wood is curing here.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'slowpoke_well_b1f',
+  name: 'Slowpoke Well B1F',
+  tileset: 'cave',
+  blkFile: 'maps__SlowpokeWellB1F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 17, y: 15, targetMapId: 'azalea_town', targetX: 31, targetY: 7 },
+    { x: 7, y: 11, targetMapId: 'slowpoke_well_b2f', targetX: 3, targetY: 3 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'slowpoke', minLevel: 6, maxLevel: 8, weight: 45 },
+    { speciesId: 'zubat', minLevel: 5, maxLevel: 8, weight: 55 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'slowpoke_well_b2f',
+  name: 'Slowpoke Well B2F',
+  tileset: 'cave',
+  blkFile: 'maps__SlowpokeWellB2F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 3, y: 3, targetMapId: 'slowpoke_well_b1f', targetX: 7, targetY: 11 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'slowpoke', minLevel: 14, maxLevel: 18, weight: 50 },
+    { speciesId: 'zubat', minLevel: 14, maxLevel: 18, weight: 50 },
+  ],
 });
 
 console.log(`Total authentic 64x64 quadrant PNGs generated: ${generatedTiles.size}`);
