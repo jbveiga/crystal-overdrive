@@ -3458,19 +3458,34 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
   };
 
+  const DEFAULT_LORE = [
+    'The weather has been fierce lately, but the POKéMON here are tough!',
+    'Trainers from all over pass through here on their way to the POKéMON LEAGUE.',
+    'If your POKéMON gets hurt, head to the nearest POKéMON CENTER.',
+  ];
+
   // Phase 11+ NPCs & trainers derived directly from pret/pokecrystal object events.
   for (const [mapId, list] of Object.entries(GENERATED_NPCS)) {
     base[mapId] = list.map((n) =>
-      makeNpc(n.id, n.x, n.y, n.dir, n.sprite as GridEntity['spriteType'], n.speaker, n.pages, {
-        talkAcrossCounter: n.counter,
-        action: n.action as GridEntity['action'],
-        trainerId: n.trainerId,
-        trainerName: n.trainerName,
-        visionRange: n.vision,
-        challengePages: n.challenge,
-        trainerPokemon: n.team?.[0],
-        trainerTeam: n.team,
-      })
+      makeNpc(
+        n.id,
+        n.x,
+        n.y,
+        n.dir,
+        n.sprite as GridEntity['spriteType'],
+        n.speaker,
+        n.pages && n.pages.length > 0 ? n.pages : [DEFAULT_LORE[(n.x + n.y) % DEFAULT_LORE.length]],
+        {
+          talkAcrossCounter: n.counter,
+          action: n.action as GridEntity['action'],
+          trainerId: n.trainerId,
+          trainerName: n.trainerName,
+          visionRange: n.vision,
+          challengePages: n.challenge,
+          trainerPokemon: n.team?.[0],
+          trainerTeam: n.team,
+        }
+      )
     );
   }
   return base;

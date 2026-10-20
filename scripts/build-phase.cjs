@@ -208,7 +208,7 @@ function npcsOf(asm, id, grid) {
     }
     if (out.some((o) => o.x === x && o.y === y)) continue;
     const nice = info.n.replace(/_/g, ' ');
-    const npc = { id: `${id}_${info.n.toLowerCase()}_${k++}`, x, y, dir: dirOf(mv), sprite: info.type, speaker: nice, pages: [LORE[(x + y + k) % LORE.length]] };
+    const npc = { id: `${id}_${info.n.toLowerCase()}_${k++}`, x, y, dir: dirOf(mv), sprite: info.type, speaker: nice };
     if (info.n === 'NURSE') Object.assign(npc, { action: 'HEAL_AND_SAVE', counter: true, pages: ['Welcome to our POKéMON CENTER!', 'We can heal your POKéMON to full health.'], speaker: '👩‍⚕️ NURSE JOY' });
     else if (info.n === 'CLERK') Object.assign(npc, { action: 'OPEN_MART', counter: true, pages: ['Welcome! How may I help you?'], speaker: '🏪 CLERK' });
     else if (info.n === 'GYM_GUIDE') npc.speaker = '🏆 GYM GUIDE';
@@ -344,7 +344,7 @@ export interface GeneratedNpc {
   dir: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
   sprite: string;
   speaker: string;
-  pages: string[];
+  pages?: string[];
   action?: string;
   counter?: boolean;
   trainerId?: string;

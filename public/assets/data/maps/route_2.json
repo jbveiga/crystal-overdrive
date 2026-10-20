@@ -3289,6 +3289,13 @@
       "targetMapId": "route_2_gate",
       "targetX": 5,
       "targetY": 0
+    },
+    {
+      "x": 12,
+      "y": 7,
+      "targetMapId": "digletts_cave",
+      "targetX": 15,
+      "targetY": 5
     }
   ],
   "bgEvents": [],

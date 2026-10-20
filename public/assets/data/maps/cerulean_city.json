@@ -4339,6 +4339,14 @@
     "WEST": {
       "mapId": "route_4",
       "offset": 10
+    },
+    "SOUTH": {
+      "mapId": "route_5",
+      "offset": 10
+    },
+    "EAST": {
+      "mapId": "route_9",
+      "offset": 18
     }
   },
   "warps": [

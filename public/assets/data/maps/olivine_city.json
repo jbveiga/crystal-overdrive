@@ -4390,6 +4390,20 @@
       "targetMapId": "olivine_lighthouse_1f",
       "targetX": 10,
       "targetY": 17
+    },
+    {
+      "x": 19,
+      "y": 27,
+      "targetMapId": "olivine_port_passage",
+      "targetX": 16,
+      "targetY": 0
+    },
+    {
+      "x": 20,
+      "y": 27,
+      "targetMapId": "olivine_port_passage",
+      "targetX": 15,
+      "targetY": 0
     }
   ],
   "bgEvents": [

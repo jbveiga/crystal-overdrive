@@ -4916,5 +4916,2650 @@
         "The weather has been fierce lately, but the POKéMON here are tough!"
       ]
     }
+  ],
+  "route_5": [
+    {
+      "id": "route_5_pokefan_m_0",
+      "x": 17,
+      "y": 16,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    }
+  ],
+  "route_5_underground_entrance": [
+    {
+      "id": "route_5_underground_entrance_teacher_0",
+      "x": 2,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    }
+  ],
+  "route_5_saffron_gate": [
+    {
+      "id": "route_5_saffron_gate_officer_0",
+      "x": 0,
+      "y": 4,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "OFFICER"
+    }
+  ],
+  "route_5_cleanse_tag_house": [
+    {
+      "id": "route_5_cleanse_tag_house_granny_0",
+      "x": 2,
+      "y": 5,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "GRANNY"
+    },
+    {
+      "id": "route_5_cleanse_tag_house_teacher_1",
+      "x": 5,
+      "y": 3,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    }
+  ],
+  "route_6": [
+    {
+      "id": "route_6_pokefan_m_0",
+      "x": 17,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    },
+    {
+      "id": "route_6_pokefan_m_1",
+      "x": 9,
+      "y": 12,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ REX",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_6_rex",
+      "trainerName": "Pokefanm Rex",
+      "vision": 2,
+      "challenge": [
+        "REX: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "phanpy",
+          "level": 35
+        }
+      ],
+      "pages": [
+        "Rex: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_6_pokefan_m_2",
+      "x": 10,
+      "y": 12,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ ALLAN",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_6_allan",
+      "trainerName": "Pokefanm Allan",
+      "vision": 2,
+      "challenge": [
+        "ALLAN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "teddiursa",
+          "level": 35
+        }
+      ],
+      "pages": [
+        "Allan: That was a great battle!"
+      ]
+    }
+  ],
+  "route_6_saffron_gate": [
+    {
+      "id": "route_6_saffron_gate_officer_0",
+      "x": 0,
+      "y": 4,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "OFFICER"
+    }
+  ],
+  "vermilion_city": [
+    {
+      "id": "vermilion_city_teacher_0",
+      "x": 18,
+      "y": 9,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    },
+    {
+      "id": "vermilion_city_gramps_1",
+      "x": 23,
+      "y": 6,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS"
+    },
+    {
+      "id": "vermilion_city_super_nerd_2",
+      "x": 14,
+      "y": 16,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    },
+    {
+      "id": "vermilion_city_pokefan_m_3",
+      "x": 31,
+      "y": 12,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    }
+  ],
+  "vermilion_gym": [
+    {
+      "id": "vermilion_gym_surge_0",
+      "x": 5,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 LEADER SURGE",
+      "action": "SURGE_EVENT",
+      "trainerId": "surge",
+      "trainerName": "Leader Surge",
+      "team": [
+        {
+          "speciesId": "raichu",
+          "level": 44,
+          "moves": [
+            "thunderwave",
+            "quickattack",
+            "thunderbolt",
+            "thunder"
+          ]
+        },
+        {
+          "speciesId": "electrode",
+          "level": 40,
+          "moves": [
+            "screech",
+            "doubleteam",
+            "swift",
+            "explosion"
+          ]
+        },
+        {
+          "speciesId": "magneton",
+          "level": 40,
+          "moves": [
+            "lockon",
+            "doubleteam",
+            "swift",
+            "zapcannon"
+          ]
+        },
+        {
+          "speciesId": "electrode",
+          "level": 40,
+          "moves": [
+            "screech",
+            "doubleteam",
+            "swift",
+            "explosion"
+          ]
+        },
+        {
+          "speciesId": "electabuzz",
+          "level": 46,
+          "moves": [
+            "quickattack",
+            "thunderpunch",
+            "lightscreen",
+            "thunder"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vermilion_gym_gentleman_1",
+      "x": 8,
+      "y": 8,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ GREGORY",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "vermilion_gym_gregory",
+      "trainerName": "Gentleman Gregory",
+      "vision": 4,
+      "challenge": [
+        "GREGORY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "pikachu",
+          "level": 37
+        },
+        {
+          "speciesId": "flaaffy",
+          "level": 33
+        }
+      ],
+      "pages": [
+        "Gregory: That was a great battle!"
+      ]
+    },
+    {
+      "id": "vermilion_gym_rocker_2",
+      "x": 4,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ VINCENT",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "vermilion_gym_vincent",
+      "trainerName": "Guitarist Vincent",
+      "vision": 3,
+      "challenge": [
+        "VINCENT: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "magnemite",
+          "level": 27
+        },
+        {
+          "speciesId": "voltorb",
+          "level": 33
+        },
+        {
+          "speciesId": "magnemite",
+          "level": 32
+        },
+        {
+          "speciesId": "magnemite",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Vincent: That was a great battle!"
+      ]
+    },
+    {
+      "id": "vermilion_gym_super_nerd_3",
+      "x": 0,
+      "y": 10,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ HORTON",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "vermilion_gym_horton",
+      "trainerName": "Juggler Horton",
+      "vision": 4,
+      "challenge": [
+        "HORTON: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "electrode",
+          "level": 33
+        },
+        {
+          "speciesId": "electrode",
+          "level": 33
+        },
+        {
+          "speciesId": "electrode",
+          "level": 33
+        },
+        {
+          "speciesId": "electrode",
+          "level": 33
+        }
+      ],
+      "pages": [
+        "Horton: That was a great battle!"
+      ]
+    },
+    {
+      "id": "vermilion_gym_gym_guide_4",
+      "x": 7,
+      "y": 15,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 GYM GUIDE"
+    }
+  ],
+  "vermilion_poke_center": [
+    {
+      "id": "vermilion_poke_center_nurse_0",
+      "x": 3,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "action": "HEAL_AND_SAVE",
+      "counter": true,
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ]
+    },
+    {
+      "id": "vermilion_poke_center_fishing_guru_1",
+      "x": 7,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "FISHING GURU"
+    },
+    {
+      "id": "vermilion_poke_center_sailor_2",
+      "x": 6,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "vermilion_poke_center_bug_catcher_3",
+      "x": 1,
+      "y": 5,
+      "dir": "DOWN",
+      "sprite": "bug_catcher",
+      "speaker": "BUG CATCHER"
+    }
+  ],
+  "vermilion_mart": [
+    {
+      "id": "vermilion_mart_clerk_0",
+      "x": 1,
+      "y": 3,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "vermilion_mart_super_nerd_1",
+      "x": 5,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    },
+    {
+      "id": "vermilion_mart_beauty_2",
+      "x": 8,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "girl",
+      "speaker": "BEAUTY"
+    }
+  ],
+  "vermilion_fishing_house": [
+    {
+      "id": "vermilion_fishing_house_fishing_guru_0",
+      "x": 2,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "FISHING GURU"
+    }
+  ],
+  "vermilion_magnet_train_house": [
+    {
+      "id": "vermilion_magnet_train_house_pokefan_f_0",
+      "x": 2,
+      "y": 3,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "POKEFAN F"
+    },
+    {
+      "id": "vermilion_magnet_train_house_youngster_1",
+      "x": 0,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    }
+  ],
+  "vermilion_digletts_house": [
+    {
+      "id": "vermilion_digletts_house_gentleman_0",
+      "x": 1,
+      "y": 3,
+      "dir": "UP",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    }
+  ],
+  "vermilion_port_passage": [
+    {
+      "id": "vermilion_port_passage_teacher_0",
+      "x": 17,
+      "y": 1,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    }
+  ],
+  "vermilion_port": [
+    {
+      "id": "vermilion_port_sailor_0",
+      "x": 7,
+      "y": 17,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "vermilion_port_sailor_1",
+      "x": 6,
+      "y": 11,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "vermilion_port_super_nerd_2",
+      "x": 11,
+      "y": 11,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    }
+  ],
+  "fast_ship_1f": [
+    {
+      "id": "fast_ship_1f_sailor_0",
+      "x": 25,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "fast_ship_1f_sailor_1",
+      "x": 14,
+      "y": 7,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "fast_ship_1f_sailor_2",
+      "x": 22,
+      "y": 17,
+      "dir": "LEFT",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "fast_ship_1f_gentleman_3",
+      "x": 19,
+      "y": 6,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    }
+  ],
+  "fast_ship_cabins_nnw_nne_ne": [
+    {
+      "id": "fast_ship_cabins_nnw_nne_ne_cooltrainer_m_0",
+      "x": 4,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ SEAN",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_nnw_nne_ne_sean",
+      "trainerName": "Cooltrainerm Sean",
+      "vision": 2,
+      "challenge": [
+        "SEAN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "flareon",
+          "level": 35
+        },
+        {
+          "speciesId": "tangela",
+          "level": 35
+        },
+        {
+          "speciesId": "tauros",
+          "level": 35
+        }
+      ],
+      "pages": [
+        "Sean: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_nnw_nne_ne_cooltrainer_f_1",
+      "x": 1,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "⚔️ CAROL",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_nnw_nne_ne_carol",
+      "trainerName": "Cooltrainerf Carol",
+      "vision": 3,
+      "challenge": [
+        "CAROL: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "electrode",
+          "level": 35
+        },
+        {
+          "speciesId": "starmie",
+          "level": 35
+        },
+        {
+          "speciesId": "ninetales",
+          "level": 35
+        }
+      ],
+      "pages": [
+        "Carol: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_nnw_nne_ne_pokefan_m_2",
+      "x": 4,
+      "y": 17,
+      "dir": "UP",
+      "sprite": "fat_man",
+      "speaker": "⚔️ NOLAND",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_nnw_nne_ne_noland",
+      "trainerName": "Hiker Noland",
+      "vision": 3,
+      "challenge": [
+        "NOLAND: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "sandslash",
+          "level": 31
+        },
+        {
+          "speciesId": "golem",
+          "level": 33
+        }
+      ],
+      "pages": [
+        "Noland: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_nnw_nne_ne_sailor_3",
+      "x": 4,
+      "y": 26,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "fast_ship_cabins_nnw_nne_ne_gentleman_4",
+      "x": 7,
+      "y": 30,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "⚔️ EDWARD",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_nnw_nne_ne_edward",
+      "trainerName": "Gentleman Edward",
+      "vision": 1,
+      "challenge": [
+        "EDWARD: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "persian",
+          "level": 33
+        }
+      ],
+      "pages": [
+        "Edward: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_nnw_nne_ne_pharmacist_5",
+      "x": 2,
+      "y": 30,
+      "dir": "UP",
+      "sprite": "teacher",
+      "speaker": "⚔️ COREY",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_nnw_nne_ne_corey",
+      "trainerName": "Burglar Corey",
+      "vision": 4,
+      "challenge": [
+        "COREY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "koffing",
+          "level": 25
+        },
+        {
+          "speciesId": "magmar",
+          "level": 28
+        },
+        {
+          "speciesId": "koffing",
+          "level": 25
+        },
+        {
+          "speciesId": "koffing",
+          "level": 30
+        }
+      ],
+      "pages": [
+        "Corey: That was a great battle!"
+      ]
+    }
+  ],
+  "fast_ship_cabins_sw_ssw_nw": [
+    {
+      "id": "fast_ship_cabins_sw_ssw_nw_fisher_0",
+      "x": 1,
+      "y": 15,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "⚔️ LYLE",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_sw_ssw_nw_lyle",
+      "trainerName": "Firebreather Lyle",
+      "vision": 2,
+      "challenge": [
+        "LYLE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "koffing",
+          "level": 28
+        },
+        {
+          "speciesId": "flareon",
+          "level": 31
+        },
+        {
+          "speciesId": "koffing",
+          "level": 28
+        }
+      ],
+      "pages": [
+        "Lyle: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_sw_ssw_nw_bug_catcher_1",
+      "x": 6,
+      "y": 15,
+      "dir": "DOWN",
+      "sprite": "bug_catcher",
+      "speaker": "⚔️ KEN",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_sw_ssw_nw_ken",
+      "trainerName": "Bug Catcher Ken",
+      "vision": 2,
+      "challenge": [
+        "KEN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "ariados",
+          "level": 30
+        },
+        {
+          "speciesId": "pinsir",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Ken: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_sw_ssw_nw_beauty_2",
+      "x": 1,
+      "y": 26,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "⚔️ CASSIE",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_sw_ssw_nw_cassie",
+      "trainerName": "Beauty Cassie",
+      "vision": 3,
+      "challenge": [
+        "CASSIE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "vileplume",
+          "level": 28
+        },
+        {
+          "speciesId": "butterfree",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Cassie: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_sw_ssw_nw_rocker_3",
+      "x": 3,
+      "y": 28,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ CLYDE",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_sw_ssw_nw_clyde",
+      "trainerName": "Guitarist Clyde",
+      "vision": 2,
+      "challenge": [
+        "CLYDE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "electabuzz",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Clyde: That was a great battle!"
+      ]
+    }
+  ],
+  "fast_ship_cabins_se_sse_captains_cabin": [
+    {
+      "id": "fast_ship_cabins_se_sse_captains_cabin_gentleman_0",
+      "x": 2,
+      "y": 17,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    },
+    {
+      "id": "fast_ship_cabins_se_sse_captains_cabin_twin_1",
+      "x": 3,
+      "y": 17,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "TWIN"
+    },
+    {
+      "id": "fast_ship_cabins_se_sse_captains_cabin_twin_2",
+      "x": 2,
+      "y": 25,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "TWIN"
+    },
+    {
+      "id": "fast_ship_cabins_se_sse_captains_cabin_pokefan_m_3",
+      "x": 5,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ COLIN",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_se_sse_captains_cabin_colin",
+      "trainerName": "Pokefanm Colin",
+      "vision": 4,
+      "challenge": [
+        "COLIN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "delibird",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Colin: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_se_sse_captains_cabin_super_nerd_6",
+      "x": 5,
+      "y": 5,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ RODNEY",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_se_sse_captains_cabin_rodney",
+      "trainerName": "Psychic T Rodney",
+      "vision": 4,
+      "challenge": [
+        "RODNEY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "drowzee",
+          "level": 29
+        },
+        {
+          "speciesId": "hypno",
+          "level": 33
+        }
+      ],
+      "pages": [
+        "Rodney: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_se_sse_captains_cabin_pokefan_m_7",
+      "x": 2,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "⚔️ JEREMY",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_se_sse_captains_cabin_jeremy",
+      "trainerName": "Pokefanm Jeremy",
+      "vision": 3,
+      "challenge": [
+        "JEREMY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "meowth",
+          "level": 28
+        },
+        {
+          "speciesId": "meowth",
+          "level": 28
+        },
+        {
+          "speciesId": "meowth",
+          "level": 28
+        }
+      ],
+      "pages": [
+        "Jeremy: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_cabins_se_sse_captains_cabin_super_nerd_8",
+      "x": 1,
+      "y": 15,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "⚔️ SHAWN",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_cabins_se_sse_captains_cabin_shawn",
+      "trainerName": "Super Nerd Shawn",
+      "vision": 2,
+      "challenge": [
+        "SHAWN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "magnemite",
+          "level": 31
+        },
+        {
+          "speciesId": "muk",
+          "level": 33
+        },
+        {
+          "speciesId": "magnemite",
+          "level": 31
+        }
+      ],
+      "pages": [
+        "Shawn: That was a great battle!"
+      ]
+    }
+  ],
+  "fast_ship_b1f": [
+    {
+      "id": "fast_ship_b1f_sailor_0",
+      "x": 30,
+      "y": 6,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "fast_ship_b1f_sailor_1",
+      "x": 31,
+      "y": 6,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "fast_ship_b1f_sailor_2",
+      "x": 9,
+      "y": 11,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "⚔️ JEFF",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_jeff",
+      "trainerName": "Sailor Jeff",
+      "vision": 3,
+      "challenge": [
+        "JEFF: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "raticate",
+          "level": 32
+        },
+        {
+          "speciesId": "raticate",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Jeff: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_b1f_lass_3",
+      "x": 6,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "⚔️ DEBRA",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_debra",
+      "trainerName": "Picnicker Debra",
+      "vision": 1,
+      "challenge": [
+        "DEBRA: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "seaking",
+          "level": 33
+        }
+      ],
+      "pages": [
+        "Debra: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_b1f_super_nerd_4",
+      "x": 26,
+      "y": 9,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ FRITZ",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_fritz",
+      "trainerName": "Juggler Fritz",
+      "vision": 1,
+      "challenge": [
+        "FRITZ: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "mrmime",
+          "level": 29
+        },
+        {
+          "speciesId": "magmar",
+          "level": 29
+        },
+        {
+          "speciesId": "machoke",
+          "level": 29
+        }
+      ],
+      "pages": [
+        "Fritz: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_b1f_sailor_5",
+      "x": 17,
+      "y": 4,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "⚔️ GARRETT",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_garrett",
+      "trainerName": "Sailor Garrett",
+      "vision": 4,
+      "challenge": [
+        "GARRETT: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "kingler",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Garrett: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_b1f_fisher_6",
+      "x": 25,
+      "y": 8,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "⚔️ JONAH",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_jonah",
+      "trainerName": "Fisher Jonah",
+      "vision": 3,
+      "challenge": [
+        "JONAH: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "shellder",
+          "level": 25
+        },
+        {
+          "speciesId": "octillery",
+          "level": 29
+        },
+        {
+          "speciesId": "remoraid",
+          "level": 25
+        },
+        {
+          "speciesId": "cloyster",
+          "level": 29
+        }
+      ],
+      "pages": [
+        "Jonah: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_b1f_black_belt_7",
+      "x": 15,
+      "y": 11,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "⚔️ WAI",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_wai",
+      "trainerName": "Blackbelt T Wai",
+      "vision": 3,
+      "challenge": [
+        "WAI: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "machoke",
+          "level": 30
+        },
+        {
+          "speciesId": "machoke",
+          "level": 32
+        },
+        {
+          "speciesId": "machoke",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Wai: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_b1f_sailor_8",
+      "x": 23,
+      "y": 4,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "⚔️ KENNETH",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_kenneth",
+      "trainerName": "Sailor Kenneth",
+      "vision": 4,
+      "challenge": [
+        "KENNETH: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "machop",
+          "level": 28
+        },
+        {
+          "speciesId": "machop",
+          "level": 28
+        },
+        {
+          "speciesId": "poliwrath",
+          "level": 28
+        },
+        {
+          "speciesId": "machop",
+          "level": 28
+        }
+      ],
+      "pages": [
+        "Kenneth: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_b1f_youngster_9",
+      "x": 14,
+      "y": 9,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ NATE",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_nate",
+      "trainerName": "Schoolboy Nate",
+      "vision": 1,
+      "challenge": [
+        "NATE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "ledian",
+          "level": 32
+        },
+        {
+          "speciesId": "exeggutor",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Nate: That was a great battle!"
+      ]
+    },
+    {
+      "id": "fast_ship_b1f_youngster_10",
+      "x": 14,
+      "y": 11,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ RICKY",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "fast_ship_b1f_ricky",
+      "trainerName": "Schoolboy Ricky",
+      "vision": 1,
+      "challenge": [
+        "RICKY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "aipom",
+          "level": 32
+        },
+        {
+          "speciesId": "ditto",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Ricky: That was a great battle!"
+      ]
+    }
+  ],
+  "olivine_port_passage": [
+    {
+      "id": "olivine_port_passage_pokefan_m_0",
+      "x": 17,
+      "y": 1,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    }
+  ],
+  "olivine_port": [
+    {
+      "id": "olivine_port_sailor_0",
+      "x": 7,
+      "y": 23,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "olivine_port_sailor_1",
+      "x": 7,
+      "y": 15,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "olivine_port_sailor_2",
+      "x": 6,
+      "y": 15,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "olivine_port_fishing_guru_3",
+      "x": 4,
+      "y": 14,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "FISHING GURU"
+    },
+    {
+      "id": "olivine_port_fishing_guru_4",
+      "x": 13,
+      "y": 14,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "FISHING GURU"
+    },
+    {
+      "id": "olivine_port_youngster_5",
+      "x": 4,
+      "y": 15,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    },
+    {
+      "id": "olivine_port_cooltrainer_f_6",
+      "x": 11,
+      "y": 15,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F"
+    }
+  ],
+  "route_11": [
+    {
+      "id": "route_11_youngster_0",
+      "x": 22,
+      "y": 14,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ OWEN",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_11_owen",
+      "trainerName": "Youngster Owen",
+      "vision": 3,
+      "challenge": [
+        "OWEN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "growlithe",
+          "level": 35
+        }
+      ],
+      "pages": [
+        "Owen: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_11_youngster_1",
+      "x": 20,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ JASON",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_11_jason",
+      "trainerName": "Youngster Jason",
+      "vision": 3,
+      "challenge": [
+        "JASON: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "sandslash",
+          "level": 33
+        },
+        {
+          "speciesId": "crobat",
+          "level": 33
+        }
+      ],
+      "pages": [
+        "Jason: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_11_youngster_2",
+      "x": 28,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ HERMAN",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_11_herman",
+      "trainerName": "Psychic T Herman",
+      "vision": 1,
+      "challenge": [
+        "HERMAN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "exeggcute",
+          "level": 30
+        },
+        {
+          "speciesId": "exeggcute",
+          "level": 30
+        },
+        {
+          "speciesId": "exeggutor",
+          "level": 30
+        }
+      ],
+      "pages": [
+        "Herman: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_11_youngster_3",
+      "x": 8,
+      "y": 6,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ FIDEL",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_11_fidel",
+      "trainerName": "Psychic T Fidel",
+      "vision": 3,
+      "challenge": [
+        "FIDEL: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "xatu",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Fidel: That was a great battle!"
+      ]
+    }
+  ],
+  "digletts_cave": [
+    {
+      "id": "digletts_cave_pokefan_m_0",
+      "x": 3,
+      "y": 31,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    }
+  ],
+  "route_9": [
+    {
+      "id": "route_9_youngster_0",
+      "x": 23,
+      "y": 11,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "⚔️ DEAN",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_9_dean",
+      "trainerName": "Camper Dean",
+      "vision": 3,
+      "challenge": [
+        "DEAN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "golduck",
+          "level": 33
+        },
+        {
+          "speciesId": "sandslash",
+          "level": 31
+        }
+      ],
+      "pages": [
+        "Dean: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_9_lass_1",
+      "x": 39,
+      "y": 8,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "⚔️ HEIDI",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_9_heidi",
+      "trainerName": "Picnicker Heidi",
+      "vision": 3,
+      "challenge": [
+        "HEIDI: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "skiploom",
+          "level": 32
+        },
+        {
+          "speciesId": "skiploom",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Heidi: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_9_youngster_2",
+      "x": 11,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ SID",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_9_sid",
+      "trainerName": "Camper Sid",
+      "vision": 4,
+      "challenge": [
+        "SID: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "dugtrio",
+          "level": 32
+        },
+        {
+          "speciesId": "primeape",
+          "level": 29
+        },
+        {
+          "speciesId": "poliwrath",
+          "level": 29
+        }
+      ],
+      "pages": [
+        "Sid: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_9_lass_3",
+      "x": 12,
+      "y": 15,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "⚔️ EDNA",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_9_edna",
+      "trainerName": "Picnicker Edna",
+      "vision": 1,
+      "challenge": [
+        "EDNA: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "nidorina",
+          "level": 30
+        },
+        {
+          "speciesId": "raichu",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Edna: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_9_pokefan_m_4",
+      "x": 28,
+      "y": 3,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ TIM",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_9_tim",
+      "trainerName": "Hiker Tim",
+      "vision": 2,
+      "challenge": [
+        "TIM: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "graveler",
+          "level": 31
+        },
+        {
+          "speciesId": "graveler",
+          "level": 31
+        },
+        {
+          "speciesId": "graveler",
+          "level": 31
+        }
+      ],
+      "pages": [
+        "Tim: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_9_pokefan_m_5",
+      "x": 36,
+      "y": 15,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ SIDNEY",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_9_sidney",
+      "trainerName": "Hiker Sidney",
+      "vision": 4,
+      "challenge": [
+        "SIDNEY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "dugtrio",
+          "level": 34
+        },
+        {
+          "speciesId": "onix",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Sidney: That was a great battle!"
+      ]
+    }
+  ],
+  "route_10_south": [
+    {
+      "id": "route_10_south_pokefan_m_0",
+      "x": 17,
+      "y": 3,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "⚔️ JIM",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_10_south_jim",
+      "trainerName": "Hiker Jim",
+      "vision": 3,
+      "challenge": [
+        "JIM: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "machamp",
+          "level": 35
+        }
+      ],
+      "pages": [
+        "Jim: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_10_south_pokefan_m_1",
+      "x": 8,
+      "y": 10,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "⚔️ ROBERT",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_10_south_robert",
+      "trainerName": "Pokefanm Robert",
+      "vision": 3,
+      "challenge": [
+        "ROBERT: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "quagsire",
+          "level": 33
+        }
+      ],
+      "pages": [
+        "Robert: That was a great battle!"
+      ]
+    }
+  ],
+  "route_10_poke_center": [
+    {
+      "id": "route_10_poke_center_nurse_0",
+      "x": 3,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "action": "HEAL_AND_SAVE",
+      "counter": true,
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ]
+    },
+    {
+      "id": "route_10_poke_center_gentleman_1",
+      "x": 7,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    },
+    {
+      "id": "route_10_poke_center_gym_guide_2",
+      "x": 7,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 GYM GUIDE"
+    },
+    {
+      "id": "route_10_poke_center_cooltrainer_f_3",
+      "x": 1,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F"
+    }
+  ],
+  "lavender_town": [
+    {
+      "id": "lavender_town_pokefan_m_0",
+      "x": 12,
+      "y": 7,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    },
+    {
+      "id": "lavender_town_teacher_1",
+      "x": 2,
+      "y": 15,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    },
+    {
+      "id": "lavender_town_gramps_2",
+      "x": 14,
+      "y": 12,
+      "dir": "UP",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS"
+    },
+    {
+      "id": "lavender_town_youngster_3",
+      "x": 6,
+      "y": 11,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    }
+  ],
+  "lavender_poke_center": [
+    {
+      "id": "lavender_poke_center_nurse_0",
+      "x": 3,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "action": "HEAL_AND_SAVE",
+      "counter": true,
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ]
+    },
+    {
+      "id": "lavender_poke_center_gentleman_1",
+      "x": 7,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    },
+    {
+      "id": "lavender_poke_center_teacher_2",
+      "x": 5,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    },
+    {
+      "id": "lavender_poke_center_youngster_3",
+      "x": 1,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    }
+  ],
+  "lavender_mart": [
+    {
+      "id": "lavender_mart_clerk_0",
+      "x": 1,
+      "y": 3,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "lavender_mart_pokefan_m_1",
+      "x": 6,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    },
+    {
+      "id": "lavender_mart_rocker_2",
+      "x": 9,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "ROCKER"
+    }
+  ],
+  "lavender_speech_house": [
+    {
+      "id": "lavender_speech_house_pokefan_f_0",
+      "x": 2,
+      "y": 3,
+      "dir": "UP",
+      "sprite": "teacher",
+      "speaker": "POKEFAN F"
+    }
+  ],
+  "lavender_name_rater": [
+    {
+      "id": "lavender_name_rater_gentleman_0",
+      "x": 2,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    }
+  ],
+  "soul_house": [
+    {
+      "id": "soul_house_gramps_0",
+      "x": 4,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS"
+    },
+    {
+      "id": "soul_house_teacher_1",
+      "x": 7,
+      "y": 3,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    },
+    {
+      "id": "soul_house_lass_2",
+      "x": 2,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "LASS"
+    },
+    {
+      "id": "soul_house_granny_3",
+      "x": 1,
+      "y": 3,
+      "dir": "UP",
+      "sprite": "teacher",
+      "speaker": "GRANNY"
+    }
+  ],
+  "route_8": [
+    {
+      "id": "route_8_biker_0",
+      "x": 10,
+      "y": 8,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "⚔️ DWAYNE",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_8_dwayne",
+      "trainerName": "Biker Dwayne",
+      "vision": 4,
+      "challenge": [
+        "DWAYNE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "koffing",
+          "level": 27
+        },
+        {
+          "speciesId": "koffing",
+          "level": 28
+        },
+        {
+          "speciesId": "koffing",
+          "level": 29
+        },
+        {
+          "speciesId": "koffing",
+          "level": 30
+        }
+      ],
+      "pages": [
+        "Dwayne: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_8_biker_1",
+      "x": 10,
+      "y": 9,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "⚔️ HARRIS",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_8_harris",
+      "trainerName": "Biker Harris",
+      "vision": 4,
+      "challenge": [
+        "HARRIS: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "flareon",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Harris: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_8_biker_2",
+      "x": 10,
+      "y": 10,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "⚔️ ZEKE",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_8_zeke",
+      "trainerName": "Biker Zeke",
+      "vision": 4,
+      "challenge": [
+        "ZEKE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "koffing",
+          "level": 32
+        },
+        {
+          "speciesId": "koffing",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Zeke: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_8_super_nerd_3",
+      "x": 23,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "⚔️ SAM",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_8_sam",
+      "trainerName": "Super Nerd Sam",
+      "vision": 3,
+      "challenge": [
+        "SAM: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "grimer",
+          "level": 34
+        },
+        {
+          "speciesId": "muk",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Sam: That was a great battle!"
+      ]
+    },
+    {
+      "id": "route_8_super_nerd_4",
+      "x": 31,
+      "y": 12,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "⚔️ TOM",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_8_tom",
+      "trainerName": "Super Nerd Tom",
+      "vision": 4,
+      "challenge": [
+        "TOM: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "magnemite",
+          "level": 32
+        },
+        {
+          "speciesId": "magnemite",
+          "level": 32
+        },
+        {
+          "speciesId": "magnemite",
+          "level": 32
+        }
+      ],
+      "pages": [
+        "Tom: That was a great battle!"
+      ]
+    }
+  ],
+  "route_8_saffron_gate": [
+    {
+      "id": "route_8_saffron_gate_officer_0",
+      "x": 5,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "OFFICER"
+    }
+  ],
+  "route_7_saffron_gate": [
+    {
+      "id": "route_7_saffron_gate_officer_0",
+      "x": 5,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "OFFICER"
+    }
+  ],
+  "celadon_city": [
+    {
+      "id": "celadon_city_fisher_0",
+      "x": 26,
+      "y": 11,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "FISHER"
+    },
+    {
+      "id": "celadon_city_teacher_1",
+      "x": 20,
+      "y": 24,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    },
+    {
+      "id": "celadon_city_gramps_2",
+      "x": 13,
+      "y": 16,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS"
+    },
+    {
+      "id": "celadon_city_gramps_3",
+      "x": 8,
+      "y": 31,
+      "dir": "UP",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS"
+    },
+    {
+      "id": "celadon_city_youngster_4",
+      "x": 18,
+      "y": 13,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    },
+    {
+      "id": "celadon_city_youngster_5",
+      "x": 24,
+      "y": 33,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    },
+    {
+      "id": "celadon_city_teacher_6",
+      "x": 6,
+      "y": 14,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    },
+    {
+      "id": "celadon_city_lass_7",
+      "x": 7,
+      "y": 22,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "LASS"
+    }
+  ],
+  "celadon_gym": [
+    {
+      "id": "celadon_gym_erika_0",
+      "x": 5,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "🏆 LEADER ERIKA",
+      "action": "ERIKA_EVENT",
+      "trainerId": "erika",
+      "trainerName": "Leader Erika",
+      "team": [
+        {
+          "speciesId": "tangela",
+          "level": 42,
+          "moves": [
+            "vinewhip",
+            "bind",
+            "gigadrain",
+            "sleeppowder"
+          ]
+        },
+        {
+          "speciesId": "jumpluff",
+          "level": 41,
+          "moves": [
+            "megadrain",
+            "leechseed",
+            "cottonspore",
+            "gigadrain"
+          ]
+        },
+        {
+          "speciesId": "victreebel",
+          "level": 46,
+          "moves": [
+            "sunnyday",
+            "synthesis",
+            "acid",
+            "razorleaf"
+          ]
+        },
+        {
+          "speciesId": "bellossom",
+          "level": 46,
+          "moves": [
+            "sunnyday",
+            "synthesis",
+            "petaldance",
+            "solarbeam"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "celadon_gym_lass_1",
+      "x": 7,
+      "y": 8,
+      "dir": "LEFT",
+      "sprite": "girl",
+      "speaker": "⚔️ MICHELLE",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "celadon_gym_michelle",
+      "trainerName": "Lass Michelle",
+      "vision": 2,
+      "challenge": [
+        "MICHELLE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "skiploom",
+          "level": 32
+        },
+        {
+          "speciesId": "hoppip",
+          "level": 33
+        },
+        {
+          "speciesId": "jumpluff",
+          "level": 34
+        }
+      ],
+      "pages": [
+        "Michelle: That was a great battle!"
+      ]
+    },
+    {
+      "id": "celadon_gym_lass_2",
+      "x": 2,
+      "y": 8,
+      "dir": "RIGHT",
+      "sprite": "girl",
+      "speaker": "⚔️ TANYA",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "celadon_gym_tanya",
+      "trainerName": "Picnicker Tanya",
+      "vision": 2,
+      "challenge": [
+        "TANYA: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "exeggutor",
+          "level": 37
+        }
+      ],
+      "pages": [
+        "Tanya: That was a great battle!"
+      ]
+    },
+    {
+      "id": "celadon_gym_beauty_3",
+      "x": 3,
+      "y": 5,
+      "dir": "RIGHT",
+      "sprite": "girl",
+      "speaker": "⚔️ JULIA",
+      "action": "TRAINER_BATTLE",
+      "trainerId": "celadon_gym_julia",
+      "trainerName": "Beauty Julia",
+      "vision": 2,
+      "challenge": [
+        "JULIA: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "paras",
+          "level": 32
+        },
+        {
+          "speciesId": "exeggcute",
+          "level": 32
+        },
+        {
+          "speciesId": "parasect",
+          "level": 35
+        }
+      ],
+      "pages": [
+        "Julia: That was a great battle!"
+      ]
+    }
+  ],
+  "celadon_poke_center": [
+    {
+      "id": "celadon_poke_center_nurse_0",
+      "x": 3,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "action": "HEAL_AND_SAVE",
+      "counter": true,
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ]
+    },
+    {
+      "id": "celadon_poke_center_gentleman_1",
+      "x": 1,
+      "y": 5,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    },
+    {
+      "id": "celadon_poke_center_pharmacist_2",
+      "x": 0,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "PHARMACIST"
+    },
+    {
+      "id": "celadon_poke_center_cooltrainer_f_3",
+      "x": 8,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F"
+    },
+    {
+      "id": "celadon_poke_center_super_nerd_4",
+      "x": 4,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    }
+  ],
+  "celadon_dept_store_1f": [
+    {
+      "id": "celadon_dept_store_1f_receptionist_0",
+      "x": 10,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "RECEPTIONIST"
+    },
+    {
+      "id": "celadon_dept_store_1f_gentleman_1",
+      "x": 11,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    },
+    {
+      "id": "celadon_dept_store_1f_teacher_2",
+      "x": 5,
+      "y": 3,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    }
+  ],
+  "celadon_dept_store_2f": [
+    {
+      "id": "celadon_dept_store_2f_clerk_0",
+      "x": 13,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "celadon_dept_store_2f_clerk_1",
+      "x": 14,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "celadon_dept_store_2f_pokefan_m_2",
+      "x": 5,
+      "y": 2,
+      "dir": "UP",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    },
+    {
+      "id": "celadon_dept_store_2f_youngster_3",
+      "x": 6,
+      "y": 2,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    }
+  ],
+  "celadon_dept_store_3f": [
+    {
+      "id": "celadon_dept_store_3f_clerk_0",
+      "x": 7,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "celadon_dept_store_3f_youngster_1",
+      "x": 6,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    },
+    {
+      "id": "celadon_dept_store_3f_super_nerd_2",
+      "x": 13,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    }
+  ],
+  "celadon_dept_store_4f": [
+    {
+      "id": "celadon_dept_store_4f_clerk_0",
+      "x": 13,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "celadon_dept_store_4f_super_nerd_1",
+      "x": 7,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    },
+    {
+      "id": "celadon_dept_store_4f_youngster_2",
+      "x": 8,
+      "y": 2,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    }
+  ],
+  "celadon_dept_store_5f": [
+    {
+      "id": "celadon_dept_store_5f_clerk_0",
+      "x": 7,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "celadon_dept_store_5f_clerk_1",
+      "x": 8,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "celadon_dept_store_5f_gentleman_2",
+      "x": 13,
+      "y": 5,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    },
+    {
+      "id": "celadon_dept_store_5f_sailor_3",
+      "x": 3,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "SAILOR"
+    },
+    {
+      "id": "celadon_dept_store_5f_teacher_4",
+      "x": 1,
+      "y": 7,
+      "dir": "RIGHT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    }
+  ],
+  "celadon_dept_store_6f": [
+    {
+      "id": "celadon_dept_store_6f_super_nerd_0",
+      "x": 9,
+      "y": 2,
+      "dir": "UP",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    },
+    {
+      "id": "celadon_dept_store_6f_youngster_1",
+      "x": 12,
+      "y": 5,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER"
+    }
+  ],
+  "celadon_mansion_1f": [
+    {
+      "id": "celadon_mansion_1f_granny_0",
+      "x": 1,
+      "y": 5,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "GRANNY"
+    }
+  ],
+  "celadon_mansion_3f": [
+    {
+      "id": "celadon_mansion_3f_cooltrainer_m_0",
+      "x": 3,
+      "y": 6,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "COOLTRAINER M"
+    },
+    {
+      "id": "celadon_mansion_3f_gym_guide_1",
+      "x": 3,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "🏆 GYM GUIDE"
+    },
+    {
+      "id": "celadon_mansion_3f_super_nerd_2",
+      "x": 0,
+      "y": 7,
+      "dir": "UP",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    },
+    {
+      "id": "celadon_mansion_3f_fisher_3",
+      "x": 0,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "FISHER"
+    }
+  ],
+  "celadon_mansion_roof": [
+    {
+      "id": "celadon_mansion_roof_fisher_0",
+      "x": 7,
+      "y": 5,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "FISHER"
+    }
+  ],
+  "celadon_mansion_roof_house": [
+    {
+      "id": "celadon_mansion_roof_house_pharmacist_0",
+      "x": 3,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "PHARMACIST"
+    }
+  ],
+  "celadon_game_corner": [
+    {
+      "id": "celadon_game_corner_clerk_0",
+      "x": 5,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "action": "OPEN_MART",
+      "counter": true,
+      "pages": [
+        "Welcome! How may I help you?"
+      ]
+    },
+    {
+      "id": "celadon_game_corner_receptionist_1",
+      "x": 3,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "RECEPTIONIST"
+    },
+    {
+      "id": "celadon_game_corner_pokefan_m_2",
+      "x": 14,
+      "y": 10,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M"
+    },
+    {
+      "id": "celadon_game_corner_teacher_3",
+      "x": 17,
+      "y": 7,
+      "dir": "RIGHT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    },
+    {
+      "id": "celadon_game_corner_fishing_guru_4",
+      "x": 11,
+      "y": 7,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "FISHING GURU"
+    },
+    {
+      "id": "celadon_game_corner_fisher_5",
+      "x": 8,
+      "y": 10,
+      "dir": "LEFT",
+      "sprite": "fisherman",
+      "speaker": "FISHER"
+    },
+    {
+      "id": "celadon_game_corner_gym_guide_6",
+      "x": 11,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 GYM GUIDE"
+    },
+    {
+      "id": "celadon_game_corner_gramps_7",
+      "x": 2,
+      "y": 8,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS"
+    }
+  ],
+  "celadon_game_corner_prize_room": [
+    {
+      "id": "celadon_game_corner_prize_room_gentleman_0",
+      "x": 0,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN"
+    },
+    {
+      "id": "celadon_game_corner_prize_room_pharmacist_1",
+      "x": 4,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "teacher",
+      "speaker": "PHARMACIST"
+    }
+  ],
+  "celadon_cafe": [
+    {
+      "id": "celadon_cafe_super_nerd_0",
+      "x": 9,
+      "y": 3,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD"
+    },
+    {
+      "id": "celadon_cafe_fisher_1",
+      "x": 4,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "fisherman",
+      "speaker": "FISHER"
+    },
+    {
+      "id": "celadon_cafe_fisher_2",
+      "x": 1,
+      "y": 7,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "FISHER"
+    },
+    {
+      "id": "celadon_cafe_fisher_3",
+      "x": 1,
+      "y": 2,
+      "dir": "RIGHT",
+      "sprite": "fisherman",
+      "speaker": "FISHER"
+    },
+    {
+      "id": "celadon_cafe_teacher_4",
+      "x": 4,
+      "y": 3,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "TEACHER"
+    }
   ]
 }

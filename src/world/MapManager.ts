@@ -314,6 +314,20 @@ export class MapManager {
       'cerulean_city',
       'route_24',
       'route_25',
+      // Phase 14: Central & Eastern Kanto
+      'route_5',
+      'route_6',
+      'vermilion_city',
+      'vermilion_port',
+      'olivine_port',
+      'route_11',
+      'route_9',
+      'route_10_north',
+      'route_10_south',
+      'lavender_town',
+      'route_8',
+      'route_7',
+      'celadon_city',
     ].includes(mapId);
   }
 

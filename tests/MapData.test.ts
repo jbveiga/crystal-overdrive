@@ -1269,4 +1269,67 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain('BLUE_EVENT:');
     expect(mainSrc).toContain("inventory.badges.includes(leaderConfig.badge)");
   });
+
+  it('validates Phase 14 Central & Eastern Kanto: Vermilion, Celadon, Lavender, Rock Tunnel, Routes 5-11', () => {
+    const phase14Maps = [
+      'route_5', 'route_5_underground_entrance', 'route_5_saffron_gate', 'route_5_cleanse_tag_house', 'underground_path',
+      'route_6', 'route_6_underground_entrance', 'route_6_saffron_gate',
+      'vermilion_city', 'vermilion_gym', 'vermilion_poke_center', 'vermilion_mart',
+      'vermilion_fishing_house', 'vermilion_magnet_train_house', 'vermilion_digletts_house',
+      'vermilion_port_passage', 'vermilion_port',
+      'fast_ship_1f', 'fast_ship_cabins_nnw_nne_ne', 'fast_ship_cabins_sw_ssw_nw', 'fast_ship_cabins_se_sse_captains_cabin', 'fast_ship_b1f',
+      'olivine_port_passage', 'olivine_port',
+      'route_11', 'digletts_cave', 'route_9', 'route_10_north', 'route_10_south', 'route_10_poke_center',
+      'rock_tunnel_1f', 'rock_tunnel_b1f',
+      'lavender_town', 'lavender_poke_center', 'lavender_mart', 'lavender_speech_house', 'lavender_name_rater', 'soul_house',
+      'route_8', 'route_8_saffron_gate', 'route_7', 'route_7_saffron_gate',
+      'celadon_city', 'celadon_gym', 'celadon_poke_center',
+      'celadon_dept_store_1f', 'celadon_dept_store_2f', 'celadon_dept_store_3f', 'celadon_dept_store_4f', 'celadon_dept_store_5f', 'celadon_dept_store_6f', 'celadon_dept_store_elevator',
+      'celadon_mansion_1f', 'celadon_mansion_2f', 'celadon_mansion_3f', 'celadon_mansion_roof', 'celadon_mansion_roof_house',
+      'celadon_game_corner', 'celadon_game_corner_prize_room', 'celadon_cafe',
+    ];
+    const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+    const load = (id: string): MapData => JSON.parse(fs.readFileSync(path.join(mapsDir, `${id}.json`), 'utf8'));
+
+    for (const mapId of phase14Maps) {
+      const m = load(mapId);
+      expect(m.collisionGrid.length).toBe(m.width * m.height);
+      for (const tile of new Set(m.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png for ${mapId}`).toBe(true);
+      }
+      for (const w of m.warps) {
+        const target = load(w.targetMapId);
+        expect([0, 2], `${mapId} -> ${w.targetMapId}`).toContain(target.collisionGrid[w.targetY * target.width + w.targetX]);
+      }
+    }
+
+    // Connections
+    expect(load('cerulean_city').connections.SOUTH?.mapId).toBe('route_5');
+    expect(load('route_5').connections.NORTH?.mapId).toBe('cerulean_city');
+    expect(load('cerulean_city').connections.EAST?.mapId).toBe('route_9');
+    expect(load('route_9').connections.WEST?.mapId).toBe('cerulean_city');
+    expect(load('route_9').connections.SOUTH?.mapId).toBe('route_10_north');
+    expect(load('route_10_north').connections.SOUTH?.mapId).toBe('route_10_south');
+    expect(load('route_10_south').connections.NORTH?.mapId).toBe('route_10_north');
+    expect(load('route_10_south').connections.SOUTH?.mapId).toBe('lavender_town');
+    expect(load('lavender_town').connections.NORTH?.mapId).toBe('route_10_south');
+    expect(load('lavender_town').connections.WEST?.mapId).toBe('route_8');
+    expect(load('route_8').connections.EAST?.mapId).toBe('lavender_town');
+    expect(load('celadon_city').connections.EAST?.mapId).toBe('route_7');
+    expect(load('route_7').connections.WEST?.mapId).toBe('celadon_city');
+    expect(load('route_6').connections.SOUTH?.mapId).toBe('vermilion_city');
+    expect(load('vermilion_city').connections.NORTH?.mapId).toBe('route_6');
+    expect(load('vermilion_city').connections.EAST?.mapId).toBe('route_11');
+    expect(load('route_11').connections.WEST?.mapId).toBe('vermilion_city');
+
+    // Gym Leaders
+    const surge = npcsByMap.vermilion_gym?.find((n) => n.action === 'SURGE_EVENT');
+    expect(surge).toBeDefined();
+    expect(surge?.trainerId).toBe('surge');
+
+    const erika = npcsByMap.celadon_gym?.find((n) => n.action === 'ERIKA_EVENT');
+    expect(erika).toBeDefined();
+    expect(erika?.trainerId).toBe('erika');
+  });
 });
