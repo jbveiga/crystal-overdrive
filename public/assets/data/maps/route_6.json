@@ -1095,6 +1095,10 @@
     "SOUTH": {
       "mapId": "vermilion_city",
       "offset": -10
+    },
+    "NORTH": {
+      "mapId": "saffron_city",
+      "offset": -10
     }
   },
   "warps": [

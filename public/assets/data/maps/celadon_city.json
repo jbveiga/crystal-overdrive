@@ -4335,6 +4335,10 @@
     "EAST": {
       "mapId": "route_7",
       "offset": 10
+    },
+    "WEST": {
+      "mapId": "route_16",
+      "offset": 18
     }
   },
   "warps": [

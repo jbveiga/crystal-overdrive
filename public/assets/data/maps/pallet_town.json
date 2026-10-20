@@ -1095,6 +1095,10 @@
     "NORTH": {
       "mapId": "route_1",
       "offset": 0
+    },
+    "SOUTH": {
+      "mapId": "route_21",
+      "offset": 0
     }
   },
   "warps": [

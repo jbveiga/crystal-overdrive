@@ -1095,6 +1095,10 @@
     "NORTH": {
       "mapId": "cerulean_city",
       "offset": -10
+    },
+    "SOUTH": {
+      "mapId": "saffron_city",
+      "offset": -10
     }
   },
   "warps": [

@@ -3466,27 +3466,32 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
 
   // Phase 11+ NPCs & trainers derived directly from pret/pokecrystal object events.
   for (const [mapId, list] of Object.entries(GENERATED_NPCS)) {
-    base[mapId] = list.map((n) =>
-      makeNpc(
-        n.id,
+    base[mapId] = list.map((n, idx) => {
+      const generatedId = n.id || `${mapId}_${n.sprite}_${idx}`;
+      return makeNpc(
+        generatedId,
         n.x,
         n.y,
         n.dir,
         n.sprite as GridEntity['spriteType'],
-        n.speaker,
-        n.pages && n.pages.length > 0 ? n.pages : [DEFAULT_LORE[(n.x + n.y) % DEFAULT_LORE.length]],
+        n.speaker || n.sprite.replace(/_/g, ' ').toUpperCase(),
+        n.pages && n.pages.length > 0
+          ? n.pages
+          : n.team
+          ? [`${n.speaker || 'TRAINER'}: That was a great battle!`]
+          : [DEFAULT_LORE[(n.x + n.y) % DEFAULT_LORE.length]],
         {
           talkAcrossCounter: n.counter,
-          action: n.action as GridEntity['action'],
-          trainerId: n.trainerId,
+          action: (n.action || (n.team ? 'TRAINER_BATTLE' : undefined)) as GridEntity['action'],
+          trainerId: n.trainerId || (n.team ? generatedId : undefined),
           trainerName: n.trainerName,
           visionRange: n.vision,
-          challengePages: n.challenge,
+          challengePages: n.challenge || (n.team ? [`${n.speaker || 'TRAINER'}: Let's battle!`] : undefined),
           trainerPokemon: n.team?.[0],
           trainerTeam: n.team,
         }
-      )
-    );
+      );
+    });
   }
   return base;
 }

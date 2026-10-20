@@ -1332,4 +1332,91 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(erika).toBeDefined();
     expect(erika?.trainerId).toBe('erika');
   });
+
+  it('validates Phase 15 Southern Kanto, Saffron & Sea Routes: Saffron, Fuchsia, Cinnabar, Cycling Road, Seafoam, Routes 12-21', () => {
+    const phase15Maps = [
+      'saffron_city', 'saffron_gym', 'fighting_dojo', 'silph_co_1f', 'mr_psychics_house',
+      'saffron_magnet_train_station', 'saffron_poke_center', 'saffron_mart',
+      'copycats_house_1f', 'copycats_house_2f',
+      'route_16', 'route_16_gate', 'route_16_fuchsia_speech_house',
+      'route_17', 'route_17_route_18_gate', 'route_18',
+      'fuchsia_city', 'fuchsia_gym', 'fuchsia_poke_center', 'fuchsia_mart',
+      'safari_zone_main_office', 'safari_zone_wardens_home',
+      'route_19_fuchsia_gate', 'route_15_fuchsia_gate',
+      'route_12', 'route_12_super_rod_house',
+      'route_13', 'route_14', 'route_15',
+      'route_19', 'route_20', 'seafoam_gym',
+      'cinnabar_island', 'cinnabar_poke_center', 'route_21',
+    ];
+    const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+    const load = (id: string): MapData => JSON.parse(fs.readFileSync(path.join(mapsDir, `${id}.json`), 'utf8'));
+
+    for (const mapId of phase15Maps) {
+      const m = load(mapId);
+      expect(m.collisionGrid.length).toBe(m.width * m.height);
+      for (const tile of new Set(m.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png for ${mapId}`).toBe(true);
+      }
+      for (const w of m.warps) {
+        const target = load(w.targetMapId);
+        expect([0, 2], `${mapId} -> ${w.targetMapId}`).toContain(target.collisionGrid[w.targetY * target.width + w.targetX]);
+      }
+    }
+
+    // Closed-loop world connectivity
+    expect(load('pallet_town').connections.SOUTH?.mapId).toBe('route_21');
+    expect(load('route_21').connections.NORTH?.mapId).toBe('pallet_town');
+    expect(load('route_21').connections.SOUTH?.mapId).toBe('cinnabar_island');
+    expect(load('cinnabar_island').connections.NORTH?.mapId).toBe('route_21');
+    expect(load('cinnabar_island').connections.EAST?.mapId).toBe('route_20');
+    expect(load('route_20').connections.WEST?.mapId).toBe('cinnabar_island');
+    expect(load('route_20').connections.EAST?.mapId).toBe('route_19');
+    expect(load('route_19').connections.WEST?.mapId).toBe('route_20');
+    expect(load('route_19').connections.NORTH?.mapId).toBe('fuchsia_city');
+    expect(load('fuchsia_city').connections.SOUTH?.mapId).toBe('route_19');
+    expect(load('fuchsia_city').connections.WEST?.mapId).toBe('route_18');
+    expect(load('route_18').connections.EAST?.mapId).toBe('fuchsia_city');
+    expect(load('fuchsia_city').connections.EAST?.mapId).toBe('route_15');
+    expect(load('route_15').connections.WEST?.mapId).toBe('fuchsia_city');
+    expect(load('route_17').connections.EAST?.mapId).toBe('route_18');
+    expect(load('route_18').connections.WEST?.mapId).toBe('route_17');
+    expect(load('route_16').connections.SOUTH?.mapId).toBe('route_17');
+    expect(load('route_17').connections.NORTH?.mapId).toBe('route_16');
+    expect(load('celadon_city').connections.WEST?.mapId).toBe('route_16');
+    expect(load('route_16').connections.EAST?.mapId).toBe('celadon_city');
+    expect(load('route_15').connections.EAST?.mapId).toBe('route_14');
+    expect(load('route_14').connections.WEST?.mapId).toBe('route_15');
+    expect(load('route_14').connections.NORTH?.mapId).toBe('route_13');
+    expect(load('route_13').connections.SOUTH?.mapId).toBe('route_14');
+    expect(load('route_13').connections.NORTH?.mapId).toBe('route_12');
+    expect(load('route_12').connections.SOUTH?.mapId).toBe('route_13');
+    expect(load('lavender_town').connections.SOUTH?.mapId).toBe('route_12');
+    expect(load('route_12').connections.NORTH?.mapId).toBe('lavender_town');
+    expect(load('route_11').connections.EAST?.mapId).toBe('route_12');
+    expect(load('route_12').connections.WEST?.mapId).toBe('route_11');
+
+    // Saffron Hub
+    expect(load('route_5').connections.SOUTH?.mapId).toBe('saffron_city');
+    expect(load('saffron_city').connections.NORTH?.mapId).toBe('route_5');
+    expect(load('route_6').connections.NORTH?.mapId).toBe('saffron_city');
+    expect(load('saffron_city').connections.SOUTH?.mapId).toBe('route_6');
+    expect(load('route_7').connections.EAST?.mapId).toBe('saffron_city');
+    expect(load('saffron_city').connections.WEST?.mapId).toBe('route_7');
+    expect(load('route_8').connections.WEST?.mapId).toBe('saffron_city');
+    expect(load('saffron_city').connections.EAST?.mapId).toBe('route_8');
+
+    // Gym Leaders
+    const sabrina = npcsByMap.saffron_gym?.find((n) => n.action === 'SABRINA_EVENT');
+    expect(sabrina).toBeDefined();
+    expect(sabrina?.trainerId).toBe('sabrina');
+
+    const janine = npcsByMap.fuchsia_gym?.find((n) => n.action === 'JANINE_EVENT');
+    expect(janine).toBeDefined();
+    expect(janine?.trainerId).toBe('janine');
+
+    const blaine = npcsByMap.seafoam_gym?.find((n) => n.action === 'BLAINE_EVENT');
+    expect(blaine).toBeDefined();
+    expect(blaine?.trainerId).toBe('blaine');
+  });
 });

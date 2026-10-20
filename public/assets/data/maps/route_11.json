@@ -2175,6 +2175,10 @@
     "WEST": {
       "mapId": "vermilion_city",
       "offset": 0
+    },
+    "EAST": {
+      "mapId": "route_12",
+      "offset": -18
     }
   },
   "warps": [],

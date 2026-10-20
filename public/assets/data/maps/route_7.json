@@ -1095,6 +1095,10 @@
     "WEST": {
       "mapId": "celadon_city",
       "offset": -10
+    },
+    "EAST": {
+      "mapId": "saffron_city",
+      "offset": -18
     }
   },
   "warps": [

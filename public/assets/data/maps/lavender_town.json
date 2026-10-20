@@ -1099,6 +1099,10 @@
     "WEST": {
       "mapId": "route_8",
       "offset": 0
+    },
+    "SOUTH": {
+      "mapId": "route_12",
+      "offset": 0
     }
   },
   "warps": [

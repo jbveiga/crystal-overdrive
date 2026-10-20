@@ -2175,6 +2175,10 @@
     "EAST": {
       "mapId": "lavender_town",
       "offset": 0
+    },
+    "WEST": {
+      "mapId": "saffron_city",
+      "offset": -18
     }
   },
   "warps": [

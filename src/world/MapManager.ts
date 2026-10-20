@@ -328,6 +328,20 @@ export class MapManager {
       'route_8',
       'route_7',
       'celadon_city',
+      // Phase 15: Southern Kanto, Saffron & Sea Routes
+      'saffron_city',
+      'route_16',
+      'route_17',
+      'route_18',
+      'fuchsia_city',
+      'route_12',
+      'route_13',
+      'route_14',
+      'route_15',
+      'route_19',
+      'route_20',
+      'cinnabar_island',
+      'route_21',
     ].includes(mapId);
   }
 
