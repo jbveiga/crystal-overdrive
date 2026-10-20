@@ -331,7 +331,7 @@ export class OverworldRenderer {
     await Promise.all(
       tileNames.map(async (name) => {
         try {
-          const tex = await Assets.load<Texture>(`/assets/tiles/${name}.png`);
+          const tex = await Assets.load<Texture>(`./assets/tiles/${name}.png`);
           tex.source.scaleMode = 'nearest';
           this.tileTextures.set(name, tex);
         } catch (err) {
@@ -356,8 +356,8 @@ export class OverworldRenderer {
       const f0 = this.tileTextures.get(wName);
       if (!f0) continue;
       try {
-        const f1 = await Assets.load<Texture>(`/assets/tiles/${wName}__w1.png`);
-        const f2 = await Assets.load<Texture>(`/assets/tiles/${wName}__w2.png`);
+        const f1 = await Assets.load<Texture>(`./assets/tiles/${wName}__w1.png`);
+        const f2 = await Assets.load<Texture>(`./assets/tiles/${wName}__w2.png`);
         f1.source.scaleMode = 'nearest';
         f2.source.scaleMode = 'nearest';
         this.waterAnimFrames.set(wName, [f0, f1, f2, f1]);
@@ -367,21 +367,21 @@ export class OverworldRenderer {
     }
 
     // 2. Load character sheets (144x32 -> 9 frames of 16x32)
-    const goldWalkTex = await Assets.load<Texture>('/assets/sprites/characters/gold_walk.png');
+    const goldWalkTex = await Assets.load<Texture>('./assets/sprites/characters/gold_walk.png');
     goldWalkTex.source.scaleMode = 'nearest';
     this.playerFrames = this.extractCharacterFrames(goldWalkTex);
 
     const npcSheetPaths: Record<NpcSpriteType, string> = {
-      boy: '/assets/sprites/characters/npc_boy.png',
-      girl: '/assets/sprites/characters/npc_girl.png',
-      fat_man: '/assets/sprites/characters/npc_fat_man.png',
-      kris: '/assets/sprites/characters/kris_walk.png',
-      silver: '/assets/sprites/characters/silver.png',
-      fisherman: '/assets/sprites/characters/fisherman.png',
-      bug_catcher: '/assets/sprites/characters/bug_catcher.png',
-      teacher: '/assets/sprites/characters/teacher.png',
-      mom: '/assets/sprites/characters/mom.png',
-      prof_elm: '/assets/sprites/characters/prof_elm.png',
+      boy: './assets/sprites/characters/npc_boy.png',
+      girl: './assets/sprites/characters/npc_girl.png',
+      fat_man: './assets/sprites/characters/npc_fat_man.png',
+      kris: './assets/sprites/characters/kris_walk.png',
+      silver: './assets/sprites/characters/silver.png',
+      fisherman: './assets/sprites/characters/fisherman.png',
+      bug_catcher: './assets/sprites/characters/bug_catcher.png',
+      teacher: './assets/sprites/characters/teacher.png',
+      mom: './assets/sprites/characters/mom.png',
+      prof_elm: './assets/sprites/characters/prof_elm.png',
     };
 
     await Promise.all(

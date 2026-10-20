@@ -155,8 +155,8 @@ export class BattleRenderer {
 
     // 3. Load Pokémon Sprites
     const [enemyTex, playerTex] = await Promise.all([
-      Assets.load<Texture>(`/assets/sprites/pokemon/${enemyPokemon.speciesId}_front.png`),
-      Assets.load<Texture>(`/assets/sprites/pokemon/${playerPokemon.speciesId}_back.png`),
+      Assets.load<Texture>(`./assets/sprites/pokemon/${enemyPokemon.speciesId}_front.png`),
+      Assets.load<Texture>(`./assets/sprites/pokemon/${playerPokemon.speciesId}_back.png`),
     ]);
 
     enemyTex.source.scaleMode = 'nearest';
@@ -464,7 +464,7 @@ export class BattleRenderer {
       });
     });
 
-    const newTex = await Assets.load<Texture>(`/assets/sprites/pokemon/${newPokemon.speciesId}_back.png`);
+    const newTex = await Assets.load<Texture>(`./assets/sprites/pokemon/${newPokemon.speciesId}_back.png`);
     newTex.source.scaleMode = 'nearest';
     this.playerPokemonSprite.texture = newTex;
 

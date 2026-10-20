@@ -246,7 +246,7 @@ export class PartyManagementUI {
             justify-content: center;
             flex-shrink: 0;
           ">
-            <img src="/assets/sprites/pokemon/${pkmn.speciesId}_front.png" alt="${pkmn.nickname}" style="width: 46px; height: 46px; image-rendering: pixelated; object-fit: contain;" />
+            <img src="./assets/sprites/pokemon/${pkmn.speciesId}_front.png" alt="${pkmn.nickname}" style="width: 46px; height: 46px; image-rendering: pixelated; object-fit: contain;" />
           </div>
           <div style="flex: 1; min-width: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 4px;">
@@ -433,7 +433,7 @@ export class PartyManagementUI {
         align-items: center;
         justify-content: center;
       ">
-        <img src="/assets/sprites/pokemon/${pkmn.speciesId}_front.png" alt="${pkmn.nickname}" style="width: 72px; height: 72px; image-rendering: pixelated; object-fit: contain;" />
+        <img src="./assets/sprites/pokemon/${pkmn.speciesId}_front.png" alt="${pkmn.nickname}" style="width: 72px; height: 72px; image-rendering: pixelated; object-fit: contain;" />
       </div>
       <div style="flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 6px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">

@@ -125,7 +125,7 @@ async function bootstrap() {
 
   const loadedMaps: MapData[] = await Promise.all(
     mapIds.map(async (id) => {
-      const res = await fetch(`/assets/data/maps/${id}.json`);
+      const res = await fetch(`./assets/data/maps/${id}.json`);
       return res.json();
     })
   );

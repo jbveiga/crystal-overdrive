@@ -451,7 +451,7 @@ export class StartMenuUI {
               <span style="font-family: monospace; font-size: 12px; color: #94a3b8;">No.${dexNum}</span>
               ${
                 isSeen
-                  ? `<img src="/assets/sprites/pokemon/${sp.id}_front.png" alt="${sp.name}" style="width: 36px; height: 36px; image-rendering: pixelated;" />`
+                  ? `<img src="./assets/sprites/pokemon/${sp.id}_front.png" alt="${sp.name}" style="width: 36px; height: 36px; image-rendering: pixelated;" />`
                   : `<div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #0f172a; border-radius: 6px; font-weight: 800; color: #64748b;">?</div>`
               }
               <div>
