@@ -17,7 +17,7 @@ import { PartyManagementUI } from './ui/PartyManagementUI';
 import { StartMenuUI } from './ui/StartMenuUI';
 import { TitleScreenUI } from './ui/TitleScreenUI';
 import { IntroSequenceUI } from './ui/IntroSequenceUI';
-import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions } from './types/game';
+import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions, SpeedMultiplier } from './types/game';
 import type { Graphics } from 'pixi.js';
 export { npcsByMap, createNpcsByMap } from './world/npcData';
 
@@ -510,6 +510,18 @@ async function bootstrap() {
   const getCaughtSpeciesSet = () =>
     new Set([...playerParty.map((p) => p.speciesId), ...playerBox.map((p) => p.speciesId)]);
 
+  let overworldHUD: OverworldHUD;
+
+  const cyclePlayerSpeed = (): SpeedMultiplier => {
+    const newSpeed = gameClock.cyclePlayerSpeed();
+    bagUI.setSpeedMultiplier(newSpeed);
+    partyUI.setSpeedMultiplier(newSpeed);
+    startMenuUI.setSpeedMultiplier(newSpeed);
+    if (overworldHUD) overworldHUD.updateSpeedDisplay(newSpeed);
+    eventBus.emit('player:speedChanged', { playerSpeed: newSpeed });
+    return newSpeed;
+  };
+
   const startMenuUI = new StartMenuUI(
     'modal-container',
     {
@@ -533,6 +545,8 @@ async function bootstrap() {
       getPlayTimeSeconds: () => playTimeSeconds,
       getMapName: () => mapManager.getCurrentMap()?.name || 'New Bark Town',
       isMuted: () => audioManager.isMuted(),
+      getSpeedMultiplier: () => gameClock.playerSpeed,
+      isGamepadActive: () => overworldHUD?.isGamepadActive() ?? false,
     },
     {
       onOpenParty: () => {
@@ -556,6 +570,12 @@ async function bootstrap() {
         overworldHUD.updateMuteDisplay(muted);
         return muted;
       },
+      onCycleSpeed: () => {
+        return cyclePlayerSpeed();
+      },
+      onToggleGamepad: () => {
+        return overworldHUD.toggleGamepad();
+      },
     }
   );
 
@@ -566,14 +586,9 @@ async function bootstrap() {
   const isAnyOverworldModalOpen = () =>
     gameState === 'TITLE' || startMenuUI.isOpen() || partyUI.isOpen() || bagUI.isOpen();
 
-  const overworldHUD = new OverworldHUD('overworld-hud-container', {
+  overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
-      const newSpeed = gameClock.cyclePlayerSpeed();
-      bagUI.setSpeedMultiplier(newSpeed);
-      partyUI.setSpeedMultiplier(newSpeed);
-      startMenuUI.setSpeedMultiplier(newSpeed);
-      eventBus.emit('player:speedChanged', { playerSpeed: newSpeed });
-      return newSpeed;
+      return cyclePlayerSpeed();
     },
     onMuteToggle: () => {
       return audioManager.toggleMute();
@@ -709,7 +724,7 @@ async function bootstrap() {
       }
     },
     onNewGame: async () => {
-      await saveManager.deleteSave();
+      // Note: Previous save is not deleted upon starting New Game; it is only replaced when the player saves the new game.
       titleScreenUI.hide();
       introSequenceUI.start();
     },

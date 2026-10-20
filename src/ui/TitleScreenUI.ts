@@ -440,7 +440,6 @@ export class TitleScreenUI {
       overflow: hidden;
       z-index: 100;
       user-select: none;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     `;
 
     // Upward drifting crystal particles layer
@@ -847,7 +846,7 @@ export class TitleScreenUI {
           ⚠️ OVERWRITE EXISTING SAVE?
         </div>
         <div style="font-size: 14px; line-height: 1.5; color: #cbd5e1;">
-          An active adventure for <strong>${this.savePreview?.playerName ?? 'GOLD'}</strong> (${this.savePreview?.playTimeFormatted ?? '00:00'}) already exists. Starting a New Game will replace your saved progress.
+          An active adventure for <strong>${this.savePreview?.playerName ?? 'GOLD'}</strong> (${this.savePreview?.playTimeFormatted ?? '00:00'}) already exists. Saving in the new adventure will replace the previous save.
         </div>
         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 6px;">
           <button id="overwrite-confirm-yes" style="

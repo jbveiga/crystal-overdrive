@@ -269,7 +269,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 6 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync, and retro overworld SFX (BUMP, HOP, RUSTLE, HEAL_JINGLE, FANFARE) (Ticket 6.3). |
 | `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
 | `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-15 char name validation/fallback, RTC period detection, `onComplete` payload. |
-| **Current Baseline** | **11 Suites** | **98 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `StartMenuUI.ts` / `BagAndMartUI.ts` / `OverworldHUD.ts` | `tests/SettingsAndMartUI.test.ts` | 7 | ✅ Covered | Settings submenu with sound toggle, speed cycle & touch controls; separate Poké Mart counter view & bag view; mobile D-pad ergonomics & responsive camera zoom. |
+| **Current Baseline** | **12 Suites** | **105 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

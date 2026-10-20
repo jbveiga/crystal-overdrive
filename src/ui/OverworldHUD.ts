@@ -15,8 +15,8 @@ export interface OverworldHUDOptions {
 
 export class OverworldHUD {
   private container: HTMLElement;
-  private speedButton!: HTMLButtonElement;
-  private muteButton!: HTMLButtonElement;
+  private speedButton: HTMLButtonElement | null = null;
+  private muteButton: HTMLButtonElement | null = null;
   private gamepadToggleButton!: HTMLButtonElement;
   private startMenuButton!: HTMLButtonElement;
   private desktopControlsBar!: HTMLDivElement;
@@ -158,386 +158,350 @@ export class OverworldHUD {
     `;
 
     this.rootElement.innerHTML = `
-        <!-- Top bar: Route Banner + Collapsible Top Menu Capsule -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px;">
-          <div id="route-banner" style="
-            background: rgba(18, 22, 28, 0.85);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            letter-spacing: 0.5px;
-          ">
-            New Bark Town
-          </div>
-
-          <!-- Top Menu Dock Capsule -->
-          <div id="top-menu-capsule" style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            pointer-events: auto;
-            background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            border-radius: 999px;
-            padding: 5px 8px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
-          ">
-            <!-- Always-Visible Capsule Controls -->
-            <button id="gamepad-toggle-btn" title="Toggle Touch Gamepad" style="
-              background: #334155;
-              color: #ffffff;
-              border: 1px solid rgba(255, 255, 255, 0.18);
-              border-radius: 999px;
-              padding: 6px 10px;
-              font-size: 12px;
-              font-weight: 700;
-              cursor: pointer;
-            ">
-              🎮
-            </button>
-            <button id="mute-toggle-btn" style="
-              background: #334155;
-              color: #ffffff;
-              border: none;
-              border-radius: 999px;
-              padding: 6px 11px;
-              font-size: 12px;
-              font-weight: 700;
-              cursor: pointer;
-              transition: background 0.15s ease;
-            ">
-              🔊 SOUND: ON
-            </button>
-            <button id="speed-toggle-btn" style="
-              background: #2563eb;
-              color: #ffffff;
-              border: none;
-              border-radius: 999px;
-              padding: 6px 12px;
-              font-size: 12px;
-              font-weight: 800;
-              cursor: pointer;
-              transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
-              box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
-            ">
-              ⚡ SPEED: 1x (Shift)
-            </button>
-            <button id="start-menu-btn" style="
-              background: #0f172a;
-              color: #facc15;
-              border: 2px solid #facc15;
-              border-radius: 999px;
-              padding: 5px 12px;
-              font-size: 12px;
-              font-weight: 800;
-              cursor: pointer;
-            ">
-              ☰ MENU (M / Esc)
-            </button>
-          </div>
-        </div>
-
-        <!-- Pokégear Modal -->
-        <div id="pokegear-modal" style="
-          display: none;
-          align-self: center;
-          background: rgba(15, 23, 42, 0.96);
-          backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 12px;
-          padding: 24px;
-          color: white;
-          width: 400px;
-          max-width: 92vw;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
-          pointer-events: auto;
-        ">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #2dd4bf;">📻 POKÉGEAR ROAMER RADAR</h3>
-            <button id="close-pokegear-btn" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">✕</button>
-          </div>
-          <div id="roamer-status-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
-        </div>
-
-        <!-- Center Notifications Container -->
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-          <!-- Roamer Alert Banner -->
-          <div id="roamer-alert-banner" style="
-            display: none;
-            background: linear-gradient(135deg, rgba(220, 38, 38, 0.92), rgba(185, 28, 28, 0.92));
-            border: 1px solid #fca5a5;
-            border-radius: 8px;
-            padding: 10px 20px;
-            color: white;
-            font-weight: 700;
-            font-size: 15px;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            box-shadow: 0 4px 16px rgba(220, 38, 38, 0.5);
-          ">
-            ⚡ A powerful aura is present on this route!
-          </div>
-
-          <!-- Interactive Building / Event Toast Banner -->
-          <div id="overworld-toast-banner" style="
-            display: none;
-            background: rgba(15, 23, 42, 0.95);
-            border: 1px solid #38bdf8;
-            border-radius: 8px;
-            padding: 10px 20px;
-            color: #f8fafc;
-            font-weight: 700;
-            font-size: 14px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-            margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-          "></div>
-        </div>
-
-        <!-- Responsive Mobile Touch Gamepad Overlay (Virtual D-Pad + A/B Action Buttons) -->
-        <div id="mobile-gamepad-overlay" style="
-          display: none;
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 30;
-        ">
-          <!-- Virtual D-Pad (Bottom-Left, 140x140px) -->
-          <div id="virtual-dpad-base" style="
-            position: absolute;
-            bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-            left: calc(16px + env(safe-area-inset-left, 0px));
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            background: rgba(15, 23, 42, 0.72);
-            backdrop-filter: blur(6px);
-            border: 2px solid rgba(148, 163, 184, 0.35);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-            pointer-events: auto;
-            touch-action: none;
-          ">
-            <div id="dpad-seg-up" style="
-              position: absolute;
-              top: 6px;
-              left: 46px;
-              width: 48px;
-              height: 44px;
-              border-radius: 8px 8px 4px 4px;
-              background: rgba(30, 41, 59, 0.9);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: #e2e8f0;
-              font-size: 16px;
-              font-weight: 900;
-              transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
-            ">▲</div>
-            <div id="dpad-seg-down" style="
-              position: absolute;
-              bottom: 6px;
-              left: 46px;
-              width: 48px;
-              height: 44px;
-              border-radius: 4px 4px 8px 8px;
-              background: rgba(30, 41, 59, 0.9);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: #e2e8f0;
-              font-size: 16px;
-              font-weight: 900;
-              transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
-            ">▼</div>
-            <div id="dpad-seg-left" style="
-              position: absolute;
-              top: 46px;
-              left: 6px;
-              width: 44px;
-              height: 48px;
-              border-radius: 8px 4px 4px 8px;
-              background: rgba(30, 41, 59, 0.9);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: #e2e8f0;
-              font-size: 16px;
-              font-weight: 900;
-              transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
-            ">◀</div>
-            <div id="dpad-seg-right" style="
-              position: absolute;
-              top: 46px;
-              right: 6px;
-              width: 44px;
-              height: 48px;
-              border-radius: 4px 8px 8px 4px;
-              background: rgba(30, 41, 59, 0.9);
-              border: 1px solid rgba(255, 255, 255, 0.2);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: #e2e8f0;
-              font-size: 16px;
-              font-weight: 900;
-              transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
-            ">▶</div>
-            <div style="
-              position: absolute;
-              top: 52px;
-              left: 52px;
-              width: 36px;
-              height: 36px;
-              border-radius: 50%;
-              background: rgba(15, 23, 42, 0.95);
-              border: 1px solid rgba(255, 255, 255, 0.12);
-            "></div>
-          </div>
-
-          <!-- Virtual Action Buttons (Bottom-Right: A & B) -->
-          <button id="virtual-btn-b" style="
-            position: absolute;
-            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
-            right: calc(68px + env(safe-area-inset-right, 0px));
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #dc2626;
-            color: #ffffff;
-            border: 2px solid #fca5a5;
-            font-size: 18px;
-            font-weight: 900;
-            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.55);
-            pointer-events: auto;
-            touch-action: none;
-            cursor: pointer;
-          ">B</button>
-          <button id="virtual-btn-a" style="
-            position: absolute;
-            bottom: calc(28px + env(safe-area-inset-bottom, 0px));
-            right: calc(16px + env(safe-area-inset-right, 0px));
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: #16a34a;
-            color: #ffffff;
-            border: 2px solid #86efac;
-            font-size: 20px;
-            font-weight: 900;
-            box-shadow: 0 4px 16px rgba(22, 163, 74, 0.6);
-            pointer-events: auto;
-            touch-action: none;
-            cursor: pointer;
-          ">A</button>
-        </div>
-
-        <!-- Bottom Area: Classic Dialogue Box + Help Bar -->
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; z-index: 40; margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));">
-          <!-- Classic Pokémon Dialogue Box -->
-          <div id="dialogue-box" style="
-            display: none;
-            width: min(680px, 94vw);
-            background: linear-gradient(180deg, rgba(15, 23, 42, 0.97) 0%, rgba(10, 15, 29, 0.99) 100%);
-            border: 3px solid #f8fafc;
-            outline: 3px solid #1e293b;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 0 0 2px #38bdf8;
-            border-radius: 10px;
-            padding: 16px 22px;
-            color: #f8fafc;
-            pointer-events: auto;
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-            margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-          ">
-            <div id="dialogue-speaker" style="
-              display: none;
-              background: #0284c7;
-              border: 2px solid #f8fafc;
-              color: #ffffff;
-              font-size: 12px;
-              font-weight: 800;
-              letter-spacing: 0.6px;
-              padding: 3px 10px;
-              border-radius: 6px;
-              width: fit-content;
-              margin-bottom: 8px;
-              text-transform: uppercase;
-            "></div>
-            <div id="dialogue-text" style="
-              font-size: 17px;
-              font-weight: 600;
-              line-height: 1.5;
-              min-height: 52px;
-              color: #f8fafc;
-              letter-spacing: 0.2px;
-              white-space: pre-wrap;
-            "></div>
-            <div id="dialogue-prompt" style="
-              display: flex;
-              justify-content: flex-end;
-              align-items: center;
-              gap: 6px;
-              font-size: 12px;
-              font-weight: 800;
-              color: #38bdf8;
-              margin-top: 6px;
-            ">
-              <span>SPACE / CLICK</span>
-              <span style="font-size: 14px;">▼</span>
-            </div>
-          </div>
-
-          <!-- Bottom Controls / Help info (Desktop Only; hidden when Touch Gamepad is active) -->
-          <div id="desktop-controls-bar" style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-          ">
-            <div style="
-              background: rgba(18, 22, 28, 0.8);
-              backdrop-filter: blur(4px);
-              border-radius: 6px;
-              padding: 6px 12px;
-              font-size: 12px;
-              color: #94a3b8;
-            ">
-              Move: <strong>WASD / Arrows</strong> | Talk / Read Signs: <strong>Space / Enter / Z</strong> | Speed: <strong>Shift</strong>
-            </div>
-
-            <button id="interact-btn" style="
-              pointer-events: auto;
-              background: #0284c7;
-              color: #ffffff;
-              border: 1px solid rgba(255, 255, 255, 0.25);
-              border-radius: 6px;
-              padding: 7px 14px;
-              font-size: 13px;
-              font-weight: 800;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
-            ">
-              💬 TALK / READ (Space)
-            </button>
-          </div>
-        </div>
+<!-- Top bar: Route Banner + Collapsible Top Menu Capsule -->
+<div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px;">
+<div id="route-banner" style="
+background: rgba(18, 22, 28, 0.85);
+backdrop-filter: blur(8px);
+border: 1px solid rgba(255, 255, 255, 0.15);
+border-radius: 8px;
+padding: 8px 16px;
+font-size: 16px;
+font-weight: 600;
+color: #ffffff;
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+letter-spacing: 0.5px;
+">
+New Bark Town
+</div>
+<!-- Top Menu Dock Capsule -->
+<div id="top-menu-capsule" style="
+display: flex;
+align-items: center;
+gap: 6px;
+pointer-events: auto;
+background: rgba(15, 23, 42, 0.88);
+backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.16);
+border-radius: 999px;
+padding: 5px 8px;
+box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+">
+<!-- Always-Visible Capsule Controls -->
+<button id="gamepad-toggle-btn" title="Toggle Touch Gamepad" style="
+background: #334155;
+color: #ffffff;
+border: 1px solid rgba(255, 255, 255, 0.18);
+border-radius: 999px;
+padding: 6px 10px;
+font-size: 12px;
+font-weight: 700;
+cursor: pointer;
+">
+🎮
+</button>
+<button id="start-menu-btn" style="
+background: #0f172a;
+color: #facc15;
+border: 2px solid #facc15;
+border-radius: 999px;
+padding: 5px 12px;
+font-size: 12px;
+font-weight: 800;
+cursor: pointer;
+">
+☰ MENU (M / Esc)
+</button>
+</div>
+</div>
+<!-- Pokégear Modal -->
+<div id="pokegear-modal" style="
+display: none;
+align-self: center;
+background: rgba(15, 23, 42, 0.96);
+backdrop-filter: blur(16px);
+border: 1px solid rgba(255, 255, 255, 0.2);
+border-radius: 12px;
+padding: 24px;
+color: white;
+width: 400px;
+max-width: 92vw;
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+pointer-events: auto;
+">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+<h3 style="margin: 0; font-size: 17px; font-weight: 800; color: #2dd4bf;">📻 POKÉGEAR ROAMER RADAR</h3>
+<button id="close-pokegear-btn" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer;">✕</button>
+</div>
+<div id="roamer-status-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+</div>
+<!-- Center Notifications Container -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+<!-- Roamer Alert Banner -->
+<div id="roamer-alert-banner" style="
+display: none;
+background: linear-gradient(135deg, rgba(220, 38, 38, 0.92), rgba(185, 28, 28, 0.92));
+border: 1px solid #fca5a5;
+border-radius: 8px;
+padding: 10px 20px;
+color: white;
+font-weight: 700;
+font-size: 15px;
+text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+box-shadow: 0 4px 16px rgba(220, 38, 38, 0.5);
+">
+⚡ A powerful aura is present on this route!
+</div>
+<!-- Interactive Building / Event Toast Banner -->
+<div id="overworld-toast-banner" style="
+display: none;
+background: rgba(15, 23, 42, 0.95);
+border: 1px solid #38bdf8;
+border-radius: 8px;
+padding: 10px 20px;
+color: #f8fafc;
+font-weight: 700;
+font-size: 14px;
+box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+"></div>
+</div>
+<!-- Responsive Mobile Touch Gamepad Overlay (Virtual D-Pad + A/B Action Buttons) -->
+<div id="mobile-gamepad-overlay" style="
+display: none;
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: 30;
+">
+<!-- Virtual D-Pad (Bottom-Left, 172x172px) -->
+<div id="virtual-dpad-base" style="
+position: absolute;
+bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+left: calc(16px + env(safe-area-inset-left, 0px));
+width: 172px;
+height: 172px;
+border-radius: 50%;
+background: rgba(15, 23, 42, 0.72);
+backdrop-filter: blur(6px);
+border: 2px solid rgba(148, 163, 184, 0.35);
+box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+pointer-events: auto;
+touch-action: none;
+">
+<div id="dpad-seg-up" style="
+position: absolute;
+top: 6px;
+left: 57px;
+width: 58px;
+height: 52px;
+border-radius: 12px;
+background: rgba(30, 41, 59, 0.9);
+border: 1px solid rgba(255, 255, 255, 0.2);
+display: flex;
+align-items: center;
+justify-content: center;
+color: #e2e8f0;
+font-size: 20px;
+font-weight: 900;
+transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+">▲</div>
+<div id="dpad-seg-down" style="
+position: absolute;
+bottom: 6px;
+left: 57px;
+width: 58px;
+height: 52px;
+border-radius: 12px;
+background: rgba(30, 41, 59, 0.9);
+border: 1px solid rgba(255, 255, 255, 0.2);
+display: flex;
+align-items: center;
+justify-content: center;
+color: #e2e8f0;
+font-size: 20px;
+font-weight: 900;
+transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+">▼</div>
+<div id="dpad-seg-left" style="
+position: absolute;
+top: 57px;
+left: 6px;
+width: 52px;
+height: 58px;
+border-radius: 12px;
+background: rgba(30, 41, 59, 0.9);
+border: 1px solid rgba(255, 255, 255, 0.2);
+display: flex;
+align-items: center;
+justify-content: center;
+color: #e2e8f0;
+font-size: 20px;
+font-weight: 900;
+transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+">◀</div>
+<div id="dpad-seg-right" style="
+position: absolute;
+top: 57px;
+right: 6px;
+width: 52px;
+height: 58px;
+border-radius: 12px;
+background: rgba(30, 41, 59, 0.9);
+border: 1px solid rgba(255, 255, 255, 0.2);
+display: flex;
+align-items: center;
+justify-content: center;
+color: #e2e8f0;
+font-size: 20px;
+font-weight: 900;
+transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
+">▶</div>
+<div style="
+position: absolute;
+top: 68px;
+left: 68px;
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background: rgba(15, 23, 42, 0.95);
+border: 1px solid rgba(255, 255, 255, 0.12);
+"></div>
+</div>
+<!-- Virtual Action Buttons (Bottom-Right: A & B) -->
+<button id="virtual-btn-b" style="
+position: absolute;
+bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+right: calc(68px + env(safe-area-inset-right, 0px));
+width: 50px;
+height: 50px;
+border-radius: 50%;
+background: #dc2626;
+color: #ffffff;
+border: 2px solid #fca5a5;
+font-size: 18px;
+font-weight: 900;
+box-shadow: 0 4px 14px rgba(220, 38, 38, 0.55);
+pointer-events: auto;
+touch-action: none;
+cursor: pointer;
+">B</button>
+<button id="virtual-btn-a" style="
+position: absolute;
+bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+right: calc(16px + env(safe-area-inset-right, 0px));
+width: 56px;
+height: 56px;
+border-radius: 50%;
+background: #16a34a;
+color: #ffffff;
+border: 2px solid #86efac;
+font-size: 20px;
+font-weight: 900;
+box-shadow: 0 4px 16px rgba(22, 163, 74, 0.6);
+pointer-events: auto;
+touch-action: none;
+cursor: pointer;
+">A</button>
+</div>
+<!-- Bottom Area: Classic Dialogue Box + Help Bar -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; z-index: 40; margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));">
+<!-- Classic Pokémon Dialogue Box -->
+<div id="dialogue-box" style="
+display: none;
+width: min(680px, 94vw);
+background: linear-gradient(180deg, rgba(15, 23, 42, 0.97) 0%, rgba(10, 15, 29, 0.99) 100%);
+border: 3px solid #f8fafc;
+outline: 3px solid #1e293b;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 0 0 2px #38bdf8;
+border-radius: 10px;
+padding: 16px 22px;
+color: #f8fafc;
+pointer-events: auto;
+cursor: pointer;
+user-select: none;
+position: relative;
+margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+">
+<div id="dialogue-speaker" style="
+display: none;
+background: #0284c7;
+border: 2px solid #f8fafc;
+color: #ffffff;
+font-size: 12px;
+font-weight: 800;
+letter-spacing: 0.6px;
+padding: 3px 10px;
+border-radius: 6px;
+width: fit-content;
+margin-bottom: 8px;
+text-transform: uppercase;
+"></div>
+<div id="dialogue-text" style="
+font-size: 17px;
+font-weight: 600;
+line-height: 1.5;
+min-height: 52px;
+color: #f8fafc;
+letter-spacing: 0.2px;
+white-space: pre-wrap;
+"></div>
+<div id="dialogue-prompt" style="
+display: flex;
+justify-content: flex-end;
+align-items: center;
+gap: 6px;
+font-size: 12px;
+font-weight: 800;
+color: #38bdf8;
+margin-top: 6px;
+">
+<span>SPACE / CLICK</span>
+<span style="font-size: 14px;">▼</span>
+</div>
+</div>
+<!-- Bottom Controls / Help info (Desktop Only; hidden when Touch Gamepad is active) -->
+<div id="desktop-controls-bar" style="
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 100%;
+">
+<div style="
+background: rgba(18, 22, 28, 0.8);
+backdrop-filter: blur(4px);
+border-radius: 6px;
+padding: 6px 12px;
+font-size: 12px;
+color: #94a3b8;
+">
+Move: <strong>WASD / Arrows</strong> | Talk / Read Signs: <strong>Space / Enter / Z</strong> | Speed: <strong>Shift</strong>
+</div>
+<button id="interact-btn" style="
+pointer-events: auto;
+background: #0284c7;
+color: #ffffff;
+border: 1px solid rgba(255, 255, 255, 0.25);
+border-radius: 6px;
+padding: 7px 14px;
+font-size: 13px;
+font-weight: 800;
+cursor: pointer;
+box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
+">
+💬 TALK / READ (Space)
+</button>
+</div>
+</div>
     `;
 
     this.container.appendChild(this.rootElement);
 
-    this.speedButton = this.rootElement.querySelector('#speed-toggle-btn') as HTMLButtonElement;
-    this.muteButton = this.rootElement.querySelector('#mute-toggle-btn') as HTMLButtonElement;
+    this.speedButton = this.rootElement.querySelector('#speed-toggle-btn') as HTMLButtonElement | null;
+    this.muteButton = this.rootElement.querySelector('#mute-toggle-btn') as HTMLButtonElement | null;
     this.gamepadToggleButton = this.rootElement.querySelector('#gamepad-toggle-btn') as HTMLButtonElement;
     this.startMenuButton = this.rootElement.querySelector('#start-menu-btn') as HTMLButtonElement;
     this.desktopControlsBar = this.rootElement.querySelector('#desktop-controls-bar') as HTMLDivElement;
@@ -597,7 +561,7 @@ export class OverworldHUD {
       pokegearModal.style.display = 'none';
     });
 
-    this.speedButton.addEventListener('click', (e) => {
+    this.speedButton?.addEventListener('click', (e) => {
       e.stopPropagation();
       if (this.options.onSpeedCycle) {
         const nextSpeed = this.options.onSpeedCycle();
@@ -605,7 +569,7 @@ export class OverworldHUD {
       }
     });
 
-    this.muteButton.addEventListener('click', (e) => {
+    this.muteButton?.addEventListener('click', (e) => {
       e.stopPropagation();
       if (this.options.onMuteToggle) {
         const muted = this.options.onMuteToggle();
@@ -652,7 +616,7 @@ export class OverworldHUD {
       const dx = clientX - cx;
       const dy = clientY - cy;
       const dist = Math.hypot(dx, dy);
-      if (dist < 10) return null;
+      if (dist < 16) return null;
 
       if (Math.abs(dx) > Math.abs(dy)) {
         return dx > 0 ? 'RIGHT' : 'LEFT';
@@ -1041,6 +1005,21 @@ export class OverworldHUD {
 
       list.appendChild(card);
     }
+  }
+
+  public toggleGamepad(): boolean {
+    this.isGamepadVisible = !this.isGamepadVisible;
+    this.updateGamepadVisibility();
+    return this.isGamepadVisible;
+  }
+
+  public isGamepadActive(): boolean {
+    return this.isGamepadVisible;
+  }
+
+  public setGamepadVisible(visible: boolean): void {
+    this.isGamepadVisible = visible;
+    this.updateGamepadVisibility();
   }
 
   public updateSpeedDisplay(speed: SpeedMultiplier): void {

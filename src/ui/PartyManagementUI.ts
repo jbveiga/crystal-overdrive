@@ -110,7 +110,6 @@ export class PartyManagementUI {
       gap: 14px;
       z-index: 55;
       pointer-events: auto;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #f8fafc;
     `;
 

@@ -154,7 +154,6 @@ export class BattleHUD {
       pointer-events: none;
       padding: max(12px, env(safe-area-inset-top, 12px)) max(12px, env(safe-area-inset-right, 12px)) max(12px, env(safe-area-inset-bottom, 12px)) max(12px, env(safe-area-inset-left, 12px));
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     `;
 
     root.innerHTML = `
@@ -969,8 +968,7 @@ export class BattleHUD {
         gap: 12px;
         z-index: 70;
         color: #f8fafc;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      `;
+        `;
 
       const newTypeColor = TYPE_COLORS[newMove.type] || '#64748b';
       const newPwr = newMove.power > 0 ? newMove.power : '—';

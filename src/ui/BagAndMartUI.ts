@@ -205,6 +205,8 @@ export const INFINITE_TMS: Record<string, TMDefinition> = {
 
 export type BagTabId = 'ITEMS' | 'TMS' | 'BALLS' | 'MART';
 
+const CARD_STYLE = 'background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;';
+
 export class BagAndMartUI {
   private container: HTMLElement;
   private bagModal!: HTMLDivElement;
@@ -274,7 +276,6 @@ export class BagAndMartUI {
       gap: 14px;
       z-index: 50;
       pointer-events: auto;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #f8fafc;
     `;
 
@@ -282,7 +283,7 @@ export class BagAndMartUI {
       <!-- Header -->
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding-bottom: 12px;">
         <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-          <h2 style="font-size: 18px; font-weight: 800; color: #38bdf8; margin: 0;">🎒 BAG & POKÉ MART</h2>
+          <h2 id="bag-modal-title" style="font-size: 18px; font-weight: 800; color: #38bdf8; margin: 0;">🎒 POKéMON BAG</h2>
           <span id="bag-money" style="font-size: 13px; font-weight: 800; background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(251, 191, 36, 0.3);">$3,000</span>
           <span id="bag-badges" style="font-size: 12px; font-weight: 700; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 3px 8px; border-radius: 6px;">🏅 0 Badges</span>
         </div>
@@ -302,7 +303,7 @@ export class BagAndMartUI {
       "></div>
 
       <!-- Tab Buttons -->
-      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+      <div id="bag-tabs-bar" style="display: flex; gap: 6px; flex-wrap: wrap;">
         <button id="tab-items" style="
           flex: 1;
           padding: 9px 6px;
@@ -419,14 +420,36 @@ export class BagAndMartUI {
     BattleAudio.playMenuSound('CONFIRM');
     this.bagModal.style.display = 'flex';
     this.feedbackBanner.style.display = 'none';
+
+    const titleEl = this.bagModal.querySelector('#bag-modal-title') as HTMLElement;
+    if (titleEl) titleEl.innerText = '🎒 POKéMON BAG';
+
+    const tabsBar = this.bagModal.querySelector('#bag-tabs-bar') as HTMLElement;
+    if (tabsBar) tabsBar.style.display = 'flex';
+
+    const tabMart = this.bagModal.querySelector('#tab-mart') as HTMLElement;
+    if (tabMart) tabMart.style.display = 'none';
+
+    const safeTab = initialTab === 'MART' ? 'ITEMS' : initialTab;
     if (this.selectedPartyIndex >= this.party.length) {
       this.selectedPartyIndex = 0;
     }
-    this.switchTab(initialTab);
+    this.switchTab(safeTab);
   }
 
   public openMart(): void {
-    this.open('MART');
+    BattleAudio.playMenuSound('CONFIRM');
+    this.bagModal.style.display = 'flex';
+    this.feedbackBanner.style.display = 'none';
+
+    const titleEl = this.bagModal.querySelector('#bag-modal-title') as HTMLElement;
+    if (titleEl) titleEl.innerText = '🏪 POKé MART';
+
+    const tabsBar = this.bagModal.querySelector('#bag-tabs-bar') as HTMLElement;
+    if (tabsBar) tabsBar.style.display = 'none';
+
+    this.updateHeaderDisplay();
+    this.renderMartTab();
   }
 
   public hide(): void {
@@ -533,7 +556,7 @@ export class BagAndMartUI {
 
     const ownedItems = MART_MEDICINE_CATALOG.filter((m) => (this.inventory.items?.[m.id] ?? 0) > 0);
     if (ownedItems.length === 0) {
-      container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 20px;">No medicine items in bag. Visit the Poké Mart tab to stock up!</div>`;
+      container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 20px;">No medicine items in bag. Visit a Poké Mart to stock up!</div>`;
       return;
     }
 
@@ -543,16 +566,7 @@ export class BagAndMartUI {
       const count = this.inventory.items[med.id] ?? 0;
 
       const card = document.createElement('div');
-      card.style.cssText = `
-        background: #1e293b;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-      `;
+      card.style.cssText = CARD_STYLE;
 
       card.innerHTML = `
         <div style="flex: 1;">
@@ -692,16 +706,7 @@ export class BagAndMartUI {
       const alreadyKnows = targetPkmn?.moves.some((m) => m.moveId === tm.moveId) ?? false;
 
       const card = document.createElement('div');
-      card.style.cssText = `
-        background: #1e293b;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-      `;
+      card.style.cssText = CARD_STYLE;
 
       card.innerHTML = `
         <div style="flex: 1;">
@@ -744,7 +749,7 @@ export class BagAndMartUI {
       [PokeballId, number]
     >;
     if (ballEntries.length === 0) {
-      container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">No Pokéballs in bag. Visit the Poké Mart tab to stock up!</div>`;
+      container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">No Pokéballs in bag. Visit a Poké Mart to stock up!</div>`;
       return;
     }
 
@@ -755,15 +760,7 @@ export class BagAndMartUI {
       const mult = catalogInfo?.multiplierLabel || '255x Guaranteed';
 
       const card = document.createElement('div');
-      card.style.cssText = `
-        background: #1e293b;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      `;
+      card.style.cssText = CARD_STYLE;
 
       card.innerHTML = `
         <div>
@@ -847,16 +844,7 @@ export class BagAndMartUI {
     for (const med of MART_MEDICINE_CATALOG) {
       const ownedCount = this.inventory.items[med.id] ?? 0;
       const card = document.createElement('div');
-      card.style.cssText = `
-        background: #1e293b;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        padding: 10px 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-      `;
+      card.style.cssText = CARD_STYLE;
 
       card.innerHTML = `
         <div style="flex: 1;">

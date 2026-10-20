@@ -39,6 +39,8 @@ export interface StartMenuStateProvider {
   getPlayTimeSeconds: () => number;
   getMapName: () => string;
   isMuted?: () => boolean;
+  getSpeedMultiplier?: () => SpeedMultiplier;
+  isGamepadActive?: () => boolean;
 }
 
 export interface StartMenuCallbacks {
@@ -47,6 +49,8 @@ export interface StartMenuCallbacks {
   onOpenPokegear: () => void;
   onSaveGame: () => Promise<void>;
   onToggleMute?: () => boolean;
+  onCycleSpeed?: () => SpeedMultiplier;
+  onToggleGamepad?: () => boolean;
 }
 
 const JOHTO_BADGES = [
@@ -66,6 +70,7 @@ export class StartMenuUI {
   private pokedexModal!: HTMLDivElement;
   private trainerCardModal!: HTMLDivElement;
   private saveConfirmModal!: HTMLDivElement;
+  private settingsModal!: HTMLDivElement;
   private stateProvider: StartMenuStateProvider;
   private callbacks: StartMenuCallbacks;
   private cursorIndex: number = 0;
@@ -136,17 +141,11 @@ export class StartMenuUI {
         },
       },
       {
-        id: 'start-opt-sound',
-        label: 'SOUND: ON',
-        icon: '🔊',
+        id: 'start-opt-settings',
+        label: 'SETTINGS',
+        icon: '⚙️',
         action: () => {
-          if (this.callbacks.onToggleMute) {
-            const muted = this.callbacks.onToggleMute();
-            if (!muted) {
-              BattleAudio.playMenuSound('CONFIRM');
-            }
-          }
-          this.renderMenuItems();
+          this.openSettings();
         },
       },
       {
@@ -174,7 +173,8 @@ export class StartMenuUI {
       this.menuPanel?.style.display === 'flex' ||
       this.pokedexModal?.style.display === 'flex' ||
       this.trainerCardModal?.style.display === 'flex' ||
-      this.saveConfirmModal?.style.display === 'flex'
+      this.saveConfirmModal?.style.display === 'flex' ||
+      this.settingsModal?.style.display === 'flex'
     );
   }
 
@@ -192,6 +192,7 @@ export class StartMenuUI {
     this.pokedexModal.style.display = 'none';
     this.trainerCardModal.style.display = 'none';
     this.saveConfirmModal.style.display = 'none';
+    this.settingsModal.style.display = 'none';
     this.menuPanel.style.display = 'flex';
     this.renderMenuItems();
   }
@@ -205,6 +206,7 @@ export class StartMenuUI {
     this.pokedexModal.style.display = 'none';
     this.trainerCardModal.style.display = 'none';
     this.saveConfirmModal.style.display = 'none';
+    this.settingsModal.style.display = 'none';
   }
 
   public handleKeyDown(e: KeyboardEvent): boolean {
@@ -237,6 +239,17 @@ export class StartMenuUI {
         e.preventDefault();
         BattleAudio.playMenuSound('CANCEL');
         this.saveConfirmModal.style.display = 'none';
+        this.menuPanel.style.display = 'flex';
+        return true;
+      }
+      return true;
+    }
+
+    if (this.settingsModal.style.display === 'flex') {
+      if (e.code === 'Escape' || e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ') {
+        e.preventDefault();
+        BattleAudio.playMenuSound('CANCEL');
+        this.settingsModal.style.display = 'none';
         this.menuPanel.style.display = 'flex';
         return true;
       }
@@ -293,7 +306,6 @@ export class StartMenuUI {
       gap: 6px;
       z-index: 60;
       pointer-events: auto;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #f8fafc;
     `;
     this.container.appendChild(panel);
@@ -320,7 +332,6 @@ export class StartMenuUI {
       gap: 14px;
       z-index: 65;
       pointer-events: auto;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #f8fafc;
     `;
     this.container.appendChild(dexModal);
@@ -346,7 +357,6 @@ export class StartMenuUI {
       gap: 16px;
       z-index: 65;
       pointer-events: auto;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #f8fafc;
     `;
     this.container.appendChild(trainerModal);
@@ -372,11 +382,36 @@ export class StartMenuUI {
       gap: 14px;
       z-index: 65;
       pointer-events: auto;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: #f8fafc;
     `;
     this.container.appendChild(saveModal);
     this.saveConfirmModal = saveModal;
+
+    // 4. Game Settings Modal
+    const setModal = document.createElement('div');
+    setModal.id = 'settings-modal';
+    setModal.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 440px;
+      max-width: 94vw;
+      background: rgba(15, 23, 42, 0.98);
+      backdrop-filter: blur(16px);
+      border: 3px solid #38bdf8;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.88), inset 0 0 0 2px rgba(56, 189, 248, 0.3);
+      border-radius: 14px;
+      padding: 22px;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 65;
+      pointer-events: auto;
+      color: #f8fafc;
+    `;
+    this.container.appendChild(setModal);
+    this.settingsModal = setModal;
   }
 
   private renderMenuItems(): void {
@@ -398,11 +433,6 @@ export class StartMenuUI {
     this.menuPanel.appendChild(header);
 
     this.menuItems.forEach((item, idx) => {
-      if (item.id === 'start-opt-sound' && this.stateProvider.isMuted) {
-        const muted = this.stateProvider.isMuted();
-        item.label = muted ? 'SOUND: OFF' : 'SOUND: ON';
-        item.icon = muted ? '🔇' : '🔊';
-      }
       const isSelected = idx === this.cursorIndex;
       const btn = document.createElement('button');
       btn.id = item.id;
@@ -462,41 +492,12 @@ export class StartMenuUI {
         const isCaught = caughtSet.has(sp.id);
         const isSeen = isCaught || seenSet.has(sp.id);
         const dexNum = String(idx + 1).padStart(3, '0');
-        return `
-          <div style="
-            background: rgba(15, 23, 42, 0.82);
-            border: 1px solid ${isCaught ? '#4ade80' : isSeen ? '#38bdf8' : 'rgba(255,255,255,0.1)'};
-            border-radius: 8px;
-            padding: 8px 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            opacity: ${isSeen ? '1' : '0.45'};
-          ">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span style="font-family: monospace; font-size: 12px; color: #94a3b8;">No.${dexNum}</span>
-              ${
-                isSeen
-                  ? `<img src="./assets/sprites/pokemon/${sp.id}_front.png" alt="${sp.name}" style="width: 36px; height: 36px; image-rendering: pixelated;" />`
-                  : `<div style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: #0f172a; border-radius: 6px; font-weight: 800; color: #64748b;">?</div>`
-              }
-              <div>
-                <div style="font-size: 14px; font-weight: 800; color: #f8fafc;">${
-                  isSeen ? sp.name.toUpperCase() : '-----'
-                }</div>
-                <div style="font-size: 11px; color: #94a3b8;">${
-                  isSeen ? sp.types.join(' / ') : 'Unknown Species'
-                }</div>
-              </div>
-            </div>
-            <div style="font-size: 12px; font-weight: 800; color: ${
-              isCaught ? '#4ade80' : isSeen ? '#38bdf8' : '#64748b'
-            };">
-              ${isCaught ? '🔴 CAUGHT' : isSeen ? '👁️ SEEN' : '---'}
-            </div>
-          </div>
-        `;
+        const bCol = isCaught ? '#4ade80' : isSeen ? '#38bdf8' : 'rgba(255,255,255,0.1)';
+        const sCol = isCaught ? '#4ade80' : isSeen ? '#38bdf8' : '#64748b';
+        const img = isSeen
+          ? `<img src="./assets/sprites/pokemon/${sp.id}_front.png" alt="${sp.name}" style="width:36px;height:36px;image-rendering:pixelated;" />`
+          : '<div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:#0f172a;border-radius:6px;font-weight:800;color:#64748b;">?</div>';
+        return `<div style="background:rgba(15,23,42,0.82);border:1px solid ${bCol};border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;opacity:${isSeen ? 1 : 0.45};"><div style="display:flex;align-items:center;gap:10px;"><span style="font-family:monospace;font-size:12px;color:#94a3b8;">No.${dexNum}</span>${img}<div><div style="font-size:14px;font-weight:800;color:#f8fafc;">${isSeen ? sp.name.toUpperCase() : '-----'}</div><div style="font-size:11px;color:#94a3b8;">${isSeen ? sp.types.join(' / ') : 'Unknown Species'}</div></div></div><div style="font-size:12px;font-weight:800;color:${sCol};">${isCaught ? '🔴 CAUGHT' : isSeen ? '👁️ SEEN' : '---'}</div></div>`;
       })
       .join('');
 
@@ -550,24 +551,15 @@ export class StartMenuUI {
     const badgesHtml = JOHTO_BADGES.map((b, i) => {
       const earned =
         badges.some((badge) => badge.toLowerCase().includes(b.id)) || i < badges.length;
-      return `
-        <div data-badge-id="${b.id}" data-earned="${earned}" style="
-          background: ${earned ? 'rgba(250, 204, 21, 0.22)' : 'rgba(15, 23, 42, 0.65)'};
-          border: 1.5px solid ${earned ? '#facc15' : 'rgba(255, 255, 255, 0.12)'};
-          box-shadow: ${earned ? '0 0 12px rgba(250, 204, 21, 0.45)' : 'none'};
-          border-radius: 8px;
-          padding: 6px 4px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 2px;
-          opacity: ${earned ? '1' : '0.45'};
-        ">
-          <span style="font-size: 16px;">${earned ? b.icon : '🔒'}</span>
-          <span style="font-size: 9px; font-weight: 800; color: ${earned ? '#fef08a' : '#94a3b8'};">${earned ? `${b.icon} ${b.name.toUpperCase()}` : b.name.toUpperCase()}</span>
-        </div>
-      `;
+      const bg = earned ? 'rgba(250,204,21,0.22)' : 'rgba(15,23,42,0.65)';
+      const border = earned ? '#facc15' : 'rgba(255,255,255,0.12)';
+      const col = earned ? '#fef08a' : '#94a3b8';
+      const bText = earned ? `${b.icon} ${b.name.toUpperCase()}` : b.name.toUpperCase();
+      return `<div data-badge-id="${b.id}" data-earned="${earned}" style="background:${bg};border:1.5px solid ${border};box-shadow:${earned ? '0 0 12px rgba(250,204,21,0.45)' : 'none'};border-radius:8px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:${earned ? 1 : 0.45};"><span style="font-size:16px;">${earned ? b.icon : '🔒'}</span><span style="font-size:9px;font-weight:800;color:${col};">${bText}</span></div>`;
     }).join('');
+
+    const cBg = 'background:rgba(15,23,42,0.72);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);';
+    const cLbl = 'font-size:11px;color:#94a3b8;font-weight:700;';
 
     this.trainerCardModal.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(250, 204, 21, 0.4); padding-bottom: 10px;">
@@ -579,20 +571,20 @@ export class StartMenuUI {
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div style="background: rgba(15, 23, 42, 0.72); border-radius: 8px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.12);">
-          <div style="font-size: 11px; color: #94a3b8; font-weight: 700;">MONEY</div>
+        <div style="${cBg}">
+          <div style="${cLbl}">MONEY</div>
           <div style="font-size: 16px; font-weight: 800; color: #fbbf24; margin-top: 2px;">$${money.toLocaleString()}</div>
         </div>
-        <div style="background: rgba(15, 23, 42, 0.72); border-radius: 8px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.12);">
-          <div style="font-size: 11px; color: #94a3b8; font-weight: 700;">PLAY TIME</div>
+        <div style="${cBg}">
+          <div style="${cLbl}">PLAY TIME</div>
           <div style="font-size: 16px; font-weight: 800; color: #38bdf8; margin-top: 2px;">⏱️ ${playTime}</div>
         </div>
-        <div style="background: rgba(15, 23, 42, 0.72); border-radius: 8px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.12);">
-          <div style="font-size: 11px; color: #94a3b8; font-weight: 700;">POKéDEX OWNED</div>
+        <div style="${cBg}">
+          <div style="${cLbl}">POKéDEX OWNED</div>
           <div style="font-size: 16px; font-weight: 800; color: #4ade80; margin-top: 2px;">📕 ${caughtCount} Species</div>
         </div>
-        <div style="background: rgba(15, 23, 42, 0.72); border-radius: 8px; padding: 10px 12px; border: 1px solid rgba(255,255,255,0.12);">
-          <div style="font-size: 11px; color: #94a3b8; font-weight: 700;">KEY ITEMS</div>
+        <div style="${cBg}">
+          <div style="${cLbl}">KEY ITEMS</div>
           <div style="font-size: 13px; font-weight: 800; color: #f8fafc; margin-top: 3px;">${
             keyItems.length > 0 ? keyItems.join(', ') : 'POKéGEAR'
           }</div>
@@ -698,5 +690,149 @@ export class StartMenuUI {
       this.saveConfirmModal.style.display = 'none';
       this.menuPanel.style.display = 'flex';
     });
+  }
+
+  public openSettings(): void {
+    BattleAudio.playMenuSound('CONFIRM');
+    this.menuPanel.style.display = 'none';
+    this.settingsModal.style.display = 'flex';
+    this.renderSettingsContent();
+  }
+
+  private renderSettingsContent(): void {
+    const isMuted = this.stateProvider.isMuted ? this.stateProvider.isMuted() : false;
+    const currentSpeed = this.stateProvider.getSpeedMultiplier
+      ? this.stateProvider.getSpeedMultiplier()
+      : this.speedMultiplier;
+    const isGamepad = this.stateProvider.isGamepadActive ? this.stateProvider.isGamepadActive() : false;
+
+    const rowStyle = 'background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;';
+    const subLabelStyle = 'font-size:11px;color:#94a3b8;';
+    const titleLabelStyle = 'font-size:13px;font-weight:800;color:#fff;';
+
+    this.settingsModal.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(56, 189, 248, 0.35); padding-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">⚙️</span>
+          <h2 style="margin: 0; font-size: 19px; font-weight: 900; color: #38bdf8; letter-spacing: 0.5px;">SETTINGS</h2>
+        </div>
+        <button id="close-settings-x-btn" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 4px;">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Sound Toggle -->
+        <div style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">AUDIO & SOUND</div>
+            <div style="${subLabelStyle}">Background music & battle SFX</div>
+          </div>
+          <button id="settings-sound-btn" style="
+            background: ${isMuted ? '#7f1d1d' : '#0284c7'};
+            color: #ffffff;
+            border: 1px solid ${isMuted ? '#ef4444' : '#38bdf8'};
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 130px;
+          ">${isMuted ? '🔇 SOUND: OFF' : '🔊 SOUND: ON'}</button>
+        </div>
+
+        <!-- Speed Multiplier Cycle -->
+        <div style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">GAME SPEED</div>
+            <div style="${subLabelStyle}">Overworld traversal & dialogue</div>
+          </div>
+          <button id="settings-speed-btn" style="
+            background: #2563eb;
+            color: #ffffff;
+            border: 1px solid #60a5fa;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 130px;
+          ">⚡ SPEED: ${currentSpeed}x</button>
+        </div>
+
+        <!-- Touch Controls Toggle -->
+        <div style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">TOUCH CONTROLS</div>
+            <div style="${subLabelStyle}">On-screen virtual D-Pad & A/B</div>
+          </div>
+          <button id="settings-gamepad-btn" style="
+            background: ${isGamepad ? '#059669' : '#334155'};
+            color: #ffffff;
+            border: 1px solid ${isGamepad ? '#34d399' : '#64748b'};
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 130px;
+          ">${isGamepad ? '🎮 TOUCH: ON' : '🎮 TOUCH: OFF'}</button>
+        </div>
+      </div>
+
+      <button id="close-settings-btn" style="
+        background: #334155;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        margin-top: 4px;
+      ">← BACK TO MENU</button>
+    `;
+
+    const soundBtn = this.settingsModal.querySelector('#settings-sound-btn') as HTMLButtonElement;
+    const speedBtn = this.settingsModal.querySelector('#settings-speed-btn') as HTMLButtonElement;
+    const gamepadBtn = this.settingsModal.querySelector('#settings-gamepad-btn') as HTMLButtonElement;
+    const closeBtn = this.settingsModal.querySelector('#close-settings-btn') as HTMLButtonElement;
+    const closeXBtn = this.settingsModal.querySelector('#close-settings-x-btn') as HTMLButtonElement;
+
+    soundBtn.addEventListener('click', () => {
+      if (this.callbacks.onToggleMute) {
+        const muted = this.callbacks.onToggleMute();
+        if (!muted) BattleAudio.playMenuSound('CONFIRM');
+        else BattleAudio.playMenuSound('CANCEL');
+        soundBtn.innerText = muted ? '🔇 SOUND: OFF' : '🔊 SOUND: ON';
+        soundBtn.style.background = muted ? '#7f1d1d' : '#0284c7';
+        soundBtn.style.borderColor = muted ? '#ef4444' : '#38bdf8';
+      }
+    });
+
+    speedBtn.addEventListener('click', () => {
+      if (this.callbacks.onCycleSpeed) {
+        const nextSpeed = this.callbacks.onCycleSpeed();
+        BattleAudio.playMenuSound('CONFIRM');
+        speedBtn.innerText = `⚡ SPEED: ${nextSpeed}x`;
+      }
+    });
+
+    gamepadBtn.addEventListener('click', () => {
+      if (this.callbacks.onToggleGamepad) {
+        const active = this.callbacks.onToggleGamepad();
+        BattleAudio.playMenuSound('CONFIRM');
+        gamepadBtn.innerText = active ? '🎮 TOUCH: ON' : '🎮 TOUCH: OFF';
+        gamepadBtn.style.background = active ? '#059669' : '#334155';
+        gamepadBtn.style.borderColor = active ? '#34d399' : '#64748b';
+      }
+    });
+
+    const closeHandler = () => {
+      BattleAudio.playMenuSound('CANCEL');
+      this.settingsModal.style.display = 'none';
+      this.menuPanel.style.display = 'flex';
+    };
+
+    closeBtn.addEventListener('click', closeHandler);
+    closeXBtn.addEventListener('click', closeHandler);
   }
 }

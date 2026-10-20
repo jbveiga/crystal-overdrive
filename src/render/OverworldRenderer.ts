@@ -1081,12 +1081,15 @@ export class OverworldRenderer {
       this.playerGrassMask.visible = false;
     }
 
-    // 2. Smooth Camera Centering
+    // 2. Smooth Camera Centering (with responsive mobile zoom)
     const screenWidth = this.app.screen.width;
     const screenHeight = this.app.screen.height;
 
-    const cameraTargetX = screenWidth / 2 - (player.renderX + 0.5) * this.tileSize;
-    const cameraTargetY = screenHeight / 2 - (player.renderY + 0.5) * this.tileSize;
+    const stageScale = screenWidth < 640 ? Math.min(1.0, Math.max(0.72, screenWidth / 520)) : 1.0;
+    this.stageContainer.scale.set(stageScale);
+
+    const cameraTargetX = screenWidth / 2 - (player.renderX + 0.5) * this.tileSize * stageScale;
+    const cameraTargetY = screenHeight / 2 - (player.renderY + 0.5) * this.tileSize * stageScale;
 
     this.stageContainer.position.set(cameraTargetX, cameraTargetY);
 
@@ -1098,7 +1101,7 @@ export class OverworldRenderer {
       mask.visible = false;
     }
 
-    const cullMargin = this.tileSize;
+    const cullMargin = this.tileSize * stageScale;
 
     for (let i = 0; i < npcs.length; i++) {
       const npc = npcs[i];
@@ -1107,8 +1110,8 @@ export class OverworldRenderer {
       const npcPxX = (npc.renderX + offsetX + 0.5) * this.tileSize;
       const npcPxY = (npc.renderY + offsetY + 0.85) * this.tileSize;
 
-      const screenX = cameraTargetX + npcPxX;
-      const screenY = cameraTargetY + npcPxY;
+      const screenX = cameraTargetX + npcPxX * stageScale;
+      const screenY = cameraTargetY + npcPxY * stageScale;
       const isInPlayingWindow =
         screenX >= -cullMargin &&
         screenX <= screenWidth + cullMargin &&

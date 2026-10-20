@@ -405,7 +405,6 @@ export class IntroSequenceUI {
       pointer-events: auto;
       z-index: 110;
       user-select: none;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     `;
 
     // Top Progress Pill
