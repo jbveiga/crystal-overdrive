@@ -297,6 +297,83 @@ describe('MapData & Authentic Tile Integrity', () => {
     }
   });
 
+  it('validates Ticket 5.1 reciprocal Route 31 <-> Violet Gate <-> Violet City and Sprout Tower 1F/2F/3F warps', () => {
+    const r31: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_31.json'), 'utf8')
+    );
+    const gate: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_31_violet_gate.json'), 'utf8')
+    );
+    const vc: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/violet_city.json'), 'utf8')
+    );
+    const st1: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/sprout_tower_1f.json'), 'utf8')
+    );
+    const st2: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/sprout_tower_2f.json'), 'utf8')
+    );
+    const st3: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/sprout_tower_3f.json'), 'utf8')
+    );
+
+    // 1. Route 31 (4,6)/(4,7) <-> Route 31 Violet Gate (9,4)/(9,5)
+    expect(r31.warps).toEqual(
+      expect.arrayContaining([
+        { x: 4, y: 6, targetMapId: 'route_31_violet_gate', targetX: 9, targetY: 4 },
+        { x: 4, y: 7, targetMapId: 'route_31_violet_gate', targetX: 9, targetY: 5 },
+      ])
+    );
+    expect(gate.warps).toEqual(
+      expect.arrayContaining([
+        { x: 9, y: 4, targetMapId: 'route_31', targetX: 5, targetY: 6 },
+        { x: 9, y: 5, targetMapId: 'route_31', targetX: 5, targetY: 7 },
+        { x: 0, y: 4, targetMapId: 'violet_city', targetX: 38, targetY: 24 },
+        { x: 0, y: 5, targetMapId: 'violet_city', targetX: 38, targetY: 25 },
+      ])
+    );
+
+    // 2. Violet City schema, non-empty groundLayer, and warps to Gate, Gym, Mart, Center, Academy, Houses, and Sprout Tower
+    expect(vc.width).toBe(40);
+    expect(vc.height).toBe(36);
+    expect(vc.groundLayer.length).toBe(40 * 36);
+    expect(vc.warps).toEqual(
+      expect.arrayContaining([
+        { x: 39, y: 24, targetMapId: 'route_31_violet_gate', targetX: 0, targetY: 4 },
+        { x: 39, y: 25, targetMapId: 'route_31_violet_gate', targetX: 0, targetY: 5 },
+        { x: 9, y: 17, targetMapId: 'violet_mart', targetX: 2, targetY: 7 },
+        { x: 18, y: 17, targetMapId: 'violet_gym', targetX: 4, targetY: 15 },
+        { x: 30, y: 17, targetMapId: 'earls_pokemon_academy', targetX: 3, targetY: 15 },
+        { x: 31, y: 25, targetMapId: 'violet_poke_center', targetX: 3, targetY: 7 },
+        { x: 21, y: 29, targetMapId: 'violet_kyles_house', targetX: 3, targetY: 7 },
+        { x: 3, y: 15, targetMapId: 'violet_nickname_speech_house', targetX: 3, targetY: 7 },
+        { x: 23, y: 5, targetMapId: 'sprout_tower_1f', targetX: 9, targetY: 15 },
+      ])
+    );
+
+    // 3. Sprout Tower 1F <-> 2F <-> 3F staircase connectivity
+    expect(st1.warps).toEqual(
+      expect.arrayContaining([
+        { x: 9, y: 15, targetMapId: 'violet_city', targetX: 23, targetY: 6 },
+        { x: 10, y: 15, targetMapId: 'violet_city', targetX: 23, targetY: 6 },
+        { x: 6, y: 4, targetMapId: 'sprout_tower_2f', targetX: 6, targetY: 4 },
+        { x: 2, y: 6, targetMapId: 'sprout_tower_2f', targetX: 2, targetY: 6 },
+        { x: 17, y: 3, targetMapId: 'sprout_tower_2f', targetX: 17, targetY: 3 },
+      ])
+    );
+    expect(st2.warps).toEqual(
+      expect.arrayContaining([
+        { x: 6, y: 4, targetMapId: 'sprout_tower_1f', targetX: 6, targetY: 4 },
+        { x: 2, y: 6, targetMapId: 'sprout_tower_1f', targetX: 2, targetY: 6 },
+        { x: 17, y: 3, targetMapId: 'sprout_tower_1f', targetX: 17, targetY: 3 },
+        { x: 10, y: 14, targetMapId: 'sprout_tower_3f', targetX: 10, targetY: 14 },
+      ])
+    );
+    expect(st3.warps).toEqual([
+      { x: 10, y: 14, targetMapId: 'sprout_tower_2f', targetX: 10, targetY: 14 },
+    ]);
+  });
+
   it('validates Phase 4 character walk sheets, battle sprites, and audio assets', () => {
     const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
     const trainersDir = path.resolve(__dirname, '../public/assets/sprites/trainers');

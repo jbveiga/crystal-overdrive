@@ -116,7 +116,7 @@ async function bootstrap() {
     playerParty = [PokemonFactory.create('cyndaquil', 5, ['tackle', 'leer', 'ember', 'smokescreen'])];
   }
 
-  // 3. Fetch and Register Vertical Slice Outdoor & Indoor Maps
+  // 3. Fetch and Register Outdoor & Indoor Maps (New Bark -> Cherrygrove -> Route 30/31 -> Violet City)
   const mapIds = [
     'new_bark_town',
     'route_29',
@@ -135,6 +135,17 @@ async function bootstrap() {
     'cherrygrove_evolution_speech_house',
     'mr_pokemons_house',
     'route_30_berry_house',
+    'route_31_violet_gate',
+    'violet_city',
+    'violet_mart',
+    'violet_poke_center',
+    'earls_pokemon_academy',
+    'violet_kyles_house',
+    'violet_nickname_speech_house',
+    'sprout_tower_1f',
+    'sprout_tower_2f',
+    'sprout_tower_3f',
+    'violet_gym',
   ];
 
   const loadedMaps: MapData[] = await Promise.all(
@@ -739,15 +750,11 @@ async function bootstrap() {
         ],
         { wanders: true }
       ),
-      makeNpc('r31_gate_officer_north', 4, 6, 'RIGHT', 'teacher', '👮 GATE OFFICER', [
-        'OFFICER: Halt there, young trainer!',
-        'Beyond here lies VIOLET CITY, but the gate is temporarily closed while officials prepare for the upcoming festival.',
-        'Please explore ROUTE 30 and ROUTE 31 for now until the way ahead is cleared!',
-      ]),
-      makeNpc('r31_gate_officer_south', 4, 7, 'RIGHT', 'teacher', '👮 GATE OFFICER', [
-        'OFFICER: Halt there, young trainer!',
-        'Beyond here lies VIOLET CITY, but the gate is temporarily closed while officials prepare for the upcoming festival.',
-        'Please explore ROUTE 30 and ROUTE 31 for now until the way ahead is cleared!',
+    ],
+    route_31_violet_gate: [
+      makeNpc('r31_gate_officer', 5, 2, 'DOWN', 'teacher', '👮 GATE OFFICER', [
+        'OFFICER: Hi there! Did you visit SPROUT TOWER?',
+        'VIOLET CITY is just ahead to the west. Good luck at the GYM!',
       ]),
     ],
     mr_pokemons_house: [
