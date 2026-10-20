@@ -399,7 +399,7 @@ async function bootstrap() {
         6,
         8,
         'DOWN',
-        'girl',
+        'teacher',
         '👩‍🏫 TEACHER',
         [
           'Wow, your POKéGEAR is impressive! Did your mom get it for you?',
@@ -412,12 +412,12 @@ async function bootstrap() {
         12,
         9,
         'DOWN',
-        'fat_man',
+        'fisherman',
         '🎣 FISHER',
         ['Yo, GOLD!', 'I hear PROF. ELM discovered some new POKéMON.'],
         { wanders: true }
       ),
-      makeNpc('nbt_rival', 3, 2, 'RIGHT', 'boy', '❓ RIVAL ???', [
+      makeNpc('nbt_rival', 3, 2, 'RIGHT', 'silver', '❓ RIVAL ???', [
         '<……>\nSo this is the famous ELM POKéMON LAB…',
         '…What are you staring at?',
       ]),
@@ -459,7 +459,7 @@ async function bootstrap() {
         15,
         11,
         'RIGHT',
-        'girl',
+        'teacher',
         '👩‍🏫 TEACHER',
         [
           "See those ledges? It's scary to jump off them.",
@@ -467,7 +467,7 @@ async function bootstrap() {
         ],
         { wanders: true }
       ),
-      makeNpc('r29_fisher', 25, 3, 'UP', 'fat_man', '🎣 FISHER', [
+      makeNpc('r29_fisher', 25, 3, 'UP', 'fisherman', '🎣 FISHER', [
         'I wanted to take a break, so I saved to record my progress.',
       ]),
     ],
@@ -482,7 +482,7 @@ async function bootstrap() {
         27,
         12,
         'LEFT',
-        'girl',
+        'teacher',
         '👩‍🏫 TEACHER',
         [
           'Did you talk to the old man by the POKéMON CENTER?',
@@ -503,7 +503,7 @@ async function bootstrap() {
         ],
         { wanders: true }
       ),
-      makeNpc('cg_fisher', 7, 12, 'RIGHT', 'fat_man', '🎣 MYSTIC WATER GUY', [
+      makeNpc('cg_fisher', 7, 12, 'RIGHT', 'fisherman', '🎣 MYSTIC WATER GUY', [
         "A POKéMON I caught had an item. I think it's MYSTIC WATER.",
         'Back to fishing for me, then.',
       ]),
@@ -541,7 +541,7 @@ async function bootstrap() {
         2,
         18,
         'RIGHT',
-        'boy',
+        'bug_catcher',
         '🐞 BUG CATCHER DON',
         [
           'I ran out of POKé BALLS while I was catching bugs.',
@@ -582,7 +582,7 @@ async function bootstrap() {
         21,
         7,
         'LEFT',
-        'boy',
+        'bug_catcher',
         '🐞 BUG CATCHER WADE',
         [
           'You can catch POKéMON even if you already have six with you.',
@@ -673,7 +673,7 @@ async function bootstrap() {
         5,
         2,
         'DOWN',
-        'fat_man',
+        'prof_elm',
         '🔬 PROF. ELM',
         [
           "Hi, GOLD! I've been researching unusual POKéMON evolutions here in NEW BARK TOWN.",
@@ -693,7 +693,7 @@ async function bootstrap() {
         7,
         4,
         'LEFT',
-        'girl',
+        'mom',
         '🏠 MOM',
         [
           'Oh, GOLD…! Your POKéMON GEAR is back from the repair shop.',
@@ -713,11 +713,11 @@ async function bootstrap() {
       ]),
     ],
     elms_house: [
-      makeNpc('elms_wife', 1, 5, 'RIGHT', 'girl', "👩 PROF. ELM'S WIFE", [
+      makeNpc('elms_wife', 1, 5, 'RIGHT', 'teacher', "👩 PROF. ELM'S WIFE", [
         "Hi, GOLD! My husband's always so busy—I hope he's OK.",
         "When he's caught up in his POKéMON research, he even forgets to eat.",
       ]),
-      makeNpc('elms_son', 5, 4, 'UP', 'boy', "👦 PROF. ELM'S SON", [
+      makeNpc('elms_son', 5, 4, 'UP', 'bug_catcher', "👦 PROF. ELM'S SON", [
         "When I grow up, I'm going to help my dad!",
         "I'm going to be a great POKéMON professor!",
       ]),

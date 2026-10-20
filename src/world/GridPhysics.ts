@@ -1,6 +1,16 @@
 import type { Direction, TileCoord } from '../types/game';
 
-export type NpcSpriteType = 'boy' | 'girl' | 'fat_man' | 'kris';
+export type NpcSpriteType =
+  | 'boy'
+  | 'girl'
+  | 'fat_man'
+  | 'kris'
+  | 'silver'
+  | 'fisherman'
+  | 'bug_catcher'
+  | 'teacher'
+  | 'mom'
+  | 'prof_elm';
 
 export interface GridEntity {
   id: string;

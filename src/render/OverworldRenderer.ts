@@ -1,6 +1,6 @@
 import { Application, Container, Sprite, Texture, Rectangle, Assets, Graphics, Text, TextStyle } from 'pixi.js';
 import type { MapData, Direction } from '../types/game';
-import type { GridEntity } from '../world/GridPhysics';
+import type { GridEntity, NpcSpriteType } from '../world/GridPhysics';
 
 interface CharacterFrames {
   downStand: Texture;
@@ -46,10 +46,7 @@ export class OverworldRenderer {
   private waterAnimTimer: number = 0;
   private waterAnimStep: number = 0;
   private playerFrames!: CharacterFrames;
-  private npcBoyFrames!: CharacterFrames;
-  private npcGirlFrames!: CharacterFrames;
-  private npcFatManFrames!: CharacterFrames;
-  private npcKrisFrames!: CharacterFrames;
+  private npcFrames: Map<NpcSpriteType, CharacterFrames> = new Map();
 
   public async init(containerElement: HTMLElement): Promise<void> {
     this.app = new Application();
@@ -374,21 +371,26 @@ export class OverworldRenderer {
     goldWalkTex.source.scaleMode = 'nearest';
     this.playerFrames = this.extractCharacterFrames(goldWalkTex);
 
-    const npcBoyTex = await Assets.load<Texture>('/assets/sprites/characters/npc_boy.png');
-    npcBoyTex.source.scaleMode = 'nearest';
-    this.npcBoyFrames = this.extractCharacterFrames(npcBoyTex);
+    const npcSheetPaths: Record<NpcSpriteType, string> = {
+      boy: '/assets/sprites/characters/npc_boy.png',
+      girl: '/assets/sprites/characters/npc_girl.png',
+      fat_man: '/assets/sprites/characters/npc_fat_man.png',
+      kris: '/assets/sprites/characters/kris_walk.png',
+      silver: '/assets/sprites/characters/silver.png',
+      fisherman: '/assets/sprites/characters/fisherman.png',
+      bug_catcher: '/assets/sprites/characters/bug_catcher.png',
+      teacher: '/assets/sprites/characters/teacher.png',
+      mom: '/assets/sprites/characters/mom.png',
+      prof_elm: '/assets/sprites/characters/prof_elm.png',
+    };
 
-    const npcGirlTex = await Assets.load<Texture>('/assets/sprites/characters/npc_girl.png');
-    npcGirlTex.source.scaleMode = 'nearest';
-    this.npcGirlFrames = this.extractCharacterFrames(npcGirlTex);
-
-    const npcFatManTex = await Assets.load<Texture>('/assets/sprites/characters/npc_fat_man.png');
-    npcFatManTex.source.scaleMode = 'nearest';
-    this.npcFatManFrames = this.extractCharacterFrames(npcFatManTex);
-
-    const npcKrisTex = await Assets.load<Texture>('/assets/sprites/characters/kris_walk.png');
-    npcKrisTex.source.scaleMode = 'nearest';
-    this.npcKrisFrames = this.extractCharacterFrames(npcKrisTex);
+    await Promise.all(
+      (Object.entries(npcSheetPaths) as Array<[NpcSpriteType, string]>).map(async ([spriteType, sheetPath]) => {
+        const tex = await Assets.load<Texture>(sheetPath);
+        tex.source.scaleMode = 'nearest';
+        this.npcFrames.set(spriteType, this.extractCharacterFrames(tex));
+      })
+    );
   }
 
   private extractCharacterFrames(sheet: Texture): CharacterFrames {
@@ -987,13 +989,7 @@ export class OverworldRenderer {
       if (!isInPlayingWindow) continue;
 
       const frames =
-        npc.spriteType === 'girl'
-          ? this.npcGirlFrames
-          : npc.spriteType === 'fat_man'
-            ? this.npcFatManFrames
-            : npc.spriteType === 'kris'
-              ? this.npcKrisFrames
-              : this.npcBoyFrames;
+        this.npcFrames.get(npc.spriteType || 'boy') || this.npcFrames.get('boy') || this.playerFrames;
 
       let sprite = this.npcSprites.get(npc.id);
       if (!sprite) {

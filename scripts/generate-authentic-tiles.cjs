@@ -113,6 +113,7 @@ const OUTDOOR_PALETTES = {
 const ROOF_PALETTES = {
   nb: makePal([27, 31, 27], [20, 31, 14], [11, 23, 5], [7, 7, 7]),
   cg: makePal([27, 31, 27], [31, 14, 28], [31, 5, 21], [7, 7, 7]),
+  vc: makePal([27, 31, 27], [24, 14, 31], [13, 7, 21], [7, 7, 7]),
 };
 
 const INDOOR_PALETTES = {
@@ -147,24 +148,16 @@ function mapCollToken(token) {
 
 const waterAnim = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__water__water.png'));
 const roofNewBark = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__new_bark.png'));
+const roofViolet = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__violet.png'));
+
+const ROOF_GRAPHICS = {
+  nb: roofNewBark,
+  cg: roofNewBark,
+  vc: roofViolet,
+};
 
 function loadTileset(tsName, isOutdoor = false) {
   const png = decode2BitPng(path.join(SOURCE_DIR, `gfx__tilesets__${tsName}.png`));
-  if (isOutdoor) {
-    for (let i = 0; i < 9; i++) {
-      const tid = 0x0a + i;
-      const dstX = (tid % 16) * 8;
-      const dstY = Math.floor(tid / 16) * 8;
-      const srcX = (i % 3) * 8;
-      const srcY = Math.floor(i / 3) * 8;
-      for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-          png.pixels[(dstY + y) * png.width + (dstX + x)] = roofNewBark.pixels[(srcY + y) * 24 + (srcX + x)];
-        }
-      }
-    }
-  }
-
   const palText = fs.readFileSync(path.join(SOURCE_DIR, `gfx__tilesets__${tsName}_palette_map.asm`), 'utf8');
   const pal0 = [];
   const pal1 = [];
@@ -194,6 +187,9 @@ const TILESETS = {
   house: loadTileset('house', false),
   pokecenter: loadTileset('pokecenter', false),
   mart: loadTileset('mart', false),
+  gate: loadTileset('gate', false),
+  tower: loadTileset('tower', false),
+  elite_four_room: loadTileset('elite_four_room', false),
 };
 
 const generatedTiles = new Set();
@@ -208,18 +204,27 @@ function buildQuadrantBuffer(ts, quad8x8, roofGroup, waterFrameIdx = 0) {
       const palName = (tid >= 0x80 ? ts.pal1[tid - 0x80] : ts.pal0[tid]) || 'GRAY';
       const pal =
         ts.isOutdoor && palName === 'ROOF'
-          ? ROOF_PALETTES[roofGroup]
+          ? ROOF_PALETTES[roofGroup] || ROOF_PALETTES.nb
           : palettes[palName] || palettes.GRAY;
       const pngTid = tid >= 0x80 ? (ts.png.height > 48 ? tid - 0x20 : tid - 0x80) : tid;
       const srcX = (pngTid % 16) * 8;
       const srcY = Math.floor(pngTid / 16) * 8;
+      const isRoofTile = ts.isOutdoor && tid >= 0x0a && tid <= 0x12;
 
       for (let py = 0; py < 8; py++) {
         for (let px = 0; px < 8; px++) {
-          const val2b =
-            ts.isOutdoor && tid === 0x14
-              ? waterAnim.pixels[(waterFrameIdx * 8 + py) * 8 + px]
-              : ts.png.pixels[(srcY + py) * ts.png.width + (srcX + px)];
+          let val2b;
+          if (ts.isOutdoor && tid === 0x14) {
+            val2b = waterAnim.pixels[(waterFrameIdx * 8 + py) * 8 + px];
+          } else if (isRoofTile) {
+            const roofImg = ROOF_GRAPHICS[roofGroup] || roofNewBark;
+            const rIdx = tid - 0x0a;
+            const rX = (rIdx % 3) * 8;
+            const rY = Math.floor(rIdx / 3) * 8;
+            val2b = roofImg.pixels[(rY + py) * 24 + (rX + px)];
+          } else {
+            val2b = ts.png.pixels[(srcY + py) * ts.png.width + (srcX + px)];
+          }
           const color = pal[3 - val2b];
           for (let dy = 0; dy < 4; dy++) {
             for (let dx = 0; dx < 4; dx++) {
@@ -241,7 +246,7 @@ function buildQuadrantBuffer(ts, quad8x8, roofGroup, waterFrameIdx = 0) {
 
 function renderQuadrant64(ts, quad8x8, roofGroup) {
   const prefix = ts.isOutdoor ? 'jt' : `in_${ts.tsName}`;
-  const hasRoof = ts.isOutdoor && quad8x8.some((tid) => ts.pal0[tid] === 'ROOF');
+  const hasRoof = ts.isOutdoor && (quad8x8.some((tid) => ts.pal0[tid] === 'ROOF') || quad8x8.some((tid) => tid >= 0x0a && tid <= 0x12));
   const hasWater = ts.isOutdoor && quad8x8.includes(0x14);
   const suffix = hasRoof ? `_${roofGroup}` : '';
   const tileName = `${prefix}_${quad8x8.map((x) => x.toString(16).padStart(2, '0')).join('_')}${suffix}`;
@@ -629,7 +634,7 @@ buildMapFromBlk({
   id: 'elms_house',
   name: "Elm's House",
   tileset: 'players_house',
-  blkFile: 'maps__House2.blk',
+  blkFile: 'maps__ElmsHouse.blk',
   blocksW: 4,
   blocksH: 4,
   warps: [
@@ -854,7 +859,10 @@ buildMapFromBlk({
   connections: {
     SOUTH: { mapId: 'route_30', offset: 20 },
   },
-  warps: [],
+  warps: [
+    { x: 4, y: 6, targetMapId: 'route_31_violet_gate', targetX: 9, targetY: 4 },
+    { x: 4, y: 7, targetMapId: 'route_31_violet_gate', targetX: 9, targetY: 5 },
+  ],
   bgEvents: [
     {
       x: 7,
@@ -953,6 +961,365 @@ buildMapFromBlk({
       pages: ['POKéMON magazines! POKéMON PAL, POKéMON HANDBOOK, POKéMON GRAPH…'],
     },
   ],
+});
+
+// ==========================================
+// Phase 4: Violet City, Sprout Tower & Violet Gym
+// ==========================================
+
+buildMapFromBlk({
+  id: 'violet_city',
+  name: 'Violet City',
+  tileset: 'johto',
+  blkFile: 'maps__VioletCity.blk',
+  blocksW: 20,
+  blocksH: 18,
+  roofGroup: 'vc',
+  connections: {},
+  warps: [
+    { x: 9, y: 17, targetMapId: 'violet_mart', targetX: 2, targetY: 7 },
+    { x: 18, y: 17, targetMapId: 'violet_gym', targetX: 4, targetY: 15 },
+    { x: 30, y: 17, targetMapId: 'earls_pokemon_academy', targetX: 3, targetY: 15 },
+    { x: 3, y: 15, targetMapId: 'violet_nickname_speech_house', targetX: 3, targetY: 7 },
+    { x: 31, y: 25, targetMapId: 'violet_poke_center', targetX: 3, targetY: 7 },
+    { x: 21, y: 29, targetMapId: 'violet_kyles_house', targetX: 3, targetY: 7 },
+    { x: 23, y: 5, targetMapId: 'sprout_tower_1f', targetX: 9, targetY: 15 },
+    { x: 39, y: 24, targetMapId: 'route_31_violet_gate', targetX: 0, targetY: 4 },
+    { x: 39, y: 25, targetMapId: 'route_31_violet_gate', targetX: 0, targetY: 5 },
+  ],
+  bgEvents: [
+    {
+      x: 24,
+      y: 20,
+      speaker: '🪧 VIOLET CITY SIGN',
+      pages: ['VIOLET CITY', 'The City of Nostalgic Scents'],
+    },
+    {
+      x: 15,
+      y: 17,
+      speaker: '🏛️ VIOLET GYM SIGN',
+      pages: ['VIOLET CITY POKéMON GYM', 'LEADER: FALKNER', 'The Elegant Master of Flying POKéMON'],
+    },
+    {
+      x: 24,
+      y: 8,
+      speaker: '🪧 SPROUT TOWER SIGN',
+      pages: ['SPROUT TOWER', 'Experience the Way of POKéMON'],
+    },
+    {
+      x: 27,
+      y: 17,
+      speaker: '🎓 EARL’S ACADEMY SIGN',
+      pages: ["EARL'S POKéMON ACADEMY"],
+    },
+    {
+      x: 32,
+      y: 25,
+      speaker: '🏥 POKéMON CENTER SIGN',
+      pages: ['Heal Your POKéMON! POKéMON CENTER'],
+    },
+    {
+      x: 10,
+      y: 17,
+      speaker: '🏪 POKé MART SIGN',
+      pages: ['For All Your Item Needs! POKé MART'],
+    },
+    {
+      x: 37,
+      y: 14,
+      speaker: '✨ HIDDEN ITEM',
+      pages: ['You found a hidden HYPER POTION!'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'sprout_tower_1f',
+  name: 'Sprout Tower 1F',
+  tileset: 'tower',
+  blkFile: 'maps__SproutTower1F.blk',
+  blocksW: 10,
+  blocksH: 8,
+  warps: [
+    { x: 9, y: 15, targetMapId: 'violet_city', targetX: 23, targetY: 6 },
+    { x: 10, y: 15, targetMapId: 'violet_city', targetX: 23, targetY: 6 },
+    { x: 6, y: 4, targetMapId: 'sprout_tower_2f', targetX: 6, targetY: 4 },
+    { x: 2, y: 6, targetMapId: 'sprout_tower_2f', targetX: 2, targetY: 6 },
+    { x: 17, y: 3, targetMapId: 'sprout_tower_2f', targetX: 17, targetY: 3 },
+  ],
+  bgEvents: [
+    {
+      x: 7,
+      y: 15,
+      speaker: '🗿 POKéMON STATUE',
+      pages: ['A POKéMON statue…', 'It looks very distinguished.'],
+    },
+    {
+      x: 12,
+      y: 15,
+      speaker: '🗿 POKéMON STATUE',
+      pages: ['A POKéMON statue…', 'It looks very distinguished.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'sprout_tower_2f',
+  name: 'Sprout Tower 2F',
+  tileset: 'tower',
+  blkFile: 'maps__SproutTower2F.blk',
+  blocksW: 10,
+  blocksH: 8,
+  warps: [
+    { x: 6, y: 4, targetMapId: 'sprout_tower_1f', targetX: 6, targetY: 4 },
+    { x: 2, y: 6, targetMapId: 'sprout_tower_1f', targetX: 2, targetY: 6 },
+    { x: 17, y: 3, targetMapId: 'sprout_tower_1f', targetX: 17, targetY: 3 },
+    { x: 10, y: 14, targetMapId: 'sprout_tower_3f', targetX: 10, targetY: 14 },
+  ],
+  bgEvents: [
+    {
+      x: 12,
+      y: 15,
+      speaker: '🗿 POKéMON STATUE',
+      pages: ['A POKéMON statue…', 'It looks very distinguished.'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'rattata', minLevel: 3, maxLevel: 5, weight: 60 },
+    { speciesId: 'gastly', minLevel: 3, maxLevel: 6, weight: 40 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'sprout_tower_3f',
+  name: 'Sprout Tower 3F',
+  tileset: 'tower',
+  blkFile: 'maps__SproutTower3F.blk',
+  blocksW: 10,
+  blocksH: 8,
+  warps: [
+    { x: 10, y: 14, targetMapId: 'sprout_tower_2f', targetX: 10, targetY: 14 },
+  ],
+  bgEvents: [
+    {
+      x: 8,
+      y: 1,
+      speaker: '🗿 POKéMON STATUE',
+      pages: ['A POKéMON statue…', 'It looks very distinguished.'],
+    },
+    {
+      x: 11,
+      y: 1,
+      speaker: '🗿 POKéMON STATUE',
+      pages: ['A POKéMON statue…', 'It looks very distinguished.'],
+    },
+    {
+      x: 9,
+      y: 0,
+      speaker: '🖼️ BELLSPROUT PAINTING',
+      pages: ["It's a powerful painting of a BELLSPROUT."],
+    },
+    {
+      x: 10,
+      y: 0,
+      speaker: '🖼️ BELLSPROUT PAINTING',
+      pages: ["It's a powerful painting of a BELLSPROUT."],
+    },
+    {
+      x: 5,
+      y: 15,
+      speaker: '🗿 POKéMON STATUE',
+      pages: ['A POKéMON statue…', 'It looks very distinguished.'],
+    },
+    {
+      x: 14,
+      y: 15,
+      speaker: '🗿 POKéMON STATUE',
+      pages: ['A POKéMON statue…', 'It looks very distinguished.'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'rattata', minLevel: 3, maxLevel: 5, weight: 50 },
+    { speciesId: 'gastly', minLevel: 3, maxLevel: 6, weight: 50 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'violet_gym',
+  name: 'Violet Gym',
+  tileset: 'elite_four_room',
+  blkFile: 'maps__VioletGym.blk',
+  blocksW: 5,
+  blocksH: 8,
+  warps: [
+    { x: 4, y: 15, targetMapId: 'violet_city', targetX: 18, targetY: 18 },
+    { x: 5, y: 15, targetMapId: 'violet_city', targetX: 18, targetY: 18 },
+  ],
+  bgEvents: [
+    {
+      x: 3,
+      y: 13,
+      speaker: '🏛️ VIOLET GYM STATUE',
+      pages: ['VIOLET CITY POKéMON GYM', 'LEADER: FALKNER', 'WINNING TRAINERS: BLUE'],
+    },
+    {
+      x: 6,
+      y: 13,
+      speaker: '🏛️ VIOLET GYM STATUE',
+      pages: ['VIOLET CITY POKéMON GYM', 'LEADER: FALKNER', 'WINNING TRAINERS: BLUE'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'earls_pokemon_academy',
+  name: "Earl's Pokémon Academy",
+  tileset: 'lab',
+  blkFile: 'maps__EarlsPokemonAcademy.blk',
+  blocksW: 4,
+  blocksH: 8,
+  warps: [
+    { x: 3, y: 15, targetMapId: 'violet_city', targetX: 30, targetY: 18 },
+    { x: 4, y: 15, targetMapId: 'violet_city', targetX: 30, targetY: 18 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON reference books and study material.'],
+    },
+    {
+      x: 1,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['POKéMON reference books and study material.'],
+    },
+    {
+      x: 3,
+      y: 0,
+      speaker: '📋 BLACKBOARD',
+      pages: ['The blackboard describes status problems during battles: POISON, PARALYSIS, SLEEP, BURN, FREEZE.'],
+    },
+    {
+      x: 4,
+      y: 0,
+      speaker: '📋 BLACKBOARD',
+      pages: ['The blackboard describes status problems during battles: POISON, PARALYSIS, SLEEP, BURN, FREEZE.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'violet_mart',
+  name: 'Violet Poké Mart',
+  tileset: 'mart',
+  blkFile: 'maps__Mart.blk',
+  blocksW: 6,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'violet_city', targetX: 9, targetY: 18 },
+    { x: 3, y: 7, targetMapId: 'violet_city', targetX: 9, targetY: 18 },
+  ],
+  bgEvents: [
+    {
+      x: 3,
+      y: 1,
+      speaker: '🛒 MART SHELVES',
+      pages: ['A clean shelf stacked with Potions, Antidotes, and Poké Balls.'],
+    },
+    {
+      x: 4,
+      y: 1,
+      speaker: '🛒 MART SHELVES',
+      pages: ['A clean shelf stacked with Potions, Antidotes, and Poké Balls.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'violet_poke_center',
+  name: 'Violet Pokémon Center',
+  tileset: 'pokecenter',
+  blkFile: 'maps__Pokecenter1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'violet_city', targetX: 31, targetY: 26 },
+    { x: 4, y: 7, targetMapId: 'violet_city', targetX: 31, targetY: 26 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '💻 PC',
+      pages: ["POKéMON Storage System opened! ...It's working normally."],
+    },
+    {
+      x: 7,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['Crammed with POKéMON medical and anatomy journals.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'violet_nickname_speech_house',
+  name: 'Nickname Speech House',
+  tileset: 'house',
+  blkFile: 'maps__House2.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'violet_city', targetX: 3, targetY: 16 },
+    { x: 4, y: 7, targetMapId: 'violet_city', targetX: 3, targetY: 16 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['Books on famous POKéMON nicknames and naming conventions.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'violet_kyles_house',
+  name: "Kyle's House",
+  tileset: 'house',
+  blkFile: 'maps__House2.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'violet_city', targetX: 21, targetY: 30 },
+    { x: 4, y: 7, targetMapId: 'violet_city', targetX: 21, targetY: 30 },
+  ],
+  bgEvents: [
+    {
+      x: 0,
+      y: 1,
+      speaker: '📚 BOOKSHELF',
+      pages: ['A collection of comic books and trade guides.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_31_violet_gate',
+  name: 'Route 31 Violet Gate',
+  tileset: 'gate',
+  blkFile: 'maps__EastWestGate.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 0, y: 4, targetMapId: 'violet_city', targetX: 38, targetY: 24 },
+    { x: 0, y: 5, targetMapId: 'violet_city', targetX: 38, targetY: 25 },
+    { x: 9, y: 4, targetMapId: 'route_31', targetX: 5, targetY: 6 },
+    { x: 9, y: 5, targetMapId: 'route_31', targetX: 5, targetY: 7 },
+  ],
+  bgEvents: [],
 });
 
 console.log(`Total authentic 64x64 quadrant PNGs generated: ${generatedTiles.size}`);

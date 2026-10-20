@@ -196,5 +196,97 @@ describe('MapData & Authentic Tile Integrity', () => {
     const healMachine = lab.bgEvents!.find((bg) => bg.x === 2 && bg.y === 1);
     expect(healMachine?.action).toBe('HEAL_AND_SAVE');
   });
+
+  it('validates Phase 4 Violet City, Violet Gym, Sprout Tower, and interior maps', () => {
+    const phase4Maps = [
+      { id: 'violet_city', w: 40, h: 36, minWarps: 8 },
+      { id: 'sprout_tower_1f', w: 20, h: 16, minWarps: 4 },
+      { id: 'sprout_tower_2f', w: 20, h: 16, minWarps: 4 },
+      { id: 'sprout_tower_3f', w: 20, h: 16, minWarps: 1 },
+      { id: 'violet_gym', w: 10, h: 16, minWarps: 2 },
+      { id: 'earls_pokemon_academy', w: 8, h: 16, minWarps: 2 },
+      { id: 'violet_mart', w: 12, h: 8, minWarps: 2 },
+      { id: 'violet_poke_center', w: 10, h: 8, minWarps: 2 },
+      { id: 'violet_nickname_speech_house', w: 8, h: 8, minWarps: 2 },
+      { id: 'violet_kyles_house', w: 8, h: 8, minWarps: 2 },
+      { id: 'route_31_violet_gate', w: 10, h: 8, minWarps: 4 },
+    ];
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+
+    for (const m of phase4Maps) {
+      const mapPath = path.resolve(__dirname, `../public/assets/data/maps/${m.id}.json`);
+      expect(fs.existsSync(mapPath)).toBe(true);
+
+      const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+      expect(mapData.id).toBe(m.id);
+      expect(mapData.width).toBe(m.w);
+      expect(mapData.height).toBe(m.h);
+      expect(mapData.tileMap).toBeDefined();
+      expect(mapData.tileMap!.length).toBe(m.w * m.h);
+      expect(mapData.collisionGrid.length).toBe(m.w * m.h);
+      expect(mapData.warps.length).toBeGreaterThanOrEqual(m.minWarps);
+
+      for (const warp of mapData.warps) {
+        const idx = warp.y * mapData.width + warp.x;
+        expect(mapData.collisionGrid[idx]).toBe(0);
+      }
+
+      for (const tile of new Set(mapData.tileMap!)) {
+        const tilePath = path.join(tilesDir, `${tile}.png`);
+        expect(fs.existsSync(tilePath)).toBe(true);
+      }
+    }
+  });
+
+  it('validates Phase 4 character walk sheets, battle sprites, and audio assets', () => {
+    const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
+    const trainersDir = path.resolve(__dirname, '../public/assets/sprites/trainers');
+    const pokemonDir = path.resolve(__dirname, '../public/assets/sprites/pokemon');
+    const bgmDir = path.resolve(__dirname, '../public/assets/audio/bgm');
+    const sfxDir = path.resolve(__dirname, '../public/assets/audio/sfx');
+
+    const expectedChars = ['falkner.png', 'sage.png', 'earl.png', 'bird_keeper.png', 'elder.png', 'elder_li.png'];
+    for (const c of expectedChars) {
+      const p = path.join(charsDir, c);
+      expect(fs.existsSync(p)).toBe(true);
+      const buf = fs.readFileSync(p);
+      expect(buf.readUInt32BE(16)).toBe(144);
+      expect(buf.readUInt32BE(20)).toBe(32);
+    }
+
+    const expectedTrainers = [
+      'falkner_front.png',
+      'bird_keeper_front.png',
+      'sage_front.png',
+      'elder_front.png',
+      'elder_li_front.png',
+    ];
+    for (const t of expectedTrainers) {
+      expect(fs.existsSync(path.join(trainersDir, t))).toBe(true);
+    }
+
+    const expectedPokemon = [
+      'pidgeotto_front.png',
+      'pidgeotto_back.png',
+      'spearow_front.png',
+      'spearow_back.png',
+      'poliwag_front.png',
+      'poliwag_back.png',
+      'poliwhirl_front.png',
+      'poliwhirl_back.png',
+    ];
+    for (const p of expectedPokemon) {
+      expect(fs.existsSync(path.join(pokemonDir, p))).toBe(true);
+    }
+
+    const expectedBgm = ['bgm_violet_city', 'bgm_sprout_tower', 'bgm_gym', 'bgm_gym_leader_battle'];
+    for (const b of expectedBgm) {
+      expect(fs.existsSync(path.join(bgmDir, `${b}.mp3`))).toBe(true);
+      expect(fs.existsSync(path.join(bgmDir, `${b}.webm`))).toBe(true);
+    }
+
+    expect(fs.existsSync(path.join(sfxDir, 'sfx_badge_get.mp3'))).toBe(true);
+    expect(fs.existsSync(path.join(sfxDir, 'sfx_badge_get.webm'))).toBe(true);
+  });
 });
 

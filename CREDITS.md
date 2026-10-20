@@ -17,6 +17,7 @@ This project is made possible thanks to the tireless preservation work, reverse-
   - Game Boy Color 15-bit RGB palette maps (`gfx/tilesets/*_palette_map.asm` and `.pal`).
   - Authentic warp triggers, NPC spawn coordinates, and movement path scripts (`maps/*.asm`).
   - Overworld signpost text and canonical character dialogue scripts.
+  - Supplemental tile references via [nikouu/Pokemon-gen-2-style-tilemap](https://github.com/nikouu/Pokemon-gen-2-style-tilemap).
 
 ---
 
@@ -31,11 +32,32 @@ This project is made possible thanks to the tireless preservation work, reverse-
 * **Assets & Data Utilized:**
   - Modern Pokémon Showdown database providing pre-validated base stats, types, EXP growth formulas, and catch rates.
   - Gen 4+ Physical/Special move classification and live type effectiveness multipliers.
-  - 2D front and back battle sprite renders.
+  - 2D front and back battle sprite renders and trainer battle poses.
+
+### [Sierraffinity/CrystalDust](https://github.com/Sierraffinity/CrystalDust)
+* **Authors:** Sierraffinity and the CrystalDust decompilation community.
+* **Repository:** [https://github.com/Sierraffinity/CrystalDust](https://github.com/Sierraffinity/CrystalDust)
+* **Assets Utilized:**
+  - 9-frame overworld walk sheets (144x32px RGBA) for Silver, Prof. Elm, Mom, Teacher, Fisherman, Bug Catcher, Falkner, Sage, Earl, Bird Keeper, Elder Li, and Johto civilian NPCs.
+
+### [PokeAPI / sprites](https://github.com/PokeAPI/sprites)
+* **Authors:** Paul Hallett and the PokeAPI community.
+* **License:** BSD 3-Clause / CC-BY-SA 4.0
+* **Assets Utilized:**
+  - Supplementary 2D Pokémon battle front and back renders.
 
 ---
 
-## 3. Core Open-Source Technologies
+## 3. Original Game Design, Art & Music Composition
+
+The artistic soul and musical heritage of Johto belong to the original creators at **GAME FREAK inc.**:
+* **Satoshi Tajiri:** Series Creator & Executive Direction.
+* **Ken Sugimori:** Original Pokémon Designs, Character Concept Art, and Visual Direction.
+* **Junichi Masuda & Go Ichinose:** Original Johto Soundtrack & Sound Effects Composition (including Violet City, Sprout Tower, Gym Leader Battles, and Victory Fanfares transcribed via `pret/pokecrystal`).
+
+---
+
+## 4. Core Open-Source Technologies
 
 The engine and development tooling of Crystal Overdrive rely on the following open-source libraries:
 
@@ -46,12 +68,13 @@ The engine and development tooling of Crystal Overdrive rely on the following op
 | **[Howler.js](https://howlerjs.com/)** | James Simpson (GoldFire Studios) | MIT | Web Audio API management and fallback audio playback. |
 | **[idb](https://github.com/jakearchibald/idb)** | Jake Archibald | ISC | Asynchronous IndexedDB storage wrapper for game save state serialization. |
 | **[Vite](https://vitejs.dev/)** | Evan You & Vite Contributors | MIT | Fast frontend development server and Rollup-based production bundler. |
-| **[Vitest](https://vitest.dev/)** | Vitest Team | MIT | Headless unit testing framework powering our 41+ automated engine test suites. |
+| **[Vitest](https://vitest.dev/)** | Vitest Team | MIT | Headless unit testing framework powering our 43+ automated engine test suites. |
 | **[TypeScript](https://www.typescriptlang.org/)** | Microsoft Corporation | Apache 2.0 | Type safety, architectural contracts, and strict separation of concerns. |
+| **[FFmpeg](https://ffmpeg.org/)** | Fabrice Bellard & FFmpeg Team | LGPL 2.1+ / GPL 2+ | Transcoding and mastering audio loops (WebM/Opus & MP3). |
 
 ---
 
-## 4. Legal & Non-Commercial Fan Project Disclaimer
+## 5. Legal & Non-Commercial Fan Project Disclaimer
 
 * **Pokémon**, Pokémon character names, Pokémon game mechanics, and Game Boy Color are trademarks and registered copyrights of **Nintendo Co., Ltd.**, **Creatures Inc.**, and **GAME FREAK inc.**
 * **Crystal Overdrive** is an unofficial, non-commercial, non-profit fan tribute created solely for educational, technical, and game-preservation purposes.
