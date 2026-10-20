@@ -46,7 +46,7 @@ This project is made possible thanks to the tireless preservation work, reverse-
 * **Authors:** Paul Hallett and the PokeAPI community.
 * **License:** BSD 3-Clause / CC-BY-SA 4.0
 * **Assets Utilized:**
-  - Supplementary 2D Pokémon battle front and back renders.
+  - Supplementary 2D Pokémon battle front and back renders (including Pidgeotto, Spearow, Poliwag, Poliwhirl, Marill, and Togepi).
   - Authentic Pokéball item and throw sprites (`sprites/items/*.png`: Poké Ball, Great Ball, Ultra Ball, Master Ball, Fast, Heavy, Level, Lure, Moon, Friend, Love, Dusk, Net, Quick, Timer, Repeat, Nest Balls).
 
 ### Pokémon Unbound (UI & Ergonomic Inspiration)

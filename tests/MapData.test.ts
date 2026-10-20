@@ -412,6 +412,8 @@ describe('MapData & Authentic Tile Integrity', () => {
       'poliwhirl_back.png',
       'marill_front.png',
       'marill_back.png',
+      'togepi_front.png',
+      'togepi_back.png',
     ];
     for (const p of expectedPokemon) {
       expect(fs.existsSync(path.join(pokemonDir, p))).toBe(true);
@@ -562,6 +564,17 @@ describe('MapData & Authentic Tile Integrity', () => {
 
     // StartMenuUI Trainer Card Zephyr Badge entry
     expect(startMenuSrc).toContain("{ id: 'zephyr', name: 'Zephyr', leader: 'Falkner', icon: '🦅' }");
+  });
+
+  it('validates Ticket 5.4 Post-Gym Elm Aide Togepi Egg delivery and step-based hatching in main.ts', () => {
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+
+    expect(mainSrc).toContain("'elms_aide'");
+    expect(mainSrc).toContain("action: 'ELMS_AIDE_EVENT'");
+    expect(mainSrc).toContain("PokemonFactory.createEgg('togepi', 256)");
+    expect(mainSrc).toContain("storyFlags.add('togepi_egg_received')");
+    expect(mainSrc).toContain("p.nickname = 'TOGEPI'");
+    expect(mainSrc).toContain("Huh? The EGG hatched! ... A lively TOGEPI hatched from the EGG!");
   });
 });
 

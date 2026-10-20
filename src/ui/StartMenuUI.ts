@@ -18,6 +18,7 @@ const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = 
   { id: 'poliwag', name: 'Poliwag', types: ['Water'] },
   { id: 'poliwhirl', name: 'Poliwhirl', types: ['Water'] },
   { id: 'marill', name: 'Marill', types: ['Water'] },
+  { id: 'togepi', name: 'Togepi', types: ['Normal'] },
   { id: 'geodude', name: 'Geodude', types: ['Rock', 'Ground'] },
   { id: 'gastly', name: 'Gastly', types: ['Ghost', 'Poison'] },
   { id: 'smeargle', name: 'Smeargle', types: ['Normal'] },

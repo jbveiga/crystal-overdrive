@@ -732,17 +732,18 @@ export class BattleHUD {
     for (const pkmn of this.playerParty) {
       const isActive = pkmn.uid === this.playerPokemon.uid;
       const isFainted = pkmn.currentHp <= 0;
+      const isEgg = Boolean(pkmn.isEgg);
       const pct = Math.max(0, Math.min(100, (pkmn.currentHp / pkmn.stats.hp) * 100));
       const hpColor = pct > 50 ? '#22c55e' : pct > 20 ? '#eab308' : '#ef4444';
 
       const btn = document.createElement('button');
       btn.style.cssText = `
         background: ${isActive ? '#0f172a' : '#1e293b'};
-        color: ${isFainted ? '#64748b' : 'white'};
+        color: ${isFainted || isEgg ? '#64748b' : 'white'};
         border: 1px solid ${isActive ? '#38bdf8' : 'rgba(255, 255, 255, 0.14)'};
         border-radius: 8px;
         padding: 8px 12px;
-        cursor: ${isActive || isFainted ? 'default' : 'pointer'};
+        cursor: ${isActive || isFainted || isEgg ? 'default' : 'pointer'};
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -751,19 +752,23 @@ export class BattleHUD {
 
       btn.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span style="font-weight: 700; font-size: 14px;">${pkmn.nickname} ${isActive ? '(OUT)' : ''}</span>
-          <span style="font-size: 11px; color: #facc15; font-weight: 700;">Lv.${pkmn.level}</span>
+          <span style="font-weight: 700; font-size: 14px;">${isEgg ? '🥚 EGG' : pkmn.nickname} ${isActive ? '(OUT)' : ''}</span>
+          <span style="font-size: 11px; color: #facc15; font-weight: 700;">${isEgg ? 'EGG' : `Lv.${pkmn.level}`}</span>
         </div>
         <div style="width: 100%; height: 6px; background: #334155; border-radius: 3px; overflow: hidden; margin-top: 6px;">
-          <div style="width: ${pct}%; height: 100%; background: ${hpColor};"></div>
+          <div style="width: ${isEgg ? 100 : pct}%; height: 100%; background: ${isEgg ? '#facc15' : hpColor};"></div>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 4px;">
-          <span>HP ${pkmn.currentHp}/${pkmn.stats.hp}</span>
+          <span>${isEgg ? `Steps: ${pkmn.eggSteps ?? 0}` : `HP ${pkmn.currentHp}/${pkmn.stats.hp}`}</span>
           <span>${pkmn.status !== 'NONE' ? pkmn.status : ''}</span>
         </div>
       `;
 
       btn.addEventListener('click', () => {
+        if (isEgg) {
+          this.showMessage("An EGG can't battle!");
+          return;
+        }
         if (isActive) {
           this.showMessage(`${pkmn.nickname} is already in battle!`);
           return;

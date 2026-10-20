@@ -52,7 +52,8 @@ export interface GridEntity {
     | 'MR_POKEMON_EVENT'
     | 'BERRY_MAN_EVENT'
     | 'ELDER_LI_EVENT'
-    | 'FALKNER_EVENT';
+    | 'FALKNER_EVENT'
+    | 'ELMS_AIDE_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

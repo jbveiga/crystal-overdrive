@@ -233,6 +233,11 @@ export class PartyManagementUI {
         ? `<span style="background: #16a34a; color: white; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 3px;">★ LEAD</span>`
         : '';
 
+      const isEgg = Boolean(pkmn.isEgg);
+      const avatarHtml = isEgg
+        ? `<span style="font-size: 28px;" role="img" aria-label="EGG">🥚</span>`
+        : `<img src="./assets/sprites/pokemon/${pkmn.speciesId}_front.png" alt="${pkmn.nickname}" style="width: 46px; height: 46px; image-rendering: pixelated; object-fit: contain;" />`;
+
       card.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px;">
           <div style="
@@ -246,25 +251,25 @@ export class PartyManagementUI {
             justify-content: center;
             flex-shrink: 0;
           ">
-            <img src="./assets/sprites/pokemon/${pkmn.speciesId}_front.png" alt="${pkmn.nickname}" style="width: 46px; height: 46px; image-rendering: pixelated; object-fit: contain;" />
+            ${avatarHtml}
           </div>
           <div style="flex: 1; min-width: 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; gap: 4px;">
               <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
-                <span style="font-weight: 800; font-size: 14px; color: #f8fafc;">${pkmn.nickname}</span>
+                <span style="font-weight: 800; font-size: 14px; color: #f8fafc;">${isEgg ? 'EGG' : pkmn.nickname}</span>
                 ${leadHtml}
                 ${statusHtml}
               </div>
-              <span style="font-size: 12px; font-weight: 800; color: #facc15;">Lv.${pkmn.level}</span>
+              <span style="font-size: 12px; font-weight: 800; color: #facc15;">${isEgg ? 'EGG' : `Lv.${pkmn.level}`}</span>
             </div>
-            <div style="display: flex; gap: 4px; margin-top: 3px;">${typeBadgesHtml}</div>
+            <div style="display: flex; gap: 4px; margin-top: 3px;">${isEgg ? `<span style="background: #f59e0b; color: white; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 3px;">MYSTERY EGG</span>` : typeBadgesHtml}</div>
             <div style="margin-top: 6px;">
               <div style="display: flex; justify-content: space-between; font-size: 11px; color: #cbd5e1; font-weight: 700; margin-bottom: 2px;">
-                <span>HP</span>
-                <span>${pkmn.currentHp} / ${pkmn.stats.hp}</span>
+                <span>${isEgg ? 'HATCH STEPS' : 'HP'}</span>
+                <span>${isEgg ? `${pkmn.eggSteps ?? 0} steps` : `${pkmn.currentHp} / ${pkmn.stats.hp}`}</span>
               </div>
               <div style="width: 100%; height: 7px; background: #0f172a; border-radius: 4px; overflow: hidden; border: 1px solid #334155;">
-                <div style="width: ${hpPct}%; height: 100%; background: ${hpColor};"></div>
+                <div style="width: ${isEgg ? 100 : hpPct}%; height: 100%; background: ${isEgg ? '#facc15' : hpColor};"></div>
               </div>
             </div>
           </div>

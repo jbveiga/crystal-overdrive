@@ -99,6 +99,14 @@ export class BattleStateMachine {
 
     // 2. Handle Party Switch action
     if (playerAction.type === 'SWITCH' && playerAction.switchPokemon) {
+      if (playerAction.switchPokemon.isEgg) {
+        events.push({ type: 'MESSAGE', text: "An EGG can't battle!" });
+        return {
+          turnNumber: this.turnCount,
+          events,
+          isBattleOver: false,
+        };
+      }
       const oldName = this.playerPokemon.nickname;
       this.playerPokemon.statStages = PokemonFactory.createDefaultStatStages();
       this.playerPokemon.isTrapped = false;

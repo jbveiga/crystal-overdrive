@@ -1235,6 +1235,47 @@ async function bootstrap() {
         }
       ),
     ],
+    violet_poke_center: [
+      makeNpc(
+        'nurse_violet',
+        3,
+        1,
+        'DOWN',
+        'mom',
+        '💖 NURSE JOY',
+        [
+          'Welcome to our POKéMON CENTER!',
+          'We can heal your POKéMON back to perfect health in just a moment!',
+        ],
+        { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
+      ),
+      makeNpc(
+        'elms_aide',
+        1,
+        4,
+        'RIGHT',
+        'teacher',
+        "🔬 PROF. ELM'S AIDE",
+        [
+          "AIDE: I'm waiting for a promising young trainer on behalf of PROF. ELM.",
+        ],
+        {
+          action: 'ELMS_AIDE_EVENT',
+        }
+      ),
+    ],
+    violet_mart: [
+      makeNpc(
+        'mart_clerk_violet',
+        2,
+        3,
+        'RIGHT',
+        'boy',
+        '🛒 MART CLERK',
+        ['Welcome to the VIOLET CITY POKéMON MART! How may I serve you?'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
+      ),
+    ],
   };
 
   const emptyNpcs: GridEntity[] = [];
@@ -1424,10 +1465,13 @@ async function bootstrap() {
     // Reset temporary trapping flag at the start of a new encounter while keeping persistent HP/Status
     opponentPokemon.isTrapped = false;
 
-    let activePlayerPokemon = playerParty.find((p) => p.currentHp > 0) || playerParty[0];
+    let activePlayerPokemon =
+      playerParty.find((p) => !p.isEgg && p.currentHp > 0) ||
+      playerParty.find((p) => !p.isEgg) ||
+      playerParty[0];
     if (activePlayerPokemon.currentHp <= 0) {
       healPlayerParty();
-      activePlayerPokemon = playerParty[0];
+      activePlayerPokemon = playerParty.find((p) => !p.isEgg) || playerParty[0];
     }
     let battleSM = new BattleStateMachine(activePlayerPokemon, opponentPokemon, options.isRoamer);
 
@@ -1867,6 +1911,51 @@ async function bootstrap() {
           return;
         }
 
+        // Post-Gym Togepi Mystery Egg Delivery by Prof. Elm's Aide (Ticket 5.4)
+        if (targetNpc.action === 'ELMS_AIDE_EVENT') {
+          if (!storyFlags.has('falkner_defeated')) {
+            overworldHUD.openDialogue(
+              ["AIDE: I'm waiting for a promising young trainer on behalf of PROF. ELM."],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          if (storyFlags.has('falkner_defeated') && !storyFlags.has('togepi_egg_received')) {
+            if (playerParty.length >= 6) {
+              overworldHUD.openDialogue(
+                [
+                  'AIDE: Oh, your party is full! Please make room in your party using the PC and come back!',
+                ],
+                targetNpc.speaker
+              );
+              return;
+            }
+
+            playerParty.push(PokemonFactory.createEgg('togepi', 256));
+            storyFlags.add('togepi_egg_received');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                `AIDE: ${playerName}! Long time, no see! PROF. ELM asked me to find you!`,
+                `${playerName} received the MYSTERY EGG from PROF. ELM's AIDE!`,
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('🥚 Received the Togepi MYSTERY EGG from Prof. Elm\'s Aide!');
+              }
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            ["AIDE: Take good care of that EGG! I'm sure something wonderful will hatch from it!"],
+            targetNpc.speaker
+          );
+          return;
+        }
+
         // Trainer NPC spoken to directly before being defeated
         if (
           targetNpc.action === 'TRAINER_BATTLE' &&
@@ -2016,6 +2105,44 @@ async function bootstrap() {
           if (tileType === 2) {
             overworldRenderer.spawnGrassRustle(coord.x, coord.y);
             BattleAudio.playOverworldSound('RUSTLE');
+          }
+
+          // Step-based Egg Hatching (Ticket 5.4)
+          for (let i = 0; i < playerParty.length; i++) {
+            const p = playerParty[i];
+            if (p.isEgg && typeof p.eggSteps === 'number') {
+              p.eggSteps--;
+              if (p.eggSteps <= 0) {
+                p.isEgg = false;
+                p.eggSteps = 0;
+                p.nickname = 'TOGEPI';
+                p.moves = [
+                  { moveId: 'metronome', currentPp: 10, maxPp: 10 },
+                  { moveId: 'charm', currentPp: 20, maxPp: 20 },
+                ];
+                const hatchedTemplate = PokemonFactory.create(p.speciesId || 'togepi', 1, [
+                  'metronome',
+                  'charm',
+                ]);
+                p.baseStats = hatchedTemplate.baseStats;
+                p.stats = hatchedTemplate.stats;
+                p.currentHp = hatchedTemplate.stats.hp;
+                seenSpecies.add(p.speciesId || 'togepi');
+                player.isMoving = false;
+                player.progress = 0;
+                BattleAudio.playCry('togepi');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  ['Huh? The EGG hatched! ... A lively TOGEPI hatched from the EGG!'],
+                  '🥚 MYSTERY EGG',
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('🐣 TOGEPI hatched from the Mystery Egg!');
+                  }
+                );
+                return;
+              }
+            }
           }
 
           // Check Line-of-Sight Trainer Encounters on active map

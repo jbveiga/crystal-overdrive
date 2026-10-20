@@ -150,6 +150,8 @@ export interface PokemonInstance {
   isTrapped: boolean;
   moves: Array<{ moveId: string; currentPp: number; maxPp: number }>;
   catchRate: number;
+  isEgg?: boolean;
+  eggSteps?: number;
 }
 
 export interface RoamerState {

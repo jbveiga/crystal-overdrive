@@ -125,6 +125,7 @@ export class PokemonFactory {
       geodude: ['tackle', 'defensecurl', 'rockthrow'],
       ledyba: ['tackle', 'supersonic'],
       spinarak: ['poisonsting', 'stringshot'],
+      togepi: ['metronome', 'charm'],
       raikou: ['thundershock', 'quickattack', 'spark', 'bite'],
       entei: ['ember', 'firespin', 'stomp', 'bite'],
       suicune: ['watergun', 'gust', 'aurorabeam', 'bubblebeam'],
@@ -166,6 +167,23 @@ export class PokemonFactory {
       isTrapped: false,
       moves,
       catchRate,
+    };
+  }
+
+  /**
+   * Instantiates an unhatched Pokémon Egg (Ticket 5.4)
+   */
+  public static createEgg(speciesId: string, hatchSteps: number = 256): PokemonInstance {
+    const base = this.create(speciesId, 1, []);
+    return {
+      ...base,
+      nickname: 'EGG',
+      level: 1,
+      currentHp: 10,
+      status: 'NONE',
+      moves: [],
+      isEgg: true,
+      eggSteps: hatchSteps,
     };
   }
 
