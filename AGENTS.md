@@ -45,3 +45,12 @@ At the end of every periodic review, present the structured **Project Health & O
 - Bundle Chunk Sizes
 - Architectural & Walkability status
 - Any performance bottlenecks identified or refactored
+
+---
+
+## 3. Project Multi-Agent Topology & Delegation
+- All specialized roles (Orchestrator, Implementer, QA & Code Reviewer, Planner, Story Designer, Designer, Asset Specialist) correspond to dedicated project chats tracked in the internal `.project_agents.json` registry file (ignored by git).
+- The Orchestrator must always inspect `.project_agents.json` upon receiving user requests to route work exclusively to the designated agents.
+- The **Implementer** is the only agent authorized to modify production code files.
+- The **QA & Code Reviewer** independently audits code against the 7 dimensions and 100% test pass guarantee.
+

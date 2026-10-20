@@ -8,3 +8,4 @@ coverage/
 *.mov
 *.mp4
 copilot-instructions.md
+.project_agents.json
