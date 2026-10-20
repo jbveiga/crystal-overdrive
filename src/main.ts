@@ -16,6 +16,7 @@ import { BagAndMartUI, type BagInventory } from './ui/BagAndMartUI';
 import { PartyManagementUI } from './ui/PartyManagementUI';
 import { StartMenuUI } from './ui/StartMenuUI';
 import { TitleScreenUI } from './ui/TitleScreenUI';
+import { IntroSequenceUI } from './ui/IntroSequenceUI';
 import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions } from './types/game';
 import type { Graphics } from 'pixi.js';
 
@@ -313,34 +314,22 @@ async function bootstrap() {
 
   const overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer);
+  overworldRenderer.setPlayerGender(playerGender);
   const lookupMap = (id: string) => mapManager.getMap(id);
   overworldRenderer.renderMap(initialMap, lookupMap);
 
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
   const battleHUD = new BattleHUD('battle-hud-container');
 
-  // 5b. Mount Title Screen UI (Ticket 4.2)
-  const titleScreenUI = new TitleScreenUI('modal-container', initialSavePreview, gameOptions, {
-    onUnlockAudio: async () => {
-      await audioManager.unlockAudio();
-    },
-    onContinue: async () => {
-      titleScreenUI.hide();
-      gameState = 'OVERWORLD';
-      overworldHUD.show();
-      const activeMap = mapManager.getCurrentMap();
-      if (activeMap) {
-        overworldHUD.updateRouteName(activeMap.name);
-        audioManager.playMapBgm(activeMap.id, 0.6);
-      }
-    },
-    onNewGame: async () => {
-      await saveManager.deleteSave();
-      titleScreenUI.hide();
+  // 5b. Mount Professor Oak Intro Sequence (Ticket 4.3) & Title Screen UI (Ticket 4.2)
+  const introSequenceUI = new IntroSequenceUI('modal-container', {
+    onComplete: async ({ name, gender }) => {
+      // Set created character profile & walk sprite sheet
+      playerName = name;
+      playerGender = gender;
+      overworldRenderer.setPlayerGender(gender);
 
       // Reset fresh adventure state
-      playerName = 'GOLD';
-      playerGender = 'BOY';
       playTimeSeconds = 0;
       playerParty.length = 0;
       playerParty.push(
@@ -394,9 +383,33 @@ async function bootstrap() {
       overworldRenderer.renderMap(startMap, lookupMap);
       overworldHUD.updateRouteName(startMap.name);
       overworldHUD.updatePokegear(roamingManager.getAllRoamers());
+      await saveCurrentGame();
+
       gameState = 'OVERWORLD';
       overworldHUD.show();
       audioManager.playMapBgm(startMap.id, 0.6);
+    },
+  });
+
+  const titleScreenUI = new TitleScreenUI('modal-container', initialSavePreview, gameOptions, {
+    onUnlockAudio: async () => {
+      await audioManager.unlockAudio();
+    },
+    onContinue: async () => {
+      titleScreenUI.hide();
+      overworldRenderer.setPlayerGender(playerGender);
+      gameState = 'OVERWORLD';
+      overworldHUD.show();
+      const activeMap = mapManager.getCurrentMap();
+      if (activeMap) {
+        overworldHUD.updateRouteName(activeMap.name);
+        audioManager.playMapBgm(activeMap.id, 0.6);
+      }
+    },
+    onNewGame: async () => {
+      await saveManager.deleteSave();
+      titleScreenUI.hide();
+      introSequenceUI.start();
     },
     onOptionsChanged: (updatedOptions) => {
       gameOptions = updatedOptions;

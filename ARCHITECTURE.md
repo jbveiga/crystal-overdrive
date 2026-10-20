@@ -14,6 +14,7 @@
 flowchart TD
     subgraph UI_Layer["UI & Presentation Layer (HTML5 / CSS3 DOM)"]
         TSUI["TitleScreenUI"]
+        ISUI["IntroSequenceUI"]
         OHUD["OverworldHUD"]
         BHUD["BattleHUD"]
         SM["StartMenuUI"]
@@ -85,6 +86,7 @@ src/
 │   └── BattleRenderer.ts     # 2.5D stage, custom Pokeball arcs, Physical/Special hit FX, camera shakes
 ├── ui/                    # Vector DOM Overlays & Interactivity (100dvh + Safe-Area Inset Aware)
 │   ├── TitleScreenUI.ts      # Crystalline Title Screen, Audio Unlock Gate, SavePreview Card, Overwrite & Options Modals
+│   ├── IntroSequenceUI.ts    # 6-Stage Prof. Oak Intro, Gender Select (Boy/Girl), 7-Char Name Input & Presets, RTC Sync
 │   ├── OverworldHUD.ts       # Collapsible menu dock, Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
 │   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, Unbound 2x2 move matrix & hotkeys
 │   ├── StartMenuUI.ts        # Classic start menu (Pokedex, Pokemon, Bag, Save)
@@ -260,7 +262,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `SaveManager.ts` | `tests/SaveManager.test.ts` | 6 | ✅ Covered | IndexedDB / localStorage serialization, `SavePreview` extraction, `GameOptions` defaults, `formatPlayTime`, legacy save migration. |
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 5 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync, audio unlock & volume controls. |
 | `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
-| **Current Baseline** | **9 Suites** | **68 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-7 char name validation/fallback, RTC period detection, `onComplete` payload. |
+| **Current Baseline** | **10 Suites** | **72 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

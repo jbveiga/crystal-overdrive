@@ -45,6 +45,8 @@ export class OverworldRenderer {
   private animatedWaterSprites: Array<{ sprite: Sprite; frames: [Texture, Texture, Texture, Texture] }> = [];
   private waterAnimTimer: number = 0;
   private waterAnimStep: number = 0;
+  private goldFrames!: CharacterFrames;
+  private krisFrames!: CharacterFrames;
   private playerFrames!: CharacterFrames;
   private npcFrames: Map<NpcSpriteType, CharacterFrames> = new Map();
 
@@ -369,7 +371,8 @@ export class OverworldRenderer {
     // 2. Load character sheets (144x32 -> 9 frames of 16x32)
     const goldWalkTex = await Assets.load<Texture>('./assets/sprites/characters/gold_walk.png');
     goldWalkTex.source.scaleMode = 'nearest';
-    this.playerFrames = this.extractCharacterFrames(goldWalkTex);
+    this.goldFrames = this.extractCharacterFrames(goldWalkTex);
+    this.playerFrames = this.goldFrames;
 
     const npcSheetPaths: Record<NpcSpriteType, string> = {
       boy: './assets/sprites/characters/npc_boy.png',
@@ -388,9 +391,23 @@ export class OverworldRenderer {
       (Object.entries(npcSheetPaths) as Array<[NpcSpriteType, string]>).map(async ([spriteType, sheetPath]) => {
         const tex = await Assets.load<Texture>(sheetPath);
         tex.source.scaleMode = 'nearest';
-        this.npcFrames.set(spriteType, this.extractCharacterFrames(tex));
+        const extracted = this.extractCharacterFrames(tex);
+        this.npcFrames.set(spriteType, extracted);
+        if (spriteType === 'kris') {
+          this.krisFrames = extracted;
+        }
       })
     );
+  }
+
+  /**
+   * Switches the active player sprite sheet between Boy (`gold_walk.png`) and Girl (`kris_walk.png`).
+   */
+  public setPlayerGender(gender: 'BOY' | 'GIRL'): void {
+    this.playerFrames = gender === 'GIRL' && this.krisFrames ? this.krisFrames : this.goldFrames;
+    if (this.playerSprite && this.playerFrames) {
+      this.playerSprite.texture = this.playerFrames.downStand;
+    }
   }
 
   private extractCharacterFrames(sheet: Texture): CharacterFrames {
