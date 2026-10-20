@@ -65,24 +65,7 @@ The artistic soul and musical heritage of Johto belong to the original creators 
 
 ---
 
-## 4. Core Open-Source Technologies
-
-The engine and development tooling of Crystal Overdrive rely on the following open-source libraries:
-
-| Library | Author / Organization | License | Usage in Crystal Overdrive |
-| :--- | :--- | :--- | :--- |
-| **[PixiJS v8](https://pixijs.com/)** | Goodboy Digital & PixiJS Team | MIT | High-performance WebGL 2.0 / WebGPU canvas renderer for 64x64 metatiles and battle arenas. |
-| **[GSAP](https://gsap.com/)** | GreenSock | Standard License | Tweening engine powering decoupled 1x/2x/3x battle animation timescales and camera shakes. |
-| **[Howler.js](https://howlerjs.com/)** | James Simpson (GoldFire Studios) | MIT | Web Audio API management and fallback audio playback. |
-| **[idb](https://github.com/jakearchibald/idb)** | Jake Archibald | ISC | Asynchronous IndexedDB storage wrapper for game save state serialization. |
-| **[Vite](https://vitejs.dev/)** | Evan You & Vite Contributors | MIT | Fast frontend development server and Rollup-based production bundler. |
-| **[Vitest](https://vitest.dev/)** | Vitest Team | MIT | Headless unit testing framework powering our 43+ automated engine test suites. |
-| **[TypeScript](https://www.typescriptlang.org/)** | Microsoft Corporation | Apache 2.0 | Type safety, architectural contracts, and strict separation of concerns. |
-| **[FFmpeg](https://ffmpeg.org/)** | Fabrice Bellard & FFmpeg Team | LGPL 2.1+ / GPL 2+ | Transcoding and mastering audio loops (WebM/Opus & MP3). |
-
----
-
-## 5. Legal & Non-Commercial Fan Project Disclaimer
+## 4. Legal & Non-Commercial Fan Project Disclaimer
 
 * **Pokémon**, Pokémon character names, Pokémon game mechanics, and Game Boy Color are trademarks and registered copyrights of **Nintendo Co., Ltd.**, **Creatures Inc.**, and **GAME FREAK inc.**
 * **Crystal Overdrive** is an unofficial, non-commercial, non-profit fan tribute created solely for educational, technical, and game-preservation purposes.
