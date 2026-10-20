@@ -509,7 +509,7 @@ export class TitleScreenUI {
       margin: auto 0;
     `;
 
-    // Emblem + Iridescent Logo Typography
+    // Iridescent Logo Typography
     const headerBlock = document.createElement('div');
     headerBlock.style.cssText = `
       display: flex;
@@ -520,17 +520,6 @@ export class TitleScreenUI {
       animation: crystalLogoShimmer 3.4s infinite ease-in-out;
     `;
     headerBlock.innerHTML = `
-      <div style="
-        font-size: 13px;
-        font-weight: 900;
-        letter-spacing: 3.5px;
-        color: #7dd3fc;
-        text-transform: uppercase;
-        background: rgba(14, 116, 144, 0.28);
-        border: 1px solid rgba(125, 211, 252, 0.45);
-        padding: 4px 14px;
-        border-radius: 999px;
-      ">POKéMON SUICUNE CHRONICLES</div>
       <h1 style="
         margin: 0;
         font-size: clamp(32px, 6.5vw, 54px);
