@@ -12,6 +12,7 @@ function createMockEntity(overrides?: Partial<GridEntity>): GridEntity {
     renderY: 5,
     direction: 'DOWN',
     isMoving: false,
+    isJumping: false,
     progress: 0,
     isPlayer: true,
     ...overrides,
@@ -162,6 +163,144 @@ describe('GridPhysics', () => {
     GridPhysics.updateEntity(player, 0.05, 'UP', isWalkable, ledgeTileLookup);
     expect(player.isMoving).toBe(false);
     expect(player.y).toBe(7);
+  });
+
+  it('blocks South Ledge hop (collision 4) when landing tile is non-walkable or occupied', () => {
+    const player = createMockEntity({ x: 5, y: 5, targetX: 5, targetY: 5 });
+    // Landing tile (5,7) is solid
+    const isWalkableSolidLanding = (_x: number, y: number) => y !== 6 && y !== 7;
+    const ledgeTileLookup = (_x: number, y: number) => (y === 6 ? 4 : 0);
+
+    GridPhysics.updateEntity(player, 0.05, 'DOWN', isWalkableSolidLanding, ledgeTileLookup);
+    expect(player.isMoving).toBe(false);
+    expect(player.isJumping).toBe(false);
+    expect(player.x).toBe(5);
+    expect(player.y).toBe(5);
+
+    // Landing tile (5,7) is occupied by an NPC
+    const isWalkable = (_x: number, y: number) => y !== 6;
+    const obstacleNpc = createMockEntity({ id: 'blocker', x: 5, y: 7, targetX: 5, targetY: 7, isPlayer: false });
+    GridPhysics.updateEntity(player, 0.05, 'DOWN', isWalkable, ledgeTileLookup, undefined, [obstacleNpc]);
+    expect(player.isMoving).toBe(false);
+    expect(player.isJumping).toBe(false);
+    expect(player.x).toBe(5);
+    expect(player.y).toBe(5);
+  });
+
+  describe('Ticket 3.7: Multi-directional ledge jumping specifications', () => {
+    // Collision 5: North Ledge / Fence (jump UP to y - 2)
+    // Collision 6: West Ledge / Fence (jump LEFT to x - 2)
+    // Collision 7: East Ledge / Fence (jump RIGHT to x + 2)
+
+    it.skip('performs a 2-tile ledge hop UP over collision 5 into clear target (x, y-2)', () => {
+      const player = createMockEntity({ x: 5, y: 5, targetX: 5, targetY: 5 });
+      const isWalkable = (_x: number, y: number) => y !== 4; // ledge at (5,4) is not directly walkable
+      const ledgeLookup = (_x: number, y: number) => (y === 4 ? 5 : 0);
+      const onLedgeJump = vi.fn();
+
+      GridPhysics.updateEntity(player, 0.05, 'UP', isWalkable, ledgeLookup, undefined, [], onLedgeJump);
+
+      expect(player.isMoving).toBe(true);
+      expect(player.isJumping).toBe(true);
+      expect(player.targetX).toBe(5);
+      expect(player.targetY).toBe(3); // Jump 2 tiles North over (5,4) into (5,3)
+      expect(onLedgeJump).toHaveBeenCalledWith(player);
+
+      GridPhysics.updateEntity(player, 0.4, null, isWalkable, ledgeLookup);
+      expect(player.isMoving).toBe(false);
+      expect(player.isJumping).toBe(false);
+      expect(player.x).toBe(5);
+      expect(player.y).toBe(3);
+    });
+
+    it.skip('performs a 2-tile ledge hop LEFT over collision 6 into clear target (x-2, y)', () => {
+      const player = createMockEntity({ x: 5, y: 5, targetX: 5, targetY: 5 });
+      const isWalkable = (x: number, _y: number) => x !== 4; // ledge at (4,5)
+      const ledgeLookup = (x: number, _y: number) => (x === 4 ? 6 : 0);
+      const onLedgeJump = vi.fn();
+
+      GridPhysics.updateEntity(player, 0.05, 'LEFT', isWalkable, ledgeLookup, undefined, [], onLedgeJump);
+
+      expect(player.isMoving).toBe(true);
+      expect(player.isJumping).toBe(true);
+      expect(player.targetX).toBe(3); // Jump 2 tiles West over (4,5) into (3,5)
+      expect(player.targetY).toBe(5);
+      expect(onLedgeJump).toHaveBeenCalledWith(player);
+
+      GridPhysics.updateEntity(player, 0.4, null, isWalkable, ledgeLookup);
+      expect(player.isMoving).toBe(false);
+      expect(player.isJumping).toBe(false);
+      expect(player.x).toBe(3);
+      expect(player.y).toBe(5);
+    });
+
+    it.skip('performs a 2-tile ledge hop RIGHT over collision 7 into clear target (x+2, y)', () => {
+      const player = createMockEntity({ x: 5, y: 5, targetX: 5, targetY: 5 });
+      const isWalkable = (x: number, _y: number) => x !== 6; // ledge at (6,5)
+      const ledgeLookup = (x: number, _y: number) => (x === 6 ? 7 : 0);
+      const onLedgeJump = vi.fn();
+
+      GridPhysics.updateEntity(player, 0.05, 'RIGHT', isWalkable, ledgeLookup, undefined, [], onLedgeJump);
+
+      expect(player.isMoving).toBe(true);
+      expect(player.isJumping).toBe(true);
+      expect(player.targetX).toBe(7); // Jump 2 tiles East over (6,5) into (7,5)
+      expect(player.targetY).toBe(5);
+      expect(onLedgeJump).toHaveBeenCalledWith(player);
+
+      GridPhysics.updateEntity(player, 0.4, null, isWalkable, ledgeLookup);
+      expect(player.isMoving).toBe(false);
+      expect(player.isJumping).toBe(false);
+      expect(player.x).toBe(7);
+      expect(player.y).toBe(5);
+    });
+
+    it.skip('blocks ledge jumping UP (5), LEFT (6), and RIGHT (7) when target tile is non-walkable or occupied', () => {
+      // 1. UP over 5 blocked by solid landing (5,3)
+      const playerUp = createMockEntity({ x: 5, y: 5 });
+      const isWalkableUpSolid = (_x: number, y: number) => y !== 4 && y !== 3;
+      const lookupUp = (_x: number, y: number) => (y === 4 ? 5 : 0);
+      GridPhysics.updateEntity(playerUp, 0.05, 'UP', isWalkableUpSolid, lookupUp);
+      expect(playerUp.isMoving).toBe(false);
+
+      // 2. LEFT over 6 blocked by occupied landing (3,5)
+      const playerLeft = createMockEntity({ x: 5, y: 5 });
+      const isWalkableLeft = (x: number, _y: number) => x !== 4;
+      const lookupLeft = (x: number, _y: number) => (x === 4 ? 6 : 0);
+      const blocker = createMockEntity({ id: 'blocker', x: 3, y: 5, targetX: 3, targetY: 5, isPlayer: false });
+      GridPhysics.updateEntity(playerLeft, 0.05, 'LEFT', isWalkableLeft, lookupLeft, undefined, [blocker]);
+      expect(playerLeft.isMoving).toBe(false);
+
+      // 3. RIGHT over 7 blocked by solid landing (7,5)
+      const playerRight = createMockEntity({ x: 5, y: 5 });
+      const isWalkableRightSolid = (x: number, _y: number) => x !== 6 && x !== 7;
+      const lookupRight = (x: number, _y: number) => (x === 6 ? 7 : 0);
+      GridPhysics.updateEntity(playerRight, 0.05, 'RIGHT', isWalkableRightSolid, lookupRight);
+      expect(playerRight.isMoving).toBe(false);
+    });
+
+    it.skip('blocks when approaching ledge from the reverse direction for UP (5), LEFT (6), and RIGHT (7)', () => {
+      // Reverse UP ledge (tile 5 at 5,4): walking DOWN from (5,3) towards (5,4) must be blocked
+      const p1 = createMockEntity({ x: 5, y: 3 });
+      const isWalkableUp = (_x: number, y: number) => y !== 4;
+      const lookupUp = (_x: number, y: number) => (y === 4 ? 5 : 0);
+      GridPhysics.updateEntity(p1, 0.05, 'DOWN', isWalkableUp, lookupUp);
+      expect(p1.isMoving).toBe(false);
+
+      // Reverse LEFT ledge (tile 6 at 4,5): walking RIGHT from (3,5) towards (4,5) must be blocked
+      const p2 = createMockEntity({ x: 3, y: 5 });
+      const isWalkableLeft = (x: number, _y: number) => x !== 4;
+      const lookupLeft = (x: number, _y: number) => (x === 4 ? 6 : 0);
+      GridPhysics.updateEntity(p2, 0.05, 'RIGHT', isWalkableLeft, lookupLeft);
+      expect(p2.isMoving).toBe(false);
+
+      // Reverse RIGHT ledge (tile 7 at 6,5): walking LEFT from (7,5) towards (6,5) must be blocked
+      const p3 = createMockEntity({ x: 7, y: 5 });
+      const isWalkableRight = (x: number, _y: number) => x !== 6;
+      const lookupRight = (x: number, _y: number) => (x === 6 ? 7 : 0);
+      GridPhysics.updateEntity(p3, 0.05, 'LEFT', isWalkableRight, lookupRight);
+      expect(p3.isMoving).toBe(false);
+    });
   });
 
   it('detects when player steps into an undefeated trainer line-of-sight unless blocked by wall/ledge', () => {
