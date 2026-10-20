@@ -63,6 +63,7 @@ async function bootstrap() {
     tms: ['TM54', 'TM73', 'TM99'],
     money: 3000,
     badges: [],
+    keyItems: [],
   };
   const defeatedTrainers: Set<string> = new Set();
   const storyFlags: Set<string> = new Set();
@@ -206,6 +207,40 @@ async function bootstrap() {
     'burned_tower_1f',
     'burned_tower_b1f',
     'tin_tower_1f',
+    // Phase 10: Western Johto
+    'route_38',
+    'route_38_ecruteak_gate',
+    'route_39',
+    'route_39_barn',
+    'route_39_farmhouse',
+    'olivine_city',
+    'olivine_poke_center',
+    'olivine_mart',
+    'olivine_gym',
+    'olivine_cafe',
+    'olivine_tims_house',
+    'olivine_good_rod_house',
+    'olivine_lighthouse_1f',
+    'olivine_lighthouse_2f',
+    'olivine_lighthouse_3f',
+    'olivine_lighthouse_4f',
+    'olivine_lighthouse_5f',
+    'olivine_lighthouse_6f',
+    'route_40',
+    'route_41',
+    'cianwood_city',
+    'cianwood_poke_center',
+    'cianwood_gym',
+    'cianwood_pharmacy',
+    'cianwood_photo_studio',
+    'cianwood_lugia_speech_house',
+    'whirl_island_ne',
+    'whirl_island_se',
+    'whirl_island_sw',
+    'whirl_island_nw',
+    'whirl_island_b1f',
+    'whirl_island_b2f',
+    'whirl_island_lugia_chamber',
   ];
 
   const loadedMaps: MapData[] = await Promise.all(
@@ -2265,6 +2300,167 @@ async function bootstrap() {
                   () => {
                     saveCurrentGame();
                     overworldHUD.showToast('👻 Received FOG BADGE & TM30 SHADOW BALL from Leader Morty!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Cianwood Pharmacy: SecretPotion Event
+        if (targetNpc.action === 'PHARMACY_SECRET_POTION_EVENT') {
+          if (storyFlags.has('has_secret_potion')) {
+            overworldHUD.openDialogue(
+              ['PHARMACIST: My SECRETPOTION is potent! It will cure any illness, guaranteed.'],
+              targetNpc.speaker
+            );
+          } else {
+            storyFlags.add('has_secret_potion');
+            if (!inventory.keyItems) inventory.keyItems = [];
+            if (!inventory.keyItems.includes('SecretPotion')) inventory.keyItems.push('SecretPotion');
+            audioManager.playSfx('sfx_badge_get');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                'PHARMACIST: Ah, you came all the way from OLIVINE? The lighthouse POKéMON is sick?',
+                'Take this! It is our ancient SECRETPOTION! It was brewed with 500 years of herbal knowledge.',
+                `${playerName} received the SECRETPOTION!`,
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('💊 Received SECRETPOTION from Cianwood Pharmacist!');
+              }
+            );
+          }
+          return;
+        }
+
+        // Olivine Lighthouse 6F: Amphy & Jasmine Healing Event
+        if (targetNpc.action === 'AMPHY_EVENT') {
+          if (storyFlags.has('amphy_cured')) {
+            overworldHUD.openDialogue(
+              [
+                'AMPHAROS: Palu! Palulu! (Amphy is radiating brilliant light, glowing happily!)',
+                'JASMINE: Amphy is all better now! I am heading back to OLIVINE GYM. Let us battle there!',
+              ],
+              targetNpc.speaker
+            );
+          } else if (storyFlags.has('has_secret_potion')) {
+            storyFlags.add('amphy_cured');
+            audioManager.playSfx('sfx_badge_get');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                `${playerName} handed over the SECRETPOTION to JASMINE!`,
+                'JASMINE carefully gave the medicine to AMPHY…',
+                'AMPHAROS swallowed it eagerly… Suddenly, its tail began to glow brightly!',
+                'AMPHAROS: Palu! Paluluuu!',
+                `JASMINE: Oh, thank goodness! Amphy's fever has broken! Thank you so much, ${playerName}!`,
+                'I will return to the GYM in OLIVINE CITY right away. Please come challenge me there for a real GYM battle!',
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('✨ Amphy recovered! Leader Jasmine returned to Olivine Gym!');
+              }
+            );
+          } else {
+            overworldHUD.openDialogue(
+              [
+                'JASMINE: …Amphy used to shine so brightly to guide ships across the dark sea…',
+                "It's so weak and feverish… I won't leave its side until it gets better.",
+                'I heard there is a pharmacy in CIANWOOD CITY across the sea that carries miracle medicine…',
+                'AMPHAROS: …Palu… (It looks pale and feverish…)',
+              ],
+              targetNpc.speaker
+            );
+          }
+          return;
+        }
+
+        // Olivine Gym Leader Boss: Jasmine
+        if (targetNpc.action === 'JASMINE_EVENT' && !storyFlags.has('jasmine_defeated')) {
+          if (!storyFlags.has('amphy_cured')) {
+            overworldHUD.openDialogue(
+              [
+                "JASMINE: …I'm sorry. I must care for Amphy at the LIGHTHOUSE. Please meet me there…",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          const introPages =
+            targetNpc.challengePages && targetNpc.challengePages.length > 0
+              ? targetNpc.challengePages
+              : [
+                  'JASMINE: …Thank you for your help at the LIGHTHOUSE. But this is different. As a GYM LEADER, I will use my full power. POKéMON of steel… Clad in diamond-hard scales! Steelix, let us begin!',
+                ];
+          overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Leader Jasmine',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('jasmine');
+                storyFlags.add('jasmine_defeated');
+                if (!inventory.badges.includes('mineral')) inventory.badges.push('mineral');
+                if (!inventory.tms.includes('TM23')) inventory.tms.push('TM23');
+                audioManager.playSfx('sfx_badge_get');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    'JASMINE: …You are truly strong. In accordance with LEAGUE rules, I confer upon you the MINERALBADGE!',
+                    'The MINERALBADGE raises the DEFENSE of all your POKéMON and allows them to navigate waterfalls. Take this TM23 IRON TAIL as well!',
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('🔩 Received MINERAL BADGE & TM23 IRON TAIL from Leader Jasmine!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Cianwood Gym Leader Boss: Chuck
+        if (targetNpc.action === 'CHUCK_EVENT' && !storyFlags.has('chuck_defeated')) {
+          const introPages =
+            targetNpc.challengePages && targetNpc.challengePages.length > 0
+              ? targetNpc.challengePages
+              : [
+                  'CHUCK: WAHAHA! So you’ve come this far! We train day and night beneath the raging waterfalls of Cianwood! My roaring fists and my partners will shatter any defense! Prepare yourself!',
+                ];
+          overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Leader Chuck',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('chuck');
+                storyFlags.add('chuck_defeated');
+                if (!inventory.badges.includes('storm')) inventory.badges.push('storm');
+                if (!inventory.tms.includes('TM01')) inventory.tms.push('TM01');
+                audioManager.playSfx('sfx_badge_get');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    'CHUCK: WAHAHA! I lost! You broke right through our defenses! Here is the STORMBADGE!',
+                    'The STORMBADGE allows your POKéMON to use FLY outside battle, and all POKéMON up to Lv. 70 will obey you! Also take this TM01 DYNAMICPUNCH!',
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('🥊 Received STORM BADGE & TM01 DYNAMICPUNCH from Leader Chuck!');
                   }
                 );
               },

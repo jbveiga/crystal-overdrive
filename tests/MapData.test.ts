@@ -968,5 +968,157 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("inventory.badges.includes('fog')");
     expect(mainSrc).toContain("inventory.tms.includes('TM30')");
   });
+
+  it('validates Phase 10 Western Johto maps, connections, reciprocal warps, and Leaders Jasmine & Chuck', () => {
+    const phase10Maps = [
+      'route_38',
+      'route_38_ecruteak_gate',
+      'route_39',
+      'route_39_barn',
+      'route_39_farmhouse',
+      'olivine_city',
+      'olivine_poke_center',
+      'olivine_mart',
+      'olivine_gym',
+      'olivine_cafe',
+      'olivine_tims_house',
+      'olivine_good_rod_house',
+      'olivine_lighthouse_1f',
+      'olivine_lighthouse_2f',
+      'olivine_lighthouse_3f',
+      'olivine_lighthouse_4f',
+      'olivine_lighthouse_5f',
+      'olivine_lighthouse_6f',
+      'route_40',
+      'route_41',
+      'cianwood_city',
+      'cianwood_poke_center',
+      'cianwood_gym',
+      'cianwood_pharmacy',
+      'cianwood_photo_studio',
+      'cianwood_lugia_speech_house',
+      'whirl_island_ne',
+      'whirl_island_se',
+      'whirl_island_sw',
+      'whirl_island_nw',
+      'whirl_island_b1f',
+      'whirl_island_b2f',
+      'whirl_island_lugia_chamber',
+    ];
+
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+
+    for (const mapId of phase10Maps) {
+      const mapPath = path.resolve(__dirname, `../public/assets/data/maps/${mapId}.json`);
+      expect(fs.existsSync(mapPath), `Map file for ${mapId} must exist`).toBe(true);
+
+      const mapData: MapData = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
+      expect(mapData.width).toBeGreaterThan(0);
+      expect(mapData.height).toBeGreaterThan(0);
+      expect(mapData.collisionGrid.length).toBe(mapData.width * mapData.height);
+      expect(mapData.tileMap?.length).toBe(mapData.width * mapData.height);
+
+      for (const tile of new Set(mapData.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png must exist for ${mapId}`).toBe(true);
+      }
+    }
+
+    // Outdoor classification verification
+    expect(MapManager.isOutdoorMap('route_38')).toBe(true);
+    expect(MapManager.isOutdoorMap('route_39')).toBe(true);
+    expect(MapManager.isOutdoorMap('olivine_city')).toBe(true);
+    expect(MapManager.isOutdoorMap('route_40')).toBe(true);
+    expect(MapManager.isOutdoorMap('route_41')).toBe(true);
+    expect(MapManager.isOutdoorMap('cianwood_city')).toBe(true);
+    expect(MapManager.isOutdoorMap('olivine_gym')).toBe(false);
+    expect(MapManager.isOutdoorMap('olivine_lighthouse_1f')).toBe(false);
+    expect(MapManager.isOutdoorMap('cianwood_gym')).toBe(false);
+    expect(MapManager.isOutdoorMap('whirl_island_b1f')).toBe(false);
+
+    // Multi-route seamless overworld connections
+    const r38Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_38.json'), 'utf8'));
+    const r39Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_39.json'), 'utf8'));
+    const olivineData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/olivine_city.json'), 'utf8'));
+    const r40Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_40.json'), 'utf8'));
+    const r41Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_41.json'), 'utf8'));
+    const cianwoodData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/cianwood_city.json'), 'utf8'));
+
+    // Route 38 <-> Route 39
+    expect(r38Data.connections.WEST?.mapId).toBe('route_39');
+    expect(r39Data.connections.EAST?.mapId).toBe('route_38');
+
+    // Route 39 <-> Olivine City
+    expect(r39Data.connections.SOUTH?.mapId).toBe('olivine_city');
+    expect(olivineData.connections.NORTH?.mapId).toBe('route_39');
+
+    // Olivine City <-> Route 40
+    expect(olivineData.connections.WEST?.mapId).toBe('route_40');
+    expect(r40Data.connections.EAST?.mapId).toBe('olivine_city');
+
+    // Route 40 <-> Route 41
+    expect(r40Data.connections.SOUTH?.mapId).toBe('route_41');
+    expect(r41Data.connections.NORTH?.mapId).toBe('route_40');
+
+    // Route 41 <-> Cianwood City
+    expect(r41Data.connections.WEST?.mapId).toBe('cianwood_city');
+    expect(cianwoodData.connections.EAST?.mapId).toBe('route_41');
+
+    // Reciprocal warps: Route 38 Gate <-> Route 38 & Ecruteak
+    const gateData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_38_ecruteak_gate.json'), 'utf8'));
+    const ecruteakData: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/ecruteak_city.json'), 'utf8'));
+
+    const gateToR38 = gateData.warps.find((w) => w.targetMapId === 'route_38');
+    expect(gateToR38).toBeDefined();
+    const r38ToGate = r38Data.warps.find((w) => w.targetMapId === 'route_38_ecruteak_gate');
+    expect(r38ToGate).toBeDefined();
+
+    const gateToEcruteak = gateData.warps.find((w) => w.targetMapId === 'ecruteak_city');
+    expect(gateToEcruteak).toBeDefined();
+    const ecruteakToGate = ecruteakData.warps.find((w) => w.targetMapId === 'route_38_ecruteak_gate');
+    expect(ecruteakToGate).toBeDefined();
+
+    // Reciprocal warps: Lighthouse 1F <-> 2F <-> 3F <-> 4F <-> 5F <-> 6F
+    const lh1Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/olivine_lighthouse_1f.json'), 'utf8'));
+    const lh2Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/olivine_lighthouse_2f.json'), 'utf8'));
+    const lh6Data: MapData = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/olivine_lighthouse_6f.json'), 'utf8'));
+
+    expect(lh1Data.warps.find((w) => w.targetMapId === 'olivine_lighthouse_2f')).toBeDefined();
+    expect(lh2Data.warps.find((w) => w.targetMapId === 'olivine_lighthouse_1f')).toBeDefined();
+    expect(lh6Data.warps.find((w) => w.targetMapId === 'olivine_lighthouse_5f')).toBeDefined();
+
+    // Gym Leaders verification: Jasmine & Chuck
+    const jasmineNpc = npcsByMap.olivine_gym.find((npc) => npc.id === 'leader_jasmine');
+    expect(jasmineNpc).toBeDefined();
+    expect(jasmineNpc?.action).toBe('JASMINE_EVENT');
+    expect(jasmineNpc?.trainerId).toBe('jasmine');
+    expect(jasmineNpc?.trainerPokemon?.speciesId).toBe('magnemite');
+    expect(jasmineNpc?.trainerTeam?.length).toBe(3);
+
+    const chuckNpc = npcsByMap.cianwood_gym.find((npc) => npc.id === 'leader_chuck');
+    expect(chuckNpc).toBeDefined();
+    expect(chuckNpc?.action).toBe('CHUCK_EVENT');
+    expect(chuckNpc?.trainerId).toBe('chuck');
+    expect(chuckNpc?.trainerPokemon?.speciesId).toBe('primeape');
+    expect(chuckNpc?.trainerTeam?.length).toBe(2);
+
+    // Amphy & SecretPotion event verification
+    const amphyNpc = npcsByMap.olivine_lighthouse_6f.find((npc) => npc.id === 'lighthouse_amphy');
+    expect(amphyNpc).toBeDefined();
+    expect(amphyNpc?.action).toBe('AMPHY_EVENT');
+
+    const pharmacistNpc = npcsByMap.cianwood_pharmacy.find((npc) => npc.id === 'cianwood_pharmacist');
+    expect(pharmacistNpc).toBeDefined();
+    expect(pharmacistNpc?.action).toBe('PHARMACY_SECRET_POTION_EVENT');
+
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    expect(mainSrc).toContain("action === 'JASMINE_EVENT'");
+    expect(mainSrc).toContain("action === 'CHUCK_EVENT'");
+    expect(mainSrc).toContain("action === 'AMPHY_EVENT'");
+    expect(mainSrc).toContain("action === 'PHARMACY_SECRET_POTION_EVENT'");
+    expect(mainSrc).toContain("inventory.badges.includes('mineral')");
+    expect(mainSrc).toContain("inventory.badges.includes('storm')");
+    expect(mainSrc).toContain("inventory.tms.includes('TM23')");
+    expect(mainSrc).toContain("inventory.tms.includes('TM01')");
+  });
 });
 

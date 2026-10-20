@@ -114,6 +114,10 @@ const ROOF_PALETTES = {
   nb: makePal([27, 31, 27], [20, 31, 14], [11, 23, 5], [7, 7, 7]),
   cg: makePal([27, 31, 27], [31, 14, 28], [31, 5, 21], [7, 7, 7]),
   vc: makePal([27, 31, 27], [24, 14, 31], [13, 7, 21], [7, 7, 7]),
+  az: makePal([27, 31, 27], [22, 20, 10], [17, 14, 3], [7, 7, 7]),
+  gr: makePal([27, 31, 27], [25, 25, 0], [20, 17, 8], [7, 7, 7]),
+  ol: makePal([27, 31, 27], [14, 17, 31], [7, 11, 15], [7, 7, 7]),
+  ci: makePal([27, 31, 27], [15, 10, 31], [7, 5, 15], [7, 7, 7]),
 };
 
 const INDOOR_PALETTES = {
@@ -158,6 +162,7 @@ const roofNewBark = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__n
 const roofViolet = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__violet.png'));
 const roofAzalea = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__azalea.png'));
 const roofGoldenrod = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__goldenrod.png'));
+const roofOlivine = decode2BitPng(path.join(SOURCE_DIR, 'gfx__tilesets__roofs__olivine.png'));
 
 const ROOF_GRAPHICS = {
   nb: roofNewBark,
@@ -165,6 +170,8 @@ const ROOF_GRAPHICS = {
   vc: roofViolet,
   az: roofAzalea,
   gr: roofGoldenrod,
+  ol: roofOlivine,
+  ci: roofOlivine,
 };
 
 function loadTileset(tsName, isOutdoor = false) {
@@ -208,6 +215,8 @@ const TILESETS = {
   underground: loadTileset('underground', false),
   game_corner: loadTileset('game_corner', false),
   park: loadTileset('park', true),
+  lighthouse: loadTileset('lighthouse', false),
+  champions_room: loadTileset('champions_room', false),
 };
 
 const generatedTiles = new Set();
@@ -2483,6 +2492,7 @@ buildMapFromBlk({
   roofGroup: 'vc',
   connections: {
     SOUTH: { mapId: 'route_37', offset: 10 },
+    WEST: { mapId: 'route_38', offset: -10 },
   },
   warps: [
     { x: 23, y: 27, targetMapId: 'ecruteak_poke_center', targetX: 3, targetY: 7 },
@@ -2492,6 +2502,8 @@ buildMapFromBlk({
     { x: 13, y: 27, targetMapId: 'ecruteak_itemfinder_house', targetX: 3, targetY: 7 },
     { x: 5, y: 5, targetMapId: 'burned_tower_1f', targetX: 9, targetY: 15 },
     { x: 37, y: 7, targetMapId: 'tin_tower_1f', targetX: 9, targetY: 15 },
+    { x: 0, y: 18, targetMapId: 'route_38_ecruteak_gate', targetX: 9, targetY: 4 },
+    { x: 0, y: 19, targetMapId: 'route_38_ecruteak_gate', targetX: 9, targetY: 5 },
   ],
   bgEvents: [
     {
@@ -2671,6 +2683,726 @@ buildMapFromBlk({
     { x: 10, y: 15, targetMapId: 'ecruteak_city', targetX: 37, targetY: 7 },
   ],
   bgEvents: [],
+});
+
+// ==========================================
+// PHASE 10: WESTERN JOHTO (Routes 38, 39, Olivine City, Lighthouse, Routes 40, 41, Whirl Islands, Cianwood City)
+// ==========================================
+
+buildMapFromBlk({
+  id: 'route_38',
+  name: 'Route 38',
+  tileset: 'johto',
+  blkFile: 'maps__Route38.blk',
+  blocksW: 20,
+  blocksH: 9,
+  roofGroup: 'vc',
+  connections: {
+    WEST: { mapId: 'route_39', offset: 0 },
+    EAST: { mapId: 'ecruteak_city', offset: 10 },
+  },
+  warps: [
+    { x: 35, y: 8, targetMapId: 'route_38_ecruteak_gate', targetX: 0, targetY: 4 },
+    { x: 35, y: 9, targetMapId: 'route_38_ecruteak_gate', targetX: 0, targetY: 5 },
+  ],
+  bgEvents: [
+    {
+      x: 33,
+      y: 7,
+      speaker: '📍 ROUTE 38 SIGN',
+      pages: ['ROUTE 38', 'West to Route 39 & Olivine City', 'East to Ecruteak City'],
+    },
+    {
+      x: 5,
+      y: 13,
+      speaker: '📋 TRAINER TIPS',
+      pages: ['TRAINER TIPS', 'If a POKéMON is poisoned or paralyzed, use an item or visit a POKéMON CENTER immediately!'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'rattata', minLevel: 16, maxLevel: 16, weight: 30 },
+    { speciesId: 'raticate', minLevel: 16, maxLevel: 16, weight: 20 },
+    { speciesId: 'magnemite', minLevel: 16, maxLevel: 16, weight: 20 },
+    { speciesId: 'pidgeotto', minLevel: 16, maxLevel: 16, weight: 15 },
+    { speciesId: 'tauros', minLevel: 13, maxLevel: 13, weight: 10 },
+    { speciesId: 'miltank', minLevel: 13, maxLevel: 13, weight: 5 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_38_ecruteak_gate',
+  name: 'Route 38 Ecruteak Gate',
+  tileset: 'gate',
+  blkFile: 'maps__EastWestGate.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 0, y: 4, targetMapId: 'route_38', targetX: 34, targetY: 8 },
+    { x: 0, y: 5, targetMapId: 'route_38', targetX: 34, targetY: 9 },
+    { x: 9, y: 4, targetMapId: 'ecruteak_city', targetX: 1, targetY: 18 },
+    { x: 9, y: 5, targetMapId: 'ecruteak_city', targetX: 1, targetY: 19 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'route_39',
+  name: 'Route 39',
+  tileset: 'johto',
+  blkFile: 'maps__Route39.blk',
+  blocksW: 10,
+  blocksH: 18,
+  roofGroup: 'vc',
+  connections: {
+    EAST: { mapId: 'route_38', offset: 0 },
+    SOUTH: { mapId: 'olivine_city', offset: -10 },
+  },
+  warps: [
+    { x: 1, y: 3, targetMapId: 'route_39_barn', targetX: 3, targetY: 7 },
+    { x: 5, y: 3, targetMapId: 'route_39_farmhouse', targetX: 2, targetY: 7 },
+  ],
+  bgEvents: [
+    {
+      x: 5,
+      y: 31,
+      speaker: '📍 ROUTE 39 SIGN',
+      pages: ['ROUTE 39', 'Olivine City Ahead'],
+    },
+    {
+      x: 9,
+      y: 5,
+      speaker: '🥛 MOOMOO FARM SIGN',
+      pages: ['MOOMOO FARM', 'Home of Delicious, Nutritious Moomoo Milk!'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'rattata', minLevel: 16, maxLevel: 16, weight: 30 },
+    { speciesId: 'raticate', minLevel: 16, maxLevel: 16, weight: 20 },
+    { speciesId: 'magnemite', minLevel: 16, maxLevel: 16, weight: 20 },
+    { speciesId: 'pidgeotto', minLevel: 16, maxLevel: 16, weight: 15 },
+    { speciesId: 'miltank', minLevel: 15, maxLevel: 15, weight: 10 },
+    { speciesId: 'tauros', minLevel: 15, maxLevel: 15, weight: 5 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_39_barn',
+  name: 'Route 39 Barn',
+  tileset: 'traditional_house',
+  blkFile: 'maps__Route39Barn.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'route_39', targetX: 1, targetY: 4 },
+    { x: 4, y: 7, targetMapId: 'route_39', targetX: 1, targetY: 4 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'route_39_farmhouse',
+  name: 'Route 39 Farmhouse',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'route_39', targetX: 5, targetY: 4 },
+    { x: 3, y: 7, targetMapId: 'route_39', targetX: 5, targetY: 4 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_city',
+  name: 'Olivine City',
+  tileset: 'johto',
+  blkFile: 'maps__OlivineCity.blk',
+  blocksW: 20,
+  blocksH: 18,
+  roofGroup: 'ol',
+  connections: {
+    NORTH: { mapId: 'route_39', offset: 10 },
+    WEST: { mapId: 'route_40', offset: 18 },
+  },
+  warps: [
+    { x: 13, y: 21, targetMapId: 'olivine_poke_center', targetX: 3, targetY: 7 },
+    { x: 10, y: 11, targetMapId: 'olivine_gym', targetX: 4, targetY: 15 },
+    { x: 25, y: 11, targetMapId: 'olivine_tims_house', targetX: 2, targetY: 7 },
+    { x: 13, y: 15, targetMapId: 'olivine_good_rod_house', targetX: 2, targetY: 7 },
+    { x: 7, y: 21, targetMapId: 'olivine_cafe', targetX: 2, targetY: 7 },
+    { x: 19, y: 17, targetMapId: 'olivine_mart', targetX: 2, targetY: 7 },
+    { x: 29, y: 27, targetMapId: 'olivine_lighthouse_1f', targetX: 10, targetY: 17 },
+  ],
+  bgEvents: [
+    {
+      x: 17,
+      y: 11,
+      speaker: '⚓ OLIVINE CITY',
+      pages: ['OLIVINE CITY', 'The Port Closest to Foreign Lands'],
+    },
+    {
+      x: 13,
+      y: 11,
+      speaker: '🏆 OLIVINE GYM',
+      pages: ['OLIVINE CITY POKéMON GYM', 'LEADER: JASMINE', 'The Steel-Clad Defense Girl!'],
+    },
+    {
+      x: 31,
+      y: 27,
+      speaker: '🗼 OLIVINE LIGHTHOUSE',
+      pages: ['OLIVINE LIGHTHOUSE', 'Also known as the Glitter Lighthouse'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'olivine_poke_center',
+  name: 'Olivine Pokémon Center',
+  tileset: 'pokecenter',
+  blkFile: 'maps__Pokecenter1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'olivine_city', targetX: 13, targetY: 22 },
+    { x: 4, y: 7, targetMapId: 'olivine_city', targetX: 13, targetY: 22 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_mart',
+  name: 'Olivine Mart',
+  tileset: 'mart',
+  blkFile: 'maps__Mart.blk',
+  blocksW: 6,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'olivine_city', targetX: 19, targetY: 18 },
+    { x: 3, y: 7, targetMapId: 'olivine_city', targetX: 19, targetY: 18 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_gym',
+  name: 'Olivine Gym',
+  tileset: 'champions_room',
+  blkFile: 'maps__OlivineGym.blk',
+  blocksW: 5,
+  blocksH: 8,
+  warps: [
+    { x: 4, y: 15, targetMapId: 'olivine_city', targetX: 10, targetY: 12 },
+    { x: 5, y: 15, targetMapId: 'olivine_city', targetX: 10, targetY: 12 },
+  ],
+  bgEvents: [
+    {
+      x: 3,
+      y: 13,
+      speaker: '🏆 OLIVINE GYM STATUE',
+      pages: ['OLIVINE CITY POKéMON GYM', 'LEADER: JASMINE'],
+    },
+    {
+      x: 6,
+      y: 13,
+      speaker: '🏆 OLIVINE GYM STATUE',
+      pages: ['OLIVINE CITY POKéMON GYM', 'LEADER: JASMINE'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'olivine_cafe',
+  name: 'Olivine Café',
+  tileset: 'game_corner',
+  blkFile: 'maps__OlivineCafe.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'olivine_city', targetX: 7, targetY: 22 },
+    { x: 3, y: 7, targetMapId: 'olivine_city', targetX: 7, targetY: 22 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_tims_house',
+  name: "Olivine Tim's House",
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'olivine_city', targetX: 25, targetY: 12 },
+    { x: 3, y: 7, targetMapId: 'olivine_city', targetX: 25, targetY: 12 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_good_rod_house',
+  name: 'Olivine Good Rod House',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'olivine_city', targetX: 13, targetY: 16 },
+    { x: 3, y: 7, targetMapId: 'olivine_city', targetX: 13, targetY: 16 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_lighthouse_1f',
+  name: 'Olivine Lighthouse 1F',
+  tileset: 'lighthouse',
+  blkFile: 'maps__OlivineLighthouse1F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 10, y: 17, targetMapId: 'olivine_city', targetX: 29, targetY: 28 },
+    { x: 11, y: 17, targetMapId: 'olivine_city', targetX: 29, targetY: 28 },
+    { x: 3, y: 11, targetMapId: 'olivine_lighthouse_2f', targetX: 3, targetY: 11 },
+    { x: 16, y: 13, targetMapId: 'olivine_lighthouse_2f', targetX: 16, targetY: 13 },
+    { x: 17, y: 13, targetMapId: 'olivine_lighthouse_2f', targetX: 17, targetY: 13 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_lighthouse_2f',
+  name: 'Olivine Lighthouse 2F',
+  tileset: 'lighthouse',
+  blkFile: 'maps__OlivineLighthouse2F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 3, y: 11, targetMapId: 'olivine_lighthouse_1f', targetX: 3, targetY: 11 },
+    { x: 5, y: 3, targetMapId: 'olivine_lighthouse_3f', targetX: 5, targetY: 3 },
+    { x: 16, y: 13, targetMapId: 'olivine_lighthouse_1f', targetX: 16, targetY: 13 },
+    { x: 17, y: 13, targetMapId: 'olivine_lighthouse_1f', targetX: 17, targetY: 13 },
+    { x: 16, y: 11, targetMapId: 'olivine_lighthouse_3f', targetX: 16, targetY: 11 },
+    { x: 17, y: 11, targetMapId: 'olivine_lighthouse_3f', targetX: 17, targetY: 11 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_lighthouse_3f',
+  name: 'Olivine Lighthouse 3F',
+  tileset: 'lighthouse',
+  blkFile: 'maps__OlivineLighthouse3F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 13, y: 3, targetMapId: 'olivine_lighthouse_4f', targetX: 13, targetY: 3 },
+    { x: 5, y: 3, targetMapId: 'olivine_lighthouse_2f', targetX: 5, targetY: 3 },
+    { x: 9, y: 5, targetMapId: 'olivine_lighthouse_4f', targetX: 9, targetY: 5 },
+    { x: 16, y: 11, targetMapId: 'olivine_lighthouse_2f', targetX: 16, targetY: 11 },
+    { x: 17, y: 11, targetMapId: 'olivine_lighthouse_2f', targetX: 17, targetY: 11 },
+    { x: 16, y: 9, targetMapId: 'olivine_lighthouse_4f', targetX: 16, targetY: 9 },
+    { x: 17, y: 9, targetMapId: 'olivine_lighthouse_4f', targetX: 17, targetY: 9 },
+    { x: 8, y: 3, targetMapId: 'olivine_lighthouse_4f', targetX: 8, targetY: 3 },
+    { x: 9, y: 3, targetMapId: 'olivine_lighthouse_4f', targetX: 9, targetY: 3 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_lighthouse_4f',
+  name: 'Olivine Lighthouse 4F',
+  tileset: 'lighthouse',
+  blkFile: 'maps__OlivineLighthouse4F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 13, y: 3, targetMapId: 'olivine_lighthouse_3f', targetX: 13, targetY: 3 },
+    { x: 3, y: 5, targetMapId: 'olivine_lighthouse_5f', targetX: 3, targetY: 5 },
+    { x: 9, y: 7, targetMapId: 'olivine_lighthouse_5f', targetX: 9, targetY: 7 },
+    { x: 9, y: 5, targetMapId: 'olivine_lighthouse_3f', targetX: 9, targetY: 5 },
+    { x: 16, y: 9, targetMapId: 'olivine_lighthouse_3f', targetX: 16, targetY: 9 },
+    { x: 17, y: 9, targetMapId: 'olivine_lighthouse_3f', targetX: 17, targetY: 9 },
+    { x: 8, y: 3, targetMapId: 'olivine_lighthouse_3f', targetX: 8, targetY: 3 },
+    { x: 9, y: 3, targetMapId: 'olivine_lighthouse_3f', targetX: 9, targetY: 3 },
+    { x: 16, y: 7, targetMapId: 'olivine_lighthouse_5f', targetX: 16, targetY: 7 },
+    { x: 17, y: 7, targetMapId: 'olivine_lighthouse_5f', targetX: 17, targetY: 7 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_lighthouse_5f',
+  name: 'Olivine Lighthouse 5F',
+  tileset: 'lighthouse',
+  blkFile: 'maps__OlivineLighthouse5F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 9, y: 15, targetMapId: 'olivine_lighthouse_6f', targetX: 9, targetY: 15 },
+    { x: 3, y: 5, targetMapId: 'olivine_lighthouse_4f', targetX: 3, targetY: 5 },
+    { x: 9, y: 7, targetMapId: 'olivine_lighthouse_4f', targetX: 9, targetY: 7 },
+    { x: 16, y: 7, targetMapId: 'olivine_lighthouse_4f', targetX: 16, targetY: 7 },
+    { x: 17, y: 7, targetMapId: 'olivine_lighthouse_4f', targetX: 17, targetY: 7 },
+    { x: 16, y: 5, targetMapId: 'olivine_lighthouse_6f', targetX: 16, targetY: 5 },
+    { x: 17, y: 5, targetMapId: 'olivine_lighthouse_6f', targetX: 17, targetY: 5 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'olivine_lighthouse_6f',
+  name: 'Olivine Lighthouse 6F',
+  tileset: 'lighthouse',
+  blkFile: 'maps__OlivineLighthouse6F.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 9, y: 15, targetMapId: 'olivine_lighthouse_5f', targetX: 9, targetY: 15 },
+    { x: 16, y: 5, targetMapId: 'olivine_lighthouse_5f', targetX: 16, targetY: 5 },
+    { x: 17, y: 5, targetMapId: 'olivine_lighthouse_5f', targetX: 17, targetY: 5 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'route_40',
+  name: 'Route 40',
+  tileset: 'johto',
+  blkFile: 'maps__Route40.blk',
+  blocksW: 10,
+  blocksH: 18,
+  roofGroup: 'ol',
+  connections: {
+    EAST: { mapId: 'olivine_city', offset: -18 },
+    SOUTH: { mapId: 'route_41', offset: -30 },
+  },
+  warps: [],
+  bgEvents: [
+    {
+      x: 14,
+      y: 5,
+      speaker: '📍 ROUTE 40 SIGN',
+      pages: ['ROUTE 40', 'Cianwood City Ahead across the sea'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'tentacool', minLevel: 15, maxLevel: 20, weight: 80 },
+    { speciesId: 'tentacruel', minLevel: 20, maxLevel: 20, weight: 20 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'route_41',
+  name: 'Route 41',
+  tileset: 'johto',
+  blkFile: 'maps__Route41.blk',
+  blocksW: 25,
+  blocksH: 27,
+  roofGroup: 'ol',
+  connections: {
+    NORTH: { mapId: 'route_40', offset: 30 },
+    WEST: { mapId: 'cianwood_city', offset: 0 },
+  },
+  warps: [
+    { x: 12, y: 17, targetMapId: 'whirl_island_nw', targetX: 5, targetY: 7 },
+    { x: 36, y: 19, targetMapId: 'whirl_island_ne', targetX: 3, targetY: 13 },
+    { x: 12, y: 37, targetMapId: 'whirl_island_sw', targetX: 5, targetY: 7 },
+    { x: 36, y: 45, targetMapId: 'whirl_island_se', targetX: 5, targetY: 13 },
+  ],
+  bgEvents: [
+    {
+      x: 14,
+      y: 17,
+      speaker: '🌀 WHIRL ISLANDS',
+      pages: ['WHIRL ISLANDS', 'Dangerous whirlpools swirl around these mysterious caverns.'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'tentacool', minLevel: 20, maxLevel: 20, weight: 60 },
+    { speciesId: 'tentacruel', minLevel: 20, maxLevel: 20, weight: 20 },
+    { speciesId: 'mantine', minLevel: 20, maxLevel: 20, weight: 20 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'cianwood_city',
+  name: 'Cianwood City',
+  tileset: 'johto',
+  blkFile: 'maps__CianwoodCity.blk',
+  blocksW: 15,
+  blocksH: 27,
+  roofGroup: 'ci',
+  connections: {
+    EAST: { mapId: 'route_41', offset: 0 },
+  },
+  warps: [
+    { x: 8, y: 43, targetMapId: 'cianwood_gym', targetX: 4, targetY: 17 },
+    { x: 23, y: 43, targetMapId: 'cianwood_poke_center', targetX: 3, targetY: 7 },
+    { x: 15, y: 47, targetMapId: 'cianwood_pharmacy', targetX: 2, targetY: 7 },
+    { x: 9, y: 31, targetMapId: 'cianwood_photo_studio', targetX: 2, targetY: 7 },
+    { x: 15, y: 37, targetMapId: 'cianwood_lugia_speech_house', targetX: 2, targetY: 7 },
+  ],
+  bgEvents: [
+    {
+      x: 20,
+      y: 34,
+      speaker: '🌊 CIANWOOD CITY',
+      pages: ['CIANWOOD CITY', 'A Port Surrounded by Rough Seas'],
+    },
+    {
+      x: 7,
+      y: 45,
+      speaker: '🥋 CIANWOOD GYM',
+      pages: ['CIANWOOD CITY POKéMON GYM', 'LEADER: CHUCK', 'His Roaring Fists Do the Talking!'],
+    },
+    {
+      x: 19,
+      y: 47,
+      speaker: '💊 CIANWOOD PHARMACY',
+      pages: ['500 YEARS OF TRADITION', 'CIANWOOD CITY PHARMACY', 'We Carry the Fabled SecretPotion!'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'cianwood_poke_center',
+  name: 'Cianwood Pokémon Center',
+  tileset: 'pokecenter',
+  blkFile: 'maps__Pokecenter1F.blk',
+  blocksW: 5,
+  blocksH: 4,
+  warps: [
+    { x: 3, y: 7, targetMapId: 'cianwood_city', targetX: 23, targetY: 44 },
+    { x: 4, y: 7, targetMapId: 'cianwood_city', targetX: 23, targetY: 44 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'cianwood_gym',
+  name: 'Cianwood Gym',
+  tileset: 'tower',
+  blkFile: 'maps__CianwoodGym.blk',
+  blocksW: 5,
+  blocksH: 9,
+  warps: [
+    { x: 4, y: 17, targetMapId: 'cianwood_city', targetX: 8, targetY: 44 },
+    { x: 5, y: 17, targetMapId: 'cianwood_city', targetX: 8, targetY: 44 },
+  ],
+  bgEvents: [
+    {
+      x: 3,
+      y: 15,
+      speaker: '🏆 CIANWOOD GYM STATUE',
+      pages: ['CIANWOOD CITY POKéMON GYM', 'LEADER: CHUCK'],
+    },
+    {
+      x: 6,
+      y: 15,
+      speaker: '🏆 CIANWOOD GYM STATUE',
+      pages: ['CIANWOOD CITY POKéMON GYM', 'LEADER: CHUCK'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'cianwood_pharmacy',
+  name: 'Cianwood Pharmacy',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'cianwood_city', targetX: 15, targetY: 48 },
+    { x: 3, y: 7, targetMapId: 'cianwood_city', targetX: 15, targetY: 48 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'cianwood_photo_studio',
+  name: 'Cianwood Photo Studio',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'cianwood_city', targetX: 9, targetY: 32 },
+    { x: 3, y: 7, targetMapId: 'cianwood_city', targetX: 9, targetY: 32 },
+  ],
+  bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'cianwood_lugia_speech_house',
+  name: 'Cianwood Lugia Speech House',
+  tileset: 'house',
+  blkFile: 'maps__House1.blk',
+  blocksW: 4,
+  blocksH: 4,
+  warps: [
+    { x: 2, y: 7, targetMapId: 'cianwood_city', targetX: 15, targetY: 38 },
+    { x: 3, y: 7, targetMapId: 'cianwood_city', targetX: 15, targetY: 38 },
+  ],
+  bgEvents: [],
+});
+
+// Whirl Islands
+buildMapFromBlk({
+  id: 'whirl_island_ne',
+  name: 'Whirl Island NE',
+  tileset: 'cave',
+  blkFile: 'maps__WhirlIslandNE.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 3, y: 13, targetMapId: 'route_41', targetX: 36, targetY: 20 },
+    { x: 17, y: 3, targetMapId: 'whirl_island_b1f', targetX: 35, targetY: 3 },
+    { x: 13, y: 11, targetMapId: 'whirl_island_b1f', targetX: 29, targetY: 9 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'krabby', minLevel: 22, maxLevel: 24, weight: 40 },
+    { speciesId: 'zubat', minLevel: 23, maxLevel: 23, weight: 30 },
+    { speciesId: 'seel', minLevel: 22, maxLevel: 24, weight: 20 },
+    { speciesId: 'golbat', minLevel: 25, maxLevel: 25, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'whirl_island_se',
+  name: 'Whirl Island SE',
+  tileset: 'cave',
+  blkFile: 'maps__WhirlIslandSE.blk',
+  blocksW: 5,
+  blocksH: 9,
+  warps: [
+    { x: 5, y: 13, targetMapId: 'route_41', targetX: 36, targetY: 46 },
+    { x: 5, y: 3, targetMapId: 'whirl_island_b1f', targetX: 31, targetY: 29 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'krabby', minLevel: 22, maxLevel: 24, weight: 40 },
+    { speciesId: 'zubat', minLevel: 23, maxLevel: 23, weight: 30 },
+    { speciesId: 'seel', minLevel: 22, maxLevel: 24, weight: 20 },
+    { speciesId: 'golbat', minLevel: 25, maxLevel: 25, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'whirl_island_sw',
+  name: 'Whirl Island SW',
+  tileset: 'cave',
+  blkFile: 'maps__WhirlIslandSW.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 5, y: 7, targetMapId: 'route_41', targetX: 12, targetY: 38 },
+    { x: 17, y: 3, targetMapId: 'whirl_island_b1f', targetX: 23, targetY: 31 },
+    { x: 3, y: 3, targetMapId: 'whirl_island_b1f', targetX: 9, targetY: 31 },
+    { x: 3, y: 15, targetMapId: 'whirl_island_nw', targetX: 3, targetY: 15 },
+    { x: 17, y: 15, targetMapId: 'whirl_island_b2f', targetX: 13, targetY: 31 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'krabby', minLevel: 22, maxLevel: 24, weight: 40 },
+    { speciesId: 'zubat', minLevel: 23, maxLevel: 23, weight: 30 },
+    { speciesId: 'seel', minLevel: 22, maxLevel: 24, weight: 20 },
+    { speciesId: 'golbat', minLevel: 25, maxLevel: 25, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'whirl_island_nw',
+  name: 'Whirl Island NW',
+  tileset: 'cave',
+  blkFile: 'maps__WhirlIslandNW.blk',
+  blocksW: 5,
+  blocksH: 9,
+  warps: [
+    { x: 5, y: 7, targetMapId: 'route_41', targetX: 12, targetY: 18 },
+    { x: 5, y: 3, targetMapId: 'whirl_island_b1f', targetX: 5, targetY: 5 },
+    { x: 3, y: 15, targetMapId: 'whirl_island_sw', targetX: 3, targetY: 15 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'krabby', minLevel: 22, maxLevel: 24, weight: 40 },
+    { speciesId: 'zubat', minLevel: 23, maxLevel: 23, weight: 30 },
+    { speciesId: 'seel', minLevel: 22, maxLevel: 24, weight: 20 },
+    { speciesId: 'golbat', minLevel: 25, maxLevel: 25, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'whirl_island_b1f',
+  name: 'Whirl Island B1F',
+  tileset: 'cave',
+  blkFile: 'maps__WhirlIslandB1F.blk',
+  blocksW: 20,
+  blocksH: 18,
+  warps: [
+    { x: 5, y: 5, targetMapId: 'whirl_island_nw', targetX: 5, targetY: 3 },
+    { x: 35, y: 3, targetMapId: 'whirl_island_ne', targetX: 17, targetY: 3 },
+    { x: 29, y: 9, targetMapId: 'whirl_island_ne', targetX: 13, targetY: 11 },
+    { x: 9, y: 31, targetMapId: 'whirl_island_sw', targetX: 3, targetY: 3 },
+    { x: 23, y: 31, targetMapId: 'whirl_island_sw', targetX: 17, targetY: 3 },
+    { x: 31, y: 29, targetMapId: 'whirl_island_se', targetX: 5, targetY: 3 },
+    { x: 25, y: 21, targetMapId: 'whirl_island_b2f', targetX: 11, targetY: 5 },
+    { x: 13, y: 27, targetMapId: 'whirl_island_b2f', targetX: 7, targetY: 11 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'krabby', minLevel: 23, maxLevel: 25, weight: 40 },
+    { speciesId: 'zubat', minLevel: 24, maxLevel: 24, weight: 30 },
+    { speciesId: 'seel', minLevel: 23, maxLevel: 25, weight: 20 },
+    { speciesId: 'golbat', minLevel: 26, maxLevel: 26, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'whirl_island_b2f',
+  name: 'Whirl Island B2F',
+  tileset: 'cave',
+  blkFile: 'maps__WhirlIslandB2F.blk',
+  blocksW: 10,
+  blocksH: 18,
+  warps: [
+    { x: 11, y: 5, targetMapId: 'whirl_island_b1f', targetX: 25, targetY: 21 },
+    { x: 7, y: 11, targetMapId: 'whirl_island_b1f', targetX: 13, targetY: 27 },
+    { x: 7, y: 25, targetMapId: 'whirl_island_lugia_chamber', targetX: 9, targetY: 13 },
+    { x: 13, y: 31, targetMapId: 'whirl_island_sw', targetX: 17, targetY: 15 },
+  ],
+  bgEvents: [],
+  grassEncounters: [
+    { speciesId: 'krabby', minLevel: 24, maxLevel: 26, weight: 40 },
+    { speciesId: 'zubat', minLevel: 25, maxLevel: 25, weight: 30 },
+    { speciesId: 'seel', minLevel: 24, maxLevel: 26, weight: 20 },
+    { speciesId: 'golbat', minLevel: 27, maxLevel: 27, weight: 10 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'whirl_island_lugia_chamber',
+  name: "Whirl Island Lugia's Chamber",
+  tileset: 'cave',
+  blkFile: 'maps__WhirlIslandLugiaChamber.blk',
+  blocksW: 10,
+  blocksH: 9,
+  warps: [
+    { x: 9, y: 13, targetMapId: 'whirl_island_b2f', targetX: 7, targetY: 25 },
+  ],
+  bgEvents: [
+    {
+      x: 9,
+      y: 5,
+      speaker: '🌊 LUGIA SHRINE',
+      pages: [
+        'A cascading underground waterfall echoes through the sacred chamber…',
+        'Deep within the basin, the legendary Silver-Winged guardian of the seas, LUGIA, rests in slumber.',
+      ],
+    },
+  ],
 });
 
 console.log(`Total authentic 64x64 quadrant PNGs generated: ${generatedTiles.size}`);

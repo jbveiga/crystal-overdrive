@@ -45,6 +45,16 @@ const TILESET_FILES = [
   'gfx/tilesets/park_palette_map.asm',
   'data/tilesets/park_metatiles.bin',
   'data/tilesets/park_collision.asm',
+  // Lighthouse
+  'gfx/tilesets/lighthouse.png',
+  'gfx/tilesets/lighthouse_palette_map.asm',
+  'data/tilesets/lighthouse_metatiles.bin',
+  'data/tilesets/lighthouse_collision.asm',
+  // Champions Room
+  'gfx/tilesets/champions_room.png',
+  'gfx/tilesets/champions_room_palette_map.asm',
+  'data/tilesets/champions_room_metatiles.bin',
+  'data/tilesets/champions_room_collision.asm',
 ];
 
 const PHASE7_MAP_FILES = [
@@ -188,6 +198,70 @@ const PHASE9_MAP_FILES = [
   'maps/TinTowerRoof.asm',
 ];
 
+const PHASE10_MAP_FILES = [
+  // Route 38 & 39
+  'maps/Route38.blk',
+  'maps/Route38.asm',
+  'maps/Route38EcruteakGate.asm',
+  'maps/Route39.blk',
+  'maps/Route39.asm',
+  'maps/Route39Barn.blk',
+  'maps/Route39Barn.asm',
+  'maps/Route39Farmhouse.asm',
+  // Olivine City & Interiors
+  'maps/OlivineCity.blk',
+  'maps/OlivineCity.asm',
+  'maps/OlivinePokecenter1F.asm',
+  'maps/OlivineMart.asm',
+  'maps/OlivineGym.blk',
+  'maps/OlivineGym.asm',
+  'maps/OlivineCafe.blk',
+  'maps/OlivineCafe.asm',
+  'maps/OlivineTimsHouse.asm',
+  'maps/OlivineGoodRodHouse.asm',
+  // Olivine Lighthouse 1F-6F
+  'maps/OlivineLighthouse1F.blk',
+  'maps/OlivineLighthouse1F.asm',
+  'maps/OlivineLighthouse2F.blk',
+  'maps/OlivineLighthouse2F.asm',
+  'maps/OlivineLighthouse3F.blk',
+  'maps/OlivineLighthouse3F.asm',
+  'maps/OlivineLighthouse4F.blk',
+  'maps/OlivineLighthouse4F.asm',
+  'maps/OlivineLighthouse5F.blk',
+  'maps/OlivineLighthouse5F.asm',
+  'maps/OlivineLighthouse6F.blk',
+  'maps/OlivineLighthouse6F.asm',
+  // Routes 40 & 41
+  'maps/Route40.blk',
+  'maps/Route40.asm',
+  'maps/Route41.blk',
+  'maps/Route41.asm',
+  // Cianwood City & Interiors
+  'maps/CianwoodCity.blk',
+  'maps/CianwoodCity.asm',
+  'maps/CianwoodGym.blk',
+  'maps/CianwoodGym.asm',
+  'maps/CianwoodPharmacy.asm',
+  'maps/CianwoodPhotoStudio.asm',
+  'maps/CianwoodLugiaSpeechHouse.asm',
+  // Whirl Islands
+  'maps/WhirlIslandNE.blk',
+  'maps/WhirlIslandNE.asm',
+  'maps/WhirlIslandSE.blk',
+  'maps/WhirlIslandSE.asm',
+  'maps/WhirlIslandSW.blk',
+  'maps/WhirlIslandSW.asm',
+  'maps/WhirlIslandNW.blk',
+  'maps/WhirlIslandNW.asm',
+  'maps/WhirlIslandB1F.blk',
+  'maps/WhirlIslandB1F.asm',
+  'maps/WhirlIslandB2F.blk',
+  'maps/WhirlIslandB2F.asm',
+  'maps/WhirlIslandLugiaChamber.blk',
+  'maps/WhirlIslandLugiaChamber.asm',
+];
+
 async function download(relPath) {
   const dest = path.join(OUT_DIR, relPath.replace(/\//g, '__'));
   if (fs.existsSync(dest)) return;
@@ -207,8 +281,8 @@ async function download(relPath) {
 }
 
 async function main() {
-  console.log('Downloading Phase 7, 8 & 9 tilesets and map files from pret/pokecrystal...');
-  for (const f of [...TILESET_FILES, ...PHASE7_MAP_FILES, ...PHASE8_MAP_FILES, ...PHASE9_MAP_FILES]) {
+  console.log('Downloading Phase 7, 8, 9 & 10 tilesets and map files from pret/pokecrystal...');
+  for (const f of [...TILESET_FILES, ...PHASE7_MAP_FILES, ...PHASE8_MAP_FILES, ...PHASE9_MAP_FILES, ...PHASE10_MAP_FILES]) {
     await download(f);
   }
   console.log('Downloads complete.');

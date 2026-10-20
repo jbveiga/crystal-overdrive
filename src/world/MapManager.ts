@@ -282,6 +282,12 @@ export class MapManager {
       'route_36',
       'route_37',
       'ecruteak_city',
+      'route_38',
+      'route_39',
+      'olivine_city',
+      'route_40',
+      'route_41',
+      'cianwood_city',
     ].includes(mapId);
   }
 

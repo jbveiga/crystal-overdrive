@@ -4335,6 +4335,10 @@
     "SOUTH": {
       "mapId": "route_37",
       "offset": 10
+    },
+    "WEST": {
+      "mapId": "route_38",
+      "offset": -10
     }
   },
   "warps": [
@@ -4386,6 +4390,20 @@
       "targetMapId": "tin_tower_1f",
       "targetX": 9,
       "targetY": 15
+    },
+    {
+      "x": 0,
+      "y": 18,
+      "targetMapId": "route_38_ecruteak_gate",
+      "targetX": 9,
+      "targetY": 4
+    },
+    {
+      "x": 0,
+      "y": 19,
+      "targetMapId": "route_38_ecruteak_gate",
+      "targetX": 9,
+      "targetY": 5
     }
   ],
   "bgEvents": [

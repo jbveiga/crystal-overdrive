@@ -8,6 +8,7 @@ export interface BagInventory {
   tms: string[];
   money: number;
   badges: string[];
+  keyItems?: string[];
 }
 
 export interface TMDefinition {
