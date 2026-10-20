@@ -7,3 +7,4 @@ dist/
 coverage/
 *.mov
 *.mp4
+copilot-instructions.md
