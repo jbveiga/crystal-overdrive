@@ -2531,11 +2531,12 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         9,
         'DOWN',
         'fat_man',
-        '🌳 SUDOWOODO',
+        '🌲 SUDOWOODO',
         [
-          'The strange tree is shaking vigorously…',
-          'SUDOWOODO: Gwoh-oh-oh! It’s actually a ROCK-type POKéMON masquerading as timber!',
-        ]
+          'An odd tree is blocking the path! It seems to wiggle when touched.',
+          'The weird tree attacked in surprise!',
+        ],
+        { action: 'SUDOWOODO_EVENT' }
       ),
       makeNpc(
         'psychic_mark',

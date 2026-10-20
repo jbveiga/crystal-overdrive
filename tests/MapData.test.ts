@@ -532,7 +532,10 @@ describe('MapData & Authentic Tile Integrity', () => {
   });
 
   it('validates Ticket 5.2 Sprout Tower 1F-3F Sages and Elder Li boss encounter registration in main.ts', () => {
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8');
 
     const expectedTrainerIds = [
       'sage_chow',
@@ -556,7 +559,10 @@ describe('MapData & Authentic Tile Integrity', () => {
   });
 
   it('validates Ticket 5.3 Violet Gym minions, Leader Falkner boss encounter, Zephyr Badge, and TM31 Mud-Slap', () => {
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8');
     const startMenuSrc = fs.readFileSync(path.resolve(__dirname, '../src/ui/StartMenuUI.ts'), 'utf8');
 
     expect(mainSrc).toContain("'gym_guide'");
@@ -577,7 +583,10 @@ describe('MapData & Authentic Tile Integrity', () => {
   });
 
   it('validates Ticket 5.4 Post-Gym Elm Aide Togepi Egg delivery and step-based hatching in main.ts', () => {
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8');
 
     expect(mainSrc).toContain("'elms_aide'");
     expect(mainSrc).toContain("action: 'ELMS_AIDE_EVENT'");

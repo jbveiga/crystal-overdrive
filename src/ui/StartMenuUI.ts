@@ -19,6 +19,7 @@ const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = 
   { id: 'poliwhirl', name: 'Poliwhirl', types: ['Water'] },
   { id: 'marill', name: 'Marill', types: ['Water'] },
   { id: 'togepi', name: 'Togepi', types: ['Normal'] },
+  { id: 'sudowoodo', name: 'Sudowoodo', types: ['Rock'] },
   { id: 'geodude', name: 'Geodude', types: ['Rock', 'Ground'] },
   { id: 'gastly', name: 'Gastly', types: ['Ghost', 'Poison'] },
   { id: 'smeargle', name: 'Smeargle', types: ['Normal'] },
@@ -75,7 +76,7 @@ export class StartMenuUI {
   private callbacks: StartMenuCallbacks;
   private cursorIndex: number = 0;
   private speedMultiplier: SpeedMultiplier = 1;
-  private menuItems: Array<{ id: string; label: string; icon: string; action: () => void }> = [];
+  private menuItems: Array<{ id: string; label: string; icon: string; shortcut: string; action: () => void }> = [];
 
   constructor(
     containerId: string = 'modal-container',
@@ -93,6 +94,7 @@ export class StartMenuUI {
         id: 'start-opt-pokedex',
         label: 'POKéDEX',
         icon: '📕',
+        shortcut: 'P',
         action: () => {
           this.openPokedex();
         },
@@ -101,6 +103,7 @@ export class StartMenuUI {
         id: 'start-opt-pokemon',
         label: 'POKéMON',
         icon: '🟢',
+        shortcut: 'K',
         action: () => {
           this.hideMenuOnly();
           this.callbacks.onOpenParty();
@@ -110,6 +113,7 @@ export class StartMenuUI {
         id: 'start-opt-bag',
         label: 'BAG',
         icon: '🎒',
+        shortcut: 'B',
         action: () => {
           this.hideMenuOnly();
           this.callbacks.onOpenBag();
@@ -119,6 +123,7 @@ export class StartMenuUI {
         id: 'start-opt-pokegear',
         label: 'POKéGEAR',
         icon: '📻',
+        shortcut: 'G',
         action: () => {
           this.hideMenuOnly();
           this.callbacks.onOpenPokegear();
@@ -126,8 +131,9 @@ export class StartMenuUI {
       },
       {
         id: 'start-opt-trainer',
-        label: 'BERNARDO',
+        label: this.stateProvider.getTrainerName() || 'TRAINER',
         icon: '🪪',
+        shortcut: 'T',
         action: () => {
           this.openTrainerCard();
         },
@@ -136,6 +142,7 @@ export class StartMenuUI {
         id: 'start-opt-save',
         label: 'SAVE',
         icon: '💾',
+        shortcut: 'S',
         action: () => {
           this.openSaveConfirm();
         },
@@ -144,6 +151,7 @@ export class StartMenuUI {
         id: 'start-opt-settings',
         label: 'SETTINGS',
         icon: '⚙️',
+        shortcut: 'O',
         action: () => {
           this.openSettings();
         },
@@ -152,6 +160,7 @@ export class StartMenuUI {
         id: 'start-opt-cancel',
         label: 'CANCEL',
         icon: '✕',
+        shortcut: '8',
         action: () => {
           BattleAudio.playMenuSound('CANCEL');
           this.closeAll();
@@ -263,11 +272,15 @@ export class StartMenuUI {
       this.renderMenuItems();
       return true;
     }
-    if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+    if (e.code === 'ArrowDown') {
       e.preventDefault();
       BattleAudio.playMenuSound('CURSOR');
       this.cursorIndex = (this.cursorIndex + 1) % this.menuItems.length;
       this.renderMenuItems();
+      return true;
+    }
+    if (this.triggerShortcut(e.code, true)) {
+      e.preventDefault();
       return true;
     }
     if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyZ') {
@@ -284,6 +297,35 @@ export class StartMenuUI {
     }
 
     return true;
+  }
+
+  public triggerShortcut(code: string, allowSaveAndDigits: boolean = false): boolean {
+    const shortcutMap: Record<string, number> = {
+      KeyP: 0,
+      KeyK: 1,
+      KeyB: 2,
+      KeyG: 3,
+      KeyT: 4,
+      KeyO: 6,
+    };
+    if (allowSaveAndDigits) {
+      shortcutMap.KeyS = 5;
+      shortcutMap.Digit1 = 0;
+      shortcutMap.Digit2 = 1;
+      shortcutMap.Digit3 = 2;
+      shortcutMap.Digit4 = 3;
+      shortcutMap.Digit5 = 4;
+      shortcutMap.Digit6 = 5;
+      shortcutMap.Digit7 = 6;
+      shortcutMap.Digit8 = 7;
+    }
+    const targetIdx = shortcutMap[code];
+    if (targetIdx !== undefined && this.menuItems[targetIdx]) {
+      this.cursorIndex = targetIdx;
+      this.menuItems[targetIdx].action();
+      return true;
+    }
+    return false;
   }
 
   private createUI(): void {
@@ -433,6 +475,9 @@ export class StartMenuUI {
     this.menuPanel.appendChild(header);
 
     this.menuItems.forEach((item, idx) => {
+      if (item.id === 'start-opt-trainer') {
+        item.label = this.stateProvider.getTrainerName() || 'TRAINER';
+      }
       const isSelected = idx === this.cursorIndex;
       const btn = document.createElement('button');
       btn.id = item.id;
@@ -447,13 +492,17 @@ export class StartMenuUI {
         cursor: pointer;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 8px;
         text-align: left;
       `;
       btn.innerHTML = `
-        <span style="color: ${isSelected ? '#facc15' : 'transparent'}; font-size: 12px;">▶</span>
-        <span>${item.icon}</span>
-        <span>${item.label}</span>
+        <span style="display: flex; align-items: center; gap: 8px;">
+          <span style="color: ${isSelected ? '#facc15' : 'transparent'}; font-size: 12px;">▶</span>
+          <span>${item.icon}</span>
+          <span>${item.label}</span>
+        </span>
+        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.28); padding: 1px 5px; border-radius: 4px;">[${item.shortcut}]</span>
       `;
 
       btn.addEventListener('mouseenter', () => {

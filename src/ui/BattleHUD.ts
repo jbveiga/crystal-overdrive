@@ -65,6 +65,7 @@ export class BattleHUD {
   private ballsInventory: Partial<Record<PokeballId, number>> = {};
   private callbacks!: BattleHUDCallbacks;
   private speedMultiplier: SpeedMultiplier = 1;
+  private isForcedPartySwitch: boolean = false;
 
   constructor(containerId: string = 'battle-hud-container') {
     const el = document.getElementById(containerId);
@@ -426,7 +427,7 @@ export class BattleHUD {
         return;
       }
 
-      if ((isBagMenuOpen || isPartyMenuOpen) && (e.code === 'Escape' || e.code === 'KeyX')) {
+      if ((isBagMenuOpen || (isPartyMenuOpen && !this.isForcedPartySwitch)) && (e.code === 'Escape' || e.code === 'KeyX')) {
         e.preventDefault();
         this.showActionMenu();
       }
@@ -749,7 +750,8 @@ export class BattleHUD {
     this.updateStatusBadges();
   }
 
-  public showPartyMenu(): void {
+  public showPartyMenu(options?: { forcedSwitch?: boolean; onSelected?: (pokemon: PokemonInstance) => void }): void {
+    this.isForcedPartySwitch = Boolean(options?.forcedSwitch);
     this.messageBox.style.display = 'none';
     this.actionMenu.style.display = 'none';
     this.fightMenu.style.display = 'none';
@@ -805,9 +807,12 @@ export class BattleHUD {
           this.showMessage(`${pkmn.nickname} has no energy left to battle!`);
           return;
         }
+        this.isForcedPartySwitch = false;
         this.partyMenu.style.display = 'none';
         this.messageBox.style.display = 'flex';
-        if (this.callbacks?.onPokemonSelected) {
+        if (options?.onSelected) {
+          options.onSelected(pkmn);
+        } else if (this.callbacks?.onPokemonSelected) {
           this.callbacks.onPokemonSelected(pkmn);
         }
       });
@@ -815,21 +820,23 @@ export class BattleHUD {
       this.partyMenu.appendChild(btn);
     }
 
-    const backBtn = document.createElement('button');
-    backBtn.style.cssText = `
-      background: #334155;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 8px;
-      cursor: pointer;
-      grid-column: span 2;
-    `;
-    backBtn.innerText = '← BACK (Esc / X)';
-    backBtn.addEventListener('click', () => this.showActionMenu());
-    this.partyMenu.appendChild(backBtn);
+    if (!this.isForcedPartySwitch) {
+      const backBtn = document.createElement('button');
+      backBtn.style.cssText = `
+        background: #334155;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 8px;
+        cursor: pointer;
+        grid-column: span 2;
+      `;
+      backBtn.innerText = '← BACK (Esc / X)';
+      backBtn.addEventListener('click', () => this.showActionMenu());
+      this.partyMenu.appendChild(backBtn);
+    }
   }
 
   public showBagMenu(): void {

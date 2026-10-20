@@ -400,5 +400,79 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       expect(toggled).toBe(!initial);
       expect(hud.isGamepadActive()).toBe(toggled);
     });
+
+    it('plays a 6-slot Poké Ball healing animation overlay and invokes onComplete (Ticket Sprint 08)', () => {
+      vi.useFakeTimers();
+      const hud = new OverworldHUD('overworld-hud-container');
+      const onComplete = vi.fn();
+
+      hud.playHealingAnimation(3, onComplete);
+      const healOverlay = mockDoc.querySelector('#pokecenter-heal-overlay') as MockElement;
+      expect(healOverlay).not.toBeNull();
+      expect(healOverlay.style.display).toBe('flex');
+      expect(hud.isDialogueOpen()).toBe(true);
+
+      vi.advanceTimersByTime(1500);
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(healOverlay.style.display).toBe('none');
+      vi.useRealTimers();
+    });
+  });
+
+  describe('5. Dynamic Trainer Card Name & Keyboard Shortcuts (Ticket Sprint 08)', () => {
+    it('renders the dynamic trainer name on the Start Menu option and supports P/K/B/G/T/S/O shortcuts', () => {
+      const onOpenParty = vi.fn();
+      const onOpenBag = vi.fn();
+      const onOpenPokegear = vi.fn();
+      const onSaveGame = vi.fn();
+
+      const ui = new StartMenuUI(
+        'modal-container',
+        {
+          getTrainerName: () => 'CRYSTAL',
+          getMoney: () => 4200,
+          getBadges: () => ['zephyr', 'hive'],
+          getPartyCount: () => 3,
+          getCaughtCount: () => 12,
+          getPlayTimeSeconds: () => 5400,
+          getMapName: () => 'Goldenrod City',
+          isMuted: () => false,
+          getSpeedMultiplier: () => 1,
+          isGamepadActive: () => false,
+        },
+        {
+          onOpenParty,
+          onOpenBag,
+          onOpenPokegear,
+          onSaveGame,
+          onToggleMute: vi.fn(),
+          onCycleSpeed: vi.fn(),
+          onToggleGamepad: vi.fn(),
+        }
+      );
+
+      ui.open();
+      const trainerBtn = mockDoc.querySelector('#start-opt-trainer') as MockElement;
+      expect(trainerBtn).not.toBeNull();
+      expect(trainerBtn.innerHTML).toContain('CRYSTAL');
+      expect(trainerBtn.innerHTML).not.toContain('BERNARDO');
+
+      // Test single-key overworld shortcuts (allowSaveAndDigits = false)
+      ui.closeAll();
+      expect(ui.triggerShortcut('KeyK', false)).toBe(true);
+      expect(onOpenParty).toHaveBeenCalledTimes(1);
+
+      expect(ui.triggerShortcut('KeyB', false)).toBe(true);
+      expect(onOpenBag).toHaveBeenCalledTimes(1);
+
+      expect(ui.triggerShortcut('KeyG', false)).toBe(true);
+      expect(onOpenPokegear).toHaveBeenCalledTimes(1);
+
+      // Save shortcut KeyS is ignored when allowSaveAndDigits is false, but opens the Save confirmation modal when Start Menu is open
+      expect(ui.triggerShortcut('KeyS', false)).toBe(false);
+      expect(ui.triggerShortcut('KeyS', true)).toBe(true);
+      const saveModal = mockDoc.querySelector('#save-confirm-modal') as MockElement;
+      expect(saveModal.style.display).toBe('flex');
+    });
   });
 });

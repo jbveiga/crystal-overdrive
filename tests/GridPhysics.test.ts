@@ -301,6 +301,22 @@ describe('GridPhysics', () => {
       GridPhysics.updateEntity(p3, 0.05, 'LEFT', isWalkableRight, lookupRight);
       expect(p3.isMoving).toBe(false);
     });
+
+    it('performs a 3-tile ledge hop when an intermediate rock/border tile (collision 1) sits between the ledge rim and landing tile (Ticket Sprint 08)', () => {
+      const player = createMockEntity({ x: 5, y: 5, targetX: 5, targetY: 5 });
+      // (5,6) is South Ledge (4), (5,7) is solid border (1), (5,8) is walkable ground (0)
+      const isWalkable = (_x: number, y: number) => y === 5 || y === 8;
+      const ledgeLookup = (_x: number, y: number) => (y === 6 ? 4 : y === 7 ? 1 : 0);
+      const onLedgeJump = vi.fn();
+
+      GridPhysics.updateEntity(player, 0.05, 'DOWN', isWalkable, ledgeLookup, undefined, [], onLedgeJump);
+
+      expect(player.isMoving).toBe(true);
+      expect(player.isJumping).toBe(true);
+      expect(player.targetX).toBe(5);
+      expect(player.targetY).toBe(8);
+      expect(onLedgeJump).toHaveBeenCalledWith(player);
+    });
   });
 
   it('detects when player steps into an undefeated trainer line-of-sight unless blocked by wall/ledge', () => {

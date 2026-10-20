@@ -191,6 +191,38 @@ const ROOF_GRAPHICS = {
   lr: roofAzalea,
 };
 
+function normalizeLedgeBlockColls(colls) {
+  const [c0, c1, c2, c3] = colls;
+  if (c1 === 8) return [6, 0, 8, 4];
+  if (c0 === 9) return [0, 7, 4, 9];
+  const out = [c0, c1, c2, c3];
+  if (c0 === 4 && c2 === 1) {
+    out[0] = 0;
+    out[2] = 4;
+  }
+  if (c1 === 4 && c3 === 1) {
+    out[1] = 0;
+    out[3] = 4;
+  }
+  if (c1 === 6 && c0 === 1) {
+    out[1] = 0;
+    out[0] = 6;
+  }
+  if (c3 === 6 && c2 === 1) {
+    out[3] = 0;
+    out[2] = 6;
+  }
+  if (c0 === 7 && c1 === 1) {
+    out[0] = 0;
+    out[1] = 7;
+  }
+  if (c2 === 7 && c3 === 1) {
+    out[2] = 0;
+    out[3] = 7;
+  }
+  return out;
+}
+
 function loadTileset(tsName, isOutdoor = false) {
   const png = decode2BitPng(path.join(SOURCE_DIR, `gfx__tilesets__${tsName}.png`));
   const palText = fs.readFileSync(path.join(SOURCE_DIR, `gfx__tilesets__${tsName}_palette_map.asm`), 'utf8');
@@ -208,7 +240,7 @@ function loadTileset(tsName, isOutdoor = false) {
     .filter((l) => l.startsWith('tilecoll'));
   const blockCollisions = collLines.map((line) => {
     const body = line.split(';')[0].replace('tilecoll', '').trim();
-    return body.split(',').map((s) => mapCollToken(s.trim()));
+    return normalizeLedgeBlockColls(body.split(',').map((s) => mapCollToken(s.trim())));
   });
 
   const meta = fs.readFileSync(path.join(SOURCE_DIR, `data__tilesets__${tsName}_metatiles.bin`));

@@ -1,5 +1,6 @@
 import type { Direction, SpeedMultiplier, RoamerState } from '../types/game';
 import { eventBus } from '../core/EventBus';
+import { BattleAudio } from '../audio/BattleAudio';
 
 export interface OverworldHUDOptions {
   onSpeedCycle?: () => SpeedMultiplier;
@@ -719,7 +720,134 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
   public isDialogueOpen(): boolean {
     const starterModal = this.rootElement.querySelector('#starter-choice-modal') as HTMLElement | null;
     const starterOpen = starterModal ? starterModal.style.display === 'flex' : false;
-    return this.dialogueActive || starterOpen;
+    const healOverlay = this.rootElement.querySelector('#pokecenter-heal-overlay') as HTMLElement | null;
+    const healOpen = healOverlay ? healOverlay.style.display === 'flex' : false;
+    return this.dialogueActive || starterOpen || healOpen;
+  }
+
+  /**
+   * Plays an authentic Pokémon Center 6-slot Poké Ball healing tray animation with glowing pulse and chime.
+   */
+  public playHealingAnimation(partyCount: number, onComplete?: () => void): void {
+    this.activeDirection = null;
+    const clampedCount = Math.max(1, Math.min(6, partyCount || 1));
+
+    let overlay = this.rootElement.querySelector('#pokecenter-heal-overlay') as HTMLDivElement | null;
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'pokecenter-heal-overlay';
+      overlay.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(250, 204, 21, 0.16) 0%, rgba(15, 23, 42, 0.55) 100%);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 65;
+        pointer-events: auto;
+        transition: opacity 0.22s ease;
+      `;
+      this.rootElement.appendChild(overlay);
+    }
+
+    const slotsHtml = Array.from({ length: 6 })
+      .map((_, i) => {
+        const occupied = i < clampedCount;
+        return `
+          <div id="heal-tray-slot-${i}" data-occupied="${occupied}" style="
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid ${occupied ? '#64748b' : 'rgba(71, 85, 105, 0.35)'};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            opacity: ${occupied ? '0.45' : '0.2'};
+            transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease, opacity 0.16s ease;
+          ">${occupied ? '🔴' : '⚪'}</div>
+        `;
+      })
+      .join('');
+
+    overlay.innerHTML = `
+      <div style="
+        width: min(380px, 90vw);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 29, 0.99) 100%);
+        border: 3px solid #facc15;
+        outline: 3px solid #1e293b;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), 0 0 28px rgba(250, 204, 21, 0.35);
+        border-radius: 14px;
+        padding: 20px 22px;
+        color: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+      ">
+        <div style="font-size: 11px; font-weight: 800; color: #facc15; letter-spacing: 1.2px;">💖 POKéMON CENTER HEALING MACHINE</div>
+        <div style="
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px 18px;
+          padding: 12px 18px;
+          background: rgba(30, 41, 59, 0.85);
+          border: 1.5px solid rgba(250, 204, 21, 0.35);
+          border-radius: 12px;
+        ">
+          ${slotsHtml}
+        </div>
+        <div id="heal-tray-status" style="font-size: 14px; font-weight: 800; color: #fef08a; text-align: center;">
+          Restoring POKéMON to full health…
+        </div>
+      </div>
+    `;
+
+    overlay.style.opacity = '1';
+    overlay.style.display = 'flex';
+    BattleAudio.playOverworldSound('HEAL_JINGLE');
+
+    const stepMs = Math.max(45, Math.round(95 / this.currentSpeed));
+    for (let i = 0; i < clampedCount; i++) {
+      setTimeout(() => {
+        const slotEl = overlay?.querySelector(`#heal-tray-slot-${i}`) as HTMLElement | null;
+        if (slotEl) {
+          slotEl.style.opacity = '1';
+          slotEl.style.borderColor = '#facc15';
+          slotEl.style.boxShadow = '0 0 14px #facc15';
+          slotEl.style.transform = 'scale(1.14)';
+        }
+      }, i * stepMs);
+    }
+
+    const pulseDelay = clampedCount * stepMs + Math.round(110 / this.currentSpeed);
+    setTimeout(() => {
+      for (let i = 0; i < clampedCount; i++) {
+        const slotEl = overlay?.querySelector(`#heal-tray-slot-${i}`) as HTMLElement | null;
+        if (slotEl) {
+          slotEl.style.borderColor = '#4ade80';
+          slotEl.style.boxShadow = '0 0 18px #4ade80';
+          slotEl.style.transform = 'scale(1.0)';
+        }
+      }
+      const statusEl = overlay?.querySelector('#heal-tray-status') as HTMLElement | null;
+      if (statusEl) {
+        statusEl.style.color = '#4ade80';
+        statusEl.innerText = '✨ Your POKéMON were fully healed!';
+      }
+    }, pulseDelay);
+
+    const totalDuration = pulseDelay + Math.round(480 / this.currentSpeed);
+    setTimeout(() => {
+      if (overlay) {
+        overlay.style.display = 'none';
+      }
+      if (onComplete) onComplete();
+    }, totalDuration);
   }
 
   /**

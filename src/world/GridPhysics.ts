@@ -73,7 +73,8 @@ export interface GridEntity {
     | 'E4_EVENT'
     | 'AMPHY_EVENT'
     | 'PHARMACY_SECRET_POTION_EVENT'
-    | 'ELMS_AIDE_EVENT';
+    | 'ELMS_AIDE_EVENT'
+    | 'SUDOWOODO_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;
@@ -178,8 +179,46 @@ export class GridPhysics {
   }
 
   /**
+   * Resolves one-way ledge hop distance (2 tiles over standard 1-tile ledge rim, or 3 tiles over a 2-tile ledge+cliff pair).
+   * Returns 0 if no valid ledge hop can be performed. Zero allocations.
+   */
+  public static resolveLedgeHopDistance(
+    entity: GridEntity,
+    heldDirection: Direction,
+    deltaDx: number,
+    deltaDy: number,
+    isWalkable: CollisionCheck,
+    getTileType: TileTypeLookup,
+    obstacles?: readonly GridEntity[]
+  ): 0 | 2 | 3 {
+    const nextX = entity.x + deltaDx;
+    const nextY = entity.y + deltaDy;
+    if (!this.canJumpLedge(heldDirection, getTileType(nextX, nextY))) {
+      return 0;
+    }
+
+    const target2X = entity.x + deltaDx * 2;
+    const target2Y = entity.y + deltaDy * 2;
+    if (isWalkable(target2X, target2Y) && !this.isTileOccupiedByEntities(target2X, target2Y, entity, obstacles)) {
+      return 2;
+    }
+
+    const target3X = entity.x + deltaDx * 3;
+    const target3Y = entity.y + deltaDy * 3;
+    if (
+      getTileType(target2X, target2Y) === 1 &&
+      isWalkable(target3X, target3Y) &&
+      !this.isTileOccupiedByEntities(target3X, target3Y, entity, obstacles)
+    ) {
+      return 3;
+    }
+
+    return 0;
+  }
+
+  /**
    * Updates an entity's position, stepping through fractional progress and chaining overflow
-   * without allocating intermediate objects. Supports 2-tile one-way ledge hops in all directions (tileType 4..9).
+   * without allocating intermediate objects. Supports 2-tile and 3-tile one-way ledge hops in all directions (tileType 4..9).
    */
   public static updateEntity(
     entity: GridEntity,
@@ -201,8 +240,6 @@ export class GridPhysics {
         const delta = this.getDirectionDelta(heldDirection);
         const nextX = entity.x + delta.dx;
         const nextY = entity.y + delta.dy;
-        const jumpTargetX = entity.x + delta.dx * 2;
-        const jumpTargetY = entity.y + delta.dy * 2;
 
         if (isWalkable(nextX, nextY) && !this.isTileOccupiedByEntities(nextX, nextY, entity, obstacles)) {
           entity.isMoving = true;
@@ -210,22 +247,25 @@ export class GridPhysics {
           entity.targetX = nextX;
           entity.targetY = nextY;
           entity.progress = 0.0;
-        } else if (
-          entity.isPlayer &&
-          this.canJumpLedge(heldDirection, getTileType(nextX, nextY)) &&
-          isWalkable(jumpTargetX, jumpTargetY) &&
-          !this.isTileOccupiedByEntities(jumpTargetX, jumpTargetY, entity, obstacles)
-        ) {
-          // One-way Ledge Hop (jumps 2 tiles over the cliff edge / fence)
-          entity.isMoving = true;
-          entity.isJumping = true;
-          entity.targetX = jumpTargetX;
-          entity.targetY = jumpTargetY;
-          entity.progress = 0.0;
-          if (onLedgeJump) onLedgeJump(entity);
-        } else {
-          // Blocked by collision while trying to walk (Ticket 6.3)
-          if (entity.isPlayer && onBump) {
+        } else if (entity.isPlayer) {
+          const hopDist = this.resolveLedgeHopDistance(
+            entity,
+            heldDirection,
+            delta.dx,
+            delta.dy,
+            isWalkable,
+            getTileType,
+            obstacles
+          );
+          if (hopDist > 0) {
+            // One-way Ledge Hop (jumps 2 or 3 tiles over the cliff edge / fence)
+            entity.isMoving = true;
+            entity.isJumping = true;
+            entity.targetX = entity.x + delta.dx * hopDist;
+            entity.targetY = entity.y + delta.dy * hopDist;
+            entity.progress = 0.0;
+            if (onLedgeJump) onLedgeJump(entity);
+          } else if (onBump) {
             onBump(entity);
           }
         }
@@ -263,33 +303,43 @@ export class GridPhysics {
           const delta = this.getDirectionDelta(heldDirection);
           const nextX = entity.x + delta.dx;
           const nextY = entity.y + delta.dy;
-          const jumpTargetX = entity.x + delta.dx * 2;
-          const jumpTargetY = entity.y + delta.dy * 2;
 
           if (isWalkable(nextX, nextY) && !this.isTileOccupiedByEntities(nextX, nextY, entity, obstacles)) {
             entity.targetX = nextX;
             entity.targetY = nextY;
             entity.isJumping = false;
             entity.progress = overflow;
-          } else if (
-            entity.isPlayer &&
-            this.canJumpLedge(heldDirection, getTileType(nextX, nextY)) &&
-            isWalkable(jumpTargetX, jumpTargetY) &&
-            !this.isTileOccupiedByEntities(jumpTargetX, jumpTargetY, entity, obstacles)
-          ) {
-            entity.targetX = jumpTargetX;
-            entity.targetY = jumpTargetY;
-            entity.isJumping = true;
-            entity.progress = overflow;
-            if (onLedgeJump) onLedgeJump(entity);
+          } else if (entity.isPlayer) {
+            const hopDist = this.resolveLedgeHopDistance(
+              entity,
+              heldDirection,
+              delta.dx,
+              delta.dy,
+              isWalkable,
+              getTileType,
+              obstacles
+            );
+            if (hopDist > 0) {
+              entity.targetX = entity.x + delta.dx * hopDist;
+              entity.targetY = entity.y + delta.dy * hopDist;
+              entity.isJumping = true;
+              entity.progress = overflow;
+              if (onLedgeJump) onLedgeJump(entity);
+            } else {
+              // Blocked by collision
+              entity.isMoving = false;
+              entity.isJumping = false;
+              entity.progress = 0.0;
+              if (onBump) {
+                onBump(entity);
+              }
+              break;
+            }
           } else {
             // Blocked by collision
             entity.isMoving = false;
             entity.isJumping = false;
             entity.progress = 0.0;
-            if (entity.isPlayer && onBump) {
-              onBump(entity);
-            }
             break;
           }
         } else {

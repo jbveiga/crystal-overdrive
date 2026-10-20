@@ -24,6 +24,9 @@ export default defineConfig({
             }
             return 'vendor';
           }
+          if (id.includes('generatedNpcs') || id.includes('npcData')) {
+            return 'world-data';
+          }
         },
       },
     },
