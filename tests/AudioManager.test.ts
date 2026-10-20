@@ -108,4 +108,18 @@ describe('AudioManager (Ticket 3.8)', () => {
     expect(BattleAudio.muted).toBe(false);
     expect(audioManager.getEffectiveBgmVolume()).toBeCloseTo(0.304, 4);
   });
+
+  it('plays authentic retro overworld sound effects without throwing (Ticket 6.3)', () => {
+    expect(() => {
+      BattleAudio.playOverworldSound('BUMP');
+      BattleAudio.playOverworldSound('HOP');
+      BattleAudio.playOverworldSound('RUSTLE');
+      BattleAudio.playOverworldSound('HEAL_JINGLE');
+      BattleAudio.playOverworldSound('FANFARE');
+      BattleAudio.playOverworldSound('EXCLAMATION');
+      BattleAudio.playOverworldSound('DOOR');
+      BattleAudio.playOverworldSound('KEY_ITEM');
+      BattleAudio.playOverworldSound('PHONE_RING');
+    }).not.toThrow();
+  });
 });

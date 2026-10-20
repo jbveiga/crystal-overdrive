@@ -68,6 +68,7 @@ export type CollisionCheck = (x: number, y: number) => boolean;
 export type TileTypeLookup = (x: number, y: number) => number;
 export type TileEnteredCallback = (entity: GridEntity, coord: TileCoord, tileType: number) => void;
 export type LedgeJumpCallback = (entity: GridEntity) => void;
+export type CollisionBumpCallback = (entity: GridEntity) => void;
 
 export class GridPhysics {
   public static readonly BASE_TRAVERSAL_TIME: number = 0.24; // 0.24 seconds per tile at 1x speed
@@ -170,7 +171,8 @@ export class GridPhysics {
     getTileType: TileTypeLookup,
     onTileEntered?: TileEnteredCallback,
     obstacles?: readonly GridEntity[],
-    onLedgeJump?: LedgeJumpCallback
+    onLedgeJump?: LedgeJumpCallback,
+    onBump?: CollisionBumpCallback
   ): void {
     if (dt <= 0) return;
 
@@ -203,6 +205,11 @@ export class GridPhysics {
           entity.targetY = jumpTargetY;
           entity.progress = 0.0;
           if (onLedgeJump) onLedgeJump(entity);
+        } else {
+          // Blocked by collision while trying to walk (Ticket 6.3)
+          if (entity.isPlayer && onBump) {
+            onBump(entity);
+          }
         }
       }
     }
@@ -262,6 +269,9 @@ export class GridPhysics {
             entity.isMoving = false;
             entity.isJumping = false;
             entity.progress = 0.0;
+            if (entity.isPlayer && onBump) {
+              onBump(entity);
+            }
             break;
           }
         } else {

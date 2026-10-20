@@ -334,4 +334,25 @@ describe('GridPhysics', () => {
     const afterDefeat = GridPhysics.checkTrainerLineOfSight(player, [trainer], defeated, () => 0);
     expect(afterDefeat).toBeNull();
   });
+
+  it('triggers onBump callback when player attempts to move into a non-walkable tile (Ticket 6.3)', () => {
+    const player = createMockEntity({ isPlayer: true });
+    const isSolid = () => false; // Everything solid
+    const bumpSpy = vi.fn();
+
+    GridPhysics.updateEntity(
+      player,
+      0.05,
+      'DOWN',
+      isSolid,
+      tileLookup,
+      undefined,
+      undefined,
+      undefined,
+      bumpSpy
+    );
+
+    expect(bumpSpy).toHaveBeenCalledTimes(1);
+    expect(bumpSpy).toHaveBeenCalledWith(player);
+  });
 });

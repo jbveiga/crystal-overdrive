@@ -337,7 +337,16 @@ export class BattleAudio {
    * Plays authentic Game Boy Color overworld sound effects (Tall grass rustle, Ledge hop, Trainer '!' alert, Doorway, Key Item, Pokégear ring)
    */
   public static playOverworldSound(
-    type: 'RUSTLE' | 'HOP' | 'EXCLAMATION' | 'DOOR' | 'KEY_ITEM' | 'PHONE_RING'
+    type:
+      | 'RUSTLE'
+      | 'HOP'
+      | 'EXCLAMATION'
+      | 'DOOR'
+      | 'KEY_ITEM'
+      | 'PHONE_RING'
+      | 'BUMP'
+      | 'HEAL_JINGLE'
+      | 'FANFARE'
   ): void {
     const ctx = this.getContext();
     if (!ctx) return;
@@ -426,6 +435,61 @@ export class BattleAudio {
         gain.connect(ctx.destination);
         osc.start(now + i * 0.055);
         osc.stop(now + (i + 1) * 0.055);
+      });
+    } else if (type === 'BUMP') {
+      // Authentic retro Game Boy wall bump thud (120Hz -> 65Hz)
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(65, now + 0.06);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.065);
+    } else if (type === 'HEAL_JINGLE') {
+      // Classic Nurse Joy 6-note recovery melody (E5, G5, C6, E6, C6, E6)
+      const notes = [
+        { f: 659.25, d: 0.11, t: 0 },
+        { f: 783.99, d: 0.11, t: 0.11 },
+        { f: 1046.5, d: 0.11, t: 0.22 },
+        { f: 1318.51, d: 0.13, t: 0.33 },
+        { f: 1046.5, d: 0.13, t: 0.46 },
+        { f: 1318.51, d: 0.32, t: 0.59 },
+      ];
+      notes.forEach((n) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(n.f, now + n.t);
+        gain.gain.setValueAtTime(0.075, now + n.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + n.t);
+        osc.stop(now + n.t + n.d);
+      });
+    } else if (type === 'FANFARE') {
+      // 4-note upbeat triumph item fanfare
+      const notes = [
+        { f: 523.25, d: 0.09, t: 0 },
+        { f: 659.25, d: 0.09, t: 0.09 },
+        { f: 783.99, d: 0.09, t: 0.18 },
+        { f: 1046.5, d: 0.28, t: 0.27 },
+      ];
+      notes.forEach((n) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(n.f, now + n.t);
+        gain.gain.setValueAtTime(0.07, now + n.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + n.t);
+        osc.stop(now + n.t + n.d);
       });
     }
   }

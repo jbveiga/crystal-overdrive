@@ -442,8 +442,11 @@ async function bootstrap() {
     }
   });
 
-  // Helper to heal the player's party to full HP, PP, and clear status
-  const healPlayerParty = () => {
+  // Helper to heal the player's party to full HP, PP, and clear status (Ticket 6.3 Nurse Joy jingle)
+  const healPlayerParty = (playSound: boolean = true) => {
+    if (playSound) {
+      BattleAudio.playOverworldSound('HEAL_JINGLE');
+    }
     for (const pkmn of playerParty) {
       pkmn.currentHp = pkmn.stats.hp;
       pkmn.status = 'NONE';
@@ -2238,6 +2241,15 @@ async function bootstrap() {
     }
   };
 
+  let lastBumpSoundTime = 0;
+  const handlePlayerBump = () => {
+    const now = performance.now();
+    if (now - lastBumpSoundTime > 260) {
+      lastBumpSoundTime = now;
+      BattleAudio.playOverworldSound('BUMP');
+    }
+  };
+
   // 8. Decoupled Main Ticker Loop
   overworldRenderer.app.ticker.add((ticker) => {
     const rawDeltaSec = ticker.deltaMS / 1000;
@@ -2414,6 +2426,9 @@ async function bootstrap() {
         activeNpcs,
         () => {
           BattleAudio.playOverworldSound('HOP');
+        },
+        () => {
+          handlePlayerBump();
         }
       );
 
