@@ -78,13 +78,13 @@ src/
 │   ├── DamageCalculator.ts   # Gen 4+ split, STAB, criticals, stat stages (-6 to +6)
 │   ├── PokemonFactory.ts     # Showdown Dex integration, EXP gain, level-up calculation
 │   ├── CatchCalculator.ts    # Gen 2 & Gen 4 Pokeball catch probabilities
-│   └── EffectivenessHelper.ts # Live Unbound-style type multiplier badges
+│   └── EffectivenessHelper.ts # Live Unbound-style type multiplier badges, hit shake specs, and ball palettes
 ├── render/                # GPU Canvas Graphics (PixiJS v8)
 │   ├── OverworldRenderer.ts  # 64x64 tiles, tall grass tufts, day/night tints, culling
-│   └── BattleRenderer.ts     # 2.5D stage, elemental particle FX, camera shakes, idle tweens
+│   └── BattleRenderer.ts     # 2.5D stage, custom Pokeball arcs, Physical/Special hit FX, camera shakes
 ├── ui/                    # Vector DOM Overlays & Interactivity
 │   ├── OverworldHUD.ts       # Speed controls, Roamer radar, dialogue typewriter
-│   ├── BattleHUD.ts          # Unbound move buttons, HP/EXP bars, party switcher
+│   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, Unbound 2x2 move matrix & hotkeys
 │   ├── StartMenuUI.ts        # Classic start menu (Pokedex, Pokemon, Bag, Save)
 │   ├── PartyManagementUI.ts  # Full party inspector, lead reordering, summaries
 │   └── BagAndMartUI.ts       # Progressive Mart inventory, out-of-battle medicine
@@ -229,10 +229,10 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `MapData.ts` | `tests/MapData.test.ts` | 10 | ✅ Covered | Binary map extraction schema, warp coords, NPC spawn data, seamless connections, directional hop codes. |
 | `RoamingManager.ts`| `tests/RoamingManager.test.ts` | 4 | ✅ Covered | Adjacency graph traversal, route weighting, active state, Burned Tower dormancy. |
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
-| `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 10 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6). |
+| `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 11 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6), Unbound pill styles & hit shake specs. |
 | `SaveManager.ts` | `tests/SaveManager.test.ts` | 2 | ✅ Covered | IndexedDB / localStorage serialization, round-trip state restoration. |
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 5 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync. |
-| **Current Baseline** | **8 Suites** | **56 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| **Current Baseline** | **8 Suites** | **57 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

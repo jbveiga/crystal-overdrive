@@ -48,6 +48,11 @@ This project is made possible thanks to the tireless preservation work, reverse-
   - Supplementary 2D Pokémon battle front and back renders.
   - Authentic Pokéball item and throw sprites (`sprites/items/*.png`: Poké Ball, Great Ball, Ultra Ball, Master Ball, Fast, Heavy, Level, Lure, Moon, Friend, Love, Dusk, Net, Quick, Timer, Repeat, Nest Balls).
 
+### Pokémon Unbound (UI & Ergonomic Inspiration)
+* **Authors:** Skeli and the Pokémon Unbound development team.
+* **Design Inspiration Utilized:**
+  - Real-time 2x2 Fight move matrix with live type effectiveness pills (`4x ULTRA`, `2x SUPER`, `1x NORMAL`, `0.5x NOT VERY`, `0.25x RESIST`, `0x IMMUNE`), Physical/Special/Status category icons, and modern asymmetric battle HUD ergonomics.
+
 ---
 
 ## 3. Original Game Design, Art & Music Composition

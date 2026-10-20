@@ -49,6 +49,74 @@ describe('EffectivenessHelper', () => {
     expect(badge.multiplier).toBe(0);
     expect(badge.label).toBe('0x IMMUNE');
   });
+
+  it('computes Unbound-style 2x2 Move Matrix pill styles, hit shake specs, and Pokéball palettes (Ticket 3.9)', () => {
+    expect(EffectivenessHelper.getPillStyle(4)).toEqual({
+      label: '4x ULTRA',
+      background: '#ec4899',
+      pulse: true,
+      strikethrough: false,
+    });
+    expect(EffectivenessHelper.getPillStyle(2)).toEqual({
+      label: '2x SUPER',
+      background: '#16a34a',
+      pulse: false,
+      strikethrough: false,
+    });
+    expect(EffectivenessHelper.getPillStyle(1)).toEqual({
+      label: '1x NORMAL',
+      background: 'rgba(100, 116, 139, 0.45)',
+      pulse: false,
+      strikethrough: false,
+    });
+    expect(EffectivenessHelper.getPillStyle(0.5)).toEqual({
+      label: '0.5x NOT VERY',
+      background: '#d97706',
+      pulse: false,
+      strikethrough: false,
+    });
+    expect(EffectivenessHelper.getPillStyle(0.25)).toEqual({
+      label: '0.25x RESIST',
+      background: '#b45309',
+      pulse: false,
+      strikethrough: false,
+    });
+    expect(EffectivenessHelper.getPillStyle(0)).toEqual({
+      label: '0x IMMUNE',
+      background: '#dc2626',
+      pulse: false,
+      strikethrough: true,
+    });
+
+    // Hit shake amplitude & duration scaling
+    expect(EffectivenessHelper.getDamageShakeSpec(0.5, false, 'Physical')).toEqual({
+      amplitude: 2,
+      durationSec: 0.1,
+      flashTint: 0xef4444,
+      screenWhiteFlash: false,
+    });
+    expect(EffectivenessHelper.getDamageShakeSpec(1, false, 'Special')).toEqual({
+      amplitude: 4,
+      durationSec: 0.15,
+      flashTint: 0xffffff,
+      screenWhiteFlash: false,
+    });
+    expect(EffectivenessHelper.getDamageShakeSpec(2, false, 'Physical')).toEqual({
+      amplitude: 8,
+      durationSec: 0.22,
+      flashTint: 0xffffff,
+      screenWhiteFlash: true,
+    });
+
+    // Custom Pokéball palette & sprite path resolution
+    expect(EffectivenessHelper.getPokeballPalette('ultra_ball')).toEqual({
+      normalizedId: 'ultra-ball',
+      topColor: 0x1e293b,
+      accentColor: 0xfacc15,
+      bottomColor: 0xf8fafc,
+      spritePath: './assets/sprites/items/ultra-ball.png',
+    });
+  });
 });
 
 describe('DamageCalculator', () => {

@@ -1,7 +1,8 @@
 import { Application, Container, Sprite, Texture, Assets, Graphics } from 'pixi.js';
 import gsap from 'gsap';
-import type { PokemonInstance, SpeedMultiplier, PokemonType, MoveCategory } from '../types/game';
+import type { PokemonInstance, SpeedMultiplier, PokemonType, MoveCategory, PokeballId } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
+import { EffectivenessHelper } from '../battle/EffectivenessHelper';
 
 export class BattleRenderer {
   public app: Application;
@@ -15,6 +16,7 @@ export class BattleRenderer {
   private playerIdleTween: gsap.core.Tween | null = null;
   private enemyIdleTween: gsap.core.Tween | null = null;
   private speedMultiplier: SpeedMultiplier = 1;
+  private lastMoveCategory: MoveCategory = 'Physical';
 
   constructor(app: Application) {
     this.app = app;
@@ -109,13 +111,10 @@ export class BattleRenderer {
     // Enemy Bevelled Platform (Top Right)
     const enemyPlatformX = width * 0.72;
     const enemyPlatformY = height * 0.39;
-    // Outer base shadow
     bg.ellipse(enemyPlatformX, enemyPlatformY + 7, 148, 46);
     bg.fill({ color: 0x14532d, alpha: 0.55 });
-    // Bevel rim
     bg.ellipse(enemyPlatformX, enemyPlatformY + 3, 144, 44);
     bg.fill({ color: 0x15803d });
-    // Inner turf ring
     bg.ellipse(enemyPlatformX, enemyPlatformY, 138, 40);
     bg.fill({ color: 0x86efac });
     bg.stroke({ width: 3, color: 0x16a34a });
@@ -125,13 +124,10 @@ export class BattleRenderer {
     // Player Bevelled Platform (Bottom Left)
     const playerPlatformX = width * 0.28;
     const playerPlatformY = height * 0.73;
-    // Outer base shadow
     bg.ellipse(playerPlatformX, playerPlatformY + 9, 188, 58);
     bg.fill({ color: 0x14532d, alpha: 0.55 });
-    // Bevel rim
     bg.ellipse(playerPlatformX, playerPlatformY + 4, 184, 55);
     bg.fill({ color: 0x15803d });
-    // Inner turf ring
     bg.ellipse(playerPlatformX, playerPlatformY, 176, 50);
     bg.fill({ color: 0x86efac });
     bg.stroke({ width: 3.5, color: 0x16a34a });
@@ -202,15 +198,12 @@ export class BattleRenderer {
         },
       });
 
-      // Double encounter flash
       tl.to(whiteFlash, { alpha: 0, duration: flashDur, yoyo: true, repeat: 2 });
-      // Open horizontal shutters while sliding combatants in
       tl.to(shutterTop, { y: -height / 2, duration: slideDur, ease: 'power2.inOut' }, 'wipe');
       tl.to(shutterBottom, { y: height / 2, duration: slideDur, ease: 'power2.inOut' }, 'wipe');
       tl.to(this.enemyPokemonSprite, { x: enemyPlatformX, duration: slideDur, ease: 'power2.out' }, 'wipe');
       tl.to(this.playerPokemonSprite, { x: playerPlatformX, duration: slideDur, ease: 'power2.out' }, 'wipe');
 
-      // Pokémon Crystal 2-Frame Entrance Animation Bounce + Species Cry
       tl.call(() => {
         BattleAudio.playCry(enemyPokemon.speciesId);
       });
@@ -225,24 +218,24 @@ export class BattleRenderer {
   }
 
   /**
-   * Animates a move with physical lunge + slash or elemental projectile particles
+   * Animates a move with Physical lunge + crimson hit distinction vs Special cast pulse + projectile vector
    */
   public animateAttack(
     attackerIsPlayer: boolean,
     moveType: PokemonType = 'Normal',
     moveCategory: MoveCategory = 'Physical'
   ): Promise<void> {
+    this.lastMoveCategory = moveCategory;
     BattleAudio.playMoveAttack(moveType, moveCategory);
 
     return new Promise((resolve) => {
       const attacker = attackerIsPlayer ? this.playerPokemonSprite : this.enemyPokemonSprite;
       const defender = attackerIsPlayer ? this.enemyPokemonSprite : this.playerPokemonSprite;
-      const targetDeltaX = attackerIsPlayer ? 42 : -42;
-      const targetDeltaY = attackerIsPlayer ? -22 : 22;
+      const targetDeltaX = attackerIsPlayer ? 46 : -46;
+      const targetDeltaY = attackerIsPlayer ? -24 : 24;
       const dur = 0.12 / this.speedMultiplier;
 
       if (moveCategory === 'Status') {
-        // Subtle cast pulse for status moves
         gsap.to(attacker, {
           y: '-=12',
           duration: dur,
@@ -254,15 +247,28 @@ export class BattleRenderer {
         return;
       }
 
-      // Lunge attacker
-      gsap.to(attacker, {
-        x: `+=${targetDeltaX}`,
-        y: `+=${targetDeltaY}`,
-        duration: dur,
-        yoyo: true,
-        repeat: 1,
-        ease: 'power1.inOut',
-      });
+      if (moveCategory === 'Physical') {
+        // Physical move: Attacker lunges forcefully toward target
+        gsap.to(attacker, {
+          x: `+=${targetDeltaX}`,
+          y: `+=${targetDeltaY}`,
+          duration: dur,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power2.inOut',
+        });
+      } else {
+        // Special move: Attacker pulses with elemental energy
+        const baseScale = attackerIsPlayer ? 3.2 : 2.4;
+        gsap.to(attacker.scale, {
+          x: baseScale * 1.14,
+          y: baseScale * 1.14,
+          duration: dur,
+          yoyo: true,
+          repeat: 1,
+          ease: 'sine.inOut',
+        });
+      }
 
       // Spawn Elemental Particle FX from attacker to defender
       const startX = attacker.x + (attackerIsPlayer ? 30 : -30);
@@ -292,28 +298,23 @@ export class BattleRenderer {
       for (let i = 0; i < particleCount; i++) {
         const p = new Graphics();
         if (moveType === 'Electric') {
-          // Lightning spark shard
           p.poly([-6, -12, 4, -2, -2, 2, 6, 12, -4, 2, 2, -2]);
           p.fill({ color: 0xfef08a });
           p.stroke({ width: 2, color: 0xeab308 });
         } else if (moveType === 'Grass') {
-          // Razor leaf crescent
           p.ellipse(0, 0, 12, 5);
           p.fill({ color: 0x4ade80 });
           p.stroke({ width: 1.5, color: 0x15803d });
         } else if (moveType === 'Fire') {
-          // Flame orb
           p.circle(0, 0, 11);
           p.fill({ color: 0xef4444 });
           p.circle(0, 0, 6);
           p.fill({ color: 0xfde047 });
         } else if (moveType === 'Water' || moveType === 'Ice') {
-          // Bubble / Ice crystal
           p.circle(0, 0, 10);
           p.fill({ color: fxColor, alpha: 0.85 });
           p.stroke({ width: 2, color: 0xffffff });
         } else {
-          // Impact star / slash
           p.star(0, 0, 5, 12, 5);
           p.fill({ color: fxColor });
           p.stroke({ width: 1.5, color: 0xfbbf24 });
@@ -337,7 +338,6 @@ export class BattleRenderer {
             },
           });
         } else {
-          // Physical impact burst directly over defender
           p.position.set(endX, endY);
           const angle = (i / particleCount) * Math.PI * 2;
           const burstDur = 0.2 / this.speedMultiplier;
@@ -406,39 +406,63 @@ export class BattleRenderer {
   }
 
   /**
-   * Flashes damaged sprite and shakes screen based on effectiveness & critical hit
+   * Flashes damaged sprite (crimson 0xef4444 for Physical, bright white 0xffffff for Special / Super Effective)
+   * and shakes screen & target horizontally scaled by effectiveness & critical hit (Ticket 3.9).
    */
   public animateDamage(
     targetIsPlayer: boolean,
     effectiveness: number = 1,
-    isCritical: boolean = false
+    isCritical: boolean = false,
+    moveCategory: MoveCategory = this.lastMoveCategory
   ): Promise<void> {
     BattleAudio.playHitImpact(effectiveness, isCritical);
+    const spec = EffectivenessHelper.getDamageShakeSpec(effectiveness, isCritical, moveCategory);
 
     return new Promise((resolve) => {
       const sprite = targetIsPlayer ? this.playerPokemonSprite : this.enemyPokemonSprite;
-      const dur = 0.06 / this.speedMultiplier;
+      const originX = sprite.x;
+      const scaledShakeDur = spec.durationSec / this.speedMultiplier;
+      const stepDur = scaledShakeDur / 4;
 
-      // Screen Shake scaled by effectiveness / critical
-      const shakeIntensity = isCritical || effectiveness >= 2 ? 10 : effectiveness >= 1 ? 5 : 2;
+      // Apply Physical crimson tint (0xef4444) or Special/Crit white flash
+      sprite.tint = moveCategory === 'Physical' ? 0xef4444 : spec.flashTint;
+
+      if (spec.screenWhiteFlash) {
+        const flashOverlay = new Graphics();
+        flashOverlay.rect(0, 0, this.app.screen.width, this.app.screen.height);
+        flashOverlay.fill({ color: 0xffffff, alpha: 0.45 });
+        this.fxContainer.addChild(flashOverlay);
+        gsap.to(flashOverlay, {
+          alpha: 0,
+          duration: (0.12 / this.speedMultiplier),
+          onComplete: () => {
+            this.fxContainer.removeChild(flashOverlay);
+          },
+        });
+      }
+
+      // Arena & Target Horizontal Shake scaled by effectiveness (2px / 4px / 8px)
       gsap.to(this.arenaContainer, {
-        x: shakeIntensity,
-        y: shakeIntensity * 0.5,
-        duration: 0.04 / this.speedMultiplier,
+        x: spec.amplitude,
+        y: spec.amplitude * 0.4,
+        duration: stepDur,
         yoyo: true,
-        repeat: 5,
+        repeat: 3,
         onComplete: () => {
           this.arenaContainer.position.set(0, 0);
         },
       });
 
       gsap.to(sprite, {
-        alpha: 0.15,
-        duration: dur,
+        x: originX + spec.amplitude,
+        alpha: 0.25,
+        duration: stepDur,
         yoyo: true,
         repeat: 3,
         onComplete: () => {
+          sprite.x = originX;
           sprite.alpha = 1;
+          sprite.tint = 0xffffff;
           resolve();
         },
       });
@@ -505,50 +529,75 @@ export class BattleRenderer {
     });
   }
 
-  public animateThrowBall(): Promise<Graphics> {
+  /**
+   * Throws an authentic custom-styled Pokéball along a parabolic arc (Ticket 3.9).
+   */
+  public async animateThrowBall(ballId: PokeballId | string = 'poke-ball'): Promise<Graphics> {
     BattleAudio.playBallEvent('THROW');
+    const palette = EffectivenessHelper.getPokeballPalette(ballId);
+
+    const width = this.app.screen.width;
+    const height = this.app.screen.height;
+
+    const ball = new Graphics();
+    // Upper hemisphere with custom Pokéball cap color
+    ball.arc(0, 0, 14, Math.PI, 0);
+    ball.fill({ color: palette.topColor });
+    // Accent crest / stripe on upper cap
+    ball.arc(0, -4, 7, Math.PI, 0);
+    ball.fill({ color: palette.accentColor });
+    // Lower hemisphere
+    ball.arc(0, 0, 14, 0, Math.PI);
+    ball.fill({ color: palette.bottomColor });
+    // Center band & button
+    ball.rect(-14, -2, 28, 4);
+    ball.fill({ color: 0x1e293b });
+    ball.circle(0, 0, 4.5);
+    ball.fill({ color: 0xffffff });
+    ball.stroke({ width: 1.5, color: 0x1e293b });
+
+    // Overlay pixel item sprite if available
+    try {
+      const tex = await Assets.load<Texture>(palette.spritePath);
+      if (tex) {
+        tex.source.scaleMode = 'nearest';
+        const spr = new Sprite(tex);
+        spr.anchor.set(0.5, 0.5);
+        spr.scale.set(2.0, 2.0);
+        ball.addChild(spr);
+      }
+    } catch {
+      // Fallback to custom vector Pokeball graphics
+    }
+
+    const startX = width * 0.28;
+    const startY = height * 0.72;
+    ball.position.set(startX, startY);
+    this.arenaContainer.addChild(ball);
+
+    const dur = 0.42 / this.speedMultiplier;
+    const targetX = this.enemyPokemonSprite.x;
+    const targetY = this.enemyPokemonSprite.y - 20;
 
     return new Promise((resolve) => {
-      const width = this.app.screen.width;
-      const height = this.app.screen.height;
-
-      const ball = new Graphics();
-      // Upper half red
-      ball.arc(0, 0, 14, Math.PI, 0);
-      ball.fill({ color: 0xdc2626 });
-      // Lower half white
-      ball.arc(0, 0, 14, 0, Math.PI);
-      ball.fill({ color: 0xf8fafc });
-      // Center band & button
-      ball.rect(-14, -2, 28, 4);
-      ball.fill({ color: 0x1e293b });
-      ball.circle(0, 0, 4);
-      ball.fill({ color: 0xffffff });
-      ball.stroke({ width: 1.5, color: 0x1e293b });
-
-      ball.position.set(width * 0.28, height * 0.72);
-      this.arenaContainer.addChild(ball);
-
-      const dur = 0.4 / this.speedMultiplier;
-      const targetX = this.enemyPokemonSprite.x;
-      const targetY = this.enemyPokemonSprite.y - 20;
-
-      // Parabolic arc throw
-      gsap.to(ball, {
-        x: targetX,
-        y: targetY,
-        rotation: Math.PI * 2,
+      const arcState = { t: 0 };
+      gsap.to(arcState, {
+        t: 1,
         duration: dur,
-        ease: 'power1.out',
+        ease: 'none',
+        onUpdate: () => {
+          const p = arcState.t;
+          ball.x = startX + (targetX - startX) * p;
+          ball.y = startY + (targetY - startY) * p - Math.sin(p * Math.PI) * 110;
+          ball.rotation = p * Math.PI * 2;
+        },
         onComplete: () => {
           if (this.enemyIdleTween) this.enemyIdleTween.kill();
-          // Shrink enemy sprite into ball with white flash
           gsap.to(this.enemyPokemonSprite, {
             alpha: 0,
             scale: 0.1,
             duration: 0.2 / this.speedMultiplier,
             onComplete: () => {
-              // Ball drops down and bounces on pedestal
               gsap.to(ball, {
                 y: targetY + 30,
                 rotation: 0,
@@ -570,7 +619,6 @@ export class BattleRenderer {
         onComplete: () => {
           if (caught) {
             BattleAudio.playBallEvent('CAUGHT');
-            // Classic 3 Golden Capture Stars bursting above the locked Pokéball
             const starGroup = new Container();
             this.fxContainer.addChild(starGroup);
             const offsets = [-22, 0, 22];
@@ -601,7 +649,6 @@ export class BattleRenderer {
             });
           } else {
             BattleAudio.playBallEvent('BREAK');
-            // Ball bursts open, enemy reappears
             this.arenaContainer.removeChild(ball);
             this.enemyPokemonSprite.alpha = 1;
             this.enemyPokemonSprite.scale.set(2.4, 2.4);

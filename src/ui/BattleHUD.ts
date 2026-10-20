@@ -39,6 +39,8 @@ const STATUS_COLORS: Record<string, string> = {
   TOX: '#9333ea',
 };
 
+const MOVE_SHORTCUT_LABELS = ['1 / Q', '2 / W', '3 / A', '4 / S'];
+
 export class BattleHUD {
   private container: HTMLElement;
   private rootElement!: HTMLDivElement;
@@ -52,6 +54,7 @@ export class BattleHUD {
   private playerExpBar!: HTMLDivElement;
   private playerHpText!: HTMLSpanElement;
   private enemyHpText!: HTMLSpanElement;
+  private playerPartyDock!: HTMLDivElement;
   private speedButton!: HTMLButtonElement;
 
   private playerPokemon!: PokemonInstance;
@@ -68,7 +71,32 @@ export class BattleHUD {
       throw new Error(`HUD Container #${containerId} not found in DOM`);
     }
     this.container = el;
+    this.injectKeyframeStyles();
     this.createUI();
+    this.setupKeyboardShortcuts();
+  }
+
+  private injectKeyframeStyles(): void {
+    if (document.getElementById('crystal-battle-hud-styles')) return;
+    const styleEl = document.createElement('style');
+    styleEl.id = 'crystal-battle-hud-styles';
+    styleEl.textContent = `
+      @keyframes crystalUltraPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(236, 72, 153, 0.75); }
+        50% { transform: scale(1.06); box-shadow: 0 0 14px rgba(236, 72, 153, 1); }
+      }
+      @keyframes crystalLowHpPulse {
+        0%, 100% { opacity: 1; filter: brightness(1); }
+        50% { opacity: 0.72; filter: brightness(1.35); }
+      }
+      .crystal-ultra-pill {
+        animation: crystalUltraPulse 1.1s infinite ease-in-out;
+      }
+      .crystal-low-hp {
+        animation: crystalLowHpPulse 0.85s infinite ease-in-out;
+      }
+    `;
+    document.head.appendChild(styleEl);
   }
 
   private getCategorySvg(category: 'Physical' | 'Special' | 'Status'): string {
@@ -118,7 +146,7 @@ export class BattleHUD {
     `;
 
     root.innerHTML = `
-      <!-- Top Area: Asymmetric Enemy HUD Card (Top-Left) & Speed Toggle (Top-Right) -->
+      <!-- Top Area: Asymmetric Enemy HUD Card (Top-Left) & Speed Toggle Pill (Top-Right) -->
       <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
         <div id="enemy-card" style="
           background: rgba(15, 23, 42, 0.92);
@@ -127,7 +155,7 @@ export class BattleHUD {
           border-bottom: 4px solid #334155;
           border-radius: 10px 10px 18px 10px;
           padding: 12px 20px;
-          min-width: 295px;
+          min-width: 300px;
           box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
         ">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
@@ -137,12 +165,12 @@ export class BattleHUD {
               <span id="enemy-gender"></span>
               <span id="enemy-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap;"></span>
             </div>
-            <span id="enemy-level" style="color: #facc15; font-size: 14px; font-weight: 800;">Lv. 3</span>
+            <span id="enemy-level" style="background: rgba(250, 204, 21, 0.16); border: 1px solid rgba(250, 204, 21, 0.45); color: #facc15; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 999px;">Lv. 3</span>
           </div>
           <div style="margin-top: 8px;">
             <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 700;">
               <span style="color: #facc15; letter-spacing: 0.5px;">HP</span>
-              <span id="enemy-hp-text">16 / 16</span>
+              <span id="enemy-hp-text">16 / 16 HP</span>
             </div>
             <div style="width: 100%; height: 9px; background: #1e293b; border: 1px solid #475569; border-radius: 5px; overflow: hidden;">
               <div id="enemy-hp-bar" style="width: 100%; height: 100%; background: #22c55e; transition: width 0.3s ease;"></div>
@@ -154,20 +182,20 @@ export class BattleHUD {
           <button id="battle-speed-btn" style="
             background: #2563eb;
             color: #ffffff;
-            border: none;
-            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
             padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 13px;
+            font-weight: 800;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
           ">
-            BATTLE: 1x (Shift)
+            ⚡ SPEED: 1x (Shift)
           </button>
         </div>
       </div>
 
-      <!-- Mid-Lower Area: Asymmetric Player HUD Card (Bottom-Right) with Cyan EXP Bar -->
+      <!-- Mid-Right Area: Asymmetric Player HUD Card with Numeric HP, Cyan EXP Bar & 6-Dot Party Dock -->
       <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;">
         <div id="player-card" style="
           background: rgba(15, 23, 42, 0.92);
@@ -176,7 +204,7 @@ export class BattleHUD {
           border-bottom: 4px solid #334155;
           border-radius: 18px 10px 10px 10px;
           padding: 12px 20px 10px 20px;
-          min-width: 310px;
+          min-width: 320px;
           box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
         ">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
@@ -185,23 +213,26 @@ export class BattleHUD {
               <span id="player-gender"></span>
               <span id="player-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap;"></span>
             </div>
-            <span id="player-level" style="color: #facc15; font-size: 14px; font-weight: 800;">Lv. 5</span>
+            <span id="player-level" style="background: rgba(250, 204, 21, 0.16); border: 1px solid rgba(250, 204, 21, 0.45); color: #facc15; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 999px;">Lv. 5</span>
           </div>
           <div style="margin-top: 8px;">
             <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 700;">
               <span style="color: #facc15; letter-spacing: 0.5px;">HP</span>
-              <span id="player-hp-text" style="color: #f8fafc; font-weight: 800;">20 / 20</span>
+              <span id="player-hp-text" style="color: #f8fafc; font-weight: 800;">20 / 20 HP</span>
             </div>
             <div style="width: 100%; height: 9px; background: #1e293b; border: 1px solid #475569; border-radius: 5px; overflow: hidden;">
               <div id="player-hp-bar" style="width: 100%; height: 100%; background: #22c55e; transition: width 0.3s ease;"></div>
             </div>
           </div>
-          <!-- Classic Cyan EXP Bar along the bottom edge -->
-          <div style="margin-top: 7px; display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 9px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">EXP</span>
-            <div style="flex: 1; height: 5px; background: #0f172a; border: 1px solid #334155; border-radius: 3px; overflow: hidden;">
-              <div id="player-exp-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.35s ease;"></div>
+          <!-- Cyan EXP Bar + 6-Dot Miniature Party Dock -->
+          <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <div style="flex: 1; display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 9px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">EXP</span>
+              <div style="flex: 1; height: 5px; background: #0f172a; border: 1px solid #334155; border-radius: 3px; overflow: hidden;">
+                <div id="player-exp-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.35s ease;"></div>
+              </div>
             </div>
+            <div id="player-party-dock" title="Party Status" style="display: flex; align-items: center; gap: 4px;"></div>
           </div>
         </div>
       </div>
@@ -215,7 +246,7 @@ export class BattleHUD {
         padding: 16px;
         box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
         pointer-events: auto;
-        min-height: 125px;
+        min-height: 132px;
         display: flex;
         gap: 20px;
       ">
@@ -285,12 +316,13 @@ export class BattleHUD {
           ">RUN</button>
         </div>
 
-        <!-- Fight Submenu (Unbound Move Buttons) -->
+        <!-- Fight Submenu (Unbound 2x2 Move Matrix) -->
         <div id="battle-fight-menu" style="
           display: none;
           grid-template-columns: 1fr 1fr;
           gap: 10px;
-          flex: 2;
+          flex: 1;
+          width: 100%;
         "></div>
 
         <!-- Bag Submenu (Pokéballs) -->
@@ -298,8 +330,9 @@ export class BattleHUD {
           display: none;
           grid-template-columns: 1fr 1fr;
           gap: 10px;
-          flex: 2;
-          max-height: 140px;
+          flex: 1;
+          width: 100%;
+          max-height: 150px;
           overflow-y: auto;
         "></div>
 
@@ -308,8 +341,9 @@ export class BattleHUD {
           display: none;
           grid-template-columns: 1fr 1fr;
           gap: 10px;
-          flex: 2;
-          max-height: 140px;
+          flex: 1;
+          width: 100%;
+          max-height: 150px;
           overflow-y: auto;
         "></div>
       </div>
@@ -328,6 +362,7 @@ export class BattleHUD {
     this.playerExpBar = root.querySelector('#player-exp-bar') as HTMLDivElement;
     this.playerHpText = root.querySelector('#player-hp-text') as HTMLSpanElement;
     this.enemyHpText = root.querySelector('#enemy-hp-text') as HTMLSpanElement;
+    this.playerPartyDock = root.querySelector('#player-party-dock') as HTMLDivElement;
     this.speedButton = root.querySelector('#battle-speed-btn') as HTMLButtonElement;
 
     this.speedButton.addEventListener('click', () => {
@@ -351,6 +386,54 @@ export class BattleHUD {
     root.querySelector('#btn-pokemon')!.addEventListener('click', () => {
       this.showPartyMenu();
     });
+  }
+
+  private setupKeyboardShortcuts(): void {
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (this.rootElement?.style.display !== 'flex' || e.repeat) return;
+
+      const isFightMenuOpen = this.fightMenu?.style.display === 'grid';
+      const isBagMenuOpen = this.bagMenu?.style.display === 'grid';
+      const isPartyMenuOpen = this.partyMenu?.style.display === 'grid';
+
+      if (isFightMenuOpen) {
+        let moveIdx = -1;
+        if (e.code === 'Digit1' || e.code === 'KeyQ') moveIdx = 0;
+        else if (e.code === 'Digit2' || e.code === 'KeyW') moveIdx = 1;
+        else if (e.code === 'Digit3' || e.code === 'KeyA') moveIdx = 2;
+        else if (e.code === 'Digit4' || e.code === 'KeyS') moveIdx = 3;
+        else if (e.code === 'Escape' || e.code === 'KeyX') {
+          e.preventDefault();
+          this.showActionMenu();
+          return;
+        }
+
+        if (moveIdx >= 0 && this.playerPokemon?.moves[moveIdx]) {
+          e.preventDefault();
+          this.selectMoveSlot(moveIdx);
+        }
+        return;
+      }
+
+      if ((isBagMenuOpen || isPartyMenuOpen) && (e.code === 'Escape' || e.code === 'KeyX')) {
+        e.preventDefault();
+        this.showActionMenu();
+      }
+    });
+  }
+
+  private selectMoveSlot(index: number): void {
+    const moveSlot = this.playerPokemon?.moves[index];
+    if (!moveSlot) return;
+    const moveData = PokemonFactory.getMoveData(moveSlot.moveId);
+    if (moveSlot.currentPp > 0) {
+      moveSlot.currentPp--;
+    }
+    this.fightMenu.style.display = 'none';
+    this.messageBox.style.display = 'flex';
+    if (this.callbacks?.onMoveSelected) {
+      this.callbacks.onMoveSelected(moveData.id);
+    }
   }
 
   public triggerSpeedToggle(): void {
@@ -390,6 +473,7 @@ export class BattleHUD {
       caughtIcon.style.display = this.caughtSpeciesIds.has(enemyPokemon.speciesId) ? 'inline' : 'none';
     }
     this.updateHp(false, enemyPokemon.currentHp, enemyPokemon.stats.hp);
+    this.updatePartyDock();
 
     this.showActionMenu();
     this.messageBox.innerText = `What will ${playerPokemon.nickname} do?`;
@@ -405,6 +489,25 @@ export class BattleHUD {
     this.updateHp(true, playerPokemon.currentHp, playerPokemon.stats.hp);
     this.updateExp(playerPokemon);
     this.updateStatusBadges();
+    this.updatePartyDock();
+  }
+
+  public updatePartyDock(): void {
+    if (!this.playerPartyDock) return;
+    let html = '';
+    for (let i = 0; i < 6; i++) {
+      const member = this.playerParty[i];
+      if (!member) {
+        html += `<span style="width: 9px; height: 9px; border-radius: 50%; background: #0f172a; border: 1.5px solid #334155; display: inline-block;" title="Empty Slot"></span>`;
+      } else if (member.currentHp <= 0) {
+        html += `<span style="width: 9px; height: 9px; border-radius: 50%; background: #7f1d1d; border: 1.5px solid #ef4444; opacity: 0.55; display: inline-block;" title="${member.nickname} (Fainted)"></span>`;
+      } else if (member.status && member.status !== 'NONE') {
+        html += `<span style="width: 9px; height: 9px; border-radius: 50%; background: #f59e0b; border: 1.5px solid #fef08a; display: inline-block;" title="${member.nickname} (${member.status})"></span>`;
+      } else {
+        html += `<span style="width: 9px; height: 9px; border-radius: 50%; background: #22c55e; border: 1.5px solid #bbf7d0; box-shadow: 0 0 4px rgba(34, 197, 94, 0.7); display: inline-block;" title="${member.nickname} (Healthy)"></span>`;
+      }
+    }
+    this.playerPartyDock.innerHTML = html;
   }
 
   public updateExp(pokemon: PokemonInstance = this.playerPokemon): void {
@@ -456,12 +559,13 @@ export class BattleHUD {
 
     renderBadges(this.playerPokemon, '#player-status-badges');
     renderBadges(this.enemyPokemon, '#enemy-status-badges');
+    this.updatePartyDock();
   }
 
   public updateSpeedDisplay(speed: SpeedMultiplier): void {
     this.speedMultiplier = speed;
     if (this.speedButton) {
-      this.speedButton.innerText = `BATTLE: ${speed}x (Shift)`;
+      this.speedButton.innerText = `⚡ SPEED: ${speed}x (Shift)`;
       if (speed === 1) this.speedButton.style.background = '#2563eb';
       else if (speed === 2) this.speedButton.style.background = '#d97706';
       else this.speedButton.style.background = '#dc2626';
@@ -477,96 +581,90 @@ export class BattleHUD {
     const drainSec = (0.3 / this.speedMultiplier).toFixed(2);
     bar.style.transition = `width ${drainSec}s ease`;
     bar.style.width = `${pct}%`;
-    text.innerText = `${currentHp} / ${maxHp}`;
+    text.innerText = `${currentHp} / ${maxHp} HP`;
 
-    if (pct > 50) bar.style.background = '#22c55e';
-    else if (pct > 20) bar.style.background = '#eab308';
-    else bar.style.background = '#ef4444';
+    if (pct > 50) {
+      bar.style.background = '#22c55e';
+      bar.classList.remove('crystal-low-hp');
+    } else if (pct > 20) {
+      bar.style.background = '#eab308';
+      bar.classList.remove('crystal-low-hp');
+    } else {
+      bar.style.background = '#ef4444';
+      if (currentHp > 0) {
+        bar.classList.add('crystal-low-hp');
+      } else {
+        bar.classList.remove('crystal-low-hp');
+      }
+    }
 
     this.updateStatusBadges();
   }
 
   public showFightMenu(): void {
+    this.messageBox.style.display = 'none';
     this.actionMenu.style.display = 'none';
     this.bagMenu.style.display = 'none';
     this.partyMenu.style.display = 'none';
     this.fightMenu.style.display = 'grid';
     this.fightMenu.innerHTML = '';
 
-    for (const moveSlot of this.playerPokemon.moves) {
+    this.playerPokemon.moves.forEach((moveSlot, idx) => {
       const moveData = PokemonFactory.getMoveData(moveSlot.moveId);
       const badge = EffectivenessHelper.evaluate(moveData, this.enemyPokemon);
+      const pill = EffectivenessHelper.getPillStyle(badge.multiplier, moveData.category === 'Status');
 
       const btn = document.createElement('button');
       btn.style.cssText = `
         background: #1e293b;
         color: white;
-        border: 1px solid rgba(255, 255, 255, 0.14);
+        border: 1.5px solid rgba(255, 255, 255, 0.16);
         border-radius: 8px;
-        padding: 8px 12px;
+        padding: 9px 12px;
         cursor: pointer;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         text-align: left;
-        transition: transform 0.1s ease, background 0.15s ease;
+        transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
       `;
-
-      let badgeBg = '#64748b';
-      let badgeGlow = 'none';
-      let badgePrefix = '';
-      if (badge.multiplier === 4) {
-        badgeBg = '#059669';
-        badgeGlow = '0 0 10px rgba(16, 185, 129, 0.85)';
-        badgePrefix = '↑↑ ';
-      } else if (badge.multiplier === 2) {
-        badgeBg = '#16a34a';
-        badgePrefix = '↑ ';
-      } else if (badge.multiplier === 0.5 || badge.multiplier === 0.25) {
-        badgeBg = '#d97706';
-        badgePrefix = '↓ ';
-      } else if (badge.multiplier === 0) {
-        badgeBg = '#dc2626';
-        badgePrefix = '✕ ';
-      }
 
       const typeColor = TYPE_COLORS[moveData.type] || '#64748b';
       const categorySvg = this.getCategorySvg(moveData.category);
+      const shortcutHint = MOVE_SHORTCUT_LABELS[idx] || `${idx + 1}`;
 
       btn.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span style="font-weight: 700; font-size: 15px;">${moveData.name}</span>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 10px; font-weight: 800; color: #94a3b8; background: #0f172a; border: 1px solid #334155; padding: 1px 5px; border-radius: 4px;">[${shortcutHint}]</span>
+            <span style="font-weight: 800; font-size: 15px;">${moveData.name}</span>
+          </div>
           <span style="display: flex; align-items: center;">${categorySvg}</span>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 6px; gap: 6px;">
           <div style="display: flex; align-items: center; gap: 6px;">
             <span style="font-size: 10px; font-weight: 800; background: ${typeColor}; color: white; padding: 2px 6px; border-radius: 4px;">${moveData.type.toUpperCase()}</span>
-            <span style="font-size: 11px; font-weight: 600; color: #94a3b8;">PP ${moveSlot.currentPp}/${moveSlot.maxPp}</span>
+            <span style="font-size: 11px; font-weight: 700; color: #cbd5e1;">PP ${moveSlot.currentPp}/${moveSlot.maxPp}</span>
           </div>
-          <span style="
-            background: ${badgeBg};
+          <span class="${pill.pulse ? 'crystal-ultra-pill' : ''}" style="
+            background: ${pill.background};
             color: white;
             font-size: 10px;
             font-weight: 800;
-            padding: 2px 6px;
+            padding: 2px 7px;
             border-radius: 4px;
-            box-shadow: ${badgeGlow};
+            text-decoration: ${pill.strikethrough ? 'line-through' : 'none'};
             white-space: nowrap;
-          ">${badgePrefix}${badge.label}</span>
+          ">${pill.label}</span>
         </div>
       `;
 
       btn.addEventListener('click', () => {
-        if (moveSlot.currentPp > 0) {
-          moveSlot.currentPp--;
-        }
-        if (this.callbacks?.onMoveSelected) {
-          this.callbacks.onMoveSelected(moveData.id);
-        }
+        this.selectMoveSlot(idx);
       });
 
       this.fightMenu.appendChild(btn);
-    }
+    });
 
     const backBtn = document.createElement('button');
     backBtn.style.cssText = `
@@ -580,7 +678,7 @@ export class BattleHUD {
       cursor: pointer;
       grid-column: span 2;
     `;
-    backBtn.innerText = '← BACK TO ACTIONS';
+    backBtn.innerText = '← BACK TO ACTIONS (Esc / X)';
     backBtn.addEventListener('click', () => this.showActionMenu());
     this.fightMenu.appendChild(backBtn);
   }
@@ -589,12 +687,14 @@ export class BattleHUD {
     this.fightMenu.style.display = 'none';
     this.bagMenu.style.display = 'none';
     this.partyMenu.style.display = 'none';
+    this.messageBox.style.display = 'flex';
     this.actionMenu.style.display = 'grid';
     this.messageBox.innerText = `What will ${this.playerPokemon.nickname} do?`;
     this.updateStatusBadges();
   }
 
   public showPartyMenu(): void {
+    this.messageBox.style.display = 'none';
     this.actionMenu.style.display = 'none';
     this.fightMenu.style.display = 'none';
     this.bagMenu.style.display = 'none';
@@ -644,6 +744,8 @@ export class BattleHUD {
           this.showMessage(`${pkmn.nickname} has no energy left to battle!`);
           return;
         }
+        this.partyMenu.style.display = 'none';
+        this.messageBox.style.display = 'flex';
         if (this.callbacks?.onPokemonSelected) {
           this.callbacks.onPokemonSelected(pkmn);
         }
@@ -664,12 +766,13 @@ export class BattleHUD {
       cursor: pointer;
       grid-column: span 2;
     `;
-    backBtn.innerText = '← BACK';
+    backBtn.innerText = '← BACK (Esc / X)';
     backBtn.addEventListener('click', () => this.showActionMenu());
     this.partyMenu.appendChild(backBtn);
   }
 
   public showBagMenu(): void {
+    this.messageBox.style.display = 'none';
     this.actionMenu.style.display = 'none';
     this.fightMenu.style.display = 'none';
     this.partyMenu.style.display = 'none';
@@ -695,6 +798,7 @@ export class BattleHUD {
       const count = this.ballsInventory[ball.id] ?? 0;
       if (count <= 0) continue;
 
+      const palette = EffectivenessHelper.getPokeballPalette(ball.id);
       const btn = document.createElement('button');
       btn.style.cssText = `
         background: #1e293b;
@@ -712,7 +816,10 @@ export class BattleHUD {
 
       btn.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-          <span style="font-weight: 700; font-size: 14px; color: ${ball.color};">🔴 ${ball.name}</span>
+          <span style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; color: ${ball.color};">
+            <img src="${palette.spritePath}" alt="${ball.name}" onerror="this.style.display='none'" style="width: 18px; height: 18px; image-rendering: pixelated;" />
+            <span>${ball.name}</span>
+          </span>
           <span style="font-size: 12px; font-weight: 700; color: #38bdf8;">x${count}</span>
         </div>
         <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">
@@ -721,6 +828,8 @@ export class BattleHUD {
       `;
 
       btn.addEventListener('click', () => {
+        this.bagMenu.style.display = 'none';
+        this.messageBox.style.display = 'flex';
         if (this.callbacks?.onBagSelected) {
           this.callbacks.onBagSelected(ball.id);
         }
@@ -741,7 +850,7 @@ export class BattleHUD {
       cursor: pointer;
       grid-column: span 2;
     `;
-    backBtn.innerText = '← BACK';
+    backBtn.innerText = '← BACK (Esc / X)';
     backBtn.addEventListener('click', () => this.showActionMenu());
     this.bagMenu.appendChild(backBtn);
   }
@@ -750,6 +859,10 @@ export class BattleHUD {
    * Renders battle dialogue text at 30ms/char (1x), 15ms/char (2x), or 0ms/instant (3x) per Specification 4.2
    */
   public async showMessage(text: string): Promise<void> {
+    this.fightMenu.style.display = 'none';
+    this.bagMenu.style.display = 'none';
+    this.partyMenu.style.display = 'none';
+    this.messageBox.style.display = 'flex';
     this.updateStatusBadges();
 
     const charDelay = this.speedMultiplier === 1 ? 30 : this.speedMultiplier === 2 ? 15 : 0;

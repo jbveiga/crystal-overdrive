@@ -202,4 +202,143 @@ export class EffectivenessHelper {
 
     return { multiplier: 1, label: '1x NORMAL', colorClass: 'badge-normal' };
   }
+
+  /**
+   * Returns the Unbound-style 2x2 Move Matrix effectiveness pill visual metadata (Ticket 3.9).
+   */
+  public static getPillStyle(
+    multiplier: number,
+    isStatus: boolean = false
+  ): {
+    label: string;
+    background: string;
+    pulse: boolean;
+    strikethrough: boolean;
+  } {
+    if (multiplier === 0) {
+      return {
+        label: '0x IMMUNE',
+        background: '#dc2626',
+        pulse: false,
+        strikethrough: true,
+      };
+    }
+    if (isStatus) {
+      return {
+        label: 'STATUS',
+        background: 'rgba(100, 116, 139, 0.45)',
+        pulse: false,
+        strikethrough: false,
+      };
+    }
+    if (multiplier >= 4) {
+      return {
+        label: '4x ULTRA',
+        background: '#ec4899',
+        pulse: true,
+        strikethrough: false,
+      };
+    }
+    if (multiplier >= 2) {
+      return {
+        label: '2x SUPER',
+        background: '#16a34a',
+        pulse: false,
+        strikethrough: false,
+      };
+    }
+    if (multiplier <= 0.25) {
+      return {
+        label: '0.25x RESIST',
+        background: '#b45309',
+        pulse: false,
+        strikethrough: false,
+      };
+    }
+    if (multiplier <= 0.5) {
+      return {
+        label: '0.5x NOT VERY',
+        background: '#d97706',
+        pulse: false,
+        strikethrough: false,
+      };
+    }
+    return {
+      label: '1x NORMAL',
+      background: 'rgba(100, 116, 139, 0.45)',
+      pulse: false,
+      strikethrough: false,
+    };
+  }
+
+  /**
+   * Computes hit shake amplitude, base duration, and flash tint color for `BattleRenderer.animateDamage` (Ticket 3.9).
+   */
+  public static getDamageShakeSpec(
+    effectiveness: number = 1,
+    isCritical: boolean = false,
+    moveCategory: 'Physical' | 'Special' | 'Status' = 'Physical'
+  ): {
+    amplitude: number;
+    durationSec: number;
+    flashTint: number;
+    screenWhiteFlash: boolean;
+  } {
+    const isSuperOrCrit = isCritical || effectiveness >= 2;
+    if (isSuperOrCrit) {
+      return {
+        amplitude: 8,
+        durationSec: 0.22,
+        flashTint: moveCategory === 'Physical' && !isCritical && effectiveness < 2 ? 0xef4444 : 0xffffff,
+        screenWhiteFlash: true,
+      };
+    }
+    if (effectiveness < 1) {
+      return {
+        amplitude: 2,
+        durationSec: 0.1,
+        flashTint: moveCategory === 'Special' ? 0xffffff : 0xef4444,
+        screenWhiteFlash: false,
+      };
+    }
+    return {
+      amplitude: 4,
+      durationSec: 0.15,
+      flashTint: moveCategory === 'Special' ? 0xffffff : 0xef4444,
+      screenWhiteFlash: false,
+    };
+  }
+
+  /**
+   * Resolves authentic Pokéball cap color, accent color, and sprite asset path for `BattleRenderer.animateThrowBall` (Ticket 3.9).
+   */
+  public static getPokeballPalette(ballId: string = 'poke-ball'): {
+    normalizedId: string;
+    topColor: number;
+    accentColor: number;
+    bottomColor: number;
+    spritePath: string;
+  } {
+    const normalizedId = ballId.replace(/_/g, '-').toLowerCase();
+    const table: Record<string, { topColor: number; accentColor: number; bottomColor: number }> = {
+      'poke-ball': { topColor: 0xdc2626, accentColor: 0xef4444, bottomColor: 0xf8fafc },
+      'great-ball': { topColor: 0x2563eb, accentColor: 0xef4444, bottomColor: 0xf8fafc },
+      'ultra-ball': { topColor: 0x1e293b, accentColor: 0xfacc15, bottomColor: 0xf8fafc },
+      'master-ball': { topColor: 0x7e22ce, accentColor: 0xec4899, bottomColor: 0xf8fafc },
+      'quick-ball': { topColor: 0x0284c7, accentColor: 0xfacc15, bottomColor: 0x0284c7 },
+      'fast-ball': { topColor: 0xea580c, accentColor: 0xfacc15, bottomColor: 0xf8fafc },
+      'net-ball': { topColor: 0x0d9488, accentColor: 0x1e293b, bottomColor: 0xf8fafc },
+      'dusk-ball': { topColor: 0x15803d, accentColor: 0xd97706, bottomColor: 0x1e293b },
+      'timer-ball': { topColor: 0xf8fafc, accentColor: 0xdc2626, bottomColor: 0xf8fafc },
+      'repeat-ball': { topColor: 0xdc2626, accentColor: 0xfacc15, bottomColor: 0xf8fafc },
+      'nest-ball': { topColor: 0x65a30d, accentColor: 0xeab308, bottomColor: 0xf8fafc },
+      'dream-ball': { topColor: 0xec4899, accentColor: 0xa855f7, bottomColor: 0xfbcfe8 },
+    };
+    const entry = table[normalizedId] ?? table['poke-ball'];
+    return {
+      normalizedId,
+      ...entry,
+      spritePath: `./assets/sprites/items/${normalizedId}.png`,
+    };
+  }
 }

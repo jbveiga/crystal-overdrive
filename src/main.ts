@@ -1044,7 +1044,7 @@ async function bootstrap() {
           await battleRenderer.animateSwitchPlayerPokemon(activePlayerPokemon);
           battleHUD.setActivePlayerPokemon(activePlayerPokemon);
         } else if (ev.type === 'THROW_BALL') {
-          ballGraphic = await battleRenderer.animateThrowBall();
+          ballGraphic = await battleRenderer.animateThrowBall(ev.ballId);
         } else if (ev.type === 'SHAKE' && ballGraphic) {
           await battleRenderer.animateShake(ballGraphic, ev.shakes, ev.caught);
         } else if (ev.type === 'ATTACK') {
