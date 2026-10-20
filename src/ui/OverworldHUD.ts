@@ -18,7 +18,9 @@ export class OverworldHUD {
   private speedButton!: HTMLButtonElement;
   private muteButton!: HTMLButtonElement;
   private gamepadToggleButton!: HTMLButtonElement;
+  private startMenuButton!: HTMLButtonElement;
   private desktopControlsBar!: HTMLDivElement;
+  private currentSpeed: SpeedMultiplier = 1;
   private routeBanner!: HTMLDivElement;
   private roamerAlertBanner!: HTMLDivElement;
   private toastBanner!: HTMLDivElement;
@@ -85,17 +87,56 @@ export class OverworldHUD {
     document.head.appendChild(style);
   }
 
+  private isTouchOrMobile(): boolean {
+    if (this.isGamepadVisible) return true;
+    if (typeof window === 'undefined') return false;
+    return (
+      window.innerWidth <= 768 ||
+      'ontouchstart' in window ||
+      (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0)
+    );
+  }
+
+  private getDialogueContinuePromptHtml(pageLabel: string = ''): string {
+    const label = this.isTouchOrMobile() ? 'TAP / [A]' : 'SPACE / CLICK';
+    return `<span>${pageLabel}${label}</span> <span style="font-size: 14px;">▼</span>`;
+  }
+
+  private updateInputModeLabels(): void {
+    const mobileMode = this.isTouchOrMobile();
+    if (this.speedButton) {
+      this.speedButton.innerText = mobileMode
+        ? `⚡ SPEED: ${this.currentSpeed}x`
+        : `⚡ SPEED: ${this.currentSpeed}x (Shift)`;
+    }
+    if (this.startMenuButton) {
+      this.startMenuButton.innerText = mobileMode ? '☰ MENU' : '☰ MENU (M / Esc)';
+    }
+    if (this.dialoguePrompt) {
+      const pageLabel =
+        this.dialogueActive && this.dialoguePages.length > 1
+          ? `(${this.dialoguePageIndex + 1}/${this.dialoguePages.length}) `
+          : '';
+      this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
+    }
+    if (this.desktopControlsBar) {
+      if (mobileMode) {
+        this.desktopControlsBar.style.setProperty('display', 'none', 'important');
+      } else {
+        this.desktopControlsBar.style.display = 'flex';
+      }
+    }
+  }
+
   private updateGamepadVisibility(): void {
     if (this.gamepadContainer) {
       this.gamepadContainer.style.display = this.isGamepadVisible ? 'block' : 'none';
-    }
-    if (this.desktopControlsBar) {
-      this.desktopControlsBar.style.display = this.isGamepadVisible ? 'none' : 'flex';
     }
     if (this.gamepadToggleButton) {
       this.gamepadToggleButton.style.background = this.isGamepadVisible ? '#0284c7' : '#334155';
       this.gamepadToggleButton.style.borderColor = this.isGamepadVisible ? '#38bdf8' : 'rgba(255,255,255,0.18)';
     }
+    this.updateInputModeLabels();
   }
 
   private createUI(): void {
@@ -498,6 +539,7 @@ export class OverworldHUD {
     this.speedButton = this.rootElement.querySelector('#speed-toggle-btn') as HTMLButtonElement;
     this.muteButton = this.rootElement.querySelector('#mute-toggle-btn') as HTMLButtonElement;
     this.gamepadToggleButton = this.rootElement.querySelector('#gamepad-toggle-btn') as HTMLButtonElement;
+    this.startMenuButton = this.rootElement.querySelector('#start-menu-btn') as HTMLButtonElement;
     this.desktopControlsBar = this.rootElement.querySelector('#desktop-controls-bar') as HTMLDivElement;
     this.routeBanner = this.rootElement.querySelector('#route-banner') as HTMLDivElement;
     this.roamerAlertBanner = this.rootElement.querySelector('#roamer-alert-banner') as HTMLDivElement;
@@ -516,7 +558,13 @@ export class OverworldHUD {
     };
     this.updateGamepadVisibility();
 
-    const startMenuBtn = this.rootElement.querySelector('#start-menu-btn') as HTMLButtonElement;
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => {
+        this.updateInputModeLabels();
+      });
+    }
+
+    const startMenuBtn = this.startMenuButton;
     const interactBtn = this.rootElement.querySelector('#interact-btn') as HTMLButtonElement;
     const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
     const closePokegearBtn = this.rootElement.querySelector('#close-pokegear-btn') as HTMLButtonElement;
@@ -744,7 +792,7 @@ export class OverworldHUD {
       if (this.dialogueCharIndex >= fullText.length) {
         if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
         this.dialogueTypeTimer = undefined;
-        this.dialoguePrompt.innerHTML = `<span>${pageLabel}SPACE / CLICK</span><span style="font-size: 14px;">▼</span>`;
+        this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
         this.dialoguePrompt.style.opacity = '1';
       }
     }, 18);
@@ -761,7 +809,7 @@ export class OverworldHUD {
       this.dialogueText.innerText = currentFullText;
       const pageLabel =
         this.dialoguePages.length > 1 ? `(${this.dialoguePageIndex + 1}/${this.dialoguePages.length}) ` : '';
-      this.dialoguePrompt.innerHTML = `<span>${pageLabel}SPACE / CLICK</span><span style="font-size: 14px;">▼</span>`;
+      this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
       this.dialoguePrompt.style.opacity = '1';
       return;
     }
@@ -873,8 +921,9 @@ export class OverworldHUD {
   }
 
   public updateSpeedDisplay(speed: SpeedMultiplier): void {
+    this.currentSpeed = speed;
     if (this.speedButton) {
-      this.speedButton.innerText = `⚡ SPEED: ${speed}x (Shift)`;
+      this.updateInputModeLabels();
       if (speed === 1) {
         this.speedButton.style.background = '#2563eb';
         this.speedButton.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.4)';

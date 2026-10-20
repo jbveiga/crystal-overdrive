@@ -84,11 +84,11 @@ src/
 ├── render/                # GPU Canvas Graphics (PixiJS v8)
 │   ├── OverworldRenderer.ts  # 64x64 tiles, tall grass tufts, day/night tints, culling
 │   └── BattleRenderer.ts     # 2.5D stage, custom Pokeball arcs, Physical/Special hit FX, camera shakes
-├── ui/                    # Vector DOM Overlays & Interactivity (100dvh + Safe-Area Inset Aware)
+├── ui/                    # Vector DOM Overlays & Interactivity (100dvh + Safe-Area Inset Aware + Device-Adaptive)
 │   ├── TitleScreenUI.ts      # Crystalline Title Screen, Audio Unlock Gate, SavePreview Card, Overwrite & Options Modals
 │   ├── IntroSequenceUI.ts    # 6-Stage Prof. Oak Intro, Gender Select (Boy/Girl), 7-Char Name Input & Presets, RTC Sync
-│   ├── OverworldHUD.ts       # Top menu capsule (single StartMenuUI trigger), Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
-│   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, Unbound 2x2 move matrix & hotkeys
+│   ├── OverworldHUD.ts       # Device-adaptive top menu capsule, Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
+│   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, device-adaptive Unbound 2x2 move matrix & hotkeys
 │   ├── StartMenuUI.ts        # Classic start menu (Pokedex, Pokemon, Bag, Save)
 │   ├── PartyManagementUI.ts  # Full party inspector, lead reordering, summaries
 │   └── BagAndMartUI.ts       # Progressive Mart inventory, out-of-battle medicine

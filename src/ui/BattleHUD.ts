@@ -73,6 +73,12 @@ export class BattleHUD {
     this.container = el;
     this.injectKeyframeStyles();
     this.createUI();
+    this.updateSpeedDisplay(this.speedMultiplier);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', () => {
+        this.updateSpeedDisplay(this.speedMultiplier);
+      });
+    }
     this.setupKeyboardShortcuts();
   }
 
@@ -94,6 +100,11 @@ export class BattleHUD {
       }
       .crystal-low-hp {
         animation: crystalLowHpPulse 0.85s infinite ease-in-out;
+      }
+      @media (hover: none) and (pointer: coarse), (max-width: 768px) {
+        .keyboard-hint {
+          display: none !important;
+        }
       }
     `;
     document.head.appendChild(styleEl);
@@ -565,7 +576,14 @@ export class BattleHUD {
   public updateSpeedDisplay(speed: SpeedMultiplier): void {
     this.speedMultiplier = speed;
     if (this.speedButton) {
-      this.speedButton.innerText = `⚡ SPEED: ${speed}x (Shift)`;
+      const isMobileOrTouch =
+        typeof window !== 'undefined' &&
+        (window.innerWidth <= 768 ||
+          'ontouchstart' in window ||
+          (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0));
+      this.speedButton.innerText = isMobileOrTouch
+        ? `⚡ SPEED: ${speed}x`
+        : `⚡ SPEED: ${speed}x (Shift)`;
       if (speed === 1) {
         this.speedButton.style.background = '#2563eb';
         this.speedButton.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.4)';
@@ -646,7 +664,7 @@ export class BattleHUD {
       btn.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 10px; font-weight: 800; color: #94a3b8; background: #0f172a; border: 1px solid #334155; padding: 1px 5px; border-radius: 4px;">[${shortcutHint}]</span>
+            <span class="keyboard-hint" style="font-size: 10px; font-weight: 800; color: #94a3b8; background: #0f172a; border: 1px solid #334155; padding: 1px 5px; border-radius: 4px;">[${shortcutHint}]</span>
             <span style="font-weight: 800; font-size: 15px;">${moveData.name}</span>
           </div>
           <span style="display: flex; align-items: center;">${categorySvg}</span>
