@@ -2171,7 +2171,12 @@
     "kt_11_11_11_11",
     "kt_11_11_11_11"
   ],
-  "connections": {},
+  "connections": {
+    "EAST": {
+      "mapId": "viridian_city",
+      "offset": -8
+    }
+  },
   "warps": [
     {
       "x": 13,

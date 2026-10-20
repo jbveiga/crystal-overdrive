@@ -3390,5 +3390,1549 @@ export const GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
         "RED: I have been waiting for a challenger. Show me your strength!"
       ]
     }
+  ],
+  "pallet_town": [
+    {
+      "id": "pallet_town_teacher_0",
+      "x": 3,
+      "y": 8,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "TEACHER",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    },
+    {
+      "id": "pallet_town_fisher_1",
+      "x": 12,
+      "y": 14,
+      "dir": "LEFT",
+      "sprite": "fisherman",
+      "speaker": "FISHER",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ]
+    }
+  ],
+  "oaks_lab": [
+    {
+      "id": "oaks_lab_scientist_0",
+      "x": 1,
+      "y": 8,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "SCIENTIST",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ]
+    },
+    {
+      "id": "oaks_lab_scientist_1",
+      "x": 8,
+      "y": 9,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "SCIENTIST",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    },
+    {
+      "id": "oaks_lab_scientist_2",
+      "x": 1,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "SCIENTIST",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    }
+  ],
+  "route_1": [
+    {
+      "id": "route_1_youngster_0",
+      "x": 4,
+      "y": 11,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "⚔️ DANNY",
+      "pages": [
+        "Danny: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_1_danny",
+      "trainerName": "Schoolboy Danny",
+      "vision": 4,
+      "challenge": [
+        "DANNY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "jynx",
+          "level": 31
+        },
+        {
+          "speciesId": "electabuzz",
+          "level": 31
+        },
+        {
+          "speciesId": "magmar",
+          "level": 31
+        }
+      ]
+    },
+    {
+      "id": "route_1_cooltrainer_f_1",
+      "x": 9,
+      "y": 25,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "⚔️ QUINN",
+      "pages": [
+        "Quinn: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_1_quinn",
+      "trainerName": "Cooltrainerf Quinn",
+      "vision": 2,
+      "challenge": [
+        "QUINN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "ivysaur",
+          "level": 38
+        },
+        {
+          "speciesId": "starmie",
+          "level": 38
+        }
+      ]
+    }
+  ],
+  "viridian_city": [
+    {
+      "id": "viridian_city_gramps_0",
+      "x": 18,
+      "y": 5,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    },
+    {
+      "id": "viridian_city_fisher_1",
+      "x": 6,
+      "y": 23,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "FISHER",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    },
+    {
+      "id": "viridian_city_youngster_2",
+      "x": 17,
+      "y": 21,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "viridian_gym": [
+    {
+      "id": "viridian_gym_blue_0",
+      "x": 5,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 LEADER BLUE",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ],
+      "action": "BLUE_EVENT",
+      "trainerId": "blue",
+      "trainerName": "Leader Blue",
+      "team": [
+        {
+          "speciesId": "pidgeot",
+          "level": 56,
+          "moves": [
+            "quickattack",
+            "whirlwind",
+            "wingattack",
+            "mirrormove"
+          ]
+        },
+        {
+          "speciesId": "alakazam",
+          "level": 54,
+          "moves": [
+            "disable",
+            "recover",
+            "psychic",
+            "reflect"
+          ]
+        },
+        {
+          "speciesId": "rhydon",
+          "level": 56,
+          "moves": [
+            "furyattack",
+            "sandstorm",
+            "rockslide",
+            "earthquake"
+          ]
+        },
+        {
+          "speciesId": "gyarados",
+          "level": 58,
+          "moves": [
+            "twister",
+            "hydropump",
+            "raindance",
+            "hyperbeam"
+          ]
+        },
+        {
+          "speciesId": "exeggutor",
+          "level": 58,
+          "moves": [
+            "sunnyday",
+            "leechseed",
+            "eggbomb",
+            "solarbeam"
+          ]
+        },
+        {
+          "speciesId": "arcanine",
+          "level": 58,
+          "moves": [
+            "roar",
+            "swift",
+            "flamethrower",
+            "extremespeed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "viridian_gym_gym_guide_1",
+      "x": 7,
+      "y": 13,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 GYM GUIDE",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ]
+    }
+  ],
+  "viridian_poke_center": [
+    {
+      "id": "viridian_poke_center_nurse_0",
+      "x": 3,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ],
+      "action": "HEAL_AND_SAVE",
+      "counter": true
+    },
+    {
+      "id": "viridian_poke_center_cooltrainer_m_1",
+      "x": 8,
+      "y": 4,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "COOLTRAINER M",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    },
+    {
+      "id": "viridian_poke_center_cooltrainer_f_2",
+      "x": 5,
+      "y": 3,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    },
+    {
+      "id": "viridian_poke_center_bug_catcher_3",
+      "x": 1,
+      "y": 6,
+      "dir": "RIGHT",
+      "sprite": "bug_catcher",
+      "speaker": "BUG CATCHER",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "viridian_mart": [
+    {
+      "id": "viridian_mart_clerk_0",
+      "x": 1,
+      "y": 3,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "pages": [
+        "Welcome! How may I help you?"
+      ],
+      "action": "OPEN_MART",
+      "counter": true
+    },
+    {
+      "id": "viridian_mart_lass_1",
+      "x": 7,
+      "y": 2,
+      "dir": "LEFT",
+      "sprite": "girl",
+      "speaker": "LASS",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    },
+    {
+      "id": "viridian_mart_cooltrainer_m_2",
+      "x": 1,
+      "y": 6,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "COOLTRAINER M",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ]
+    }
+  ],
+  "viridian_nickname_house": [
+    {
+      "id": "viridian_nickname_house_pokefan_m_0",
+      "x": 2,
+      "y": 4,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    },
+    {
+      "id": "viridian_nickname_house_lass_1",
+      "x": 5,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "LASS",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "trainer_house_1f": [
+    {
+      "id": "trainer_house_1f_receptionist_0",
+      "x": 0,
+      "y": 11,
+      "dir": "RIGHT",
+      "sprite": "teacher",
+      "speaker": "RECEPTIONIST",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    },
+    {
+      "id": "trainer_house_1f_cooltrainer_m_1",
+      "x": 7,
+      "y": 11,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "COOLTRAINER M",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    },
+    {
+      "id": "trainer_house_1f_cooltrainer_f_2",
+      "x": 6,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    },
+    {
+      "id": "trainer_house_1f_youngster_3",
+      "x": 4,
+      "y": 8,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ]
+    },
+    {
+      "id": "trainer_house_1f_gentleman_4",
+      "x": 2,
+      "y": 4,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "GENTLEMAN",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "trainer_house_b1f": [
+    {
+      "id": "trainer_house_b1f_receptionist_0",
+      "x": 7,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "RECEPTIONIST",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    }
+  ],
+  "route_2": [
+    {
+      "id": "route_2_bug_catcher_0",
+      "x": 10,
+      "y": 45,
+      "dir": "LEFT",
+      "sprite": "bug_catcher",
+      "speaker": "⚔️ ROB",
+      "pages": [
+        "Rob: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_2_rob",
+      "trainerName": "Bug Catcher Rob",
+      "vision": 4,
+      "challenge": [
+        "ROB: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "beedrill",
+          "level": 32
+        },
+        {
+          "speciesId": "butterfree",
+          "level": 32
+        }
+      ]
+    },
+    {
+      "id": "route_2_bug_catcher_1",
+      "x": 6,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "bug_catcher",
+      "speaker": "⚔️ ED",
+      "pages": [
+        "Ed: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_2_ed",
+      "trainerName": "Bug Catcher Ed",
+      "vision": 3,
+      "challenge": [
+        "ED: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "beedrill",
+          "level": 30
+        },
+        {
+          "speciesId": "beedrill",
+          "level": 30
+        },
+        {
+          "speciesId": "beedrill",
+          "level": 30
+        }
+      ]
+    },
+    {
+      "id": "route_2_bug_catcher_2",
+      "x": 0,
+      "y": 40,
+      "dir": "RIGHT",
+      "sprite": "bug_catcher",
+      "speaker": "⚔️ DOUG",
+      "pages": [
+        "Doug: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_2_doug",
+      "trainerName": "Bug Catcher Doug",
+      "vision": 3,
+      "challenge": [
+        "DOUG: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "ariados",
+          "level": 34
+        }
+      ]
+    }
+  ],
+  "route_2_gate": [
+    {
+      "id": "route_2_gate_scientist_0",
+      "x": 6,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "boy",
+      "speaker": "SCIENTIST",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "route_2_nugget_house": [
+    {
+      "id": "route_2_nugget_house_fisher_0",
+      "x": 2,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "FISHER",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    }
+  ],
+  "pewter_city": [
+    {
+      "id": "pewter_city_cooltrainer_f_0",
+      "x": 19,
+      "y": 11,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    },
+    {
+      "id": "pewter_city_bug_catcher_1",
+      "x": 14,
+      "y": 29,
+      "dir": "DOWN",
+      "sprite": "bug_catcher",
+      "speaker": "BUG CATCHER",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    },
+    {
+      "id": "pewter_city_gramps_2",
+      "x": 29,
+      "y": 17,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    }
+  ],
+  "pewter_gym": [
+    {
+      "id": "pewter_gym_brock_0",
+      "x": 5,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 LEADER BROCK",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ],
+      "action": "BROCK_EVENT",
+      "trainerId": "brock",
+      "trainerName": "Leader Brock",
+      "team": [
+        {
+          "speciesId": "graveler",
+          "level": 41,
+          "moves": [
+            "defensecurl",
+            "rockslide",
+            "rollout",
+            "earthquake"
+          ]
+        },
+        {
+          "speciesId": "rhyhorn",
+          "level": 41,
+          "moves": [
+            "furyattack",
+            "scaryface",
+            "earthquake",
+            "horndrill"
+          ]
+        },
+        {
+          "speciesId": "omastar",
+          "level": 42,
+          "moves": [
+            "bite",
+            "surf",
+            "protect",
+            "spikecannon"
+          ]
+        },
+        {
+          "speciesId": "onix",
+          "level": 44,
+          "moves": [
+            "bind",
+            "rockslide",
+            "bide",
+            "sandstorm"
+          ]
+        },
+        {
+          "speciesId": "kabutops",
+          "level": 42,
+          "moves": [
+            "slash",
+            "surf",
+            "endure",
+            "gigadrain"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pewter_gym_youngster_1",
+      "x": 2,
+      "y": 5,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "⚔️ JERRY",
+      "pages": [
+        "Jerry: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "pewter_gym_jerry",
+      "trainerName": "Camper Jerry",
+      "vision": 3,
+      "challenge": [
+        "JERRY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "sandslash",
+          "level": 37
+        }
+      ]
+    },
+    {
+      "id": "pewter_gym_gym_guide_2",
+      "x": 6,
+      "y": 11,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 GYM GUIDE",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    }
+  ],
+  "pewter_poke_center": [
+    {
+      "id": "pewter_poke_center_nurse_0",
+      "x": 3,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ],
+      "action": "HEAL_AND_SAVE",
+      "counter": true
+    },
+    {
+      "id": "pewter_poke_center_teacher_1",
+      "x": 8,
+      "y": 6,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "TEACHER",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ]
+    },
+    {
+      "id": "pewter_poke_center_bug_catcher_2",
+      "x": 2,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "bug_catcher",
+      "speaker": "BUG CATCHER",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    },
+    {
+      "id": "pewter_poke_center_pokefan_m_3",
+      "x": 7,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    }
+  ],
+  "pewter_mart": [
+    {
+      "id": "pewter_mart_clerk_0",
+      "x": 1,
+      "y": 3,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "pages": [
+        "Welcome! How may I help you?"
+      ],
+      "action": "OPEN_MART",
+      "counter": true
+    },
+    {
+      "id": "pewter_mart_youngster_1",
+      "x": 9,
+      "y": 2,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    },
+    {
+      "id": "pewter_mart_super_nerd_2",
+      "x": 6,
+      "y": 6,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    }
+  ],
+  "pewter_nidoran_house": [
+    {
+      "id": "pewter_nidoran_house_super_nerd_0",
+      "x": 3,
+      "y": 5,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    }
+  ],
+  "pewter_snooze_house": [
+    {
+      "id": "pewter_snooze_house_gramps_0",
+      "x": 5,
+      "y": 3,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    }
+  ],
+  "route_3": [
+    {
+      "id": "route_3_fisher_0",
+      "x": 26,
+      "y": 12,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "⚔️ OTIS",
+      "pages": [
+        "Otis: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_3_otis",
+      "trainerName": "Firebreather Otis",
+      "vision": 2,
+      "challenge": [
+        "OTIS: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "magmar",
+          "level": 29
+        },
+        {
+          "speciesId": "weezing",
+          "level": 32
+        },
+        {
+          "speciesId": "magmar",
+          "level": 29
+        }
+      ]
+    },
+    {
+      "id": "route_3_youngster_1",
+      "x": 10,
+      "y": 7,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "⚔️ WARREN",
+      "pages": [
+        "Warren: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_3_warren",
+      "trainerName": "Youngster Warren",
+      "vision": 3,
+      "challenge": [
+        "WARREN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "fearow",
+          "level": 35
+        }
+      ]
+    },
+    {
+      "id": "route_3_youngster_2",
+      "x": 16,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ JIMMY",
+      "pages": [
+        "Jimmy: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_3_jimmy",
+      "trainerName": "Youngster Jimmy",
+      "vision": 1,
+      "challenge": [
+        "JIMMY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "raticate",
+          "level": 33
+        },
+        {
+          "speciesId": "arbok",
+          "level": 33
+        }
+      ]
+    },
+    {
+      "id": "route_3_fisher_3",
+      "x": 49,
+      "y": 5,
+      "dir": "DOWN",
+      "sprite": "fisherman",
+      "speaker": "⚔️ BURT",
+      "pages": [
+        "Burt: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_3_burt",
+      "trainerName": "Firebreather Burt",
+      "vision": 3,
+      "challenge": [
+        "BURT: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "koffing",
+          "level": 32
+        },
+        {
+          "speciesId": "slugma",
+          "level": 32
+        }
+      ]
+    }
+  ],
+  "mount_moon_gift_shop": [
+    {
+      "id": "mount_moon_gift_shop_gramps_0",
+      "x": 4,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    },
+    {
+      "id": "mount_moon_gift_shop_gramps_1",
+      "x": 1,
+      "y": 2,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    },
+    {
+      "id": "mount_moon_gift_shop_lass_2",
+      "x": 1,
+      "y": 6,
+      "dir": "LEFT",
+      "sprite": "girl",
+      "speaker": "LASS",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ]
+    },
+    {
+      "id": "mount_moon_gift_shop_lass_3",
+      "x": 5,
+      "y": 4,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "LASS",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    }
+  ],
+  "route_4": [
+    {
+      "id": "route_4_youngster_0",
+      "x": 17,
+      "y": 9,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ HANK",
+      "pages": [
+        "Hank: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_4_hank",
+      "trainerName": "Bird Keeper Hank",
+      "vision": 3,
+      "challenge": [
+        "HANK: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "pidgey",
+          "level": 12
+        },
+        {
+          "speciesId": "pidgeot",
+          "level": 34
+        }
+      ]
+    },
+    {
+      "id": "route_4_lass_1",
+      "x": 9,
+      "y": 7,
+      "dir": "LEFT",
+      "sprite": "girl",
+      "speaker": "⚔️ HOPE",
+      "pages": [
+        "Hope: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_4_hope",
+      "trainerName": "Picnicker Hope",
+      "vision": 4,
+      "challenge": [
+        "HOPE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "flaaffy",
+          "level": 34
+        }
+      ]
+    }
+  ],
+  "cerulean_city": [
+    {
+      "id": "cerulean_city_cooltrainer_m_0",
+      "x": 15,
+      "y": 23,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "COOLTRAINER M",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    },
+    {
+      "id": "cerulean_city_super_nerd_1",
+      "x": 23,
+      "y": 15,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ]
+    },
+    {
+      "id": "cerulean_city_cooltrainer_f_2",
+      "x": 21,
+      "y": 24,
+      "dir": "LEFT",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    },
+    {
+      "id": "cerulean_city_fisher_3",
+      "x": 30,
+      "y": 26,
+      "dir": "LEFT",
+      "sprite": "fisherman",
+      "speaker": "FISHER",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    },
+    {
+      "id": "cerulean_city_youngster_4",
+      "x": 6,
+      "y": 12,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "YOUNGSTER",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "cerulean_gym": [
+    {
+      "id": "cerulean_gym_rocket_0",
+      "x": 4,
+      "y": 10,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "ROCKET",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    },
+    {
+      "id": "cerulean_gym_misty_1",
+      "x": 5,
+      "y": 3,
+      "dir": "DOWN",
+      "sprite": "girl",
+      "speaker": "🏆 LEADER MISTY",
+      "pages": [
+        "Have you filled your POKéDEX yet? Keep exploring!"
+      ],
+      "action": "MISTY_EVENT",
+      "trainerId": "misty",
+      "trainerName": "Leader Misty",
+      "team": [
+        {
+          "speciesId": "golduck",
+          "level": 42,
+          "moves": [
+            "surf",
+            "disable",
+            "psychup",
+            "psychic"
+          ]
+        },
+        {
+          "speciesId": "quagsire",
+          "level": 42,
+          "moves": [
+            "surf",
+            "amnesia",
+            "earthquake",
+            "raindance"
+          ]
+        },
+        {
+          "speciesId": "lapras",
+          "level": 44,
+          "moves": [
+            "surf",
+            "perishsong",
+            "blizzard",
+            "raindance"
+          ]
+        },
+        {
+          "speciesId": "starmie",
+          "level": 47,
+          "moves": [
+            "surf",
+            "confuseray",
+            "recover",
+            "icebeam"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cerulean_gym_swimmer_girl_2",
+      "x": 4,
+      "y": 7,
+      "dir": "RIGHT",
+      "sprite": "girl",
+      "speaker": "⚔️ DIANA",
+      "pages": [
+        "Diana: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "cerulean_gym_diana",
+      "trainerName": "Swimmerf Diana",
+      "vision": 3,
+      "challenge": [
+        "DIANA: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "golduck",
+          "level": 37
+        }
+      ]
+    },
+    {
+      "id": "cerulean_gym_swimmer_girl_3",
+      "x": 0,
+      "y": 9,
+      "dir": "RIGHT",
+      "sprite": "girl",
+      "speaker": "⚔️ BRIANA",
+      "pages": [
+        "Briana: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "cerulean_gym_briana",
+      "trainerName": "Swimmerf Briana",
+      "vision": 1,
+      "challenge": [
+        "BRIANA: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "seaking",
+          "level": 35
+        },
+        {
+          "speciesId": "seaking",
+          "level": 35
+        }
+      ]
+    },
+    {
+      "id": "cerulean_gym_gym_guide_4",
+      "x": 7,
+      "y": 13,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 GYM GUIDE",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    }
+  ],
+  "cerulean_poke_center": [
+    {
+      "id": "cerulean_poke_center_nurse_0",
+      "x": 3,
+      "y": 1,
+      "dir": "DOWN",
+      "sprite": "teacher",
+      "speaker": "👩‍⚕️ NURSE JOY",
+      "pages": [
+        "Welcome to our POKéMON CENTER!",
+        "We can heal your POKéMON to full health."
+      ],
+      "action": "HEAL_AND_SAVE",
+      "counter": true
+    },
+    {
+      "id": "cerulean_poke_center_super_nerd_1",
+      "x": 8,
+      "y": 4,
+      "dir": "LEFT",
+      "sprite": "fat_man",
+      "speaker": "SUPER NERD",
+      "pages": [
+        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+      ]
+    },
+    {
+      "id": "cerulean_poke_center_gym_guide_2",
+      "x": 1,
+      "y": 5,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "🏆 GYM GUIDE",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    }
+  ],
+  "cerulean_mart": [
+    {
+      "id": "cerulean_mart_clerk_0",
+      "x": 1,
+      "y": 3,
+      "dir": "RIGHT",
+      "sprite": "boy",
+      "speaker": "🏪 CLERK",
+      "pages": [
+        "Welcome! How may I help you?"
+      ],
+      "action": "OPEN_MART",
+      "counter": true
+    },
+    {
+      "id": "cerulean_mart_cooltrainer_m_1",
+      "x": 1,
+      "y": 6,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "COOLTRAINER M",
+      "pages": [
+        "I heard strange rumors about a legendary POKéMON in this region…"
+      ]
+    },
+    {
+      "id": "cerulean_mart_cooltrainer_f_2",
+      "x": 7,
+      "y": 2,
+      "dir": "LEFT",
+      "sprite": "girl",
+      "speaker": "COOLTRAINER F",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    }
+  ],
+  "cerulean_police_station": [
+    {
+      "id": "cerulean_police_station_fishing_guru_0",
+      "x": 5,
+      "y": 1,
+      "dir": "UP",
+      "sprite": "fisherman",
+      "speaker": "FISHING GURU",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    },
+    {
+      "id": "cerulean_police_station_pokefan_f_1",
+      "x": 5,
+      "y": 4,
+      "dir": "LEFT",
+      "sprite": "teacher",
+      "speaker": "POKEFAN F",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "cerulean_trade_house": [
+    {
+      "id": "cerulean_trade_house_granny_0",
+      "x": 2,
+      "y": 4,
+      "dir": "RIGHT",
+      "sprite": "teacher",
+      "speaker": "GRANNY",
+      "pages": [
+        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+      ]
+    },
+    {
+      "id": "cerulean_trade_house_gramps_1",
+      "x": 1,
+      "y": 2,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "cerulean_badge_house": [
+    {
+      "id": "cerulean_badge_house_pokefan_m_0",
+      "x": 2,
+      "y": 3,
+      "dir": "RIGHT",
+      "sprite": "fat_man",
+      "speaker": "POKEFAN M",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    }
+  ],
+  "route_25": [
+    {
+      "id": "route_25_youngster_0",
+      "x": 12,
+      "y": 8,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ DUDLEY",
+      "pages": [
+        "Dudley: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_25_dudley",
+      "trainerName": "Schoolboy Dudley",
+      "vision": 3,
+      "challenge": [
+        "DUDLEY: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "oddish",
+          "level": 35
+        }
+      ]
+    },
+    {
+      "id": "route_25_lass_1",
+      "x": 16,
+      "y": 11,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "⚔️ ELLEN",
+      "pages": [
+        "Ellen: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_25_ellen",
+      "trainerName": "Lass Ellen",
+      "vision": 3,
+      "challenge": [
+        "ELLEN: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "wigglytuff",
+          "level": 30
+        },
+        {
+          "speciesId": "granbull",
+          "level": 34
+        }
+      ]
+    },
+    {
+      "id": "route_25_youngster_2",
+      "x": 21,
+      "y": 8,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ JOE",
+      "pages": [
+        "Joe: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_25_joe",
+      "trainerName": "Schoolboy Joe",
+      "vision": 1,
+      "challenge": [
+        "JOE: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "tangela",
+          "level": 33
+        },
+        {
+          "speciesId": "vaporeon",
+          "level": 33
+        }
+      ]
+    },
+    {
+      "id": "route_25_lass_3",
+      "x": 22,
+      "y": 6,
+      "dir": "RIGHT",
+      "sprite": "girl",
+      "speaker": "⚔️ LAURA",
+      "pages": [
+        "Laura: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_25_laura",
+      "trainerName": "Lass Laura",
+      "vision": 3,
+      "challenge": [
+        "LAURA: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "gloom",
+          "level": 28
+        },
+        {
+          "speciesId": "pidgeotto",
+          "level": 31
+        },
+        {
+          "speciesId": "bellossom",
+          "level": 31
+        }
+      ]
+    },
+    {
+      "id": "route_25_youngster_4",
+      "x": 25,
+      "y": 4,
+      "dir": "DOWN",
+      "sprite": "boy",
+      "speaker": "⚔️ LLOYD",
+      "pages": [
+        "Lloyd: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_25_lloyd",
+      "trainerName": "Camper Lloyd",
+      "vision": 2,
+      "challenge": [
+        "LLOYD: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "nidoking",
+          "level": 34
+        }
+      ]
+    },
+    {
+      "id": "route_25_lass_5",
+      "x": 28,
+      "y": 11,
+      "dir": "UP",
+      "sprite": "girl",
+      "speaker": "⚔️ SHANNON",
+      "pages": [
+        "Shannon: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_25_shannon",
+      "trainerName": "Lass Shannon",
+      "vision": 1,
+      "challenge": [
+        "SHANNON: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "paras",
+          "level": 29
+        },
+        {
+          "speciesId": "paras",
+          "level": 29
+        },
+        {
+          "speciesId": "parasect",
+          "level": 32
+        }
+      ]
+    },
+    {
+      "id": "route_25_super_nerd_6",
+      "x": 31,
+      "y": 7,
+      "dir": "DOWN",
+      "sprite": "fat_man",
+      "speaker": "⚔️ PAT",
+      "pages": [
+        "Pat: That was a great battle!"
+      ],
+      "action": "TRAINER_BATTLE",
+      "trainerId": "route_25_pat",
+      "trainerName": "Super Nerd Pat",
+      "vision": 1,
+      "challenge": [
+        "PAT: Let's battle!"
+      ],
+      "team": [
+        {
+          "speciesId": "porygon",
+          "level": 36
+        }
+      ]
+    },
+    {
+      "id": "route_25_cooltrainer_m_7",
+      "x": 37,
+      "y": 8,
+      "dir": "LEFT",
+      "sprite": "boy",
+      "speaker": "COOLTRAINER M",
+      "pages": [
+        "Training every day is the secret to a strong team!"
+      ]
+    }
+  ],
+  "bills_house": [
+    {
+      "id": "bills_house_gramps_0",
+      "x": 2,
+      "y": 3,
+      "dir": "UP",
+      "sprite": "fat_man",
+      "speaker": "GRAMPS",
+      "pages": [
+        "The weather has been fierce lately, but the POKéMON here are tough!"
+      ]
+    }
   ]
 };

@@ -302,6 +302,18 @@ export class MapManager {
       'route_23',
       'route_28',
       'silver_cave_outside',
+      // Phase 13: Western & Central Kanto
+      'pallet_town',
+      'route_1',
+      'viridian_city',
+      'route_2',
+      'pewter_city',
+      'route_3',
+      'mount_moon_square',
+      'route_4',
+      'cerulean_city',
+      'route_24',
+      'route_25',
     ].includes(mapId);
   }
 

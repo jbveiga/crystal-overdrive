@@ -1198,4 +1198,75 @@ describe('MapData & Authentic Tile Integrity', () => {
     }
     expect(fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8')).toContain("action === 'E4_EVENT'");
   });
+
+  it('validates Phase 13 Western & Central Kanto: Pallet, Viridian, Pewter, Cerulean, Routes 1-4, 24-25', () => {
+    const phase13Maps = [
+      'pallet_town', 'reds_house_1f', 'reds_house_2f', 'blues_house', 'oaks_lab',
+      'route_1', 'viridian_city', 'viridian_gym', 'viridian_poke_center', 'viridian_mart',
+      'viridian_nickname_house', 'trainer_house_1f', 'trainer_house_b1f',
+      'route_2', 'route_2_gate', 'route_2_nugget_house',
+      'pewter_city', 'pewter_gym', 'pewter_poke_center', 'pewter_mart',
+      'pewter_nidoran_house', 'pewter_snooze_house',
+      'route_3', 'mount_moon', 'mount_moon_square', 'mount_moon_gift_shop',
+      'route_4', 'cerulean_city', 'cerulean_gym', 'cerulean_poke_center',
+      'cerulean_mart', 'cerulean_police_station', 'cerulean_trade_house', 'cerulean_badge_house',
+      'route_24', 'route_25', 'bills_house',
+    ];
+    const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+    const load = (id: string): MapData => JSON.parse(fs.readFileSync(path.join(mapsDir, `${id}.json`), 'utf8'));
+
+    for (const mapId of phase13Maps) {
+      const m = load(mapId);
+      expect(m.collisionGrid.length).toBe(m.width * m.height);
+      for (const tile of new Set(m.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png for ${mapId}`).toBe(true);
+      }
+      for (const w of m.warps) {
+        const target = load(w.targetMapId);
+        expect([0, 2], `${mapId} -> ${w.targetMapId}`).toContain(target.collisionGrid[w.targetY * target.width + w.targetX]);
+      }
+    }
+
+    // Reciprocal connections
+    expect(load('route_22').connections.EAST?.mapId).toBe('viridian_city');
+    expect(load('viridian_city').connections.WEST?.mapId).toBe('route_22');
+    expect(load('pallet_town').connections.NORTH?.mapId).toBe('route_1');
+    expect(load('route_1').connections.SOUTH?.mapId).toBe('pallet_town');
+    expect(load('route_1').connections.NORTH?.mapId).toBe('viridian_city');
+    expect(load('viridian_city').connections.SOUTH?.mapId).toBe('route_1');
+    expect(load('viridian_city').connections.NORTH?.mapId).toBe('route_2');
+    expect(load('route_2').connections.SOUTH?.mapId).toBe('viridian_city');
+    expect(load('route_2').connections.NORTH?.mapId).toBe('pewter_city');
+    expect(load('pewter_city').connections.SOUTH?.mapId).toBe('route_2');
+    expect(load('pewter_city').connections.EAST?.mapId).toBe('route_3');
+    expect(load('route_3').connections.WEST?.mapId).toBe('pewter_city');
+    expect(load('route_3').connections.EAST?.mapId).toBe('route_4');
+    expect(load('route_4').connections.WEST?.mapId).toBe('route_3');
+    expect(load('route_4').connections.EAST?.mapId).toBe('cerulean_city');
+    expect(load('cerulean_city').connections.WEST?.mapId).toBe('route_4');
+    expect(load('cerulean_city').connections.NORTH?.mapId).toBe('route_24');
+    expect(load('route_24').connections.SOUTH?.mapId).toBe('cerulean_city');
+    expect(load('route_24').connections.NORTH?.mapId).toBe('route_25');
+    expect(load('route_25').connections.SOUTH?.mapId).toBe('route_24');
+
+    // Gym Leaders
+    const brock = npcsByMap.pewter_gym?.find((n) => n.action === 'BROCK_EVENT');
+    expect(brock).toBeDefined();
+    expect(brock?.trainerId).toBe('brock');
+
+    const misty = npcsByMap.cerulean_gym?.find((n) => n.action === 'MISTY_EVENT');
+    expect(misty).toBeDefined();
+    expect(misty?.trainerId).toBe('misty');
+
+    const blue = npcsByMap.viridian_gym?.find((n) => n.action === 'BLUE_EVENT');
+    expect(blue).toBeDefined();
+    expect(blue?.trainerId).toBe('blue');
+
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    expect(mainSrc).toContain('BROCK_EVENT:');
+    expect(mainSrc).toContain('MISTY_EVENT:');
+    expect(mainSrc).toContain('BLUE_EVENT:');
+    expect(mainSrc).toContain("inventory.badges.includes(leaderConfig.badge)");
+  });
 });

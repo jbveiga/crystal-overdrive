@@ -111,8 +111,8 @@ function grassOf(cst) {
 
 // ---------- trainers ----------
 function partyFor(cls, name) {
-  const norm = (s) => s.toLowerCase().replace(/_/g, '');
-  const target = norm(cls).replace(/t$/, '') ;
+  const norm = (s) => s.toLowerCase().replace(/_/g, '').replace(/\./g, '');
+  const target = norm(cls).replace(/t$/, '');
   const groups = [...partiesText.matchAll(/^(\w+)Group:/gm)];
   let g = groups.find((x) => norm(x[1]) === norm(cls)) || groups.find((x) => norm(x[1]) === target);
   if (!g) g = groups.find((x) => norm(x[1]).startsWith(target));
@@ -121,7 +121,7 @@ function partyFor(cls, name) {
   const next = groups.find((x) => x.index > start);
   const body = partiesText.slice(start, next ? next.index : undefined);
   const base = name.replace(/\d+$/, '');
-  const re = new RegExp(`db "${base}@", (TRAINERTYPE_\\w+)\\n([\\s\\S]*?)db -1`);
+  const re = new RegExp(`db "${base.replace(/\./g, '\\.')}@", (TRAINERTYPE_\\w+)\\n([\\s\\S]*?)db -1`);
   const m = body.match(re);
   if (!m) return null;
   const type = m[1];
@@ -142,7 +142,18 @@ function partyFor(cls, name) {
   return team;
 }
 
-const GIRL = ['LASS', 'BEAUTY', 'TWIN', 'SWIMMER_GIRL', 'PICNICKER', 'KIMONO_GIRL', 'COOLTRAINER_F', 'MEDIUM', 'MOM', 'JASMINE'];
+const KANTO_LEADERS = {
+  SPRITE_BROCK: { leader: 'BROCK', cls: 'BROCK' },
+  SPRITE_MISTY: { leader: 'MISTY', cls: 'MISTY' },
+  SPRITE_SURGE: { leader: 'SURGE', cls: 'LTSURGE', partyName: 'LT.SURGE' },
+  SPRITE_ERIKA: { leader: 'ERIKA', cls: 'ERIKA' },
+  SPRITE_JANINE: { leader: 'JANINE', cls: 'JANINE' },
+  SPRITE_SABRINA: { leader: 'SABRINA', cls: 'SABRINA' },
+  SPRITE_BLAINE: { leader: 'BLAINE', cls: 'BLAINE' },
+  SPRITE_BLUE: { leader: 'BLUE', cls: 'BLUE' },
+};
+
+const GIRL = ['LASS', 'BEAUTY', 'TWIN', 'SWIMMER_GIRL', 'PICNICKER', 'KIMONO_GIRL', 'COOLTRAINER_F', 'MEDIUM', 'MOM', 'JASMINE', 'MISTY', 'ERIKA', 'JANINE', 'SABRINA'];
 const TEACH = ['POKEFAN_F', 'TEACHER', 'NURSE', 'GRANNY', 'LADY', 'PHARMACIST', 'RECEPTIONIST'];
 const FISH = ['FISHER', 'SAILOR', 'FISHING_GURU', 'SWIMMER_M', 'COOK'];
 const FAT = ['POKEFAN_M', 'FAT_MAN', 'GENTLEMAN', 'BLACK_BELT', 'SUPER_NERD', 'HIKER', 'OFFICER', 'GRAMPS'];
@@ -151,6 +162,7 @@ const PEOPLE = new Set([
   'SKIER', 'BOARDER', 'GUITARIST', 'FIREBREATHER', 'JUGGLER', 'PSYCHIC', 'CAMPER', 'BIKER', 'POKEMANIAC', 'GRUNT', 'ROCKET', 'CLERK',
   'WILL', 'KOGA', 'BRUNO', 'KAREN', 'LANCE', 'RED',
   'SCIENTIST', 'MYSTICALMAN', 'GYM_GUIDE', 'SILVER', 'COOLTRAINER', 'BLACKBELT', 'MANIA', 'BURGLAR', 'EUSINE', 'CLAIR', 'PRYCE', 'DRAGON_TAMER', 'ELDER', 'SCHOOLBOY', 'BLUE', 'SUPER', 'POKEFAN',
+  'BROCK', 'SURGE', 'BLAINE',
 ]);
 function spriteInfo(sp) {
   const n = sp.replace('SPRITE_', '');
@@ -218,6 +230,10 @@ function npcsOf(asm, id, grid) {
         action: 'TRAINER_BATTLE', trainerId: `${id}_${nm.toLowerCase()}`, trainerName: `${ln[1].replace(/_/g, ' ')} ${pretty}`.replace(/\w+/g, (w) => w[0] + w.slice(1).toLowerCase()),
         vision: Math.min(+sight || 2, 4), challenge: [`${nm}: Let's battle!`], team, speaker: `⚔️ ${pretty.toUpperCase()}`, pages: [`${pretty}: That was a great battle!`],
       });
+    } else if (KANTO_LEADERS[sprite]) {
+      const info = KANTO_LEADERS[sprite];
+      const team = partyFor(info.cls, info.partyName || info.leader);
+      Object.assign(npc, { action: `${info.leader}_EVENT`, trainerId: info.leader.toLowerCase(), trainerName: `Leader ${info.leader[0]}${info.leader.slice(1).toLowerCase()}`, team, speaker: `🏆 LEADER ${info.leader}` });
     } else if (['SPRITE_PRYCE', 'SPRITE_CLAIR'].includes(sprite)) {
       const leader = sprite === 'SPRITE_PRYCE' ? 'PRYCE' : 'CLAIR';
       const team = partyFor(leader, leader);
