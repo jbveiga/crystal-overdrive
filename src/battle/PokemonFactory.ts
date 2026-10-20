@@ -240,4 +240,30 @@ export class PokemonFactory {
 
     return { leveledUp, newLevel: pokemon.level };
   }
+
+  /**
+   * Retrieves moves learned by species at the specified level in Gen 2 (Ticket 6.4)
+   */
+  public static async getLearnableMovesAtLevel(speciesId: string, level: number): Promise<string[]> {
+    try {
+      const learnsetData = await Dex.forGen(2).learnsets.get(speciesId);
+      if (!learnsetData || !learnsetData.learnset) return [];
+
+      const result: string[] = [];
+      const targetTag = `2L${level}`;
+
+      for (const [moveId, sources] of Object.entries(learnsetData.learnset)) {
+        if (Array.isArray(sources)) {
+          for (const src of sources) {
+            if (src === targetTag) {
+              result.push(moveId);
+            }
+          }
+        }
+      }
+      return result;
+    } catch {
+      return [];
+    }
+  }
 }

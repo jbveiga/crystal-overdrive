@@ -1,6 +1,7 @@
-import type { PokemonInstance, SpeedMultiplier, PokeballId, PokemonType, StatId } from '../types/game';
+import type { PokemonInstance, SpeedMultiplier, PokeballId, PokemonType, StatId, MoveData } from '../types/game';
 import { EffectivenessHelper } from '../battle/EffectivenessHelper';
 import { PokemonFactory } from '../battle/PokemonFactory';
+import { BattleAudio } from '../audio/BattleAudio';
 
 export interface BattleHUDCallbacks {
   onMoveSelected: (moveId: string) => void;
@@ -681,6 +682,11 @@ export class BattleHUD {
       const typeColor = TYPE_COLORS[moveData.type] || '#64748b';
       const categorySvg = this.getCategorySvg(moveData.category);
       const shortcutHint = MOVE_SHORTCUT_LABELS[idx] || `${idx + 1}`;
+      const pwrStr = moveData.power > 0 ? `${moveData.power}` : '—';
+      const accStr = moveData.accuracy > 0 ? `${moveData.accuracy}` : '—';
+
+      btn.title = `${moveData.name} (${moveData.type.toUpperCase()}) | Category: ${moveData.category} | PWR: ${pwrStr} | ACC: ${accStr}% | PP: ${moveSlot.currentPp}/${moveSlot.maxPp}`;
+      btn.setAttribute('aria-label', btn.title);
 
       btn.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -694,6 +700,8 @@ export class BattleHUD {
           <div style="display: flex; align-items: center; gap: 6px;">
             <span style="font-size: 10px; font-weight: 800; background: ${typeColor}; color: white; padding: 2px 6px; border-radius: 4px;">${moveData.type.toUpperCase()}</span>
             <span style="font-size: 11px; font-weight: 700; color: #cbd5e1;">PP ${moveSlot.currentPp}/${moveSlot.maxPp}</span>
+            <span style="font-size: 10px; font-weight: 700; color: #94a3b8;">PWR ${pwrStr}</span>
+            <span style="font-size: 10px; font-weight: 700; color: #94a3b8;">ACC ${accStr}</span>
           </div>
           <span class="${pill.pulse ? 'crystal-ultra-pill' : ''}" style="
             background: ${pill.background};
@@ -933,6 +941,127 @@ export class BattleHUD {
 
     const postDelay = 600 / this.speedMultiplier;
     return new Promise((resolve) => setTimeout(resolve, postDelay));
+  }
+
+  /**
+   * Prompts the player to replace one of 4 known moves with a newly learned move (Ticket 6.4).
+   * Returns slot index 0..3 to replace, or null if declined.
+   */
+  public promptMoveForget(pokemon: PokemonInstance, newMove: MoveData): Promise<number | null> {
+    return new Promise((resolve) => {
+      const modal = document.createElement('div');
+      modal.id = 'move-learn-modal';
+      modal.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 480px;
+        max-width: 92vw;
+        background: rgba(15, 23, 42, 0.96);
+        backdrop-filter: blur(14px);
+        border: 2px solid #38bdf8;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        z-index: 70;
+        color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      `;
+
+      const newTypeColor = TYPE_COLORS[newMove.type] || '#64748b';
+      const newPwr = newMove.power > 0 ? newMove.power : '—';
+      const newAcc = newMove.accuracy > 0 ? `${newMove.accuracy}%` : '—';
+
+      modal.innerHTML = `
+        <div style="font-weight: 800; font-size: 16px; color: #38bdf8;">
+          ✨ LEARN A NEW MOVE?
+        </div>
+        <div style="font-size: 13px; color: #cbd5e1; line-height: 1.4;">
+          <strong>${pokemon.nickname}</strong> wants to learn <strong>${newMove.name}</strong>, but already knows 4 moves! Select an existing move to replace, or cancel to keep current moves.
+        </div>
+        <div style="background: rgba(30, 41, 59, 0.9); border: 1.5px solid ${newTypeColor}; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span style="font-size: 10px; font-weight: 800; background: ${newTypeColor}; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">${newMove.type.toUpperCase()}</span>
+            <strong style="font-size: 14px; color: #f8fafc;">${newMove.name}</strong>
+            <span style="font-size: 11px; color: #94a3b8; margin-left: 6px;">[${newMove.category.toUpperCase()}]</span>
+          </div>
+          <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">
+            PWR: ${newPwr} | ACC: ${newAcc} | PP: ${newMove.pp}
+          </div>
+        </div>
+        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Existing Moves:</div>
+        <div id="forget-slots-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        <button id="cancel-learn-btn" style="
+          margin-top: 6px;
+          background: #334155;
+          color: #f8fafc;
+          border: none;
+          border-radius: 8px;
+          padding: 10px;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+        ">✕ Keep Existing Moves (Don't Learn)</button>
+      `;
+
+      const slotsContainer = modal.querySelector('#forget-slots-container') as HTMLDivElement;
+      pokemon.moves.forEach((slot, idx) => {
+        const slotData = PokemonFactory.getMoveData(slot.moveId);
+        const slotTypeColor = TYPE_COLORS[slotData.type] || '#64748b';
+        const slotPwr = slotData.power > 0 ? slotData.power : '—';
+        const slotAcc = slotData.accuracy > 0 ? `${slotData.accuracy}%` : '—';
+
+        const slotBtn = document.createElement('button');
+        slotBtn.style.cssText = `
+          background: #1e293b;
+          color: white;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 8px;
+          padding: 9px 12px;
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          text-align: left;
+          transition: background 0.15s ease, border-color 0.15s ease;
+        `;
+        slotBtn.innerHTML = `
+          <div>
+            <span style="font-size: 10px; font-weight: 800; background: ${slotTypeColor}; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">${slotData.type.toUpperCase()}</span>
+            <strong style="font-size: 13px;">Forget ${slotData.name}</strong>
+          </div>
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">
+            PWR: ${slotPwr} | ACC: ${slotAcc} | PP: ${slot.currentPp}/${slot.maxPp}
+          </div>
+        `;
+        slotBtn.addEventListener('mouseenter', () => {
+          slotBtn.style.borderColor = '#ef4444';
+          slotBtn.style.background = 'rgba(239, 68, 68, 0.15)';
+        });
+        slotBtn.addEventListener('mouseleave', () => {
+          slotBtn.style.borderColor = 'rgba(255, 255, 255, 0.16)';
+          slotBtn.style.background = '#1e293b';
+        });
+        slotBtn.addEventListener('click', () => {
+          BattleAudio.playMenuSound('CONFIRM');
+          modal.remove();
+          resolve(idx);
+        });
+        slotsContainer.appendChild(slotBtn);
+      });
+
+      modal.querySelector('#cancel-learn-btn')!.addEventListener('click', () => {
+        BattleAudio.playMenuSound('CANCEL');
+        modal.remove();
+        resolve(null);
+      });
+
+      this.container.appendChild(modal);
+    });
   }
 
   public hide(): void {

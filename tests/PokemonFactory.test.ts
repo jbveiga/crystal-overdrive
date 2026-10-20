@@ -59,4 +59,38 @@ describe('PokemonFactory & Egg Hatching System (Ticket 5.4)', () => {
     expect(chikorita.currentHp).toBeGreaterThan(0);
     expect(chikorita.moves.map((m) => m.moveId)).toEqual(['tackle', 'growl', 'razorleaf', 'poisonpowder']);
   });
+
+  it('retrieves learnable moves by species and level in Gen 2 (Ticket 6.4)', async () => {
+    const cyndaquilLv6 = await PokemonFactory.getLearnableMovesAtLevel('cyndaquil', 6);
+    expect(cyndaquilLv6).toContain('smokescreen');
+
+    const totodileLv7 = await PokemonFactory.getLearnableMovesAtLevel('totodile', 7);
+    expect(totodileLv7).toContain('rage');
+
+    const chikoritaLv8 = await PokemonFactory.getLearnableMovesAtLevel('chikorita', 8);
+    expect(chikoritaLv8).toContain('razorleaf');
+
+    const cyndaquilLv12 = await PokemonFactory.getLearnableMovesAtLevel('cyndaquil', 12);
+    expect(cyndaquilLv12).toContain('ember');
+
+    const noMove = await PokemonFactory.getLearnableMovesAtLevel('cyndaquil', 99);
+    expect(noMove).toEqual([]);
+  });
+
+  it('provides complete move inspect tooltip metadata (Ticket 6.4)', () => {
+    const ember = PokemonFactory.getMoveData('ember');
+    expect(ember.id).toBe('ember');
+    expect(ember.type).toBe('Fire');
+    expect(ember.category).toBe('Special');
+    expect(ember.power).toBe(40);
+    expect(ember.accuracy).toBe(100);
+    expect(ember.pp).toBe(25);
+
+    const growl = PokemonFactory.getMoveData('growl');
+    expect(growl.id).toBe('growl');
+    expect(growl.type).toBe('Normal');
+    expect(growl.category).toBe('Status');
+    expect(growl.power).toBe(0);
+    expect(growl.accuracy).toBe(100);
+  });
 });

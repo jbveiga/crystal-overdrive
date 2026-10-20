@@ -1756,6 +1756,52 @@ async function bootstrap() {
             await battleHUD.showMessage(
               `🎉 ${activePlayerPokemon.nickname} grew to Lv. ${levelResult.newLevel}!`
             );
+
+            // Level-Up Learnset Move Learning (Ticket 6.4)
+            const learnableMoveIds = await PokemonFactory.getLearnableMovesAtLevel(
+              activePlayerPokemon.speciesId,
+              levelResult.newLevel
+            );
+
+            for (const newMoveId of learnableMoveIds) {
+              const alreadyKnown = activePlayerPokemon.moves.some((m) => m.moveId === newMoveId);
+              if (alreadyKnown) continue;
+
+              const newMoveData = PokemonFactory.getMoveData(newMoveId);
+
+              if (activePlayerPokemon.moves.length < 4) {
+                // Auto-learn if fewer than 4 moves
+                activePlayerPokemon.moves.push({
+                  moveId: newMoveData.id,
+                  currentPp: newMoveData.pp,
+                  maxPp: newMoveData.pp,
+                });
+                BattleAudio.playBallEvent('LEVEL_UP');
+                await battleHUD.showMessage(
+                  `✨ ${activePlayerPokemon.nickname} learned ${newMoveData.name}!`
+                );
+              } else {
+                // Prompt to forget an existing move or decline
+                const chosenIdx = await battleHUD.promptMoveForget(activePlayerPokemon, newMoveData);
+                if (chosenIdx !== null && chosenIdx >= 0 && chosenIdx < 4) {
+                  const forgottenMove = activePlayerPokemon.moves[chosenIdx];
+                  const forgottenData = PokemonFactory.getMoveData(forgottenMove.moveId);
+                  activePlayerPokemon.moves[chosenIdx] = {
+                    moveId: newMoveData.id,
+                    currentPp: newMoveData.pp,
+                    maxPp: newMoveData.pp,
+                  };
+                  BattleAudio.playBallEvent('LEVEL_UP');
+                  await battleHUD.showMessage(
+                    `1, 2, and... Poof! ${activePlayerPokemon.nickname} forgot ${forgottenData.name} and learned ${newMoveData.name}!`
+                  );
+                } else {
+                  await battleHUD.showMessage(
+                    `${activePlayerPokemon.nickname} did not learn ${newMoveData.name}.`
+                  );
+                }
+              }
+            }
           }
 
           // Multi-Pokémon Trainer Team continuation (Ticket 5.5)
