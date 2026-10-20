@@ -246,10 +246,11 @@ Every code addition and pull request must strictly honor these five non-negotiab
 * **Test Framework:** Vitest (`vitest run`), configured for ultra-fast, in-memory execution (~45ms baseline).
 * **Test Location & Naming:** `tests/<ModuleName>.test.ts`, matching corresponding source module in `src/`.
 * **Deterministic Execution:** Seeded PRNG or explicit test vectors for RNG-heavy logic (damage rolls, catch rates, roamer graph selections).
+* **Periodic Optimization Review Cadence:** Every 5 to 10 completed feature implementations (e.g. after Tickets 5.1–5.5, Tickets 6.1–6.5, etc.), an automated and manual health review is run via `npm run review` (`scripts/project-optimization-review.cjs`) to audit layer purity, NPC walkability, reciprocal warps, test suite, and bundle budgets.
 * **Pre-Merge / Verification Gate:**
   1. `npm test` (All Vitest suites must pass with zero warnings).
   2. `npm run build` (`tsc` strict static type-check + Vite production bundle validation).
-  3. Static boundary scan ensuring pure logic directories remain free of DOM/PixiJS imports.
+  3. `npm run review` (Full 5-stage health and boundary audit).
   4. **Documentation Invariant:** Update `CREDITS.md` if any new external assets, audio, sprites, or tools are added.
   5. **Architecture Invariant:** Update `ARCHITECTURE.md` if any data schemas, engine lifecycles, or interfaces are modified.
 
