@@ -2178,7 +2178,7 @@
     },
     "EAST": {
       "mapId": "ecruteak_city",
-      "offset": 10
+      "offset": -10
     }
   },
   "warps": [

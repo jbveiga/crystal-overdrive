@@ -241,6 +241,46 @@ async function bootstrap() {
     'whirl_island_b1f',
     'whirl_island_b2f',
     'whirl_island_lugia_chamber',
+    // Phase 11: Mahogany, Lake of Rage & Blackthorn
+    'route_42',
+    'route_42_ecruteak_gate',
+    'mount_mortar_1f_outside',
+    'mount_mortar_1f_inside',
+    'mount_mortar_2f_inside',
+    'mount_mortar_b1f',
+    'mahogany_town',
+    'mahogany_mart',
+    'mahogany_gym',
+    'mahogany_poke_center',
+    'mahogany_red_gyarados_speech_house',
+    'team_rocket_base_b1f',
+    'team_rocket_base_b2f',
+    'team_rocket_base_b3f',
+    'route_43',
+    'route_43_mahogany_gate',
+    'route_43_gate',
+    'lake_of_rage',
+    'lake_of_rage_hidden_power_house',
+    'lake_of_rage_magikarp_house',
+    'route_44',
+    'ice_path_1f',
+    'ice_path_b1f',
+    'ice_path_b2f_mahogany_side',
+    'ice_path_b2f_blackthorn_side',
+    'ice_path_b3f',
+    'blackthorn_city',
+    'blackthorn_gym_1f',
+    'blackthorn_gym_2f',
+    'blackthorn_dragon_speech_house',
+    'blackthorn_emys_house',
+    'blackthorn_mart',
+    'blackthorn_poke_center',
+    'move_deleters_house',
+    'dragons_den_1f',
+    'dragons_den_b1f',
+    'dragon_shrine',
+    'route_45',
+    'route_46',
   ];
 
   const loadedMaps: MapData[] = await Promise.all(
@@ -2426,6 +2466,76 @@ async function bootstrap() {
               },
             });
           });
+          return;
+        }
+
+        // Pryce Gym Leader Boss
+        if (targetNpc.action === 'PRYCE_EVENT' && !storyFlags.has('pryce_defeated')) {
+          overworldHUD.openDialogue(
+            targetNpc.challengePages && targetNpc.challengePages.length > 0 ? targetNpc.challengePages : ['PRYCE: In my 60 years of training, I have seen it all. Let me show you the power of ice!'],
+            targetNpc.speaker,
+            () => {
+              const team = buildTrainerTeamInstances(targetNpc);
+              if (team.length === 0) return;
+              triggerBattle(team[0], {
+                isTrainer: true,
+                isGymLeader: true,
+                trainerName: targetNpc.trainerName || 'Leader Pryce',
+                trainerTeam: team,
+                onVictory: () => {
+                  defeatedTrainers.add('pryce');
+                  storyFlags.add('pryce_defeated');
+                  if (!inventory.badges.includes('glacier')) inventory.badges.push('glacier');
+                  if (!inventory.tms.includes('TM16')) inventory.tms.push('TM16');
+                  audioManager.playSfx('sfx_badge_get');
+                  BattleAudio.playOverworldSound('KEY_ITEM');
+                  overworldHUD.openDialogue(
+                    ['PRYCE: Your strong bond is clear. Take the GLACIERBADGE and TM16 ICY WIND!'],
+                    targetNpc.speaker,
+                    () => {
+                      saveCurrentGame();
+                      overworldHUD.showToast('❄️ Received GLACIER BADGE & TM16 from Leader Pryce!');
+                    }
+                  );
+                },
+              });
+            }
+          );
+          return;
+        }
+
+        // Clair Gym Leader Boss
+        if (targetNpc.action === 'CLAIR_EVENT' && !storyFlags.has('clair_defeated')) {
+          overworldHUD.openDialogue(
+            targetNpc.challengePages && targetNpc.challengePages.length > 0 ? targetNpc.challengePages : ['CLAIR: I am the best dragon master! Not even you can defeat me!'],
+            targetNpc.speaker,
+            () => {
+              const team = buildTrainerTeamInstances(targetNpc);
+              if (team.length === 0) return;
+              triggerBattle(team[0], {
+                isTrainer: true,
+                isGymLeader: true,
+                trainerName: targetNpc.trainerName || 'Leader Clair',
+                trainerTeam: team,
+                onVictory: () => {
+                  defeatedTrainers.add('clair');
+                  storyFlags.add('clair_defeated');
+                  if (!inventory.badges.includes('rising')) inventory.badges.push('rising');
+                  if (!inventory.tms.includes('TM24')) inventory.tms.push('TM24');
+                  audioManager.playSfx('sfx_badge_get');
+                  BattleAudio.playOverworldSound('KEY_ITEM');
+                  overworldHUD.openDialogue(
+                    ['CLAIR: I lost?! Fine, take the RISINGBADGE and TM24 DRAGONBREATH!'],
+                    targetNpc.speaker,
+                    () => {
+                      saveCurrentGame();
+                      overworldHUD.showToast('🐉 Received RISING BADGE & TM24 from Leader Clair!');
+                    }
+                  );
+                },
+              });
+            }
+          );
           return;
         }
 

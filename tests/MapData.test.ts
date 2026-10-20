@@ -1120,5 +1120,54 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("inventory.tms.includes('TM23')");
     expect(mainSrc).toContain("inventory.tms.includes('TM01')");
   });
-});
+  it('validates Phase 11 Mahogany, Lake of Rage & Blackthorn maps, connections, warps, and Leaders Pryce & Clair', () => {
+    const phase11Maps = ['route_42', 'route_42_ecruteak_gate', 'mount_mortar_1f_outside', 'mount_mortar_1f_inside', 'mount_mortar_2f_inside', 'mount_mortar_b1f', 'mahogany_town', 'mahogany_mart', 'mahogany_gym', 'mahogany_poke_center', 'mahogany_red_gyarados_speech_house', 'team_rocket_base_b1f', 'team_rocket_base_b2f', 'team_rocket_base_b3f', 'route_43', 'route_43_mahogany_gate', 'route_43_gate', 'lake_of_rage', 'lake_of_rage_hidden_power_house', 'lake_of_rage_magikarp_house', 'route_44', 'ice_path_1f', 'ice_path_b1f', 'ice_path_b2f_mahogany_side', 'ice_path_b2f_blackthorn_side', 'ice_path_b3f', 'blackthorn_city', 'blackthorn_gym_1f', 'blackthorn_gym_2f', 'blackthorn_dragon_speech_house', 'blackthorn_emys_house', 'blackthorn_mart', 'blackthorn_poke_center', 'move_deleters_house', 'dragons_den_1f', 'dragons_den_b1f', 'dragon_shrine', 'route_45', 'route_46'];
+    const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
+    const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
+    const load = (id: string): MapData => JSON.parse(fs.readFileSync(path.join(mapsDir, `${id}.json`), 'utf8'));
 
+    for (const mapId of phase11Maps) {
+      expect(fs.existsSync(path.join(mapsDir, `${mapId}.json`)), `Map file for ${mapId} must exist`).toBe(true);
+      const m = load(mapId);
+      expect(m.collisionGrid.length).toBe(m.width * m.height);
+      expect(m.tileMap?.length).toBe(m.width * m.height);
+      for (const tile of new Set(m.tileMap!)) {
+        expect(fs.existsSync(path.join(tilesDir, `${tile}.png`)), `Tile ${tile}.png must exist for ${mapId}`).toBe(true);
+      }
+      for (const w of m.warps) {
+        const target = load(w.targetMapId);
+        expect([0, 2], `${mapId} warp lands on walkable tile in ${w.targetMapId}`).toContain(
+          target.collisionGrid[w.targetY * target.width + w.targetX]
+        );
+      }
+    }
+
+    expect(MapManager.isOutdoorMap('mahogany_town')).toBe(true);
+    expect(MapManager.isOutdoorMap('blackthorn_city')).toBe(true);
+    expect(MapManager.isOutdoorMap('ice_path_1f')).toBe(false);
+
+    expect(load('ecruteak_city').connections.EAST?.mapId).toBe('route_42');
+    expect(load('route_42').connections.WEST?.mapId).toBe('ecruteak_city');
+    expect(load('route_42').connections.EAST?.mapId).toBe('mahogany_town');
+    expect(load('mahogany_town').connections.NORTH?.mapId).toBe('route_43');
+    expect(load('route_43').connections.NORTH?.mapId).toBe('lake_of_rage');
+    expect(load('mahogany_town').connections.EAST?.mapId).toBe('route_44');
+    expect(load('route_44').connections.EAST?.mapId).toBe('blackthorn_city');
+    expect(load('blackthorn_city').connections.SOUTH?.mapId).toBe('route_45');
+    expect(load('route_45').connections.WEST?.mapId).toBe('route_46');
+    expect(load('route_46').connections.SOUTH?.mapId).toBe('route_29');
+    expect(load('route_29').connections.NORTH?.mapId).toBe('route_46');
+    expect(load('route_38').connections.EAST?.offset).toBe(-load('ecruteak_city').connections.WEST!.offset);
+
+    const pryce = npcsByMap.mahogany_gym.find((n) => n.action === 'PRYCE_EVENT');
+    expect(pryce?.trainerTeam?.length).toBe(3);
+    const clair = npcsByMap.blackthorn_gym_2f.find((n) => n.action === 'CLAIR_EVENT') ?? npcsByMap.blackthorn_gym_1f.find((n) => n.action === 'CLAIR_EVENT');
+    expect(clair?.trainerTeam?.length).toBe(4);
+
+    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    expect(mainSrc).toContain("action === 'PRYCE_EVENT'");
+    expect(mainSrc).toContain("action === 'CLAIR_EVENT'");
+    expect(mainSrc).toContain("inventory.badges.includes('glacier')");
+    expect(mainSrc).toContain("inventory.badges.includes('rising')");
+  });
+});

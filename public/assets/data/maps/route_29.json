@@ -3259,6 +3259,10 @@
     "WEST": {
       "mapId": "cherrygrove_city",
       "offset": 0
+    },
+    "NORTH": {
+      "mapId": "route_46",
+      "offset": 20
     }
   },
   "warps": [],

@@ -260,7 +260,7 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | :--- | :--- | :---: | :---: | :--- |
 | `GameClock.ts` | `tests/GameClock.test.ts` | 7 | ✅ Covered | Decoupled player vs world delta, pausing, time dilation, Johto TimeOfDay calculation (Morning/Day/Night), simulated hours, and ambient tint values (Ticket 6.2). |
 | `GridPhysics.ts` | `tests/GridPhysics.test.ts` | 15 | ✅ Covered | 1x/2x/3x speed, tile collision, bounds, fractional chaining, multi-directional ledge hopping (4..9), trainer vision, and wall collision bump callback (Ticket 6.3). |
-| `MapData.ts` | `tests/MapData.test.ts` | 22 | ✅ Covered | Binary map extraction schema, warp coords, reciprocal warps, Sprout Tower, Violet Gym & Falkner, Post-Gym Togepi Egg Aide, Elm's Lab starter Poké Ball `bgEvents` & Route 29 roadblock (Ticket 6.1), time-of-day encounter rolling & outdoor classification (Ticket 6.2), 100% NPC walkability guard (`0`/`2`), Phase 7 South Johto, Phase 8 Goldenrod Metropolis & Day-Care Route 34, Phase 9 Central Johto, and Phase 10 Western Johto (Route 38, Route 39 Moomoo Farm, Olivine City, Lighthouse 1F–6F, Routes 40 & 41, Whirl Islands, Cianwood City & Gym Leaders Jasmine & Chuck). |
+| `MapData.ts` | `tests/MapData.test.ts` | 23 | ✅ Covered | Binary map extraction schema, warp coords, reciprocal warps, Sprout Tower, Violet Gym & Falkner, Post-Gym Togepi Egg Aide, Elm's Lab starter Poké Ball `bgEvents` & Route 29 roadblock (Ticket 6.1), time-of-day encounter rolling & outdoor classification (Ticket 6.2), 100% NPC walkability guard (`0`/`2`), Phase 7 South Johto, Phase 8 Goldenrod Metropolis & Day-Care Route 34, Phase 9 Central Johto, and Phase 10 Western Johto (Route 38, Route 39 Moomoo Farm, Olivine City, Lighthouse 1F–6F, Routes 40 & 41, Whirl Islands, Cianwood City & Gym Leaders Jasmine & Chuck), and Phase 11 (Mahogany, Rocket Hideout, Lake of Rage, Ice Path, Blackthorn, Dragon's Den, Routes 42–46, Leaders Pryce & Clair). |
 | `RoamingManager.ts`| `tests/RoamingManager.test.ts` | 4 | ✅ Covered | Adjacency graph traversal, route weighting, active state, Burned Tower dormancy. |
 | `CatchCalculator.ts`| `tests/CatchCalculator.test.ts` | 6 | ✅ Covered | Modern Pokéball multipliers (Quick, Dusk, Net, etc.), status modifiers. |
 | `DamageCalculator.ts`| `tests/DamageCalculator.test.ts`| 11 | ✅ Covered | Physical/Special split, STAB, crits, dual-type damage, stat stage modifiers (-6 to +6), Unbound pill styles & hit shake specs. |
@@ -269,9 +269,12 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 6 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync, and retro overworld SFX (BUMP, HOP, RUSTLE, HEAL_JINGLE, FANFARE) (Ticket 6.3). |
 | `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
 | `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-15 char name validation/fallback, RTC period detection, `onComplete` payload. |
-| **Current Baseline** | **11 Suites** | **93 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| **Current Baseline** | **11 Suites** | **94 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.
 - `EffectivenessHelper.ts`: Dedicated standalone suite for Unbound badge mapping and complex dual-type effectiveness.
 - `PokemonFactory.ts`: Dedicated suite for `@pkmn/dex` hydration, IV/DV calculations, and learnset resolution.
+
+### 6.3 Phase Builder Pipeline (`scripts/build-phase.cjs`)
+Phases 11+ are generated directly from pret/pokecrystal asm via `node scripts/build-phase.cjs <phase>` (definitions in `scripts/phases/`). It derives dimensions, warps (with walkable landing tiles for outdoor targets), connections (block offsets ×2), day-time wild encounters, and NPC/trainer parties (`src/world/generatedNpcs.ts`, merged into `npcsByMap`). Generated NPCs are validated on walkable tiles (`0`/`2`).

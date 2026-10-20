@@ -288,6 +288,14 @@ export class MapManager {
       'route_40',
       'route_41',
       'cianwood_city',
+      'route_42',
+      'mahogany_town',
+      'route_43',
+      'lake_of_rage',
+      'route_44',
+      'blackthorn_city',
+      'route_45',
+      'route_46',
     ].includes(mapId);
   }
 

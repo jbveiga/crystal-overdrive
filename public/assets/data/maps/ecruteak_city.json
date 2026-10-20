@@ -4338,7 +4338,11 @@
     },
     "WEST": {
       "mapId": "route_38",
-      "offset": -10
+      "offset": 10
+    },
+    "EAST": {
+      "mapId": "route_42",
+      "offset": 18
     }
   },
   "warps": [
@@ -4403,6 +4407,20 @@
       "y": 19,
       "targetMapId": "route_38_ecruteak_gate",
       "targetX": 9,
+      "targetY": 5
+    },
+    {
+      "x": 35,
+      "y": 26,
+      "targetMapId": "route_42_ecruteak_gate",
+      "targetX": 0,
+      "targetY": 4
+    },
+    {
+      "x": 35,
+      "y": 27,
+      "targetMapId": "route_42_ecruteak_gate",
+      "targetX": 0,
       "targetY": 5
     }
   ],

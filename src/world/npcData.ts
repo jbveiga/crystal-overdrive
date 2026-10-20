@@ -1,5 +1,6 @@
 import type { Direction } from '../types/game';
 import type { GridEntity } from './GridPhysics';
+import { GENERATED_NPCS } from './generatedNpcs';
 
 export const makeNpc = (
   id: string,
@@ -49,7 +50,7 @@ export const makeNpc = (
 });
 
 export function createNpcsByMap(): Record<string, GridEntity[]> {
-  return {
+  const base: Record<string, GridEntity[]> = {
     new_bark_town: [
       makeNpc(
         'nbt_teacher',
@@ -3456,6 +3457,23 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       ]),
     ],
   };
+
+  // Phase 11+ NPCs & trainers derived directly from pret/pokecrystal object events.
+  for (const [mapId, list] of Object.entries(GENERATED_NPCS)) {
+    base[mapId] = list.map((n) =>
+      makeNpc(n.id, n.x, n.y, n.dir, n.sprite as GridEntity['spriteType'], n.speaker, n.pages, {
+        talkAcrossCounter: n.counter,
+        action: n.action as GridEntity['action'],
+        trainerId: n.trainerId,
+        trainerName: n.trainerName,
+        visionRange: n.vision,
+        challengePages: n.challenge,
+        trainerPokemon: n.team?.[0],
+        trainerTeam: n.team,
+      })
+    );
+  }
+  return base;
 }
 
 export const npcsByMap: Record<string, GridEntity[]> = createNpcsByMap();
