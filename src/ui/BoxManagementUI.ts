@@ -280,6 +280,18 @@ export class BoxManagementUI {
     setTimeout(() => toast.remove(), 2400);
   }
 
+  private cleanSpeciesId(speciesId: string): string {
+    return (speciesId || 'bulbasaur').toLowerCase().trim().replace(/[^a-z0-9_]/g, '_');
+  }
+
+  public getSpeciesFrontSprite(speciesId: string): string {
+    return `./assets/sprites/pokemon/${this.cleanSpeciesId(speciesId)}_front.png`;
+  }
+
+  public getSpeciesIcon(speciesId: string): string {
+    return `./assets/sprites/pokemon/icons/${this.cleanSpeciesId(speciesId)}.png`;
+  }
+
   private injectNeoKantoStyles(): void {
     if (typeof document === 'undefined') return;
     if (document.getElementById('neo-kanto-box-styles')) return;
@@ -298,6 +310,11 @@ export class BoxManagementUI {
         --nk-tertiary-cerulean: #2A75D3;
         --nk-text-parchment: #F6F8F3;
         --nk-text-muted: #8A9BA8;
+      }
+
+      #box-management-modal,
+      #box-management-card {
+        pointer-events: auto !important;
       }
 
       @keyframes nk-pulse {
@@ -324,6 +341,7 @@ export class BoxManagementUI {
         font-size: 11px;
         font-weight: 700;
         cursor: pointer;
+        pointer-events: auto !important;
         transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease, border-color 0.12s ease;
         user-select: none;
         display: inline-flex;
@@ -375,6 +393,7 @@ export class BoxManagementUI {
         transition: transform 0.08s ease, border-color 0.1s ease, box-shadow 0.08s ease;
         user-select: none;
         cursor: pointer;
+        pointer-events: auto !important;
       }
       .nk-slot:hover {
         border-color: #2A75D3 !important;
@@ -461,10 +480,15 @@ export class BoxManagementUI {
         }
       }
     `;
-    document.head?.appendChild(style);
+    (document.head || document.body)?.appendChild(style);
   }
 
   private render(): void {
+    if (this.boundKeyHandler && typeof window !== 'undefined') {
+      window.removeEventListener('keydown', this.boundKeyHandler);
+      this.boundKeyHandler = null;
+    }
+
     if (this.rootElement) {
       this.rootElement.remove();
     }
@@ -481,6 +505,7 @@ export class BoxManagementUI {
 
     const modal = document.createElement('div');
     modal.id = 'box-management-modal';
+    modal.className = 'interactive';
     modal.style.cssText = `
       position: fixed;
       inset: 0;
@@ -493,10 +518,12 @@ export class BoxManagementUI {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       box-sizing: border-box;
       padding: 8px;
+      pointer-events: auto !important;
     `;
 
     const containerCard = document.createElement('div');
     containerCard.id = 'box-management-card';
+    containerCard.className = 'interactive';
     containerCard.style.cssText = `
       background: #0D1322;
       border: 1.5px solid #22324F;
@@ -506,6 +533,7 @@ export class BoxManagementUI {
       flex-direction: column;
       overflow: hidden;
       position: relative;
+      pointer-events: auto !important;
     `;
 
     containerCard.innerHTML = `
@@ -631,16 +659,17 @@ export class BoxManagementUI {
                     align-items: center;
                     justify-content: center;
                     position: relative;
+                    pointer-events: auto;
                   ">
                     ${
                       pkmn
                         ? `
-                        <img src="/assets/sprites/pokemon/icons/${pkmn.speciesId}.png" alt="${pkmn.speciesId}" style="
+                        <img src="${this.getSpeciesIcon(pkmn.speciesId)}" alt="${pkmn.speciesId}" style="
                           width: 38px;
                           height: 38px;
                           object-fit: contain;
                           image-rendering: pixelated;
-                        " onerror="this.src='/assets/sprites/pokemon/${pkmn.speciesId}.png'" />
+                        " onerror="this.onerror=null; this.src='${this.getSpeciesFrontSprite(pkmn.speciesId)}';" />
                         <div style="font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: #8A9BA8; margin-top: -2px;">
                           Lv.${pkmn.level}
                         </div>
@@ -704,17 +733,18 @@ export class BoxManagementUI {
                     padding: 4px 10px;
                     gap: 10px;
                     position: relative;
+                    pointer-events: auto;
                   ">
                     ${
                       pkmn
                         ? `
-                        <img src="/assets/sprites/pokemon/icons/${pkmn.speciesId}.png" alt="${pkmn.speciesId}" style="
+                        <img src="${this.getSpeciesIcon(pkmn.speciesId)}" alt="${pkmn.speciesId}" style="
                           width: 36px;
                           height: 36px;
                           object-fit: contain;
                           image-rendering: pixelated;
                           flex-shrink: 0;
-                        " onerror="this.src='/assets/sprites/pokemon/${pkmn.speciesId}.png'" />
+                        " onerror="this.onerror=null; this.src='${this.getSpeciesFrontSprite(pkmn.speciesId)}';" />
                         <div style="flex: 1; min-width: 0;">
                           <div style="display: flex; justify-content: space-between; align-items: baseline;">
                             <span style="font-size: 12px; font-weight: 800; color: #F6F8F3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -769,7 +799,7 @@ export class BoxManagementUI {
         ${
           selectedPkmn
             ? `
-            <img src="/assets/sprites/pokemon/${selectedPkmn.speciesId}.png" alt="${selectedPkmn.speciesId}" style="
+            <img id="inspector-front-sprite" src="${this.getSpeciesFrontSprite(selectedPkmn.speciesId)}" alt="${selectedPkmn.speciesId}" style="
               width: 68px;
               height: 68px;
               object-fit: contain;
@@ -779,7 +809,7 @@ export class BoxManagementUI {
               border-radius: 4px;
               padding: 2px;
               flex-shrink: 0;
-            " onerror="this.src='/assets/sprites/pokemon/icons/${selectedPkmn.speciesId}.png'" />
+            " onerror="this.onerror=null; this.src='${this.getSpeciesIcon(selectedPkmn.speciesId)}';" />
 
             <div style="flex: 1; min-width: 0;">
               <div style="display: flex; align-items: center; gap: 8px;">

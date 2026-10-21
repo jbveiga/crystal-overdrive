@@ -670,6 +670,7 @@ export class EvolutionSceneUI {
         box-sizing: border-box;
         user-select: none;
         overflow: hidden;
+        pointer-events: auto !important;
       }
 
       .nk-evo-stage {
@@ -687,6 +688,7 @@ export class EvolutionSceneUI {
         padding: 20px;
         box-sizing: border-box;
         overflow: hidden;
+        pointer-events: auto !important;
       }
 
       .nk-evo-header {

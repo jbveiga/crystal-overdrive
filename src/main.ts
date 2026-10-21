@@ -746,7 +746,12 @@ async function bootstrap() {
   startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
 
   const isAnyOverworldModalOpen = () =>
-    gameState === 'TITLE' || startMenuUI.isOpen() || partyUI.isOpen() || bagUI.isOpen() || missionLogUI.isOpen();
+    gameState === 'TITLE' ||
+    startMenuUI.isOpen() ||
+    partyUI.isOpen() ||
+    bagUI.isOpen() ||
+    missionLogUI.isOpen() ||
+    boxManagementUI.isOpen();
 
   overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
@@ -756,6 +761,10 @@ async function bootstrap() {
       return audioManager.toggleMute();
     },
     onMenuToggle: () => {
+      if (boxManagementUI.isOpen()) {
+        boxManagementUI.close();
+        return;
+      }
       if (missionLogUI.isOpen()) {
         missionLogUI.hide();
         return;

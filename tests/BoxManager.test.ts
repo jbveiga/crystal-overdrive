@@ -379,5 +379,40 @@ describe('Sprint 13.5: Pokémon Storage System & Box Management Grid (TICKET-SPR
 
       ui.close();
     });
+
+    it('enforces pointer-events: auto !important, canonical _front.png inspector sprites, and defensive this.onerror=null fallbacks (BUGFIX-BILLS-PC-INTERACTION-FLICKER-01)', () => {
+      const ui = new BoxManagementUI('modal-container');
+      const party = [PokemonFactory.create('cyndaquil', 14)];
+      const storage = StorageManager.createDefaultStorage([PokemonFactory.create('totodile', 10)]);
+
+      expect(ui.getSpeciesFrontSprite('Cyndaquil')).toBe('./assets/sprites/pokemon/cyndaquil_front.png');
+      expect(ui.getSpeciesIcon('Cyndaquil')).toBe('./assets/sprites/pokemon/icons/cyndaquil.png');
+      expect(ui.getSpeciesFrontSprite('mr_mime')).toBe('./assets/sprites/pokemon/mr_mime_front.png');
+
+      ui.open(party, storage);
+
+      const modal = mockDoc.getElementById('box-management-modal');
+      const card = mockDoc.getElementById('box-management-card');
+      expect(modal).not.toBeNull();
+      expect(card).not.toBeNull();
+      expect(modal?.className).toContain('interactive');
+      expect(card?.className).toContain('interactive');
+      expect(modal?.style.cssText).toContain('pointer-events: auto !important');
+      expect(card?.style.cssText).toContain('pointer-events: auto !important');
+
+      // Verify inspector renders _front.png sprite and defensive this.onerror=null
+      expect(card?.innerHTML).toContain('./assets/sprites/pokemon/cyndaquil_front.png');
+      expect(card?.innerHTML).toContain('./assets/sprites/pokemon/icons/totodile.png');
+      expect(card?.innerHTML).toContain("this.onerror=null; this.src='./assets/sprites/pokemon/icons/cyndaquil.png';");
+      expect(card?.innerHTML).toContain("this.onerror=null; this.src='./assets/sprites/pokemon/totodile_front.png';");
+
+      // Verify keydown listener teardown on re-render
+      const removeSpy = (globalThis as any).removeEventListener;
+      removeSpy.mockClear();
+      ui.changeBox(1);
+      expect(removeSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+
+      ui.close();
+    });
   });
 });
