@@ -23,6 +23,7 @@ export interface SaveData {
     y: number;
     direction: Direction;
     speedMultiplier: SpeedMultiplier;
+    battleSpeedMultiplier?: SpeedMultiplier;
     badges: string[];
     money: number;
   };
@@ -102,6 +103,8 @@ export class SaveManager {
       textSpeed: 'MID',
       battleAnimations: true,
       playerSpeedDefault: 1,
+      battleSpeedMultiplier: 1,
+      touchControlStyle: 'DPAD',
     };
   }
 

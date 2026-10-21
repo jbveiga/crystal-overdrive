@@ -1,4 +1,4 @@
-import type { Direction, SpeedMultiplier, RoamerState } from '../types/game';
+import type { Direction, SpeedMultiplier, RoamerState, TouchControlStyle } from '../types/game';
 import { eventBus } from '../core/EventBus';
 import { BattleAudio } from '../audio/BattleAudio';
 
@@ -39,6 +39,9 @@ export class OverworldHUD {
   private rootElement!: HTMLDivElement;
   private gamepadContainer!: HTMLDivElement;
   private dpadSegments: Partial<Record<Direction, HTMLDivElement>> = {};
+  private dpadCenterPivot: HTMLDivElement | null = null;
+  private joystickKnob: HTMLDivElement | null = null;
+  private touchControlStyle: TouchControlStyle = 'DPAD';
   private isGamepadVisible: boolean = false;
   private activeDirection: Direction | null = null;
   private touchDirection: Direction | null = null;
@@ -136,6 +139,9 @@ export class OverworldHUD {
     if (this.gamepadToggleButton) {
       this.gamepadToggleButton.style.background = this.isGamepadVisible ? '#0284c7' : '#334155';
       this.gamepadToggleButton.style.borderColor = this.isGamepadVisible ? '#38bdf8' : 'rgba(255,255,255,0.18)';
+    }
+    if (typeof document !== 'undefined' && document.body?.classList) {
+      document.body.classList.toggle('touch-controls-active', this.isGamepadVisible);
     }
     this.updateInputModeLabels();
   }
@@ -361,7 +367,7 @@ font-size: 20px;
 font-weight: 900;
 transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.08s ease;
 ">▶</div>
-<div style="
+<div id="dpad-center-pivot" style="
 position: absolute;
 top: 68px;
 left: 68px;
@@ -370,6 +376,20 @@ height: 36px;
 border-radius: 50%;
 background: rgba(15, 23, 42, 0.95);
 border: 1px solid rgba(255, 255, 255, 0.12);
+"></div>
+<div id="virtual-joystick-knob" style="
+display: none;
+position: absolute;
+top: 52px;
+left: 52px;
+width: 68px;
+height: 68px;
+border-radius: 50%;
+background: radial-gradient(circle at 35% 35%, #38bdf8 0%, #0284c7 55%, #0f172a 100%);
+border: 2px solid #bae6fd;
+box-shadow: 0 4px 14px rgba(0, 0, 0, 0.65), 0 0 12px rgba(56, 189, 248, 0.45);
+pointer-events: none;
+transform: translate(0px, 0px);
 "></div>
 </div>
 <!-- Virtual Action Buttons (Bottom-Right: A & B) -->
@@ -521,7 +541,10 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
       LEFT: this.rootElement.querySelector('#dpad-seg-left') as HTMLDivElement,
       RIGHT: this.rootElement.querySelector('#dpad-seg-right') as HTMLDivElement,
     };
+    this.dpadCenterPivot = this.rootElement.querySelector('#dpad-center-pivot') as HTMLDivElement | null;
+    this.joystickKnob = this.rootElement.querySelector('#virtual-joystick-knob') as HTMLDivElement | null;
     this.updateGamepadVisibility();
+    this.applyTouchControlStyleUI();
 
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', () => {
@@ -610,6 +633,13 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
       });
     };
 
+    const resetJoystickKnob = () => {
+      if (this.joystickKnob) {
+        this.joystickKnob.style.transform = 'translate(0px, 0px)';
+        this.joystickKnob.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.65), 0 0 12px rgba(56, 189, 248, 0.45)';
+      }
+    };
+
     const resolveDirectionFromPoint = (clientX: number, clientY: number): Direction | null => {
       const rect = dpadBase.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
@@ -617,7 +647,22 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
       const dx = clientX - cx;
       const dy = clientY - cy;
       const dist = Math.hypot(dx, dy);
-      if (dist < 16) return null;
+
+      if (this.touchControlStyle === 'JOYSTICK' && this.joystickKnob) {
+        const maxRadius = 44;
+        const clampedDist = Math.min(maxRadius, dist);
+        const angle = Math.atan2(dy, dx);
+        const clampedDx = Math.round(Math.cos(angle) * clampedDist);
+        const clampedDy = Math.round(Math.sin(angle) * clampedDist);
+        this.joystickKnob.style.transform = `translate(${clampedDx}px, ${clampedDy}px)`;
+        this.joystickKnob.style.boxShadow =
+          dist >= 12
+            ? '0 4px 16px rgba(0, 0, 0, 0.75), 0 0 18px #38bdf8'
+            : '0 4px 14px rgba(0, 0, 0, 0.65), 0 0 12px rgba(56, 189, 248, 0.45)';
+      }
+
+      const deadzone = this.touchControlStyle === 'JOYSTICK' ? 12 : 16;
+      if (dist < deadzone) return null;
 
       if (Math.abs(dx) > Math.abs(dy)) {
         return dx > 0 ? 'RIGHT' : 'LEFT';
@@ -627,6 +672,9 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
 
     const updateTouchDir = (dir: Direction | null) => {
       this.touchDirection = dir;
+      if (dir === null) {
+        resetJoystickKnob();
+      }
       highlightDpadSegment(dir);
       this.computeActiveDirection();
     };
@@ -811,7 +859,8 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
     overlay.style.display = 'flex';
     BattleAudio.playOverworldSound('HEAL_JINGLE');
 
-    const stepMs = Math.max(45, Math.round(95 / this.currentSpeed));
+    // Fixed canonical timing synced to the 8-note HEAL_JINGLE audio regardless of turbo speed
+    const stepMs = 180;
     for (let i = 0; i < clampedCount; i++) {
       setTimeout(() => {
         const slotEl = overlay?.querySelector(`#heal-tray-slot-${i}`) as HTMLElement | null;
@@ -824,7 +873,7 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
       }, i * stepMs);
     }
 
-    const pulseDelay = clampedCount * stepMs + Math.round(110 / this.currentSpeed);
+    const pulseDelay = clampedCount * stepMs + 250;
     setTimeout(() => {
       for (let i = 0; i < clampedCount; i++) {
         const slotEl = overlay?.querySelector(`#heal-tray-slot-${i}`) as HTMLElement | null;
@@ -841,7 +890,7 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
       }
     }, pulseDelay);
 
-    const totalDuration = pulseDelay + Math.round(480 / this.currentSpeed);
+    const totalDuration = pulseDelay + 1400;
     setTimeout(() => {
       if (overlay) {
         overlay.style.display = 'none';
@@ -1148,6 +1197,38 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
   public setGamepadVisible(visible: boolean): void {
     this.isGamepadVisible = visible;
     this.updateGamepadVisibility();
+  }
+
+  private applyTouchControlStyleUI(): void {
+    const isJoystick = this.touchControlStyle === 'JOYSTICK';
+    (['UP', 'DOWN', 'LEFT', 'RIGHT'] as Direction[]).forEach((d) => {
+      const seg = this.dpadSegments[d];
+      if (seg) {
+        seg.style.display = isJoystick ? 'none' : 'flex';
+      }
+    });
+    if (this.dpadCenterPivot) {
+      this.dpadCenterPivot.style.display = isJoystick ? 'none' : 'block';
+    }
+    if (this.joystickKnob) {
+      this.joystickKnob.style.display = isJoystick ? 'block' : 'none';
+      this.joystickKnob.style.transform = 'translate(0px, 0px)';
+    }
+  }
+
+  public setTouchControlStyle(style: TouchControlStyle): void {
+    this.touchControlStyle = style === 'JOYSTICK' ? 'JOYSTICK' : 'DPAD';
+    this.applyTouchControlStyleUI();
+  }
+
+  public getTouchControlStyle(): TouchControlStyle {
+    return this.touchControlStyle;
+  }
+
+  public toggleTouchControlStyle(): TouchControlStyle {
+    const next: TouchControlStyle = this.touchControlStyle === 'DPAD' ? 'JOYSTICK' : 'DPAD';
+    this.setTouchControlStyle(next);
+    return next;
   }
 
   public updateSpeedDisplay(speed: SpeedMultiplier): void {

@@ -88,6 +88,14 @@
       .interactive {
         pointer-events: auto;
       }
+      @media (hover: none) and (pointer: coarse), (max-width: 768px) {
+        .keyboard-hint {
+          display: none !important;
+        }
+      }
+      body.touch-controls-active .keyboard-hint {
+        display: none !important;
+      }
       /* Zero-Latency Animated Retro GBC Loader (Ticket Sprint 09) */
       #retro-loader {
         position: fixed;

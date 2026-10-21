@@ -108,6 +108,63 @@ export class BattleHUD {
           display: none !important;
         }
       }
+      body.touch-controls-active .keyboard-hint {
+        display: none !important;
+      }
+      @media (max-width: 500px) {
+        .move-pwr-acc {
+          display: none !important;
+        }
+        #battle-fight-menu button {
+          padding: 7px 10px !important;
+          min-height: 48px !important;
+        }
+      }
+      @media (orientation: portrait) {
+        #enemy-card, #player-card {
+          width: calc(100vw - 120px) !important;
+          max-width: 270px !important;
+          min-width: unset !important;
+          padding: 8px 14px !important;
+          font-size: 14px !important;
+        }
+        #battle-speed-btn {
+          padding: 6px 12px !important;
+          font-size: 12px !important;
+        }
+        #battle-bottom-panel {
+          max-height: 48dvh !important;
+          min-height: unset !important;
+          padding: 10px 12px max(10px, env(safe-area-inset-bottom, 12px)) 12px !important;
+          box-sizing: border-box !important;
+        }
+        #battle-fight-menu {
+          max-height: 48dvh !important;
+          overflow-y: auto !important;
+          box-sizing: border-box !important;
+          padding-bottom: env(safe-area-inset-bottom, 8px) !important;
+        }
+        #battle-action-menu {
+          width: 100% !important;
+        }
+      }
+      @media (orientation: landscape) and (max-height: 520px) {
+        #enemy-card, #player-card {
+          padding: 6px 12px !important;
+          min-width: 220px !important;
+          font-size: 13px !important;
+        }
+        #battle-bottom-panel {
+          min-height: 80px !important;
+          max-height: 42dvh !important;
+          padding: 6px 12px !important;
+          box-sizing: border-box !important;
+        }
+        #battle-fight-menu {
+          max-height: 36dvh !important;
+          overflow-y: auto !important;
+        }
+      }
     `;
     document.head.appendChild(styleEl);
   }
@@ -202,7 +259,7 @@ export class BattleHUD {
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
           ">
-            ⚡ SPEED: 1x (Shift)
+            <span>⚡ SPEED: 1x</span> <span class="keyboard-hint">(Shift)</span>
           </button>
         </div>
       </div>
@@ -250,7 +307,7 @@ export class BattleHUD {
       </div>
 
       <!-- Bottom Control & Classic Double-Framed Dialogue Panel -->
-      <div style="
+      <div id="battle-bottom-panel" style="
         background: rgba(15, 23, 42, 0.95);
         backdrop-filter: blur(12px);
         border: 2px solid rgba(255, 255, 255, 0.24);
@@ -261,6 +318,7 @@ export class BattleHUD {
         min-height: 132px;
         display: flex;
         gap: 20px;
+        box-sizing: border-box;
       ">
         <!-- Dialogue Text -->
         <div id="battle-message-box" style="
@@ -335,6 +393,11 @@ export class BattleHUD {
           gap: 10px;
           flex: 1;
           width: 100%;
+          max-height: 48dvh;
+          overflow-y: auto;
+          box-sizing: border-box;
+          padding-bottom: env(safe-area-inset-bottom, 12px);
+          -webkit-overflow-scrolling: touch;
         "></div>
 
         <!-- Bag Submenu (Pokéballs) -->
@@ -595,6 +658,14 @@ export class BattleHUD {
     this.updatePartyDock();
   }
 
+  public getSpeedMultiplier(): SpeedMultiplier {
+    return this.speedMultiplier;
+  }
+
+  public setSpeedMultiplier(speed: SpeedMultiplier): void {
+    this.updateSpeedDisplay(speed);
+  }
+
   public updateSpeedDisplay(speed: SpeedMultiplier): void {
     this.speedMultiplier = speed;
     if (this.speedButton) {
@@ -602,10 +673,11 @@ export class BattleHUD {
         typeof window !== 'undefined' &&
         (window.innerWidth <= 768 ||
           'ontouchstart' in window ||
-          (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0));
-      this.speedButton.innerText = isMobileOrTouch
-        ? `⚡ SPEED: ${speed}x`
-        : `⚡ SPEED: ${speed}x (Shift)`;
+          (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0) ||
+          (typeof document !== 'undefined' && document.body?.classList?.contains('touch-controls-active')));
+      this.speedButton.innerHTML = isMobileOrTouch
+        ? `<span>⚡ SPEED: ${speed}x</span>`
+        : `<span>⚡ SPEED: ${speed}x</span> <span class="keyboard-hint">(Shift)</span>`;
       if (speed === 1) {
         this.speedButton.style.background = '#2563eb';
         this.speedButton.style.boxShadow = '0 2px 8px rgba(37, 99, 235, 0.4)';
@@ -700,8 +772,8 @@ export class BattleHUD {
           <div style="display: flex; align-items: center; gap: 6px;">
             <span style="font-size: 10px; font-weight: 800; background: ${typeColor}; color: white; padding: 2px 6px; border-radius: 4px;">${moveData.type.toUpperCase()}</span>
             <span style="font-size: 11px; font-weight: 700; color: #cbd5e1;">PP ${moveSlot.currentPp}/${moveSlot.maxPp}</span>
-            <span style="font-size: 10px; font-weight: 700; color: #94a3b8;">PWR ${pwrStr}</span>
-            <span style="font-size: 10px; font-weight: 700; color: #94a3b8;">ACC ${accStr}</span>
+            <span class="move-pwr-acc" style="font-size: 10px; font-weight: 700; color: #94a3b8;">PWR ${pwrStr}</span>
+            <span class="move-pwr-acc" style="font-size: 10px; font-weight: 700; color: #94a3b8;">ACC ${accStr}</span>
           </div>
           <span class="${pill.pulse ? 'crystal-ultra-pill' : ''}" style="
             background: ${pill.background};
@@ -735,7 +807,7 @@ export class BattleHUD {
       cursor: pointer;
       grid-column: span 2;
     `;
-    backBtn.innerText = '← BACK TO ACTIONS (Esc / X)';
+    backBtn.innerHTML = '<span>← BACK</span> <span class="keyboard-hint">(Esc / X)</span>';
     backBtn.addEventListener('click', () => this.showActionMenu());
     this.fightMenu.appendChild(backBtn);
   }
@@ -833,7 +905,7 @@ export class BattleHUD {
         cursor: pointer;
         grid-column: span 2;
       `;
-      backBtn.innerText = '← BACK (Esc / X)';
+      backBtn.innerHTML = '<span>← BACK</span> <span class="keyboard-hint">(Esc / X)</span>';
       backBtn.addEventListener('click', () => this.showActionMenu());
       this.partyMenu.appendChild(backBtn);
     }
@@ -918,7 +990,7 @@ export class BattleHUD {
       cursor: pointer;
       grid-column: span 2;
     `;
-    backBtn.innerText = '← BACK (Esc / X)';
+    backBtn.innerHTML = '<span>← BACK</span> <span class="keyboard-hint">(Esc / X)</span>';
     backBtn.addEventListener('click', () => this.showActionMenu());
     this.bagMenu.appendChild(backBtn);
   }
@@ -955,8 +1027,29 @@ export class BattleHUD {
    */
   public promptMoveForget(pokemon: PokemonInstance, newMove: MoveData): Promise<number | null> {
     return new Promise((resolve) => {
+      const prevMessageDisplay = this.messageBox ? this.messageBox.style.display : 'flex';
+      if (this.messageBox) {
+        this.messageBox.style.display = 'none';
+      }
+
+      const backdrop = document.createElement('div');
+      backdrop.id = 'move-learn-backdrop';
+      backdrop.className = 'interactive';
+      backdrop.style.cssText = `
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.65);
+        pointer-events: auto;
+        z-index: 95;
+      `;
+
+      backdrop.style.pointerEvents = 'auto';
+
       const modal = document.createElement('div');
       modal.id = 'move-learn-modal';
+      modal.className = 'interactive';
       modal.style.cssText = `
         position: absolute;
         top: 50%;
@@ -964,6 +1057,8 @@ export class BattleHUD {
         transform: translate(-50%, -50%);
         width: 480px;
         max-width: 92vw;
+        max-height: 85dvh;
+        overflow-y: auto;
         background: rgba(15, 23, 42, 0.96);
         backdrop-filter: blur(14px);
         border: 2px solid #38bdf8;
@@ -973,9 +1068,11 @@ export class BattleHUD {
         display: flex;
         flex-direction: column;
         gap: 12px;
-        z-index: 70;
+        z-index: 100;
+        pointer-events: auto;
         color: #f8fafc;
-        `;
+      `;
+      modal.style.pointerEvents = 'auto';
 
       const newTypeColor = TYPE_COLORS[newMove.type] || '#64748b';
       const newPwr = newMove.power > 0 ? newMove.power : '—';
@@ -1010,8 +1107,35 @@ export class BattleHUD {
           font-size: 13px;
           font-weight: 700;
           cursor: pointer;
+          pointer-events: auto;
         ">✕ Keep Existing Moves (Don't Learn)</button>
       `;
+
+      let resolved = false;
+      let cursorIndex = 0; // 0..3 = move slots, 4 = cancel
+      const slotButtons: HTMLButtonElement[] = [];
+
+      const cleanupAndResolve = (choice: number | null) => {
+        if (resolved) return;
+        resolved = true;
+        if (typeof window !== 'undefined') {
+          window.removeEventListener('keydown', onKeyDown);
+        }
+        if ((backdrop as any).remove) {
+          backdrop.remove();
+        } else if (backdrop.parentNode) {
+          backdrop.parentNode.removeChild(backdrop);
+        }
+        if ((modal as any).remove) {
+          modal.remove();
+        } else if (modal.parentNode) {
+          modal.parentNode.removeChild(modal);
+        }
+        if (this.messageBox) {
+          this.messageBox.style.display = prevMessageDisplay || 'flex';
+        }
+        resolve(choice);
+      };
 
       const slotsContainer = modal.querySelector('#forget-slots-container') as HTMLDivElement;
       pokemon.moves.forEach((slot, idx) => {
@@ -1021,6 +1145,7 @@ export class BattleHUD {
         const slotAcc = slotData.accuracy > 0 ? `${slotData.accuracy}%` : '—';
 
         const slotBtn = document.createElement('button');
+        slotBtn.id = `forget-slot-btn-${idx}`;
         slotBtn.style.cssText = `
           background: #1e293b;
           color: white;
@@ -1028,6 +1153,7 @@ export class BattleHUD {
           border-radius: 8px;
           padding: 9px 12px;
           cursor: pointer;
+          pointer-events: auto;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -1036,6 +1162,7 @@ export class BattleHUD {
         `;
         slotBtn.innerHTML = `
           <div>
+            <span class="keyboard-hint" style="font-size: 10px; font-weight: 800; color: #94a3b8; margin-right: 4px;">[${idx + 1}]</span>
             <span style="font-size: 10px; font-weight: 800; background: ${slotTypeColor}; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">${slotData.type.toUpperCase()}</span>
             <strong style="font-size: 13px;">Forget ${slotData.name}</strong>
           </div>
@@ -1044,6 +1171,7 @@ export class BattleHUD {
           </div>
         `;
         slotBtn.addEventListener('mouseenter', () => {
+          cursorIndex = idx;
           slotBtn.style.borderColor = '#ef4444';
           slotBtn.style.background = 'rgba(239, 68, 68, 0.15)';
         });
@@ -1051,20 +1179,67 @@ export class BattleHUD {
           slotBtn.style.borderColor = 'rgba(255, 255, 255, 0.16)';
           slotBtn.style.background = '#1e293b';
         });
-        slotBtn.addEventListener('click', () => {
+        slotBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
           BattleAudio.playMenuSound('CONFIRM');
-          modal.remove();
-          resolve(idx);
+          cleanupAndResolve(idx);
         });
         slotsContainer.appendChild(slotBtn);
+        slotButtons.push(slotBtn);
       });
 
-      modal.querySelector('#cancel-learn-btn')!.addEventListener('click', () => {
+      const cancelBtn = modal.querySelector('#cancel-learn-btn') as HTMLButtonElement;
+      cancelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         BattleAudio.playMenuSound('CANCEL');
-        modal.remove();
-        resolve(null);
+        cleanupAndResolve(null);
       });
 
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (resolved) return;
+        if (e.code === 'Digit1' && pokemon.moves[0]) {
+          e.preventDefault();
+          BattleAudio.playMenuSound('CONFIRM');
+          cleanupAndResolve(0);
+        } else if (e.code === 'Digit2' && pokemon.moves[1]) {
+          e.preventDefault();
+          BattleAudio.playMenuSound('CONFIRM');
+          cleanupAndResolve(1);
+        } else if (e.code === 'Digit3' && pokemon.moves[2]) {
+          e.preventDefault();
+          BattleAudio.playMenuSound('CONFIRM');
+          cleanupAndResolve(2);
+        } else if (e.code === 'Digit4' && pokemon.moves[3]) {
+          e.preventDefault();
+          BattleAudio.playMenuSound('CONFIRM');
+          cleanupAndResolve(3);
+        } else if (e.code === 'Escape' || e.code === 'KeyX') {
+          e.preventDefault();
+          BattleAudio.playMenuSound('CANCEL');
+          cleanupAndResolve(null);
+        } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+          e.preventDefault();
+          cursorIndex = (cursorIndex + 1) % (slotButtons.length + 1);
+        } else if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+          e.preventDefault();
+          cursorIndex = (cursorIndex - 1 + slotButtons.length + 1) % (slotButtons.length + 1);
+        } else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyZ') {
+          e.preventDefault();
+          if (cursorIndex < slotButtons.length) {
+            BattleAudio.playMenuSound('CONFIRM');
+            cleanupAndResolve(cursorIndex);
+          } else {
+            BattleAudio.playMenuSound('CANCEL');
+            cleanupAndResolve(null);
+          }
+        }
+      };
+
+      if (typeof window !== 'undefined') {
+        window.addEventListener('keydown', onKeyDown);
+      }
+
+      this.container.appendChild(backdrop);
       this.container.appendChild(modal);
     });
   }

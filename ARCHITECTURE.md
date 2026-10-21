@@ -269,8 +269,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 6 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync, and retro overworld SFX (BUMP, HOP, RUSTLE, HEAL_JINGLE, FANFARE) (Ticket 6.3). |
 | `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
 | `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-15 char name validation/fallback, RTC period detection, `onComplete` payload. |
-| `StartMenuUI.ts` / `BagAndMartUI.ts` / `OverworldHUD.ts` | `tests/SettingsAndMartUI.test.ts` | 9 | ✅ Covered | Settings submenu with sound toggle, speed cycle & touch controls; separate Poké Mart counter view & bag view; mobile D-pad ergonomics, dynamic Trainer Card name, P/K/B/G/T/S/O shortcuts, and 6-slot Poké Ball healing animation (Sprint 08). |
-| **Current Baseline** | **12 Suites** | **109 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `StartMenuUI.ts` / `BagAndMartUI.ts` / `OverworldHUD.ts` / `BattleHUD.ts` | `tests/SettingsAndMartUI.test.ts` | 12 | ✅ Covered | Settings submenu with sound toggle, speed cycle, touch controls & D-Pad vs Virtual Analog Joystick control style; separate Poké Mart counter view & bag view; mobile D-pad ergonomics, dynamic Trainer Card name, P/K/B/G/T/S/O shortcuts, 6-slot Poké Ball healing animation at fixed canonical speed, interactive `#move-learn-modal` pointer-events & keyboard shortcuts, and persisted `battleSpeedMultiplier` & `touchControlStyle` (Sprint 08, Sprint 10). |
+| **Current Baseline** | **12 Suites** | **112 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

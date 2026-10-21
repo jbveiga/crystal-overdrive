@@ -2,12 +2,16 @@ export type SpeedMultiplier = 1 | 2 | 3 | 4;
 export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 export type PlayerGender = 'BOY' | 'GIRL';
 
+export type TouchControlStyle = 'DPAD' | 'JOYSTICK';
+
 export interface GameOptions {
   soundVolume: number;      // 0.0 - 1.0 (default: 0.7)
   bgmVolume: number;        // 0.0 - 1.0 (default: 0.7)
   textSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT'; // (default: 'MID')
   battleAnimations: boolean; // (default: true)
   playerSpeedDefault: SpeedMultiplier; // (default: 1)
+  battleSpeedMultiplier?: SpeedMultiplier; // (default: 1)
+  touchControlStyle?: TouchControlStyle; // (default: 'DPAD')
 }
 
 export interface SavePreview {

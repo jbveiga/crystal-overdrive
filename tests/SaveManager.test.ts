@@ -92,6 +92,8 @@ describe('SaveManager Data Contracts & Ticket 4.1 Extensions', () => {
       textSpeed: 'MID',
       battleAnimations: true,
       playerSpeedDefault: 1,
+      battleSpeedMultiplier: 1,
+      touchControlStyle: 'DPAD',
     });
   });
 

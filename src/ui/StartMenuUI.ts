@@ -1,4 +1,4 @@
-import type { SpeedMultiplier } from '../types/game';
+import type { SpeedMultiplier, TouchControlStyle } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
 
 const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = [
@@ -42,6 +42,7 @@ export interface StartMenuStateProvider {
   isMuted?: () => boolean;
   getSpeedMultiplier?: () => SpeedMultiplier;
   isGamepadActive?: () => boolean;
+  getTouchControlStyle?: () => TouchControlStyle;
 }
 
 export interface StartMenuCallbacks {
@@ -52,6 +53,7 @@ export interface StartMenuCallbacks {
   onToggleMute?: () => boolean;
   onCycleSpeed?: () => SpeedMultiplier;
   onToggleGamepad?: () => boolean;
+  onToggleTouchControlStyle?: () => TouchControlStyle;
 }
 
 const JOHTO_BADGES = [
@@ -471,7 +473,7 @@ export class StartMenuUI {
       display: flex;
       justify-content: space-between;
     `;
-    header.innerHTML = `<span>START MENU</span><span style="color: #94a3b8;">ESC</span>`;
+    header.innerHTML = `<span>START MENU</span><span class="keyboard-hint" style="color: #94a3b8;">ESC</span>`;
     this.menuPanel.appendChild(header);
 
     this.menuItems.forEach((item, idx) => {
@@ -502,7 +504,7 @@ export class StartMenuUI {
           <span>${item.icon}</span>
           <span>${item.label}</span>
         </span>
-        <span style="font-size: 10px; font-weight: 800; color: #94a3b8; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.28); padding: 1px 5px; border-radius: 4px;">[${item.shortcut}]</span>
+        <span class="keyboard-hint" style="font-size: 10px; font-weight: 800; color: #94a3b8; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.28); padding: 1px 5px; border-radius: 4px;">[${item.shortcut}]</span>
       `;
 
       btn.addEventListener('mouseenter', () => {
@@ -754,6 +756,10 @@ export class StartMenuUI {
       ? this.stateProvider.getSpeedMultiplier()
       : this.speedMultiplier;
     const isGamepad = this.stateProvider.isGamepadActive ? this.stateProvider.isGamepadActive() : false;
+    const controlStyle: TouchControlStyle = this.stateProvider.getTouchControlStyle
+      ? this.stateProvider.getTouchControlStyle()
+      : 'DPAD';
+    const isJoystick = controlStyle === 'JOYSTICK';
 
     const rowStyle = 'background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;';
     const subLabelStyle = 'font-size:11px;color:#94a3b8;';
@@ -825,6 +831,25 @@ export class StartMenuUI {
             min-width: 130px;
           ">${isGamepad ? '🎮 TOUCH: ON' : '🎮 TOUCH: OFF'}</button>
         </div>
+
+        <!-- Touch Control Style Toggle (D-Pad vs Analog Joystick) -->
+        <div style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">CONTROL STYLE</div>
+            <div style="${subLabelStyle}">D-Pad buttons or analog joystick</div>
+          </div>
+          <button id="settings-control-style-btn" style="
+            background: ${isJoystick ? '#7c3aed' : '#0284c7'};
+            color: #ffffff;
+            border: 1px solid ${isJoystick ? '#c084fc' : '#38bdf8'};
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 130px;
+          ">${isJoystick ? '🕹️ JOYSTICK (Analog)' : '🕹️ D-PAD (Buttons)'}</button>
+        </div>
       </div>
 
       <button id="close-settings-btn" style="
@@ -843,6 +868,7 @@ export class StartMenuUI {
     const soundBtn = this.settingsModal.querySelector('#settings-sound-btn') as HTMLButtonElement;
     const speedBtn = this.settingsModal.querySelector('#settings-speed-btn') as HTMLButtonElement;
     const gamepadBtn = this.settingsModal.querySelector('#settings-gamepad-btn') as HTMLButtonElement;
+    const controlStyleBtn = this.settingsModal.querySelector('#settings-control-style-btn') as HTMLButtonElement;
     const closeBtn = this.settingsModal.querySelector('#close-settings-btn') as HTMLButtonElement;
     const closeXBtn = this.settingsModal.querySelector('#close-settings-x-btn') as HTMLButtonElement;
 
@@ -872,6 +898,17 @@ export class StartMenuUI {
         gamepadBtn.innerText = active ? '🎮 TOUCH: ON' : '🎮 TOUCH: OFF';
         gamepadBtn.style.background = active ? '#059669' : '#334155';
         gamepadBtn.style.borderColor = active ? '#34d399' : '#64748b';
+      }
+    });
+
+    controlStyleBtn.addEventListener('click', () => {
+      if (this.callbacks.onToggleTouchControlStyle) {
+        const nextStyle = this.callbacks.onToggleTouchControlStyle();
+        BattleAudio.playMenuSound('CONFIRM');
+        const nextIsJoy = nextStyle === 'JOYSTICK';
+        controlStyleBtn.innerText = nextIsJoy ? '🕹️ JOYSTICK (Analog)' : '🕹️ D-PAD (Buttons)';
+        controlStyleBtn.style.background = nextIsJoy ? '#7c3aed' : '#0284c7';
+        controlStyleBtn.style.borderColor = nextIsJoy ? '#c084fc' : '#38bdf8';
       }
     });
 

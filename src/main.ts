@@ -117,7 +117,12 @@ async function bootstrap() {
       lastVisitedPokecenter = { mapId: initialMapId, x: 3, y: 3 };
     }
 
-    gameClock.playerSpeed = existingSave.player.speedMultiplier;
+    gameClock.playerSpeed =
+      existingSave.player.speedMultiplier || existingSave.options?.playerSpeedDefault || 1;
+    gameClock.battleSpeed =
+      existingSave.player.battleSpeedMultiplier || existingSave.options?.battleSpeedMultiplier || 1;
+    gameOptions.playerSpeedDefault = gameClock.playerSpeed;
+    gameOptions.battleSpeedMultiplier = gameClock.battleSpeed;
 
     // Only awaken Legendary Beasts if player has reached the Ecruteak Burned Tower story milestone (4+ Badges)
     if (inventory.badges.length >= 4) {
@@ -487,6 +492,11 @@ async function bootstrap() {
 
   // 4. Save Game Helper
   const saveCurrentGame = async () => {
+    gameOptions.playerSpeedDefault = gameClock.playerSpeed;
+    gameOptions.battleSpeedMultiplier = gameClock.battleSpeed;
+    if (overworldHUD) {
+      gameOptions.touchControlStyle = overworldHUD.getTouchControlStyle();
+    }
     const saveData: SaveData = {
       version: 1,
       timestamp: Date.now(),
@@ -499,6 +509,7 @@ async function bootstrap() {
         y: player.y,
         direction: player.direction,
         speedMultiplier: gameClock.playerSpeed,
+        battleSpeedMultiplier: gameClock.battleSpeed,
         badges: inventory.badges,
         money: inventory.money,
       },
@@ -537,6 +548,7 @@ async function bootstrap() {
 
   const cyclePlayerSpeed = (): SpeedMultiplier => {
     const newSpeed = gameClock.cyclePlayerSpeed();
+    gameOptions.playerSpeedDefault = newSpeed;
     bagUI.setSpeedMultiplier(newSpeed);
     partyUI.setSpeedMultiplier(newSpeed);
     startMenuUI.setSpeedMultiplier(newSpeed);
@@ -572,6 +584,7 @@ async function bootstrap() {
       isMuted: () => audioManager.isMuted(),
       getSpeedMultiplier: () => gameClock.playerSpeed,
       isGamepadActive: () => overworldHUD?.isGamepadActive() ?? false,
+      getTouchControlStyle: () => overworldHUD?.getTouchControlStyle() ?? gameOptions.touchControlStyle ?? 'DPAD',
     },
     {
       onOpenParty: () => {
@@ -600,6 +613,12 @@ async function bootstrap() {
       },
       onToggleGamepad: () => {
         return overworldHUD.toggleGamepad();
+      },
+      onToggleTouchControlStyle: () => {
+        const nextStyle = overworldHUD.toggleTouchControlStyle();
+        gameOptions.touchControlStyle = nextStyle;
+        saveCurrentGame();
+        return nextStyle;
       },
     }
   );
@@ -653,6 +672,7 @@ async function bootstrap() {
     isModalOpen: isAnyOverworldModalOpen,
   });
   overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
+  overworldHUD.setTouchControlStyle(gameOptions.touchControlStyle || 'DPAD');
   overworldHUD.updateMuteDisplay(audioManager.isMuted());
   overworldHUD.updateRouteName(initialMap.name);
   overworldHUD.updatePokegear(roamingManager.getAllRoamers());
@@ -666,7 +686,9 @@ async function bootstrap() {
   overworldRenderer.renderMap(initialMap, lookupMap);
 
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
+  battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
   const battleHUD = new BattleHUD('battle-hud-container');
+  battleHUD.setSpeedMultiplier(gameClock.battleSpeed);
   window.updateLoaderProgress?.(100, 'Ready!');
   window.dismissLoader?.();
 
@@ -761,6 +783,14 @@ async function bootstrap() {
       audioManager.setBgmVolume(updatedOptions.bgmVolume);
       audioManager.setSfxVolume(updatedOptions.soundVolume);
       gameClock.playerSpeed = updatedOptions.playerSpeedDefault;
+      if (updatedOptions.battleSpeedMultiplier) {
+        gameClock.battleSpeed = updatedOptions.battleSpeedMultiplier;
+        battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
+        battleHUD.setSpeedMultiplier(gameClock.battleSpeed);
+      }
+      if (updatedOptions.touchControlStyle) {
+        overworldHUD.setTouchControlStyle(updatedOptions.touchControlStyle);
+      }
       overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
       bagUI.setSpeedMultiplier(gameClock.playerSpeed);
       partyUI.setSpeedMultiplier(gameClock.playerSpeed);
@@ -1110,6 +1140,7 @@ async function bootstrap() {
           },
           onSpeedToggle: () => {
             const nextSpeed = gameClock.cycleBattleSpeed();
+            gameOptions.battleSpeedMultiplier = nextSpeed;
             battleRenderer.setSpeedMultiplier(nextSpeed);
             return nextSpeed;
           },

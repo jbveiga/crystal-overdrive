@@ -83,6 +83,21 @@ class MockElement {
     return child;
   }
 
+  removeChild(child: MockElement) {
+    const idx = this.children.indexOf(child);
+    if (idx >= 0) {
+      this.children.splice(idx, 1);
+      child.parent = null;
+    }
+    return child;
+  }
+
+  remove() {
+    if (this.parent) {
+      this.parent.removeChild(this);
+    }
+  }
+
   addEventListener(event: string, fn: Function) {
     if (!this.listeners[event]) this.listeners[event] = [];
     this.listeners[event].push(fn);
@@ -156,6 +171,11 @@ class MockDocument {
     hudContainer.id = 'overworld-hud-container';
     this.body.appendChild(hudContainer);
     this.register(hudContainer);
+
+    const battleHudContainer = new MockElement('div');
+    battleHudContainer.id = 'battle-hud-container';
+    this.body.appendChild(battleHudContainer);
+    this.register(battleHudContainer);
   }
 }
 
@@ -170,8 +190,10 @@ const mockDoc = new MockDocument();
 import { StartMenuUI } from '../src/ui/StartMenuUI';
 import { BagAndMartUI } from '../src/ui/BagAndMartUI';
 import { OverworldHUD } from '../src/ui/OverworldHUD';
+import { BattleHUD } from '../src/ui/BattleHUD';
 import { TitleScreenUI } from '../src/ui/TitleScreenUI';
-import type { SavePreview, PokemonInstance } from '../src/types/game';
+import { SaveManager } from '../src/core/SaveManager';
+import type { SavePreview, PokemonInstance, MoveData } from '../src/types/game';
 
 describe('Settings, Mart, and Mobile UI Enhancements', () => {
   beforeEach(() => {
@@ -401,9 +423,10 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       expect(hud.isGamepadActive()).toBe(toggled);
     });
 
-    it('plays a 6-slot Poké Ball healing animation overlay and invokes onComplete (Ticket Sprint 08)', () => {
+    it('plays a 6-slot Poké Ball healing animation overlay at fixed canonical speed regardless of 4x turbo (Ticket Sprint 08 & Sprint 10)', () => {
       vi.useFakeTimers();
       const hud = new OverworldHUD('overworld-hud-container');
+      hud.updateSpeedDisplay(4);
       const onComplete = vi.fn();
 
       hud.playHealingAnimation(3, onComplete);
@@ -412,7 +435,12 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       expect(healOverlay.style.display).toBe('flex');
       expect(hud.isDialogueOpen()).toBe(true);
 
+      // At 1500ms it should still be playing even though player speed is 4x
       vi.advanceTimersByTime(1500);
+      expect(onComplete).not.toHaveBeenCalled();
+
+      // At 2300ms (790ms pulseDelay + 1400ms hold = 2190ms) it completes
+      vi.advanceTimersByTime(800);
       expect(onComplete).toHaveBeenCalledTimes(1);
       expect(healOverlay.style.display).toBe('none');
       vi.useRealTimers();
@@ -473,6 +501,116 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       expect(ui.triggerShortcut('KeyS', true)).toBe(true);
       const saveModal = mockDoc.querySelector('#save-confirm-modal') as MockElement;
       expect(saveModal.style.display).toBe('flex');
+    });
+  });
+
+  describe('6. Sprint 10: Move Learn Modal Fix, Virtual Analog Joystick & Speed Persistence', () => {
+    it('makes #move-learn-modal interactive with pointer-events: auto and resolves when a slot or cancel is clicked', async () => {
+      const battleHUD = new BattleHUD('battle-hud-container');
+      const mockPkmn: PokemonInstance = {
+        uid: 'cyndaquil-1',
+        speciesId: 'cyndaquil',
+        nickname: 'CYNDAQUIL',
+        level: 12,
+        types: ['Fire'],
+        baseStats: { hp: 39, attack: 52, defense: 43, spAttack: 60, spDefense: 50, speed: 65 },
+        stats: { hp: 35, attack: 20, defense: 18, spAttack: 22, spDefense: 19, speed: 24 },
+        currentHp: 35,
+        status: 'NONE',
+        isTrapped: false,
+        moves: [
+          { moveId: 'tackle', currentPp: 35, maxPp: 35 },
+          { moveId: 'leer', currentPp: 30, maxPp: 30 },
+          { moveId: 'smokescreen', currentPp: 20, maxPp: 20 },
+          { moveId: 'ember', currentPp: 25, maxPp: 25 },
+        ],
+        catchRate: 45,
+      };
+      const newMove: MoveData = {
+        id: 'quickattack',
+        name: 'Quick Attack',
+        type: 'Normal',
+        category: 'Physical',
+        power: 40,
+        accuracy: 100,
+        pp: 30,
+        priority: 1,
+      };
+
+      const promise = battleHUD.promptMoveForget(mockPkmn, newMove);
+      const modal = mockDoc.querySelector('#move-learn-modal') as MockElement;
+      const backdrop = mockDoc.querySelector('#move-learn-backdrop') as MockElement;
+      expect(modal).not.toBeNull();
+      expect(backdrop).not.toBeNull();
+      expect(modal.style.pointerEvents).toBe('auto');
+      expect(modal.className).toContain('interactive');
+
+      const slot0 = mockDoc.querySelector('#forget-slot-btn-0') as MockElement;
+      expect(slot0).not.toBeNull();
+      slot0.click();
+
+      const chosenSlot = await promise;
+      expect(chosenSlot).toBe(0);
+    });
+
+    it('switches between D-PAD (Buttons) and JOYSTICK (Analog) in OverworldHUD and StartMenuUI Settings', () => {
+      const hud = new OverworldHUD('overworld-hud-container');
+      expect(hud.getTouchControlStyle()).toBe('DPAD');
+
+      const segUp = mockDoc.querySelector('#dpad-seg-up') as MockElement;
+      const knob = mockDoc.querySelector('#virtual-joystick-knob') as MockElement;
+      expect(segUp.style.display).toBe('flex');
+      expect(knob.style.display).toBe('none');
+
+      const nextStyle = hud.toggleTouchControlStyle();
+      expect(nextStyle).toBe('JOYSTICK');
+      expect(hud.getTouchControlStyle()).toBe('JOYSTICK');
+      expect(segUp.style.display).toBe('none');
+      expect(knob.style.display).toBe('block');
+
+      const ui = new StartMenuUI(
+        'modal-container',
+        {
+          getTrainerName: () => 'GOLD',
+          getMoney: () => 3000,
+          getBadges: () => [],
+          getPartyCount: () => 1,
+          getCaughtCount: () => 1,
+          getPlayTimeSeconds: () => 120,
+          getMapName: () => 'New Bark Town',
+          isMuted: () => false,
+          getSpeedMultiplier: () => 1,
+          isGamepadActive: () => true,
+          getTouchControlStyle: () => hud.getTouchControlStyle(),
+        },
+        {
+          onOpenParty: vi.fn(),
+          onOpenBag: vi.fn(),
+          onOpenPokegear: vi.fn(),
+          onSaveGame: vi.fn(),
+          onToggleMute: vi.fn(),
+          onCycleSpeed: vi.fn(),
+          onToggleGamepad: vi.fn(),
+          onToggleTouchControlStyle: () => hud.toggleTouchControlStyle(),
+        }
+      );
+
+      ui.open();
+      (mockDoc.querySelector('#start-opt-settings') as MockElement).click();
+      const styleBtn = mockDoc.querySelector('#settings-control-style-btn') as MockElement;
+      expect(styleBtn).not.toBeNull();
+      expect(styleBtn.innerText).toContain('JOYSTICK (Analog)');
+
+      styleBtn.click();
+      expect(hud.getTouchControlStyle()).toBe('DPAD');
+      expect(styleBtn.innerText).toContain('D-PAD (Buttons)');
+    });
+
+    it('includes battleSpeedMultiplier and touchControlStyle in SaveManager default options', () => {
+      const defaults = SaveManager.getDefaultOptions();
+      expect(defaults.playerSpeedDefault).toBe(1);
+      expect(defaults.battleSpeedMultiplier).toBe(1);
+      expect(defaults.touchControlStyle).toBe('DPAD');
     });
   });
 });
