@@ -123,14 +123,14 @@ export class SaveManager {
   }
 
   /**
-   * Formats total elapsed seconds into `"HH:MM"` (e.g. `84` -> `"00:01"`, `5040` -> `"01:24"`).
+   * Formats total elapsed seconds into canonical `"HH:MM:ss"` (e.g. `0` -> `"00:00:00"`, `65` -> `"00:01:05"`, `3665` -> `"01:01:05"`).
    */
   public static formatPlayTime(seconds: number): string {
     const safeSeconds = Math.max(0, Math.floor(seconds || 0));
-    const totalMinutes = Math.floor(safeSeconds / 60);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    const hours = Math.floor(safeSeconds / 3600);
+    const minutes = Math.floor((safeSeconds % 3600) / 60);
+    const secs = safeSeconds % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
 
   /**

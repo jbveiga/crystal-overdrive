@@ -76,12 +76,14 @@ describe('SaveManager Data Contracts & Ticket 4.1 Extensions', () => {
   });
 
   it('formats play time strings accurately for 0s, under 1 hour, and over 10 hours', () => {
-    expect(SaveManager.formatPlayTime(0)).toBe('00:00');
-    expect(SaveManager.formatPlayTime(59)).toBe('00:00');
-    expect(SaveManager.formatPlayTime(84)).toBe('00:01');
-    expect(SaveManager.formatPlayTime(5040)).toBe('01:24');
-    expect(SaveManager.formatPlayTime(36000)).toBe('10:00');
-    expect(SaveManager.formatPlayTime(45180)).toBe('12:33');
+    expect(SaveManager.formatPlayTime(0)).toBe('00:00:00');
+    expect(SaveManager.formatPlayTime(59)).toBe('00:00:59');
+    expect(SaveManager.formatPlayTime(65)).toBe('00:01:05');
+    expect(SaveManager.formatPlayTime(84)).toBe('00:01:24');
+    expect(SaveManager.formatPlayTime(3665)).toBe('01:01:05');
+    expect(SaveManager.formatPlayTime(5040)).toBe('01:24:00');
+    expect(SaveManager.formatPlayTime(36000)).toBe('10:00:00');
+    expect(SaveManager.formatPlayTime(45180)).toBe('12:33:00');
   });
 
   it('returns canonical default GameOptions from SaveManager.getDefaultOptions()', () => {
@@ -140,7 +142,7 @@ describe('SaveManager Data Contracts & Ticket 4.1 Extensions', () => {
     expect(preview?.gender).toBe('GIRL');
     expect(preview?.badgeCount).toBe(1);
     expect(preview?.pokedexCount).toBe(4);
-    expect(preview?.playTimeFormatted).toBe('01:24');
+    expect(preview?.playTimeFormatted).toBe('01:24:00');
     expect(preview?.currentLocationName).toBe("Player's House");
     expect(preview?.partyLeadSpeciesId).toBe('cyndaquil');
     expect(preview?.partyLeadLevel).toBe(14);
@@ -180,7 +182,7 @@ describe('SaveManager Data Contracts & Ticket 4.1 Extensions', () => {
     expect(preview?.gender).toBe('BOY');
     expect(preview?.badgeCount).toBe(0);
     expect(preview?.pokedexCount).toBe(0);
-    expect(preview?.playTimeFormatted).toBe('00:01');
+    expect(preview?.playTimeFormatted).toBe('00:01:24');
     expect(preview?.currentLocationName).toBe('New Bark Town');
     expect(preview?.partyLeadSpeciesId).toBe('totodile');
     expect(preview?.partyLeadLevel).toBe(5);
