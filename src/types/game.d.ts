@@ -139,6 +139,8 @@ export interface BgEvent {
     | 'HEAL_AND_SAVE'
     | 'OPEN_MART'
     | 'OPEN_POKEGEAR'
+    | 'POKECENTER_MAP'
+    | 'OPEN_MAP'
     | 'OPEN_PC'
     | 'STARTER_CYNDAQUIL'
     | 'STARTER_TOTODILE'

@@ -25,6 +25,7 @@ import { ItemfinderHUD } from './ui/ItemfinderHUD';
 import { NamingModalUI } from './ui/NamingModalUI';
 import { StorageManager, BoxManager } from './world/StorageManager';
 import { BoxManagementUI } from './ui/BoxManagementUI';
+import { TownMapUI } from './ui/TownMapUI';
 import type {
   MapData,
   Direction,
@@ -634,6 +635,8 @@ async function bootstrap() {
   const itemfinderHUD = new ItemfinderHUD('overworld-hud-container');
   const namingModalUI = new NamingModalUI('overworld-hud-container');
   const boxManagementUI = new BoxManagementUI('modal-container');
+  const townMapUI = new TownMapUI({ containerId: 'modal-container' });
+  const visitedMaps = new Set<string>([initialMapId]);
 
   let handleInteract = () => {};
   let toggleLiveItemfinderRadar = (): boolean => false;
@@ -699,7 +702,7 @@ async function bootstrap() {
         partyUI.hide();
         bagUI.hide();
         missionLogUI.hide();
-        overworldHUD.openPokegear();
+        townMapUI.open(mapManager.getCurrentMap()?.id || initialMapId, visitedMaps, roamingManager.getActiveRoamers());
       },
       onOpenMissions: () => {
         partyUI.hide();
@@ -754,7 +757,8 @@ async function bootstrap() {
     bagUI.isOpen() ||
     missionLogUI.isOpen() ||
     boxManagementUI.isOpen() ||
-    namingModalUI.isOpen();
+    namingModalUI.isOpen() ||
+    townMapUI.isOpen();
 
   overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
@@ -1000,6 +1004,10 @@ async function bootstrap() {
       return;
     }
     if (gameState === 'OVERWORLD') {
+      if (townMapUI.isOpen()) {
+        townMapUI.handleKeyDown(e);
+        return;
+      }
       if (missionLogUI.isOpen()) {
         missionLogUI.handleKeyDown(e);
         return;
@@ -3111,6 +3119,19 @@ async function bootstrap() {
         return;
       }
 
+      // Town Map Wall Poster Interaction
+      if (
+        bgEvent.action === 'POKECENTER_MAP' ||
+        bgEvent.action === 'OPEN_MAP' ||
+        bgEvent.pages.some((p) => p.toUpperCase().includes('TOWN MAP')) ||
+        bgEvent.speaker?.toUpperCase().includes('TOWN MAP')
+      ) {
+        overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
+          townMapUI.open(currentMap.id, visitedMaps, roamingManager.getActiveRoamers());
+        });
+        return;
+      }
+
       overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
         if (bgEvent.action === 'HEAL_AND_SAVE') {
           healPlayerParty(false);
@@ -3572,6 +3593,7 @@ async function bootstrap() {
             overworldRenderer
               .playDoorwayFade(() => {
                 const targetMap = mapManager.setCurrentMap(warp.targetMapId);
+                visitedMaps.add(targetMap.id);
                 if (targetMap.id.endsWith('_poke_center')) {
                   lastVisitedPokecenter = { mapId: targetMap.id, x: warp.targetX, y: Math.max(2, warp.targetY - 1) };
                 }

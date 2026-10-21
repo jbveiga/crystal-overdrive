@@ -51,6 +51,7 @@ export interface StartMenuCallbacks {
   onOpenParty: () => void;
   onOpenBag: () => void;
   onOpenPokegear: () => void;
+  onOpenTownMap?: () => void;
   onOpenMissions?: () => void;
   onSaveGame: () => Promise<void>;
   onToggleMute?: () => boolean;
