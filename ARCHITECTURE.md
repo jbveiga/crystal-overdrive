@@ -151,7 +151,7 @@ export interface MapData {
 export type NpcSpriteType =
   | 'boy' | 'girl' | 'fat_man' | 'kris'
   | 'silver' | 'fisherman' | 'bug_catcher' | 'teacher' | 'mom' | 'prof_elm'
-  | 'sage' | 'elder' | 'elder_li' | 'falkner' | 'bird_keeper' | 'earl';
+  | 'sage' | 'elder' | 'elder_li' | 'falkner' | 'bird_keeper' | 'earl' | 'oak';
 ```
 
 ### 3.3 Overworld Items & Scattered Pickups (`public/assets/data/overworld_items.json`)

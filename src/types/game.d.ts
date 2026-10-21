@@ -1,6 +1,24 @@
 export type SpeedMultiplier = 1 | 2 | 3 | 4;
 export type Direction = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
 export type PlayerGender = 'BOY' | 'GIRL';
+export type SpriteType =
+  | 'boy'
+  | 'girl'
+  | 'fat_man'
+  | 'kris'
+  | 'silver'
+  | 'fisherman'
+  | 'bug_catcher'
+  | 'teacher'
+  | 'mom'
+  | 'prof_elm'
+  | 'sage'
+  | 'elder'
+  | 'elder_li'
+  | 'falkner'
+  | 'bird_keeper'
+  | 'earl'
+  | 'oak';
 
 export type TouchControlStyle = 'DPAD' | 'JOYSTICK';
 

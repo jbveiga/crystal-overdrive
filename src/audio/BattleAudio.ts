@@ -23,6 +23,20 @@ export class BattleAudio {
   }
 
   /**
+   * Automatically disconnects one-shot OscillatorNode and GainNode instances from the AudioContext graph upon completion
+   */
+  private static bindAutoDisconnect(osc: OscillatorNode, gain: GainNode): void {
+    osc.onended = () => {
+      try {
+        osc.disconnect();
+        gain.disconnect();
+      } catch {
+        // ignore already-disconnected nodes
+      }
+    };
+  }
+
+  /**
    * Plays a synthesized 8-bit/16-bit electronic Pokémon cry deterministic to speciesId
    */
   public static playCry(speciesId: string, isFaint: boolean = false): void {
@@ -42,6 +56,7 @@ export class BattleAudio {
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    this.bindAutoDisconnect(osc, gain);
     osc.type = 'square';
 
     if (isFaint) {
@@ -75,6 +90,7 @@ export class BattleAudio {
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    this.bindAutoDisconnect(osc, gain);
 
     if (category === 'Status') {
       osc.type = 'sine';
@@ -121,6 +137,7 @@ export class BattleAudio {
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    this.bindAutoDisconnect(osc, gain);
 
     if (effectiveness >= 2 || isCritical) {
       // Heavy bass impact burst for Super Effective / Critical
@@ -172,6 +189,7 @@ export class BattleAudio {
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'square';
       osc.frequency.setValueAtTime(freq, now + idx * 0.055);
       gain.gain.setValueAtTime(0.06, now + idx * 0.055);
@@ -195,6 +213,7 @@ export class BattleAudio {
     if (type === 'THROW') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'sine';
       osc.frequency.setValueAtTime(280, now);
       osc.frequency.exponentialRampToValueAtTime(760, now + 0.18);
@@ -207,6 +226,7 @@ export class BattleAudio {
     } else if (type === 'BREAK') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(480, now);
       osc.frequency.exponentialRampToValueAtTime(140, now + 0.16);
@@ -219,6 +239,7 @@ export class BattleAudio {
     } else if (type === 'WOBBLE') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(220, now);
       osc.frequency.setValueAtTime(310, now + 0.06);
@@ -246,6 +267,7 @@ export class BattleAudio {
       for (const n of notes) {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'square';
         osc.frequency.setValueAtTime(n.f, now + n.t);
         gain.gain.setValueAtTime(0.07, now + n.t);
@@ -270,6 +292,7 @@ export class BattleAudio {
     if (type === 'CURSOR') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'square';
       osc.frequency.setValueAtTime(740, now);
       gain.gain.setValueAtTime(0.04, now);
@@ -281,6 +304,7 @@ export class BattleAudio {
     } else if (type === 'CONFIRM') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'square';
       osc.frequency.setValueAtTime(659.25, now);
       osc.frequency.setValueAtTime(987.77, now + 0.045);
@@ -293,6 +317,7 @@ export class BattleAudio {
     } else if (type === 'CANCEL') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(523.25, now);
       osc.frequency.setValueAtTime(349.23, now + 0.05);
@@ -307,6 +332,7 @@ export class BattleAudio {
       notes.forEach((f, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'sine';
         osc.frequency.setValueAtTime(f, now + i * 0.065);
         gain.gain.setValueAtTime(0.07, now + i * 0.065);
@@ -321,6 +347,7 @@ export class BattleAudio {
       notes.forEach((f, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'square';
         osc.frequency.setValueAtTime(f, now + i * 0.06);
         gain.gain.setValueAtTime(0.06, now + i * 0.06);
@@ -356,6 +383,7 @@ export class BattleAudio {
     if (type === 'RUSTLE') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(680, now);
       osc.frequency.exponentialRampToValueAtTime(1120, now + 0.065);
@@ -368,6 +396,7 @@ export class BattleAudio {
     } else if (type === 'HOP') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'square';
       osc.frequency.setValueAtTime(320, now);
       osc.frequency.exponentialRampToValueAtTime(640, now + 0.11);
@@ -387,6 +416,7 @@ export class BattleAudio {
       for (const n of notes) {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'square';
         osc.frequency.setValueAtTime(n.f, now + n.t);
         gain.gain.setValueAtTime(0.08, now + n.t);
@@ -399,6 +429,7 @@ export class BattleAudio {
     } else if (type === 'DOOR') {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'sine';
       osc.frequency.setValueAtTime(380, now);
       osc.frequency.exponentialRampToValueAtTime(160, now + 0.12);
@@ -413,6 +444,7 @@ export class BattleAudio {
       notes.forEach((f, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'square';
         osc.frequency.setValueAtTime(f, now + i * 0.08);
         gain.gain.setValueAtTime(0.07, now + i * 0.08);
@@ -427,6 +459,7 @@ export class BattleAudio {
       notes.forEach((f, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'square';
         osc.frequency.setValueAtTime(f, now + i * 0.055);
         gain.gain.setValueAtTime(0.06, now + i * 0.055);
@@ -440,6 +473,7 @@ export class BattleAudio {
       // Authentic retro Game Boy wall bump thud (120Hz -> 65Hz)
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(120, now);
       osc.frequency.exponentialRampToValueAtTime(65, now + 0.06);
@@ -462,6 +496,7 @@ export class BattleAudio {
       notes.forEach((n) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'square';
         osc.frequency.setValueAtTime(n.f, now + n.t);
         gain.gain.setValueAtTime(0.075, now + n.t);
@@ -482,6 +517,7 @@ export class BattleAudio {
       notes.forEach((n) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'square';
         osc.frequency.setValueAtTime(n.f, now + n.t);
         gain.gain.setValueAtTime(0.07, now + n.t);
@@ -506,6 +542,7 @@ export class BattleAudio {
       [0, 0.14].forEach((offset) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
         osc.type = 'square';
         osc.frequency.setValueAtTime(1174.66, now + offset);
         osc.frequency.setValueAtTime(1567.98, now + offset + 0.04);
@@ -519,6 +556,7 @@ export class BattleAudio {
     } else {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(220, now);
       gain.gain.setValueAtTime(0.06, now);

@@ -312,7 +312,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         5,
         3,
         'DOWN',
-        'fat_man',
+        'oak',
         '🎓 PROF. OAK',
         [
           'Aha! So you are GOLD! I am OAK, a POKéMON researcher.',

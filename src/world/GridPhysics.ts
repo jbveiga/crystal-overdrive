@@ -16,7 +16,8 @@ export type NpcSpriteType =
   | 'elder_li'
   | 'falkner'
   | 'bird_keeper'
-  | 'earl';
+  | 'earl'
+  | 'oak';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
@@ -92,20 +93,18 @@ export type CollisionBumpCallback = (entity: GridEntity) => void;
 export class GridPhysics {
   public static readonly BASE_TRAVERSAL_TIME: number = 0.24; // 0.24 seconds per tile at 1x speed
 
+  public static readonly DIRECTION_DELTAS: Record<Direction, { readonly dx: number; readonly dy: number }> = {
+    UP: { dx: 0, dy: -1 },
+    DOWN: { dx: 0, dy: 1 },
+    LEFT: { dx: -1, dy: 0 },
+    RIGHT: { dx: 1, dy: 0 },
+  };
+
   /**
-   * Helper to get integer delta for a direction
+   * Helper to get integer delta for a direction (zero-allocation static lookup)
    */
   public static getDirectionDelta(dir: Direction): { dx: number; dy: number } {
-    switch (dir) {
-      case 'UP':
-        return { dx: 0, dy: -1 };
-      case 'DOWN':
-        return { dx: 0, dy: 1 };
-      case 'LEFT':
-        return { dx: -1, dy: 0 };
-      case 'RIGHT':
-        return { dx: 1, dy: 0 };
-    }
+    return this.DIRECTION_DELTAS[dir];
   }
 
   /**

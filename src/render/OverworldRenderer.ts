@@ -34,7 +34,9 @@ export class OverworldRenderer {
   private playerGrassMask!: Graphics;
   private itemBallGraphics: Map<string, Container> = new Map();
   private npcSprites: Map<string, Sprite> = new Map();
+  private activeNpcSpriteList: Sprite[] = [];
   private npcGrassMasks: Map<string, Graphics> = new Map();
+  private activeNpcGrassMaskList: Graphics[] = [];
   private grassParticles: GrassParticle[] = [];
   private exclamationContainer: Container | null = null;
   private ambientOverlay!: Graphics;
@@ -501,6 +503,7 @@ export class OverworldRenderer {
       falkner: './assets/sprites/characters/falkner.png',
       bird_keeper: './assets/sprites/characters/bird_keeper.png',
       earl: './assets/sprites/characters/earl.png',
+      oak: './assets/sprites/characters/oak.png',
     };
 
     await Promise.all(
@@ -1098,11 +1101,11 @@ export class OverworldRenderer {
     this.stageContainer.position.set(cameraTargetX, cameraTargetY);
 
     // 3. Update NPCs across active & connected maps with playing-window viewport culling (Zero-allocation pass)
-    for (const sprite of this.npcSprites.values()) {
-      sprite.visible = false;
+    for (let i = 0; i < this.activeNpcSpriteList.length; i++) {
+      this.activeNpcSpriteList[i].visible = false;
     }
-    for (const mask of this.npcGrassMasks.values()) {
-      mask.visible = false;
+    for (let i = 0; i < this.activeNpcGrassMaskList.length; i++) {
+      this.activeNpcGrassMaskList[i].visible = false;
     }
 
     const cullMargin = this.tileSize * stageScale;
@@ -1134,6 +1137,7 @@ export class OverworldRenderer {
         sprite.scale.set(scale, scale);
         this.entityContainer.addChild(sprite);
         this.npcSprites.set(npc.id, sprite);
+        this.activeNpcSpriteList.push(sprite);
       }
       sprite.visible = true;
       sprite.position.set(npcPxX, npcPxY);
@@ -1153,6 +1157,7 @@ export class OverworldRenderer {
           mask = this.createGrassWadingGraphic();
           this.foregroundContainer.addChild(mask);
           this.npcGrassMasks.set(npc.id, mask);
+          this.activeNpcGrassMaskList.push(mask);
         }
         mask.visible = true;
         mask.position.set(npcPxX, npcPxY);

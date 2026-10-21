@@ -24,7 +24,15 @@ export default defineConfig({
             }
             return 'vendor';
           }
-          if (id.includes('generatedNpcs') || id.includes('npcData')) {
+          if (id.includes('src/ui/')) {
+            return 'ui';
+          }
+          if (
+            id.includes('generatedNpcs') ||
+            id.includes('npcData') ||
+            id.includes('missionData') ||
+            id.includes('overworld_items')
+          ) {
             return 'world-data';
           }
         },

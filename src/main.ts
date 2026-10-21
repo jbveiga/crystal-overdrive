@@ -2805,6 +2805,39 @@ async function bootstrap() {
     }
   };
 
+  const stepNeighborNpcs = (
+    neighborMapId: string | undefined,
+    triggerNewWanderStep: boolean,
+    dtWorld: number
+  ): void => {
+    if (!neighborMapId) return;
+    const neighborMap = mapManager.getMap(neighborMapId);
+    const neighborNpcs = neighborMap ? npcsByMap[neighborMap.id] : undefined;
+    if (!neighborMap || !neighborNpcs) return;
+
+    mapManager.setNeighborScratchMap(neighborMap);
+    for (let i = 0; i < neighborNpcs.length; i++) {
+      const npcEntity = neighborNpcs[i];
+      if (!npcEntity.wanders) continue;
+
+      const desiredDir =
+        triggerNewWanderStep && !npcEntity.isMoving && Math.random() < 0.55
+          ? directions[Math.floor(Math.random() * 4)]
+          : null;
+
+      GridPhysics.updateEntity(
+        npcEntity,
+        dtWorld,
+        desiredDir,
+        mapManager.isWalkableInNeighborBounds,
+        mapManager.getTileType,
+        undefined,
+        neighborNpcs
+      );
+    }
+    mapManager.setNeighborScratchMap(null);
+  };
+
   // 8. Decoupled Main Ticker Loop
   overworldRenderer.app.ticker.add((ticker) => {
     const rawDeltaSec = ticker.deltaMS / 1000;
@@ -3026,38 +3059,11 @@ async function bootstrap() {
           );
         }
 
-        // Also update wandering NPCs on connected West/East/North/South neighbor maps at 1.0x world time
-        const updateNeighborMapNpcs = (neighborMapId: string | undefined) => {
-          if (!neighborMapId) return;
-          const neighborMap = mapManager.getMap(neighborMapId);
-          const neighborNpcs = neighborMap ? npcsByMap[neighborMap.id] : undefined;
-          if (!neighborMap || !neighborNpcs) return;
-
-          for (let i = 0; i < neighborNpcs.length; i++) {
-            const npcEntity = neighborNpcs[i];
-            if (!npcEntity.wanders) continue;
-
-            const desiredDir =
-              triggerNewWanderStep && !npcEntity.isMoving && Math.random() < 0.55
-                ? directions[Math.floor(Math.random() * 4)]
-                : null;
-
-            GridPhysics.updateEntity(
-              npcEntity,
-              dtWorld,
-              desiredDir,
-              (x, y) => mapManager.isWalkableInMapBounds(neighborMap, x, y),
-              mapManager.getTileType,
-              undefined,
-              neighborNpcs
-            );
-          }
-        };
-
-        updateNeighborMapNpcs(currentMap?.connections.WEST?.mapId);
-        updateNeighborMapNpcs(currentMap?.connections.EAST?.mapId);
-        updateNeighborMapNpcs(currentMap?.connections.NORTH?.mapId);
-        updateNeighborMapNpcs(currentMap?.connections.SOUTH?.mapId);
+        // Also update wandering NPCs on connected West/East/North/South neighbor maps at 1.0x world time (zero closure allocations)
+        stepNeighborNpcs(currentMap?.connections.WEST?.mapId, triggerNewWanderStep, dtWorld);
+        stepNeighborNpcs(currentMap?.connections.EAST?.mapId, triggerNewWanderStep, dtWorld);
+        stepNeighborNpcs(currentMap?.connections.NORTH?.mapId, triggerNewWanderStep, dtWorld);
+        stepNeighborNpcs(currentMap?.connections.SOUTH?.mapId, triggerNewWanderStep, dtWorld);
       }
 
       // Render active & connected map NPCs after any border/warp transitions during this tick (viewport-culled)

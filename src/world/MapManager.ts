@@ -8,6 +8,7 @@ export interface WildEncounterResult {
 
 export class MapManager {
   private currentMap: MapData | null = null;
+  private neighborScratchMap: MapData | null = null;
   private maps: Map<string, MapData> = new Map();
 
   registerMap(map: MapData): void {
@@ -72,6 +73,21 @@ export class MapManager {
   isWalkableInBounds = (x: number, y: number): boolean => {
     if (!this.currentMap) return false;
     return this.isWalkableInMapBounds(this.currentMap, x, y);
+  };
+
+  /**
+   * Sets the temporary neighbor scratch map used by zero-allocation neighbor NPC stepping.
+   */
+  setNeighborScratchMap(map: MapData | null): void {
+    this.neighborScratchMap = map;
+  }
+
+  /**
+   * Zero-allocation bound collision callback for neighbor map NPC stepping.
+   */
+  isWalkableInNeighborBounds = (x: number, y: number): boolean => {
+    if (!this.neighborScratchMap) return false;
+    return this.isWalkableInMapBounds(this.neighborScratchMap, x, y);
   };
 
   /**

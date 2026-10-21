@@ -1481,9 +1481,17 @@ describe('MapData & Authentic Tile Integrity', () => {
     const chikoFlags = new Set(['starter_chosen', 'starter_chikorita', 'ELM_CALLED_ABOUT_THEFT']);
     expect(OverworldItemManager.getStarterBallsForLab(chikoFlags).map((b) => b.id)).toEqual(['totodile_ball']);
 
-    // 2. Mr. Pokémon's House NPC departure & walkable path
+    // 2. Mr. Pokémon's House NPC departure, Prof. Oak authentic 'oak' sprite sheet, & walkable path
+    const oakSpritePath = path.resolve(__dirname, '../public/assets/sprites/characters/oak.png');
+    expect(fs.existsSync(oakSpritePath)).toBe(true);
+    const oakBuf = fs.readFileSync(oakSpritePath);
+    expect(oakBuf.readUInt32BE(16)).toBe(144);
+    expect(oakBuf.readUInt32BE(20)).toBe(32);
+
     const preEggNpcs = getNpcsForMap('mr_pokemons_house', new Set());
     expect(preEggNpcs.map((n) => n.id)).toEqual(['mr_pokemon_npc', 'prof_oak_npc']);
+    const profOakNpc = preEggNpcs.find((n) => n.id === 'prof_oak_npc');
+    expect(profOakNpc?.spriteType).toBe('oak');
 
     flags.add('HAS_MYSTERY_EGG');
     flags.add('HAS_POKEDEX');

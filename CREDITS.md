@@ -40,7 +40,7 @@ This project is made possible thanks to the tireless preservation work, reverse-
 * **Authors:** Sierraffinity and the CrystalDust decompilation community.
 * **Repository:** [https://github.com/Sierraffinity/CrystalDust](https://github.com/Sierraffinity/CrystalDust)
 * **Assets Utilized:**
-  - 9-frame overworld walk sheets (144x32px RGBA) for Silver, Prof. Elm, Mom, Teacher, Fisherman, Bug Catcher, Falkner, Sage, Earl, Bird Keeper, Elder Li, and Johto civilian NPCs.
+  - 9-frame overworld walk sheets (144x32px RGBA) for Silver, Prof. Elm, Prof. Oak, Mom, Teacher, Fisherman, Bug Catcher, Falkner, Sage, Earl, Bird Keeper, Elder Li, and Johto civilian NPCs.
 
 ### [PokeAPI / sprites](https://github.com/PokeAPI/sprites)
 * **Authors:** Paul Hallett and the PokeAPI community.
