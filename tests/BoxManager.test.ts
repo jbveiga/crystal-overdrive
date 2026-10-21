@@ -342,5 +342,42 @@ describe('Sprint 13.5: Pokémon Storage System & Box Management Grid (TICKET-SPR
 
       ui.close();
     });
+
+    it('preserves lifted slot buffer across mobile segmented tab switching (Neo-Kanto Protocol)', () => {
+      const ui = new BoxManagementUI('modal-container');
+      const party = [
+        PokemonFactory.create('cyndaquil', 15),
+        PokemonFactory.create('hoothoot', 12),
+      ];
+      const stored = PokemonFactory.create('mareep', 10);
+      const storage = StorageManager.createDefaultStorage([stored]);
+
+      ui.open(party, storage);
+      expect(ui.getMobileTab()).toBe('box');
+
+      // 1. In Box view, select box slot 0 (mareep)
+      ui.selectSlot('box', 0);
+      const selectedBefore = ui.getSelectedSlot();
+      expect(selectedBefore).not.toBeNull();
+      expect(selectedBefore?.type).toBe('box');
+      expect(selectedBefore?.slotIndex).toBe(0);
+
+      // 2. Switch mobile segmented tab to 'party'
+      ui.setMobileTab('party');
+      expect(ui.getMobileTab()).toBe('party');
+
+      // 3. Assert lifted selection buffer persists across tab switch
+      const selectedAfterTab = ui.getSelectedSlot();
+      expect(selectedAfterTab).toEqual(selectedBefore);
+
+      // 4. Tap party slot 1 (hoothoot) -> completes swap across tabs!
+      ui.selectSlot('party', 1);
+
+      expect(party[1].speciesId).toBe('mareep');
+      expect(storage.boxes[0].pokemon[0]?.speciesId).toBe('hoothoot');
+      expect(ui.getSelectedSlot()).toBeNull();
+
+      ui.close();
+    });
   });
 });
