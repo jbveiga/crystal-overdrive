@@ -321,7 +321,7 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `PokemonFactory.ts` / `SaveManager.ts` | `tests/ExpShare.test.ts` | 5 | ✅ Covered | Unbound-style 3-mode Exp. Share (`OFF`, `ALL`, `CAPPED`), default `CAPPED` save hydration, Johto/Kanto badge level caps (`15..85`), 100% active + 50% bench party distribution, and `1 EXP` clamping at/above level cap (KEY-ITEMS-UNBOUND-01). |
 | `ItemfinderRadar.ts` | `tests/ItemfinderRadar.test.ts` | 5 | ✅ Covered | Pure TypeScript 8-tile dowsing radar scan, nearest uncollected hidden item vector lock, 8-way compass bearings, adjacent `FACING` detection, and dynamic sonar pitch $f(d) = 880 + (8-d)\times 120\text{ Hz}$ (KEY-ITEMS-UNBOUND-01). |
 | `NamingModalUI.ts` / `main.ts` / `npcData.ts` | `tests/RivalAndAzalea.test.ts` | 10 | ✅ Covered | Passerby Rival counter-starter selection (Cyndaquil -> Totodile, Totodile -> Chikorita, Chikorita -> Cyndaquil), dropped Trainer Card `SILVER`, Police interrogation & 15-character naming modal with presets (`SILVER`, `KAZU`, `KAMON`, `RED`), `SaveData.rivalName` serialization/hydration, Slowpoke Well Team Rocket raid with Executive Proton (Koffing Lv. 14, Zubat Lv. 9), Kurt Apricorn ball crafting unlock + Lure Ball award, Azalea Gym Leader Bugsy battle (Metapod Lv. 14, Kakuna Lv. 14, Scyther Lv. 16), Hive Badge, TM49 Fury Cutter, field Cut, and Mission M03 completion (Sprint 13). |
-| `StorageManager.ts` / `BoxManager.ts` / `BoxManagementUI.ts` | `tests/BoxManager.test.ts` | 12 | ✅ Covered | 14 storage boxes of 20 slots each (280 total capacity), automatic wild catch overflow into storage with transfer dialogue and fanfare, interactive PC terminals in all Pokémon Centers and player bedroom launching `BoxManagementUI`, 1-click party-box swapping, mobile segmented tab buffer persistence, `pointer-events: auto !important` clickability, canonical `_front.png` inspector sprites with defensive `this.onerror=null` fallbacks, release double-check safeguard, party minimum protection (cannot deposit/release last conscious Pokémon), protected Roaming Beasts (Raikou, Entei, Suicune) release protection, and backward-compatible save migration (Sprint 13.5, Stitch Neo-Kanto Protocol, BUGFIX-BILLS-PC-INTERACTION-FLICKER-01). |
+| `StorageManager.ts` / `BoxManager.ts` / `BoxManagementUI.ts` | `tests/BoxManager.test.ts` | 13 | ✅ Covered | 14 storage boxes of 20 slots each (280 total capacity), automatic wild catch overflow into storage with transfer dialogue and fanfare, interactive PC terminals in all Pokémon Centers and player bedroom launching `BoxManagementUI`, decoupled inspection and exclusive button-driven party-box swapping (`[ ⇄ MOVE / SWAP ]`), mobile segmented tab buffer persistence, `pointer-events: auto !important` clickability, canonical `_front.png` inspector sprites with defensive `this.onerror=null` fallbacks, release double-check safeguard, party minimum protection (cannot deposit/release last conscious Pokémon), protected Roaming Beasts (Raikou, Entei, Suicune) release protection, and backward-compatible save migration (Sprint 13.5, Stitch Neo-Kanto Protocol, TICKET-UX-STORAGE-BUTTON-ONLY-SWAP-01). |
 | `BagAndMartUI.ts` / `NamingModalUI.ts` / `npcData.ts` | `tests/ProgressionNarrative.test.ts` | 4 | ✅ Covered | `TMS & HMS` pocket definitions for HM05/TM70 Flash, TM31 Mud-Slap, TM49 Fury Cutter, HM01 Cut with dynamic fallback for unknown TM ids, rival naming modal clickability (`pointer-events: auto !important`), mobile-friendly input (`inputmode`, 16px font, CLEAR button), empty-name SILVER fallback, and peeking `nbt_rival` despawn/shove (BUGFIX-PROGRESSION-NARRATIVE-02). |
 | `OverworldItemManager.ts` / `SaveManager.ts` / `main.ts` | `tests/ElmsLabStarters.test.ts` | 7 | ✅ Covered | Elm's Lab table Poké Ball states (3 -> 2 -> 1 for all three starter choices), context-aware table inspection dialogues (empty spot / stolen ball / remaining ball), HM05 Flash as the sole Flash item (TM70 removed from Elder Li reward and Bag) and legacy TM70 save pruning (TICKET-NARRATIVE-ELMS-TABLE-POKEBALLS-01). |
 | `EvolutionManager.ts` | `tests/EvolutionManager.test.ts` | 20 | ✅ Covered | Pure domain evolution engine: level-up thresholds (starters, Tyrogue Atk/Def stat branches), evolutionary stones (Fire, Water, Thunder, Leaf, Moon, Sun), single-player Link Cable / Link Stone trade evolutions, friendship happiness scale (>= 220, Day/Night Eevee branch, baby Pokémon), Everstone invariant suppression, and stat recalculation with proportional HP preservation (Ticket 14.1). |
@@ -330,8 +330,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `MapTileIntegrity` / `MoveReplacementModalUI.ts` | `tests/MapTileIntegrity.test.ts` | 13 | ✅ Covered | 100% map tile integrity across all 315 maps (944 warps landing strictly on walkable tiles 0/2, texture-collision coherence, zero missing tiles), `PokemonFactory.canLearnMove` Gen 2 learnset tables, `MoveReplacementModalUI` 4-move tactical replacement with canonical "Poof!" dialogue and safe cancellation, `BagAndMartUI` party compatibility ABLE / NOT ABLE badges and shop ball catalog badge filtering, and Bill's PC `[ ⇄ MOVE / SWAP ]` / `[ 📋 SUMMARY ]` primary actions, demoted tertiary release button (`28px`, slate `#64748B`), and in-game double confirmation safety modal (TICKET-UX-TMHM-RELEASE-MAP-INTEGRITY-01). |
 | `DaySiblings.ts` / `npcData.ts` | `tests/DaySiblings.test.ts` | 7 | ✅ Covered | All 7 Day Siblings (Monica -> `sharp_beak`, Tuscany -> `pink_bow`, Wesley -> `black_belt`, Arthur -> `hard_stone`, Frieda -> `poison_barb`, Santos -> `soft_sand`, Sunny -> `magnet`) registered with `DAY_SIBLING_EVENT`, 100% walkable tiles (`0`), once-per-save story flags (`received_item_*`), fanfare chimes, toasts, and on-demand map tile loader `ensureMapTilesLoaded` for Route 32 cave rocks/shorelines (BUGFIX-ROUTE32-FRIEDA-TILES-01). |
 | `RuinsOfAlphCaves` / `mapData` | `tests/RuinsOfAlphCaves.test.ts` | 4 | ✅ Covered | Authentic Kabuto Chamber (8x10) and Inner Chamber (20x28) structures, collision grids, 100% tile existence, wild Unown encounters (Lv. 5), reciprocal exterior warps, and main fallback registration (TICKET-WORLD-RUINS-OF-ALPH-CAVES-01). |
-| `UnionCaveMapping` / `npcData.ts` | `tests/UnionCaveMapping.test.ts` | 4 | ✅ Covered | Three-floor Union Cave mapping (1F, B1F, B2F) with Route 32 <-> Route 33 transit, reciprocal ladder/stair warps, wild encounter tables, Friday Lapras encounter at (11, 31) with cry, Lv. 20 battle, and despawn (TICKET-WORLD-UNION-CAVE-MAPPING-01). |
-| **Current Baseline** | **28 Suites** | **243 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `UnionCaveMapping` / `npcData.ts` | `tests/UnionCaveMapping.test.ts` | 6 | ✅ Covered | Three-floor Union Cave mapping (1F, B1F, B2F) with Route 32 <-> Route 33 transit, reciprocal ladder/stair warps, wild encounter tables, all 8 canonical ground item balls on walkable tiles, all 7 trainers (Hiker Daniel, Pokemaniac Larry, Firebreather Ray, Hiker Phillip, Pokemaniac Andrew, Ace Trainer Nick, Ace Trainer Gwen) with sightlines, Lapras fan, and Friday Lapras encounter at (11, 31) with cry, Lv. 20 battle, and despawn (TICKET-WORLD-UNION-CAVE-COMPLETE-PACKAGE-01). |
+| **Current Baseline** | **28 Suites** | **246 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.
@@ -441,4 +441,32 @@ Introduced in Sprint 13.5, the Bill's PC Pokémon Storage System provides full G
   - 1-click pick and swap between party and box slots, with keyboard navigation (`ArrowLeft`, `ArrowRight`, `Escape`).
 - **Interactive PC Terminals (`src/main.ts`)**:
   - Integrated into all Pokémon Centers and the player's bedroom via facing interaction (`OPEN_PC` action).
+
+---
+
+### 7.3 The 10-Point Complete Map Delivery Standard (Mandatory Mapping Package)
+
+Every new map or regional zone delivered to the engine must be a **100% complete, fully playable package**. Under no circumstance may a map be staged as mere empty geometry or isolated tiles. Every map implementation must satisfy all 10 mandatory dimensions:
+
+1. **Reciprocal Navigation**:
+   - Complete bidirectional warps to and from all connecting routes and towns with safe, walkable landing thresholds (tile `0` or `2`).
+   - All building, cave, and gate exits must land the player facing `DOWN` on a designated walkable doorstep apron tile (`targetY + 1` or safe clearance) to permanently prevent re-warp loops.
+2. **Complete NPC Population**:
+   - 100% of canonical trainers populated in `src/world/npcData.ts` with authentic teams, levels, movesets, sightline ranges (`visionRange`), prize money, and defeat dialogues.
+3. **Dialogue & Lore Entities**:
+   - All civilian NPCs, landmark signposts, Day-of-Week siblings, and special environmental interactions with sound chimes and once-per-save story flags.
+4. **Story & Quest Continuity**:
+   - Route-specific story gates, narrative blockers, and quest progression handlers (e.g. dynamic roadblock despawning, badge verification).
+5. **Overworld Item Balls**:
+   - 100% of canonical ground item balls (TMs, Pokéballs, medicines, battle items) registered in `OverworldItemManager` with pickup sounds and toasts.
+6. **Time-of-Day Wild Encounters, Surfing & Fishing Tables**:
+   - Canonical Morning (04:00–09:59), Day (10:00–17:59), and Night (18:00–03:59) encounter distributions, plus Surfing tables on water and Old/Good/Super Rod fishing tables.
+7. **Signposts, Directional Boards & Trainer Tips**:
+   - Interactive wooden boards at route forks, town borders, and cave entrances with authentic text and `A` button interaction.
+8. **Natural Resources & Field Obstacles**:
+   - Fruit/Apricorn trees with daily picking lifecycles, hoppable one-way ledges with jump shadows, Cut trees, breakable Rock Smash boulders, and Headbutt trees.
+9. **Hidden Items & Dowsing Machine (Itemfinder) Integration**:
+   - Buried items hidden in dead-ends or rock clusters, registered with coordinates for Itemfinder radar detection.
+10. **Zone BGM & Environmental Ambience**:
+    - Canonical BGM track assigned to every zone, plus ambient environmental audio (cave drips, coastal waves, Route 33 rain).
 

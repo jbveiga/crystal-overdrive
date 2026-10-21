@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { MapData } from '../src/types/game';
 import { createNpcsByMap } from '../src/world/npcData';
+import { OverworldItemManager } from '../src/world/OverworldItemManager';
 
 describe('Union Cave Full Mapping & Level Audit (TICKET-WORLD-UNION-CAVE-MAPPING-01)', () => {
   const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
@@ -144,5 +145,125 @@ describe('Union Cave Full Mapping & Level Audit (TICKET-WORLD-UNION-CAVE-MAPPING
     // Sprite asset presence on disk
     const spritePath = path.resolve(__dirname, '../public/assets/sprites/characters/lapras.png');
     expect(fs.existsSync(spritePath)).toBe(true);
+  });
+
+  it('asserts all 8 canonical ground item balls exist on walkable coordinates (TICKET-WORLD-UNION-CAVE-COMPLETE-PACKAGE-01)', () => {
+    const uc1f = loadMap('union_cave_1f');
+    const ucb1f = loadMap('union_cave_b1f');
+    const ucb2f = loadMap('union_cave_b2f');
+
+    const itemManager = new OverworldItemManager();
+    const balls1f = itemManager.getActiveItemBalls('union_cave_1f');
+    const ballsB1f = itemManager.getActiveItemBalls('union_cave_b1f');
+    const ballsB2f = itemManager.getActiveItemBalls('union_cave_b2f');
+
+    // 1. 1F ground items (4 item balls: Great Ball, X Attack, Potion, Awakening)
+    expect(balls1f.length).toBe(4);
+    const expected1f = [
+      { id: 'union_cave_1f_17_21_great_ball', itemId: 'great_ball', x: 17, y: 21 },
+      { id: 'union_cave_1f_4_2_x_attack', itemId: 'x_attack', x: 4, y: 2 },
+      { id: 'union_cave_1f_4_17_potion', itemId: 'potion', x: 4, y: 17 },
+      { id: 'union_cave_1f_12_33_awakening', itemId: 'awakening', x: 12, y: 33 },
+    ];
+    for (const exp of expected1f) {
+      const found = balls1f.find((b) => b.id === exp.id);
+      expect(found, `Item ball ${exp.id} must exist`).toBeDefined();
+      expect(found?.itemId).toBe(exp.itemId);
+      expect(found?.x).toBe(exp.x);
+      expect(found?.y).toBe(exp.y);
+      expect(isWalkable(uc1f, exp.x, exp.y), `Item ${exp.id} must be on a walkable tile`).toBe(true);
+    }
+
+    // 2. B1F ground items (2 item balls: TM39 Swift, X Defend)
+    expect(ballsB1f.length).toBe(2);
+    const expectedB1f = [
+      { id: 'union_cave_b1f_2_16_tm_swift', itemId: 'tm_swift', x: 2, y: 16 },
+      { id: 'union_cave_b1f_17_23_x_defend', itemId: 'x_defend', x: 17, y: 23 },
+    ];
+    for (const exp of expectedB1f) {
+      const found = ballsB1f.find((b) => b.id === exp.id);
+      expect(found, `Item ball ${exp.id} must exist`).toBeDefined();
+      expect(found?.itemId).toBe(exp.itemId);
+      expect(found?.x).toBe(exp.x);
+      expect(found?.y).toBe(exp.y);
+      expect(isWalkable(ucb1f, exp.x, exp.y), `Item ${exp.id} must be on a walkable tile`).toBe(true);
+    }
+
+    // 3. B2F ground items (2 item balls: Elixir, Hyper Potion)
+    expect(ballsB2f.length).toBe(2);
+    const expectedB2f = [
+      { id: 'union_cave_b2f_16_2_elixer', itemId: 'elixer', x: 16, y: 2 },
+      { id: 'union_cave_b2f_12_19_hyper_potion', itemId: 'hyper_potion', x: 12, y: 19 },
+    ];
+    for (const exp of expectedB2f) {
+      const found = ballsB2f.find((b) => b.id === exp.id);
+      expect(found, `Item ball ${exp.id} must exist`).toBeDefined();
+      expect(found?.itemId).toBe(exp.itemId);
+      expect(found?.x).toBe(exp.x);
+      expect(found?.y).toBe(exp.y);
+      expect(isWalkable(ucb2f, exp.x, exp.y), `Item ${exp.id} must be on a walkable tile`).toBe(true);
+    }
+
+    expect(balls1f.length + ballsB1f.length + ballsB2f.length).toBe(8);
+  });
+
+  it('verifies all 7 canonical trainers and special entities across Union Cave (TICKET-WORLD-UNION-CAVE-COMPLETE-PACKAGE-01)', () => {
+    const npcsByMap = createNpcsByMap();
+    const uc1f = loadMap('union_cave_1f');
+    const ucb1f = loadMap('union_cave_b1f');
+    const ucb2f = loadMap('union_cave_b2f');
+
+    const npcs1f = npcsByMap.union_cave_1f || [];
+    const npcsB1f = npcsByMap.union_cave_b1f || [];
+    const npcsB2f = npcsByMap.union_cave_b2f || [];
+
+    // 1F Trainers (3 trainers)
+    const trainers1f = npcs1f.filter((n) => n.action === 'TRAINER_BATTLE');
+    expect(trainers1f.length).toBe(3);
+    const expectedTrainers1f = ['hiker_daniel', 'pokemaniac_larry', 'firebreather_ray'];
+    for (const tid of expectedTrainers1f) {
+      const t = trainers1f.find((n) => n.trainerId === tid);
+      expect(t, `Trainer ${tid} must exist on 1F`).toBeDefined();
+      expect(t?.visionRange).toBeGreaterThanOrEqual(1);
+      expect(t?.trainerTeam && t.trainerTeam.length).toBeGreaterThanOrEqual(1);
+      expect(isWalkable(uc1f, t!.x, t!.y), `Trainer ${tid} must be on a walkable tile`).toBe(true);
+    }
+
+    // B1F Trainers (2 trainers)
+    const trainersB1f = npcsB1f.filter((n) => n.action === 'TRAINER_BATTLE');
+    expect(trainersB1f.length).toBe(2);
+    const expectedTrainersB1f = ['hiker_phillip', 'pokemaniac_andrew'];
+    for (const tid of expectedTrainersB1f) {
+      const t = trainersB1f.find((n) => n.trainerId === tid);
+      expect(t, `Trainer ${tid} must exist on B1F`).toBeDefined();
+      expect(t?.visionRange).toBeGreaterThanOrEqual(1);
+      expect(t?.trainerTeam && t.trainerTeam.length).toBeGreaterThanOrEqual(1);
+      expect(isWalkable(ucb1f, t!.x, t!.y), `Trainer ${tid} must be on a walkable tile`).toBe(true);
+    }
+
+    // B2F Trainers (2 trainers: Nick & Gwen) + Fan + Lapras
+    const trainersB2f = npcsB2f.filter((n) => n.action === 'TRAINER_BATTLE');
+    expect(trainersB2f.length).toBe(2);
+    const expectedTrainersB2f = ['ace_trainer_nick', 'ace_trainer_gwen'];
+    for (const tid of expectedTrainersB2f) {
+      const t = trainersB2f.find((n) => n.trainerId === tid);
+      expect(t, `Trainer ${tid} must exist on B2F`).toBeDefined();
+      expect(t?.visionRange).toBeGreaterThanOrEqual(1);
+      expect(t?.trainerTeam && t.trainerTeam.length).toBeGreaterThanOrEqual(1);
+      expect(isWalkable(ucb2f, t!.x, t!.y), `Trainer ${tid} must be on a walkable tile`).toBe(true);
+    }
+
+    // Total trainers across Union Cave = 7
+    expect(trainers1f.length + trainersB1f.length + trainersB2f.length).toBe(7);
+
+    // Special NPCs in B2F: Lapras fan (civilian) and Friday Lapras
+    const fan = npcsB2f.find((n) => n.id === 'lapras_fan');
+    expect(fan).toBeDefined();
+    expect(isWalkable(ucb2f, fan!.x, fan!.y)).toBe(true);
+
+    const lapras = npcsB2f.find((n) => n.id === 'union_cave_lapras');
+    expect(lapras).toBeDefined();
+    expect(lapras?.action).toBe('LAPRAS_EVENT');
+    expect(isWalkable(ucb2f, lapras!.x, lapras!.y)).toBe(true);
   });
 });

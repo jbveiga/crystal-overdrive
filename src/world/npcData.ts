@@ -1437,6 +1437,27 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         }
       ),
       makeNpc(
+        'ace_trainer_gwen',
+        5,
+        21,
+        'RIGHT',
+        'girl',
+        '⭐ ACE TRAINER GWEN',
+        ['You and your POKéMON are in perfect sync! Remarkable battle!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'ace_trainer_gwen',
+          trainerName: 'Ace Trainer Gwen',
+          visionRange: 3,
+          challengePages: ["ACE TRAINER GWEN: I'm training with my partner POKéMON in these secluded caverns! Let's see your strength!"],
+          trainerPokemon: { speciesId: 'eevee', level: 12, moves: ['tackle', 'tailwhip', 'quickattack', 'sandattack'] },
+          trainerTeam: [
+            { speciesId: 'eevee', level: 12, moves: ['tackle', 'tailwhip', 'quickattack', 'sandattack'] },
+            { speciesId: 'flareon', level: 12, moves: ['tackle', 'ember', 'tailwhip', 'quickattack'] },
+          ],
+        }
+      ),
+      makeNpc(
         'lapras_fan',
         6,
         26,
