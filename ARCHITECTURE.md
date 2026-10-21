@@ -309,7 +309,9 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `PokemonFactory.ts` / `SaveManager.ts` | `tests/ExpShare.test.ts` | 5 | ✅ Covered | Unbound-style 3-mode Exp. Share (`OFF`, `ALL`, `CAPPED`), default `CAPPED` save hydration, Johto/Kanto badge level caps (`15..85`), 100% active + 50% bench party distribution, and `1 EXP` clamping at/above level cap (KEY-ITEMS-UNBOUND-01). |
 | `ItemfinderRadar.ts` | `tests/ItemfinderRadar.test.ts` | 5 | ✅ Covered | Pure TypeScript 8-tile dowsing radar scan, nearest uncollected hidden item vector lock, 8-way compass bearings, adjacent `FACING` detection, and dynamic sonar pitch $f(d) = 880 + (8-d)\times 120\text{ Hz}$ (KEY-ITEMS-UNBOUND-01). |
 | `NamingModalUI.ts` / `main.ts` / `npcData.ts` | `tests/RivalAndAzalea.test.ts` | 10 | ✅ Covered | Passerby Rival counter-starter selection (Cyndaquil -> Totodile, Totodile -> Chikorita, Chikorita -> Cyndaquil), dropped Trainer Card `SILVER`, Police interrogation & 15-character naming modal with presets (`SILVER`, `KAZU`, `KAMON`, `RED`), `SaveData.rivalName` serialization/hydration, Slowpoke Well Team Rocket raid with Executive Proton (Koffing Lv. 14, Zubat Lv. 9), Kurt Apricorn ball crafting unlock + Lure Ball award, Azalea Gym Leader Bugsy battle (Metapod Lv. 14, Kakuna Lv. 14, Scyther Lv. 16), Hive Badge, TM49 Fury Cutter, field Cut, and Mission M03 completion (Sprint 13). |
-| **Current Baseline** | **17 Suites** | **150 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `StorageManager.ts` / `BoxManager.ts` / `BoxManagementUI.ts` | `tests/BoxManager.test.ts` | 10 | ✅ Covered | 14 storage boxes of 20 slots each (280 total capacity), automatic wild catch overflow into storage with transfer dialogue and fanfare, interactive PC terminals in all Pokémon Centers and player bedroom launching `BoxManagementUI`, 1-click party-box swapping, release double-check safeguard, party minimum protection (cannot deposit/release last conscious Pokémon), protected Roaming Beasts (Raikou, Entei, Suicune) release protection, and backward-compatible save migration (Sprint 13.5). |
+| `PokemonSprites` / `pokemon/*.png` | `tests/PokemonSprites.test.ts` | 4 | ✅ Covered | 100% complete Generation 1 & 2 sprite asset verification across all 251 species (IDs 1–251, Bulbasaur to Celebi): 251 front battle sprites (96x96), 251 back battle sprites (96x96), 251 party/box mini-icons (40x30), and special naming alias fallbacks (Mr. Mime, Ho-Oh, Nidoran-F, Nidoran-M). |
+| **Current Baseline** | **19 Suites** | **164 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.
@@ -318,3 +320,105 @@ Every code addition and pull request must strictly honor these five non-negotiab
 
 ### 6.3 Phase Builder Pipeline (`scripts/build-phase.cjs`)
 Phases 11+ are generated directly from pret/pokecrystal asm via `node scripts/build-phase.cjs <phase>` (definitions in `scripts/phases/`). It derives dimensions, warps (with walkable landing tiles for outdoor targets), connections (block offsets ×2), day-time wild encounters, and NPC/trainer parties (`src/world/generatedNpcs.ts`, merged into `npcsByMap`). Generated NPCs are validated on walkable tiles (`0`/`2`).
+
+---
+
+## 7. Engine Backlog & Future Subsystems Specifications
+
+### 7.1 Pokémon Evolution System Architecture (`EvolutionManager.ts`, `EvolutionSceneUI.ts`)
+
+The Evolution System is designed as a modular, event-driven subsystem decoupled across pure domain logic, UI presentation, and audio feedback:
+
+```mermaid
+flowchart TD
+    Trigger["Evolution Trigger Check<br/>(Level-Up, Stone, Friendship, Link Cable)"] --> Eval{"Can Evolve?<br/>(Everstone / Condition Met)"}
+    Eval -->|No| Retain["Remain in Base Form"]
+    Eval -->|Yes| Launch["Launch Evolution Scene UI<br/>(Pulsing Silhouette Animation + BGM)"]
+    Launch --> CancelCheck{"User Pressed B / Cancel?"}
+    CancelCheck -->|Yes| Abort["Abort Evolution<br/>'Huh? POKÉMON stopped evolving!'"]
+    CancelCheck -->|No| Transform["Execute Evolution & Transformation<br/>(Species Swap, Stat Recomputation)"]
+    Transform --> Triumph["Audio Fanfare & Celebration Dialog"]
+    Triumph --> Dex["Update Seen & Caught Dex Records"]
+    Dex --> LearnMoves["Prompt Evolution Move Learning (if applicable)"]
+```
+
+#### 1. Evolution Trigger Checks & Methods (`src/world/EvolutionManager.ts`)
+- **Level-Up Evolution**:
+  - Automatically evaluated on battle victory EXP distribution (`distributePartyExp`) and Rare Candy consumption.
+  - Matches current species against canonical evolution level thresholds across all Gen 1 & Gen 2 species (e.g., Cyndaquil Lv. 14 $\to$ Quilava Lv. 36 $\to$ Typhlosion; Totodile Lv. 18 $\to$ Croconaw Lv. 30 $\to$ Feraligatr; Chikorita Lv. 16 $\to$ Bayleef Lv. 32 $\to$ Meganium).
+- **Evolutionary Stones**:
+  - Triggered via Bag usage: *Fire Stone*, *Water Stone*, *Thunder Stone*, *Leaf Stone*, *Moon Stone*, *Sun Stone*.
+  - Validates compatibility matrix against target party member and prompts confirmation.
+- **Friendship / Happiness Evolutions**:
+  - Internal friendship metric ($0$–$255$) tracked on each `PokemonInstance`.
+  - Incremented by walking cycles (every 128 steps), leveling up, participating in battles, and vitamin usage; reduced by fainting.
+  - Triggers evolution when friendship reaches $\ge 220$:
+    - *Togepi* $\to$ *Togetic*
+    - *Golbat* $\to$ *Crobat*
+    - *Chansey* $\to$ *Blissey*
+    - *Eevee* $\to$ *Espeon* (Morning/Day) or *Umbreon* (Night) based on [`GameClock.timeOfDay`](file:///Users/bernardo/Documents/Crystal%20Overdrive/src/core/GameClock.ts).
+- **Single-Player Trade Evolutions (Unbound-Style Link Cable / Link Stone)**:
+  - Introduces a consumable `LINK CABLE` / `LINK STONE` item enabling all 10 canonical trade evolutions in pure single-player without requiring external hardware or network link:
+    - *Haunter* $\to$ *Gengar*
+    - *Kadabra* $\to$ *Alakazam*
+    - *Machoke* $\to$ *Machamp*
+    - *Graveler* $\to$ *Golem*
+    - *Onix* + Metal Coat $\to$ *Steelix*
+    - *Scyther* + Metal Coat $\to$ *Scizor*
+    - *Seadra* + Dragon Scale $\to$ *Kingdra*
+    - *Poliwhirl* + King's Rock $\to$ *Politoed*
+    - *Slowpoke* + King's Rock $\to$ *Slowking*
+    - *Porygon* + Up-Grade $\to$ *Porygon2*
+- **Everstone Invariant**:
+  - If target Pokémon is holding an `EVERSTONE`, evolution triggers are completely suppressed.
+
+#### 2. Evolution Visual Sequence & UI (`src/ui/EvolutionSceneUI.ts`)
+- **Cinematic Presentation**:
+  - Fullscreen dark overlay (`rgba(10, 15, 29, 0.98)`).
+  - Intro prompt: `"What? [POKÉMON] is evolving!"`
+  - High-performance vector/canvas animation with pulsating silhouette cross-fade alternating between the base sprite and evolved sprite, accelerating over 5.5 seconds.
+  - Glowing particle burst upon transformation completion.
+- **B-Button Cancellation**:
+  - Pressing `B` / `Cancel` or tapping the on-screen Cancel button interrupts the pulse loop:
+    - Halts the animation immediately.
+    - Plays abort sound.
+    - Displays: `"Huh? [POKÉMON] stopped evolving!"`
+    - Preserves unevolved form for early move acquisition strategies.
+
+#### 3. Post-Evolution State Updates (`src/battle/PokemonFactory.ts`, `src/core/SaveManager.ts`)
+- **Stat Recalculation**:
+  - Recomputes Max HP, Attack, Defense, Special Attack, Special Defense, and Speed based on the new species base stats, retaining existing IVs/DVs, EVs/Stat Exp, and Nature.
+  - Adjusts current HP proportionally to preserve current HP percentage.
+- **Species & Pokedex Sync**:
+  - Updates `pokemon.speciesId`, species name, and type attributes.
+  - Automatically registers new species into `saveData.seenSpecies` and `saveData.caughtSpecies`.
+- **Evolution Move Learning**:
+  - Checks if the evolved species has a move learned at its current level or upon evolution.
+  - Prompts move learn modal (`promptMoveForget`) if the moveset is already full (4 moves).
+
+#### 4. Audio & SFX Integration (`src/audio/BattleAudio.ts`, `src/audio/AudioManager.ts`)
+- **Evolution Theme Loop**: Plays authentic 8-bit evolution BGM loop during the pulsing silhouette sequence.
+- **Evolution Triumph Fanfare**: Plays celebratory fanfare upon transformation completion:
+  `"Congratulations! Your [POKÉMON] evolved into [NEW POKÉMON]!"`
+- **Cancellation SFX**: Plays subtle descent/interruption cue if aborted with the B button.
+
+### 7.2 Pokémon Storage System & Box Management Grid (`StorageManager.ts`, `BoxManager.ts`, `BoxManagementUI.ts`)
+
+Introduced in Sprint 13.5, the Bill's PC Pokémon Storage System provides full Gen 2 canonical storage modernized with Pokémon Unbound-style visual box navigation and management:
+
+- **14-Box Grid Architecture (`StorageManager.ts`, `BoxManager.ts`)**:
+  - Pure TypeScript domain models (zero PixiJS / DOM dependencies).
+  - 14 boxes (`BOX 1` .. `BOX 14`), each containing 20 slots (`(PokemonInstance | null)[]`), providing total storage capacity for 280 Pokémon.
+  - Automatic catch overflow: when the party is full (6 Pokémon), caught wild Pokémon are transferred into the current box, automatically advancing to the next box if full, with transfer fanfare and dialogue.
+  - Party minimum invariant: prevents depositing or releasing the player's last conscious party member.
+  - Roaming beast release safeguard: prevents accidental release of Legendary Roaming Beasts (*Raikou*, *Entei*, *Suicune*).
+  - Backward-compatible save migration: automatically converts legacy flat `box: PokemonInstance[]` arrays into the 14-box structure upon loading.
+- **Unbound-Style Split-View Box Management UI (`src/ui/BoxManagementUI.ts`)**:
+  - High-DPI dark glassmorphism modal with responsive desktop and mobile layouts.
+  - Left panel: 4x5 box grid with mini-icons (`/assets/sprites/pokemon/icons/${speciesId}.png`), level badges, and box cycling arrows (`◀ BOX X ▶`).
+  - Right panel: 6 party slots with HP bars and typing badges.
+  - Bottom inspector card: displays selected Pokémon's animated front sprite, base stats (HP, ATK, DEF, SPA, SPD, SPE), moves, and release button with double confirmation.
+  - 1-click pick and swap between party and box slots, with keyboard navigation (`ArrowLeft`, `ArrowRight`, `Escape`).
+- **Interactive PC Terminals (`src/main.ts`)**:
+  - Integrated into all Pokémon Centers and the player's bedroom via facing interaction (`OPEN_PC` action).
+

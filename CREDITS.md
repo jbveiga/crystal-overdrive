@@ -46,7 +46,8 @@ This project is made possible thanks to the tireless preservation work, reverse-
 * **Authors:** Paul Hallett and the PokeAPI community.
 * **License:** BSD 3-Clause / CC-BY-SA 4.0
 * **Assets Utilized:**
-  - Supplementary 2D Pokémon battle front and back renders (including Pidgeotto, Spearow, Poliwag, Poliwhirl, Marill, and Togepi).
+  - Complete Generation 1 & 2 Pokémon battle front and back renders across all 251 species (Bulbasaur to Celebi, `public/assets/sprites/pokemon/*_{front,back}.png`).
+  - Generation 1 & 2 Party and PC Box menu mini-sprites across all 251 species (`public/assets/sprites/pokemon/icons/*.png`).
   - Authentic Pokéball item and throw sprites (`sprites/items/*.png`: Poké Ball, Great Ball, Ultra Ball, Master Ball, Fast, Heavy, Level, Lure, Moon, Friend, Love, Dusk, Net, Quick, Timer, Repeat, Nest Balls).
 
 ### Pokémon Unbound (UI & Ergonomic Inspiration)

@@ -10,7 +10,9 @@ import type {
   GameOptions,
   SavePreview,
   SerializedMissionState,
+  PokemonStorageState,
 } from '../types/game';
+import { StorageManager } from '../world/StorageManager';
 
 export interface SaveData {
   version: number;
@@ -31,7 +33,8 @@ export interface SaveData {
   };
   rivalName?: string;
   party: PokemonInstance[];
-  box: PokemonInstance[];
+  box?: PokemonInstance[];
+  storage?: PokemonStorageState;
   inventory: {
     balls: Partial<Record<PokeballId, number>>;
     items?: Partial<Record<MedicineId, number>>;
@@ -181,6 +184,9 @@ export class SaveManager {
           loaded.player.rivalName = loaded.rivalName;
         } else if (loaded.player && loaded.player.rivalName && !loaded.rivalName) {
           loaded.rivalName = loaded.player.rivalName;
+        }
+        if (!loaded.storage) {
+          loaded.storage = StorageManager.createDefaultStorage(loaded.box);
         }
       }
       return loaded;

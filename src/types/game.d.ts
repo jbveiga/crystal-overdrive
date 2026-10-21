@@ -136,6 +136,7 @@ export interface BgEvent {
     | 'HEAL_AND_SAVE'
     | 'OPEN_MART'
     | 'OPEN_POKEGEAR'
+    | 'OPEN_PC'
     | 'STARTER_CYNDAQUIL'
     | 'STARTER_TOTODILE'
     | 'STARTER_CHIKORITA';
@@ -301,6 +302,18 @@ export interface OverworldFruitTree {
   treeId: string;
 }
 export type FruitTreeEntry = OverworldFruitTree;
+
+export interface StorageBox {
+  id: number; // 0 to 13 (Boxes 1–14)
+  name: string; // "BOX 1", "BOX 2", etc.
+  pokemon: (PokemonInstance | null)[]; // 20 slots per box
+  wallpaper?: string;
+}
+
+export interface PokemonStorageState {
+  currentBoxIndex: number; // Active box (0–13)
+  boxes: StorageBox[]; // 14 boxes total (280 total capacity)
+}
 
 export interface OverworldItemsDataset {
   summary: {

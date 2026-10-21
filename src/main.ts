@@ -23,11 +23,14 @@ import { OverworldItemManager } from './world/OverworldItemManager';
 import { ItemfinderRadar } from './world/ItemfinderRadar';
 import { ItemfinderHUD } from './ui/ItemfinderHUD';
 import { NamingModalUI } from './ui/NamingModalUI';
+import { StorageManager, BoxManager } from './world/StorageManager';
+import { BoxManagementUI } from './ui/BoxManagementUI';
 import type {
   MapData,
   Direction,
   PokeballId,
   PokemonInstance,
+  PokemonStorageState,
   PlayerGender,
   GameOptions,
   SpeedMultiplier,
@@ -66,6 +69,10 @@ async function bootstrap() {
 
   let playerParty: PokemonInstance[] = [];
   let playerBox: PokemonInstance[] = [];
+  let storageState: PokemonStorageState =
+    existingSave?.storage || StorageManager.createDefaultStorage(existingSave?.box);
+  const boxManager = new BoxManager(storageState);
+  playerBox = boxManager.flatten();
   let playTimeSeconds = 0;
   const inventory: BagInventory = {
     balls: {
@@ -553,7 +560,8 @@ async function bootstrap() {
       },
       rivalName,
       party: playerParty,
-      box: playerBox,
+      box: boxManager.flatten(),
+      storage: boxManager.getState(),
       inventory: {
         balls: inventory.balls,
         items: inventory.items,
@@ -623,12 +631,13 @@ async function bootstrap() {
   const missionLogUI = new MissionLogUI('modal-container', missionManager);
   const itemfinderHUD = new ItemfinderHUD('overworld-hud-container');
   const namingModalUI = new NamingModalUI('overworld-hud-container');
+  const boxManagementUI = new BoxManagementUI('modal-container');
 
   let handleInteract = () => {};
   let toggleLiveItemfinderRadar = (): boolean => false;
 
   const getCaughtSpeciesSet = () =>
-    new Set([...playerParty.map((p) => p.speciesId), ...playerBox.map((p) => p.speciesId)]);
+    new Set([...playerParty.map((p) => p.speciesId), ...boxManager.flatten().map((p) => p.speciesId)]);
 
   let overworldHUD: OverworldHUD;
 
@@ -885,6 +894,9 @@ async function bootstrap() {
       storyFlags.clear();
       seenSpecies.clear();
       rivalName = 'SILVER';
+      boxManager.getState().boxes.forEach((b) => b.pokemon.fill(null));
+      boxManager.changeBox(0);
+      playerBox = [];
       overworldItemManager.setCollectedFlags([]);
       overworldItemManager.setFruitTreePicks({});
       const freshNpcs = createNpcsByMap();
@@ -1399,7 +1411,21 @@ async function bootstrap() {
           if (playerParty.length < 6) {
             playerParty.push(opponentPokemon);
           } else {
-            playerBox.push(opponentPokemon);
+            const depositRes = boxManager.deposit(opponentPokemon);
+            playerBox = boxManager.flatten();
+            const targetBox = boxManager.getBox(depositRes.boxIndex);
+            const boxName = targetBox ? targetBox.name : `BOX ${depositRes.boxIndex + 1}`;
+            BattleAudio.playOverworldSound('FANFARE');
+            await battleHUD.showMessage("Bill's PC was accessed.");
+            await battleHUD.showMessage(
+              `${opponentPokemon.nickname || opponentPokemon.speciesId.toUpperCase()} was transferred to ${boxName}!`
+            );
+            if (depositRes.rolledOver) {
+              await battleHUD.showMessage(
+                `The previous box was full! Automatically stored in ${boxName}!`
+              );
+            }
+            saveCurrentGame();
           }
         } else if (result.winner === 'PLAYER') {
           if (options.isRoamer) {
@@ -2900,6 +2926,21 @@ async function bootstrap() {
           );
           return;
         }
+      }
+
+      // Bill's PC Storage Terminal Interaction
+      if (
+        bgEvent.action === 'OPEN_PC' ||
+        bgEvent.speaker?.includes('PC') ||
+        bgEvent.pages.some((p) => p.includes('PC'))
+      ) {
+        overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
+          boxManagementUI.open(playerParty, boxManager.getState(), {
+            onSave: () => saveCurrentGame(),
+            onClose: () => saveCurrentGame(),
+          });
+        });
+        return;
       }
 
       overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
