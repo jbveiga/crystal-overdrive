@@ -46,6 +46,8 @@ export class BoxManagementUI {
   private boxManager!: BoxManager;
   private activeBoxIndex: number = 0;
   private selectedSlot: SelectedSlot = null;
+  private isSwapPending: boolean = false;
+  private movingSource: SelectedSlot = null;
   private mobileTab: 'box' | 'party' = 'box';
   private callbacks: BoxManagementCallbacks = {};
   private active: boolean = false;
@@ -67,6 +69,39 @@ export class BoxManagementUI {
 
   public getSelectedSlot(): SelectedSlot {
     return this.selectedSlot;
+  }
+
+  public isMovePending(): boolean {
+    return this.isSwapPending;
+  }
+
+  public getMovingSource(): SelectedSlot {
+    return this.movingSource;
+  }
+
+  public initiateMove(): void {
+    if (!this.selectedSlot) {
+      this.showToast('⚠️ Select a Pokémon in Box or Party to swap.');
+      return;
+    }
+    const pkmn = this.getPokemonAt(this.selectedSlot.type, this.selectedSlot.slotIndex);
+    if (!pkmn) {
+      this.showToast('⚠️ Select a Pokémon to move.');
+      return;
+    }
+    this.isSwapPending = true;
+    this.movingSource = { ...this.selectedSlot };
+    BattleAudio.playMenuSound('CURSOR');
+    this.showToast(`⇄ Moving ${pkmn.nickname || pkmn.speciesId.toUpperCase()}. Click destination slot to move/swap.`);
+    this.render();
+  }
+
+  public cancelMove(): void {
+    if (!this.isSwapPending) return;
+    this.isSwapPending = false;
+    this.movingSource = null;
+    BattleAudio.playMenuSound('CANCEL');
+    this.render();
   }
 
   public getMobileTab(): 'box' | 'party' {
@@ -91,6 +126,8 @@ export class BoxManagementUI {
     this.activeBoxIndex = this.boxManager.getCurrentBoxIndex();
     this.callbacks = callbacks;
     this.selectedSlot = null;
+    this.isSwapPending = false;
+    this.movingSource = null;
     this.mobileTab = 'box';
     this.active = true;
 
@@ -101,6 +138,8 @@ export class BoxManagementUI {
   public close(): void {
     if (!this.active) return;
     this.active = false;
+    this.isSwapPending = false;
+    this.movingSource = null;
 
     if (this.boundKeyHandler) {
       window.removeEventListener('keydown', this.boundKeyHandler);
@@ -123,7 +162,9 @@ export class BoxManagementUI {
       (this.activeBoxIndex + delta + StorageManager.TOTAL_BOXES) % StorageManager.TOTAL_BOXES;
     this.activeBoxIndex = nextIndex;
     this.boxManager.changeBox(nextIndex);
-    this.selectedSlot = null;
+    if (!this.isSwapPending) {
+      this.selectedSlot = null;
+    }
     BattleAudio.playMenuSound('CURSOR');
     this.render();
   }
@@ -132,36 +173,42 @@ export class BoxManagementUI {
     if (index >= 0 && index < StorageManager.TOTAL_BOXES) {
       this.activeBoxIndex = index;
       this.boxManager.changeBox(index);
-      this.selectedSlot = null;
+      if (!this.isSwapPending) {
+        this.selectedSlot = null;
+      }
       this.render();
     }
   }
 
   public selectSlot(type: 'box' | 'party', slotIndex: number): void {
-    // If nothing currently selected: select this slot
-    if (!this.selectedSlot) {
-      const pkmn = this.getPokemonAt(type, slotIndex);
-      if (!pkmn) return; // Don't pick empty slot as source
-      this.selectedSlot = { type, boxIndex: this.activeBoxIndex, slotIndex };
-      BattleAudio.playMenuSound('CURSOR');
-      this.render();
+    // If a move is currently pending, this click selects the destination
+    if (this.isSwapPending && this.movingSource) {
+      // If clicking the exact same slot as moving source: cancel move mode
+      if (
+        this.movingSource.type === type &&
+        this.movingSource.slotIndex === slotIndex &&
+        (type === 'party' || this.movingSource.boxIndex === this.activeBoxIndex)
+      ) {
+        this.cancelMove();
+        return;
+      }
+
+      // Execute Move / Swap
+      this.executeSwap(this.movingSource, { type, boxIndex: this.activeBoxIndex, slotIndex });
       return;
     }
 
-    // If clicking the same slot: deselect
-    if (
-      this.selectedSlot.type === type &&
-      this.selectedSlot.slotIndex === slotIndex &&
-      (type === 'party' || this.selectedSlot.boxIndex === this.activeBoxIndex)
-    ) {
+    // Normal Inspection Mode (not moving): update inspection selection
+    const pkmn = this.getPokemonAt(type, slotIndex);
+    if (!pkmn) {
       this.selectedSlot = null;
-      BattleAudio.playMenuSound('CANCEL');
       this.render();
       return;
     }
 
-    // Execute Move / Swap
-    this.executeSwap(this.selectedSlot, { type, boxIndex: this.activeBoxIndex, slotIndex });
+    this.selectedSlot = { type, boxIndex: this.activeBoxIndex, slotIndex };
+    BattleAudio.playMenuSound('CURSOR');
+    this.render();
   }
 
   private getPokemonAt(type: 'box' | 'party', slotIndex: number): PokemonInstance | null {
@@ -174,6 +221,8 @@ export class BoxManagementUI {
 
   private executeSwap(source: NonNullable<SelectedSlot>, target: NonNullable<SelectedSlot>): void {
     let success = false;
+    const sourceBoxIndex = source.boxIndex ?? this.activeBoxIndex;
+    const targetBoxIndex = target.boxIndex ?? this.activeBoxIndex;
 
     // Party to Party swap
     if (source.type === 'party' && target.type === 'party') {
@@ -183,28 +232,32 @@ export class BoxManagementUI {
       this.party = this.party.filter((p) => Boolean(p));
       success = true;
     }
-    // Box to Box swap (within active box)
+    // Box to Box swap (handles intra-box or cross-box)
     else if (source.type === 'box' && target.type === 'box') {
-      const box = this.boxManager.getBox(this.activeBoxIndex);
-      if (box) {
-        const temp = box.pokemon[source.slotIndex];
-        box.pokemon[source.slotIndex] = box.pokemon[target.slotIndex];
-        box.pokemon[target.slotIndex] = temp;
+      const sourceBox = this.boxManager.getBox(sourceBoxIndex);
+      const targetBox = this.boxManager.getBox(targetBoxIndex);
+      if (sourceBox && targetBox) {
+        const temp = sourceBox.pokemon[source.slotIndex];
+        sourceBox.pokemon[source.slotIndex] = targetBox.pokemon[target.slotIndex];
+        targetBox.pokemon[target.slotIndex] = temp;
         success = true;
       }
     }
     // Party to Box
     else if (source.type === 'party' && target.type === 'box') {
-      success = this.boxManager.swap(this.party, source.slotIndex, this.activeBoxIndex, target.slotIndex);
+      success = this.boxManager.swap(this.party, source.slotIndex, targetBoxIndex, target.slotIndex);
     }
     // Box to Party
     else if (source.type === 'box' && target.type === 'party') {
-      success = this.boxManager.swap(this.party, target.slotIndex, this.activeBoxIndex, source.slotIndex);
+      success = this.boxManager.swap(this.party, target.slotIndex, sourceBoxIndex, source.slotIndex);
     }
+
+    this.isSwapPending = false;
+    this.movingSource = null;
 
     if (success) {
       BattleAudio.playMenuSound('CONFIRM');
-      this.selectedSlot = null;
+      this.selectedSlot = { type: target.type, boxIndex: target.boxIndex, slotIndex: target.slotIndex };
       if (this.callbacks.onSave) {
         this.callbacks.onSave(this.party, this.boxManager.getState());
       }
@@ -506,6 +559,16 @@ export class BoxManagementUI {
         box-shadow: 0 0 14px rgba(255, 208, 40, 0.45) !important;
         transform: translateY(-2px);
       }
+      .nk-slot.moving-source {
+        border: 2px dashed #FFD028 !important;
+        background: rgba(255, 208, 40, 0.25) !important;
+        box-shadow: 0 0 16px rgba(255, 208, 40, 0.6) !important;
+        animation: nk-pulse-glow 1.5s infinite;
+      }
+      @keyframes nk-pulse-glow {
+        0%, 100% { box-shadow: 0 0 8px rgba(255, 208, 40, 0.4); }
+        50% { box-shadow: 0 0 20px rgba(255, 208, 40, 0.85); }
+      }
 
       /* Desktop Layout (>= 768px) */
       @media (min-width: 768px) {
@@ -744,13 +807,28 @@ export class BoxManagementUI {
           ">
             ${currentBox.pokemon
               .map((pkmn, idx) => {
+                const isMovingSource =
+                  this.isSwapPending &&
+                  this.movingSource?.type === 'box' &&
+                  this.movingSource.slotIndex === idx &&
+                  this.movingSource.boxIndex === this.activeBoxIndex;
                 const isSelected =
-                  this.selectedSlot?.type === 'box' && this.selectedSlot.slotIndex === idx;
+                  !isMovingSource &&
+                  this.selectedSlot?.type === 'box' &&
+                  this.selectedSlot.slotIndex === idx;
                 return `
-                  <div class="box-slot nk-slot ${isSelected ? 'selected' : ''}" data-slot="${idx}" style="
-                    background: ${isSelected ? 'rgba(255, 208, 40, 0.18)' : '#080E1D'};
+                  <div class="box-slot nk-slot ${isSelected ? 'selected' : ''} ${isMovingSource ? 'moving-source' : ''}" data-slot="${idx}" style="
+                    background: ${
+                      isMovingSource
+                        ? 'rgba(255, 208, 40, 0.25)'
+                        : isSelected
+                        ? 'rgba(255, 208, 40, 0.18)'
+                        : '#080E1D'
+                    };
                     border: ${
-                      isSelected
+                      isMovingSource
+                        ? '2px dashed #FFD028'
+                        : isSelected
                         ? '2px solid #FFD028'
                         : pkmn
                         ? '1px solid rgba(255, 255, 255, 0.1)'
@@ -817,13 +895,27 @@ export class BoxManagementUI {
             ${[0, 1, 2, 3, 4, 5]
               .map((idx) => {
                 const pkmn = this.party[idx] || null;
+                const isMovingSource =
+                  this.isSwapPending &&
+                  this.movingSource?.type === 'party' &&
+                  this.movingSource.slotIndex === idx;
                 const isSelected =
-                  this.selectedSlot?.type === 'party' && this.selectedSlot.slotIndex === idx;
+                  !isMovingSource &&
+                  this.selectedSlot?.type === 'party' &&
+                  this.selectedSlot.slotIndex === idx;
                 return `
-                  <div class="party-slot nk-slot ${isSelected ? 'selected' : ''}" data-slot="${idx}" style="
-                    background: ${isSelected ? 'rgba(255, 208, 40, 0.18)' : '#1A2640'};
+                  <div class="party-slot nk-slot ${isSelected ? 'selected' : ''} ${isMovingSource ? 'moving-source' : ''}" data-slot="${idx}" style="
+                    background: ${
+                      isMovingSource
+                        ? 'rgba(255, 208, 40, 0.25)'
+                        : isSelected
+                        ? 'rgba(255, 208, 40, 0.18)'
+                        : '#1A2640'
+                    };
                     border: ${
-                      isSelected
+                      isMovingSource
+                        ? '2px dashed #FFD028'
+                        : isSelected
                         ? '2px solid #FFD028'
                         : pkmn
                         ? '1px solid rgba(255, 255, 255, 0.1)'
@@ -973,19 +1065,19 @@ export class BoxManagementUI {
 
         <!-- Actions -->
         <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0; flex-wrap: wrap;">
-          <button id="box-swap-btn" class="nk-btn" style="
-            background: #FFD028;
-            color: #0D1322;
+          <button id="box-swap-btn" class="nk-btn ${this.isSwapPending ? 'nk-btn-danger' : 'nk-btn-primary'}" style="
+            background: ${this.isSwapPending ? '#EE4238 !important' : '#FFD028 !important'};
+            color: ${this.isSwapPending ? '#F6F8F3 !important' : '#0D1322 !important'};
             font-weight: 800;
             font-size: 11px;
             height: 32px;
             padding: 0 12px;
-            border: none;
+            border: 1px solid ${this.isSwapPending ? '#EE4238' : '#FFD028'} !important;
             border-radius: 4px;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.3);
           ">
-            ⇄ MOVE / SWAP
+            ${this.isSwapPending ? '✕ CANCEL MOVE' : '⇄ MOVE / SWAP'}
           </button>
           <button id="box-summary-btn" class="nk-btn" style="
             background: #141E33;
@@ -1030,14 +1122,10 @@ export class BoxManagementUI {
     containerCard.querySelector('#box-next-btn')?.addEventListener('click', () => this.changeBox(1));
 
     containerCard.querySelector('#box-swap-btn')?.addEventListener('click', () => {
-      if (!this.selectedSlot) {
-        this.showToast('⚠️ Select a Pokémon in Box or Party to swap.');
-        return;
-      }
-      const pkmn = this.getPokemonAt(this.selectedSlot.type, this.selectedSlot.slotIndex);
-      if (pkmn) {
-        BattleAudio.playMenuSound('CURSOR');
-        this.showToast(`⇄ Selected ${pkmn.nickname}. Click destination slot to move/swap.`);
+      if (this.isSwapPending) {
+        this.cancelMove();
+      } else {
+        this.initiateMove();
       }
     });
 
@@ -1110,7 +1198,11 @@ export class BoxManagementUI {
     // Keyboard navigation (Arrow keys + Esc)
     this.boundKeyHandler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        this.close();
+        if (this.isSwapPending) {
+          this.cancelMove();
+        } else {
+          this.close();
+        }
       } else if (e.key === 'ArrowLeft') {
         this.changeBox(-1);
       } else if (e.key === 'ArrowRight') {

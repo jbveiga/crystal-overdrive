@@ -10,8 +10,9 @@ class MockElement {
   public tagName: string;
   public id: string = '';
   public className: string = '';
-  public innerHTML: string = '';
+  private _innerHTML: string = '';
   public innerText: string = '';
+  public textContent: string = '';
   public children: MockElement[] = [];
   public parent: MockElement | null = null;
   public listeners: Record<string, Function[]> = {};
@@ -20,6 +21,48 @@ class MockElement {
 
   constructor(tagName: string) {
     this.tagName = tagName.toUpperCase();
+  }
+
+  get innerHTML(): string {
+    const childContent = this.children.map((c) => c.innerHTML || c.textContent || c.innerText).join(' ');
+    return (this._innerHTML + ' ' + childContent).trim();
+  }
+
+  set innerHTML(val: string) {
+    this._innerHTML = val;
+    this.textContent = val.replace(/<[^>]+>/g, '');
+    this.innerText = this.textContent;
+    this.children = [];
+
+    const regex = /<([a-z0-9]+)([^>]*)>/gi;
+    let match;
+    while ((match = regex.exec(val)) !== null) {
+      const tag = match[1];
+      const attrs = match[2];
+      if (tag.startsWith('/')) continue;
+
+      const idMatch = attrs.match(/id=["']([^"']+)["']/i);
+      const classMatch = attrs.match(/class=["']([^"']+)["']/i);
+      const styleMatch = attrs.match(/style=["']([^"']+)["']/i);
+      const dataIndexMatch = attrs.match(/data-index=["']([^"']+)["']/i);
+      const dataSlotMatch = attrs.match(/data-slot=["']([^"']+)["']/i);
+      const textMatch = val.slice(regex.lastIndex).match(/^([^<]*)/);
+
+      const child = new MockElement(tag);
+      if (idMatch) child.id = idMatch[1];
+      if (classMatch) child.className = classMatch[1];
+      if (dataIndexMatch) child.setAttribute('data-index', dataIndexMatch[1]);
+      if (dataSlotMatch) child.setAttribute('data-slot', dataSlotMatch[1]);
+      if (textMatch) {
+        child.textContent = textMatch[1].trim();
+        child.innerText = child.textContent;
+        child._innerHTML = child.textContent;
+      }
+      if (styleMatch) {
+        child.style.cssText = styleMatch[1];
+      }
+      this.appendChild(child);
+    }
   }
 
   appendChild(child: MockElement) {
@@ -321,7 +364,7 @@ describe('Sprint 13.5: Pokémon Storage System & Box Management Grid (TICKET-SPR
       expect(ui.isOpen()).toBe(false);
     });
 
-    it('swaps Pokémon between party and box slot upon 2-click selection', () => {
+    it('decouples inspection from swapping and executes swap only after MOVE / SWAP button activation', () => {
       const ui = new BoxManagementUI('modal-container');
       const lead = PokemonFactory.create('cyndaquil', 10);
       const bench = PokemonFactory.create('sentret', 6);
@@ -331,14 +374,65 @@ describe('Sprint 13.5: Pokémon Storage System & Box Management Grid (TICKET-SPR
 
       ui.open(party, storage);
 
-      // Select party slot 1 (bench: sentret)
+      // 1. Normal inspection: Click party slot 1, then box slot 0 without clicking MOVE
       ui.selectSlot('party', 1);
+      expect(ui.getSelectedSlot()?.type).toBe('party');
+      expect(ui.getSelectedSlot()?.slotIndex).toBe(1);
+      expect(ui.isMovePending()).toBe(false);
 
-      // Click box slot 0 (stored: totodile) -> executes swap!
+      ui.selectSlot('box', 0);
+      // Decoupled inspection: box slot 0 is now inspected, NO SWAP occurred!
+      expect(ui.getSelectedSlot()?.type).toBe('box');
+      expect(ui.getSelectedSlot()?.slotIndex).toBe(0);
+      expect(party[1].speciesId).toBe('sentret');
+      expect(storage.boxes[0].pokemon[0]?.speciesId).toBe('totodile');
+
+      // 2. Select party slot 1 to move
+      ui.selectSlot('party', 1);
+      const swapBtn = mockDoc.querySelector('#box-swap-btn') as MockElement;
+      expect(swapBtn.innerHTML).toContain('MOVE / SWAP');
+
+      // Click MOVE / SWAP button
+      swapBtn.click();
+      expect(ui.isMovePending()).toBe(true);
+      expect(ui.getMovingSource()?.type).toBe('party');
+      expect(ui.getMovingSource()?.slotIndex).toBe(1);
+
+      // Verify button toggles to CANCEL MOVE
+      const cancelBtn = mockDoc.querySelector('#box-swap-btn') as MockElement;
+      expect(cancelBtn.innerHTML).toContain('CANCEL MOVE');
+
+      // 3. Click destination: box slot 0 -> completes swap!
       ui.selectSlot('box', 0);
 
       expect(party[1].speciesId).toBe('totodile');
       expect(storage.boxes[0].pokemon[0]?.speciesId).toBe('sentret');
+      expect(ui.isMovePending()).toBe(false);
+
+      ui.close();
+    });
+
+    it('cancels pending move via CANCEL MOVE button without modifying storage', () => {
+      const ui = new BoxManagementUI('modal-container');
+      const party = [PokemonFactory.create('cyndaquil', 12)];
+      const stored = PokemonFactory.create('pidgey', 5);
+      const storage = StorageManager.createDefaultStorage([stored]);
+
+      ui.open(party, storage);
+      ui.selectSlot('party', 0);
+
+      // Initiate move
+      ui.initiateMove();
+      expect(ui.isMovePending()).toBe(true);
+
+      // Click CANCEL MOVE
+      const cancelBtn = mockDoc.querySelector('#box-swap-btn') as MockElement;
+      cancelBtn.click();
+
+      expect(ui.isMovePending()).toBe(false);
+      expect(ui.getMovingSource()).toBeNull();
+      expect(party[0].speciesId).toBe('cyndaquil');
+      expect(storage.boxes[0].pokemon[0]?.speciesId).toBe('pidgey');
 
       ui.close();
     });
@@ -355,27 +449,30 @@ describe('Sprint 13.5: Pokémon Storage System & Box Management Grid (TICKET-SPR
       ui.open(party, storage);
       expect(ui.getMobileTab()).toBe('box');
 
-      // 1. In Box view, select box slot 0 (mareep)
+      // 1. In Box view, select box slot 0 (mareep) and initiate move
       ui.selectSlot('box', 0);
-      const selectedBefore = ui.getSelectedSlot();
-      expect(selectedBefore).not.toBeNull();
-      expect(selectedBefore?.type).toBe('box');
-      expect(selectedBefore?.slotIndex).toBe(0);
+      ui.initiateMove();
+      expect(ui.isMovePending()).toBe(true);
+      const movingBefore = ui.getMovingSource();
+      expect(movingBefore).not.toBeNull();
+      expect(movingBefore?.type).toBe('box');
+      expect(movingBefore?.slotIndex).toBe(0);
 
       // 2. Switch mobile segmented tab to 'party'
       ui.setMobileTab('party');
       expect(ui.getMobileTab()).toBe('party');
 
-      // 3. Assert lifted selection buffer persists across tab switch
-      const selectedAfterTab = ui.getSelectedSlot();
-      expect(selectedAfterTab).toEqual(selectedBefore);
+      // 3. Assert moving source buffer persists across tab switch
+      const movingAfterTab = ui.getMovingSource();
+      expect(movingAfterTab).toEqual(movingBefore);
+      expect(ui.isMovePending()).toBe(true);
 
       // 4. Tap party slot 1 (hoothoot) -> completes swap across tabs!
       ui.selectSlot('party', 1);
 
       expect(party[1].speciesId).toBe('mareep');
       expect(storage.boxes[0].pokemon[0]?.speciesId).toBe('hoothoot');
-      expect(ui.getSelectedSlot()).toBeNull();
+      expect(ui.isMovePending()).toBe(false);
 
       ui.close();
     });
