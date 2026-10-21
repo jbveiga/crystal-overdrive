@@ -210,13 +210,6 @@ export const INFINITE_TMS: Record<string, TMDefinition> = {
     type: 'Normal',
     desc: "Illuminates dark caves and reduces the target's accuracy in battle.",
   },
-  TM70: {
-    id: 'TM70',
-    moveId: 'flash',
-    name: 'Flash',
-    type: 'Normal',
-    desc: "Illuminates dark caves and reduces the target's accuracy in battle.",
-  },
   TM31: {
     id: 'TM31',
     moveId: 'mudslap',

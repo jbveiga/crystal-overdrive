@@ -1895,16 +1895,15 @@ async function bootstrap() {
                 defeatedTrainers.add('elder_li');
                 storyFlags.add('sprout_tower_cleared');
                 if (!inventory.tms.includes('HM05')) inventory.tms.push('HM05');
-                if (!inventory.tms.includes('TM70')) inventory.tms.push('TM70');
                 BattleAudio.playOverworldSound('KEY_ITEM');
                 overworldHUD.openDialogue(
                   [
-                    'ELDER LI: Ah, splendid! You truly possess the heart of a true trainer! As proof of your mastery, take this TECHNICAL MACHINE: TM70 FLASH!',
+                    'ELDER LI: Ah, splendid! You truly possess the heart of a true trainer! As proof of your mastery, take this HIDDEN MACHINE: HM05 FLASH!',
                   ],
                   targetNpc.speaker,
                   () => {
                     saveCurrentGame();
-                    overworldHUD.showToast('⚡ Defeated Elder Li & received HM05 / TM70 FLASH!');
+                    overworldHUD.showToast('⚡ Defeated Elder Li & received HM05 FLASH!');
                   }
                 );
               },
@@ -2928,7 +2927,43 @@ async function bootstrap() {
         bgEvent.action === 'STARTER_CHIKORITA'
       ) {
         if (storyFlags.has('starter_chosen') || playerParty.length > 0) {
-          overworldHUD.openDialogue(["It's an empty POKé BALL."], bgEvent.speaker);
+          const tableSpecies: 'cyndaquil' | 'totodile' | 'chikorita' =
+            bgEvent.action === 'STARTER_CYNDAQUIL'
+              ? 'cyndaquil'
+              : bgEvent.action === 'STARTER_TOTODILE'
+              ? 'totodile'
+              : 'chikorita';
+          const tableName = tableSpecies.toUpperCase();
+          const chosenSpecies = detectChosenStarterSpecies();
+
+          // A. The spot of the ball the player took
+          if (chosenSpecies === tableSpecies) {
+            overworldHUD.openDialogue(
+              [`It's an empty spot. You already chose ${tableName}!`],
+              bgEvent.speaker
+            );
+            return;
+          }
+
+          // B. The spot of the ball the Rival stole after Elm's emergency call
+          const counterPickMap: Record<string, string> = {
+            cyndaquil: 'totodile',
+            totodile: 'chikorita',
+            chikorita: 'cyndaquil',
+          };
+          const rivalStolen = chosenSpecies ? counterPickMap[chosenSpecies] : null;
+          if (storyFlags.has('ELM_CALLED_ABOUT_THEFT') && rivalStolen === tableSpecies) {
+            overworldHUD.openDialogue(['The POKé BALL was stolen from the table!'], bgEvent.speaker);
+            return;
+          }
+
+          // C. A ball still sitting on the table
+          const tableType =
+            tableSpecies === 'cyndaquil' ? 'FIRE' : tableSpecies === 'totodile' ? 'WATER' : 'GRASS';
+          overworldHUD.openDialogue(
+            [`It's ${tableName}, a ${tableType} POKéMON!`, 'PROF. ELM: You already chose your partner!'],
+            bgEvent.speaker
+          );
           return;
         }
 

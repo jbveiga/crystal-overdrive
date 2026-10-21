@@ -185,6 +185,14 @@ export class SaveManager {
         } else if (loaded.player && loaded.player.rivalName && !loaded.rivalName) {
           loaded.rivalName = loaded.player.rivalName;
         }
+        // Gen 2 has no TM70: Flash is exclusively HM05. Prune legacy duplicate.
+        if (loaded.inventory && Array.isArray(loaded.inventory.tms) && loaded.inventory.tms.includes('TM70')) {
+          const hadHm05 = loaded.inventory.tms.includes('HM05');
+          loaded.inventory.tms = loaded.inventory.tms.filter((id) => id !== 'TM70');
+          if (!hadHm05 && loaded.storyFlags?.includes('sprout_tower_cleared')) {
+            loaded.inventory.tms.push('HM05');
+          }
+        }
         if (!loaded.storage) {
           loaded.storage = StorageManager.createDefaultStorage(loaded.box);
         }

@@ -47,9 +47,9 @@ describe('BUGFIX-PROGRESSION-NARRATIVE-02', () => {
     body.children = [];
   });
 
-  it('defines HM05, TM70, TM31, TM49 and HM01 in the TMs & HMs pocket', () => {
+  it('defines HM05, TM31, TM49 and HM01 in the TMs & HMs pocket', () => {
     expect(INFINITE_TMS.HM05.moveId).toBe('flash');
-    expect(INFINITE_TMS.TM70.moveId).toBe('flash');
+    expect(INFINITE_TMS.TM70).toBeUndefined();
     expect(INFINITE_TMS.TM31.moveId).toBe('mudslap');
     expect(INFINITE_TMS.TM49.moveId).toBe('furycutter');
     expect(INFINITE_TMS.TM49.type).toBe('Bug');

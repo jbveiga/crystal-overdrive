@@ -659,7 +659,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'elder_li',
         '🏮 ELDER LI',
         [
-          'ELDER LI: You care deeply for your POKéMON. With TM70 / HM05 FLASH, even the darkest caves will shine bright.',
+          'ELDER LI: You care deeply for your POKéMON. With HM05 FLASH, even the darkest caves will shine bright.',
           'Go forth and challenge FALKNER at the VIOLET CITY GYM!',
         ],
         {

@@ -556,7 +556,7 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain("speciesId: 'bellsprout', level: 7");
     expect(mainSrc).toContain("speciesId: 'hoot-hoot', level: 10");
     expect(mainSrc).toContain("inventory.tms.push('HM05')");
-    expect(mainSrc).toContain("inventory.tms.push('TM70')");
+    expect(mainSrc).not.toContain("inventory.tms.push('TM70')");
     expect(mainSrc).toContain("storyFlags.add('sprout_tower_cleared')");
   });
 
@@ -644,7 +644,7 @@ describe('MapData & Authentic Tile Integrity', () => {
     // Starter modal & Route 29 roadblock checks
     expect(mainSrc).toContain('overworldHUD.openStarterChoiceModal');
     expect(mainSrc).toContain("storyFlags.add('starter_chosen')");
-    expect(mainSrc).toContain("It's an empty POKé BALL.");
+    expect(mainSrc).toContain("It's an empty spot. You already chose");
     expect(mainSrc).toContain("current.id === 'new_bark_town' && conn.mapId === 'route_29' && playerParty.length === 0");
   });
 
