@@ -447,6 +447,36 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       expect(healOverlay.style.display).toBe('none');
       vi.useRealTimers();
     });
+
+    it('renders #overworld-toast-banner as a top-aligned floating pill and plays canonical field rest blackout fade (TICKET-UI-HEALING-POLISH-01)', () => {
+      vi.useFakeTimers();
+      const hud = new OverworldHUD('overworld-hud-container');
+      const toast = mockDoc.querySelector('#overworld-toast-banner') as MockElement;
+      expect(toast).not.toBeNull();
+      expect(toast.style.position).toBe('fixed');
+      expect(toast.style.top).toContain('54px');
+      expect(toast.style.borderRadius).toBe('9999px');
+
+      const onFieldRestComplete = vi.fn();
+      hud.playFieldRestAnimation(onFieldRestComplete);
+
+      const fieldRestOverlay = mockDoc.querySelector('#field-rest-overlay') as MockElement;
+      expect(fieldRestOverlay).not.toBeNull();
+      expect(fieldRestOverlay.style.display).toBe('block');
+      expect(fieldRestOverlay.style.opacity).toBe('1');
+      expect(hud.isDialogueOpen()).toBe(true);
+      expect(mockDoc.querySelector('#pokecenter-heal-overlay')).toBeNull();
+
+      vi.advanceTimersByTime(900);
+      expect(fieldRestOverlay.style.opacity).toBe('0');
+      expect(onFieldRestComplete).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(300);
+      expect(onFieldRestComplete).toHaveBeenCalledTimes(1);
+      expect(fieldRestOverlay.style.display).toBe('none');
+      expect(hud.isDialogueOpen()).toBe(false);
+      vi.useRealTimers();
+    });
   });
 
   describe('5. Dynamic Trainer Card Name & Keyboard Shortcuts (Ticket Sprint 08)', () => {

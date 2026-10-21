@@ -1491,9 +1491,15 @@ async function bootstrap() {
 
           healPlayerParty(false);
           saveCurrentGame();
-          overworldHUD.playHealingAnimation(playerParty.length, () => {
-            overworldHUD.showToast('💖 Your party was restored to full HP & PP at the Pokémon Center!');
-          });
+          if (respawnMap.id.endsWith('_poke_center')) {
+            overworldHUD.playHealingAnimation(playerParty.length, () => {
+              overworldHUD.showToast('💖 Your party was restored to full HP & PP at the Pokémon Center!');
+            });
+          } else {
+            overworldHUD.playFieldRestAnimation(() => {
+              overworldHUD.showToast('💖 Your party was restored to full HP & PP at home!');
+            });
+          }
           return;
         }
         if (options.isRoamer) {
@@ -1699,9 +1705,7 @@ async function bootstrap() {
               () => {
                 healPlayerParty(false);
                 saveCurrentGame();
-                overworldHUD.playHealingAnimation(playerParty.length, () => {
-                  overworldHUD.showToast('💖 Your party was restored to full HP & PP!');
-                });
+                overworldHUD.playFieldRestAnimation();
               }
             );
             return;
@@ -1713,9 +1717,7 @@ async function bootstrap() {
             () => {
               healPlayerParty(false);
               saveCurrentGame();
-              overworldHUD.playHealingAnimation(playerParty.length, () => {
-                overworldHUD.showToast('💖 Your party was restored to full HP & PP!');
-              });
+              overworldHUD.playFieldRestAnimation();
             }
           );
           return;
@@ -2523,9 +2525,7 @@ async function bootstrap() {
           overworldHUD.openDialogue(postEggPages, '🔬 PROF. ELM', () => {
             healPlayerParty(false);
             saveCurrentGame();
-            overworldHUD.playHealingAnimation(playerParty.length, () => {
-              overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
-            });
+            overworldHUD.playFieldRestAnimation();
           });
           return;
         }
@@ -2535,12 +2535,14 @@ async function bootstrap() {
             if (targetNpc.action === 'HEAL_AND_SAVE') {
               if (currentMap.id.endsWith('_poke_center')) {
                 lastVisitedPokecenter = { mapId: currentMap.id, x: 3, y: 3 };
+                healPlayerParty(false);
+                saveCurrentGame();
+                overworldHUD.playHealingAnimation(playerParty.length);
+              } else {
+                healPlayerParty(false);
+                saveCurrentGame();
+                overworldHUD.playFieldRestAnimation();
               }
-              healPlayerParty(false);
-              saveCurrentGame();
-              overworldHUD.playHealingAnimation(playerParty.length, () => {
-                overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
-              });
             } else if (targetNpc.action === 'OPEN_MART') {
               bagUI.openMart();
             }
@@ -2625,9 +2627,11 @@ async function bootstrap() {
         if (bgEvent.action === 'HEAL_AND_SAVE') {
           healPlayerParty(false);
           saveCurrentGame();
-          overworldHUD.playHealingAnimation(playerParty.length, () => {
-            overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
-          });
+          if (currentMap.id.endsWith('_poke_center')) {
+            overworldHUD.playHealingAnimation(playerParty.length);
+          } else {
+            overworldHUD.playFieldRestAnimation();
+          }
         } else if (bgEvent.action === 'OPEN_MART') {
           bagUI.openMart();
         }

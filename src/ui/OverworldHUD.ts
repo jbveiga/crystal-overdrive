@@ -87,6 +87,16 @@ export class OverworldHUD {
           display: none !important;
         }
       }
+      @keyframes toastSlideDown {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -12px);
+        }
+        100% {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -259,20 +269,30 @@ box-shadow: 0 4px 16px rgba(220, 38, 38, 0.5);
 ">
 ⚡ A powerful aura is present on this route!
 </div>
-<!-- Interactive Building / Event Toast Banner -->
+</div>
+<!-- Top-Aligned Floating Pill Toast Banner (TICKET-UI-HEALING-POLISH-01) -->
 <div id="overworld-toast-banner" style="
 display: none;
-background: rgba(15, 23, 42, 0.95);
-border: 1px solid #38bdf8;
-border-radius: 8px;
-padding: 10px 20px;
+position: fixed;
+top: calc(54px + env(safe-area-inset-top, 0px));
+left: 50%;
+transform: translateX(-50%);
+max-width: min(440px, calc(100vw - 32px));
+z-index: 45;
+pointer-events: none;
+background: rgba(15, 23, 42, 0.94);
+backdrop-filter: blur(10px);
+border: 1.5px solid #38bdf8;
+border-radius: 9999px;
+padding: 8px 18px;
 color: #f8fafc;
 font-weight: 700;
-font-size: 14px;
-box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+font-size: 13px;
+text-align: center;
+box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+animation: toastSlideDown 0.22s ease-out;
+transition: opacity 0.18s ease, transform 0.18s ease;
 "></div>
-</div>
 <!-- Responsive Mobile Touch Gamepad Overlay (Virtual D-Pad + A/B Action Buttons) -->
 <div id="mobile-gamepad-overlay" style="
 display: none;
@@ -770,7 +790,55 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
     const starterOpen = starterModal ? starterModal.style.display === 'flex' : false;
     const healOverlay = this.rootElement.querySelector('#pokecenter-heal-overlay') as HTMLElement | null;
     const healOpen = healOverlay ? healOverlay.style.display === 'flex' : false;
-    return this.dialogueActive || starterOpen || healOpen;
+    const fieldRestOverlay = this.rootElement.querySelector('#field-rest-overlay') as HTMLElement | null;
+    const fieldRestOpen = fieldRestOverlay ? fieldRestOverlay.style.display === 'block' : false;
+    return this.dialogueActive || starterOpen || healOpen || fieldRestOpen;
+  }
+
+  /**
+   * Plays a canonical Game Boy Color field rest blackout fade (Mom, Prof. Elm, Mr. Pokémon)
+   * with recovery jingle while keeping the 6-slot counter tray exclusive to Pokémon Centers.
+   */
+  public playFieldRestAnimation(onComplete?: () => void): void {
+    this.activeDirection = null;
+    let overlay = this.rootElement.querySelector('#field-rest-overlay') as HTMLDivElement | null;
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'field-rest-overlay';
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000000;
+        z-index: 60;
+        opacity: 0;
+        pointer-events: auto;
+        display: none;
+        transition: opacity 0.22s ease-in-out;
+      `;
+      this.rootElement.appendChild(overlay);
+    }
+
+    overlay.style.display = 'block';
+    overlay.style.opacity = '1';
+    BattleAudio.playOverworldSound('HEAL_JINGLE');
+
+    // Step 1-3: Fade to black (220ms) + Hold blackout (650ms) = 870ms
+    setTimeout(() => {
+      if (overlay) {
+        overlay.style.opacity = '0';
+      }
+    }, 870);
+
+    // Step 4-5: Fade from black (250ms) -> clean up and invoke callback at 1120ms
+    setTimeout(() => {
+      if (overlay) {
+        overlay.style.display = 'none';
+      }
+      if (onComplete) onComplete();
+    }, 1120);
   }
 
   /**
