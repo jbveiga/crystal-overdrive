@@ -4,7 +4,8 @@ import { BattleAudio } from '../audio/BattleAudio';
 
 export interface BagInventory {
   balls: Partial<Record<PokeballId, number>>;
-  items?: Partial<Record<MedicineId, number>>;
+  items?: Partial<Record<string, number>>;
+  berries?: Partial<Record<string, number>>;
   tms: string[];
   money: number;
   badges: string[];
@@ -216,12 +217,14 @@ export class BagAndMartUI {
   private selectedPartyIndex: number = 0;
   private speedMultiplier: SpeedMultiplier = 1;
   private onInventoryChanged?: () => void;
+  private onUseItemfinder?: () => void;
 
   constructor(
     containerId: string = 'modal-container',
     inventory: BagInventory,
     party: PokemonInstance[],
-    onInventoryChanged?: () => void
+    onInventoryChanged?: () => void,
+    onUseItemfinder?: () => void
   ) {
     const el = document.getElementById(containerId);
     if (!el) throw new Error(`UI Container #${containerId} not found`);
@@ -237,8 +240,12 @@ export class BagAndMartUI {
         revive: 1,
       };
     }
+    if (!this.inventory.berries) {
+      this.inventory.berries = {};
+    }
     this.party = party;
     this.onInventoryChanged = onInventoryChanged;
+    this.onUseItemfinder = onUseItemfinder;
     this.createUI();
   }
 
@@ -555,7 +562,8 @@ export class BagAndMartUI {
     }
 
     const ownedItems = MART_MEDICINE_CATALOG.filter((m) => (this.inventory.items?.[m.id] ?? 0) > 0);
-    if (ownedItems.length === 0) {
+    const hasBerries = Object.values(this.inventory.berries || {}).some((c) => (c ?? 0) > 0);
+    if (ownedItems.length === 0 && !this.onUseItemfinder && !hasBerries) {
       container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 20px;">No medicine items in bag. Visit a Poké Mart to stock up!</div>`;
       return;
     }
@@ -596,6 +604,55 @@ export class BagAndMartUI {
       });
 
       container.appendChild(card);
+    }
+
+    if (this.onUseItemfinder) {
+      const finderCard = document.createElement('div');
+      finderCard.style.cssText = CARD_STYLE;
+      finderCard.innerHTML = `
+        <div style="flex: 1;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span style="font-weight: 700; color: #38bdf8;">📡 ITEMFINDER</span>
+            <span style="font-size: 10px; background: #0284c7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">KEY ITEM</span>
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">Scans a 8-tile radar radius around you for hidden items and reports their compass bearing.</div>
+        </div>
+        <button class="use-itemfinder-btn" style="
+          background: #0284c7;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 14px;
+          font-weight: 800;
+          font-size: 12px;
+          cursor: pointer;
+          white-space: nowrap;
+        ">SCAN NEARBY</button>
+      `;
+      const scanBtn = finderCard.querySelector('.use-itemfinder-btn') as HTMLButtonElement;
+      scanBtn.addEventListener('click', () => {
+        this.hide();
+        this.onUseItemfinder?.();
+      });
+      container.appendChild(finderCard);
+    }
+
+    const berryEntries = Object.entries(this.inventory.berries || {}).filter(([, c]) => (c ?? 0) > 0);
+    for (const [berryId, count] of berryEntries) {
+      const berryCard = document.createElement('div');
+      berryCard.style.cssText = CARD_STYLE;
+      const formattedName = berryId.replace(/[_-]+/g, ' ').toUpperCase();
+      berryCard.innerHTML = `
+        <div style="flex: 1;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span style="font-weight: 700; color: #f43f5e;">🍒 ${formattedName}</span>
+            <span style="font-size: 10px; background: #be123c; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">BERRY / APRICORN</span>
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">Picked fresh from a fruit-bearing tree in Johto or Kanto.</div>
+        </div>
+        <div style="font-size: 15px; font-weight: 800; color: #fb7185;">x${count}</div>
+      `;
+      container.appendChild(berryCard);
     }
   }
 

@@ -493,4 +493,40 @@ export class BattleAudio {
       });
     }
   }
+
+  /**
+   * Plays authentic Itemfinder radar sonar ping (double high-pitch beep if found, low dull tone if not found)
+   */
+  public static playItemfinderPing(found: boolean): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    if (found) {
+      [0, 0.14].forEach((offset) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1174.66, now + offset);
+        osc.frequency.setValueAtTime(1567.98, now + offset + 0.04);
+        gain.gain.setValueAtTime(0.07, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.11);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + offset);
+        osc.stop(now + offset + 0.11);
+      });
+    } else {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, now);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.14);
+    }
+  }
 }

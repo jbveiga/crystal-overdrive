@@ -1,5 +1,5 @@
 import { Application, Container, Sprite, Texture, Rectangle, Assets, Graphics, Text, TextStyle } from 'pixi.js';
-import type { MapData, Direction } from '../types/game';
+import type { MapData, Direction, OverworldItemBall, OverworldFruitTree } from '../types/game';
 import type { GridEntity, NpcSpriteType } from '../world/GridPhysics';
 
 interface CharacterFrames {
@@ -26,11 +26,13 @@ export class OverworldRenderer {
   public app!: Application;
   private stageContainer!: Container;
   private mapContainer!: Container;
+  private itemBallContainer!: Container;
   private entityContainer!: Container;
   private foregroundContainer!: Container;
   private playerShadow!: Graphics;
   private playerSprite!: Sprite;
   private playerGrassMask!: Graphics;
+  private itemBallGraphics: Map<string, Container> = new Map();
   private npcSprites: Map<string, Sprite> = new Map();
   private npcGrassMasks: Map<string, Graphics> = new Map();
   private grassParticles: GrassParticle[] = [];
@@ -65,6 +67,7 @@ export class OverworldRenderer {
 
     this.stageContainer = new Container();
     this.mapContainer = new Container();
+    this.itemBallContainer = new Container();
     this.entityContainer = new Container();
     this.foregroundContainer = new Container();
     this.ambientOverlay = new Graphics();
@@ -74,6 +77,7 @@ export class OverworldRenderer {
     this.fadeOverlay.visible = false;
 
     this.stageContainer.addChild(this.mapContainer);
+    this.stageContainer.addChild(this.itemBallContainer);
     this.stageContainer.addChild(this.entityContainer);
     this.stageContainer.addChild(this.foregroundContainer);
     this.app.stage.addChild(this.stageContainer);
@@ -1191,6 +1195,74 @@ export class OverworldRenderer {
       this.ambientOverlay.rect(0, 0, screenW, screenH);
       this.ambientOverlay.fill({ color, alpha });
       this.ambientOverlay.visible = true;
+    }
+  }
+
+  /**
+   * Renders active uncollected Overworld Item Balls and Fruit Tree berry indicators on the current map (Sprint 12)
+   */
+  public renderOverworldItems(
+    itemBalls: OverworldItemBall[],
+    fruitTrees: OverworldFruitTree[] = [],
+    pickedTreeIds: Set<string> = new Set()
+  ): void {
+    if (!this.itemBallContainer) return;
+    this.itemBallContainer.removeChildren();
+    this.itemBallGraphics.clear();
+
+    for (const ball of itemBalls) {
+      const node = new Container();
+      const px = (ball.x + 0.5) * this.tileSize;
+      const py = (ball.y + 0.55) * this.tileSize;
+      node.position.set(px, py);
+
+      const g = new Graphics();
+      // Drop shadow
+      g.ellipse(0, 12, 13, 5).fill({ color: 0x000000, alpha: 0.35 });
+      // Outer black border
+      g.circle(0, 0, 13).fill({ color: 0x111827 });
+      // Bottom white half
+      g.arc(0, 0, 10, 0, Math.PI).fill({ color: 0xf8fafc });
+      // Top red half
+      g.arc(0, 0, 10, Math.PI, Math.PI * 2).fill({ color: 0xef4444 });
+      // Center band & button
+      g.rect(-11, -2, 22, 4).fill({ color: 0x111827 });
+      g.circle(0, 0, 4.5).fill({ color: 0x111827 });
+      g.circle(0, 0, 2.5).fill({ color: 0xf8fafc });
+      // Specular highlight
+      g.circle(-4, -5, 2.2).fill({ color: 0xfca5a5, alpha: 0.9 });
+
+      node.addChild(g);
+      this.itemBallContainer.addChild(node);
+      this.itemBallGraphics.set(ball.eventFlag, node);
+      this.itemBallGraphics.set(ball.id, node);
+    }
+
+    for (const tree of fruitTrees) {
+      if (pickedTreeIds.has(tree.treeId)) continue;
+      const node = new Container();
+      const px = (tree.x + 0.5) * this.tileSize;
+      const py = (tree.y + 0.38) * this.tileSize;
+      node.position.set(px, py);
+
+      const g = new Graphics();
+      g.circle(0, 0, 8).fill({ color: 0x14532d });
+      g.circle(0, 0, 6).fill({ color: 0xf59e0b });
+      g.circle(-2, -2, 2).fill({ color: 0xfef08a });
+      node.addChild(g);
+      this.itemBallContainer.addChild(node);
+      this.itemBallGraphics.set(tree.treeId, node);
+    }
+  }
+
+  public removeItemBall(flagOrId: string): void {
+    const node = this.itemBallGraphics.get(flagOrId);
+    if (node) {
+      node.visible = false;
+      if (node.parent) {
+        node.parent.removeChild(node);
+      }
+      this.itemBallGraphics.delete(flagOrId);
     }
   }
 }

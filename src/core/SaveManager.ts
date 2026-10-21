@@ -34,6 +34,8 @@ export interface SaveData {
     balls: Partial<Record<PokeballId, number>>;
     items?: Partial<Record<MedicineId, number>>;
     tms: string[];
+    berries?: Partial<Record<string, number>>;
+    keyItems?: string[];
   };
   roamers: RoamerState[];
   defeatedTrainers: string[];
@@ -41,6 +43,10 @@ export interface SaveData {
   seenSpecies?: string[];
   options?: GameOptions;
   missions?: Record<string, SerializedMissionState>;
+  collectedItems?: string[];
+  collectedItemFlags?: string[];
+  harvestedFruitTrees?: string[];
+  fruitTreePicks?: Record<string, number>;
 }
 
 const DB_NAME = 'crystal-overdrive-db';

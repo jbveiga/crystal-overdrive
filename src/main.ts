@@ -19,6 +19,7 @@ import { TitleScreenUI } from './ui/TitleScreenUI';
 import { IntroSequenceUI } from './ui/IntroSequenceUI';
 import { MissionLogUI } from './ui/MissionLogUI';
 import { MissionManager } from './world/MissionManager';
+import { OverworldItemManager } from './world/OverworldItemManager';
 import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions, SpeedMultiplier } from './types/game';
 import type { Graphics } from 'pixi.js';
 import { createNpcsByMap } from './world/npcData';
@@ -44,6 +45,7 @@ async function bootstrap() {
   const saveManager = new SaveManager();
   const audioManager = new AudioManager();
   const missionManager = new MissionManager();
+  const overworldItemManager = new OverworldItemManager();
   let gameState: 'TITLE' | 'OVERWORLD' | 'BATTLE' = 'TITLE';
 
   // 2. Load or Initialize Game State
@@ -71,6 +73,7 @@ async function bootstrap() {
       awakening: 2,
       revive: 1,
     },
+    berries: {},
     tms: ['TM54', 'TM73', 'TM99'],
     money: 3000,
     badges: [],
@@ -103,6 +106,12 @@ async function bootstrap() {
     if (existingSave.inventory.items) {
       inventory.items = existingSave.inventory.items;
     }
+    if (existingSave.inventory.berries) {
+      inventory.berries = existingSave.inventory.berries;
+    }
+    if (existingSave.inventory.keyItems) {
+      inventory.keyItems = existingSave.inventory.keyItems;
+    }
     inventory.tms = existingSave.inventory.tms;
     inventory.money = existingSave.player.money;
     inventory.badges = existingSave.player.badges;
@@ -111,6 +120,14 @@ async function bootstrap() {
     existingSave.seenSpecies?.forEach((s) => seenSpecies.add(s));
     playerParty.forEach((p) => seenSpecies.add(p.speciesId));
     playerBox.forEach((p) => seenSpecies.add(p.speciesId));
+    overworldItemManager.setCollectedFlags([
+      ...(existingSave.collectedItems || []),
+      ...(existingSave.collectedItemFlags || []),
+      ...Array.from(storyFlags),
+    ]);
+    overworldItemManager.setFruitTreePicks(
+      existingSave.fruitTreePicks || existingSave.harvestedFruitTrees
+    );
     missionManager.deserialize(existingSave.missions);
     missionManager.checkStoryFlags(storyFlags);
 
@@ -524,11 +541,17 @@ async function bootstrap() {
       inventory: {
         balls: inventory.balls,
         items: inventory.items,
+        berries: inventory.berries,
         tms: inventory.tms,
+        keyItems: inventory.keyItems,
       },
       roamers: roamingManager.getAllRoamers(),
       defeatedTrainers: Array.from(defeatedTrainers),
       storyFlags: Array.from(storyFlags),
+      collectedItems: overworldItemManager.getCollectedFlags(),
+      collectedItemFlags: overworldItemManager.getCollectedFlags(),
+      harvestedFruitTrees: overworldItemManager.getHarvestedTreeIds(),
+      fruitTreePicks: overworldItemManager.getFruitTreePicksRecord(),
       seenSpecies: Array.from(seenSpecies),
       options: gameOptions,
       missions: missionManager.serialize(),
@@ -537,10 +560,45 @@ async function bootstrap() {
     console.log('💾 Game state successfully saved to IndexedDB.');
   };
 
+  const addOverworldItemToInventory = (rawItemId: string) => {
+    const norm = rawItemId.toLowerCase().replace(/_/g, '-');
+    const pocket = OverworldItemManager.resolveItemPocket(rawItemId);
+    if (pocket === 'TMS') {
+      const code = rawItemId.toUpperCase().split('_')[0];
+      if (!inventory.tms.includes(code)) {
+        inventory.tms.push(code);
+      }
+    } else if (pocket === 'BALLS') {
+      const ballKey = norm as PokeballId;
+      inventory.balls[ballKey] = (inventory.balls[ballKey] || 0) + 1;
+    } else if (pocket === 'BERRIES') {
+      if (!inventory.berries) inventory.berries = {};
+      inventory.berries[rawItemId] = (inventory.berries[rawItemId] || 0) + 1;
+    } else if (pocket === 'KEY_ITEMS') {
+      if (!inventory.keyItems) inventory.keyItems = [];
+      if (!inventory.keyItems.includes(rawItemId)) {
+        inventory.keyItems.push(rawItemId);
+      }
+    } else {
+      if (!inventory.items) inventory.items = {};
+      inventory.items[norm] = (inventory.items[norm] || 0) + 1;
+    }
+  };
+
+  let triggerItemfinderScan = () => {};
+
   // 5. Initialize HUDs, Party Management, Start Menu & Renderers
-  const bagUI = new BagAndMartUI('modal-container', inventory, playerParty, () => {
-    saveCurrentGame();
-  });
+  const bagUI = new BagAndMartUI(
+    'modal-container',
+    inventory,
+    playerParty,
+    () => {
+      saveCurrentGame();
+    },
+    () => {
+      triggerItemfinderScan();
+    }
+  );
 
   const partyUI = new PartyManagementUI('modal-container', playerParty, () => {
     saveCurrentGame();
@@ -716,7 +774,18 @@ async function bootstrap() {
   await overworldRenderer.init(canvasContainer);
   overworldRenderer.setPlayerGender(playerGender);
   const lookupMap = (id: string) => mapManager.getMap(id);
+
+  const syncMapOverworldItems = (map: MapData | null) => {
+    if (!map) return;
+    overworldRenderer.renderOverworldItems(
+      overworldItemManager.getActiveItemBalls(map.id),
+      overworldItemManager.getFruitTreesForMap(map.id),
+      new Set(overworldItemManager.getHarvestedTreeIds())
+    );
+  };
+
   overworldRenderer.renderMap(initialMap, lookupMap);
+  syncMapOverworldItems(initialMap);
 
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
   battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
@@ -755,11 +824,15 @@ async function bootstrap() {
         revive: 1,
       };
       inventory.tms = ['TM54', 'TM73', 'TM99'];
+      inventory.berries = {};
+      inventory.keyItems = [];
       inventory.money = 3000;
       inventory.badges = [];
       defeatedTrainers.clear();
       storyFlags.clear();
       seenSpecies.clear();
+      overworldItemManager.setCollectedFlags([]);
+      overworldItemManager.setFruitTreePicks({});
       roamingManager.sleepBeasts();
       missionManager.deserialize(new MissionManager().serialize());
 
@@ -782,6 +855,7 @@ async function bootstrap() {
       player.progress = 0;
 
       overworldRenderer.renderMap(startMap, lookupMap);
+      syncMapOverworldItems(startMap);
       overworldHUD.updateRouteName(startMap.name);
       overworldHUD.updatePokegear(roamingManager.getAllRoamers());
       await saveCurrentGame();
@@ -1008,6 +1082,7 @@ async function bootstrap() {
       targetX = nextMap.width - 1;
       targetY -= conn.offset;
       overworldRenderer.renderMap(nextMap, lookupMap);
+      syncMapOverworldItems(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
     }
     // Transitioning East
@@ -1018,6 +1093,7 @@ async function bootstrap() {
       targetX = 0;
       targetY -= conn.offset;
       overworldRenderer.renderMap(nextMap, lookupMap);
+      syncMapOverworldItems(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
     }
     // Transitioning North
@@ -1028,6 +1104,7 @@ async function bootstrap() {
       targetX -= conn.offset;
       targetY = nextMap.height - 1;
       overworldRenderer.renderMap(nextMap, lookupMap);
+      syncMapOverworldItems(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
     }
     // Transitioning South
@@ -1038,6 +1115,7 @@ async function bootstrap() {
       targetX -= conn.offset;
       targetY = 0;
       overworldRenderer.renderMap(nextMap, lookupMap);
+      syncMapOverworldItems(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
     }
 
@@ -1383,6 +1461,7 @@ async function bootstrap() {
           player.progress = 0;
 
           overworldRenderer.renderMap(respawnMap, lookupMap);
+          syncMapOverworldItems(respawnMap);
           overworldHUD.updateRouteName(respawnMap.name);
           audioManager.playMapBgm(respawnMap.id, 0.8);
           overworldHUD.show();
@@ -2306,6 +2385,7 @@ async function bootstrap() {
                   const mapNow = mapManager.getCurrentMap();
                   if (mapNow) {
                     overworldRenderer.renderMap(mapNow, lookupMap);
+                    syncMapOverworldItems(mapNow);
                   }
                   saveCurrentGame();
                 },
@@ -2449,6 +2529,95 @@ async function bootstrap() {
       return;
     }
 
+    // 2b. Check Overworld Visible Item Balls (Sprint 12)
+    const itemBall =
+      overworldItemManager.checkItemBall(currentMap.id, facingX, facingY) ||
+      overworldItemManager.checkItemBall(currentMap.id, player.x, player.y);
+    if (itemBall) {
+      addOverworldItemToInventory(itemBall.itemId);
+      overworldItemManager.collectItem(itemBall.eventFlag);
+      storyFlags.add(itemBall.eventFlag);
+      overworldRenderer.removeItemBall(itemBall.eventFlag);
+      BattleAudio.playOverworldSound('KEY_ITEM');
+      const itemName = OverworldItemManager.formatItemName(itemBall.itemId);
+      const pocket = OverworldItemManager.resolveItemPocket(itemBall.itemId);
+      overworldHUD.openDialogue(
+        [
+          `${playerName} found ${itemName}!`,
+          `${playerName} put the ${itemName} in the ${pocket} POCKET.`,
+        ],
+        '🔴 ITEM BALL',
+        () => {
+          saveCurrentGame();
+          overworldHUD.showToast(`🔴 Found ${itemName}!`);
+        }
+      );
+      return;
+    }
+
+    // 2c. Check Overworld Hidden Items (Sprint 12)
+    const hiddenItem = overworldItemManager.checkHiddenItemInteraction(
+      currentMap.id,
+      facingX,
+      facingY,
+      player.x,
+      player.y
+    );
+    if (hiddenItem) {
+      addOverworldItemToInventory(hiddenItem.itemId);
+      overworldItemManager.collectItem(hiddenItem.eventFlag);
+      storyFlags.add(hiddenItem.eventFlag);
+      if (hiddenItem.itemId === 'machine_part') {
+        storyFlags.add('machine_part_found');
+      }
+      BattleAudio.playOverworldSound('KEY_ITEM');
+      const itemName = OverworldItemManager.formatItemName(hiddenItem.itemId);
+      const pocket = OverworldItemManager.resolveItemPocket(hiddenItem.itemId);
+      overworldHUD.openDialogue(
+        [
+          `${playerName} found ${itemName}!`,
+          `${playerName} put the ${itemName} in the ${pocket} POCKET.`,
+        ],
+        '✨ HIDDEN ITEM',
+        () => {
+          saveCurrentGame();
+          overworldHUD.showToast(`✨ Found hidden ${itemName}!`);
+        }
+      );
+      return;
+    }
+
+    // 2d. Check Overworld Fruit Trees (Sprint 12)
+    const fruitTree =
+      overworldItemManager.checkFruitTree(currentMap.id, facingX, facingY) ||
+      overworldItemManager.checkFruitTree(currentMap.id, player.x, player.y);
+    if (fruitTree) {
+      if (overworldItemManager.isFruitTreePickedToday(fruitTree.treeId)) {
+        overworldHUD.openDialogue(
+          ["It's a fruit-bearing tree, but there are no berries left today."],
+          '🌳 FRUIT TREE'
+        );
+      } else {
+        addOverworldItemToInventory(fruitTree.berryId);
+        overworldItemManager.pickFruitTree(fruitTree.treeId);
+        overworldRenderer.removeItemBall(fruitTree.treeId);
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        const berryName = OverworldItemManager.formatItemName(fruitTree.berryId);
+        overworldHUD.openDialogue(
+          [
+            `Hey! It's a fruit-bearing tree! It has ${berryName}!`,
+            `${playerName} picked the ${berryName}!`,
+          ],
+          '🌳 FRUIT TREE',
+          () => {
+            saveCurrentGame();
+            overworldHUD.showToast(`🍒 Picked ${berryName}!`);
+          }
+        );
+      }
+      return;
+    }
+
     // 3. Check Cuttable Trees (HM01 Cut interaction - Task 2)
     if (
       facingX >= 0 &&
@@ -2491,6 +2660,7 @@ async function bootstrap() {
               currentMap.collisionGrid[tileIdx] = 0;
               currentMap.tileMap![tileIdx] = 'jt_07_07_07_07';
               overworldRenderer.renderMap(currentMap, lookupMap);
+              syncMapOverworldItems(currentMap);
             }
           );
         } else {
@@ -2500,6 +2670,23 @@ async function bootstrap() {
           );
         }
       }
+    }
+  };
+
+  triggerItemfinderScan = () => {
+    if (gameState !== 'OVERWORLD' || isCutsceneLocked || overworldHUD.isDialogueOpen()) return;
+    const currentMap = mapManager.getCurrentMap();
+    if (!currentMap) return;
+    const result = overworldItemManager.scanItemfinder(currentMap.id, player.x, player.y, 8);
+    if (result && result.direction) {
+      BattleAudio.playItemfinderPing(true);
+      overworldHUD.openDialogue(
+        [`Yes! ITEMFINDER indicates there's an item nearby! It's ${result.direction}!`],
+        '📡 ITEMFINDER'
+      );
+    } else {
+      BattleAudio.playItemfinderPing(false);
+      overworldHUD.openDialogue(["... ... Nope! There's no response."], '📡 ITEMFINDER');
     }
   };
 
@@ -2579,6 +2766,7 @@ async function bootstrap() {
                 player.renderY = warp.targetY;
 
                 overworldRenderer.renderMap(targetMap, lookupMap);
+                syncMapOverworldItems(targetMap);
                 overworldHUD.updateRouteName(targetMap.name);
                 audioManager.playMapBgm(targetMap.id, 0.8);
               })

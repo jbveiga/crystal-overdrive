@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+import { OverworldItemManager } from '../src/world/OverworldItemManager';
 
 interface OverworldItemSummary {
   totalItemBalls: number;
@@ -298,5 +299,90 @@ describe('Overworld Items & Authentic Pret Extraction', () => {
       expect(tree.berryId).toBeTruthy();
       expect(tree.treeId).toMatch(/^FRUITTREE_/);
     }
+  });
+
+  it('supports item ball lookup, collection flag persistence, and despawning via OverworldItemManager', () => {
+    const manager = new OverworldItemManager();
+
+    // Route 29 has 1 visible item ball at (48, 2): potion
+    const activeBefore = manager.getActiveItemBalls('route_29');
+    expect(activeBefore).toHaveLength(1);
+    expect(activeBefore[0].itemId).toBe('potion');
+
+    const hit = manager.checkItemBall('route_29', 48, 2);
+    expect(hit).not.toBeNull();
+    expect(hit?.eventFlag).toBe('EVENT_ROUTE_29_POTION');
+
+    manager.collectItem('EVENT_ROUTE_29_POTION');
+    expect(manager.checkItemBall('route_29', 48, 2)).toBeNull();
+    expect(manager.getActiveItemBalls('route_29')).toHaveLength(0);
+    expect(manager.getCollectedFlags()).toContain('EVENT_ROUTE_29_POTION');
+  });
+
+  it('detects hidden items on facing or standing coordinates and hides them once collected', () => {
+    const manager = new OverworldItemManager();
+
+    // Route 30 has a hidden potion at (14, 9)
+    expect(manager.checkHiddenItem('route_30', 13, 9)).toBeNull();
+    const hidden = manager.checkHiddenItem('route_30', 14, 9);
+    expect(hidden).not.toBeNull();
+    expect(hidden?.itemId).toBe('potion');
+    expect(hidden?.eventFlag).toBe('EVENT_ROUTE_30_HIDDEN_POTION');
+
+    // Standing check fallback via checkHiddenItemInteraction
+    const standingHit = manager.checkHiddenItemInteraction('route_30', 14, 8, 14, 9);
+    expect(standingHit?.eventFlag).toBe('EVENT_ROUTE_30_HIDDEN_POTION');
+
+    manager.collectItem('EVENT_ROUTE_30_HIDDEN_POTION');
+    expect(manager.checkHiddenItem('route_30', 14, 9)).toBeNull();
+  });
+
+  it('tracks fruit tree daily harvest state and resets on the next calendar day', () => {
+    const manager = new OverworldItemManager();
+    const day1Noon = new Date(2026, 9, 21, 12, 0, 0).getTime();
+    const day2Morning = new Date(2026, 9, 22, 8, 0, 0).getTime();
+
+    const tree = manager.checkFruitTree('route_29', 12, 2);
+    expect(tree).not.toBeNull();
+    expect(tree?.treeId).toBe('FRUITTREE_ROUTE_29');
+
+    expect(manager.isFruitTreePickedToday('FRUITTREE_ROUTE_29', day1Noon)).toBe(false);
+    manager.pickFruitTree('FRUITTREE_ROUTE_29', day1Noon);
+    expect(manager.isFruitTreePickedToday('FRUITTREE_ROUTE_29', day1Noon)).toBe(true);
+    expect(manager.isFruitTreePickedToday('FRUITTREE_ROUTE_29', day2Morning)).toBe(false);
+  });
+
+  it('computes accurate Itemfinder compass bearings and respects the 8-tile radar radius', () => {
+    const manager = new OverworldItemManager();
+
+    // Route 30 hidden item is at (14, 9)
+    // Player at (14, 12) -> hidden item is 3 tiles North (dx=0, dy=-3)
+    const northScan = manager.scanItemfinder('route_30', 14, 12, 8);
+    expect(northScan).not.toBeNull();
+    expect(northScan?.direction).toBe('North of here');
+    expect(northScan?.distance).toBe(3);
+
+    // Player at (11, 6) -> hidden item at (14, 9) is Southeast (dx=+3, dy=+3)
+    const seScan = manager.scanItemfinder('route_30', 11, 6, 8);
+    expect(seScan).not.toBeNull();
+    expect(seScan?.direction).toBe('Southeast of here');
+
+    // Player standing directly on (14, 9) -> right here!
+    const exactScan = manager.scanItemfinder('route_30', 14, 9, 8);
+    expect(exactScan).not.toBeNull();
+    expect(exactScan?.direction).toBe('right here!');
+
+    // Player far away at (14, 25) -> 16 tiles away (> 8 radius)
+    const farScan = manager.scanItemfinder('route_30', 14, 25, 8);
+    expect(farScan).toBeNull();
+  });
+
+  it('formats item display names and classifies inventory pockets accurately', () => {
+    expect(OverworldItemManager.formatItemName('super_potion')).toBe('SUPER POTION');
+    expect(OverworldItemManager.resolveItemPocket('tm01_dynamicpunch')).toBe('TMS');
+    expect(OverworldItemManager.resolveItemPocket('ultra_ball')).toBe('BALLS');
+    expect(OverworldItemManager.resolveItemPocket('psncureberry')).toBe('BERRIES');
+    expect(OverworldItemManager.resolveItemPocket('machine_part')).toBe('KEY_ITEMS');
+    expect(OverworldItemManager.resolveItemPocket('hyper_potion')).toBe('ITEMS');
   });
 });

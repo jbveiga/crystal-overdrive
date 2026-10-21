@@ -214,3 +214,63 @@ export interface SerializedMissionState {
   currentStepIndex: number;
   stepsCompleted: boolean[];
 }
+
+export type ItemPocket = 'BALLS' | 'ITEMS' | 'KEY_ITEMS' | 'TMS' | 'BERRIES';
+
+export interface OverworldItemBall {
+  id: string;
+  mapId: string;
+  region: 'johto' | 'kanto';
+  x: number;
+  y: number;
+  itemId: string;
+  eventFlag: string;
+}
+export type ItemBallEntry = OverworldItemBall;
+
+export interface OverworldHiddenItem {
+  id: string;
+  mapId: string;
+  region: 'johto' | 'kanto';
+  x: number;
+  y: number;
+  itemId: string;
+  eventFlag: string;
+}
+export type HiddenItemEntry = OverworldHiddenItem;
+
+export interface OverworldFruitTree {
+  id: string;
+  mapId: string;
+  region: 'johto' | 'kanto';
+  x: number;
+  y: number;
+  berryId: string;
+  treeId: string;
+}
+export type FruitTreeEntry = OverworldFruitTree;
+
+export interface OverworldItemsDataset {
+  summary: {
+    totalItemBalls: number;
+    totalHiddenItems: number;
+    totalFruitTrees: number;
+    total?: number;
+    totalMapsWithItems?: number;
+    johto?: { itemBalls: number; hiddenItems: number; fruitTrees: number; total: number };
+    kanto?: { itemBalls: number; hiddenItems: number; fruitTrees: number; total: number };
+  };
+  itemBalls: OverworldItemBall[];
+  hiddenItems: OverworldHiddenItem[];
+  fruitTrees: OverworldFruitTree[];
+  byMap: Record<
+    string,
+    {
+      mapId?: string;
+      region?: 'johto' | 'kanto';
+      itemBalls: OverworldItemBall[];
+      hiddenItems: OverworldHiddenItem[];
+      fruitTrees: OverworldFruitTree[];
+    }
+  >;
+}
