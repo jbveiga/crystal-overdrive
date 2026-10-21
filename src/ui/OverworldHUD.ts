@@ -11,6 +11,7 @@ export interface OverworldHUDOptions {
   onMartOpen?: () => void;
   onSaveGame?: () => void;
   onInteract?: () => void;
+  onRadarToggle?: () => boolean;
   isModalOpen?: () => boolean;
 }
 
@@ -18,6 +19,7 @@ export class OverworldHUD {
   private container: HTMLElement;
   private speedButton: HTMLButtonElement | null = null;
   private muteButton: HTMLButtonElement | null = null;
+  private radarToggleButton: HTMLButtonElement | null = null;
   private gamepadToggleButton!: HTMLButtonElement;
   private startMenuButton!: HTMLButtonElement;
   private desktopControlsBar!: HTMLDivElement;
@@ -205,6 +207,18 @@ padding: 5px 8px;
 box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
 ">
 <!-- Always-Visible Capsule Controls -->
+<button id="radar-toggle-btn" title="Toggle Itemfinder Radar (D)" style="
+background: #334155;
+color: #ffffff;
+border: 1px solid rgba(255, 255, 255, 0.18);
+border-radius: 999px;
+padding: 6px 10px;
+font-size: 12px;
+font-weight: 700;
+cursor: pointer;
+">
+📡
+</button>
 <button id="gamepad-toggle-btn" title="Toggle Touch Gamepad" style="
 background: #334155;
 color: #ffffff;
@@ -543,6 +557,7 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
 
     this.speedButton = this.rootElement.querySelector('#speed-toggle-btn') as HTMLButtonElement | null;
     this.muteButton = this.rootElement.querySelector('#mute-toggle-btn') as HTMLButtonElement | null;
+    this.radarToggleButton = this.rootElement.querySelector('#radar-toggle-btn') as HTMLButtonElement | null;
     this.gamepadToggleButton = this.rootElement.querySelector('#gamepad-toggle-btn') as HTMLButtonElement;
     this.startMenuButton = this.rootElement.querySelector('#start-menu-btn') as HTMLButtonElement;
     this.desktopControlsBar = this.rootElement.querySelector('#desktop-controls-bar') as HTMLDivElement;
@@ -577,6 +592,14 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
     const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
     const closePokegearBtn = this.rootElement.querySelector('#close-pokegear-btn') as HTMLButtonElement;
     const roamerStatusList = this.rootElement.querySelector('#roamer-status-list') as HTMLDivElement;
+
+    this.radarToggleButton?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.options.onRadarToggle) {
+        const active = this.options.onRadarToggle();
+        this.updateRadarDisplay(active);
+      }
+    });
 
     this.gamepadToggleButton.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1352,6 +1375,14 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
     }
   }
 
+  public updateRadarDisplay(active: boolean): void {
+    if (this.radarToggleButton) {
+      this.radarToggleButton.style.background = active ? '#0284c7' : '#334155';
+      this.radarToggleButton.style.borderColor = active ? '#38bdf8' : 'rgba(255, 255, 255, 0.18)';
+      this.radarToggleButton.style.boxShadow = active ? '0 0 10px rgba(56, 189, 248, 0.5)' : 'none';
+    }
+  }
+
   public updateRouteName(name: string): void {
     if (this.routeBanner) {
       this.routeBanner.innerText = name;
@@ -1414,6 +1445,15 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
 
       if (this.options.isModalOpen?.()) {
         return;
+      }
+
+      if (e.code === 'KeyD' || e.code === 'KeyR') {
+        if (!e.repeat && this.isVisible() && !this.isDialogueOpen() && this.options.onRadarToggle) {
+          e.preventDefault();
+          const active = this.options.onRadarToggle();
+          this.updateRadarDisplay(active);
+          return;
+        }
       }
 
       if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ' || e.code === 'KeyE') {

@@ -1,0 +1,164 @@
+import type { RadarPing } from '../types/game';
+
+/**
+ * Pokémon Unbound-Style Live Itemfinder Compass HUD Capsule.
+ * Renders a top-right floating radar pill with a rotating directional needle,
+ * tile distance readout, and golden lock-on pulse when facing a buried item.
+ */
+export class ItemfinderHUD {
+  private container: HTMLElement;
+  private capsuleElement!: HTMLDivElement;
+  private dialElement!: HTMLDivElement;
+  private needleElement!: HTMLDivElement;
+  private statusLabelElement!: HTMLDivElement;
+  private subLabelElement!: HTMLDivElement;
+  private active: boolean = false;
+  private lastPing: RadarPing | null = null;
+
+  constructor(containerId: string = 'overworld-hud-container') {
+    const el = document.getElementById(containerId);
+    if (!el) {
+      throw new Error(`ItemfinderHUD container #${containerId} not found in DOM`);
+    }
+    this.container = el;
+    this.createUI();
+  }
+
+  private createUI(): void {
+    this.capsuleElement = document.createElement('div');
+    this.capsuleElement.id = 'itemfinder-hud-capsule';
+    this.capsuleElement.style.cssText = `
+      display: none;
+      position: fixed;
+      top: calc(56px + env(safe-area-inset-top, 0px));
+      right: max(14px, env(safe-area-inset-right, 14px));
+      min-width: 152px;
+      height: 44px;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid #38bdf8;
+      border-radius: 9999px;
+      padding: 4px 14px 4px 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65);
+      align-items: center;
+      gap: 10px;
+      z-index: 40;
+      pointer-events: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    `;
+
+    this.capsuleElement.innerHTML = `
+      <div id="itemfinder-compass-dial" style="
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(30, 41, 59, 0.95);
+        border: 1.5px solid #38bdf8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        flex-shrink: 0;
+      ">
+        <div id="itemfinder-compass-needle" style="
+          font-size: 15px;
+          font-weight: 900;
+          color: #38bdf8;
+          line-height: 1;
+          transform: rotate(0deg);
+          transition: transform 0.16s ease, color 0.16s ease;
+        ">➤</div>
+      </div>
+      <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.15;">
+        <div id="itemfinder-radar-header" style="
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: 0.8px;
+          color: #94a3b8;
+        ">📡 DOWSING RADAR</div>
+        <div id="itemfinder-distance-label" style="
+          font-size: 12px;
+          font-weight: 800;
+          color: #f8fafc;
+          white-space: nowrap;
+        ">NO RESPONSE</div>
+      </div>
+    `;
+
+    this.container.appendChild(this.capsuleElement);
+    this.dialElement = this.capsuleElement.querySelector('#itemfinder-compass-dial') as HTMLDivElement;
+    this.needleElement = this.capsuleElement.querySelector('#itemfinder-compass-needle') as HTMLDivElement;
+    this.subLabelElement = this.capsuleElement.querySelector('#itemfinder-radar-header') as HTMLDivElement;
+    this.statusLabelElement = this.capsuleElement.querySelector('#itemfinder-distance-label') as HTMLDivElement;
+  }
+
+  public isActive(): boolean {
+    return this.active;
+  }
+
+  public show(): void {
+    this.active = true;
+    this.capsuleElement.style.display = 'flex';
+  }
+
+  public hide(): void {
+    this.active = false;
+    this.capsuleElement.style.display = 'none';
+  }
+
+  public toggle(): boolean {
+    if (this.active) {
+      this.hide();
+    } else {
+      this.show();
+    }
+    return this.active;
+  }
+
+  public getLastPing(): RadarPing | null {
+    return this.lastPing;
+  }
+
+  public update(ping: RadarPing): void {
+    this.lastPing = ping;
+    if (!this.active) return;
+
+    if (!ping.hasItemInRange || ping.distance === null) {
+      this.capsuleElement.style.borderColor = '#64748b';
+      this.capsuleElement.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.65)';
+      this.dialElement.style.borderColor = '#64748b';
+      this.needleElement.style.color = '#64748b';
+      this.needleElement.style.transform = 'rotate(0deg)';
+      this.subLabelElement.innerText = '📡 DOWSING RADAR';
+      this.subLabelElement.style.color = '#94a3b8';
+      this.statusLabelElement.innerText = 'NO RESPONSE';
+      this.statusLabelElement.style.color = '#94a3b8';
+      return;
+    }
+
+    const tileSteps = Math.max(1, Math.round(ping.distance));
+    this.needleElement.style.transform = `rotate(${Math.round(ping.bearingAngleDeg)}deg)`;
+
+    if (ping.isFacingDirectly || ping.proximityBand === 'FACING' || ping.distance <= 1) {
+      // Gold lock-on state when right on or facing the buried item
+      this.capsuleElement.style.borderColor = '#facc15';
+      this.capsuleElement.style.boxShadow = '0 6px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(250, 204, 21, 0.55)';
+      this.dialElement.style.borderColor = '#facc15';
+      this.needleElement.style.color = '#facc15';
+      this.subLabelElement.innerText = ping.isFacingDirectly ? '✨ LOCKED ON [A]' : '✨ TARGET NEARBY';
+      this.subLabelElement.style.color = '#facc15';
+      this.statusLabelElement.innerText = 'RIGHT HERE!';
+      this.statusLabelElement.style.color = '#fef08a';
+    } else {
+      // Active vector lock (2..8 tiles)
+      this.capsuleElement.style.borderColor = '#38bdf8';
+      this.capsuleElement.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.65), 0 0 12px rgba(56, 189, 248, 0.35)';
+      this.dialElement.style.borderColor = '#38bdf8';
+      this.needleElement.style.color = '#38bdf8';
+      this.subLabelElement.innerText = `📡 BEARING ${ping.bearing}`;
+      this.subLabelElement.style.color = '#38bdf8';
+      this.statusLabelElement.innerText = `📍 ${tileSteps} TILE${tileSteps === 1 ? '' : 'S'}`;
+      this.statusLabelElement.style.color = '#f8fafc';
+    }
+  }
+}

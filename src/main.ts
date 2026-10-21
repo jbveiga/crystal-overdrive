@@ -20,7 +20,18 @@ import { IntroSequenceUI } from './ui/IntroSequenceUI';
 import { MissionLogUI } from './ui/MissionLogUI';
 import { MissionManager } from './world/MissionManager';
 import { OverworldItemManager } from './world/OverworldItemManager';
-import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions, SpeedMultiplier } from './types/game';
+import { ItemfinderRadar } from './world/ItemfinderRadar';
+import { ItemfinderHUD } from './ui/ItemfinderHUD';
+import type {
+  MapData,
+  Direction,
+  PokeballId,
+  PokemonInstance,
+  PlayerGender,
+  GameOptions,
+  SpeedMultiplier,
+  ExpShareMode,
+} from './types/game';
 import type { Graphics } from 'pixi.js';
 import { createNpcsByMap } from './world/npcData';
 export { npcsByMap, createNpcsByMap } from './world/npcData';
@@ -605,8 +616,10 @@ async function bootstrap() {
   });
 
   const missionLogUI = new MissionLogUI('modal-container', missionManager);
+  const itemfinderHUD = new ItemfinderHUD('overworld-hud-container');
 
   let handleInteract = () => {};
+  let toggleLiveItemfinderRadar = (): boolean => false;
 
   const getCaughtSpeciesSet = () =>
     new Set([...playerParty.map((p) => p.speciesId), ...playerBox.map((p) => p.speciesId)]);
@@ -654,6 +667,7 @@ async function bootstrap() {
       getSpeedMultiplier: () => gameClock.playerSpeed,
       isGamepadActive: () => overworldHUD?.isGamepadActive() ?? false,
       getTouchControlStyle: () => overworldHUD?.getTouchControlStyle() ?? gameOptions.touchControlStyle ?? 'DPAD',
+      getExpShareMode: () => gameOptions.expShare ?? 'CAPPED',
     },
     {
       onOpenParty: () => {
@@ -695,6 +709,19 @@ async function bootstrap() {
         gameOptions.touchControlStyle = nextStyle;
         saveCurrentGame();
         return nextStyle;
+      },
+      onCycleExpShareMode: () => {
+        const modes: ExpShareMode[] = ['OFF', 'ALL', 'CAPPED'];
+        const current = gameOptions.expShare ?? 'CAPPED';
+        const next = modes[(modes.indexOf(current) + 1) % modes.length];
+        gameOptions.expShare = next;
+        saveCurrentGame();
+        return next;
+      },
+      onSetExpShareMode: (mode: ExpShareMode) => {
+        gameOptions.expShare = mode;
+        saveCurrentGame();
+        return mode;
       },
     }
   );
@@ -748,6 +775,9 @@ async function bootstrap() {
     },
     onInteract: () => {
       handleInteract();
+    },
+    onRadarToggle: () => {
+      return toggleLiveItemfinderRadar();
     },
     isModalOpen: isAnyOverworldModalOpen,
   });
@@ -1351,60 +1381,90 @@ async function bootstrap() {
             overworldHUD.hideRoamerAlert();
           }
 
-          // Award EXP & Check Level-Up
+          // Award EXP & Check Level-Up across party via Unbound-Style Exp. Share (OFF | ALL | CAPPED)
           const expGained = PokemonFactory.calculateExpGain(opponentPokemon, Boolean(options.isTrainer));
-          await battleHUD.showMessage(`${activePlayerPokemon.nickname} gained ${expGained} EXP. Points!`);
-          const levelResult = PokemonFactory.gainExp(activePlayerPokemon, expGained);
-          battleHUD.updateExp(activePlayerPokemon);
-          battleHUD.updateHp(true, activePlayerPokemon.currentHp, activePlayerPokemon.stats.hp);
-          if (levelResult.leveledUp) {
-            BattleAudio.playBallEvent('LEVEL_UP');
-            await battleHUD.showMessage(
-              `🎉 ${activePlayerPokemon.nickname} grew to Lv. ${levelResult.newLevel}!`
-            );
+          const expShareMode: ExpShareMode = gameOptions.expShare || 'CAPPED';
+          const expAwards = PokemonFactory.distributePartyExp(
+            playerParty,
+            activePlayerPokemon,
+            expGained,
+            expShareMode,
+            inventory.badges.length
+          );
 
-            // Level-Up Learnset Move Learning (Ticket 6.4)
-            const learnableMoveIds = await PokemonFactory.getLearnableMovesAtLevel(
-              activePlayerPokemon.speciesId,
-              levelResult.newLevel
-            );
-
-            for (const newMoveId of learnableMoveIds) {
-              const alreadyKnown = activePlayerPokemon.moves.some((m) => m.moveId === newMoveId);
-              if (alreadyKnown) continue;
-
-              const newMoveData = PokemonFactory.getMoveData(newMoveId);
-
-              if (activePlayerPokemon.moves.length < 4) {
-                // Auto-learn if fewer than 4 moves
-                activePlayerPokemon.moves.push({
-                  moveId: newMoveData.id,
-                  currentPp: newMoveData.pp,
-                  maxPp: newMoveData.pp,
-                });
-                BattleAudio.playBallEvent('LEVEL_UP');
+          for (const award of expAwards) {
+            const member = award.pokemon;
+            if (award.isActiveBattler) {
+              if (award.isCapped) {
                 await battleHUD.showMessage(
-                  `✨ ${activePlayerPokemon.nickname} learned ${newMoveData.name}!`
+                  `🧢 ${member.nickname} is at the level cap (Lv. ${award.levelCap})! Received 1 EXP.`
                 );
               } else {
-                // Prompt to forget an existing move or decline
-                const chosenIdx = await battleHUD.promptMoveForget(activePlayerPokemon, newMoveData);
-                if (chosenIdx !== null && chosenIdx >= 0 && chosenIdx < 4) {
-                  const forgottenMove = activePlayerPokemon.moves[chosenIdx];
-                  const forgottenData = PokemonFactory.getMoveData(forgottenMove.moveId);
-                  activePlayerPokemon.moves[chosenIdx] = {
+                await battleHUD.showMessage(`${member.nickname} gained ${award.expAwarded} EXP. Points!`);
+              }
+              battleHUD.updateExp(activePlayerPokemon);
+              battleHUD.updateHp(true, activePlayerPokemon.currentHp, activePlayerPokemon.stats.hp);
+            } else {
+              if (award.isCapped) {
+                await battleHUD.showMessage(
+                  `🧢 ${member.nickname} is at the level cap (Lv. ${award.levelCap})! Received 1 EXP.`
+                );
+              } else {
+                await battleHUD.showMessage(
+                  `✨ ${member.nickname} gained ${award.expAwarded} EXP. Points via Exp. Share!`
+                );
+              }
+            }
+
+            if (award.leveledUp) {
+              BattleAudio.playBallEvent('LEVEL_UP');
+              await battleHUD.showMessage(
+                `🎉 ${member.nickname} grew to Lv. ${award.newLevel}!`
+              );
+
+              // Level-Up Learnset Move Learning (Ticket 6.4)
+              const learnableMoveIds = await PokemonFactory.getLearnableMovesAtLevel(
+                member.speciesId,
+                award.newLevel
+              );
+
+              for (const newMoveId of learnableMoveIds) {
+                const alreadyKnown = member.moves.some((m) => m.moveId === newMoveId);
+                if (alreadyKnown) continue;
+
+                const newMoveData = PokemonFactory.getMoveData(newMoveId);
+
+                if (member.moves.length < 4) {
+                  // Auto-learn if fewer than 4 moves
+                  member.moves.push({
                     moveId: newMoveData.id,
                     currentPp: newMoveData.pp,
                     maxPp: newMoveData.pp,
-                  };
+                  });
                   BattleAudio.playBallEvent('LEVEL_UP');
                   await battleHUD.showMessage(
-                    `1, 2, and... Poof! ${activePlayerPokemon.nickname} forgot ${forgottenData.name} and learned ${newMoveData.name}!`
+                    `✨ ${member.nickname} learned ${newMoveData.name}!`
                   );
                 } else {
-                  await battleHUD.showMessage(
-                    `${activePlayerPokemon.nickname} did not learn ${newMoveData.name}.`
-                  );
+                  // Prompt to forget an existing move or decline
+                  const chosenIdx = await battleHUD.promptMoveForget(member, newMoveData);
+                  if (chosenIdx !== null && chosenIdx >= 0 && chosenIdx < 4) {
+                    const forgottenMove = member.moves[chosenIdx];
+                    const forgottenData = PokemonFactory.getMoveData(forgottenMove.moveId);
+                    member.moves[chosenIdx] = {
+                      moveId: newMoveData.id,
+                      currentPp: newMoveData.pp,
+                      maxPp: newMoveData.pp,
+                    };
+                    BattleAudio.playBallEvent('LEVEL_UP');
+                    await battleHUD.showMessage(
+                      `1, 2, and... Poof! ${member.nickname} forgot ${forgottenData.name} and learned ${newMoveData.name}!`
+                    );
+                  } else {
+                    await battleHUD.showMessage(
+                      `${member.nickname} did not learn ${newMoveData.name}.`
+                    );
+                  }
                 }
               }
             }
@@ -2680,6 +2740,17 @@ async function bootstrap() {
       if (hiddenItem.itemId === 'machine_part') {
         storyFlags.add('machine_part_found');
       }
+      if (itemfinderHUD.isActive()) {
+        const remainingHidden = overworldItemManager.getHiddenItemsForMap(currentMap.id, storyFlags);
+        const nextPing = ItemfinderRadar.scan(
+          player.x,
+          player.y,
+          player.direction,
+          remainingHidden,
+          storyFlags
+        );
+        itemfinderHUD.update(nextPing);
+      }
       BattleAudio.playOverworldSound('KEY_ITEM');
       const itemName = OverworldItemManager.formatItemName(hiddenItem.itemId);
       const pocket = OverworldItemManager.resolveItemPocket(hiddenItem.itemId);
@@ -2783,19 +2854,59 @@ async function bootstrap() {
     }
   };
 
+  const refreshItemfinderRadar = (playSonar: boolean = true) => {
+    if (!itemfinderHUD.isActive()) return;
+    const currentMap = mapManager.getCurrentMap();
+    if (!currentMap) return;
+    const hiddenItems = overworldItemManager.getHiddenItemsForMap(currentMap.id, storyFlags);
+    const ping = ItemfinderRadar.scan(
+      player.x,
+      player.y,
+      player.direction,
+      hiddenItems,
+      storyFlags
+    );
+    itemfinderHUD.update(ping);
+    if (playSonar && ping.hasItemInRange) {
+      BattleAudio.playItemfinderSonar(ping.distance, ping.isFacingDirectly);
+    }
+  };
+
+  toggleLiveItemfinderRadar = (): boolean => {
+    if (gameState !== 'OVERWORLD' || isCutsceneLocked || overworldHUD.isDialogueOpen()) {
+      return itemfinderHUD.isActive();
+    }
+    const active = itemfinderHUD.toggle();
+    overworldHUD.updateRadarDisplay(active);
+    if (active) {
+      refreshItemfinderRadar(true);
+      const ping = itemfinderHUD.getLastPing();
+      if (!ping?.hasItemInRange) {
+        BattleAudio.playItemfinderSonar(null, false);
+      }
+    } else {
+      BattleAudio.playMenuSound('CANCEL');
+    }
+    return active;
+  };
+
   triggerItemfinderScan = () => {
     if (gameState !== 'OVERWORLD' || isCutsceneLocked || overworldHUD.isDialogueOpen()) return;
     const currentMap = mapManager.getCurrentMap();
     if (!currentMap) return;
+    itemfinderHUD.show();
+    overworldHUD.updateRadarDisplay(true);
+    const hiddenItems = overworldItemManager.getHiddenItemsForMap(currentMap.id, storyFlags);
+    const ping = ItemfinderRadar.scan(player.x, player.y, player.direction, hiddenItems, storyFlags);
+    itemfinderHUD.update(ping);
+    BattleAudio.playItemfinderSonar(ping.distance, ping.isFacingDirectly);
     const result = overworldItemManager.scanItemfinder(currentMap.id, player.x, player.y, 8);
     if (result && result.direction) {
-      BattleAudio.playItemfinderPing(true);
       overworldHUD.openDialogue(
         [`Yes! ITEMFINDER indicates there's an item nearby! It's ${result.direction}!`],
         '📡 ITEMFINDER'
       );
     } else {
-      BattleAudio.playItemfinderPing(false);
       overworldHUD.openDialogue(["... ... Nope! There's no response."], '📡 ITEMFINDER');
     }
   };
@@ -2944,6 +3055,11 @@ async function bootstrap() {
           if (tileType === 2) {
             overworldRenderer.spawnGrassRustle(coord.x, coord.y);
             BattleAudio.playOverworldSound('RUSTLE');
+          }
+
+          // Live Unbound-Style Itemfinder Radar Step Sweep
+          if (itemfinderHUD.isActive()) {
+            refreshItemfinderRadar(true);
           }
 
           // Step-based Egg Hatching (Ticket 5.4)

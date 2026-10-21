@@ -1,5 +1,23 @@
 import { Dex } from '@pkmn/dex';
-import type { PokemonInstance, MoveData, PokemonType, MoveCategory, StatusCondition, StatStages } from '../types/game';
+import type {
+  PokemonInstance,
+  MoveData,
+  PokemonType,
+  MoveCategory,
+  StatusCondition,
+  StatStages,
+  ExpShareMode,
+} from '../types/game';
+
+export interface PartyExpAward {
+  pokemon: PokemonInstance;
+  expAwarded: number;
+  isCapped: boolean;
+  isActiveBattler: boolean;
+  leveledUp: boolean;
+  newLevel: number;
+  levelCap: number;
+}
 
 export class PokemonFactory {
   public static createDefaultStatStages(): StatStages {
@@ -201,6 +219,104 @@ export class PokemonFactory {
     const baseYield = Math.max(45, Math.floor(baseExpSum * 0.25));
     const trainerMult = isTrainer ? 1.5 : 1.0;
     return Math.max(12, Math.floor((baseYield * defeated.level * trainerMult) / 5));
+  }
+
+  /**
+   * Soft Level Caps by Badge Count for Unbound-style Capped Exp. Share:
+   * Badge 0: Lv. 15 (Falkner Ace Lv. 13)
+   * Badge 1: Lv. 18 (Bugsy Ace Lv. 16)
+   * Badge 2: Lv. 22 (Whitney Ace Lv. 20)
+   * Badge 3: Lv. 27 (Morty Ace Lv. 25)
+   * Badge 4: Lv. 32 (Chuck Ace Lv. 30)
+   * Badge 5: Lv. 37 (Jasmine Ace Lv. 35)
+   * Badge 6: Lv. 37 (Pryce Ace Lv. 35)
+   * Badge 7: Lv. 42 (Clair Ace Lv. 40)
+   * Badge 8: Lv. 52 (Lance Ace Lv. 50)
+   * 16 Badges: Lv. 85 (Red Ace Lv. 81)
+   */
+  public static readonly LEVEL_CAPS_BY_BADGE: Record<number, number> = {
+    0: 15,
+    1: 18,
+    2: 22,
+    3: 27,
+    4: 32,
+    5: 37,
+    6: 37,
+    7: 42,
+    8: 52,
+    16: 85,
+  };
+
+  public static readonly GYM_ACE_LEVELS_BY_BADGE: Record<number, number> = {
+    0: 13,
+    1: 16,
+    2: 20,
+    3: 25,
+    4: 30,
+    5: 35,
+    6: 35,
+    7: 40,
+    8: 50,
+    16: 81,
+  };
+
+  public static getLevelCapForBadges(badgeCount: number): number {
+    const safeCount = Math.max(0, Math.floor(badgeCount || 0));
+    if (safeCount >= 16) return 85;
+    if (safeCount >= 9) return 85;
+    return this.LEVEL_CAPS_BY_BADGE[safeCount] ?? 52;
+  }
+
+  public static getGymAceLevelForBadges(badgeCount: number): number {
+    const safeCount = Math.max(0, Math.floor(badgeCount || 0));
+    if (safeCount >= 16) return 81;
+    if (safeCount >= 9) return 81;
+    return this.GYM_ACE_LEVELS_BY_BADGE[safeCount] ?? 50;
+  }
+
+  /**
+   * Distributes battle EXP across the party according to Unbound Exp. Share mode ('OFF' | 'ALL' | 'CAPPED').
+   * - OFF: Only the active battler gains 100% EXP.
+   * - ALL: Active battler gains 100% EXP; conscious non-egg bench members gain 50% split EXP.
+   * - CAPPED: Same as ALL, except any Pokémon at or above the current level cap has its EXP clamped to 1 EXP.
+   */
+  public static distributePartyExp(
+    party: PokemonInstance[],
+    activeBattler: PokemonInstance,
+    baseExpGained: number,
+    mode: ExpShareMode = 'CAPPED',
+    badgeCount: number = 0,
+    explicitLevelCap?: number
+  ): PartyExpAward[] {
+    const levelCap =
+      typeof explicitLevelCap === 'number' ? explicitLevelCap : this.getLevelCapForBadges(badgeCount);
+    const awards: PartyExpAward[] = [];
+
+    for (const member of party) {
+      if (member.isEgg || member.currentHp <= 0) continue;
+
+      const isActiveBattler = member === activeBattler || member.uid === activeBattler.uid;
+      if (mode === 'OFF' && !isActiveBattler) {
+        continue;
+      }
+
+      const rawShare = isActiveBattler ? baseExpGained : Math.max(1, Math.floor(baseExpGained * 0.5));
+      const isCapped = mode === 'CAPPED' && member.level >= levelCap;
+      const expAwarded = isCapped ? 1 : rawShare;
+
+      const levelResult = this.gainExp(member, expAwarded);
+      awards.push({
+        pokemon: member,
+        expAwarded,
+        isCapped,
+        isActiveBattler,
+        leveledUp: levelResult.leveledUp,
+        newLevel: levelResult.newLevel,
+        levelCap,
+      });
+    }
+
+    return awards;
   }
 
   /**

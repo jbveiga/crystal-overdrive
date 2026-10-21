@@ -615,7 +615,7 @@ export class BagAndMartUI {
             <span style="font-weight: 700; color: #38bdf8;">📡 ITEMFINDER</span>
             <span style="font-size: 10px; background: #0284c7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">KEY ITEM</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">Scans a 8-tile radar radius around you for hidden items and reports their compass bearing.</div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">A high-tech dowsing machine that detects hidden items within 8 paces and casts a live directional radar beam toward their location.</div>
         </div>
         <button class="use-itemfinder-btn" style="
           background: #0284c7;

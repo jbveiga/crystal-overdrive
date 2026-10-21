@@ -21,6 +21,8 @@ export type SpriteType =
   | 'oak';
 
 export type TouchControlStyle = 'DPAD' | 'JOYSTICK';
+export type ExpShareMode = 'OFF' | 'ALL' | 'CAPPED';
+export type ExpShareSetting = ExpShareMode;
 
 export interface GameOptions {
   soundVolume: number;      // 0.0 - 1.0 (default: 0.7)
@@ -30,6 +32,30 @@ export interface GameOptions {
   playerSpeedDefault: SpeedMultiplier; // (default: 1)
   battleSpeedMultiplier?: SpeedMultiplier; // (default: 1)
   touchControlStyle?: TouchControlStyle; // (default: 'DPAD')
+  expShare?: ExpShareMode;  // (default: 'CAPPED')
+}
+
+export interface RadarPing {
+  active: boolean;
+  hasItemInRange: boolean;
+  nearestItem: {
+    eventFlag: string;
+    itemId: string;
+    x: number;
+    y: number;
+    distance: number;
+    dx: number;
+    dy: number;
+  } | null;
+  distance: number | null;
+  dx: number;
+  dy: number;
+  bearing: 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'HERE' | 'NONE';
+  bearingAngleDeg: number; // 0 = East, 90 = South, 180 = West, 270 = North
+  angleRad: number;
+  isFacingTarget: boolean;
+  isFacingDirectly: boolean;
+  proximityBand: 'NONE' | 'FAR' | 'MEDIUM' | 'CLOSE' | 'FACING';
 }
 
 export interface SavePreview {

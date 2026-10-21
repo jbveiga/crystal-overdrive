@@ -1,5 +1,6 @@
-import type { SpeedMultiplier, TouchControlStyle } from '../types/game';
+import type { SpeedMultiplier, TouchControlStyle, ExpShareMode } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
+import { PokemonFactory } from '../battle/PokemonFactory';
 
 const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = [
   { id: 'cyndaquil', name: 'Cyndaquil', types: ['Fire'] },
@@ -43,6 +44,7 @@ export interface StartMenuStateProvider {
   getSpeedMultiplier?: () => SpeedMultiplier;
   isGamepadActive?: () => boolean;
   getTouchControlStyle?: () => TouchControlStyle;
+  getExpShareMode?: () => ExpShareMode;
 }
 
 export interface StartMenuCallbacks {
@@ -55,6 +57,8 @@ export interface StartMenuCallbacks {
   onCycleSpeed?: () => SpeedMultiplier;
   onToggleGamepad?: () => boolean;
   onToggleTouchControlStyle?: () => TouchControlStyle;
+  onCycleExpShareMode?: () => ExpShareMode;
+  onSetExpShareMode?: (mode: ExpShareMode) => ExpShareMode | void;
 }
 
 const JOHTO_BADGES = [
@@ -776,6 +780,29 @@ export class StartMenuUI {
       ? this.stateProvider.getTouchControlStyle()
       : 'DPAD';
     const isJoystick = controlStyle === 'JOYSTICK';
+    const expShareMode: ExpShareMode = this.stateProvider.getExpShareMode
+      ? this.stateProvider.getExpShareMode()
+      : 'CAPPED';
+    const currentBadges = this.stateProvider.getBadges ? this.stateProvider.getBadges().length : 0;
+    const currentLevelCap = PokemonFactory.getLevelCapForBadges(currentBadges);
+
+    const getExpShareButtonLabel = (mode: ExpShareMode) => {
+      if (mode === 'OFF') return 'EXP: OFF (Single Battler)';
+      if (mode === 'ALL') return 'EXP: ALL (Full Team 50%)';
+      return `EXP: 🧢 CAPPED (Lv. ${currentLevelCap})`;
+    };
+
+    const getExpShareButtonBg = (mode: ExpShareMode) => {
+      if (mode === 'OFF') return '#475569';
+      if (mode === 'ALL') return '#059669';
+      return '#7c3aed';
+    };
+
+    const getExpShareButtonBorder = (mode: ExpShareMode) => {
+      if (mode === 'OFF') return '#94a3b8';
+      if (mode === 'ALL') return '#34d399';
+      return '#c084fc';
+    };
 
     const rowStyle = 'background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;';
     const subLabelStyle = 'font-size:11px;color:#94a3b8;';
@@ -866,6 +893,62 @@ export class StartMenuUI {
             min-width: 130px;
           ">${isJoystick ? '🕹️ JOYSTICK (Analog)' : '🕹️ D-PAD (Buttons)'}</button>
         </div>
+
+        <!-- Unbound-Style Exp. Share Mode Toggle (OFF | ALL | CAPPED) -->
+        <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="${titleLabelStyle}">EXP. SHARE MODE</div>
+              <div style="${subLabelStyle}">Party EXP distribution & level caps</div>
+            </div>
+            <button id="settings-exp-share-btn" style="
+              background: ${getExpShareButtonBg(expShareMode)};
+              color: #ffffff;
+              border: 1px solid ${getExpShareButtonBorder(expShareMode)};
+              border-radius: 6px;
+              padding: 7px 12px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+              min-width: 130px;
+            ">${getExpShareButtonLabel(expShareMode)}</button>
+          </div>
+          <div id="settings-exp-segmented-group" style="display:flex;gap:6px;width:100%;">
+            <button id="settings-exp-off-btn" style="
+              flex: 1;
+              background: ${expShareMode === 'OFF' ? '#475569' : '#0f172a'};
+              color: ${expShareMode === 'OFF' ? '#ffffff' : '#94a3b8'};
+              border: 1px solid ${expShareMode === 'OFF' ? '#cbd5e1' : 'rgba(255,255,255,0.12)'};
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ OFF ]</button>
+            <button id="settings-exp-all-btn" style="
+              flex: 1;
+              background: ${expShareMode === 'ALL' ? '#059669' : '#0f172a'};
+              color: ${expShareMode === 'ALL' ? '#ffffff' : '#94a3b8'};
+              border: 1px solid ${expShareMode === 'ALL' ? '#34d399' : 'rgba(255,255,255,0.12)'};
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ ALL ]</button>
+            <button id="settings-exp-capped-btn" style="
+              flex: 1;
+              background: ${expShareMode === 'CAPPED' ? '#7c3aed' : '#0f172a'};
+              color: ${expShareMode === 'CAPPED' ? '#ffffff' : '#94a3b8'};
+              border: 1px solid ${expShareMode === 'CAPPED' ? '#c084fc' : 'rgba(255,255,255,0.12)'};
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ 🧢 CAPPED ]</button>
+          </div>
+        </div>
       </div>
 
       <button id="close-settings-btn" style="
@@ -885,8 +968,56 @@ export class StartMenuUI {
     const speedBtn = this.settingsModal.querySelector('#settings-speed-btn') as HTMLButtonElement;
     const gamepadBtn = this.settingsModal.querySelector('#settings-gamepad-btn') as HTMLButtonElement;
     const controlStyleBtn = this.settingsModal.querySelector('#settings-control-style-btn') as HTMLButtonElement;
+    const expShareBtn = this.settingsModal.querySelector('#settings-exp-share-btn') as HTMLButtonElement;
+    const expOffBtn = this.settingsModal.querySelector('#settings-exp-off-btn') as HTMLButtonElement;
+    const expAllBtn = this.settingsModal.querySelector('#settings-exp-all-btn') as HTMLButtonElement;
+    const expCappedBtn = this.settingsModal.querySelector('#settings-exp-capped-btn') as HTMLButtonElement;
     const closeBtn = this.settingsModal.querySelector('#close-settings-btn') as HTMLButtonElement;
     const closeXBtn = this.settingsModal.querySelector('#close-settings-x-btn') as HTMLButtonElement;
+
+    let activeExpMode: ExpShareMode = expShareMode;
+    const syncExpShareButtons = (mode: ExpShareMode) => {
+      activeExpMode = mode;
+      expShareBtn.innerText = getExpShareButtonLabel(mode);
+      expShareBtn.style.background = getExpShareButtonBg(mode);
+      expShareBtn.style.borderColor = getExpShareButtonBorder(mode);
+
+      expOffBtn.style.background = mode === 'OFF' ? '#475569' : '#0f172a';
+      expOffBtn.style.color = mode === 'OFF' ? '#ffffff' : '#94a3b8';
+      expOffBtn.style.borderColor = mode === 'OFF' ? '#cbd5e1' : 'rgba(255,255,255,0.12)';
+
+      expAllBtn.style.background = mode === 'ALL' ? '#059669' : '#0f172a';
+      expAllBtn.style.color = mode === 'ALL' ? '#ffffff' : '#94a3b8';
+      expAllBtn.style.borderColor = mode === 'ALL' ? '#34d399' : 'rgba(255,255,255,0.12)';
+
+      expCappedBtn.style.background = mode === 'CAPPED' ? '#7c3aed' : '#0f172a';
+      expCappedBtn.style.color = mode === 'CAPPED' ? '#ffffff' : '#94a3b8';
+      expCappedBtn.style.borderColor = mode === 'CAPPED' ? '#c084fc' : 'rgba(255,255,255,0.12)';
+    };
+
+    const applyExpMode = (nextMode: ExpShareMode) => {
+      BattleAudio.playMenuSound('CONFIRM');
+      if (this.callbacks.onSetExpShareMode) {
+        this.callbacks.onSetExpShareMode(nextMode);
+      }
+      syncExpShareButtons(nextMode);
+    };
+
+    expShareBtn.addEventListener('click', () => {
+      if (this.callbacks.onCycleExpShareMode) {
+        const cycled = this.callbacks.onCycleExpShareMode();
+        BattleAudio.playMenuSound('CONFIRM');
+        syncExpShareButtons(cycled);
+      } else {
+        const order: ExpShareMode[] = ['OFF', 'ALL', 'CAPPED'];
+        const nextMode = order[(order.indexOf(activeExpMode) + 1) % order.length];
+        applyExpMode(nextMode);
+      }
+    });
+
+    expOffBtn.addEventListener('click', () => applyExpMode('OFF'));
+    expAllBtn.addEventListener('click', () => applyExpMode('ALL'));
+    expCappedBtn.addEventListener('click', () => applyExpMode('CAPPED'));
 
     soundBtn.addEventListener('click', () => {
       if (this.callbacks.onToggleMute) {

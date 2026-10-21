@@ -2928,7 +2928,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'fat_man',
         '🔍 ITEM COLLECTOR',
         [
-          'Take this ITEMFINDER! It beeps whenever valuable items are buried underground near you!',
+          "There are countless items hidden in the grass, rocks, and ruins of Johto that aren't obvious to the naked eye.",
+          'This upgraded dowsing machine projects a real-time radar beam pointing straight toward buried treasures within 8 paces!',
         ]
       ),
     ],

@@ -190,6 +190,8 @@ const mockDoc = new MockDocument();
 import { StartMenuUI } from '../src/ui/StartMenuUI';
 import { BagAndMartUI } from '../src/ui/BagAndMartUI';
 import { OverworldHUD } from '../src/ui/OverworldHUD';
+import { ItemfinderHUD } from '../src/ui/ItemfinderHUD';
+import { ItemfinderRadar } from '../src/world/ItemfinderRadar';
 import { BattleHUD } from '../src/ui/BattleHUD';
 import { TitleScreenUI } from '../src/ui/TitleScreenUI';
 import { MissionLogUI } from '../src/ui/MissionLogUI';
@@ -690,6 +692,73 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       const toast = mockDoc.querySelector('#overworld-toast-banner') as MockElement;
       expect(toast.style.display).toBe('block');
       expect(toast.innerHTML).toContain('MISSION COMPLETED');
+    });
+
+    it('renders EXP. SHARE MODE controls in StartMenuUI Settings and updates ItemfinderHUD states (TICKET-KEY-ITEMS-UNBOUND-01)', () => {
+      let currentExpMode: 'OFF' | 'ALL' | 'CAPPED' = 'CAPPED';
+      const ui = new StartMenuUI(
+        'modal-container',
+        {
+          getTrainerName: () => 'GOLD',
+          getMoney: () => 3000,
+          getBadges: () => ['zephyr'],
+          getPartyCount: () => 1,
+          getCaughtCount: () => 1,
+          getPlayTimeSeconds: () => 120,
+          getMapName: () => 'Violet City',
+          getExpShareMode: () => currentExpMode,
+          getLevelCap: () => 18,
+          getGymAceLevel: () => 16,
+        },
+        {
+          onOpenParty: vi.fn(),
+          onOpenBag: vi.fn(),
+          onOpenPokegear: vi.fn(),
+          onSaveGame: vi.fn(),
+          onSetExpShareMode: (mode) => {
+            currentExpMode = mode;
+            return currentExpMode;
+          },
+        }
+      );
+
+      ui.open();
+      (mockDoc.querySelector('#start-opt-settings') as MockElement).click();
+
+      const cycleBtn = mockDoc.querySelector('#settings-exp-share-btn') as MockElement;
+      const offBtn = mockDoc.querySelector('#settings-exp-off-btn') as MockElement;
+      const allBtn = mockDoc.querySelector('#settings-exp-all-btn') as MockElement;
+      const cappedBtn = mockDoc.querySelector('#settings-exp-capped-btn') as MockElement;
+
+      expect(cycleBtn).not.toBeNull();
+      expect(offBtn).not.toBeNull();
+      expect(allBtn).not.toBeNull();
+      expect(cappedBtn).not.toBeNull();
+
+      offBtn.click();
+      expect(currentExpMode).toBe('OFF');
+
+      allBtn.click();
+      expect(currentExpMode).toBe('ALL');
+
+      cappedBtn.click();
+      expect(currentExpMode).toBe('CAPPED');
+
+      // Test ItemfinderHUD capsule
+      const radarHud = new ItemfinderHUD('overworld-hud-container');
+      radarHud.show();
+      expect(radarHud.isActive()).toBe(true);
+
+      const ping = ItemfinderRadar.scan(
+        10,
+        7,
+        'UP',
+        [{ eventFlag: 'hidden_1', itemId: 'rare_candy', x: 10, y: 6 }],
+        new Set()
+      );
+      radarHud.update(ping);
+      const distLabel = mockDoc.querySelector('#itemfinder-distance-label') as MockElement;
+      expect(distLabel.innerText).toBe('RIGHT HERE!');
     });
   });
 });

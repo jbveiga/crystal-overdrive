@@ -102,7 +102,7 @@ export class SaveManager {
   }
 
   /**
-   * Returns canonical default GameOptions (Ticket 4.1).
+   * Returns canonical default GameOptions (Ticket 4.1 & TICKET-KEY-ITEMS-UNBOUND-01).
    */
   public static getDefaultOptions(): GameOptions {
     return {
@@ -113,6 +113,7 @@ export class SaveManager {
       playerSpeedDefault: 1,
       battleSpeedMultiplier: 1,
       touchControlStyle: 'DPAD',
+      expShare: 'CAPPED',
     };
   }
 
@@ -158,13 +159,24 @@ export class SaveManager {
 
   public async loadGame(): Promise<SaveData | null> {
     try {
+      let loaded: SaveData | null = null;
       if (this.dbPromise) {
         const db = await this.dbPromise;
         const save = await db.get(STORE_NAME, SAVE_KEY);
-        if (save) return save;
+        if (save) loaded = save;
       }
-      const memSave = this.memoryStore.get(SAVE_KEY);
-      return memSave ? JSON.parse(JSON.stringify(memSave)) : null;
+      if (!loaded) {
+        const memSave = this.memoryStore.get(SAVE_KEY);
+        loaded = memSave ? JSON.parse(JSON.stringify(memSave)) : null;
+      }
+      if (loaded) {
+        if (!loaded.options) {
+          loaded.options = SaveManager.getDefaultOptions();
+        } else if (!loaded.options.expShare) {
+          loaded.options.expShare = 'CAPPED';
+        }
+      }
+      return loaded;
     } catch (err) {
       console.error('Failed to load game from IndexedDB:', err);
       return this.memoryStore.get(SAVE_KEY) || null;

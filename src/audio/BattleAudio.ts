@@ -567,4 +567,61 @@ export class BattleAudio {
       osc.stop(now + 0.14);
     }
   }
+
+  /**
+   * Plays dynamic proximity sonar ping for Unbound-style Live Itemfinder Radar:
+   * f(d) = 880 + (8 - d) * 120 Hz with 80ms exponential decay, or double lock-on chime when facing/on target.
+   */
+  public static playItemfinderSonar(distance: number | null, isFacing: boolean = false): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    if (distance === null || distance > 8) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, now);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
+      return;
+    }
+
+    const clamped = Math.max(0, Math.min(8, distance));
+    const baseFreq = Math.round(880 + (8 - clamped) * 120);
+
+    if (isFacing || clamped <= 1) {
+      [0, 0.11].forEach((offset, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(baseFreq + idx * 240, now + offset);
+        gain.gain.setValueAtTime(0.07, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + offset);
+        osc.stop(now + offset + 0.08);
+      });
+    } else {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(baseFreq, now);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.12, now + 0.08);
+      gain.gain.setValueAtTime(0.06, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    }
+  }
 }
