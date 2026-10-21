@@ -246,6 +246,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
             level: 4,
             moves: ['tackle', 'tailwhip', 'quickattack'],
           },
+          trainerTeam: [
+            {
+              speciesId: 'rattata',
+              level: 4,
+              moves: ['tackle', 'tailwhip', 'quickattack'],
+            },
+          ],
         }
       ),
       makeNpc(
@@ -343,10 +350,17 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
             'Then you have to battle!',
           ],
           trainerPokemon: {
-            speciesId: 'hoot-hoot',
+            speciesId: 'hoothoot',
             level: 4,
             moves: ['tackle', 'growl', 'peck', 'hypnosis'],
           },
+          trainerTeam: [
+            {
+              speciesId: 'hoothoot',
+              level: 4,
+              moves: ['tackle', 'growl', 'peck', 'hypnosis'],
+            },
+          ],
         }
       ),
       makeNpc(
@@ -373,6 +387,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
             level: 3,
             moves: ['tackle', 'stringshot'],
           },
+          trainerTeam: [
+            {
+              speciesId: 'caterpie',
+              level: 3,
+              moves: ['tackle', 'stringshot'],
+            },
+          ],
         }
       ),
       makeNpc(
@@ -414,6 +435,28 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
             level: 4,
             moves: ['poisonsting', 'stringshot', 'tackle'],
           },
+          trainerTeam: [
+            {
+              speciesId: 'caterpie',
+              level: 2,
+              moves: ['tackle', 'stringshot'],
+            },
+            {
+              speciesId: 'caterpie',
+              level: 2,
+              moves: ['tackle', 'stringshot'],
+            },
+            {
+              speciesId: 'weedle',
+              level: 3,
+              moves: ['poisonsting', 'stringshot'],
+            },
+            {
+              speciesId: 'caterpie',
+              level: 2,
+              moves: ['tackle', 'stringshot'],
+            },
+          ],
         }
       ),
       makeNpc('r31_sleepy_man', 17, 7, 'DOWN', 'fat_man', '😴 SLEEPY MAN', [
@@ -744,6 +787,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
             level: 6,
             moves: ['vinewhip', 'growth'],
           },
+          trainerTeam: [
+            {
+              speciesId: 'bellsprout',
+              level: 6,
+              moves: ['vinewhip', 'growth'],
+            },
+          ],
         }
       ),
       makeNpc(
@@ -769,6 +819,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
             level: 6,
             moves: ['vinewhip', 'growth'],
           },
+          trainerTeam: [
+            {
+              speciesId: 'bellsprout',
+              level: 6,
+              moves: ['vinewhip', 'growth'],
+            },
+          ],
         }
       ),
       makeNpc(
