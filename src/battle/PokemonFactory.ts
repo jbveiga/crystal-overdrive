@@ -20,6 +20,8 @@ export interface PartyExpAward {
 }
 
 export class PokemonFactory {
+  private static learnsetCache = new Map<string, Record<string, string[]>>();
+
   public static createDefaultStatStages(): StatStages {
     return { atk: 0, def: 0, spa: 0, spd: 0, spe: 0, acc: 0, eva: 0 };
   }
@@ -95,6 +97,52 @@ export class PokemonFactory {
       secondaryStatus,
       statChanges,
     };
+  }
+
+  /**
+   * Checks whether a Pokémon species can learn a specific move in Gen 2.
+   * Traverses current species and pre-evolution chain using Showdown Gen 2 Dex.
+   */
+  public static async canLearnMove(speciesId: string, moveId: string): Promise<boolean> {
+    const dexMove = Dex.moves.get(moveId);
+    if (!dexMove.exists) return false;
+    const normalizedMoveId = dexMove.id;
+
+    const gen2 = Dex.forGen(2);
+    let currentSpecies = gen2.species.get(speciesId);
+    if (!currentSpecies.exists) {
+      currentSpecies = Dex.species.get(speciesId);
+      if (!currentSpecies.exists) return false;
+    }
+
+    let curr: any = currentSpecies;
+    while (curr && curr.exists) {
+      let lsMap = PokemonFactory.learnsetCache.get(curr.id);
+      if (!lsMap) {
+        try {
+          const ls = await gen2.learnsets.get(curr.id);
+          if (ls && ls.learnset) {
+            lsMap = ls.learnset as Record<string, string[]>;
+            PokemonFactory.learnsetCache.set(curr.id, lsMap);
+          }
+        } catch {
+          // Fallback if learnset cannot be loaded
+        }
+      }
+
+      if (lsMap && lsMap[normalizedMoveId]) {
+        const sources = lsMap[normalizedMoveId];
+        // In Gen 2, moves learned in Gen 2 ('2M', '2L', '2T', '2E', etc.) or Gen 1 transfer ('1M', '1L', etc.)
+        if (Array.isArray(sources) && sources.some((s) => s.startsWith('2') || s.startsWith('1'))) {
+          return true;
+        }
+      }
+
+      if (!curr.prevo) break;
+      curr = gen2.species.get(curr.prevo);
+    }
+
+    return false;
   }
 
   /**

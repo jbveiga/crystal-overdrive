@@ -1,7 +1,8 @@
-import type { PokemonInstance, PokeballId, MedicineId, SpeedMultiplier } from '../types/game';
+import type { PokemonInstance, PokeballId, MedicineId, SpeedMultiplier, MoveData } from '../types/game';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { BattleAudio } from '../audio/BattleAudio';
 import { OverworldItemManager } from '../world/OverworldItemManager';
+import { MoveReplacementModalUI } from './MoveReplacementModalUI';
 
 export interface BagInventory {
   balls: Partial<Record<PokeballId, number>>;
@@ -244,6 +245,7 @@ export class BagAndMartUI {
   private inventory: BagInventory;
   private party: PokemonInstance[];
   private selectedPartyIndex: number = 0;
+  private activeTeachingTM: TMDefinition | null = null;
   private speedMultiplier: SpeedMultiplier = 1;
   private onInventoryChanged?: () => void;
   private onUseItemfinder?: () => void;
@@ -757,15 +759,167 @@ export class BagAndMartUI {
     return true;
   }
 
-  private renderTMsTab(): void {
+  public setActiveTeachingTM(tm: TMDefinition | null): void {
+    this.activeTeachingTM = tm;
+    this.renderTMsTab();
+  }
+
+  private async renderTMsTab(): Promise<void> {
     const container = this.bagModal.querySelector('#bag-content') as HTMLDivElement;
     container.innerHTML = '';
+
+    if (this.activeTeachingTM) {
+      const tm = this.activeTeachingTM;
+      // Party Compatibility View
+      const headerBox = document.createElement('div');
+      headerBox.style.cssText = `
+        background: rgba(15, 23, 42, 0.9);
+        border: 1.5px solid #38bdf8;
+        border-radius: 8px;
+        padding: 12px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      `;
+      headerBox.innerHTML = `
+        <div style="flex: 1;">
+          <div style="font-size: 10px; font-weight: 800; color: #38bdf8; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">
+            PARTY COMPATIBILITY // SELECT POKÉMON TO TEACH:
+          </div>
+          <div style="font-size: 16px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+            <span>${tm.id}: ${tm.name}</span>
+            <span style="font-size: 10px; background: #334155; padding: 2px 6px; border-radius: 4px; color: #cbd5e1;">${tm.type.toUpperCase()}</span>
+            <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">INFINITE USE</span>
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">${tm.desc}</div>
+        </div>
+        <button id="btn-back-to-tms" style="
+          background: #334155;
+          color: #f8fafc;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 6px;
+          padding: 8px 14px;
+          font-size: 12px;
+          font-weight: 800;
+          cursor: pointer;
+          white-space: nowrap;
+        ">← BACK TO TM LIST</button>
+      `;
+
+      headerBox.querySelector('#btn-back-to-tms')?.addEventListener('click', () => {
+        BattleAudio.playMenuSound('CANCEL');
+        this.activeTeachingTM = null;
+        this.renderTMsTab();
+      });
+
+      container.appendChild(headerBox);
+
+      const partyListContainer = document.createElement('div');
+      partyListContainer.id = 'party-compatibility-list';
+      partyListContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px; margin-top: 4px;';
+      container.appendChild(partyListContainer);
+
+      for (let i = 0; i < this.party.length; i++) {
+        const pkmn = this.party[i];
+        const alreadyKnows = pkmn.moves.some((m) => m.moveId === tm.moveId);
+        const canLearn = await PokemonFactory.canLearnMove(pkmn.speciesId, tm.moveId);
+        const movesSummary = pkmn.moves
+          .map((m) => {
+            try {
+              return PokemonFactory.getMoveData(m.moveId).name;
+            } catch {
+              return m.moveId.toUpperCase();
+            }
+          })
+          .join(' • ');
+
+        const card = document.createElement('div');
+        card.className = 'party-compat-card';
+        card.style.cssText = `
+          background: #1e293b;
+          border: 1.5px solid ${alreadyKnows ? 'rgba(56, 189, 248, 0.3)' : canLearn ? 'rgba(34, 197, 94, 0.4)' : 'rgba(100, 116, 139, 0.2)'};
+          border-radius: 8px;
+          padding: 10px 14px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          opacity: ${canLearn || alreadyKnows ? '1' : '0.65'};
+        `;
+
+        const badgeHtml = alreadyKnows
+          ? `<span class="compat-badge-learned" style="
+              background: #0284c7;
+              color: white;
+              padding: 6px 12px;
+              border-radius: 6px;
+              font-weight: 800;
+              font-size: 11px;
+              white-space: nowrap;
+            ">LEARNED ✓</span>`
+          : canLearn
+            ? `<button class="teach-pokemon-btn" data-index="${i}" style="
+                background: #16a34a;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 8px 14px;
+                font-weight: 800;
+                font-size: 12px;
+                cursor: pointer;
+                white-space: nowrap;
+              ">ABLE — TEACH</button>`
+            : `<span class="compat-badge-not-able" style="
+                background: #334155;
+                color: #94a3b8;
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-weight: 700;
+                font-size: 11px;
+                white-space: nowrap;
+              ">NOT ABLE</span>`;
+
+        card.innerHTML = `
+          <div style="flex: 1;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <span style="font-weight: 800; font-size: 14px; color: #ffffff;">${pkmn.nickname}</span>
+              <span style="font-size: 11px; color: #38bdf8; font-weight: 700;">Lv. ${pkmn.level}</span>
+              <span style="font-size: 11px; color: #cbd5e1;">HP: ${pkmn.currentHp}/${pkmn.stats.hp}</span>
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; margin-top: 3px;">
+              Moves: <span style="color: #e2e8f0;">${movesSummary}</span>
+            </div>
+          </div>
+          <div>${badgeHtml}</div>
+        `;
+
+        if (canLearn && !alreadyKnows) {
+          const btn = card.querySelector('.teach-pokemon-btn') as HTMLButtonElement;
+          btn?.addEventListener('click', async () => {
+            await this.teachTM(tm, pkmn);
+          });
+        }
+
+        partyListContainer.appendChild(card);
+      }
+      return;
+    }
 
     this.renderPartyTargetSelector(container, () => this.renderTMsTab());
 
     const targetPkmn = this.party[this.selectedPartyIndex] || this.party[0];
     if (targetPkmn) {
-      const movesSummary = targetPkmn.moves.map((m) => PokemonFactory.getMoveData(m.moveId).name).join(' • ');
+      const movesSummary = targetPkmn.moves
+        .map((m) => {
+          try {
+            return PokemonFactory.getMoveData(m.moveId).name;
+          } catch {
+            return m.moveId.toUpperCase();
+          }
+        })
+        .join(' • ');
       const partyInfo = document.createElement('div');
       partyInfo.style.cssText = `
         background: rgba(30, 41, 59, 0.7);
@@ -794,8 +948,6 @@ export class BagAndMartUI {
         desc: `Teaches ${OverworldItemManager.formatItemName(tmId)} to a compatible Pokémon.`,
       };
 
-      const alreadyKnows = targetPkmn?.moves.some((m) => m.moveId === tm.moveId) ?? false;
-
       const card = document.createElement('div');
       card.style.cssText = CARD_STYLE;
 
@@ -809,24 +961,24 @@ export class BagAndMartUI {
           </div>
           <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">${tm.desc}</div>
         </div>
-        <button style="
-          background: ${alreadyKnows ? '#334155' : '#2563eb'};
-          color: ${alreadyKnows ? '#94a3b8' : 'white'};
+        <button class="teach-tm-btn" style="
+          background: #2563eb;
+          color: white;
           border: none;
           border-radius: 6px;
           padding: 8px 14px;
           font-weight: 700;
           font-size: 12px;
-          cursor: ${alreadyKnows ? 'default' : 'pointer'};
-        ">${alreadyKnows ? 'LEARNED ✓' : 'TEACH'}</button>
+          cursor: pointer;
+        ">TEACH</button>
       `;
 
-      const teachBtn = card.querySelector('button') as HTMLButtonElement;
-      if (!alreadyKnows) {
-        teachBtn.addEventListener('click', () => {
-          this.teachTM(tm, targetPkmn);
-        });
-      }
+      const teachBtn = card.querySelector('.teach-tm-btn') as HTMLButtonElement;
+      teachBtn.addEventListener('click', () => {
+        BattleAudio.playMenuSound('CURSOR');
+        this.activeTeachingTM = tm;
+        this.renderTMsTab();
+      });
 
       container.appendChild(card);
     }
@@ -874,7 +1026,7 @@ export class BagAndMartUI {
 
     const currentBadges = this.inventory.badges.length;
 
-    // Badge Progression Control Bar
+    // Badge Progression Display (Read-only, reflecting actual player achievements)
     const badgeBar = document.createElement('div');
     badgeBar.style.cssText = `
       background: rgba(30, 41, 59, 0.85);
@@ -890,37 +1042,13 @@ export class BagAndMartUI {
 
     badgeBar.innerHTML = `
       <div style="font-size: 12px; font-weight: 700; color: #cbd5e1;">
-        🏅 Gym Badges (Unlocks Modern Pokéballs):
+        🏅 Gym Badges Earned: <strong style="color: #38bdf8;">${currentBadges} / 8</strong>
       </div>
-      <div id="badge-tier-btns" style="display: flex; gap: 6px;"></div>
+      <div style="font-size: 11px; color: #94a3b8;">
+        New badges unlock specialty Pokéballs.
+      </div>
     `;
     container.appendChild(badgeBar);
-
-    const tierContainer = badgeBar.querySelector('#badge-tier-btns') as HTMLDivElement;
-    const badgeTiers = [0, 1, 3, 5, 8];
-    for (const tier of badgeTiers) {
-      const btn = document.createElement('button');
-      const isSelected = currentBadges === tier;
-      btn.style.cssText = `
-        background: ${isSelected ? '#0d9488' : '#334155'};
-        color: ${isSelected ? '#ffffff' : '#94a3b8'};
-        border: 1px solid ${isSelected ? '#2dd4bf' : 'transparent'};
-        border-radius: 5px;
-        padding: 4px 9px;
-        font-size: 11px;
-        font-weight: 800;
-        cursor: pointer;
-      `;
-      btn.innerText = `${tier}`;
-      btn.addEventListener('click', () => {
-        BattleAudio.playMenuSound('CONFIRM');
-        this.inventory.badges = Array.from({ length: tier }, (_, i) => `Badge_${i + 1}`);
-        this.updateHeaderDisplay();
-        this.renderMartTab();
-        if (this.onInventoryChanged) this.onInventoryChanged();
-      });
-      tierContainer.appendChild(btn);
-    }
 
     // Medicine Section Header
     const medHeader = document.createElement('div');
@@ -984,22 +1112,14 @@ export class BagAndMartUI {
     ballHeader.innerText = '🔴 SPECIALTY & STANDARD POKÉ BALLS';
     container.appendChild(ballHeader);
 
-    for (const item of MART_POKEBALL_CATALOG) {
-      const isUnlocked = currentBadges >= item.requiredBadges;
+    // Only render available balls unlocked by badge count (completely hide locked items)
+    const availableBalls = MART_POKEBALL_CATALOG.filter((item) => currentBadges >= item.requiredBadges);
+
+    for (const item of availableBalls) {
       const ownedCount = this.inventory.balls[item.id] ?? 0;
 
       const card = document.createElement('div');
-      card.style.cssText = `
-        background: ${isUnlocked ? '#1e293b' : 'rgba(15, 23, 42, 0.6)'};
-        border: 1px solid ${isUnlocked ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.04)'};
-        border-radius: 8px;
-        padding: 12px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        opacity: ${isUnlocked ? '1' : '0.55'};
-      `;
+      card.style.cssText = CARD_STYLE;
 
       card.innerHTML = `
         <div style="flex: 1;">
@@ -1010,58 +1130,43 @@ export class BagAndMartUI {
           </div>
           <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">${item.desc}</div>
         </div>
-        <div>
-          ${
-            isUnlocked
-              ? `<button class="buy-ball-btn" style="
-                  background: #16a34a;
-                  color: white;
-                  border: none;
-                  border-radius: 6px;
-                  padding: 8px 12px;
-                  font-weight: 800;
-                  font-size: 12px;
-                  cursor: pointer;
-                ">BUY $${item.price}</button>`
-              : `<span style="
-                  font-size: 11px;
-                  font-weight: 800;
-                  background: #334155;
-                  color: #94a3b8;
-                  padding: 6px 10px;
-                  border-radius: 6px;
-                  white-space: nowrap;
-                ">🔒 ${item.requiredBadges} BADGE${item.requiredBadges > 1 ? 'S' : ''}</span>`
-          }
-        </div>
+        <button class="buy-ball-btn" style="
+          background: #16a34a;
+          color: white;
+          border: none;
+          border-radius: 6px;
+          padding: 8px 12px;
+          font-weight: 800;
+          font-size: 12px;
+          cursor: pointer;
+        ">BUY $${item.price}</button>
       `;
 
-      if (isUnlocked) {
-        const buyBtn = card.querySelector('.buy-ball-btn') as HTMLButtonElement;
-        buyBtn.addEventListener('click', () => {
-          if (this.inventory.money < item.price) {
-            BattleAudio.playMenuSound('CANCEL');
-            this.showFeedback(`Not enough money to buy ${item.name}! ($${item.price} required)`, true);
-            return;
-          }
-          BattleAudio.playMenuSound('CONFIRM');
-          this.inventory.money -= item.price;
-          this.inventory.balls[item.id] = (this.inventory.balls[item.id] ?? 0) + 1;
-          this.updateHeaderDisplay();
-          this.showFeedback(`Purchased 1x ${item.name}! (Now holding x${this.inventory.balls[item.id]})`);
-          this.renderMartTab();
-          if (this.onInventoryChanged) this.onInventoryChanged();
-        });
-      }
+      const buyBtn = card.querySelector('.buy-ball-btn') as HTMLButtonElement;
+      buyBtn.addEventListener('click', () => {
+        if (this.inventory.money < item.price) {
+          BattleAudio.playMenuSound('CANCEL');
+          this.showFeedback(`Not enough money to buy ${item.name}! ($${item.price} required)`, true);
+          return;
+        }
+        BattleAudio.playMenuSound('CONFIRM');
+        this.inventory.money -= item.price;
+        this.inventory.balls[item.id] = (this.inventory.balls[item.id] ?? 0) + 1;
+        this.updateHeaderDisplay();
+        this.showFeedback(`Purchased 1x ${item.name}! (Now holding x${this.inventory.balls[item.id]})`);
+        this.renderMartTab();
+        if (this.onInventoryChanged) this.onInventoryChanged();
+      });
 
       container.appendChild(card);
     }
   }
 
   /**
-   * Teaches an Infinite TM to the selected party Pokémon
+   * Teaches an Infinite TM to the selected party Pokémon.
+   * If the Pokémon has 4 moves, opens MoveReplacementModalUI to choose which move to forget.
    */
-  private teachTM(tm: TMDefinition, target: PokemonInstance | undefined = this.party[0]): void {
+  public async teachTM(tm: TMDefinition, target: PokemonInstance | undefined = this.party[0]): Promise<void> {
     if (!target) return;
 
     const alreadyKnows = target.moves.some((m) => m.moveId === tm.moveId);
@@ -1071,8 +1176,30 @@ export class BagAndMartUI {
       return;
     }
 
-    const moveData = PokemonFactory.getMoveData(tm.moveId);
-    BattleAudio.playMenuSound('HEAL');
+    const canLearn = await PokemonFactory.canLearnMove(target.speciesId, tm.moveId);
+    if (!canLearn) {
+      BattleAudio.playMenuSound('CANCEL');
+      this.showFeedback(`${target.nickname} cannot learn ${tm.name}!`, true);
+      return;
+    }
+
+    let moveData: MoveData;
+    try {
+      moveData = PokemonFactory.getMoveData(tm.moveId);
+    } catch {
+      moveData = {
+        id: tm.moveId,
+        name: tm.name,
+        type: tm.type as any,
+        category: 'Physical',
+        power: 50,
+        accuracy: 100,
+        pp: 20,
+        priority: 0,
+        leavesOneHp: false,
+        trapsTarget: false,
+      };
+    }
 
     if (target.moves.length < 4) {
       target.moves.push({
@@ -1080,22 +1207,40 @@ export class BagAndMartUI {
         currentPp: moveData.pp,
         maxPp: moveData.pp,
       });
+      BattleAudio.playMenuSound('HEAL');
       this.showFeedback(`✨ ${target.nickname} learned ${tm.name}! (TM ${tm.id} remains intact)`);
+      this.renderTMsTab();
+      if (this.onInventoryChanged) {
+        this.onInventoryChanged();
+      }
     } else {
-      const replacedMove = target.moves[3];
-      target.moves[3] = {
-        moveId: moveData.id,
-        currentPp: moveData.pp,
-        maxPp: moveData.pp,
-      };
-      this.showFeedback(
-        `✨ 1, 2, and... Poof! ${target.nickname} replaced ${replacedMove.moveId.toUpperCase()} with ${tm.name}!`
-      );
-    }
+      const modal = new MoveReplacementModalUI(this.container);
+      const chosenSlot = await modal.open(target, moveData);
 
-    this.renderTMsTab();
-    if (this.onInventoryChanged) {
-      this.onInventoryChanged();
+      if (chosenSlot !== null && chosenSlot >= 0 && chosenSlot < 4) {
+        const replacedMove = target.moves[chosenSlot];
+        let replacedName = replacedMove.moveId.toUpperCase();
+        try {
+          replacedName = PokemonFactory.getMoveData(replacedMove.moveId).name.toUpperCase();
+        } catch {}
+
+        target.moves[chosenSlot] = {
+          moveId: moveData.id,
+          currentPp: moveData.pp,
+          maxPp: moveData.pp,
+        };
+        BattleAudio.playMenuSound('HEAL');
+        this.showFeedback(
+          `✨ 1, 2, and... Poof! ${target.nickname} forgot ${replacedName} and learned ${tm.name}!`
+        );
+        this.renderTMsTab();
+        if (this.onInventoryChanged) {
+          this.onInventoryChanged();
+        }
+      } else {
+        BattleAudio.playMenuSound('CANCEL');
+        this.showFeedback(`${target.nickname} did not learn ${tm.name}.`);
+      }
     }
   }
 }

@@ -1,6 +1,7 @@
 import type { PokemonInstance, PokemonStorageState } from '../types/game';
 import { StorageManager, BoxManager } from '../world/StorageManager';
 import { BattleAudio } from '../audio/BattleAudio';
+import { PokemonFactory } from '../battle/PokemonFactory';
 
 export interface BoxManagementCallbacks {
   onSave?: (party: PokemonInstance[], storage: PokemonStorageState) => void;
@@ -231,13 +232,114 @@ export class BoxManagementUI {
       return;
     }
 
-    const confirmed = typeof window !== 'undefined' && typeof window.confirm === 'function'
-      ? window.confirm(
-          `Are you sure you want to release ${pkmn.nickname || pkmn.speciesId.toUpperCase()} (Lv. ${pkmn.level})?\n\nBye-bye, ${pkmn.nickname}!`
-        )
-      : true;
+    this.showReleaseConfirmModal(pkmn);
+  }
 
-    if (confirmed) {
+  private showReleaseConfirmModal(pkmn: PokemonInstance): void {
+    if (!this.rootElement) return;
+
+    // Remove any previous confirm modal
+    const prev = this.rootElement.querySelector('#release-confirm-modal');
+    if (prev) {
+      if ((prev as any).remove) (prev as any).remove();
+      else prev.parentNode?.removeChild(prev);
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'release-confirm-modal';
+    modal.className = 'interactive';
+    modal.style.cssText = `
+      position: absolute;
+      inset: 0;
+      background: rgba(13, 19, 34, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      pointer-events: auto !important;
+    `;
+
+    const card = document.createElement('div');
+    card.id = 'release-confirm-card';
+    card.className = 'interactive';
+    card.style.cssText = `
+      background: #0D1322;
+      border: 2px solid #EE4238;
+      border-radius: 8px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9);
+      padding: 20px;
+      width: min(440px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      color: #F6F8F3;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      pointer-events: auto !important;
+    `;
+
+    const pAny = pkmn as any;
+    const genderText = pAny.gender ? ` • ${pAny.gender === 'M' ? 'Male ♂' : 'Female ♀'}` : '';
+
+    card.innerHTML = `
+      <div style="font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 800; color: #EE4238; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+        ⚠️ RELEASE CONFIRMATION
+      </div>
+      <div style="font-size: 14px; color: #F6F8F3; font-weight: 700;">
+        Are you sure you want to release <span style="color: #FFD028;">${pkmn.nickname || pkmn.speciesId.toUpperCase()}</span>?
+        <div style="font-size: 12px; color: #8A9BA8; font-weight: 500; margin-top: 4px;">
+          (Level ${pkmn.level}${genderText} • ${pkmn.speciesId.toUpperCase()})
+        </div>
+      </div>
+      <div style="font-size: 12px; color: #CBD5E1; line-height: 1.5; background: rgba(238, 66, 56, 0.1); border-left: 3px solid #EE4238; padding: 8px 12px; border-radius: 4px;">
+        "Once released, ${pkmn.nickname || pkmn.speciesId.toUpperCase()} will be gone forever. This action cannot be undone."
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px;">
+        <button id="btn-keep-pokemon" style="
+          background: #FFD028;
+          color: #0D1322;
+          font-family: 'Space Mono', monospace;
+          font-size: 12px;
+          font-weight: 800;
+          padding: 10px 16px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+        ">KEEP POKÉMON (Cancel)</button>
+        <button id="btn-confirm-release" style="
+          background: rgba(238, 66, 56, 0.2);
+          border: 1.5px solid #EE4238;
+          color: #EE4238;
+          font-family: 'Space Mono', monospace;
+          font-size: 12px;
+          font-weight: 800;
+          padding: 10px 16px;
+          border-radius: 6px;
+          cursor: pointer;
+        ">YES, RELEASE POKÉMON</button>
+      </div>
+    `;
+
+    modal.appendChild(card);
+    this.rootElement.appendChild(modal);
+
+    const closeConfirm = () => {
+      if ((modal as any).remove) (modal as any).remove();
+      else if (modal.parentNode) modal.parentNode.removeChild(modal);
+    };
+
+    const keepBtn = card.querySelector('#btn-keep-pokemon') as HTMLButtonElement;
+    keepBtn?.focus?.();
+    keepBtn?.addEventListener('click', () => {
+      BattleAudio.playMenuSound('CANCEL');
+      closeConfirm();
+    });
+
+    const confirmBtn = card.querySelector('#btn-confirm-release') as HTMLButtonElement;
+    confirmBtn?.addEventListener('click', () => {
+      closeConfirm();
+      if (!this.selectedSlot || this.selectedSlot.type !== 'box') return;
       const res = this.boxManager.release(this.activeBoxIndex, this.selectedSlot.slotIndex);
       if (res.success) {
         BattleAudio.playMenuSound('SAVE');
@@ -250,7 +352,7 @@ export class BoxManagementUI {
       } else {
         this.showToast(`⚠️ ${res.reason || 'Could not release Pokémon.'}`);
       }
-    }
+    });
   }
 
   private showToast(msg: string): void {
@@ -870,12 +972,49 @@ export class BoxManagementUI {
         }
 
         <!-- Actions -->
-        <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0;">
-          <button id="box-release-btn" class="nk-btn nk-btn-danger" style="
-            height: 36px;
+        <div style="display: flex; gap: 8px; align-items: center; flex-shrink: 0; flex-wrap: wrap;">
+          <button id="box-swap-btn" class="nk-btn" style="
+            background: #FFD028;
+            color: #0D1322;
+            font-weight: 800;
+            font-size: 11px;
+            height: 32px;
             padding: 0 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
           ">
-            🗑️ RELEASE
+            ⇄ MOVE / SWAP
+          </button>
+          <button id="box-summary-btn" class="nk-btn" style="
+            background: #141E33;
+            border: 1.5px solid #2A75D3;
+            color: #F6F8F3;
+            font-weight: 700;
+            font-size: 11px;
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 4px;
+            cursor: pointer;
+          ">
+            📋 SUMMARY
+          </button>
+          <div style="width: 1px; height: 22px; background: rgba(100, 116, 139, 0.3); margin: 0 2px;"></div>
+          <button id="box-release-btn" class="nk-btn-tertiary" style="
+            background: transparent !important;
+            color: #64748B !important;
+            border: 1px solid rgba(100, 116, 139, 0.3) !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            height: 28px !important;
+            padding: 0 10px !important;
+            box-shadow: none !important;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease !important;
+          ">
+            🗑️ Release
           </button>
         </div>
       </div>
@@ -889,7 +1028,56 @@ export class BoxManagementUI {
     containerCard.querySelector('#box-close-btn')?.addEventListener('click', () => this.close());
     containerCard.querySelector('#box-prev-btn')?.addEventListener('click', () => this.changeBox(-1));
     containerCard.querySelector('#box-next-btn')?.addEventListener('click', () => this.changeBox(1));
-    containerCard.querySelector('#box-release-btn')?.addEventListener('click', () => this.releaseSelected());
+
+    containerCard.querySelector('#box-swap-btn')?.addEventListener('click', () => {
+      if (!this.selectedSlot) {
+        this.showToast('⚠️ Select a Pokémon in Box or Party to swap.');
+        return;
+      }
+      const pkmn = this.getPokemonAt(this.selectedSlot.type, this.selectedSlot.slotIndex);
+      if (pkmn) {
+        BattleAudio.playMenuSound('CURSOR');
+        this.showToast(`⇄ Selected ${pkmn.nickname}. Click destination slot to move/swap.`);
+      }
+    });
+
+    containerCard.querySelector('#box-summary-btn')?.addEventListener('click', () => {
+      if (!this.selectedSlot) {
+        this.showToast('⚠️ Select a Pokémon to view summary.');
+        return;
+      }
+      const pkmn = this.getPokemonAt(this.selectedSlot.type, this.selectedSlot.slotIndex);
+      if (pkmn) {
+        BattleAudio.playMenuSound('CURSOR');
+        const moveNames = pkmn.moves
+          .map((m) => {
+            try {
+              return PokemonFactory.getMoveData(m.moveId).name;
+            } catch {
+              return m.moveId.toUpperCase();
+            }
+          })
+          .join(', ');
+        this.showToast(
+          `📋 ${pkmn.nickname}: Lv.${pkmn.level} ${pkmn.nature || 'Hardy'} | HP ${pkmn.currentHp}/${pkmn.stats.hp} | Moves: ${moveNames}`
+        );
+      }
+    });
+
+    const releaseBtn = containerCard.querySelector('#box-release-btn') as HTMLElement;
+    if (releaseBtn) {
+      releaseBtn.addEventListener('mouseenter', () => {
+        releaseBtn.style.background = 'rgba(238, 66, 56, 0.15)';
+        releaseBtn.style.color = '#EE4238';
+        releaseBtn.style.borderColor = '#EE4238';
+      });
+      releaseBtn.addEventListener('mouseleave', () => {
+        releaseBtn.style.background = 'transparent';
+        releaseBtn.style.color = '#64748B';
+        releaseBtn.style.borderColor = 'rgba(100, 116, 139, 0.3)';
+      });
+      releaseBtn.addEventListener('click', () => this.releaseSelected());
+    }
 
     // Mobile tabs
     containerCard.querySelector('#mobile-tab-box')?.addEventListener('click', () => {
