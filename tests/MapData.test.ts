@@ -1515,4 +1515,56 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(missionManager.getMission('M01')?.status).toBe('COMPLETED');
     expect(missionManager.getMission('M02')?.status).toBe('ACTIVE');
   });
+
+  it('validates BUGFIX-RUINS-OF-ALPH-WARPS-COLLISION-01: solid cave roofs, Route 36 reciprocal warps, and Sudowoodo sprite', () => {
+    const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
+    const load = (id: string): MapData => JSON.parse(fs.readFileSync(path.join(mapsDir, `${id}.json`), 'utf8'));
+    const ruins = load('ruins_of_alph_outside');
+    const gate = load('route_36_ruins_of_alph_gate');
+    const route36 = load('route_36');
+
+    // 1. All 108 cave roof tiles are solid
+    const roofIdx = ruins.tileMap.map((t, i) => (t === 'jt_3c_3c_3c_3c' ? i : -1)).filter((i) => i >= 0);
+    expect(roofIdx).toHaveLength(108);
+    for (const i of roofIdx) {
+      expect(ruins.collisionGrid[i]).toBe(1);
+    }
+
+    // 2. Doorway entrances stay walkable and warp tiles are walkable
+    const walkable = (m: MapData, x: number, y: number) => m.collisionGrid[y * m.width + x] === 0;
+    expect(walkable(ruins, 7, 5)).toBe(true);
+    expect(walkable(ruins, 7, 6)).toBe(true);
+
+    // 3. Bidirectional warp reciprocity between the gate and Ruins of Alph
+    for (const sx of [4, 5]) {
+      const south = gate.warps.find((w) => w.x === sx && w.y === 7)!;
+      expect(south.targetMapId).toBe('ruins_of_alph_outside');
+      expect([south.targetX, south.targetY]).toEqual([7, 6]);
+      expect(walkable(ruins, south.targetX, south.targetY)).toBe(true);
+    }
+    const back = ruins.warps.find((w) => w.x === 7 && w.y === 5);
+    expect(back).toBeDefined();
+    expect(back!.targetMapId).toBe('route_36_ruins_of_alph_gate');
+    expect([back!.targetX, back!.targetY]).toEqual([4, 6]);
+    expect(walkable(gate, 4, 6)).toBe(true);
+
+    // 4. North exits land one tile above Route 36's gate doors, walkable, facing UP
+    for (const nx of [4, 5]) {
+      const north = gate.warps.find((w) => w.x === nx && w.y === 0)!;
+      expect(north.targetMapId).toBe('route_36');
+      expect([north.targetX, north.targetY]).toEqual([nx + 43, 12]);
+      expect(north.direction).toBe('UP');
+      expect(walkable(route36, north.targetX, north.targetY)).toBe(true);
+      const door = route36.warps.find((w) => w.targetMapId === 'route_36_ruins_of_alph_gate' && w.targetX === nx);
+      expect(door).toBeDefined();
+    }
+
+    // 5. Sudowoodo uses its own sprite and the asset exists on disk
+    const sudowoodo = npcsByMap.route_36.find((n) => n.id === 'sudowoodo')!;
+    expect(sudowoodo.spriteType).toBe('sudowoodo');
+    const assetPath = path.resolve(__dirname, '../public/assets/sprites/characters/sudowoodo.png');
+    expect(fs.existsSync(assetPath)).toBe(true);
+    const rendererSrc = fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldRenderer.ts'), 'utf8');
+    expect(rendererSrc).toContain("sudowoodo: './assets/sprites/characters/sudowoodo.png'");
+  });
 });

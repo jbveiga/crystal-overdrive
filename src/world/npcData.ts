@@ -2601,7 +2601,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         35,
         9,
         'DOWN',
-        'fat_man',
+        'sudowoodo',
         '🌲 SUDOWOODO',
         [
           'An odd tree is blocking the path! It seems to wiggle when touched.',

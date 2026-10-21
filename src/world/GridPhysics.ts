@@ -17,7 +17,8 @@ export type NpcSpriteType =
   | 'falkner'
   | 'bird_keeper'
   | 'earl'
-  | 'oak';
+  | 'oak'
+  | 'sudowoodo';
 
 export interface TrainerPokemonSpec {
   speciesId: string;

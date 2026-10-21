@@ -3504,7 +3504,8 @@ async function bootstrap() {
                   lastVisitedPokecenter = { mapId: targetMap.id, x: warp.targetX, y: Math.max(2, warp.targetY - 1) };
                 }
                 const isEnteringIndoor = Object.keys(targetMap.connections || {}).length === 0;
-                player.direction = warp.targetY <= 1 ? 'DOWN' : isEnteringIndoor ? 'UP' : 'DOWN';
+                player.direction =
+                  warp.direction ?? (warp.targetY <= 1 ? 'DOWN' : isEnteringIndoor ? 'UP' : 'DOWN');
                 player.x = warp.targetX;
                 player.y = warp.targetY;
                 player.targetX = warp.targetX;

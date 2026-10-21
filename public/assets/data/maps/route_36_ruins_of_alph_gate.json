@@ -258,28 +258,30 @@
       "y": 0,
       "targetMapId": "route_36",
       "targetX": 47,
-      "targetY": 13
+      "targetY": 12,
+      "direction": "UP"
     },
     {
       "x": 5,
       "y": 0,
       "targetMapId": "route_36",
       "targetX": 48,
-      "targetY": 13
+      "targetY": 12,
+      "direction": "UP"
     },
     {
       "x": 4,
       "y": 7,
       "targetMapId": "ruins_of_alph_outside",
       "targetX": 7,
-      "targetY": 1
+      "targetY": 6
     },
     {
       "x": 5,
       "y": 7,
       "targetMapId": "ruins_of_alph_outside",
-      "targetX": 8,
-      "targetY": 1
+      "targetX": 7,
+      "targetY": 6
     }
   ],
   "bgEvents": [],

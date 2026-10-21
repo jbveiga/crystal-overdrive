@@ -18,7 +18,8 @@ export type SpriteType =
   | 'falkner'
   | 'bird_keeper'
   | 'earl'
-  | 'oak';
+  | 'oak'
+  | 'sudowoodo';
 
 export type TouchControlStyle = 'DPAD' | 'JOYSTICK';
 export type ExpShareMode = 'OFF' | 'ALL' | 'CAPPED';
@@ -112,6 +113,8 @@ export interface WarpEvent {
   targetMapId: string;
   targetX: number;
   targetY: number;
+  /** Optional facing direction after arriving through this warp (overrides default heuristics). */
+  direction?: Direction;
 }
 
 export interface WildEncounterSlot {

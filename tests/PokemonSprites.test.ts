@@ -48,4 +48,23 @@ describe('Complete 251 Pokémon Sprites & Icons Integrity', () => {
       expect(fs.existsSync(path.join(iconsDir, `${alias}.png`))).toBe(true);
     }
   });
+
+  it('verifies Route 36 Sudowoodo overworld sprites are present and valid', () => {
+    const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
+    const spritesDir = path.resolve(__dirname, '../public/assets/sprites');
+
+    // 144x32 9-frame character walk sheet
+    const charSudowoodo = path.join(charsDir, 'sudowoodo.png');
+    expect(fs.existsSync(charSudowoodo)).toBe(true);
+    const buf144 = fs.readFileSync(charSudowoodo);
+    expect(buf144.readUInt32BE(16)).toBe(144);
+    expect(buf144.readUInt32BE(20)).toBe(32);
+
+    // 16x32 GBC sprite
+    const gbcSudowoodo = path.join(spritesDir, 'sudowoodo.png');
+    expect(fs.existsSync(gbcSudowoodo)).toBe(true);
+    const bufGbc = fs.readFileSync(gbcSudowoodo);
+    expect(bufGbc.readUInt32BE(16)).toBe(16);
+    expect(bufGbc.readUInt32BE(20)).toBe(32);
+  });
 });
