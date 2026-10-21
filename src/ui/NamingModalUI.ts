@@ -85,9 +85,14 @@ export class NamingModalUI {
 
     const backdrop = document.createElement('div');
     backdrop.id = 'rival-naming-modal';
+    backdrop.className = 'interactive';
     backdrop.style.cssText = `
+      pointer-events: auto !important;
       position: fixed;
       inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      overflow-y: auto;
       background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(4px);
       display: flex;
@@ -100,9 +105,13 @@ export class NamingModalUI {
 
     const card = document.createElement('div');
     card.id = 'rival-naming-card';
+    card.className = 'interactive';
     card.style.cssText = `
+      pointer-events: auto !important;
       width: 380px;
       max-width: 95vw;
+      max-height: calc(100dvh - 32px);
+      overflow-y: auto;
       min-height: 340px;
       background: #0f172a;
       border: 3px solid #ef4444;
@@ -147,16 +156,20 @@ export class NamingModalUI {
         "What was the name of the red-haired boy who stole the POKéMON?"
       </div>
 
-      <div style="width: 100%; position: relative; margin-bottom: 14px;">
-        <input id="rival-name-input" type="text" maxlength="15" value="${this.currentName}" placeholder="NAME..." style="
-          width: 100%;
-          height: 42px;
+      <div style="width: 100%; display: flex; gap: 8px; align-items: stretch; margin-bottom: 14px;">
+        <input id="rival-name-input" type="text" maxlength="15" value="${this.currentName}" placeholder="NAME..."
+          inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" style="
+          pointer-events: auto !important;
+          flex: 1;
+          min-width: 0;
+          height: 48px;
+          min-height: 44px;
           background: #020617;
           border: 2px solid #ef4444;
           border-radius: 8px;
           padding: 0 12px;
           font-family: inherit;
-          font-size: 18px;
+          font-size: 16px;
           font-weight: 800;
           color: #fef08a;
           letter-spacing: 2px;
@@ -164,7 +177,25 @@ export class NamingModalUI {
           box-sizing: border-box;
           outline: none;
           text-align: center;
+          -webkit-user-select: text;
+          user-select: text;
+          touch-action: manipulation;
         " />
+        <button id="rival-clear-btn" type="button" class="interactive" style="
+          pointer-events: auto !important;
+          height: 48px;
+          min-height: 44px;
+          min-width: 72px;
+          background: #1e293b;
+          color: #e2e8f0;
+          border: 1px solid #475569;
+          border-radius: 8px;
+          font-family: inherit;
+          font-size: 11px;
+          font-weight: 800;
+          cursor: pointer;
+          touch-action: manipulation;
+        ">✕ CLEAR</button>
       </div>
 
       <div style="font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">
@@ -180,7 +211,8 @@ export class NamingModalUI {
       ">
         ${RIVAL_NAME_PRESETS.map(
           (preset) => `
-            <button class="rival-preset-btn" data-name="${preset}" style="
+            <button class="rival-preset-btn interactive" data-name="${preset}" style="
+              pointer-events: auto !important;
               background: ${preset === this.currentName ? '#ef4444' : '#1e293b'};
               color: ${preset === this.currentName ? '#ffffff' : '#e2e8f0'};
               border: 1px solid ${preset === this.currentName ? '#fca5a5' : '#475569'};
@@ -198,7 +230,8 @@ export class NamingModalUI {
       </div>
 
       <div style="display: flex; gap: 10px; width: 100%; margin-top: auto;">
-        <button id="rival-confirm-btn" style="
+        <button id="rival-confirm-btn" class="interactive" style="
+          pointer-events: auto !important;
           flex: 1;
           height: 40px;
           background: #ef4444;
@@ -240,6 +273,14 @@ export class NamingModalUI {
         }
       });
     });
+
+    const clearBtn = card.querySelector('#rival-clear-btn') as HTMLButtonElement;
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.setName('');
+        this.inputElement?.focus();
+      });
+    }
 
     const confirmBtn = card.querySelector('#rival-confirm-btn') as HTMLButtonElement;
     if (confirmBtn) {

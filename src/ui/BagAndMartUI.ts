@@ -1,6 +1,7 @@
 import type { PokemonInstance, PokeballId, MedicineId, SpeedMultiplier } from '../types/game';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { BattleAudio } from '../audio/BattleAudio';
+import { OverworldItemManager } from '../world/OverworldItemManager';
 
 export interface BagInventory {
   balls: Partial<Record<PokeballId, number>>;
@@ -202,6 +203,41 @@ export const INFINITE_TMS: Record<string, TMDefinition> = {
     type: 'Normal',
     desc: 'Locks the target in battle, preventing roaming beasts from fleeing.',
   },
+  HM05: {
+    id: 'HM05',
+    moveId: 'flash',
+    name: 'Flash',
+    type: 'Normal',
+    desc: "Illuminates dark caves and reduces the target's accuracy in battle.",
+  },
+  TM70: {
+    id: 'TM70',
+    moveId: 'flash',
+    name: 'Flash',
+    type: 'Normal',
+    desc: "Illuminates dark caves and reduces the target's accuracy in battle.",
+  },
+  TM31: {
+    id: 'TM31',
+    moveId: 'mudslap',
+    name: 'Mud-Slap',
+    type: 'Ground',
+    desc: '20 Power Ground attack that inflicts damage and lowers target accuracy.',
+  },
+  TM49: {
+    id: 'TM49',
+    moveId: 'furycutter',
+    name: 'Fury Cutter',
+    type: 'Bug',
+    desc: '40 Power Bug attack that doubles in power with consecutive hits.',
+  },
+  HM01: {
+    id: 'HM01',
+    moveId: 'cut',
+    name: 'Cut',
+    type: 'Normal',
+    desc: '50 Power Normal attack that cuts down small trees on the overworld.',
+  },
 };
 
 export type BagTabId = 'ITEMS' | 'TMS' | 'BALLS' | 'MART';
@@ -332,7 +368,7 @@ export class BagAndMartUI {
           font-weight: 700;
           font-size: 12px;
           cursor: pointer;
-        ">💿 INFINITE TMS</button>
+        ">💿 TMS & HMS</button>
         <button id="tab-balls" style="
           flex: 1;
           padding: 9px 6px;
@@ -757,8 +793,13 @@ export class BagAndMartUI {
     }
 
     for (const tmId of tms) {
-      const tm = INFINITE_TMS[tmId];
-      if (!tm) continue;
+      const tm: TMDefinition = INFINITE_TMS[tmId] || {
+        id: tmId,
+        moveId: tmId.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        name: OverworldItemManager.formatItemName(tmId),
+        type: 'Normal',
+        desc: `Teaches ${OverworldItemManager.formatItemName(tmId)} to a compatible Pokémon.`,
+      };
 
       const alreadyKnows = targetPkmn?.moves.some((m) => m.moveId === tm.moveId) ?? false;
 

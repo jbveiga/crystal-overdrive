@@ -751,7 +751,8 @@ async function bootstrap() {
     partyUI.isOpen() ||
     bagUI.isOpen() ||
     missionLogUI.isOpen() ||
-    boxManagementUI.isOpen();
+    boxManagementUI.isOpen() ||
+    namingModalUI.isOpen();
 
   overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
@@ -910,6 +911,7 @@ async function bootstrap() {
       overworldItemManager.setFruitTreePicks({});
       const freshNpcs = createNpcsByMap();
       npcsByMap.mr_pokemons_house = freshNpcs.mr_pokemons_house;
+      npcsByMap.new_bark_town = freshNpcs.new_bark_town;
       npcsByMap.route_36 = freshNpcs.route_36;
       npcsByMap.elms_lab = freshNpcs.elms_lab;
       npcsByMap.azalea_town = freshNpcs.azalea_town;
@@ -1044,6 +1046,16 @@ async function bootstrap() {
 
   if (storyFlags.has('sudowoodo_cleared') && npcsByMap.route_36) {
     npcsByMap.route_36 = npcsByMap.route_36.filter((n) => n.id !== 'sudowoodo');
+  }
+  if (
+    (storyFlags.has('HAS_MYSTERY_EGG') ||
+      storyFlags.has('mystery_egg_received') ||
+      storyFlags.has('rival_1_defeated') ||
+      storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') ||
+      storyFlags.has('EVENT_RIVAL_NAMED')) &&
+    npcsByMap.new_bark_town
+  ) {
+    npcsByMap.new_bark_town = npcsByMap.new_bark_town.filter((n) => n.id !== 'nbt_rival');
   }
   if ((storyFlags.has('HAS_MYSTERY_EGG') || storyFlags.has('HAS_POKEDEX')) && npcsByMap.mr_pokemons_house) {
     npcsByMap.mr_pokemons_house = npcsByMap.mr_pokemons_house.filter((n) => n.id !== 'prof_oak_npc');
@@ -1812,6 +1824,9 @@ async function bootstrap() {
                   npcsByMap.mr_pokemons_house = npcsByMap.mr_pokemons_house.filter(
                     (n) => n.id !== 'prof_oak_npc'
                   );
+                }
+                if (npcsByMap.new_bark_town) {
+                  npcsByMap.new_bark_town = npcsByMap.new_bark_town.filter((n) => n.id !== 'nbt_rival');
                 }
                 saveCurrentGame();
                 overworldHUD.showToast('🥚 Received MYSTERY EGG & 📕 POKéDEX! (Check START MENU -> POKéDEX)');
@@ -2584,6 +2599,39 @@ async function bootstrap() {
                   saveCurrentGame();
                 },
               });
+            }
+          );
+          return;
+        }
+
+        // Peeking Rival outside Elm's Lab: shoves the player away from the window
+        if (targetNpc.id === 'nbt_rival') {
+          overworldHUD.openDialogue(
+            [
+              '<……>\nSo this is the famous ELM POKéMON LAB…',
+              '…What are you staring at?',
+              '*BUMP!* The boy shoved you away from the window!',
+            ],
+            '❓ RIVAL ???',
+            () => {
+              BattleAudio.playOverworldSound('BUMP');
+              const backDir = getOppositeDirection(player.direction);
+              const dx = backDir === 'LEFT' ? -1 : backDir === 'RIGHT' ? 1 : 0;
+              const dy = backDir === 'UP' ? -1 : backDir === 'DOWN' ? 1 : 0;
+              const nx = player.x + dx;
+              const ny = player.y + dy;
+              if (mapManager.isWalkable(nx, ny)) {
+                const faceDir = player.direction;
+                player.x = nx;
+                player.y = ny;
+                player.targetX = nx;
+                player.targetY = ny;
+                player.renderX = nx;
+                player.renderY = ny;
+                player.isMoving = false;
+                player.progress = 0;
+                player.direction = faceDir;
+              }
             }
           );
           return;
