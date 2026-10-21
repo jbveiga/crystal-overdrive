@@ -115,7 +115,7 @@ export class SaveManager {
       bgmVolume: 0.7,
       textSpeed: 'MID',
       battleAnimations: true,
-      playerSpeedDefault: 1,
+      playerSpeedDefault: 3,
       battleSpeedMultiplier: 1,
       touchControlStyle: 'DPAD',
       expShare: 'CAPPED',

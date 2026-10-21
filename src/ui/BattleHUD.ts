@@ -64,6 +64,9 @@ export class BattleHUD {
   private caughtSpeciesIds: Set<string> = new Set();
   private ballsInventory: Partial<Record<PokeballId, number>> = {};
   private callbacks!: BattleHUDCallbacks;
+  public static readonly DIALOGUE_CHAR_DELAY_MS = 18;
+  public static readonly DIALOGUE_POST_DELAY_MS = 750;
+
   private speedMultiplier: SpeedMultiplier = 1;
   private isForcedPartySwitch: boolean = false;
 
@@ -118,6 +121,57 @@ export class BattleHUD {
         #battle-fight-menu button {
           padding: 7px 10px !important;
           min-height: 48px !important;
+        }
+      }
+      /* Move grid containment for the widest phones (Pixel 9 Pro XL 448px, iPhone 16 Pro Max 440px, zoom 480px) */
+      #battle-fight-menu {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        gap: 8px !important;
+      }
+      .battle-move-btn {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+      }
+      .battle-move-btn > div {
+        min-width: 0 !important;
+        max-width: 100% !important;
+      }
+      .battle-move-btn .move-btn-name {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #battle-message-box.full-width-dialogue {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+        box-sizing: border-box !important;
+      }
+      @media (max-width: 768px) {
+        #battle-bottom-panel {
+          flex-direction: column !important;
+          box-sizing: border-box !important;
+          max-width: 100% !important;
+          overflow: hidden !important;
+          gap: 8px !important;
+        }
+        #battle-action-menu {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+          gap: 8px !important;
+        }
+        #battle-action-menu button {
+          min-height: 52px !important;
+          font-size: 15px !important;
         }
       }
       @media (orientation: portrait) {
@@ -737,6 +791,7 @@ export class BattleHUD {
       const pill = EffectivenessHelper.getPillStyle(badge.multiplier, moveData.category === 'Status');
 
       const btn = document.createElement('button');
+      btn.className = 'battle-move-btn';
       btn.style.cssText = `
         background: #1e293b;
         color: white;
@@ -764,7 +819,7 @@ export class BattleHUD {
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <div style="display: flex; align-items: center; gap: 6px;">
             <span class="keyboard-hint" style="font-size: 10px; font-weight: 800; color: #94a3b8; background: #0f172a; border: 1px solid #334155; padding: 1px 5px; border-radius: 4px;">[${shortcutHint}]</span>
-            <span style="font-weight: 800; font-size: 15px;">${moveData.name}</span>
+            <span class="move-btn-name" style="font-weight: 800; font-size: 15px;">${moveData.name}</span>
           </div>
           <span style="display: flex; align-items: center;">${categorySvg}</span>
         </div>
@@ -816,9 +871,18 @@ export class BattleHUD {
     this.fightMenu.style.display = 'none';
     this.bagMenu.style.display = 'none';
     this.partyMenu.style.display = 'none';
-    this.messageBox.style.display = 'flex';
     this.actionMenu.style.display = 'grid';
     this.messageBox.innerText = `What will ${this.playerPokemon.nickname} do?`;
+    if (this.isMobileViewport()) {
+      // Handheld: the 2x2 action quadrant takes over the full bottom tray
+      this.messageBox.style.display = 'none';
+      this.messageBox.className = '';
+      this.actionMenu.style.width = '100%';
+    } else {
+      this.messageBox.style.display = 'flex';
+      this.messageBox.className = '';
+      this.actionMenu.style.width = '';
+    }
     this.updateStatusBadges();
   }
 
@@ -996,29 +1060,31 @@ export class BattleHUD {
   }
 
   /**
-   * Renders battle dialogue text at 30ms/char (1x), 15ms/char (2x), or 0ms/instant (3x) per Specification 4.2
+   * Renders battle dialogue at a fixed, legible ~18ms/char with a ~750ms post-delay.
+   * Intentionally decoupled from the battle speed multiplier so text stays readable at any battle speed.
+   * The dialogue takes the full bottom tray; the action menu is hidden while a message is shown.
    */
   public async showMessage(text: string): Promise<void> {
     this.fightMenu.style.display = 'none';
     this.bagMenu.style.display = 'none';
     this.partyMenu.style.display = 'none';
+    this.actionMenu.style.display = 'none';
     this.messageBox.style.display = 'flex';
+    this.messageBox.className = 'full-width-dialogue';
+    this.messageBox.style.width = '100%';
     this.updateStatusBadges();
 
-    const charDelay = this.speedMultiplier === 1 ? 30 : this.speedMultiplier === 2 ? 15 : 0;
-
-    if (charDelay === 0) {
-      this.messageBox.innerText = text;
-    } else {
-      this.messageBox.innerText = '';
-      for (let i = 1; i <= text.length; i++) {
-        this.messageBox.innerText = text.slice(0, i);
-        await new Promise((r) => setTimeout(r, charDelay));
-      }
+    this.messageBox.innerText = '';
+    for (let i = 1; i <= text.length; i++) {
+      this.messageBox.innerText = text.slice(0, i);
+      await new Promise((r) => setTimeout(r, BattleHUD.DIALOGUE_CHAR_DELAY_MS));
     }
 
-    const postDelay = 600 / this.speedMultiplier;
-    return new Promise((resolve) => setTimeout(resolve, postDelay));
+    return new Promise((resolve) => setTimeout(resolve, BattleHUD.DIALOGUE_POST_DELAY_MS));
+  }
+
+  private isMobileViewport(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth <= 768;
   }
 
   /**

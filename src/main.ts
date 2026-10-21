@@ -161,7 +161,7 @@ async function bootstrap() {
     }
 
     gameClock.playerSpeed =
-      existingSave.player.speedMultiplier || existingSave.options?.playerSpeedDefault || 1;
+      existingSave.player.speedMultiplier || existingSave.options?.playerSpeedDefault || 3;
     gameClock.battleSpeed =
       existingSave.player.battleSpeedMultiplier || existingSave.options?.battleSpeedMultiplier || 1;
     gameOptions.playerSpeedDefault = gameClock.playerSpeed;

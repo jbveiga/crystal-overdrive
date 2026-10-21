@@ -14,14 +14,22 @@ export interface AmbientTint {
 }
 
 export class GameClock {
-  private _playerSpeed: SpeedMultiplier = 1;
+  /** Battle simulation speed ceiling (dialogue speed is decoupled from this). */
+  public static readonly MAX_BATTLE_SPEED: SpeedMultiplier = 2;
+  /** Default overworld traversal speed. */
+  public static readonly DEFAULT_PLAYER_SPEED: SpeedMultiplier = 3;
+
+  private _playerSpeed: SpeedMultiplier = GameClock.DEFAULT_PLAYER_SPEED;
   private _battleSpeed: SpeedMultiplier = 1;
   private _simulatedHour?: number;
   private readonly maxDelta: number = 0.1; // Max 100ms clamp to prevent spiral of death
 
-  constructor(initialPlayerSpeed: SpeedMultiplier = 1, initialBattleSpeed: SpeedMultiplier = 1) {
+  constructor(
+    initialPlayerSpeed: SpeedMultiplier = GameClock.DEFAULT_PLAYER_SPEED,
+    initialBattleSpeed: SpeedMultiplier = 1
+  ) {
     this._playerSpeed = initialPlayerSpeed;
-    this._battleSpeed = initialBattleSpeed;
+    this._battleSpeed = Math.min(initialBattleSpeed, GameClock.MAX_BATTLE_SPEED) as SpeedMultiplier;
   }
 
   public setSimulatedHour(hour: number | undefined): void {
@@ -72,7 +80,7 @@ export class GameClock {
 
   set battleSpeed(speed: SpeedMultiplier) {
     if (speed === 1 || speed === 2 || speed === 3 || speed === 4) {
-      this._battleSpeed = speed;
+      this._battleSpeed = Math.min(speed, GameClock.MAX_BATTLE_SPEED) as SpeedMultiplier;
     }
   }
 
@@ -85,10 +93,10 @@ export class GameClock {
   }
 
   /**
-   * Cycles battle speed between 1x -> 2x -> 3x -> 4x -> 1x
+   * Cycles battle speed between 1x -> 2x -> 1x (capped at MAX_BATTLE_SPEED)
    */
   cycleBattleSpeed(): SpeedMultiplier {
-    this._battleSpeed = ((this._battleSpeed % 4) + 1) as SpeedMultiplier;
+    this._battleSpeed = ((this._battleSpeed % GameClock.MAX_BATTLE_SPEED) + 1) as SpeedMultiplier;
     return this._battleSpeed;
   }
 

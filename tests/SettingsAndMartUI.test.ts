@@ -642,7 +642,7 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
 
     it('includes battleSpeedMultiplier and touchControlStyle in SaveManager default options', () => {
       const defaults = SaveManager.getDefaultOptions();
-      expect(defaults.playerSpeedDefault).toBe(1);
+      expect(defaults.playerSpeedDefault).toBe(3);
       expect(defaults.battleSpeedMultiplier).toBe(1);
       expect(defaults.touchControlStyle).toBe('DPAD');
     });
@@ -759,6 +759,104 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       radarHud.update(ping);
       const distLabel = mockDoc.querySelector('#itemfinder-distance-label') as MockElement;
       expect(distLabel.innerText).toBe('RIGHT HERE!');
+    });
+  });
+
+  describe('7. TICKET-UI-BATTLE-ERGONOMICS-SPEED-01: Move Grid Containment, Tray Swap & Decoupled Dialogue Speed', () => {
+    const makePkmn = (): PokemonInstance => ({
+      uid: 'cyndaquil-1',
+      speciesId: 'cyndaquil',
+      nickname: 'CYNDAQUIL',
+      level: 12,
+      types: ['Fire'],
+      baseStats: { hp: 39, attack: 52, defense: 43, spAttack: 60, spDefense: 50, speed: 65 },
+      stats: { hp: 35, attack: 20, defense: 18, spAttack: 22, spDefense: 19, speed: 24 },
+      currentHp: 35,
+      status: 'NONE',
+      isTrapped: false,
+      moves: [{ moveId: 'tackle', currentPp: 35, maxPp: 35 }],
+      catchRate: 45,
+    });
+
+    const makeHud = () => {
+      const hud = new BattleHUD('battle-hud-container');
+      (hud as any).playerPokemon = makePkmn();
+      (hud as any).enemyPokemon = makePkmn();
+      return hud;
+    };
+
+    it('injects zero-spill move grid containment rules for the widest phones (448px / 440px / 480px)', () => {
+      makeHud();
+      const styleEl = mockDoc.head.children.find((c) => c.id === 'crystal-battle-hud-styles') as any;
+      expect(styleEl).toBeDefined();
+      const css: string = styleEl.textContent;
+      expect(css).toContain('grid-template-columns: repeat(2, minmax(0, 1fr)) !important');
+      expect(css).toContain('.battle-move-btn');
+      expect(css).toContain('min-width: 0 !important');
+      expect(css).toContain('max-width: 100% !important');
+      expect(css).toContain('text-overflow: ellipsis !important');
+      expect(css).toContain('white-space: nowrap !important');
+    });
+
+    it('swaps the bottom tray: message mode hides the action menu and takes full width', async () => {
+      vi.useFakeTimers();
+      try {
+        const hud = makeHud();
+        const actionMenu = (hud as any).actionMenu as MockElement;
+        const messageBox = (hud as any).messageBox as MockElement;
+        const p = hud.showMessage('Hi!');
+        await vi.advanceTimersByTimeAsync(2000);
+        await p;
+        expect(actionMenu.style.display).toBe('none');
+        expect(messageBox.style.display).toBe('flex');
+        expect(messageBox.style.width).toBe('100%');
+        expect(messageBox.className).toContain('full-width-dialogue');
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('gives the action quadrant the full tray on mobile and keeps the split layout on desktop', () => {
+      const hud = makeHud();
+      const actionMenu = (hud as any).actionMenu as MockElement;
+      const messageBox = (hud as any).messageBox as MockElement;
+
+      (globalThis as any).innerWidth = 440;
+      hud.showActionMenu();
+      expect(actionMenu.style.display).toBe('grid');
+      expect(actionMenu.style.width).toBe('100%');
+      expect(messageBox.style.display).toBe('none');
+
+      (globalThis as any).innerWidth = 1024;
+      hud.showActionMenu();
+      expect(actionMenu.style.display).toBe('grid');
+      expect(messageBox.style.display).toBe('flex');
+    });
+
+    it('keeps typewriter timing independent of battle speed (~18ms/char + 750ms post-delay)', async () => {
+      expect(BattleHUD.DIALOGUE_CHAR_DELAY_MS).toBe(18);
+      expect(BattleHUD.DIALOGUE_POST_DELAY_MS).toBe(750);
+
+      vi.useFakeTimers();
+      try {
+        for (const speed of [1, 2] as const) {
+          const hud = makeHud();
+          hud.setSpeedMultiplier(speed);
+          let done = false;
+          const text = 'ABCDE';
+          const p = hud.showMessage(text).then(() => {
+            done = true;
+          });
+          const total = 18 * text.length + 750;
+          await vi.advanceTimersByTimeAsync(total - 5);
+          expect(done).toBe(false);
+          await vi.advanceTimersByTimeAsync(10);
+          await p;
+          expect(done).toBe(true);
+        }
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 });
