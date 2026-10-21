@@ -19,6 +19,7 @@ This project is made possible thanks to the tireless preservation work, reverse-
   - Overworld signpost text and canonical character dialogue scripts.
   - Authentic Gen 2 Pokémon front and back sprites (`gfx/pokemon/marill/front.png`, `back.png`, and Johto roster sprites).
   - In-battle move attack animation VFX sprites (`gfx/battle_anims/*.png`: `hit`, `cut`, `fire`, `water`, `bubble`, `lightning`, `ice`, `plant`, `rocks`, `smoke`, `shine`, `poison`, `wind`, `speed`).
+  - Authentic overworld object event sprites (`gfx/sprites/fruit_tree.png` with authentic `PAL_OW_TREE` GBC palette).
   - Supplemental tile references via [nikouu/Pokemon-gen-2-style-tilemap](https://github.com/nikouu/Pokemon-gen-2-style-tilemap).
 
 ---

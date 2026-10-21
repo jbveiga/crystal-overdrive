@@ -20,6 +20,8 @@ flowchart TD
         SM["StartMenuUI"]
         PM["PartyManagementUI"]
         BM["BagAndMartUI"]
+        BMUI["BoxManagementUI"]
+        MLUI["MissionLogUI"]
     end
 
     subgraph Render_Layer["Render Layer (PixiJS v8 WebGL/WebGPU)"]
@@ -37,6 +39,10 @@ flowchart TD
         PF["PokemonFactory (Showdown Dex, EXP & Leveling)"]
         SMAN["SaveManager (IndexedDB / LocalStorage)"]
         EB["EventBus (Decoupled Pub/Sub)"]
+        STM["StorageManager (14-Box PC Storage Grid)"]
+        EVM["EvolutionManager (Levels, Stones, Link Cable)"]
+        OIM["OverworldItemManager (Balls, Hidden, Trees)"]
+        MSM["MissionManager (Main & Side Quests)"]
     end
 
     subgraph Audio_Layer["Audio Layer (Howler.js & Web Audio API)"]
@@ -76,6 +82,10 @@ src/
 │   ├── MapManager.ts      # Binary map loader (.blk), seamless neighbor connections
 │   ├── RoamingManager.ts  # Markov transition adjacency for Raikou, Entei, Suicune
 │   ├── ItemfinderRadar.ts # Pure TS 8-tile dowsing compass radar & dynamic sonar math
+│   ├── OverworldItemManager.ts # Field item balls, hidden items, and fruit tree daily harvest
+│   ├── MissionManager.ts  # 15 Main & 21 Side quest tracking and step progression
+│   ├── StorageManager.ts  # 14-box Pokémon storage engine (280 slots) with catch auto-deposit
+│   ├── EvolutionManager.ts # Pure domain evolution logic (levels, stones, Link Cable, friendship)
 │   └── npcData.ts         # Canonical Johto NPC & Trainer placements across all maps
 ├── battle/                # Turn-Based Tactical Combat System
 │   ├── BattleStateMachine.ts # Round execution, turn-order resolution, and residuals
@@ -92,6 +102,8 @@ src/
 │   ├── NamingModalUI.ts       # Centered Rival naming modal with presets (SILVER, KAZU, KAMON, RED) & 15-char input
 │   ├── OverworldHUD.ts       # Device-adaptive top menu capsule, Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
 │   ├── ItemfinderHUD.ts      # Top-right floating Itemfinder dowsing compass capsule with rotating needle & gold lock-on state
+│   ├── MissionLogUI.ts       # Unbound-style mission tracker with categorized tabs and objective steps
+│   ├── BoxManagementUI.ts    # Split-view Bill's PC 14-box storage grid & party transfer manager
 │   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, device-adaptive Unbound 2x2 move matrix & hotkeys
 │   ├── StartMenuUI.ts        # Classic start menu (Pokedex, Pokemon, Bag, Save)
 │   ├── PartyManagementUI.ts  # Full party inspector, lead reordering, summaries
@@ -304,7 +316,7 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
 | `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-15 char name validation/fallback, RTC period detection, `onComplete` payload. |
 | `StartMenuUI.ts` / `BagAndMartUI.ts` / `OverworldHUD.ts` / `BattleHUD.ts` / `MissionLogUI.ts` / `ItemfinderHUD.ts` | `tests/SettingsAndMartUI.test.ts` | 15 | ✅ Covered | Settings submenu with sound toggle, speed cycle, touch controls, D-Pad vs Virtual Analog Joystick control style, and 3-state Unbound `EXP. SHARE MODE` (`OFF` / `ALL` / `CAPPED`); separate Poké Mart counter view & bag view; mobile D-pad ergonomics, dynamic Trainer Card name, P/K/B/G/M/T/S/O shortcuts, 6-slot Poké Ball healing animation at fixed canonical speed, canonical field rest blackout fade (`playFieldRestAnimation`) & top-aligned floating pill toast (`#overworld-toast-banner`), interactive `#move-learn-modal` pointer-events & keyboard shortcuts, Unbound-style `MissionLogUI`, `ItemfinderHUD` compass capsule states, and persisted `battleSpeedMultiplier` & `touchControlStyle` (Sprint 08, Sprint 10, Sprint 11, UI-HEALING-POLISH-01, KEY-ITEMS-UNBOUND-01). |
-| `overworld_items.json` / `OverworldItemManager.ts` | `tests/OverworldItems.test.ts` | 10 | ✅ Covered | Authentic pret/pokecrystal scattered overworld item extraction (136 item balls, 80 hidden items, 30 fruit trees = 246 total), Johto (173) vs Kanto (73) regional integrity, valid coordinates & event flags, and `OverworldItemManager` item ball collection/despawn, hidden item detection, fruit tree daily harvest reset, Itemfinder 8-tile radar bearings, and pocket classification (Sprint 12). |
+| `overworld_items.json` / `OverworldItemManager.ts` | `tests/OverworldItems.test.ts` | 11 | ✅ Covered | Authentic pret/pokecrystal scattered overworld item extraction (136 item balls, 80 hidden items, 30 fruit trees = 246 total), Johto (173) vs Kanto (73) regional integrity, valid coordinates & event flags, and `OverworldItemManager` item ball collection/despawn, solid obstacle collision (`isSolidObstacle`), hidden item detection, fruit tree daily harvest reset, Itemfinder 8-tile radar bearings, and pocket classification (Sprint 12, PC-RADAR-COLLISION-01). |
 | `MissionManager.ts` / `missionData.ts` | `tests/MissionManager.test.ts` | 4 | ✅ Covered | Unbound-style quest system hydrating all 15 Main Story Missions (M01–M15) and 21 Side Missions (S01–S21), category/status filtering, sequential step progression, `checkStoryFlags` auto-unlock/completion, and lossless save state serialization (Sprint 11). |
 | `PokemonFactory.ts` / `SaveManager.ts` | `tests/ExpShare.test.ts` | 5 | ✅ Covered | Unbound-style 3-mode Exp. Share (`OFF`, `ALL`, `CAPPED`), default `CAPPED` save hydration, Johto/Kanto badge level caps (`15..85`), 100% active + 50% bench party distribution, and `1 EXP` clamping at/above level cap (KEY-ITEMS-UNBOUND-01). |
 | `ItemfinderRadar.ts` | `tests/ItemfinderRadar.test.ts` | 5 | ✅ Covered | Pure TypeScript 8-tile dowsing radar scan, nearest uncollected hidden item vector lock, 8-way compass bearings, adjacent `FACING` detection, and dynamic sonar pitch $f(d) = 880 + (8-d)\times 120\text{ Hz}$ (KEY-ITEMS-UNBOUND-01). |
@@ -312,7 +324,7 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `StorageManager.ts` / `BoxManager.ts` / `BoxManagementUI.ts` | `tests/BoxManager.test.ts` | 11 | ✅ Covered | 14 storage boxes of 20 slots each (280 total capacity), automatic wild catch overflow into storage with transfer dialogue and fanfare, interactive PC terminals in all Pokémon Centers and player bedroom launching `BoxManagementUI`, 1-click party-box swapping, mobile segmented tab buffer persistence, release double-check safeguard, party minimum protection (cannot deposit/release last conscious Pokémon), protected Roaming Beasts (Raikou, Entei, Suicune) release protection, and backward-compatible save migration (Sprint 13.5 & Stitch Neo-Kanto Protocol). |
 | `EvolutionManager.ts` | `tests/EvolutionManager.test.ts` | 20 | ✅ Covered | Pure domain evolution engine: level-up thresholds (starters, Tyrogue Atk/Def stat branches), evolutionary stones (Fire, Water, Thunder, Leaf, Moon, Sun), single-player Link Cable / Link Stone trade evolutions, friendship happiness scale (>= 220, Day/Night Eevee branch, baby Pokémon), Everstone invariant suppression, and stat recalculation with proportional HP preservation (Ticket 14.1). |
 | `PokemonSprites` / `pokemon/*.png` | `tests/PokemonSprites.test.ts` | 4 | ✅ Covered | 100% complete Generation 1 & 2 sprite asset verification across all 251 species (IDs 1–251, Bulbasaur to Celebi): 251 front battle sprites (96x96), 251 back battle sprites (96x96), 251 party/box mini-icons (40x30), and special naming alias fallbacks (Mr. Mime, Ho-Oh, Nidoran-F, Nidoran-M). |
-| **Current Baseline** | **20 Suites** | **185 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| **Current Baseline** | **20 Suites** | **186 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

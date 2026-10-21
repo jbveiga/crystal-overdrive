@@ -54,6 +54,7 @@ export class OverworldRenderer {
   private krisFrames!: CharacterFrames;
   private playerFrames!: CharacterFrames;
   private npcFrames: Map<NpcSpriteType, CharacterFrames> = new Map();
+  private fruitTreeTexture: Texture | null = null;
 
   public async init(containerElement: HTMLElement): Promise<void> {
     this.app = new Application();
@@ -517,6 +518,14 @@ export class OverworldRenderer {
         }
       })
     );
+
+    try {
+      const treeTex = await Assets.load<Texture>('./assets/sprites/fruit_tree_64.png');
+      treeTex.source.scaleMode = 'nearest';
+      this.fruitTreeTexture = treeTex;
+    } catch (err) {
+      console.warn('Could not load fruit tree sprite:', err);
+    }
   }
 
   /**
@@ -1244,20 +1253,79 @@ export class OverworldRenderer {
     }
 
     for (const tree of fruitTrees) {
-      if (pickedTreeIds.has(tree.treeId)) continue;
       const node = new Container();
       const px = (tree.x + 0.5) * this.tileSize;
-      const py = (tree.y + 0.38) * this.tileSize;
+      const py = (tree.y + 0.5) * this.tileSize;
       node.position.set(px, py);
 
-      const g = new Graphics();
-      g.circle(0, 0, 8).fill({ color: 0x14532d });
-      g.circle(0, 0, 6).fill({ color: 0xf59e0b });
-      g.circle(-2, -2, 2).fill({ color: 0xfef08a });
-      node.addChild(g);
+      const isPicked = pickedTreeIds.has(tree.treeId);
+
+      if (this.fruitTreeTexture) {
+        const sprite = new Sprite(this.fruitTreeTexture);
+        sprite.anchor.set(0.5, 0.5);
+        sprite.width = this.tileSize;
+        sprite.height = this.tileSize;
+        node.addChild(sprite);
+      } else {
+        // High-fidelity procedural Gen 2 berry tree fallback
+        const g = new Graphics();
+        // Drop shadow
+        g.ellipse(0, 22, 24, 8).fill({ color: 0x000000, alpha: 0.35 });
+        // Textured wooden trunk base
+        g.rect(-8, 6, 16, 20).fill({ color: 0x5c3317 });
+        g.rect(-6, 8, 4, 16).fill({ color: 0x78350f });
+        g.rect(2, 8, 4, 16).fill({ color: 0x451a03 });
+        // Multi-tiered leafy green canopy
+        g.circle(0, 0, 24).fill({ color: 0x14532d });
+        g.circle(-10, -6, 18).fill({ color: 0x166534 });
+        g.circle(10, -6, 18).fill({ color: 0x166534 });
+        g.circle(0, -12, 19).fill({ color: 0x15803d });
+        // Leaf highlights
+        g.circle(-6, -14, 10).fill({ color: 0x22c55e });
+        g.circle(8, -12, 8).fill({ color: 0x22c55e });
+
+        // Bare foliage branches if already harvested
+        if (isPicked) {
+          g.moveTo(-10, -4).lineTo(-16, -10).stroke({ width: 2, color: 0x451a03 });
+          g.moveTo(10, -4).lineTo(16, -10).stroke({ width: 2, color: 0x451a03 });
+          g.moveTo(0, 2).lineTo(0, -6).stroke({ width: 2, color: 0x451a03 });
+        }
+        node.addChild(g);
+      }
+
+      // Hanging colored berries matching fruit type when not picked
+      if (!isPicked) {
+        const berryColor = this.resolveBerryColor(tree.berryId);
+        const berries = new Graphics();
+        // Left berry cluster
+        berries.circle(-10, -2, 5.5).fill({ color: berryColor });
+        berries.circle(-11, -4, 1.8).fill({ color: 0xffffff, alpha: 0.85 });
+        // Right berry cluster
+        berries.circle(10, -2, 5.5).fill({ color: berryColor });
+        berries.circle(9, -4, 1.8).fill({ color: 0xffffff, alpha: 0.85 });
+        // Center-front berry
+        berries.circle(0, 6, 6).fill({ color: berryColor });
+        berries.circle(-1, 4, 2).fill({ color: 0xffffff, alpha: 0.85 });
+        node.addChild(berries);
+      }
+
       this.itemBallContainer.addChild(node);
       this.itemBallGraphics.set(tree.treeId, node);
     }
+  }
+
+  private resolveBerryColor(berryId?: string): number {
+    if (!berryId) return 0xf59e0b;
+    const norm = berryId.toLowerCase().replace(/[^a-z]/g, '');
+    if (norm.includes('psncure')) return 0xf97316; // Orange (Psncureberry)
+    if (norm.includes('przcure')) return 0x3b82f6; // Blue (Przcureberry)
+    if (norm.includes('burnt')) return 0x06b6d4;   // Ice Cyan (Burnt Berry)
+    if (norm.includes('bitter')) return 0xeab308;  // Yellow (Bitter Berry)
+    if (norm.includes('mint')) return 0x10b981;    // Green (Mint Berry)
+    if (norm.includes('ice')) return 0xef4444;     // Red (Ice Berry)
+    if (norm.includes('mystery')) return 0x8b5cf6; // Purple (Mystery Berry)
+    if (norm.includes('miracle')) return 0xfacc15; // Gold (Miracle Berry)
+    return 0xf43f5e;                               // Red/Pink (Berry)
   }
 
   public removeItemBall(flagOrId: string): void {

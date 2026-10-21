@@ -1256,6 +1256,7 @@ async function bootstrap() {
 
     gameState = 'BATTLE';
     overworldHUD.hide();
+    itemfinderHUD.suspend();
     player.isMoving = false;
     player.progress = 0;
     audioManager.playBattleBgm(
@@ -1341,6 +1342,7 @@ async function bootstrap() {
             gameState = 'OVERWORLD';
             audioManager.restoreOverworldBgm(0.6);
             overworldHUD.show();
+            itemfinderHUD.resume();
             if (options.onBattleEnd) {
               await options.onBattleEnd(runResult);
             }
@@ -1600,6 +1602,7 @@ async function bootstrap() {
           overworldHUD.updateRouteName(respawnMap.name);
           audioManager.playMapBgm(respawnMap.id, 0.8);
           overworldHUD.show();
+          itemfinderHUD.resume();
 
           healPlayerParty(false);
           saveCurrentGame();
@@ -1623,6 +1626,7 @@ async function bootstrap() {
         gameState = 'OVERWORLD';
         audioManager.restoreOverworldBgm(0.6);
         overworldHUD.show();
+        itemfinderHUD.resume();
         saveCurrentGame();
 
         if (options.onBattleEnd) {
@@ -2959,10 +2963,26 @@ async function bootstrap() {
       return;
     }
 
-    // 2b. Check Overworld Visible Item Balls (Sprint 12)
-    const itemBall =
-      overworldItemManager.checkItemBall(currentMap.id, facingX, facingY) ||
-      overworldItemManager.checkItemBall(currentMap.id, player.x, player.y);
+    // 2a-fallback. Universal Pokémon Center & Bedroom PC Terminal Fallback
+    if (
+      (currentMap.id.endsWith('_poke_center') && facingX === 9 && facingY === 1) ||
+      (currentMap.id === 'players_house_2f' && facingX === 0 && facingY === 1)
+    ) {
+      overworldHUD.openDialogue(
+        ["Accessed BILL'S PC!", 'POKéMON Storage System is online and synced.'],
+        "💻 BILL'S PC",
+        () => {
+          boxManagementUI.open(playerParty, boxManager.getState(), {
+            onSave: () => saveCurrentGame(),
+            onClose: () => saveCurrentGame(),
+          });
+        }
+      );
+      return;
+    }
+
+    // 2b. Check Overworld Visible Item Balls (Sprint 12 — Facing Adjacent Interaction)
+    const itemBall = overworldItemManager.checkItemBall(currentMap.id, facingX, facingY, storyFlags);
     if (itemBall) {
       addOverworldItemToInventory(itemBall.itemId);
       overworldItemManager.collectItem(itemBall.eventFlag);
@@ -3028,10 +3048,8 @@ async function bootstrap() {
       return;
     }
 
-    // 2d. Check Overworld Fruit Trees (Sprint 12)
-    const fruitTree =
-      overworldItemManager.checkFruitTree(currentMap.id, facingX, facingY) ||
-      overworldItemManager.checkFruitTree(currentMap.id, player.x, player.y);
+    // 2d. Check Overworld Fruit Trees (Sprint 12 — Facing Adjacent Interaction)
+    const fruitTree = overworldItemManager.checkFruitTree(currentMap.id, facingX, facingY);
     if (fruitTree) {
       if (overworldItemManager.isFruitTreePickedToday(fruitTree.treeId)) {
         overworldHUD.openDialogue(
@@ -3041,7 +3059,7 @@ async function bootstrap() {
       } else {
         addOverworldItemToInventory(fruitTree.berryId);
         overworldItemManager.pickFruitTree(fruitTree.treeId);
-        overworldRenderer.removeItemBall(fruitTree.treeId);
+        syncMapOverworldItems(currentMap);
         BattleAudio.playOverworldSound('KEY_ITEM');
         const berryName = OverworldItemManager.formatItemName(fruitTree.berryId);
         overworldHUD.openDialogue(
@@ -3285,6 +3303,24 @@ async function bootstrap() {
     );
   };
 
+  const isTileWalkableForPlayer = (x: number, y: number): boolean => {
+    if (!mapManager.isWalkable(x, y)) return false;
+    const activeMap = mapManager.getCurrentMap();
+    if (activeMap && overworldItemManager.isSolidObstacle(activeMap.id, x, y, storyFlags)) {
+      return false;
+    }
+    return true;
+  };
+
+  const isTileWalkableForActiveMapNpc = (x: number, y: number): boolean => {
+    if (!mapManager.isWalkableInBounds(x, y)) return false;
+    const activeMap = mapManager.getCurrentMap();
+    if (activeMap && overworldItemManager.isSolidObstacle(activeMap.id, x, y, storyFlags)) {
+      return false;
+    }
+    return true;
+  };
+
   // 8. Decoupled Main Ticker Loop
   overworldRenderer.app.ticker.add((ticker) => {
     const rawDeltaSec = ticker.deltaMS / 1000;
@@ -3306,7 +3342,7 @@ async function bootstrap() {
         player,
         dtPlayer,
         heldDir,
-        mapManager.isWalkable,
+        isTileWalkableForPlayer,
         mapManager.getTileType,
         (_entity, coord, tileType) => {
           handleMapTransition(player);
@@ -3550,7 +3586,7 @@ async function bootstrap() {
             npcEntity,
             dtWorld,
             desiredDir,
-            mapManager.isWalkableInBounds,
+            isTileWalkableForActiveMapNpc,
             mapManager.getTileType,
             undefined,
             npcObstaclesScratch

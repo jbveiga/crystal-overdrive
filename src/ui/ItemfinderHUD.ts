@@ -13,6 +13,7 @@ export class ItemfinderHUD {
   private statusLabelElement!: HTMLDivElement;
   private subLabelElement!: HTMLDivElement;
   private active: boolean = false;
+  private suspended: boolean = false;
   private lastPing: RadarPing | null = null;
 
   constructor(containerId: string = 'overworld-hud-container') {
@@ -96,9 +97,27 @@ export class ItemfinderHUD {
     return this.active;
   }
 
+  public isSuspended(): boolean {
+    return this.suspended;
+  }
+
+  public suspend(): void {
+    this.suspended = true;
+    this.capsuleElement.style.display = 'none';
+  }
+
+  public resume(): void {
+    this.suspended = false;
+    if (this.active) {
+      this.capsuleElement.style.display = 'flex';
+    }
+  }
+
   public show(): void {
     this.active = true;
-    this.capsuleElement.style.display = 'flex';
+    if (!this.suspended) {
+      this.capsuleElement.style.display = 'flex';
+    }
   }
 
   public hide(): void {
@@ -121,7 +140,7 @@ export class ItemfinderHUD {
 
   public update(ping: RadarPing): void {
     this.lastPing = ping;
-    if (!this.active) return;
+    if (!this.active || this.suspended) return;
 
     if (!ping.hasItemInRange || ping.distance === null) {
       this.capsuleElement.style.borderColor = '#64748b';

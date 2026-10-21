@@ -150,6 +150,21 @@ export class OverworldItemManager {
   }
 
   /**
+   * Checks if a coordinate on mapId contains a solid obstacle (uncollected item ball or fruit tree).
+   */
+  public isSolidObstacle(mapId: string, x: number, y: number, externalFlags?: Set<string>): boolean {
+    // 1. Uncollected visible item balls block movement
+    if (this.checkItemBall(mapId, x, y, externalFlags)) {
+      return true;
+    }
+    // 2. Fruit trees block movement
+    if (this.checkFruitTree(mapId, x, y)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Validates whether a fruit tree has already yielded fruit today (calendar day check)
    */
   public isFruitTreePickedToday(treeId: string, nowMs: number = Date.now()): boolean {

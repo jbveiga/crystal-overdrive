@@ -270,11 +270,12 @@
   ],
   "bgEvents": [
     {
-      "x": 0,
+      "x": 9,
       "y": 1,
-      "speaker": "💻 PC",
+      "speaker": "💻 BILL'S PC",
       "pages": [
-        "POKéMON Storage System opened! ...It's working normally."
+        "Accessed BILL'S PC!",
+        "POKéMON Storage System is online and synced."
       ]
     },
     {

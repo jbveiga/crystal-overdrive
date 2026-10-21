@@ -385,4 +385,21 @@ describe('Overworld Items & Authentic Pret Extraction', () => {
     expect(OverworldItemManager.resolveItemPocket('machine_part')).toBe('KEY_ITEMS');
     expect(OverworldItemManager.resolveItemPocket('hyper_potion')).toBe('ITEMS');
   });
+
+  it('detects uncollected item balls and fruit trees as solid obstacles while clearing collected items', () => {
+    const manager = new OverworldItemManager();
+
+    // Route 29 has item ball at (48, 2) and fruit tree at (12, 2)
+    expect(manager.isSolidObstacle('route_29', 48, 2)).toBe(true);
+    expect(manager.isSolidObstacle('route_29', 12, 2)).toBe(true);
+    expect(manager.isSolidObstacle('route_29', 10, 10)).toBe(false);
+
+    // After collecting the item ball, it is no longer a solid obstacle
+    manager.collectItem('EVENT_ROUTE_29_POTION');
+    expect(manager.isSolidObstacle('route_29', 48, 2)).toBe(false);
+
+    // Fruit tree remains solid even after picking berries
+    manager.pickFruitTree('FRUITTREE_ROUTE_29');
+    expect(manager.isSolidObstacle('route_29', 12, 2)).toBe(true);
+  });
 });
