@@ -9,6 +9,7 @@ import type {
   PlayerGender,
   GameOptions,
   SavePreview,
+  SerializedMissionState,
 } from '../types/game';
 
 export interface SaveData {
@@ -39,6 +40,7 @@ export interface SaveData {
   storyFlags?: string[];
   seenSpecies?: string[];
   options?: GameOptions;
+  missions?: Record<string, SerializedMissionState>;
 }
 
 const DB_NAME = 'crystal-overdrive-db';

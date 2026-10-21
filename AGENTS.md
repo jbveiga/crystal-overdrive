@@ -54,3 +54,17 @@ At the end of every periodic review, present the structured **Project Health & O
 - The **Implementer** is the only agent authorized to modify production code files.
 - The **QA & Code Reviewer** independently audits code against the 7 dimensions and 100% test pass guarantee.
 
+### 3.1 Autonomous Execution, Absolute Timer Ban & Completion Messaging Directive
+- **Absolute Ban on Timers:** The Orchestrator is **strictly forbidden from setting any timers** (`schedule` tool, cron jobs, background countdowns, or sleep scripts) under any circumstance. 
+- **Strict Non-Interference:** Once a ticket or instruction has been dispatched to a specialized agent (Implementer, Planner, QA Reviewer, Asset Specialist), the Orchestrator must grant full autonomy and **NEVER** micromanage or interrupt the agent while they are actively working.
+- **Prohibited Polling Behaviors:**
+  - **No Polling Loops:** Do NOT query `git status`, directory listings, or transcript logs to track in-flight file edits.
+  - **No In-Flight Pings:** Do NOT send mid-task "checking in", "status check", or reminder messages while an agent is executing.
+  - **Zero Timers:** Never schedule timers to wait on or monitor agent progress.
+- **Mandatory Agent Completion Messaging:**
+  - Every specialized agent (Implementer, Planner, QA Reviewer, Asset Specialist, Story Designer, Designer) **MUST explicitly send a return message to the Orchestrator as soon as their task is completed**.
+  - The return message must summarize the completed deliverables and hand off the next action.
+- **Pure Event-Driven Reactive Resumption:**
+  - The Orchestrator delegates the work, calls zero additional tools, and terminates its turn.
+  - The system will automatically wake the Orchestrator up the moment the assigned agent's return message arrives.
+

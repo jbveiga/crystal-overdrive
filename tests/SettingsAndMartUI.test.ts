@@ -192,6 +192,8 @@ import { BagAndMartUI } from '../src/ui/BagAndMartUI';
 import { OverworldHUD } from '../src/ui/OverworldHUD';
 import { BattleHUD } from '../src/ui/BattleHUD';
 import { TitleScreenUI } from '../src/ui/TitleScreenUI';
+import { MissionLogUI } from '../src/ui/MissionLogUI';
+import { MissionManager } from '../src/world/MissionManager';
 import { SaveManager } from '../src/core/SaveManager';
 import type { SavePreview, PokemonInstance, MoveData } from '../src/types/game';
 
@@ -611,6 +613,53 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       expect(defaults.playerSpeedDefault).toBe(1);
       expect(defaults.battleSpeedMultiplier).toBe(1);
       expect(defaults.touchControlStyle).toBe('DPAD');
+    });
+  });
+
+  describe('7. Sprint 11: Unbound-Style MissionLogUI & Start Menu Integration', () => {
+    it('renders MissionLogUI with ALL/MAIN/SIDE/COMPLETED tabs, mission dossier, and Start Menu [M] shortcut', () => {
+      const manager = new MissionManager();
+      const missionLogUI = new MissionLogUI('modal-container', manager);
+      const hud = new OverworldHUD('overworld-hud-container');
+
+      const ui = new StartMenuUI(
+        'modal-container',
+        {
+          getTrainerName: () => 'GOLD',
+          getMoney: () => 3000,
+          getBadges: () => [],
+          getPartyCount: () => 1,
+          getCaughtCount: () => 1,
+          getPlayTimeSeconds: () => 120,
+          getMapName: () => 'New Bark Town',
+        },
+        {
+          onOpenParty: vi.fn(),
+          onOpenBag: vi.fn(),
+          onOpenPokegear: vi.fn(),
+          onOpenMissions: () => missionLogUI.open(),
+          onSaveGame: vi.fn(),
+        }
+      );
+
+      expect(ui.triggerShortcut('KeyM', false)).toBe(true);
+      expect(missionLogUI.isOpen()).toBe(true);
+
+      const title = mockDoc.querySelector('#mission-dossier-title') as MockElement;
+      expect(title).not.toBeNull();
+      expect(title.innerText).toContain('M01: A New Beginning');
+
+      const sideTab = mockDoc.querySelector('#mission-tab-side') as MockElement;
+      expect(sideTab).not.toBeNull();
+      sideTab.click();
+      expect((mockDoc.querySelector('#mission-dossier-title') as MockElement).innerText).toContain(
+        'S01: The Route 30 Forager'
+      );
+
+      hud.showMissionToast('A New Beginning', 'All objectives completed!', 'completed');
+      const toast = mockDoc.querySelector('#overworld-toast-banner') as MockElement;
+      expect(toast.style.display).toBe('block');
+      expect(toast.innerHTML).toContain('MISSION COMPLETED');
     });
   });
 });

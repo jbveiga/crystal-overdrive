@@ -49,6 +49,7 @@ export interface StartMenuCallbacks {
   onOpenParty: () => void;
   onOpenBag: () => void;
   onOpenPokegear: () => void;
+  onOpenMissions?: () => void;
   onSaveGame: () => Promise<void>;
   onToggleMute?: () => boolean;
   onCycleSpeed?: () => SpeedMultiplier;
@@ -129,6 +130,17 @@ export class StartMenuUI {
         action: () => {
           this.hideMenuOnly();
           this.callbacks.onOpenPokegear();
+        },
+      },
+      {
+        id: 'start-opt-missions',
+        label: 'MISSIONS',
+        icon: '📜',
+        shortcut: 'M',
+        action: () => {
+          BattleAudio.playMenuSound('CONFIRM');
+          this.hideMenuOnly();
+          this.callbacks.onOpenMissions?.();
         },
       },
       {
@@ -291,7 +303,7 @@ export class StartMenuUI {
       if (chosen) chosen.action();
       return true;
     }
-    if (e.code === 'Escape' || e.code === 'KeyM') {
+    if (e.code === 'Escape') {
       e.preventDefault();
       BattleAudio.playMenuSound('CANCEL');
       this.closeAll();
@@ -302,30 +314,34 @@ export class StartMenuUI {
   }
 
   public triggerShortcut(code: string, allowSaveAndDigits: boolean = false): boolean {
-    const shortcutMap: Record<string, number> = {
-      KeyP: 0,
-      KeyK: 1,
-      KeyB: 2,
-      KeyG: 3,
-      KeyT: 4,
-      KeyO: 6,
+    const shortcutByCode: Record<string, string> = {
+      KeyP: 'start-opt-pokedex',
+      KeyK: 'start-opt-pokemon',
+      KeyB: 'start-opt-bag',
+      KeyG: 'start-opt-pokegear',
+      KeyM: 'start-opt-missions',
+      KeyT: 'start-opt-trainer',
+      KeyO: 'start-opt-settings',
     };
     if (allowSaveAndDigits) {
-      shortcutMap.KeyS = 5;
-      shortcutMap.Digit1 = 0;
-      shortcutMap.Digit2 = 1;
-      shortcutMap.Digit3 = 2;
-      shortcutMap.Digit4 = 3;
-      shortcutMap.Digit5 = 4;
-      shortcutMap.Digit6 = 5;
-      shortcutMap.Digit7 = 6;
-      shortcutMap.Digit8 = 7;
+      shortcutByCode.KeyS = 'start-opt-save';
+      if (code.startsWith('Digit')) {
+        const digit = parseInt(code.replace('Digit', ''), 10);
+        if (digit >= 1 && digit <= this.menuItems.length) {
+          this.cursorIndex = digit - 1;
+          this.menuItems[this.cursorIndex].action();
+          return true;
+        }
+      }
     }
-    const targetIdx = shortcutMap[code];
-    if (targetIdx !== undefined && this.menuItems[targetIdx]) {
-      this.cursorIndex = targetIdx;
-      this.menuItems[targetIdx].action();
-      return true;
+    const targetId = shortcutByCode[code];
+    if (targetId) {
+      const targetIdx = this.menuItems.findIndex((item) => item.id === targetId);
+      if (targetIdx >= 0) {
+        this.cursorIndex = targetIdx;
+        this.menuItems[targetIdx].action();
+        return true;
+      }
     }
     return false;
   }

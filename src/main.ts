@@ -17,6 +17,8 @@ import { PartyManagementUI } from './ui/PartyManagementUI';
 import { StartMenuUI } from './ui/StartMenuUI';
 import { TitleScreenUI } from './ui/TitleScreenUI';
 import { IntroSequenceUI } from './ui/IntroSequenceUI';
+import { MissionLogUI } from './ui/MissionLogUI';
+import { MissionManager } from './world/MissionManager';
 import type { MapData, Direction, PokeballId, PokemonInstance, PlayerGender, GameOptions, SpeedMultiplier } from './types/game';
 import type { Graphics } from 'pixi.js';
 import { createNpcsByMap } from './world/npcData';
@@ -41,6 +43,7 @@ async function bootstrap() {
   const roamingManager = new RoamingManager();
   const saveManager = new SaveManager();
   const audioManager = new AudioManager();
+  const missionManager = new MissionManager();
   let gameState: 'TITLE' | 'OVERWORLD' | 'BATTLE' = 'TITLE';
 
   // 2. Load or Initialize Game State
@@ -108,6 +111,8 @@ async function bootstrap() {
     existingSave.seenSpecies?.forEach((s) => seenSpecies.add(s));
     playerParty.forEach((p) => seenSpecies.add(p.speciesId));
     playerBox.forEach((p) => seenSpecies.add(p.speciesId));
+    missionManager.deserialize(existingSave.missions);
+    missionManager.checkStoryFlags(storyFlags);
 
     initialMapId = existingSave.player.mapId;
     initialPlayerX = existingSave.player.x;
@@ -492,6 +497,7 @@ async function bootstrap() {
 
   // 4. Save Game Helper
   const saveCurrentGame = async () => {
+    missionManager.checkStoryFlags(storyFlags);
     gameOptions.playerSpeedDefault = gameClock.playerSpeed;
     gameOptions.battleSpeedMultiplier = gameClock.battleSpeed;
     if (overworldHUD) {
@@ -525,6 +531,7 @@ async function bootstrap() {
       storyFlags: Array.from(storyFlags),
       seenSpecies: Array.from(seenSpecies),
       options: gameOptions,
+      missions: missionManager.serialize(),
     };
     await saveManager.saveGame(saveData);
     console.log('💾 Game state successfully saved to IndexedDB.');
@@ -538,6 +545,8 @@ async function bootstrap() {
   const partyUI = new PartyManagementUI('modal-container', playerParty, () => {
     saveCurrentGame();
   });
+
+  const missionLogUI = new MissionLogUI('modal-container', missionManager);
 
   let handleInteract = () => {};
 
@@ -598,7 +607,14 @@ async function bootstrap() {
       onOpenPokegear: () => {
         partyUI.hide();
         bagUI.hide();
+        missionLogUI.hide();
         overworldHUD.openPokegear();
+      },
+      onOpenMissions: () => {
+        partyUI.hide();
+        bagUI.hide();
+        missionManager.checkStoryFlags(storyFlags);
+        missionLogUI.open();
       },
       onSaveGame: async () => {
         await saveCurrentGame();
@@ -628,7 +644,7 @@ async function bootstrap() {
   startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
 
   const isAnyOverworldModalOpen = () =>
-    gameState === 'TITLE' || startMenuUI.isOpen() || partyUI.isOpen() || bagUI.isOpen();
+    gameState === 'TITLE' || startMenuUI.isOpen() || partyUI.isOpen() || bagUI.isOpen() || missionLogUI.isOpen();
 
   overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
@@ -638,6 +654,10 @@ async function bootstrap() {
       return audioManager.toggleMute();
     },
     onMenuToggle: () => {
+      if (missionLogUI.isOpen()) {
+        missionLogUI.hide();
+        return;
+      }
       if (partyUI.isOpen()) {
         partyUI.hide();
         return;
@@ -677,6 +697,19 @@ async function bootstrap() {
   overworldHUD.updateRouteName(initialMap.name);
   overworldHUD.updatePokegear(roamingManager.getAllRoamers());
   overworldHUD.hide();
+
+  missionManager.setCallbacks({
+    onMissionUnlocked: (mission) => {
+      overworldHUD.showMissionToast(mission.title, mission.summary, 'unlocked');
+    },
+    onMissionAdvanced: (mission, step) => {
+      overworldHUD.showMissionToast(mission.title, step.description, 'progress');
+    },
+    onMissionCompleted: (mission) => {
+      BattleAudio.playOverworldSound('KEY_ITEM');
+      overworldHUD.showMissionToast(mission.title, 'All objectives completed!', 'completed');
+    },
+  });
 
   window.updateLoaderProgress?.(70, 'Mounting overworld engine...');
   const overworldRenderer = new OverworldRenderer();
@@ -728,6 +761,7 @@ async function bootstrap() {
       storyFlags.clear();
       seenSpecies.clear();
       roamingManager.sleepBeasts();
+      missionManager.deserialize(new MissionManager().serialize());
 
       gameClock.playerSpeed = gameOptions.playerSpeedDefault;
       overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
@@ -805,6 +839,10 @@ async function bootstrap() {
       return;
     }
     if (gameState === 'OVERWORLD') {
+      if (missionLogUI.isOpen()) {
+        missionLogUI.handleKeyDown(e);
+        return;
+      }
       if (startMenuUI.isOpen()) {
         startMenuUI.handleKeyDown(e);
         return;

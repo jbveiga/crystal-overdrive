@@ -154,7 +154,38 @@ export type NpcSpriteType =
   | 'sage' | 'elder' | 'elder_li' | 'falkner' | 'bird_keeper' | 'earl';
 ```
 
-### 3.3 Roaming Beast Markov Graph (`src/world/RoamingManager.ts`)
+### 3.3 Overworld Items & Scattered Pickups (`public/assets/data/overworld_items.json`)
+Authentic extraction of all 246 scattered overworld pickups from Pokémon Crystal (`scripts/pokecrystal_raw/maps__*.asm`):
+- **136 Visible Item Balls** (`OBJECTTYPE_ITEMBALL`): Parsed directly with event flag mappings.
+- **80 Hidden Items** (`BGEVENT_ITEM`): Parsed from background event triggers with flags.
+- **30 Fruit Trees** (`SPRITE_FRUIT_TREE` / `fruittree`): Parsed and resolved against `data/items/fruit_trees.asm` berry tables.
+- **Indexed Structure**: Includes overall and regional summary stats (Johto: 173 items, Kanto: 73 items), flat category arrays, and an O(1) `byMap` index containing map-scoped item balls, hidden items, and fruit trees.
+
+```typescript
+export interface OverworldItemsPayload {
+  summary: {
+    totalItemBalls: number;    // 136
+    totalHiddenItems: number;  // 80
+    totalFruitTrees: number;   // 30
+    total: number;             // 246
+    totalMapsWithItems: number;// 93
+    johto: { itemBalls: 103, hiddenItems: 48, fruitTrees: 22, total: 173 };
+    kanto: { itemBalls: 33, hiddenItems: 32, fruitTrees: 8, total: 73 };
+  };
+  itemBalls: ItemBallEntry[];
+  hiddenItems: HiddenItemEntry[];
+  fruitTrees: FruitTreeEntry[];
+  byMap: Record<string, {
+    mapId: string;
+    region: 'johto' | 'kanto';
+    itemBalls: ItemBallEntry[];
+    hiddenItems: HiddenItemEntry[];
+    fruitTrees: FruitTreeEntry[];
+  }>;
+}
+```
+
+### 3.4 Roaming Beast Markov Graph (`src/world/RoamingManager.ts`)
 The three legendary beasts (*Raikou*, *Entei*, *Suicune*) stay dormant in Ecruteak's Burned Tower until awakened by story events. Once active, their positions transition across an adjacency graph upon player route transitions:
 - $P(\text{Stay}) = 0.50$
 - $P(\text{Move to Adjacent Route}) = 0.35$
@@ -269,8 +300,10 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `AudioManager.ts` | `tests/AudioManager.test.ts` | 6 | ✅ Covered | Map-to-BGM track resolution, gain staging math, battle ducking/restoration, mute sync, and retro overworld SFX (BUMP, HOP, RUSTLE, HEAL_JINGLE, FANFARE) (Ticket 6.3). |
 | `TitleScreenUI.ts` | `tests/TitleScreenUI.test.ts` | 6 | ✅ Covered | Default menu focus (`CONTINUE` vs `NEW_GAME`), `SavePreview` summary binding, audio unlock gate, keyboard navigation, overwrite confirmation modal, `GameOptions` updates. |
 | `IntroSequenceUI.ts` | `tests/IntroSequenceUI.test.ts` | 4 | ✅ Covered | 6-stage state machine progression, Boy/Girl preset selection, 1-15 char name validation/fallback, RTC period detection, `onComplete` payload. |
-| `StartMenuUI.ts` / `BagAndMartUI.ts` / `OverworldHUD.ts` / `BattleHUD.ts` | `tests/SettingsAndMartUI.test.ts` | 12 | ✅ Covered | Settings submenu with sound toggle, speed cycle, touch controls & D-Pad vs Virtual Analog Joystick control style; separate Poké Mart counter view & bag view; mobile D-pad ergonomics, dynamic Trainer Card name, P/K/B/G/T/S/O shortcuts, 6-slot Poké Ball healing animation at fixed canonical speed, interactive `#move-learn-modal` pointer-events & keyboard shortcuts, and persisted `battleSpeedMultiplier` & `touchControlStyle` (Sprint 08, Sprint 10). |
-| **Current Baseline** | **12 Suites** | **112 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `StartMenuUI.ts` / `BagAndMartUI.ts` / `OverworldHUD.ts` / `BattleHUD.ts` / `MissionLogUI.ts` | `tests/SettingsAndMartUI.test.ts` | 13 | ✅ Covered | Settings submenu with sound toggle, speed cycle, touch controls & D-Pad vs Virtual Analog Joystick control style; separate Poké Mart counter view & bag view; mobile D-pad ergonomics, dynamic Trainer Card name, P/K/B/G/M/T/S/O shortcuts, 6-slot Poké Ball healing animation at fixed canonical speed, interactive `#move-learn-modal` pointer-events & keyboard shortcuts, Unbound-style `MissionLogUI`, and persisted `battleSpeedMultiplier` & `touchControlStyle` (Sprint 08, Sprint 10, Sprint 11). |
+| `overworld_items.json` | `tests/OverworldItems.test.ts` | 5 | ✅ Covered | Authentic pret/pokecrystal scattered overworld item extraction (136 item balls, 80 hidden items, 30 fruit trees = 246 total), Johto (173) vs Kanto (73) regional integrity, valid coordinates & event flags, and authentic item assertions (Violet City, Route 29–31, Ilex Forest, Burned Tower, Fighting Dojo, Cerulean Gym Machine Part, Cerulean Berserk Gene). |
+| `MissionManager.ts` / `missionData.ts` | `tests/MissionManager.test.ts` | 4 | ✅ Covered | Unbound-style quest system hydrating all 15 Main Story Missions (M01–M15) and 21 Side Missions (S01–S21), category/status filtering, sequential step progression, `checkStoryFlags` auto-unlock/completion, and lossless save state serialization (Sprint 11). |
+| **Current Baseline** | **14 Suites** | **122 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

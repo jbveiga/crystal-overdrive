@@ -1100,7 +1100,33 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
   public showToast(message: string, durationMs: number = 3200): void {
     if (!this.toastBanner) return;
     if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    this.toastBanner.style.borderColor = '#38bdf8';
     this.toastBanner.innerText = message;
+    this.toastBanner.style.display = 'block';
+    this.toastTimeout = setTimeout(() => {
+      this.toastBanner.style.display = 'none';
+    }, durationMs);
+  }
+
+  public showMissionToast(
+    title: string,
+    subtitle: string,
+    type: 'unlocked' | 'progress' | 'completed' = 'progress',
+    durationMs: number = 3800
+  ): void {
+    if (!this.toastBanner) return;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+
+    const borderColor = type === 'completed' ? '#4ade80' : type === 'unlocked' ? '#facc15' : '#38bdf8';
+    const headerIcon = type === 'completed' ? '🏆 MISSION COMPLETED' : type === 'unlocked' ? '✨ NEW MISSION' : '📜 MISSION PROGRESS';
+
+    this.toastBanner.style.borderColor = borderColor;
+    this.toastBanner.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 3px; text-align: center;">
+        <span style="font-size: 11px; font-weight: 900; color: ${borderColor}; letter-spacing: 0.8px;">${headerIcon}: ${title}</span>
+        <span style="font-size: 13px; font-weight: 700; color: #f8fafc;">${subtitle}</span>
+      </div>
+    `;
     this.toastBanner.style.display = 'block';
     this.toastTimeout = setTimeout(() => {
       this.toastBanner.style.display = 'none';
@@ -1305,7 +1331,7 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
         return;
       }
 
-      if ((e.code === 'Escape' || e.code === 'KeyM') && !e.repeat && this.isVisible() && !this.isDialogueOpen()) {
+      if (e.code === 'Escape' && !e.repeat && this.isVisible() && !this.isDialogueOpen()) {
         if (this.isPokegearOpen()) {
           const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
           pokegearModal.style.display = 'none';

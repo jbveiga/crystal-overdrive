@@ -174,3 +174,43 @@ export interface RoamerState {
   isCaught: boolean;
   isDefeated: boolean;
 }
+
+export type MissionCategory = 'MAIN' | 'SIDE';
+export type MissionStatus = 'LOCKED' | 'ACTIVE' | 'COMPLETED';
+export type MissionFilter = 'ALL' | 'MAIN' | 'SIDE' | 'COMPLETED';
+
+export interface MissionStep {
+  id: string;
+  description: string;
+  completed: boolean;
+  targetMapId?: string;
+  storyFlag?: string;
+}
+
+export interface MissionReward {
+  type: 'ITEM' | 'MONEY' | 'BADGE' | 'TM' | 'POKEMON';
+  value: string | number;
+  label: string;
+}
+
+export interface Mission {
+  id: string;
+  title: string;
+  category: MissionCategory;
+  act: number;
+  summary: string;
+  location: string;
+  giver: string;
+  status: MissionStatus;
+  steps: MissionStep[];
+  currentStepIndex: number;
+  rewards: MissionReward[];
+  unlockedAtStoryFlag?: string;
+  completedAtStoryFlag?: string;
+}
+
+export interface SerializedMissionState {
+  status: MissionStatus;
+  currentStepIndex: number;
+  stepsCompleted: boolean[];
+}
