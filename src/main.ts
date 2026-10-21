@@ -22,6 +22,7 @@ import { MissionManager } from './world/MissionManager';
 import { OverworldItemManager } from './world/OverworldItemManager';
 import { ItemfinderRadar } from './world/ItemfinderRadar';
 import { ItemfinderHUD } from './ui/ItemfinderHUD';
+import { NamingModalUI } from './ui/NamingModalUI';
 import type {
   MapData,
   Direction,
@@ -100,6 +101,7 @@ async function bootstrap() {
   let initialPlayerDir: Direction = 'DOWN';
   let playerName = 'GOLD';
   let playerGender: PlayerGender = 'BOY';
+  let rivalName = 'SILVER';
   let gameOptions: GameOptions = SaveManager.getDefaultOptions();
   let lastVisitedPokecenter = { mapId: 'new_bark_town', x: 6, y: 4 };
 
@@ -107,6 +109,7 @@ async function bootstrap() {
     console.log('📦 Restoring save state from IndexedDB...');
     playerName = existingSave.player.name || 'GOLD';
     playerGender = existingSave.player.gender || 'BOY';
+    rivalName = existingSave.rivalName || existingSave.player.rivalName || 'SILVER';
     if (existingSave.options) {
       gameOptions = existingSave.options;
     }
@@ -546,7 +549,9 @@ async function bootstrap() {
         battleSpeedMultiplier: gameClock.battleSpeed,
         badges: inventory.badges,
         money: inventory.money,
+        rivalName,
       },
+      rivalName,
       party: playerParty,
       box: playerBox,
       inventory: {
@@ -617,6 +622,7 @@ async function bootstrap() {
 
   const missionLogUI = new MissionLogUI('modal-container', missionManager);
   const itemfinderHUD = new ItemfinderHUD('overworld-hud-container');
+  const namingModalUI = new NamingModalUI('overworld-hud-container');
 
   let handleInteract = () => {};
   let toggleLiveItemfinderRadar = (): boolean => false;
@@ -878,11 +884,15 @@ async function bootstrap() {
       defeatedTrainers.clear();
       storyFlags.clear();
       seenSpecies.clear();
+      rivalName = 'SILVER';
       overworldItemManager.setCollectedFlags([]);
       overworldItemManager.setFruitTreePicks({});
       const freshNpcs = createNpcsByMap();
       npcsByMap.mr_pokemons_house = freshNpcs.mr_pokemons_house;
       npcsByMap.route_36 = freshNpcs.route_36;
+      npcsByMap.elms_lab = freshNpcs.elms_lab;
+      npcsByMap.azalea_town = freshNpcs.azalea_town;
+      npcsByMap.slowpoke_well_b1f = freshNpcs.slowpoke_well_b1f;
       roamingManager.sleepBeasts();
       missionManager.deserialize(new MissionManager().serialize());
 
@@ -1016,6 +1026,22 @@ async function bootstrap() {
   }
   if ((storyFlags.has('HAS_MYSTERY_EGG') || storyFlags.has('HAS_POKEDEX')) && npcsByMap.mr_pokemons_house) {
     npcsByMap.mr_pokemons_house = npcsByMap.mr_pokemons_house.filter((n) => n.id !== 'prof_oak_npc');
+  }
+  if ((!storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') || storyFlags.has('EVENT_RIVAL_NAMED')) && npcsByMap.elms_lab) {
+    npcsByMap.elms_lab = npcsByMap.elms_lab.filter((n) => n.id !== 'lab_police_officer');
+  }
+  if ((storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') || storyFlags.has('slowpoke_well_cleared')) && npcsByMap.azalea_town) {
+    npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_well_grunt');
+  }
+  if (storyFlags.has('slowpoke_well_cleared')) {
+    if (npcsByMap.azalea_town) {
+      npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_gym_grunt');
+    }
+    if (npcsByMap.slowpoke_well_b1f) {
+      npcsByMap.slowpoke_well_b1f = npcsByMap.slowpoke_well_b1f.filter(
+        (n) => !n.id.startsWith('rocket_grunt') && n.id !== 'executive_proton'
+      );
+    }
   }
 
   const emptyNpcs: GridEntity[] = [];
@@ -1892,8 +1918,10 @@ async function bootstrap() {
               onVictory: () => {
                 defeatedTrainers.add('bugsy');
                 storyFlags.add('bugsy_defeated');
+                storyFlags.add('CAN_USE_CUT');
                 if (!inventory.badges.includes('hive')) inventory.badges.push('hive');
                 if (!inventory.tms.includes('TM49')) inventory.tms.push('TM49');
+                missionManager.checkStoryFlags(storyFlags);
                 audioManager.playSfx('sfx_badge_get');
                 BattleAudio.playOverworldSound('KEY_ITEM');
                 overworldHUD.openDialogue(
@@ -2522,6 +2550,186 @@ async function bootstrap() {
           return;
         }
 
+        // Police Officer Interrogation & Rival Naming in Elm's Lab (Ticket SPRINT-13-RIVAL-AND-AZALEA)
+        if (targetNpc.action === 'POLICE_RIVAL_NAMING' || targetNpc.id === 'lab_police_officer') {
+          overworldHUD.openDialogue(
+            [
+              'OFFICER: I heard a POKéMON was stolen here…',
+              'Apparently, it was a young male with long, red hair…',
+              'What? You battled a trainer like that? Did you happen to get his name?',
+            ],
+            '👮 POLICE OFFICER',
+            () => {
+              namingModalUI.open(
+                {
+                  onConfirm: (chosenName) => {
+                    rivalName = chosenName;
+                    storyFlags.add('EVENT_RIVAL_NAMED');
+                    if (npcsByMap.elms_lab) {
+                      npcsByMap.elms_lab = npcsByMap.elms_lab.filter((n) => n.id !== 'lab_police_officer');
+                    }
+                    overworldHUD.openDialogue(
+                      [
+                        `OFFICER: OK! So ${rivalName} was his name. Thanks for helping our investigation!`,
+                        'The police officer tipped his hat and hurried out of the lab!',
+                      ],
+                      '👮 POLICE OFFICER',
+                      () => {
+                        saveCurrentGame();
+                        overworldHUD.showToast(`👮 Suspect identified as ${rivalName}!`);
+                      }
+                    );
+                  },
+                },
+                rivalName || 'SILVER'
+              );
+            }
+          );
+          return;
+        }
+
+        // Azalea Town: Kurt Briefing
+        if (targetNpc.id === 'azalea_kurt') {
+          storyFlags.add('EVENT_KURT_LEFT_FOR_WELL');
+          if (npcsByMap.azalea_town) {
+            npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_well_grunt');
+          }
+          overworldHUD.openDialogue(
+            [
+              'KURT: Those dastardly TEAM ROCKET villains are chopping off SLOWPOKE tails in the well!',
+              "I'm going in there to drive them off myself! Stay back, kid!",
+              'Kurt grabbed his walking stick and stormed towards SLOWPOKE WELL!',
+            ],
+            targetNpc.speaker,
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('👴 Kurt rushed into Slowpoke Well!');
+            }
+          );
+          return;
+        }
+
+        // Azalea Town: Kurt's House Post-Well Interaction
+        if (targetNpc.id === 'kurt_house_kurt') {
+          if (storyFlags.has('slowpoke_well_cleared')) {
+            overworldHUD.openDialogue(
+              [
+                "KURT: You drove off TEAM ROCKET from SLOWPOKE WELL? You're a wonderful trainer!",
+                "Bring me any APRICORNS you find on trees, and I'll gladly craft custom POKé BALLS for you free of charge!",
+              ],
+              targetNpc.speaker
+            );
+          } else {
+            overworldHUD.openDialogue(
+              [
+                'KURT: TEAM ROCKET is cutting off SLOWPOKE tails in the well outside!',
+                'We have to put a stop to their cruelty!',
+              ],
+              targetNpc.speaker
+            );
+          }
+          return;
+        }
+
+        // Azalea Town: Grunt Blockades
+        if (targetNpc.id === 'azalea_well_grunt') {
+          overworldHUD.openDialogue(
+            [
+              "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        if (targetNpc.id === 'azalea_gym_grunt') {
+          overworldHUD.openDialogue(
+            [
+              "ROCKET GRUNT: No one gets in the GYM! Buzz off, brat!",
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        // Slowpoke Well: Executive Proton Boss Battle (Ticket SPRINT-13-RIVAL-AND-AZALEA)
+        if (targetNpc.action === 'PROTON_EVENT' || targetNpc.id === 'executive_proton') {
+          if (!storyFlags.has('proton_defeated')) {
+            const introPages = [
+              "PROTON: What do you want? If you interrupt our work, don't expect any mercy! We're TEAM ROCKET, and we'll do anything for money!",
+            ];
+            overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+              const team = buildTrainerTeamInstances(targetNpc);
+              if (team.length === 0) return;
+              triggerBattle(team[0], {
+                isTrainer: true,
+                trainerName: 'Executive Proton',
+                trainerTeam: team,
+                onVictory: () => {
+                  defeatedTrainers.add('executive_proton');
+                  storyFlags.add('proton_defeated');
+                  storyFlags.add('slowpoke_well_cleared');
+                  if (npcsByMap.slowpoke_well_b1f) {
+                    npcsByMap.slowpoke_well_b1f = npcsByMap.slowpoke_well_b1f.filter(
+                      (n) => !n.id.startsWith('rocket_grunt') && n.id !== 'executive_proton'
+                    );
+                  }
+                  if (npcsByMap.azalea_town) {
+                    npcsByMap.azalea_town = npcsByMap.azalea_town.filter(
+                      (n) => n.id !== 'azalea_well_grunt' && n.id !== 'azalea_gym_grunt'
+                    );
+                  }
+                  overworldHUD.openDialogue(
+                    [
+                      "PROTON: You did OK today, but don't think you've stopped us!",
+                      "TEAM ROCKET will never give up! Retreat!",
+                      "The Rocket Grunts and Executive Proton scrambled out of the cavern!",
+                      "KURT: Way to go! Team Rocket has taken off! Let's get out of here.",
+                    ],
+                    '⚡ EXECUTIVE PROTON',
+                    () => {
+                      overworldHUD.playFieldRestAnimation(() => {
+                        healPlayerParty(false);
+                        const kurtMap = mapManager.setCurrentMap('kurts_house');
+                        player.x = 3;
+                        player.y = 4;
+                        player.targetX = 3;
+                        player.targetY = 4;
+                        player.renderX = 3;
+                        player.renderY = 4;
+                        player.direction = 'UP';
+                        overworldRenderer.renderMap(kurtMap, lookupMap);
+                        syncMapOverworldItems(kurtMap);
+                        overworldHUD.updateRouteName(kurtMap.name);
+                        audioManager.playMapBgm(kurtMap.id, 0.8);
+
+                        inventory.balls['lure-ball'] = (inventory.balls['lure-ball'] || 0) + 1;
+                        storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
+                        missionManager.checkStoryFlags(storyFlags);
+                        BattleAudio.playOverworldSound('KEY_ITEM');
+                        overworldHUD.openDialogue(
+                          [
+                            "KURT: You drove off TEAM ROCKET from SLOWPOKE WELL? You're a wonderful trainer!",
+                            "Take this LURE BALL as a token of my gratitude!",
+                            `${playerName} received a LURE BALL from KURT!`,
+                            "KURT: Bring me any APRICORNS you find on trees, and I'll gladly craft custom POKé BALLS for you free of charge!",
+                          ],
+                          '👴 KURT',
+                          () => {
+                            saveCurrentGame();
+                            overworldHUD.showToast('⚡ Rescued the Slowpoke & received LURE BALL from Kurt!');
+                          }
+                        );
+                      });
+                    }
+                  );
+                },
+              });
+            });
+            return;
+          }
+        }
+
         // Prof. Elm Lab Starter Dialogue & Errands (Ticket 6.1 & BUGFIX-NARRATIVE-01)
         if (targetNpc.id === 'elm_npc') {
           if (!storyFlags.has('starter_chosen')) {
@@ -2537,6 +2745,17 @@ async function bootstrap() {
           }
 
           if (storyFlags.has('HAS_MYSTERY_EGG') && !storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')) {
+            if (storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') && !storyFlags.has('EVENT_RIVAL_NAMED')) {
+              overworldHUD.openDialogue(
+                [
+                  `PROF. ELM: ${playerName}! Did the officer question you about the break-in?`,
+                  'Please speak to the POLICE OFFICER first so we can help the investigation!',
+                ],
+                '🔬 PROF. ELM'
+              );
+              return;
+            }
+
             storyFlags.add('EVENT_GAVE_MYSTERY_EGG_TO_ELM');
             if (inventory.keyItems) {
               inventory.keyItems = inventory.keyItems.filter((k) => k !== 'MYSTERY EGG');
@@ -2953,6 +3172,78 @@ async function bootstrap() {
     mapManager.setNeighborScratchMap(null);
   };
 
+  // Passerby Rival 1 Ambush Encounter (Cherrygrove East Exit)
+  const triggerCherrygroveRivalAmbush = () => {
+    isCutsceneLocked = true;
+    player.isMoving = false;
+    player.progress = 0;
+    player.direction = 'RIGHT';
+
+    let rivalSpeciesId: 'totodile' | 'chikorita' | 'cyndaquil' = 'totodile';
+    let rivalMoves = ['scratch', 'leer'];
+    if (storyFlags.has('starter_cyndaquil') || playerParty.some((p) => p.speciesId === 'cyndaquil')) {
+      rivalSpeciesId = 'totodile';
+      rivalMoves = ['scratch', 'leer'];
+    } else if (storyFlags.has('starter_totodile') || playerParty.some((p) => p.speciesId === 'totodile')) {
+      rivalSpeciesId = 'chikorita';
+      rivalMoves = ['tackle', 'growl'];
+    } else if (storyFlags.has('starter_chikorita') || playerParty.some((p) => p.speciesId === 'chikorita')) {
+      rivalSpeciesId = 'cyndaquil';
+      rivalMoves = ['tackle', 'leer'];
+    }
+
+    const rivalPokemon = PokemonFactory.create(rivalSpeciesId, 5, rivalMoves);
+    audioManager.playBattleBgm('trainer');
+    overworldHUD.openDialogue(
+      [
+        '❓ PASSERBY BOY: <……> <……> <……>',
+        'You got a POKéMON at the LAB. What a waste. A wimp like you.',
+        '<……> <……> <……>',
+        "Don't you get what I'm saying?",
+        "Well, I too, have a good POKéMON. I'll show you what I mean!",
+      ],
+      '❓ PASSERBY BOY',
+      () => {
+        triggerBattle(rivalPokemon, {
+          isTrainer: true,
+          trainerName: 'Passerby ???',
+          trainerTeam: [rivalPokemon],
+          onVictory: () => {
+            overworldHUD.openDialogue(
+              [
+                '❓ PASSERBY BOY: Humph. Are you happy you won?',
+                '<……> <……> <……>',
+                "My name's ???. I'm going to be the world's greatest POKéMON trainer.",
+                'Get out of my way!',
+                `*BUMP!* The boy shoved past ${playerName} and bolted toward Route 29!`,
+                'As the boy shoved past, a card slipped from his jacket pocket!',
+                `${playerName} picked up the dropped TRAINER CARD!`,
+                'The name printed on the card reads: SILVER!',
+              ],
+              '❓ PASSERBY BOY',
+              () => {
+                BattleAudio.playOverworldSound('BUMP');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                storyFlags.add('EVENT_RIVAL_CHERRYGROVE_DEFEATED');
+                defeatedTrainers.add('rival_cherrygrove');
+                isCutsceneLocked = false;
+                const freshNpcs = createNpcsByMap();
+                if (freshNpcs.elms_lab && npcsByMap.elms_lab) {
+                  const officer = freshNpcs.elms_lab.find((n) => n.id === 'lab_police_officer');
+                  if (officer && !npcsByMap.elms_lab.some((n) => n.id === 'lab_police_officer')) {
+                    npcsByMap.elms_lab.push(officer);
+                  }
+                }
+                saveCurrentGame();
+                overworldHUD.showToast('Dropped TRAINER CARD acquired! Suspect: SILVER');
+              }
+            );
+          },
+        });
+      }
+    );
+  };
+
   // 8. Decoupled Main Ticker Loop
   overworldRenderer.app.ticker.add((ticker) => {
     const rawDeltaSec = ticker.deltaMS / 1000;
@@ -2994,6 +3285,39 @@ async function bootstrap() {
                   'Workers and road crews are currently preparing this route. Please check back later!',
                 ],
                 '🚧 ROADBLOCK'
+              );
+              return;
+            }
+
+            if (warp.targetMapId === 'azalea_gym' && !storyFlags.has('slowpoke_well_cleared')) {
+              player.isMoving = false;
+              player.progress = 0;
+              isCutsceneLocked = false;
+              BattleAudio.playMenuSound('CANCEL');
+              overworldHUD.openDialogue(
+                [
+                  'The GYM door is firmly locked!',
+                  'A notice on the door says: "GYM temporarily closed due to disturbance in SLOWPOKE WELL."',
+                ],
+                '🔒 AZALEA GYM'
+              );
+              return;
+            }
+
+            if (
+              warp.targetMapId === 'slowpoke_well_b1f' &&
+              !storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') &&
+              !storyFlags.has('slowpoke_well_cleared')
+            ) {
+              player.isMoving = false;
+              player.progress = 0;
+              isCutsceneLocked = false;
+              BattleAudio.playMenuSound('CANCEL');
+              overworldHUD.openDialogue(
+                [
+                  "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
+                ],
+                '⚡ ROCKET GRUNT'
               );
               return;
             }
@@ -3048,6 +3372,19 @@ async function bootstrap() {
                   );
                 }
               });
+            return;
+          }
+
+          // Passerby Rival 1 Ambush (Cherrygrove City East Exit)
+          if (
+            currentMap?.id === 'cherrygrove_city' &&
+            coord.x >= 37 &&
+            coord.y >= 5 &&
+            coord.y <= 8 &&
+            storyFlags.has('HAS_MYSTERY_EGG') &&
+            !storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED')
+          ) {
+            triggerCherrygroveRivalAmbush();
             return;
           }
 

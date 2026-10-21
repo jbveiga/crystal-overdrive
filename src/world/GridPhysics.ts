@@ -75,7 +75,9 @@ export interface GridEntity {
     | 'AMPHY_EVENT'
     | 'PHARMACY_SECRET_POTION_EVENT'
     | 'ELMS_AIDE_EVENT'
-    | 'SUDOWOODO_EVENT';
+    | 'SUDOWOODO_EVENT'
+    | 'POLICE_RIVAL_NAMING'
+    | 'PROTON_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

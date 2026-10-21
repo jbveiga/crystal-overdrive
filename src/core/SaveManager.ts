@@ -27,7 +27,9 @@ export interface SaveData {
     battleSpeedMultiplier?: SpeedMultiplier;
     badges: string[];
     money: number;
+    rivalName?: string;
   };
+  rivalName?: string;
   party: PokemonInstance[];
   box: PokemonInstance[];
   inventory: {
@@ -175,6 +177,11 @@ export class SaveManager {
         } else if (!loaded.options.expShare) {
           loaded.options.expShare = 'CAPPED';
         }
+        if (loaded.player && !loaded.player.rivalName && loaded.rivalName) {
+          loaded.player.rivalName = loaded.rivalName;
+        } else if (loaded.player && loaded.player.rivalName && !loaded.rivalName) {
+          loaded.rivalName = loaded.player.rivalName;
+        }
       }
       return loaded;
     } catch (err) {
@@ -213,6 +220,7 @@ export class SaveManager {
     const playTimeFormatted = SaveManager.formatPlayTime(save.playTimeSeconds || 0);
     const currentLocationName = SaveManager.formatLocationName(save.player.mapId);
     const leadPokemon = Array.isArray(save.party) && save.party.length > 0 ? save.party[0] : undefined;
+    const rivalName = save.rivalName || save.player.rivalName || 'SILVER';
 
     return {
       playerName,
@@ -224,6 +232,7 @@ export class SaveManager {
       partyLeadSpeciesId: leadPokemon?.speciesId,
       partyLeadLevel: leadPokemon?.level,
       timestamp: save.timestamp || 0,
+      rivalName,
     };
   }
 

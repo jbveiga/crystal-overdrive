@@ -89,6 +89,7 @@ src/
 ├── ui/                    # Vector DOM Overlays & Interactivity (100dvh + Safe-Area Inset Aware + Device-Adaptive)
 │   ├── TitleScreenUI.ts      # Crystalline Title Screen, Audio Unlock Gate, SavePreview Card, Overwrite & Options Modals
 │   ├── IntroSequenceUI.ts    # 6-Stage Prof. Oak Intro, Authentic Marill Sprite, Gender Select (Boy/Girl), 15-Char Name Input & Presets, RTC Sync
+│   ├── NamingModalUI.ts       # Centered Rival naming modal with presets (SILVER, KAZU, KAMON, RED) & 15-char input
 │   ├── OverworldHUD.ts       # Device-adaptive top menu capsule, Elevated Mobile Touch Gamepad, story-gated Roamer radar, dialogue typewriter
 │   ├── ItemfinderHUD.ts      # Top-right floating Itemfinder dowsing compass capsule with rotating needle & gold lock-on state
 │   ├── BattleHUD.ts          # Asymmetrical HUD cards, 6-dot party dock, device-adaptive Unbound 2x2 move matrix & hotkeys
@@ -307,7 +308,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `MissionManager.ts` / `missionData.ts` | `tests/MissionManager.test.ts` | 4 | ✅ Covered | Unbound-style quest system hydrating all 15 Main Story Missions (M01–M15) and 21 Side Missions (S01–S21), category/status filtering, sequential step progression, `checkStoryFlags` auto-unlock/completion, and lossless save state serialization (Sprint 11). |
 | `PokemonFactory.ts` / `SaveManager.ts` | `tests/ExpShare.test.ts` | 5 | ✅ Covered | Unbound-style 3-mode Exp. Share (`OFF`, `ALL`, `CAPPED`), default `CAPPED` save hydration, Johto/Kanto badge level caps (`15..85`), 100% active + 50% bench party distribution, and `1 EXP` clamping at/above level cap (KEY-ITEMS-UNBOUND-01). |
 | `ItemfinderRadar.ts` | `tests/ItemfinderRadar.test.ts` | 5 | ✅ Covered | Pure TypeScript 8-tile dowsing radar scan, nearest uncollected hidden item vector lock, 8-way compass bearings, adjacent `FACING` detection, and dynamic sonar pitch $f(d) = 880 + (8-d)\times 120\text{ Hz}$ (KEY-ITEMS-UNBOUND-01). |
-| **Current Baseline** | **16 Suites** | **140 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `NamingModalUI.ts` / `main.ts` / `npcData.ts` | `tests/RivalAndAzalea.test.ts` | 10 | ✅ Covered | Passerby Rival counter-starter selection (Cyndaquil -> Totodile, Totodile -> Chikorita, Chikorita -> Cyndaquil), dropped Trainer Card `SILVER`, Police interrogation & 15-character naming modal with presets (`SILVER`, `KAZU`, `KAMON`, `RED`), `SaveData.rivalName` serialization/hydration, Slowpoke Well Team Rocket raid with Executive Proton (Koffing Lv. 14, Zubat Lv. 9), Kurt Apricorn ball crafting unlock + Lure Ball award, Azalea Gym Leader Bugsy battle (Metapod Lv. 14, Kakuna Lv. 14, Scyther Lv. 16), Hive Badge, TM49 Fury Cutter, field Cut, and Mission M03 completion (Sprint 13). |
+| **Current Baseline** | **17 Suites** | **150 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

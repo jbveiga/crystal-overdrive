@@ -356,6 +356,20 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'There was a loud noise outside…',
         'To add to your POKéDEX, you have to catch POKéMON. Throw POKé BALLS at wild POKéMON to get them!',
       ]),
+      makeNpc(
+        'lab_police_officer',
+        4,
+        4,
+        'DOWN',
+        'fat_man',
+        '👮 POLICE OFFICER',
+        [
+          'OFFICER: I heard a POKéMON was stolen here…',
+          'Apparently, it was a young male with long, red hair…',
+          'What? You battled a trainer like that? Did you happen to get his name?',
+        ],
+        { action: 'POLICE_RIVAL_NAMING' }
+      ),
     ],
     players_house_1f: [
       makeNpc(
@@ -1322,6 +1336,28 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         ]
       ),
       makeNpc(
+        'azalea_well_grunt',
+        31,
+        9,
+        'DOWN',
+        'silver',
+        '⚡ ROCKET GRUNT',
+        [
+          "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
+        ]
+      ),
+      makeNpc(
+        'azalea_gym_grunt',
+        10,
+        16,
+        'DOWN',
+        'silver',
+        '⚡ ROCKET GRUNT',
+        [
+          "ROCKET GRUNT: No one gets in the GYM! Buzz off, brat!",
+        ]
+      ),
+      makeNpc(
         'azalea_slowpoke',
         21,
         10,
@@ -1589,8 +1625,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     slowpoke_well_b1f: [
       makeNpc(
         'rocket_grunt_1',
-        5,
-        2,
+        15,
+        7,
         'DOWN',
         'silver',
         '⚡ ROCKET GRUNT',
@@ -1649,6 +1685,29 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         }
       ),
       makeNpc(
+        'executive_proton',
+        5,
+        2,
+        'DOWN',
+        'silver',
+        '⚡ EXECUTIVE PROTON',
+        ["PROTON: What do you want? If you interrupt our work, don't expect any mercy! We're TEAM ROCKET, and we'll do anything for money!"],
+        {
+          action: 'PROTON_EVENT',
+          trainerId: 'executive_proton',
+          trainerName: 'Executive Proton',
+          visionRange: 3,
+          challengePages: [
+            "PROTON: What do you want? If you interrupt our work, don't expect any mercy! We're TEAM ROCKET, and we'll do anything for money!",
+          ],
+          trainerPokemon: { speciesId: 'koffing', level: 14, moves: ['tackle', 'smog', 'poisongas'] },
+          trainerTeam: [
+            { speciesId: 'zubat', level: 9, moves: ['leechlife', 'bite'] },
+            { speciesId: 'koffing', level: 14, moves: ['tackle', 'smog', 'poisongas'] },
+          ],
+        }
+      ),
+      makeNpc(
         'well_kurt',
         16,
         14,
@@ -1670,6 +1729,18 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         [
           'SLOWPOKE: ... ... ...',
           'It rubs gently against your leg with relief and gratitude.',
+        ]
+      ),
+      makeNpc(
+        'well_slowpoke_2',
+        7,
+        4,
+        'DOWN',
+        'fat_man',
+        '🦛 RESCUED SLOWPOKE',
+        [
+          'SLOWPOKE: ... ... ...',
+          'Its tail has a neat bandage on it. It wags happily!',
         ]
       ),
     ],

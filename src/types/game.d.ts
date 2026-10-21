@@ -24,6 +24,12 @@ export type TouchControlStyle = 'DPAD' | 'JOYSTICK';
 export type ExpShareMode = 'OFF' | 'ALL' | 'CAPPED';
 export type ExpShareSetting = ExpShareMode;
 
+export interface PlayerProfile {
+  name: string;
+  gender: PlayerGender;
+  rivalName?: string;
+}
+
 export interface GameOptions {
   soundVolume: number;      // 0.0 - 1.0 (default: 0.7)
   bgmVolume: number;        // 0.0 - 1.0 (default: 0.7)
@@ -68,6 +74,7 @@ export interface SavePreview {
   partyLeadSpeciesId?: string;
   partyLeadLevel?: number;
   timestamp: number;
+  rivalName?: string;
 }
 
 export type PokemonType =
@@ -83,7 +90,8 @@ export type StatStages = Record<StatId, number>;
 export type PokeballId =
   | 'poke-ball' | 'great-ball' | 'ultra-ball' | 'master-ball'
   | 'quick-ball' | 'dusk-ball' | 'net-ball' | 'nest-ball'
-  | 'timer-ball' | 'repeat-ball' | 'fast-ball' | 'dream-ball';
+  | 'timer-ball' | 'repeat-ball' | 'fast-ball' | 'dream-ball'
+  | 'lure-ball' | 'level-ball' | 'heavy-ball' | 'love-ball' | 'friend-ball' | 'moon-ball';
 
 export type MedicineId =
   | 'potion'
