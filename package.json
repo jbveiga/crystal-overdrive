@@ -1,6 +1,7 @@
 {
   "name": "crystal-overdrive",
   "version": "0.1.0",
+  "description": "Classic 90s handheld monster RPG web engine tribute",
   "private": true,
   "type": "module",
   "scripts": {
