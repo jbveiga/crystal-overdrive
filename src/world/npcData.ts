@@ -49,6 +49,142 @@ export const makeNpc = (
   trainerTeam: opts.trainerTeam,
 });
 
+export interface DaySiblingInfo {
+  id: string;
+  name: string;
+  day: string;
+  mapId: string;
+  itemId: string;
+  itemName: string;
+  flag: string;
+  speaker: string;
+  giftPages: string[];
+  alreadyGivenPages: string[];
+}
+
+export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
+  monica_of_monday: {
+    id: 'monica_of_monday',
+    name: 'Monica of Monday',
+    day: 'Monday',
+    mapId: 'route_40',
+    itemId: 'sharp_beak',
+    itemName: 'SHARP BEAK',
+    flag: 'received_item_monica',
+    speaker: '🎀 MONICA OF MONDAY',
+    giftPages: [
+      "MONICA: Hello! I'm MONICA of Monday! As a token of friendship, please take this!",
+      "It's a SHARP BEAK! It boosts the power of FLYING-type moves!",
+    ],
+    alreadyGivenPages: [
+      "MONICA: My siblings are all across JOHTO! Did you meet them yet?",
+    ],
+  },
+  tuscany_of_tuesday: {
+    id: 'tuscany_of_tuesday',
+    name: 'Tuscany of Tuesday',
+    day: 'Tuesday',
+    mapId: 'route_29',
+    itemId: 'pink_bow',
+    itemName: 'PINK BOW',
+    flag: 'received_item_tuscany',
+    speaker: '🎀 TUSCANY OF TUESDAY',
+    giftPages: [
+      "TUSCANY: Yahoo! I'm TUSCANY of Tuesday! Nice to meet you!",
+      "Take this PINK BOW! It strengthens NORMAL-type moves!",
+    ],
+    alreadyGivenPages: [
+      "TUSCANY: Do my siblings know you? We appear on different days of the week!",
+    ],
+  },
+  wesley_of_wednesday: {
+    id: 'wesley_of_wednesday',
+    name: 'Wesley of Wednesday',
+    day: 'Wednesday',
+    mapId: 'lake_of_rage',
+    itemId: 'black_belt',
+    itemName: 'BLACK BELT',
+    flag: 'received_item_wesley',
+    speaker: '🥋 WESLEY OF WEDNESDAY',
+    giftPages: [
+      "WESLEY: Yo! I'm WESLEY of Wednesday! You must train diligently!",
+      "Here's a BLACK BELT! It boosts the power of FIGHTING-type moves!",
+    ],
+    alreadyGivenPages: [
+      "WESLEY: Keep training! Dedication is the path to strength!",
+    ],
+  },
+  arthur_of_thursday: {
+    id: 'arthur_of_thursday',
+    name: 'Arthur of Thursday',
+    day: 'Thursday',
+    mapId: 'route_36',
+    itemId: 'hard_stone',
+    itemName: 'HARD STONE',
+    flag: 'received_item_arthur',
+    speaker: '🪨 ARTHUR OF THURSDAY',
+    giftPages: [
+      "ARTHUR: Who am I? I'm ARTHUR of Thursday! Pleased to make your acquaintance!",
+      "Here, take this HARD STONE! It powers up ROCK-type moves!",
+    ],
+    alreadyGivenPages: [
+      "ARTHUR: A stone is solid and unwavering. Be like a rock in your journey!",
+    ],
+  },
+  frieda: {
+    id: 'frieda',
+    name: 'Frieda of Friday',
+    day: 'Friday',
+    mapId: 'route_32',
+    itemId: 'poison_barb',
+    itemName: 'POISON BARB',
+    flag: 'received_item_frieda',
+    speaker: '🎀 FRIEDA OF FRIDAY',
+    giftPages: [
+      "FRIEDA: Yahoo! It's Friday! I'm FRIEDA of Friday! Nice to meet you!",
+      "Here's a POISON BARB to power up POISON-type moves!",
+    ],
+    alreadyGivenPages: [
+      "FRIEDA: Isn't Friday wonderful? I hope your weekend is full of adventures!",
+    ],
+  },
+  santos_of_saturday: {
+    id: 'santos_of_saturday',
+    name: 'Santos of Saturday',
+    day: 'Saturday',
+    mapId: 'blackthorn_city',
+    itemId: 'soft_sand',
+    itemName: 'SOFT SAND',
+    flag: 'received_item_santos',
+    speaker: '🏖️ SANTOS OF SATURDAY',
+    giftPages: [
+      "SANTOS: It's Saturday! I'm SANTOS of Saturday! Good to see you, trainer!",
+      "Take this SOFT SAND! It boosts the power of GROUND-type moves!",
+    ],
+    alreadyGivenPages: [
+      "SANTOS: Have you met my other six siblings? We are scattered all over!",
+    ],
+  },
+  sunny_of_sunday: {
+    id: 'sunny_of_sunday',
+    name: 'Sunny of Sunday',
+    day: 'Sunday',
+    mapId: 'route_37',
+    itemId: 'magnet',
+    itemName: 'MAGNET',
+    flag: 'received_item_sunny',
+    speaker: '⚡ SUNNY OF SUNDAY',
+    giftPages: [
+      "SUNNY: Hi! I'm SUNNY of Sunday! Nice to meet you!",
+      "Here is a MAGNET to power up ELECTRIC-type moves!",
+    ],
+    alreadyGivenPages: [
+      "SUNNY: Sunday is the best day to recharge! Enjoy your day!",
+    ],
+  },
+};
+DAY_SIBLINGS['frieda_of_friday'] = DAY_SIBLINGS['frieda'];
+
 export function createNpcsByMap(): Record<string, GridEntity[]> {
   const base: Record<string, GridEntity[]> = {
     new_bark_town: [
@@ -134,6 +270,19 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         "You can't climb up those jagged cliff ledges, and the mountain Pokémon up there are fierce!",
         'Get some more training under your belt before heading into the northern ridges!',
       ]),
+      makeNpc(
+        'tuscany_of_tuesday',
+        29,
+        12,
+        'DOWN',
+        'girl',
+        '🎀 TUSCANY OF TUESDAY',
+        [
+          "TUSCANY: Yahoo! I'm TUSCANY of Tuesday! Nice to meet you!",
+          "Take this PINK BOW! It strengthens NORMAL-type moves!",
+        ],
+        { action: 'DAY_SIBLING_EVENT' }
+      ),
     ],
     cherrygrove_city: [
       makeNpc('cg_guide_gent', 32, 6, 'DOWN', 'fat_man', '👴 GUIDE GENT', [
@@ -1049,7 +1198,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         [
           "FRIEDA: Yahoo! It's Friday! I'm FRIEDA of Friday! Nice to meet you!",
           "Here's a POISON BARB to power up POISON-type moves!",
-        ]
+        ],
+        { action: 'DAY_SIBLING_EVENT' }
       ),
       makeNpc(
         'salesman',
@@ -2662,6 +2812,19 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           'If you use a SQUIRTBOTTLE on it, it will jump right out of the ground!',
         ]
       ),
+      makeNpc(
+        'arthur_of_thursday',
+        20,
+        12,
+        'DOWN',
+        'boy',
+        '🪨 ARTHUR OF THURSDAY',
+        [
+          "ARTHUR: Who am I? I'm ARTHUR of Thursday! Pleased to make your acquaintance!",
+          "Here, take this HARD STONE! It powers up ROCK-type moves!",
+        ],
+        { action: 'DAY_SIBLING_EVENT' }
+      ),
     ],
     route_36_ruins_of_alph_gate: [
       makeNpc(
@@ -2706,7 +2869,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         [
           "SUNNY: Hi! I'm SUNNY of Sunday! Nice to meet you!",
           'Here is a MAGNET to power up ELECTRIC-type moves!',
-        ]
+        ],
+        { action: 'DAY_SIBLING_EVENT' }
       ),
     ],
     ecruteak_city: [
@@ -3391,6 +3555,19 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         trainerPokemon: { speciesId: 'staryu', level: 21, moves: ['watergun', 'swift', 'recover'] },
         trainerTeam: [{ speciesId: 'staryu', level: 21, moves: ['watergun', 'swift', 'recover'] }],
       }),
+      makeNpc(
+        'monica_of_monday',
+        10,
+        12,
+        'DOWN',
+        'girl',
+        '🎀 MONICA OF MONDAY',
+        [
+          "MONICA: Hello! I'm MONICA of Monday! As a token of friendship, please take this!",
+          "It's a SHARP BEAK! It boosts the power of FLYING-type moves!",
+        ],
+        { action: 'DAY_SIBLING_EVENT' }
+      ),
     ],
 
     route_41: [
@@ -3529,6 +3706,38 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'When the world falls into peril, its wings stir hurricanes to quell the fury of the sea.',
       ]),
     ],
+
+    lake_of_rage: [
+      makeNpc(
+        'wesley_of_wednesday',
+        8,
+        18,
+        'DOWN',
+        'boy',
+        '🥋 WESLEY OF WEDNESDAY',
+        [
+          "WESLEY: Yo! I'm WESLEY of Wednesday! You must train diligently!",
+          "Here's a BLACK BELT! It boosts the power of FIGHTING-type moves!",
+        ],
+        { action: 'DAY_SIBLING_EVENT' }
+      ),
+    ],
+
+    blackthorn_city: [
+      makeNpc(
+        'santos_of_saturday',
+        16,
+        16,
+        'DOWN',
+        'boy',
+        '🏖️ SANTOS OF SATURDAY',
+        [
+          "SANTOS: It's Saturday! I'm SANTOS of Saturday! Good to see you, trainer!",
+          "Take this SOFT SAND! It boosts the power of GROUND-type moves!",
+        ],
+        { action: 'DAY_SIBLING_EVENT' }
+      ),
+    ],
   };
 
   const DEFAULT_LORE = [
@@ -3539,7 +3748,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
 
   // Phase 11+ NPCs & trainers derived directly from pret/pokecrystal object events.
   for (const [mapId, list] of Object.entries(GENERATED_NPCS)) {
-    base[mapId] = list.map((n, idx) => {
+    const generatedList = list.map((n, idx) => {
       const generatedId = n.id || `${mapId}_${n.sprite}_${idx}`;
       return makeNpc(
         generatedId,
@@ -3565,6 +3774,12 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         }
       );
     });
+
+    if (base[mapId]) {
+      base[mapId].push(...generatedList);
+    } else {
+      base[mapId] = generatedList;
+    }
   }
   return base;
 }

@@ -78,7 +78,8 @@ export interface GridEntity {
     | 'ELMS_AIDE_EVENT'
     | 'SUDOWOODO_EVENT'
     | 'POLICE_RIVAL_NAMING'
-    | 'PROTON_EVENT';
+    | 'PROTON_EVENT'
+    | 'DAY_SIBLING_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

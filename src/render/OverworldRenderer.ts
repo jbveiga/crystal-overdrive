@@ -791,6 +791,45 @@ export class OverworldRenderer {
   }
 
   /**
+   * Ensures all tiles referenced by a map (base tileMap and overlayMap) are loaded into tileTextures.
+   * Loads textures on-demand from ./assets/tiles/${name}.png so maps (such as Route 32 cave rocks
+   * and shoreline water) never fallback to grassTex.
+   */
+  public async ensureMapTilesLoaded(map: MapData): Promise<void> {
+    if (!map.tileMap) return;
+    const missingTileNames: string[] = [];
+
+    for (const name of map.tileMap) {
+      if (name && !this.tileTextures.has(name) && !missingTileNames.includes(name)) {
+        missingTileNames.push(name);
+      }
+    }
+    if (map.overlayMap) {
+      for (const name of map.overlayMap) {
+        if (name && !this.tileTextures.has(name) && !missingTileNames.includes(name)) {
+          missingTileNames.push(name);
+        }
+      }
+    }
+
+    if (missingTileNames.length === 0) return;
+
+    await Promise.all(
+      missingTileNames.map(async (name) => {
+        try {
+          const tex = await Assets.load<Texture>(`./assets/tiles/${name}.png`);
+          if (tex) {
+            tex.source.scaleMode = 'nearest';
+            this.tileTextures.set(name, tex);
+          }
+        } catch (err) {
+          console.warn(`Could not load tile ${name}:`, err);
+        }
+      })
+    );
+  }
+
+  /**
    * Builds the textured overworld tilemap, including seamlessly connected neighbor maps (W/E/N/S) and outdoor border blocks
    */
   public renderMap(map: MapData, lookupMap?: (mapId: string) => MapData | undefined): void {
@@ -798,6 +837,17 @@ export class OverworldRenderer {
     this.animatedWaterSprites.length = 0;
     this.currentRenderedMap = map;
     this.tileSize = map.tileSize;
+
+    if (map.tileMap) {
+      const hasMissing = map.tileMap.some((name) => name && !this.tileTextures.has(name));
+      if (hasMissing) {
+        this.ensureMapTilesLoaded(map).then(() => {
+          if (this.currentRenderedMap === map) {
+            this.renderMap(map, lookupMap);
+          }
+        });
+      }
+    }
 
     const grassTex = this.tileTextures.get('grass') || Texture.WHITE;
     const tallGrassTex = this.tileTextures.get('tall_grass') || grassTex;

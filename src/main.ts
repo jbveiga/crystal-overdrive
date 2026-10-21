@@ -37,8 +37,8 @@ import type {
   ExpShareMode,
 } from './types/game';
 import type { Graphics } from 'pixi.js';
-import { createNpcsByMap } from './world/npcData';
-export { npcsByMap, createNpcsByMap } from './world/npcData';
+import { createNpcsByMap, DAY_SIBLINGS } from './world/npcData';
+export { npcsByMap, createNpcsByMap, DAY_SIBLINGS } from './world/npcData';
 
 declare global {
   interface Window {
@@ -856,6 +856,7 @@ async function bootstrap() {
     );
   };
 
+  await overworldRenderer.ensureMapTilesLoaded(initialMap);
   overworldRenderer.renderMap(initialMap, lookupMap);
   syncMapOverworldItems(initialMap);
 
@@ -1874,6 +1875,34 @@ async function bootstrap() {
             overworldHUD.showToast('🧪 Received POTION from the Route 30 Berry House!');
           });
           return;
+        }
+
+        // Universal Day Sibling item gift handler (Monica, Tuscany, Wesley, Arthur, Frieda, Santos, Sunny)
+        if (targetNpc.action === 'DAY_SIBLING_EVENT') {
+          const sibling =
+            DAY_SIBLINGS[targetNpc.id] ||
+            Object.values(DAY_SIBLINGS).find(
+              (s) =>
+                s.name.toLowerCase().includes(targetNpc.id.toLowerCase()) ||
+                targetNpc.id.toLowerCase().includes(s.id.toLowerCase())
+            );
+
+          if (sibling) {
+            if (storyFlags.has(sibling.flag)) {
+              overworldHUD.openDialogue(sibling.alreadyGivenPages, targetNpc.speaker);
+              return;
+            }
+
+            storyFlags.add(sibling.flag);
+            if (!inventory.items) inventory.items = {};
+            inventory.items[sibling.itemId] = (inventory.items[sibling.itemId] || 0) + 1;
+            BattleAudio.playOverworldSound('FANFARE');
+            overworldHUD.openDialogue(sibling.giftPages, targetNpc.speaker, () => {
+              saveCurrentGame();
+              overworldHUD.showToast(`🎁 Received ${sibling.itemName} from ${sibling.name}!`);
+            });
+            return;
+          }
         }
 
         // Sprout Tower 3F Boss: Elder Li (Ticket 5.2)
