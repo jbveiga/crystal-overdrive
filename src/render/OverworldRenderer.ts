@@ -506,6 +506,7 @@ export class OverworldRenderer {
       bird_keeper: './assets/sprites/characters/bird_keeper.png',
       earl: './assets/sprites/characters/earl.png',
       oak: './assets/sprites/characters/oak.png',
+      lapras: './assets/sprites/characters/lapras.png',
     };
 
     await Promise.all(

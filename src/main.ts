@@ -919,6 +919,7 @@ async function bootstrap() {
       npcsByMap.elms_lab = freshNpcs.elms_lab;
       npcsByMap.azalea_town = freshNpcs.azalea_town;
       npcsByMap.slowpoke_well_b1f = freshNpcs.slowpoke_well_b1f;
+      npcsByMap.union_cave_b2f = freshNpcs.union_cave_b2f;
       roamingManager.sleepBeasts();
       missionManager.deserialize(new MissionManager().serialize());
 
@@ -1078,6 +1079,14 @@ async function bootstrap() {
         (n) => !n.id.startsWith('rocket_grunt') && n.id !== 'executive_proton'
       );
     }
+  }
+
+  const isFriday = new Date().getDay() === 5 || storyFlags.has('FORCE_FRIDAY');
+  if (
+    (!isFriday || storyFlags.has('defeated_lapras_union_cave') || storyFlags.has('caught_lapras')) &&
+    npcsByMap.union_cave_b2f
+  ) {
+    npcsByMap.union_cave_b2f = npcsByMap.union_cave_b2f.filter((n) => n.id !== 'union_cave_lapras');
   }
 
   const emptyNpcs: GridEntity[] = [];
@@ -2634,7 +2643,39 @@ async function bootstrap() {
           return;
         }
 
-        // Peeking Rival outside Elm's Lab: shoves the player away from the window
+        // Union Cave B2F Friday Lapras Boss Encounter & Event (TICKET-WORLD-UNION-CAVE-MAPPING-01)
+        if (targetNpc.action === 'LAPRAS_EVENT' || targetNpc.id === 'union_cave_lapras') {
+          BattleAudio.playCry('lapras');
+          overworldHUD.openDialogue(
+            ['LAPRAS: Gyaoo!'],
+            '🌊 LAPRAS',
+            () => {
+              const laprasPkmn = PokemonFactory.create('lapras', 20, [
+                'watergun',
+                'growl',
+                'sing',
+                'mist',
+              ]);
+              triggerBattle(laprasPkmn, {
+                onBattleEnd: () => {
+                  storyFlags.add('defeated_lapras_union_cave');
+                  if (npcsByMap.union_cave_b2f) {
+                    npcsByMap.union_cave_b2f = npcsByMap.union_cave_b2f.filter(
+                      (n) => n.id !== 'union_cave_lapras'
+                    );
+                  }
+                  const mapNow = mapManager.getCurrentMap();
+                  if (mapNow) {
+                    overworldRenderer.renderMap(mapNow, lookupMap);
+                    syncMapOverworldItems(mapNow);
+                  }
+                  saveCurrentGame();
+                },
+              });
+            }
+          );
+          return;
+        }
         if (targetNpc.id === 'nbt_rival') {
           overworldHUD.openDialogue(
             [

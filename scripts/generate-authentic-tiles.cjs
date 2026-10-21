@@ -419,6 +419,11 @@ function buildMapFromBlk({
     }
   }
 
+  // For union_cave_b2f, ensure Friday Lapras coordinate (11, 31) is walkable water (2)
+  if (id === 'union_cave_b2f') {
+    collisionGrid[31 * width + 11] = 2;
+  }
+
   // Ensure all warp door/carpet coordinates are walkable (0)
   for (const w of warps) {
     collisionGrid[w.y * width + w.x] = 0;
@@ -1547,6 +1552,7 @@ buildMapFromBlk({
     { x: 13, y: 20, targetMapId: 'route_32_ruins_of_alph_gate', targetX: 0, targetY: 4 },
     { x: 13, y: 21, targetMapId: 'route_32_ruins_of_alph_gate', targetX: 0, targetY: 5 },
     { x: 7, y: 5, targetMapId: 'route_36_ruins_of_alph_gate', targetX: 4, targetY: 6 },
+    { x: 6, y: 19, targetMapId: 'union_cave_b1f', targetX: 17, targetY: 19 },
   ],
   bgEvents: [
     {
@@ -1673,6 +1679,7 @@ buildMapFromBlk({
     { x: 3, y: 3, targetMapId: 'union_cave_1f', targetX: 5, targetY: 19 },
     { x: 3, y: 33, targetMapId: 'union_cave_1f', targetX: 3, targetY: 33 },
     { x: 17, y: 31, targetMapId: 'union_cave_b2f', targetX: 5, targetY: 3 },
+    { x: 17, y: 19, targetMapId: 'ruins_of_alph_outside', targetX: 6, targetY: 19 },
   ],
   bgEvents: [],
   grassEncounters: [

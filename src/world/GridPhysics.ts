@@ -18,7 +18,8 @@ export type NpcSpriteType =
   | 'bird_keeper'
   | 'earl'
   | 'oak'
-  | 'sudowoodo';
+  | 'sudowoodo'
+  | 'lapras';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
@@ -79,7 +80,8 @@ export interface GridEntity {
     | 'SUDOWOODO_EVENT'
     | 'POLICE_RIVAL_NAMING'
     | 'PROTON_EVENT'
-    | 'DAY_SIBLING_EVENT';
+    | 'DAY_SIBLING_EVENT'
+    | 'LAPRAS_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

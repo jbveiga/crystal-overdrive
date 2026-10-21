@@ -2193,6 +2193,13 @@
       "targetMapId": "union_cave_b2f",
       "targetX": 5,
       "targetY": 3
+    },
+    {
+      "x": 17,
+      "y": 19,
+      "targetMapId": "ruins_of_alph_outside",
+      "targetX": 6,
+      "targetY": 19
     }
   ],
   "bgEvents": [],

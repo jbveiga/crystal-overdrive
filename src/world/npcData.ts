@@ -1448,6 +1448,18 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           'If you use SURF, you can meet it yourself!',
         ]
       ),
+      makeNpc(
+        'union_cave_lapras',
+        11,
+        31,
+        'DOWN',
+        'lapras',
+        '🌊 LAPRAS',
+        ['Gyaoo!'],
+        {
+          action: 'LAPRAS_EVENT',
+        }
+      ),
     ],
     route_33: [
       makeNpc(
