@@ -217,6 +217,27 @@ export interface PokemonInstance {
   catchRate: number;
   isEgg?: boolean;
   eggSteps?: number;
+  friendship?: number; // 0-255 (default 70 for wild caught, 120 for hatched eggs)
+  heldItem?: string;
+  ivs?: Partial<BaseStats>;
+  evs?: Partial<BaseStats>;
+  nature?: string;
+}
+
+export type EvolutionTriggerType = 'LEVEL_UP' | 'ITEM' | 'FRIENDSHIP';
+
+export interface EvolutionCheckContext {
+  trigger: EvolutionTriggerType;
+  level?: number;
+  itemId?: string;
+  timeOfDay?: 'MORNING' | 'DAY' | 'NIGHT';
+}
+
+export interface EvolutionCandidate {
+  currentSpeciesId: string;
+  targetSpeciesId: string;
+  targetSpeciesName: string;
+  method: string;
 }
 
 export interface RoamerState {
