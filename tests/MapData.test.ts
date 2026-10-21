@@ -3,7 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import type { MapData } from '../src/types/game';
 import { MapManager } from '../src/world/MapManager';
-import { npcsByMap } from '../src/world/npcData';
+import { npcsByMap, getNpcsForMap } from '../src/world/npcData';
+import { OverworldItemManager } from '../src/world/OverworldItemManager';
+import { MissionManager } from '../src/world/MissionManager';
 
 describe('MapData & Authentic Tile Integrity', () => {
   it('validates new_bark_town.json structure, tileMap dimensions, and asset presence', () => {
@@ -1447,5 +1449,62 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mainSrc).toContain('./assets/data/world_maps.json');
     expect(mainSrc).toContain('window.updateLoaderProgress?.(');
     expect(mainSrc).toContain('window.dismissLoader?.()');
+  });
+
+  it('validates BUGFIX-NARRATIVE-01: Starter Poké Ball table sprites, Prof. Oak departure in Mr. Pokémon House, and Elm Egg handover', () => {
+    const flags = new Set<string>();
+
+    // 1. Starter Poké Ball table sprites in Elm's Lab
+    const initialBalls = OverworldItemManager.getStarterBallsForLab(flags);
+    expect(initialBalls).toHaveLength(3);
+    expect(initialBalls.map((b) => ({ id: b.id, x: b.x, y: b.y }))).toEqual([
+      { id: 'cyndaquil_ball', x: 6, y: 3 },
+      { id: 'totodile_ball', x: 7, y: 3 },
+      { id: 'chikorita_ball', x: 8, y: 3 },
+    ]);
+
+    // Player picks Cyndaquil -> Cyndaquil ball at (6, 3) despawns immediately
+    flags.add('starter_chosen');
+    flags.add('starter_cyndaquil');
+    const afterChoice = OverworldItemManager.getStarterBallsForLab(flags);
+    expect(afterChoice.map((b) => b.id)).toEqual(['totodile_ball', 'chikorita_ball']);
+
+    // Rival steals counter-pick (Totodile) after Elm's call -> only Chikorita ball at (8, 3) remains
+    flags.add('ELM_CALLED_ABOUT_THEFT');
+    const afterTheft = OverworldItemManager.getStarterBallsForLab(flags);
+    expect(afterTheft.map((b) => b.id)).toEqual(['chikorita_ball']);
+
+    // Counter-pick verification for Totodile (Rival steals Chikorita) and Chikorita (Rival steals Cyndaquil)
+    const totoFlags = new Set(['starter_chosen', 'starter_totodile', 'ELM_CALLED_ABOUT_THEFT']);
+    expect(OverworldItemManager.getStarterBallsForLab(totoFlags).map((b) => b.id)).toEqual(['cyndaquil_ball']);
+
+    const chikoFlags = new Set(['starter_chosen', 'starter_chikorita', 'ELM_CALLED_ABOUT_THEFT']);
+    expect(OverworldItemManager.getStarterBallsForLab(chikoFlags).map((b) => b.id)).toEqual(['totodile_ball']);
+
+    // 2. Mr. Pokémon's House NPC departure & walkable path
+    const preEggNpcs = getNpcsForMap('mr_pokemons_house', new Set());
+    expect(preEggNpcs.map((n) => n.id)).toEqual(['mr_pokemon_npc', 'prof_oak_npc']);
+
+    flags.add('HAS_MYSTERY_EGG');
+    flags.add('HAS_POKEDEX');
+    const postEggNpcs = getNpcsForMap('mr_pokemons_house', flags);
+    expect(postEggNpcs.map((n) => n.id)).toEqual(['mr_pokemon_npc']);
+
+    const mrPkmnMap: MapData = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/mr_pokemons_house.json'), 'utf8')
+    );
+    // Walkable corridor from entrance door (2, 7)/(3, 7) straight up to Mr. Pokémon (3, 3) and Prof. Oak (5, 3)
+    for (let y = 3; y <= 7; y++) {
+      expect(mrPkmnMap.collisionGrid[y * mrPkmnMap.width + 2]).toBe(0);
+      expect(mrPkmnMap.collisionGrid[y * mrPkmnMap.width + 3]).toBe(0);
+      expect(mrPkmnMap.collisionGrid[y * mrPkmnMap.width + 5]).toBe(0);
+    }
+
+    // 3. Handing Mystery Egg to Prof. Elm completes Mission M01 and unlocks M02
+    const missionManager = new MissionManager();
+    flags.add('EVENT_GAVE_MYSTERY_EGG_TO_ELM');
+    missionManager.checkStoryFlags(flags);
+    expect(missionManager.getMission('M01')?.status).toBe('COMPLETED');
+    expect(missionManager.getMission('M02')?.status).toBe('ACTIVE');
   });
 });

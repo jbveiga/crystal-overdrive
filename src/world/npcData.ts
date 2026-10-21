@@ -3498,3 +3498,23 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
 }
 
 export const npcsByMap: Record<string, GridEntity[]> = createNpcsByMap();
+
+/**
+ * Returns the active NPCs for a given map filtered by dynamic story flags:
+ * - `mr_pokemons_house`: `prof_oak_npc` departs after `HAS_MYSTERY_EGG` / `HAS_POKEDEX` is set.
+ * - `route_36`: `sudowoodo` is cleared after `sudowoodo_cleared` is set.
+ */
+export function getNpcsForMap(
+  mapId: string,
+  storyFlags: Set<string>,
+  registry: Record<string, GridEntity[]> = npcsByMap
+): GridEntity[] {
+  const list = registry[mapId] || [];
+  if (mapId === 'mr_pokemons_house' && (storyFlags.has('HAS_MYSTERY_EGG') || storyFlags.has('HAS_POKEDEX'))) {
+    return list.filter((n) => n.id !== 'prof_oak_npc');
+  }
+  if (mapId === 'route_36' && storyFlags.has('sudowoodo_cleared')) {
+    return list.filter((n) => n.id !== 'sudowoodo');
+  }
+  return list;
+}

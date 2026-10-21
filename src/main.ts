@@ -640,7 +640,9 @@ async function bootstrap() {
       },
       getKeyItems: () => {
         const items = ['POKéGEAR'];
-        if (storyFlags.has('HAS_MYSTERY_EGG')) items.push('🥚 MYSTERY EGG');
+        if (storyFlags.has('HAS_MYSTERY_EGG') && !storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')) {
+          items.push('🥚 MYSTERY EGG');
+        }
         if (storyFlags.has('HAS_POKEDEX')) items.push('📕 POKéDEX');
         if (storyFlags.has('has_squirtbottle')) items.push('💧 SQUIRTBOTTLE');
         if (storyFlags.has('has_secret_potion')) items.push('💊 SECRETPOTION');
@@ -775,10 +777,25 @@ async function bootstrap() {
   overworldRenderer.setPlayerGender(playerGender);
   const lookupMap = (id: string) => mapManager.getMap(id);
 
+  const detectChosenStarterSpecies = (): 'cyndaquil' | 'totodile' | 'chikorita' | undefined => {
+    if (storyFlags.has('starter_cyndaquil')) return 'cyndaquil';
+    if (storyFlags.has('starter_totodile')) return 'totodile';
+    if (storyFlags.has('starter_chikorita')) return 'chikorita';
+    const allOwned = [...playerParty.map((p) => p.speciesId), ...playerBox.map((p) => p.speciesId), ...Array.from(seenSpecies)];
+    if (allOwned.some((id) => id === 'totodile' || id === 'croconaw' || id === 'feraligatr')) return 'totodile';
+    if (allOwned.some((id) => id === 'chikorita' || id === 'bayleef' || id === 'meganium')) return 'chikorita';
+    if (allOwned.some((id) => id === 'cyndaquil' || id === 'quilava' || id === 'typhlosion')) return 'cyndaquil';
+    return undefined;
+  };
+
   const syncMapOverworldItems = (map: MapData | null) => {
     if (!map) return;
+    const itemBalls = [...overworldItemManager.getActiveItemBalls(map.id)];
+    if (map.id === 'elms_lab') {
+      itemBalls.push(...OverworldItemManager.getStarterBallsForLab(storyFlags, detectChosenStarterSpecies()));
+    }
     overworldRenderer.renderOverworldItems(
-      overworldItemManager.getActiveItemBalls(map.id),
+      itemBalls,
       overworldItemManager.getFruitTreesForMap(map.id),
       new Set(overworldItemManager.getHarvestedTreeIds())
     );
@@ -833,6 +850,9 @@ async function bootstrap() {
       seenSpecies.clear();
       overworldItemManager.setCollectedFlags([]);
       overworldItemManager.setFruitTreePicks({});
+      const freshNpcs = createNpcsByMap();
+      npcsByMap.mr_pokemons_house = freshNpcs.mr_pokemons_house;
+      npcsByMap.route_36 = freshNpcs.route_36;
       roamingManager.sleepBeasts();
       missionManager.deserialize(new MissionManager().serialize());
 
@@ -963,6 +983,9 @@ async function bootstrap() {
 
   if (storyFlags.has('sudowoodo_cleared') && npcsByMap.route_36) {
     npcsByMap.route_36 = npcsByMap.route_36.filter((n) => n.id !== 'sudowoodo');
+  }
+  if ((storyFlags.has('HAS_MYSTERY_EGG') || storyFlags.has('HAS_POKEDEX')) && npcsByMap.mr_pokemons_house) {
+    npcsByMap.mr_pokemons_house = npcsByMap.mr_pokemons_house.filter((n) => n.id !== 'prof_oak_npc');
   }
 
   const emptyNpcs: GridEntity[] = [];
@@ -1634,23 +1657,65 @@ async function bootstrap() {
         }
 
         // Special scripted quest inside Mr. Pokémon's House (Mystery Egg + Prof. Oak's Pokédex)
-        if (targetNpc.action === 'MR_POKEMON_EVENT' && !storyFlags.has('HAS_MYSTERY_EGG')) {
-          storyFlags.add('HAS_MYSTERY_EGG');
-          storyFlags.add('HAS_POKEDEX');
-          healPlayerParty();
-          BattleAudio.playOverworldSound('KEY_ITEM');
+        if (targetNpc.action === 'MR_POKEMON_EVENT' || targetNpc.id === 'mr_pokemon_npc') {
+          if (!storyFlags.has('HAS_MYSTERY_EGG')) {
+            storyFlags.add('HAS_MYSTERY_EGG');
+            storyFlags.add('HAS_POKEDEX');
+            if (!inventory.keyItems) inventory.keyItems = [];
+            if (!inventory.keyItems.includes('MYSTERY EGG')) inventory.keyItems.push('MYSTERY EGG');
+            if (!inventory.keyItems.includes('POKéDEX')) inventory.keyItems.push('POKéDEX');
+            healPlayerParty();
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                `MR. POKéMON: Hello, hello! You must be ${playerName}, sent by PROF. ELM!`,
+                `This is the rare egg I asked PROF. ELM to examine—${playerName} received the MYSTERY EGG!`,
+                `PROF. OAK: Aha! So you are ${playerName}! Your ${playerParty[0]?.nickname || 'POKéMON'} seems very attached to you!`,
+                'PROF. OAK: You look like a dependable trainer! Take this latest-model POKéDEX!',
+                'PROF. OAK: I am off to GOLDENROD CITY for my radio show. Good luck on your journey!',
+                '🎩 MR. POKéMON also restored your party to full health before your journey back!',
+              ],
+              '🎩 MR. POKéMON & 🎓 PROF. OAK',
+              () => {
+                if (npcsByMap.mr_pokemons_house) {
+                  npcsByMap.mr_pokemons_house = npcsByMap.mr_pokemons_house.filter(
+                    (n) => n.id !== 'prof_oak_npc'
+                  );
+                }
+                saveCurrentGame();
+                overworldHUD.showToast('🥚 Received MYSTERY EGG & 📕 POKéDEX! (Check START MENU -> POKéDEX)');
+              }
+            );
+            return;
+          }
+
+          if (!storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')) {
+            overworldHUD.openDialogue(
+              [
+                "MR. POKéMON: I'm depending on you!",
+                'Please deliver that rare EGG to PROF. ELM safely!',
+              ],
+              targetNpc.speaker,
+              () => {
+                healPlayerParty(false);
+                saveCurrentGame();
+                overworldHUD.playHealingAnimation(playerParty.length, () => {
+                  overworldHUD.showToast('💖 Your party was restored to full HP & PP!');
+                });
+              }
+            );
+            return;
+          }
+
           overworldHUD.openDialogue(
-            [
-              `MR. POKéMON: Hello, hello! You must be ${playerName}, sent by PROF. ELM!`,
-              `This is the rare egg I asked PROF. ELM to examine—${playerName} received the MYSTERY EGG!`,
-              `PROF. OAK: Aha! So you are ${playerName}! Your ${playerParty[0]?.nickname || 'POKéMON'} seems very attached to you!`,
-              'PROF. OAK: You look like a dependable trainer! Take this latest-model POKéDEX!',
-              '🎩 MR. POKéMON also restored your party to full health before your journey back!',
-            ],
-            '🎩 MR. POKéMON & 🎓 PROF. OAK',
+            ['MR. POKéMON: Life is wonderful! Always new discoveries to be made!'],
+            targetNpc.speaker,
             () => {
+              healPlayerParty(false);
               saveCurrentGame();
-              overworldHUD.showToast('🥚 Received MYSTERY EGG & 📕 POKéDEX! (Check START MENU -> POKéDEX)');
+              overworldHUD.playHealingAnimation(playerParty.length, () => {
+                overworldHUD.showToast('💖 Your party was restored to full HP & PP!');
+              });
             }
           );
           return;
@@ -2395,7 +2460,7 @@ async function bootstrap() {
           return;
         }
 
-        // Prof. Elm Lab Starter Dialogue & Errands (Ticket 6.1)
+        // Prof. Elm Lab Starter Dialogue & Errands (Ticket 6.1 & BUGFIX-NARRATIVE-01)
         if (targetNpc.id === 'elm_npc') {
           if (!storyFlags.has('starter_chosen')) {
             overworldHUD.openDialogue(
@@ -2407,24 +2472,62 @@ async function bootstrap() {
               targetNpc.speaker
             );
             return;
-          } else {
+          }
+
+          if (storyFlags.has('HAS_MYSTERY_EGG') && !storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')) {
+            storyFlags.add('EVENT_GAVE_MYSTERY_EGG_TO_ELM');
+            if (inventory.keyItems) {
+              inventory.keyItems = inventory.keyItems.filter((k) => k !== 'MYSTERY EGG');
+            }
+            BattleAudio.playOverworldSound('KEY_ITEM');
             overworldHUD.openDialogue(
               [
-                `PROF. ELM: Hi, ${playerName}! How is your partner POKéMON doing?`,
-                'MR. POKéMON lives a bit past CHERRYGROVE CITY on ROUTE 30. Take care on your way!',
-                'Here—let me heal your POKéMON and record your research progress!',
+                `PROF. ELM: ${playerName}! You're back!`,
+                'And you brought the MYSTERY EGG!',
+                "This... this is an incredible discovery! I'll examine it thoroughly at once!",
+                `${playerName} handed the MYSTERY EGG to PROF. ELM!`,
+                'PROF. ELM: Take on the JOHTO GYM CHALLENGE! Your first stop is the VIOLET CITY GYM!',
               ],
-              targetNpc.speaker,
+              '🔬 PROF. ELM',
               () => {
-                healPlayerParty(false);
-                saveCurrentGame();
-                overworldHUD.playHealingAnimation(playerParty.length, () => {
-                  overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
-                });
+                inventory.balls['poke-ball'] = (inventory.balls['poke-ball'] || 0) + 5;
+                missionManager.checkStoryFlags(storyFlags);
+                overworldHUD.openDialogue(
+                  [
+                    `ELM'S AIDE: ${playerName}! Take these POKé BALLS for your journey!`,
+                    'Wild POKéMON can be caught once you weaken them in battle!',
+                  ],
+                  "👨‍🔬 ELM'S AIDE",
+                  () => {
+                    saveCurrentGame();
+                    overworldHUD.showToast('🎒 Received 5 POKé BALLS!');
+                  }
+                );
               }
             );
             return;
           }
+
+          const postEggPages = storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')
+            ? [
+                `PROF. ELM: How is your POKéMON journey going, ${playerName}?`,
+                'The GYM LEADER in VIOLET CITY is FALKNER, a master of BIRD POKéMON!',
+                "Here—let me heal your team so you're ready!",
+              ]
+            : [
+                `PROF. ELM: Hi, ${playerName}! How is your partner POKéMON doing?`,
+                'MR. POKéMON lives a bit past CHERRYGROVE CITY on ROUTE 30. Take care on your way!',
+                'Here—let me heal your POKéMON and record your research progress!',
+              ];
+
+          overworldHUD.openDialogue(postEggPages, '🔬 PROF. ELM', () => {
+            healPlayerParty(false);
+            saveCurrentGame();
+            overworldHUD.playHealingAnimation(playerParty.length, () => {
+              overworldHUD.showToast('💖 Your party was restored to full HP & PP and game saved!');
+            });
+          });
+          return;
         }
 
         if (targetNpc.pages && targetNpc.pages.length > 0) {
@@ -2494,6 +2597,9 @@ async function bootstrap() {
               playerParty.push(starterPokemon);
               seenSpecies.add(chosen.speciesId);
               storyFlags.add('starter_chosen');
+              storyFlags.add(`starter_${chosen.speciesId}`);
+              overworldRenderer.removeItemBall(`${chosen.speciesId}_ball`);
+              syncMapOverworldItems(currentMap);
               BattleAudio.playOverworldSound('KEY_ITEM');
               overworldHUD.openDialogue(
                 [

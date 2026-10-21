@@ -273,4 +273,75 @@ export class OverworldItemManager {
     }
     return 'ITEMS';
   }
+
+  /**
+   * Computes the visible Starter Poké Ball sprites on the table in Prof. Elm's Lab (`elms_lab`):
+   * - Before choosing a starter: all 3 balls at (6, 3) [Cyndaquil], (7, 3) [Totodile], and (8, 3) [Chikorita] are visible.
+   * - After `starter_chosen`: the player's chosen ball despawns.
+   * - After `ELM_CALLED_ABOUT_THEFT`: the Rival's counter-pick stolen ball also despawns, leaving only the 1 unchosen ball.
+   */
+  public static getStarterBallsForLab(
+    storyFlags: Set<string>,
+    chosenSpeciesId?: string
+  ): OverworldItemBall[] {
+    const balls: Array<OverworldItemBall & { starterId: 'cyndaquil' | 'totodile' | 'chikorita' }> = [
+      {
+        id: 'cyndaquil_ball',
+        starterId: 'cyndaquil',
+        mapId: 'elms_lab',
+        region: 'johto',
+        x: 6,
+        y: 3,
+        itemId: 'poke_ball',
+        eventFlag: 'STARTER_BALL_CYNDAQUIL',
+      },
+      {
+        id: 'totodile_ball',
+        starterId: 'totodile',
+        mapId: 'elms_lab',
+        region: 'johto',
+        x: 7,
+        y: 3,
+        itemId: 'poke_ball',
+        eventFlag: 'STARTER_BALL_TOTODILE',
+      },
+      {
+        id: 'chikorita_ball',
+        starterId: 'chikorita',
+        mapId: 'elms_lab',
+        region: 'johto',
+        x: 8,
+        y: 3,
+        itemId: 'poke_ball',
+        eventFlag: 'STARTER_BALL_CHIKORITA',
+      },
+    ];
+
+    if (!storyFlags.has('starter_chosen')) {
+      return balls;
+    }
+
+    let playerStarter: 'cyndaquil' | 'totodile' | 'chikorita' = 'cyndaquil';
+    if (chosenSpeciesId === 'totodile' || storyFlags.has('starter_totodile')) {
+      playerStarter = 'totodile';
+    } else if (chosenSpeciesId === 'chikorita' || storyFlags.has('starter_chikorita')) {
+      playerStarter = 'chikorita';
+    } else if (chosenSpeciesId === 'cyndaquil' || storyFlags.has('starter_cyndaquil')) {
+      playerStarter = 'cyndaquil';
+    }
+
+    const counterPickMap: Record<'cyndaquil' | 'totodile' | 'chikorita', 'cyndaquil' | 'totodile' | 'chikorita'> = {
+      cyndaquil: 'totodile',
+      totodile: 'chikorita',
+      chikorita: 'cyndaquil',
+    };
+
+    const rivalStolenStarter = storyFlags.has('ELM_CALLED_ABOUT_THEFT')
+      ? counterPickMap[playerStarter]
+      : null;
+
+    return balls.filter(
+      (b) => b.starterId !== playerStarter && b.starterId !== rivalStolenStarter
+    );
+  }
 }
