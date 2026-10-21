@@ -2174,6 +2174,20 @@
   "connections": {},
   "warps": [
     {
+      "x": 14,
+      "y": 7,
+      "targetMapId": "ruins_of_alph_kabuto_chamber",
+      "targetX": 4,
+      "targetY": 8
+    },
+    {
+      "x": 10,
+      "y": 13,
+      "targetMapId": "ruins_of_alph_inner_chamber",
+      "targetX": 4,
+      "targetY": 3
+    },
+    {
       "x": 17,
       "y": 11,
       "targetMapId": "ruins_of_alph_research_center",

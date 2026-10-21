@@ -205,7 +205,7 @@ describe('TICKET-UX-TMHM-RELEASE-MAP-INTEGRITY-01: Full Verification Suite', () 
     mockDoc.body.appendChild(container);
   });
 
-  describe('1. Map Tile & Warp Integrity Suite (All 315 Maps)', () => {
+  describe('1. Map Tile & Warp Integrity Suite (All 317 Maps)', () => {
     const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
     const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
     const mapFiles = fs.readdirSync(mapsDir).filter((f) => f.endsWith('.json'));
@@ -216,8 +216,8 @@ describe('TICKET-UX-TMHM-RELEASE-MAP-INTEGRITY-01: Full Verification Suite', () 
       maps[data.id] = data;
     }
 
-    it('verifies all 315 maps have coherent grid dimensions (width * height === collisionGrid.length)', () => {
-      expect(Object.keys(maps).length).toBe(315);
+    it('verifies all maps have coherent grid dimensions (width * height === collisionGrid.length)', () => {
+      expect(Object.keys(maps).length).toBe(317);
       for (const map of Object.values(maps)) {
         expect(map.collisionGrid.length).toBe(map.width * map.height);
         if (map.tileMap) {

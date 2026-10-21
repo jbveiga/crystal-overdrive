@@ -269,6 +269,7 @@ const TILESETS = {
   ice_path: loadTileset('ice_path', false),
   facility: loadTileset('facility', false),
   kanto: loadTileset('kanto', true),
+  ruins_of_alph: loadTileset('ruins_of_alph', false),
 };
 
 const generatedTiles = new Set();
@@ -405,6 +406,15 @@ function buildMapFromBlk({
           coll = 4;
         }
         collisionGrid[idx] = coll;
+      }
+    }
+  }
+
+  // For ruins_of_alph_outside, ensure all 108 cave roof tiles are solid (1) (BUGFIX-RUINS-OF-ALPH-WARPS-COLLISION-01)
+  if (id === 'ruins_of_alph_outside') {
+    for (let i = 0; i < tileMap.length; i++) {
+      if (tileMap[i] === 'jt_3c_3c_3c_3c') {
+        collisionGrid[i] = 1;
       }
     }
   }
@@ -1531,9 +1541,12 @@ buildMapFromBlk({
   blocksH: 18,
   roofGroup: 'vc',
   warps: [
+    { x: 14, y: 7, targetMapId: 'ruins_of_alph_kabuto_chamber', targetX: 4, targetY: 8 },
+    { x: 10, y: 13, targetMapId: 'ruins_of_alph_inner_chamber', targetX: 4, targetY: 3 },
     { x: 17, y: 11, targetMapId: 'ruins_of_alph_research_center', targetX: 2, targetY: 7 },
     { x: 13, y: 20, targetMapId: 'route_32_ruins_of_alph_gate', targetX: 0, targetY: 4 },
     { x: 13, y: 21, targetMapId: 'route_32_ruins_of_alph_gate', targetX: 0, targetY: 5 },
+    { x: 7, y: 5, targetMapId: 'route_36_ruins_of_alph_gate', targetX: 4, targetY: 6 },
   ],
   bgEvents: [
     {
@@ -1547,6 +1560,58 @@ buildMapFromBlk({
       y: 12,
       speaker: '🪧 RESEARCH CENTER',
       pages: ['RUINS OF ALPH RESEARCH CENTER'],
+    },
+  ],
+  grassEncounters: [
+    { speciesId: 'unown', minLevel: 5, maxLevel: 5, weight: 100 },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'ruins_of_alph_kabuto_chamber',
+  name: 'Ruins of Alph Kabuto Chamber',
+  tileset: 'ruins_of_alph',
+  blkFile: 'maps__RuinsOfAlphPuzzleChamber.blk',
+  blocksW: 4,
+  blocksH: 5,
+  warps: [
+    { x: 3, y: 9, targetMapId: 'ruins_of_alph_outside', targetX: 14, targetY: 7 },
+    { x: 4, y: 9, targetMapId: 'ruins_of_alph_outside', targetX: 14, targetY: 7 },
+    { x: 5, y: 9, targetMapId: 'ruins_of_alph_outside', targetX: 14, targetY: 7 },
+  ],
+  bgEvents: [
+    {
+      x: 3,
+      y: 2,
+      speaker: '🧩 KABUTO PUZZLE',
+      pages: ['A mysterious stone sliding puzzle depicting an ancient creature.'],
+    },
+    {
+      x: 4,
+      y: 2,
+      speaker: '📜 ANCIENT INSCRIPTION',
+      pages: ['A creature that hid on the sea floor.', 'Eyes on its back scanned the area.'],
+    },
+  ],
+});
+
+buildMapFromBlk({
+  id: 'ruins_of_alph_inner_chamber',
+  name: 'Ruins of Alph Inner Chamber',
+  tileset: 'ruins_of_alph',
+  blkFile: 'maps__RuinsOfAlphInnerChamber.blk',
+  blocksW: 10,
+  blocksH: 14,
+  warps: [
+    { x: 4, y: 3, targetMapId: 'ruins_of_alph_outside', targetX: 10, targetY: 13 },
+    { x: 10, y: 13, targetMapId: 'ruins_of_alph_outside', targetX: 10, targetY: 13 },
+  ],
+  bgEvents: [
+    {
+      x: 10,
+      y: 2,
+      speaker: '🏛️ ANCIENT RUINS PILLAR',
+      pages: ['There is a strange presence here... Ancient symbols are carved into the pillars.'],
     },
   ],
   grassEncounters: [

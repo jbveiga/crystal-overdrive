@@ -213,6 +213,8 @@ async function bootstrap() {
     'route_32_ruins_of_alph_gate',
     'ruins_of_alph_outside',
     'ruins_of_alph_research_center',
+    'ruins_of_alph_kabuto_chamber',
+    'ruins_of_alph_inner_chamber',
     'union_cave_1f',
     'union_cave_b1f',
     'union_cave_b2f',
