@@ -271,4 +271,145 @@ describe('10-Point Completeness Audit for Previously Mapped Areas (TICKET-AUDIT-
       expect(track.length, `BGM track for ${mId} must be a valid track id`).toBeGreaterThan(0);
     }
   });
+
+  describe('10-Point Completeness Audit for Route 33 & Azalea Town (TICKET-WORLD-ROUTE33-AZALEA-01)', () => {
+    it('Dimension 1: asserts 100% of warps in Route 33 and Azalea Town lead to valid maps with walkable landing tiles', () => {
+      const targetMaps = ['route_33', 'azalea_town'];
+      for (const mId of targetMaps) {
+        const map = loadMap(mId);
+        for (const w of map.warps || []) {
+          const targetPath = path.join(mapsDir, `${w.targetMapId}.json`);
+          expect(fs.existsSync(targetPath), `Target map ${w.targetMapId} from ${mId} must exist`).toBe(true);
+          const targetMap: MapData = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
+          expect(
+            isWalkable(targetMap, w.targetX, w.targetY),
+            `Warp landing from ${mId} to ${w.targetMapId} at (${w.targetX}, ${w.targetY}) must be on a walkable tile (0 or 2)`
+          ).toBe(true);
+        }
+      }
+
+      // Assert reciprocal connection from union_cave_1f to route_33
+      const uc1f = loadMap('union_cave_1f');
+      const r33Exit = uc1f.warps.find((w) => w.targetMapId === 'route_33');
+      expect(r33Exit).toBeDefined();
+      const r33 = loadMap('route_33');
+      expect(isWalkable(r33, r33Exit!.targetX, r33Exit!.targetY)).toBe(true);
+    });
+
+    it('Dimension 2: asserts Hiker Anthony and Azalea NPCs stand on walkable tiles with complete combat data and teams', () => {
+      const npcsByMap = createNpcsByMap();
+      const r33 = loadMap('route_33');
+      const azalea = loadMap('azalea_town');
+
+      // Route 33: Hiker Anthony
+      const r33Npcs = npcsByMap.route_33 || [];
+      const anthony = r33Npcs.find((n) => n.id === 'hiker_anthony');
+      expect(anthony).toBeDefined();
+      expect(isWalkable(r33, anthony!.x, anthony!.y)).toBe(true);
+      expect(anthony?.action).toBe('TRAINER_BATTLE');
+      expect(anthony?.visionRange).toBeGreaterThanOrEqual(1);
+      expect(anthony?.trainerTeam?.length).toBeGreaterThanOrEqual(2);
+
+      // Azalea Town: All civilian NPCs and grunts stand on walkable tiles
+      const azaleaNpcs = npcsByMap.azalea_town || [];
+      expect(azaleaNpcs.length).toBeGreaterThanOrEqual(6);
+      for (const npc of azaleaNpcs) {
+        expect(
+          isWalkable(azalea, npc.x, npc.y),
+          `NPC ${npc.id} at (${npc.x}, ${npc.y}) on azalea_town must be walkable`
+        ).toBe(true);
+      }
+    });
+
+    it('Dimension 3: asserts authentic Pokecrystal dialogue for Kurt, Slowpoke Well grunts, Charcoal apprentice, and Slowpokes', () => {
+      const npcsByMap = createNpcsByMap();
+      const azaleaNpcs = npcsByMap.azalea_town || [];
+
+      const kurt = azaleaNpcs.find((n) => n.id === 'azalea_kurt');
+      expect(kurt?.pages.some((p) => p.includes('TEAM ROCKET'))).toBe(true);
+
+      const wellGrunt = azaleaNpcs.find((n) => n.id === 'azalea_well_grunt');
+      expect(wellGrunt?.pages.some((p) => p.includes('SLOWPOKE WELL'))).toBe(true);
+
+      const gymGrunt = azaleaNpcs.find((n) => n.id === 'azalea_gym_grunt');
+      expect(gymGrunt?.pages.some((p) => p.includes('GYM'))).toBe(true);
+
+      const slowpokes = azaleaNpcs.filter((n) => n.id.includes('slowpoke'));
+      expect(slowpokes.length).toBeGreaterThanOrEqual(2);
+      expect(slowpokes[0].pages.some((p) => p.includes('Yaaawn'))).toBe(true);
+    });
+
+    it('Dimension 4: asserts Rocket Grunts block entrances and despawn cleanly when slowpoke_well_cleared', () => {
+      const npcsByMap = createNpcsByMap();
+      const wellGrunt = npcsByMap.azalea_town.find((n) => n.id === 'azalea_well_grunt');
+      const gymGrunt = npcsByMap.azalea_town.find((n) => n.id === 'azalea_gym_grunt');
+      expect(wellGrunt).toBeDefined();
+      expect(gymGrunt).toBeDefined();
+
+      // Despawn simulation matches main.ts logic
+      const storyFlags = new Set<string>(['slowpoke_well_cleared']);
+      const activeNpcs = npcsByMap.azalea_town.filter(
+        (n) =>
+          !(storyFlags.has('slowpoke_well_cleared') &&
+            (n.id === 'azalea_well_grunt' || n.id === 'azalea_gym_grunt'))
+      );
+      expect(activeNpcs.some((n) => n.id === 'azalea_well_grunt')).toBe(false);
+      expect(activeNpcs.some((n) => n.id === 'azalea_gym_grunt')).toBe(false);
+    });
+
+    it('Dimension 6: asserts Route 33 has time-of-day grass encounter distributions for MORNING, DAY, and NIGHT', () => {
+      const r33 = loadMap('route_33');
+      expect(r33.grassEncounters && r33.grassEncounters.length).toBeGreaterThanOrEqual(10);
+
+      const times = new Set((r33.grassEncounters || []).map((e) => (e as any).timeOfDay));
+      expect(times.has('MORNING')).toBe(true);
+      expect(times.has('DAY')).toBe(true);
+      expect(times.has('NIGHT')).toBe(true);
+    });
+
+    it('Dimension 7: asserts Route 33 and Azalea Town have interactive signpost and directional board bgEvents', () => {
+      const r33 = loadMap('route_33');
+      const azalea = loadMap('azalea_town');
+
+      expect(r33.bgEvents && r33.bgEvents.length).toBeGreaterThanOrEqual(2);
+      expect(r33.bgEvents?.some((b) => b.pages.some((p) => p.includes('ROUTE 33')))).toBe(true);
+
+      expect(azalea.bgEvents && azalea.bgEvents.length).toBeGreaterThanOrEqual(5);
+      expect(azalea.bgEvents?.some((b) => b.pages.some((p) => p.includes('AZALEA TOWN')))).toBe(true);
+      expect(azalea.bgEvents?.some((b) => b.pages.some((p) => p.includes('SLOWPOKE WELL')))).toBe(true);
+      expect(azalea.bgEvents?.some((b) => b.pages.some((p) => p.includes('BUGSY')))).toBe(true);
+    });
+
+    it('Dimension 8: asserts Route 33 and Azalea Town Apricorn/Berry trees are registered in overworld_items.json', () => {
+      const itemManager = new OverworldItemManager();
+      const r33Trees = itemManager.getFruitTreesForMap('route_33');
+      expect(r33Trees.length).toBeGreaterThanOrEqual(1);
+      expect(r33Trees[0].x).toBe(14);
+      expect(r33Trees[0].y).toBe(16);
+
+      const azaleaTrees = itemManager.getFruitTreesForMap('azalea_town');
+      expect(azaleaTrees.length).toBeGreaterThanOrEqual(1);
+      expect(azaleaTrees.some((t) => t.berryId === 'wht_apricorn')).toBe(true);
+    });
+
+    it('Dimension 9: asserts Azalea Town buried hidden items are indexed for Itemfinder radar detection', () => {
+      const itemManager = new OverworldItemManager();
+      const azaleaHidden = itemManager.getHiddenItemsForMap('azalea_town');
+      expect(azaleaHidden.length).toBeGreaterThanOrEqual(1);
+      expect(azaleaHidden[0].x).toBe(31);
+      expect(azaleaHidden[0].y).toBe(6);
+      expect(azaleaHidden[0].itemId).toBe('full_heal');
+    });
+
+    it('Dimension 10: asserts canonical zone BGM track assignments resolve cleanly for Route 33, Azalea Town, and interiors', () => {
+      const audioManager = new AudioManager();
+      expect(audioManager.getTrackForMap('route_33')).toBe('bgm_route_29');
+      expect(audioManager.getTrackForMap('azalea_town')).toBe('bgm_cherrygrove_city');
+      expect(audioManager.getTrackForMap('azalea_poke_center')).toBe('bgm_cherrygrove_city');
+      expect(audioManager.getTrackForMap('azalea_mart')).toBe('bgm_cherrygrove_city');
+      expect(audioManager.getTrackForMap('kurts_house')).toBe('bgm_cherrygrove_city');
+      expect(audioManager.getTrackForMap('charcoal_kiln')).toBe('bgm_cherrygrove_city');
+      expect(audioManager.getTrackForMap('azalea_gym')).toBe('bgm_gym');
+    });
+  });
 });

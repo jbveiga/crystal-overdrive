@@ -1619,6 +1619,18 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         ]
       ),
       makeNpc(
+        'azalea_slowpoke_2',
+        15,
+        13,
+        'RIGHT',
+        'fat_man',
+        '🦛 SLOWPOKE',
+        [
+          'SLOWPOKE: ... ... ...',
+          'Yaaawn? It seems to be enjoying the pleasant breeze in Azalea Town.',
+        ]
+      ),
+      makeNpc(
         'azalea_apprentice',
         17,
         10,

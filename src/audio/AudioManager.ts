@@ -32,6 +32,8 @@ const MAP_BGM_TABLE: Record<string, BgmTrackId> = {
   route_29: 'bgm_route_29',
   route_30: 'bgm_route_29',
   route_31: 'bgm_route_29',
+  route_32: 'bgm_route_29',
+  route_33: 'bgm_route_29',
   mr_pokemons_house: 'bgm_route_29',
   route_30_berry_house: 'bgm_route_29',
 
@@ -42,6 +44,20 @@ const MAP_BGM_TABLE: Record<string, BgmTrackId> = {
   guide_gents_house: 'bgm_cherrygrove_city',
   cherrygrove_gym_speech_house: 'bgm_cherrygrove_city',
   cherrygrove_evolution_speech_house: 'bgm_cherrygrove_city',
+
+  // Azalea Town & Indoors
+  azalea_town: 'bgm_cherrygrove_city',
+  azalea_poke_center: 'bgm_cherrygrove_city',
+  azalea_mart: 'bgm_cherrygrove_city',
+  kurts_house: 'bgm_cherrygrove_city',
+  charcoal_kiln: 'bgm_cherrygrove_city',
+  azalea_gym: 'bgm_gym',
+
+  // Union Cave & Caves
+  union_cave_1f: 'bgm_sprout_tower',
+  union_cave_b1f: 'bgm_sprout_tower',
+  union_cave_b2f: 'bgm_sprout_tower',
+  slowpoke_well_b1f: 'bgm_sprout_tower',
 
   // Violet City & Indoors
   violet_city: 'bgm_violet_city',

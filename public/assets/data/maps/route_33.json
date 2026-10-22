@@ -1112,9 +1112,17 @@
   ],
   "bgEvents": [
     {
+      "x": 11,
+      "y": 3,
+      "speaker": "🪧 ROUTE 33 SIGN",
+      "pages": [
+        "ROUTE 33: Wind & Rain Crossing"
+      ]
+    },
+    {
       "x": 13,
       "y": 11,
-      "speaker": "🪧 ROUTE 33 SIGN",
+      "speaker": "🪧 ROUTE 33 DIRECTIONAL SIGN",
       "pages": [
         "ROUTE 33",
         "UNION CAVE - AZALEA TOWN"
@@ -1123,38 +1131,108 @@
   ],
   "grassEncounters": [
     {
+      "speciesId": "rattata",
+      "minLevel": 6,
+      "maxLevel": 7,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
       "speciesId": "spearow",
       "minLevel": 6,
       "maxLevel": 8,
-      "weight": 35,
-      "timeOfDay": "DAY"
-    },
-    {
-      "speciesId": "geodude",
-      "minLevel": 6,
-      "maxLevel": 8,
-      "weight": 35,
-      "timeOfDay": "ANY"
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "ekans",
       "minLevel": 6,
       "maxLevel": 7,
-      "weight": 30,
-      "timeOfDay": "DAY"
+      "weight": 20,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 6,
+      "maxLevel": 7,
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "zubat",
       "minLevel": 6,
       "maxLevel": 8,
-      "weight": 40,
-      "timeOfDay": "NIGHT"
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 6,
+      "maxLevel": 8,
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "rattata",
       "minLevel": 6,
       "maxLevel": 7,
       "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "spearow",
+      "minLevel": 6,
+      "maxLevel": 8,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "ekans",
+      "minLevel": 6,
+      "maxLevel": 7,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 6,
+      "maxLevel": 7,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 6,
+      "maxLevel": 8,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 6,
+      "maxLevel": 7,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 6,
+      "maxLevel": 8,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "ekans",
+      "minLevel": 6,
+      "maxLevel": 7,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 6,
+      "maxLevel": 8,
+      "weight": 20,
       "timeOfDay": "NIGHT"
     }
   ]
