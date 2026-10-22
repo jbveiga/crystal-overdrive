@@ -254,6 +254,13 @@
   "connections": {},
   "warps": [
     {
+      "x": 4,
+      "y": 6,
+      "targetMapId": "ruins_of_alph_inner_chamber",
+      "targetX": 10,
+      "targetY": 11
+    },
+    {
       "x": 3,
       "y": 9,
       "targetMapId": "ruins_of_alph_outside",

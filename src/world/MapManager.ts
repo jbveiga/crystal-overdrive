@@ -164,7 +164,13 @@ export class MapManager {
     rng: () => number = Math.random,
     timeOfDay?: 'MORNING' | 'DAY' | 'NIGHT'
   ): WildEncounterResult | null {
-    if (tileType !== 2 || !this.currentMap) {
+    if (!this.currentMap) {
+      return null;
+    }
+
+    const isCaveOrRuins =
+      MapManager.isCaveMap(this.currentMap.id) || this.currentMap.id.includes('ruins_of_alph');
+    if (tileType !== 2 && !(isCaveOrRuins && tileType === 0)) {
       return null;
     }
 

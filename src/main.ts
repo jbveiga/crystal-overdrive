@@ -26,6 +26,7 @@ import { NamingModalUI } from './ui/NamingModalUI';
 import { StorageManager, BoxManager } from './world/StorageManager';
 import { BoxManagementUI } from './ui/BoxManagementUI';
 import { TownMapUI } from './ui/TownMapUI';
+import { RuinsPuzzleModalUI } from './ui/RuinsPuzzleModalUI';
 import type {
   MapData,
   WarpEvent,
@@ -637,6 +638,7 @@ async function bootstrap() {
   const namingModalUI = new NamingModalUI('overworld-hud-container');
   const boxManagementUI = new BoxManagementUI('modal-container');
   const townMapUI = new TownMapUI({ containerId: 'modal-container' });
+  const ruinsPuzzleModalUI = new RuinsPuzzleModalUI('modal-container');
   const visitedMaps = new Set<string>([initialMapId]);
 
   let handleInteract = () => {};
@@ -765,7 +767,8 @@ async function bootstrap() {
     missionLogUI.isOpen() ||
     boxManagementUI.isOpen() ||
     namingModalUI.isOpen() ||
-    townMapUI.isOpen();
+    townMapUI.isOpen() ||
+    ruinsPuzzleModalUI.isOpen();
 
   overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
@@ -775,6 +778,10 @@ async function bootstrap() {
       return audioManager.toggleMute();
     },
     onMenuToggle: () => {
+      if (ruinsPuzzleModalUI.isOpen()) {
+        ruinsPuzzleModalUI.close();
+        return;
+      }
       if (boxManagementUI.isOpen()) {
         boxManagementUI.close();
         return;
@@ -2012,6 +2019,162 @@ async function bootstrap() {
             );
           }
         );
+      }
+    );
+  };
+
+  const executeWarpTransition = (warp: WarpEvent) => {
+    const currentM = mapManager.getCurrentMap();
+    if (!currentM) return;
+
+    const targetMapExists = mapManager.getMap(warp.targetMapId);
+    if (!targetMapExists) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        [
+          'The way ahead is closed for construction!',
+          'Workers and road crews are currently preparing this route. Please check back later!',
+        ],
+        '🚧 ROADBLOCK'
+      );
+      return;
+    }
+
+    if (warp.targetMapId === 'azalea_gym' && !storyFlags.has('slowpoke_well_cleared')) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        [
+          'The GYM door is firmly locked!',
+          'A notice on the door says: "GYM temporarily closed due to disturbance in SLOWPOKE WELL."',
+        ],
+        '🔒 AZALEA GYM'
+      );
+      return;
+    }
+
+    if (
+      warp.targetMapId === 'slowpoke_well_b1f' &&
+      !storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') &&
+      !storyFlags.has('slowpoke_well_cleared')
+    ) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        [
+          "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
+        ],
+        '⚡ ROCKET GRUNT'
+      );
+      return;
+    }
+
+    if (
+      warp.targetMapId === 'ruins_of_alph_inner_chamber' &&
+      !storyFlags.has('unown_awakened_kabuto')
+    ) {
+      // The stone floor has not collapsed into a trapdoor hole yet
+      return;
+    }
+
+    const previousMapId = currentM.id;
+    const transitionConfig = mapManager.resolveWarpTransition(warp);
+
+    player.isMoving = false;
+    player.progress = 0;
+    isCutsceneLocked = true;
+    BattleAudio.playWarpSound(transitionConfig.soundCue);
+
+    overworldRenderer
+      .playDoorwayFade(() => {
+        const targetMap = mapManager.setCurrentMap(transitionConfig.targetMapId);
+        visitedMaps.add(targetMap.id);
+        if (targetMap.id.endsWith('_poke_center')) {
+          lastVisitedPokecenter = {
+            mapId: targetMap.id,
+            x: transitionConfig.landingX,
+            y: Math.max(2, transitionConfig.landingY - 1),
+          };
+        }
+        player.direction = transitionConfig.landingFacing;
+        player.x = transitionConfig.landingX;
+        player.y = transitionConfig.landingY;
+        player.targetX = transitionConfig.landingX;
+        player.targetY = transitionConfig.landingY;
+        player.renderX = transitionConfig.landingX;
+        player.renderY = transitionConfig.landingY;
+
+        overworldRenderer.renderMap(targetMap, lookupMap);
+        syncMapOverworldItems(targetMap);
+        overworldHUD.updateRouteName(targetMap.name);
+        audioManager.playMapBgm(targetMap.id, 0.8);
+      }, transitionConfig.fadeDurationMs)
+      .then(() => {
+        isCutsceneLocked = false;
+
+        // Trigger Prof. Elm's emergency Pokégear phone call upon stepping out of Mr. Pokémon's House with the Mystery Egg
+        if (
+          previousMapId === 'mr_pokemons_house' &&
+          storyFlags.has('HAS_MYSTERY_EGG') &&
+          !storyFlags.has('ELM_CALLED_ABOUT_THEFT')
+        ) {
+          storyFlags.add('ELM_CALLED_ABOUT_THEFT');
+          BattleAudio.playOverworldSound('PHONE_RING');
+          overworldHUD.openDialogue(
+            [
+              '📻 *BEEP! BEEP! Your POKéGEAR is ringing!*',
+              "PROF. ELM: H-hello? GOLD? It's a disaster here at the LAB!",
+              'A red-haired boy broke in! Please bring that MYSTERY EGG back to NEW BARK TOWN when you can!',
+            ],
+            '📻 PROF. ELM (POKéGEAR)',
+            () => {
+              saveCurrentGame();
+            }
+          );
+        }
+      });
+  };
+
+  const handleRuinsPuzzleSolve = (_puzzleId: string) => {
+    storyFlags.add('unown_awakened_kabuto');
+    storyFlags.add('EVENT_SOLVED_KABUTO_PUZZLE');
+    storyFlags.add('EVENT_MADE_UNOWN_APPEAR_IN_RUINS');
+
+    // Screen shake tremor
+    const canvas = document.getElementById('game-canvas');
+    if (canvas) {
+      canvas.classList.add('screen-shake');
+      setTimeout(() => canvas.classList.remove('screen-shake'), 1200);
+    }
+    BattleAudio.playWarpSound('CAVE_WARP');
+
+    overworldHUD.openDialogue(
+      [
+        'The ancient stone tiles clicked perfectly into place!',
+        'A rumbling tremor shakes the chamber!',
+        'The stone floor collapsed beneath your feet!',
+      ],
+      '🏛️ RUINS OF ALPH',
+      () => {
+        executeWarpTransition({
+          x: 4,
+          y: 6,
+          targetMapId: 'ruins_of_alph_inner_chamber',
+          targetX: 10,
+          targetY: 11,
+          direction: 'DOWN',
+        });
+        setTimeout(() => {
+          overworldHUD.showToast('There is a strange presence here…');
+        }, 500);
+        saveCurrentGame();
       }
     );
   };
@@ -3291,6 +3454,39 @@ async function bootstrap() {
           return;
         }
 
+        if (targetNpc.action === 'UNOWN_DEX_EVENT') {
+          if (storyFlags.has('unown_awakened_kabuto')) {
+            if (!storyFlags.has('ENGINE_UNOWN_DEX')) {
+              storyFlags.add('ENGINE_UNOWN_DEX');
+              overworldHUD.openDialogue(
+                [
+                  'HEAD RESEARCHER: You discovered how to awaken the UNOWN in the ruins? That is incredible news!',
+                  `${playerName}'s POKéDEX was upgraded with the UNOWN DEX!`,
+                  'Use your POKéDEX to catalog all 26 distinct forms of UNOWN!',
+                ],
+                targetNpc.speaker,
+                () => {
+                  BattleAudio.playOverworldSound('KEY_ITEM');
+                  saveCurrentGame();
+                }
+              );
+            } else {
+              overworldHUD.openDialogue(
+                ['The UNOWN DEX records all forms of UNOWN you encounter!'],
+                targetNpc.speaker
+              );
+            }
+          } else {
+            overworldHUD.openDialogue(
+              [
+                'The ruins are quiet today... We are researching ancient glyphs, but our equipment detects no active signals from the chambers.',
+              ],
+              targetNpc.speaker
+            );
+          }
+          return;
+        }
+
         if (targetNpc.pages && targetNpc.pages.length > 0) {
           overworldHUD.openDialogue(targetNpc.pages, targetNpc.speaker, () => {
             if (targetNpc.action === 'HEAL_AND_SAVE') {
@@ -3462,6 +3658,43 @@ async function bootstrap() {
               : 'WINNING TRAINERS: SILVER',
           ];
           overworldHUD.openDialogue(statuePages, bgEvent.speaker);
+          return;
+        }
+      }
+
+      // Ruins of Alph Kabuto Chamber Altar & Inscription Interaction
+      if (currentMap.id === 'ruins_of_alph_kabuto_chamber') {
+        if (facingX === 3 && facingY === 2) {
+          if (storyFlags.has('unown_awakened_kabuto')) {
+            overworldHUD.openDialogue(['A completed stone panel of KABUTO.'], '🧩 KABUTO PUZZLE');
+          } else {
+            overworldHUD.openDialogue(
+              [
+                "It's an ancient stone puzzle depicting a prehistoric POKéMON.",
+                'Attempt to assemble the sliding panels?',
+              ],
+              '🧩 KABUTO PUZZLE',
+              () => {
+                ruinsPuzzleModalUI.open({
+                  onSolve: (puzzleId) => {
+                    handleRuinsPuzzleSolve(puzzleId);
+                  },
+                  onClose: () => {},
+                });
+              }
+            );
+          }
+          return;
+        }
+
+        if (facingX === 4 && facingY === 2) {
+          overworldHUD.openDialogue(
+            [
+              'A POKéMON that hid on the sea floor.',
+              'Eyes on its back scanned the area.',
+            ],
+            '📜 ANCIENT INSCRIPTION'
+          );
           return;
         }
       }
@@ -3858,117 +4091,6 @@ async function bootstrap() {
 
       const heldDir = isCutsceneLocked ? null : overworldHUD.getHeldDirection();
 
-      const executeWarpTransition = (warp: WarpEvent) => {
-        const currentM = mapManager.getCurrentMap();
-        if (!currentM) return;
-
-        const targetMapExists = mapManager.getMap(warp.targetMapId);
-        if (!targetMapExists) {
-          player.isMoving = false;
-          player.progress = 0;
-          isCutsceneLocked = false;
-          BattleAudio.playMenuSound('CANCEL');
-          overworldHUD.openDialogue(
-            [
-              'The way ahead is closed for construction!',
-              'Workers and road crews are currently preparing this route. Please check back later!',
-            ],
-            '🚧 ROADBLOCK'
-          );
-          return;
-        }
-
-        if (warp.targetMapId === 'azalea_gym' && !storyFlags.has('slowpoke_well_cleared')) {
-          player.isMoving = false;
-          player.progress = 0;
-          isCutsceneLocked = false;
-          BattleAudio.playMenuSound('CANCEL');
-          overworldHUD.openDialogue(
-            [
-              'The GYM door is firmly locked!',
-              'A notice on the door says: "GYM temporarily closed due to disturbance in SLOWPOKE WELL."',
-            ],
-            '🔒 AZALEA GYM'
-          );
-          return;
-        }
-
-        if (
-          warp.targetMapId === 'slowpoke_well_b1f' &&
-          !storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') &&
-          !storyFlags.has('slowpoke_well_cleared')
-        ) {
-          player.isMoving = false;
-          player.progress = 0;
-          isCutsceneLocked = false;
-          BattleAudio.playMenuSound('CANCEL');
-          overworldHUD.openDialogue(
-            [
-              "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
-            ],
-            '⚡ ROCKET GRUNT'
-          );
-          return;
-        }
-
-        const previousMapId = currentM.id;
-        const transitionConfig = mapManager.resolveWarpTransition(warp);
-
-        player.isMoving = false;
-        player.progress = 0;
-        isCutsceneLocked = true;
-        BattleAudio.playWarpSound(transitionConfig.soundCue);
-
-        overworldRenderer
-          .playDoorwayFade(() => {
-            const targetMap = mapManager.setCurrentMap(transitionConfig.targetMapId);
-            visitedMaps.add(targetMap.id);
-            if (targetMap.id.endsWith('_poke_center')) {
-              lastVisitedPokecenter = {
-                mapId: targetMap.id,
-                x: transitionConfig.landingX,
-                y: Math.max(2, transitionConfig.landingY - 1),
-              };
-            }
-            player.direction = transitionConfig.landingFacing;
-            player.x = transitionConfig.landingX;
-            player.y = transitionConfig.landingY;
-            player.targetX = transitionConfig.landingX;
-            player.targetY = transitionConfig.landingY;
-            player.renderX = transitionConfig.landingX;
-            player.renderY = transitionConfig.landingY;
-
-            overworldRenderer.renderMap(targetMap, lookupMap);
-            syncMapOverworldItems(targetMap);
-            overworldHUD.updateRouteName(targetMap.name);
-            audioManager.playMapBgm(targetMap.id, 0.8);
-          }, transitionConfig.fadeDurationMs)
-          .then(() => {
-            isCutsceneLocked = false;
-
-            // Trigger Prof. Elm's emergency Pokégear phone call upon stepping out of Mr. Pokémon's House with the Mystery Egg
-            if (
-              previousMapId === 'mr_pokemons_house' &&
-              storyFlags.has('HAS_MYSTERY_EGG') &&
-              !storyFlags.has('ELM_CALLED_ABOUT_THEFT')
-            ) {
-              storyFlags.add('ELM_CALLED_ABOUT_THEFT');
-              BattleAudio.playOverworldSound('PHONE_RING');
-              overworldHUD.openDialogue(
-                [
-                  '📻 *BEEP! BEEP! Your POKéGEAR is ringing!*',
-                  "PROF. ELM: H-hello? GOLD? It's a disaster here at the LAB!",
-                  'A red-haired boy broke in! Please bring that MYSTERY EGG back to NEW BARK TOWN when you can!',
-                ],
-                '📻 PROF. ELM (POKéGEAR)',
-                () => {
-                  saveCurrentGame();
-                }
-              );
-            }
-          });
-      };
-
       GridPhysics.updateEntity(
         player,
         dtPlayer,
@@ -4067,24 +4189,37 @@ async function bootstrap() {
             return;
           }
 
-          // Wild Encounter Check in Tall Grass (tile type 2)
-          if (tileType === 2 && playerParty.length > 0) {
-            const roamer = latestMap ? roamingManager.getActiveRoamerOnRoute(latestMap.id) : undefined;
-            const encounter = mapManager.rollWildEncounter(
-              tileType,
-              roamer?.speciesId,
-              Math.random,
-              currentTimeOfDay
-            );
+          // Wild Encounter Check in Tall Grass (tile type 2) or Cave / Ruins floors (tile type 0)
+          const isCaveOrRuins =
+            latestMap &&
+            (MapManager.isCaveMap(latestMap.id) || latestMap.id.includes('ruins_of_alph'));
+          const canEncounter = tileType === 2 || (isCaveOrRuins && tileType === 0);
 
-            if (encounter) {
-              console.log(`[Wild Encounter] Wild ${encounter.speciesId} (Lv. ${encounter.level}) appeared!`);
-              // Use persistent Roamer instance if encountering a Legendary Beast (Specification 4.4.3)
-              const wildPkmn =
-                encounter.isRoamer && roamer
-                  ? roamer.pokemon
-                  : PokemonFactory.create(encounter.speciesId, encounter.level);
-              triggerBattle(wildPkmn, { isRoamer: encounter.isRoamer });
+          if (canEncounter && playerParty.length > 0) {
+            // In ruins_of_alph_inner_chamber, encounters only occur once Unown are awakened
+            if (
+              latestMap?.id === 'ruins_of_alph_inner_chamber' &&
+              !storyFlags.has('unown_awakened_kabuto')
+            ) {
+              // Chamber is quiet until puzzle is solved
+            } else {
+              const roamer = latestMap ? roamingManager.getActiveRoamerOnRoute(latestMap.id) : undefined;
+              const encounter = mapManager.rollWildEncounter(
+                tileType,
+                roamer?.speciesId,
+                Math.random,
+                currentTimeOfDay
+              );
+
+              if (encounter) {
+                console.log(`[Wild Encounter] Wild ${encounter.speciesId} (Lv. ${encounter.level}) appeared!`);
+                // Use persistent Roamer instance if encountering a Legendary Beast (Specification 4.4.3)
+                const wildPkmn =
+                  encounter.isRoamer && roamer
+                    ? roamer.pokemon
+                    : PokemonFactory.create(encounter.speciesId, encounter.level);
+                triggerBattle(wildPkmn, { isRoamer: encounter.isRoamer });
+              }
             }
           }
         },

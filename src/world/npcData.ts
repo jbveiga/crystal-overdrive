@@ -1519,7 +1519,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'DOWN',
         'sage',
         '🔬 HEAD RESEARCHER',
-        ['We are compiling the UNOWN DEX! Each UNOWN matches one letter of our alphabet!']
+        ['The ruins are quiet today... We are researching ancient glyphs, but our equipment detects no active signals from the chambers.'],
+        { action: 'UNOWN_DEX_EVENT' }
       ),
       makeNpc(
         'research_scientist2',
@@ -1529,6 +1530,19 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'sage',
         '🔬 RESEARCH ASSISTANT',
         ['The past and future intertwine in these ancient stones. They date back over 1,500 years!']
+      ),
+    ],
+    ruins_of_alph_kabuto_chamber: [
+      makeNpc(
+        'kabuto_chamber_guide',
+        5,
+        5,
+        'DOWN',
+        'sage',
+        '🏛️ CHAMBER GUIDE',
+        [
+          'Welcome to this chamber. There are sliding stone panels that depict a POKéMON drawn by the ancients. Slide the panels around to form the picture.',
+        ]
       ),
     ],
     union_cave_1f: [
