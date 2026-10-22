@@ -185,8 +185,8 @@ export class BattleRenderer {
 
     this.fxContainer.addChild(shutterTop, shutterBottom, whiteFlash);
 
-    const flashDur = 0.07 / this.speedMultiplier;
-    const slideDur = 0.42 / this.speedMultiplier;
+    const flashDur = 0.05 / this.speedMultiplier;
+    const slideDur = 0.30 / this.speedMultiplier;
 
     await new Promise<void>((resolve) => {
       const tl = gsap.timeline({
@@ -209,9 +209,9 @@ export class BattleRenderer {
       });
       tl.to(this.enemyPokemonSprite, {
         y: enemyPlatformY - 8,
-        duration: 0.09 / this.speedMultiplier,
+        duration: 0.065 / this.speedMultiplier,
         yoyo: true,
-        repeat: 3,
+        repeat: 2,
         ease: 'power1.out',
       });
     });

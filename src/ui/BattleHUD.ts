@@ -64,8 +64,8 @@ export class BattleHUD {
   private caughtSpeciesIds: Set<string> = new Set();
   private ballsInventory: Partial<Record<PokeballId, number>> = {};
   private callbacks!: BattleHUDCallbacks;
-  public static readonly DIALOGUE_CHAR_DELAY_MS = 18;
-  public static readonly DIALOGUE_POST_DELAY_MS = 750;
+  public static readonly DIALOGUE_CHAR_DELAY_MS = 12;
+  public static readonly DIALOGUE_POST_DELAY_MS = 500;
 
   private speedMultiplier: SpeedMultiplier = 1;
   private isForcedPartySwitch: boolean = false;
@@ -1060,7 +1060,7 @@ export class BattleHUD {
   }
 
   /**
-   * Renders battle dialogue at a fixed, legible ~18ms/char with a ~750ms post-delay.
+   * Renders battle dialogue at a fixed, snappy ~12ms/char with a ~500ms post-delay.
    * Intentionally decoupled from the battle speed multiplier so text stays readable at any battle speed.
    * The dialogue takes the full bottom tray; the action menu is hidden while a message is shown.
    */

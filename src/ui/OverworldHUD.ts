@@ -16,6 +16,8 @@ export interface OverworldHUDOptions {
 }
 
 export class OverworldHUD {
+  public static readonly DIALOGUE_CHAR_DELAY_MS = 12;
+
   private container: HTMLElement;
   private speedButton: HTMLButtonElement | null = null;
   private muteButton: HTMLButtonElement | null = null;
@@ -1150,7 +1152,7 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
         this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
         this.dialoguePrompt.style.opacity = '1';
       }
-    }, 18);
+    }, OverworldHUD.DIALOGUE_CHAR_DELAY_MS);
   }
 
   public advanceDialogue(): void {

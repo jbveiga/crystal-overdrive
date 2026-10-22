@@ -16,13 +16,14 @@ describe('GameClock', () => {
     expect(clock.cyclePlayerSpeed()).toBe(1);
   });
 
-  it('cycles battle speed capped at 2x (1 -> 2 -> 1) and clamps higher values', () => {
+  it('cycles battle speed capped at 3x (1 -> 2 -> 3 -> 1) and clamps higher values', () => {
     const clock = new GameClock();
     expect(clock.cycleBattleSpeed()).toBe(2);
+    expect(clock.cycleBattleSpeed()).toBe(3);
     expect(clock.cycleBattleSpeed()).toBe(1);
     clock.battleSpeed = 4;
-    expect(clock.battleSpeed).toBe(2);
-    expect(new GameClock(1, 3).battleSpeed).toBe(2);
+    expect(clock.battleSpeed).toBe(3);
+    expect(new GameClock(1, 4).battleSpeed).toBe(3);
   });
 
   it('decouples world, player, and battle delta times based on multipliers (including 4x Overdrive)', () => {
@@ -32,14 +33,14 @@ describe('GameClock', () => {
 
     expect(deltas.dtWorld).toBeCloseTo(0.016);
     expect(deltas.dtPlayer).toBeCloseTo(0.032);
-    expect(deltas.dtBattle).toBeCloseTo(0.032);
+    expect(deltas.dtBattle).toBeCloseTo(0.048);
 
     clock.playerSpeed = 4;
     clock.battleSpeed = 4;
     const overdriveDeltas = clock.tick(rawDt);
     expect(overdriveDeltas.dtWorld).toBeCloseTo(0.016);
     expect(overdriveDeltas.dtPlayer).toBeCloseTo(0.064);
-    expect(overdriveDeltas.dtBattle).toBeCloseTo(0.032);
+    expect(overdriveDeltas.dtBattle).toBeCloseTo(0.048);
   });
 
   it('clamps large delta time spikes to 100ms (0.1s)', () => {

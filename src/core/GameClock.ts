@@ -15,7 +15,7 @@ export interface AmbientTint {
 
 export class GameClock {
   /** Battle simulation speed ceiling (dialogue speed is decoupled from this). */
-  public static readonly MAX_BATTLE_SPEED: SpeedMultiplier = 2;
+  public static readonly MAX_BATTLE_SPEED: SpeedMultiplier = 3;
   /** Default overworld traversal speed. */
   public static readonly DEFAULT_PLAYER_SPEED: SpeedMultiplier = 3;
 
@@ -93,7 +93,7 @@ export class GameClock {
   }
 
   /**
-   * Cycles battle speed between 1x -> 2x -> 1x (capped at MAX_BATTLE_SPEED)
+   * Cycles battle speed between 1x -> 2x -> 3x -> 1x (capped at MAX_BATTLE_SPEED)
    */
   cycleBattleSpeed(): SpeedMultiplier {
     this._battleSpeed = ((this._battleSpeed % GameClock.MAX_BATTLE_SPEED) + 1) as SpeedMultiplier;
