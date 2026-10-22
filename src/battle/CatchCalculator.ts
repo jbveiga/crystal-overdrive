@@ -5,6 +5,7 @@ export interface CatchAttemptResult {
   shakes: 0 | 1 | 2 | 3 | 4;
   ballMultiplier: number;
   captureValue: number;
+  baseFriendship?: number;
 }
 
 export interface CatchContext {
@@ -12,9 +13,39 @@ export interface CatchContext {
   isNight?: boolean;
   isCave?: boolean;
   isSpeciesRegistered?: boolean;
+  isFishing?: boolean;
+  playerLevel?: number;
+  playerPokemon?: PokemonInstance;
+  playerSpeciesId?: string;
+  playerGender?: 'M' | 'F' | 'N';
+  targetGender?: 'M' | 'F' | 'N';
+  isOppositeGender?: boolean;
+  isRoamer?: boolean;
+  targetWeightKg?: number;
 }
 
+export const MOON_STONE_EVOLVERS = new Set([
+  'nidoran_f',
+  'nidoran-f',
+  'nidorina',
+  'nidoran_m',
+  'nidoran-m',
+  'nidorino',
+  'clefairy',
+  'jigglypuff',
+]);
+
 export class CatchCalculator {
+  /**
+   * Returns flat catch rate modifier for Heavy Ball based on target weight in kg (Gen 2 crystal canon)
+   */
+  public static getHeavyBallModifier(weightKg: number): number {
+    if (weightKg >= 300) return 30;
+    if (weightKg >= 200) return 20;
+    if (weightKg >= 100) return 0;
+    return -20;
+  }
+
   /**
    * Calculates the specific Pokéball multiplier based on battle context and target Pokémon
    */
@@ -51,11 +82,54 @@ export class CatchCalculator {
       case 'repeat-ball':
         return context.isSpeciesRegistered ? 3.5 : 1.0;
 
-      case 'fast-ball':
-        return target.baseStats.speed >= 100 ? 4.0 : 1.0;
+      case 'fast-ball': {
+        const isRoamer = Boolean(
+          context.isRoamer || ['raikou', 'entei', 'suicune'].includes(target.speciesId.toLowerCase())
+        );
+        return (target.baseStats?.speed ?? 0) >= 100 || isRoamer ? 4.0 : 1.0;
+      }
 
       case 'dream-ball':
         return target.status === 'SLP' ? 4.0 : 1.0;
+
+      case 'level-ball': {
+        const playerLvl = context.playerLevel ?? context.playerPokemon?.level ?? 1;
+        const targetLvl = target.level || 1;
+        if (playerLvl <= targetLvl) return 1.0;
+        if (playerLvl >= 4 * targetLvl) return 8.0;
+        if (playerLvl >= 2 * targetLvl) return 4.0;
+        return 2.0;
+      }
+
+      case 'lure-ball':
+        return context.isFishing ? 3.0 : 1.0;
+
+      case 'moon-ball': {
+        const sId = target.speciesId.toLowerCase().replace(/-/g, '_');
+        return MOON_STONE_EVOLVERS.has(sId) || MOON_STONE_EVOLVERS.has(target.speciesId.toLowerCase())
+          ? 4.0
+          : 1.0;
+      }
+
+      case 'friend-ball':
+        return 1.0;
+
+      case 'heavy-ball':
+        return 1.0; // Flat catch rate addition handled in attemptCatch
+
+      case 'love-ball': {
+        const pSpecies = (context.playerSpeciesId || context.playerPokemon?.speciesId || '').toLowerCase();
+        const tSpecies = target.speciesId.toLowerCase();
+        const sameSpecies = Boolean(pSpecies && pSpecies === tSpecies);
+
+        const pGender = context.playerGender || (context.playerPokemon as any)?.gender;
+        const tGender = context.targetGender || (target as any)?.gender;
+        const oppositeGender =
+          Boolean(context.isOppositeGender) ||
+          Boolean(pGender && tGender && pGender !== 'N' && tGender !== 'N' && pGender !== tGender);
+
+        return sameSpecies && oppositeGender ? 8.0 : 1.0;
+      }
 
       case 'poke-ball':
       default:
@@ -93,10 +167,16 @@ export class CatchCalculator {
 
     const hpMax = target.stats.hp;
     const hpCurr = target.currentHp;
-    const catchRate = target.catchRate;
+
+    let baseCatchRate = target.catchRate;
+    if (ballId === 'heavy-ball') {
+      const weight = context.targetWeightKg ?? (target as any).weightKg ?? 50;
+      const mod = this.getHeavyBallModifier(weight);
+      baseCatchRate = Math.max(1, Math.min(255, baseCatchRate + mod));
+    }
 
     // Modified catch rate X
-    const numerator = (3 * hpMax - 2 * hpCurr) * catchRate * ballMultiplier;
+    const numerator = (3 * hpMax - 2 * hpCurr) * baseCatchRate * ballMultiplier;
     const baseValue = Math.floor(numerator / (3 * hpMax));
     const X = Math.min(255, Math.floor(baseValue * statusMod));
 
@@ -107,6 +187,7 @@ export class CatchCalculator {
         shakes: 4,
         ballMultiplier,
         captureValue: 255,
+        baseFriendship: ballId === 'friend-ball' ? 200 : undefined,
       };
     }
 
@@ -124,11 +205,15 @@ export class CatchCalculator {
       }
     }
 
+    const caught = successfulShakes === 4;
+
     return {
-      caught: successfulShakes === 4,
+      caught,
       shakes: successfulShakes,
       ballMultiplier,
       captureValue: X,
+      baseFriendship: caught && ballId === 'friend-ball' ? 200 : undefined,
     };
   }
 }
+

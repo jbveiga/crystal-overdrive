@@ -34,6 +34,8 @@ import { RadioTowerQuizUI } from './ui/RadioTowerQuizUI';
 import { BugContestManager, isContestDay } from './world/BugContestManager';
 import { BugContestHUDWidget } from './ui/BugContestHUDWidget';
 import { BugContestSpecimenSwapModal } from './ui/BugContestSpecimenSwapModal';
+import { KurtCraftingManager } from './world/KurtCraftingManager';
+import { KurtCraftingModalUI } from './ui/KurtCraftingModalUI';
 import type {
   MapData,
   WarpEvent,
@@ -592,6 +594,7 @@ async function bootstrap() {
       options: gameOptions,
       missions: missionManager.serialize(),
       dayCare: dayCareManager.getState(),
+      kurtCraftingOrder: kurtCraftingManager.activeOrder,
     };
     await saveManager.saveGame(saveData);
     console.log('💾 Game state successfully saved to IndexedDB.');
@@ -653,7 +656,40 @@ async function bootstrap() {
   const radioTowerQuizUI = new RadioTowerQuizUI('modal-container');
   const bugContestManager = new BugContestManager();
   const bugContestHUD = new BugContestHUDWidget('overworld-hud-container');
+  const kurtCraftingManager = new KurtCraftingManager(existingSave?.kurtCraftingOrder);
   const visitedMaps = new Set<string>([initialMapId]);
+
+  const getApricornCount = (apricornId: string): number => {
+    const normUnderscore = apricornId.toLowerCase().replace(/-/g, '_');
+    const normHyphen = apricornId.toLowerCase().replace(/_/g, '-');
+    return (
+      (inventory.berries?.[normUnderscore] || 0) +
+      (inventory.berries?.[normHyphen] || 0) +
+      ((inventory as any).items?.[normUnderscore] || 0) +
+      ((inventory as any).items?.[normHyphen] || 0) +
+      ((inventory as any).apricorns?.[normUnderscore] || 0) +
+      ((inventory as any).apricorns?.[normHyphen] || 0)
+    );
+  };
+
+  const deductApricorn = (apricornId: string, quantity: number): void => {
+    const normUnderscore = apricornId.toLowerCase().replace(/-/g, '_');
+    const normHyphen = apricornId.toLowerCase().replace(/_/g, '-');
+    let remaining = quantity;
+    const buckets = [inventory.berries, (inventory as any).items, (inventory as any).apricorns];
+    for (const bucket of buckets) {
+      if (!bucket || remaining <= 0) continue;
+      for (const key of [normUnderscore, normHyphen]) {
+        if (bucket[key]) {
+          const take = Math.min(bucket[key], remaining);
+          bucket[key] -= take;
+          remaining -= take;
+          if (bucket[key] <= 0) delete bucket[key];
+          if (remaining <= 0) break;
+        }
+      }
+    }
+  };
 
   let handleInteract = () => {};
   let toggleLiveItemfinderRadar = (): boolean => false;
@@ -3874,17 +3910,14 @@ async function bootstrap() {
           return;
         }
 
-        // Azalea Town: Kurt's House Post-Well Interaction
+        // Azalea Town: Kurt's House Post-Well Interaction & Apricorn Crafting
         if (targetNpc.id === 'kurt_house_kurt') {
-          if (storyFlags.has('slowpoke_well_cleared')) {
-            overworldHUD.openDialogue(
-              [
-                "KURT: You drove off TEAM ROCKET from SLOWPOKE WELL? You're a wonderful trainer!",
-                "Bring me any APRICORNS you find on trees, and I'll gladly craft custom POKé BALLS for you free of charge!",
-              ],
-              targetNpc.speaker
-            );
-          } else {
+          const isWellCleared =
+            storyFlags.has('slowpoke_well_cleared') ||
+            storyFlags.has('cleared_slowpoke_well') ||
+            storyFlags.has('EVENT_CLEARED_SLOWPOKE_WELL');
+
+          if (!isWellCleared) {
             overworldHUD.openDialogue(
               [
                 'KURT: TEAM ROCKET is cutting off SLOWPOKE tails in the well outside!',
@@ -3892,7 +3925,91 @@ async function bootstrap() {
               ],
               targetNpc.speaker
             );
+            return;
           }
+
+          // Phase A: Initial Hero Visit - Free Lure Ball
+          if (!storyFlags.has('EVENT_KURT_GAVE_YOU_LURE_BALL')) {
+            inventory.balls['lure-ball'] = (inventory.balls['lure-ball'] || 0) + 1;
+            storyFlags.add('EVENT_KURT_GAVE_YOU_LURE_BALL');
+            storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
+            missionManager.checkStoryFlags(storyFlags);
+            BattleAudio.playOverworldSound('FANFARE');
+            overworldHUD.showToast('Received LURE BALL!');
+            saveCurrentGame();
+            overworldHUD.openDialogue(
+              [
+                "KURT: You drove off TEAM ROCKET from SLOWPOKE WELL? You're a wonderful trainer!",
+                "Take this LURE BALL as my thanks!",
+                "Bring me any APRICORNS you find on trees, and I'll gladly craft custom POKé BALLS for you free of charge!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          // Phase D: Collection & Delivery
+          if (kurtCraftingManager.activeOrder?.isReady) {
+            const finished = kurtCraftingManager.collectOrder()!;
+            inventory.balls[finished.ballId] = (inventory.balls[finished.ballId] || 0) + finished.quantity;
+            storyFlags.delete('ENGINE_KURT_MAKING_BALLS');
+            targetNpc.x = 3;
+            targetNpc.y = 2;
+            targetNpc.renderX = 3;
+            targetNpc.renderY = 2;
+            targetNpc.direction = 'DOWN';
+            BattleAudio.playOverworldSound('FANFARE');
+            const ballName = finished.ballId.toUpperCase().replace(/-/g, ' ');
+            overworldHUD.showToast(`Received ${finished.quantity}x ${ballName}!`);
+            saveCurrentGame();
+            overworldHUD.openDialogue(
+              [
+                "KURT: Thanks for waiting! Your custom Poké Balls are ready!",
+                `Handed over ${finished.quantity}x ${ballName}!`,
+                "Bring me more Apricorns whenever you'd like another batch!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          // Phase C: Crafting In Progress
+          if (storyFlags.has('ENGINE_KURT_MAKING_BALLS')) {
+            overworldHUD.openDialogue(
+              [
+                "KURT: I'm working! Don't bother me!",
+                "Crafting custom Poké Balls takes intense focus and delicate hammer work!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          // Phase B: Open Workshop Modal
+          new KurtCraftingModalUI('modal-container', {
+            getApricornCount,
+            onSubmitOrder: (apricornId, quantity) => {
+              deductApricorn(apricornId, quantity);
+              kurtCraftingManager.placeOrder(apricornId, quantity);
+              storyFlags.add('ENGINE_KURT_MAKING_BALLS');
+              targetNpc.x = 14;
+              targetNpc.y = 3;
+              targetNpc.renderX = 14;
+              targetNpc.renderY = 3;
+              targetNpc.direction = 'UP';
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              overworldHUD.showToast(`Kurt accepted ${quantity}x Apricorn!`);
+              saveCurrentGame();
+              overworldHUD.openDialogue(
+                [
+                  "KURT: Now that my granddaughter is helping me, I can work much faster.",
+                  "I'll get to hammering right away! Check back soon!",
+                ],
+                targetNpc.speaker
+              );
+            },
+            onClose: () => {},
+          });
           return;
         }
 

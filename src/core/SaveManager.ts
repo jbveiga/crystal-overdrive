@@ -14,6 +14,7 @@ import type {
 } from '../types/game';
 import { StorageManager } from '../world/StorageManager';
 import type { DayCareState } from '../world/DayCareManager';
+import type { KurtCraftingOrder } from '../world/KurtCraftingManager';
 
 export interface SaveData {
   version: number;
@@ -54,6 +55,7 @@ export interface SaveData {
   harvestedFruitTrees?: string[];
   fruitTreePicks?: Record<string, number>;
   dayCare?: DayCareState;
+  kurtCraftingOrder?: KurtCraftingOrder;
 }
 
 const DB_NAME = 'crystal-overdrive-db';
