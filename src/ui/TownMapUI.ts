@@ -7,6 +7,16 @@ import {
   type TownMapLandmark,
 } from '../world/townMapData';
 
+export interface TownMapResponsiveMetrics {
+  viewportWidth: number;
+  isMobile: boolean; // width < 768
+  cardWidthPct: number; // 100vw on mobile
+  cardHeightPct: number; // 100dvh on mobile
+  splitDirection: 'column' | 'row';
+  canvasFlexBasis: string;
+  inspectorFlexBasis: string;
+}
+
 export interface TownMapUIOptions {
   containerId?: string;
   onClose?: () => void;
@@ -171,6 +181,19 @@ export class TownMapUI {
     return false;
   }
 
+  public static getResponsiveMetrics(viewportWidth: number): TownMapResponsiveMetrics {
+    const isMobile = viewportWidth < 768;
+    return {
+      viewportWidth,
+      isMobile,
+      cardWidthPct: isMobile ? 100 : 96,
+      cardHeightPct: isMobile ? 100 : 92,
+      splitDirection: isMobile ? 'column' : 'row',
+      canvasFlexBasis: isMobile ? '54vh' : 'auto',
+      inspectorFlexBasis: isMobile ? '42vh' : 'auto',
+    };
+  }
+
   private injectStyles(): void {
     if (typeof document === 'undefined') return;
     if (document.getElementById('neo-kanto-town-map-styles')) return;
@@ -235,6 +258,59 @@ export class TownMapUI {
         z-index: 26;
         box-shadow: 0 0 12px rgba(255, 208, 40, 0.8);
       }
+
+      /* Responsive Mobile Viewport Adaptations (< 768px Full-Width Architecture) */
+      @media (max-width: 768px) {
+        #town-map-modal {
+          padding: 0 !important;
+        }
+        #town-map-card {
+          width: 100vw !important;
+          max-width: 100vw !important;
+          height: 100dvh !important;
+          border-radius: 0 !important;
+          border: none !important;
+          box-shadow: none !important;
+        }
+        #town-map-split {
+          flex-direction: column !important;
+          min-height: 0 !important;
+        }
+        #town-map-canvas-container {
+          width: 100% !important;
+          flex: 1 1 54vh !important;
+          min-height: 50vh !important;
+          border-right: none !important;
+          border-bottom: 2px solid #22324F !important;
+        }
+        #town-map-inspector {
+          width: 100% !important;
+          flex: 0 0 auto !important;
+          max-height: 42vh !important;
+          padding: 12px 16px !important;
+          box-sizing: border-box !important;
+          border-top: none !important;
+        }
+        .town-map-node {
+          min-width: 24px;
+          min-height: 24px;
+        }
+        .town-map-node::before {
+          content: '';
+          position: absolute;
+          inset: -8px;
+          cursor: pointer;
+        }
+        .town-map-header-title {
+          font-size: 11px !important;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .town-map-gps-pill {
+          display: none !important;
+        }
+      }
     `;
     (document.head || document.body)?.appendChild(style);
   }
@@ -248,6 +324,8 @@ export class TownMapUI {
     if (this.rootElement) {
       this.rootElement.remove();
     }
+
+    const isMobile = typeof window !== 'undefined' && window.innerWidth > 0 && window.innerWidth < 768;
 
     const modal = document.createElement('div');
     modal.id = 'town-map-modal';
@@ -263,20 +341,21 @@ export class TownMapUI {
       z-index: 1000;
       font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       box-sizing: border-box;
-      padding: 12px;
+      padding: ${isMobile ? '0' : '12px'};
       pointer-events: auto !important;
     `;
 
     const card = document.createElement('div');
     card.id = 'town-map-card';
-    card.className = 'interactive';
+    card.className = `interactive ${isMobile ? 'mobile-viewport' : ''}`;
     card.style.cssText = `
       background: #0D1322;
-      border: 2px solid #22324F;
-      border-radius: 8px;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 208, 40, 0.15);
-      width: min(980px, 96vw);
-      height: min(650px, 92vh);
+      border: ${isMobile ? 'none' : '2px solid #22324F'};
+      border-radius: ${isMobile ? '0' : '8px'};
+      box-shadow: ${isMobile ? 'none' : '0 16px 48px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 208, 40, 0.15)'};
+      width: ${isMobile ? '100vw' : 'min(980px, 96vw)'};
+      max-width: ${isMobile ? '100vw' : 'none'};
+      height: ${isMobile ? '100dvh' : 'min(650px, 92vh)'};
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -304,7 +383,7 @@ export class TownMapUI {
 
     card.innerHTML = `
       <!-- Console Header -->
-      <div style="
+      <div id="town-map-header" style="
         height: 48px;
         background: #141E33;
         border-bottom: 2px solid #22324F;
@@ -314,12 +393,12 @@ export class TownMapUI {
         padding: 0 16px;
         flex-shrink: 0;
       ">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 16px;">🗺️</span>
-          <span style="font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FFD028;">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0; overflow: hidden;">
+          <span style="font-size: 16px; flex-shrink: 0;">🗺️</span>
+          <span class="town-map-header-title" style="font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FFD028; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
             JOHTO REGIONAL RADAR // POKÉGEAR MAP
           </span>
-          <div style="display: flex; align-items: center; gap: 6px; margin-left: 8px;">
+          <div class="town-map-gps-pill" style="display: flex; align-items: center; gap: 6px; margin-left: 8px; flex-shrink: 0;">
             <span style="
               width: 8px;
               height: 8px;
@@ -344,24 +423,25 @@ export class TownMapUI {
           font-size: 11px;
           font-weight: 700;
           cursor: pointer;
+          flex-shrink: 0;
         ">
           ✕ CLOSE [ESC]
         </button>
       </div>
 
-      <!-- Main Layout Split: Map Canvas (Left 65%) vs Inspector (Right 35%) -->
-      <div id="town-map-split" style="
+      <!-- Main Layout Split: Map Canvas vs Inspector -->
+      <div id="town-map-split" class="${isMobile ? 'mobile-split' : ''}" style="
         display: flex;
+        flex-direction: ${isMobile ? 'column' : 'row'};
         flex: 1;
         min-height: 0;
         overflow: hidden;
       ">
         <!-- Blueprint Vector Map Canvas -->
         <div id="town-map-canvas-container" style="
-          flex: 1.8;
+          ${isMobile ? 'flex: 1 1 54vh; width: 100%; min-height: 50vh; border-bottom: 2px solid #22324F;' : 'flex: 1.8; border-right: 2px solid #22324F;'}
           position: relative;
           background: #080E1D;
-          border-right: 2px solid #22324F;
           overflow: hidden;
           background-image: 
             radial-gradient(#141E33 1.5px, transparent 1.5px),
@@ -400,7 +480,8 @@ export class TownMapUI {
               const isVisitedLm = this.visitedLandmarkIds.has(lm.id);
 
               const isCityOrTown = lm.type === 'city' || lm.type === 'town';
-              const size = isCityOrTown ? 18 : lm.type === 'route' ? 10 : 14;
+              const baseSize = isCityOrTown ? 18 : lm.type === 'route' ? 10 : 14;
+              const size = isMobile ? Math.max(24, baseSize) : baseSize;
               const bg = isCityOrTown
                 ? lm.gymLeader
                   ? '#FFD028'
@@ -427,6 +508,8 @@ export class TownMapUI {
                     top: ${topPct}%;
                     width: ${size}px;
                     height: ${size}px;
+                    min-width: ${isMobile ? '24px' : 'auto'};
+                    min-height: ${isMobile ? '24px' : 'auto'};
                     background: ${bg};
                     border-radius: ${radius};
                     border: 2px solid #0D1322;
@@ -468,9 +551,16 @@ export class TownMapUI {
             .join('')}
         </div>
 
-        <!-- Telemetry Inspector Card (Right) -->
+        <!-- Telemetry Inspector Card (Right / Bottom Sheet) -->
         <div id="town-map-inspector" style="
-          flex: 1.1;
+          ${isMobile ? 'flex: 0 0 auto; width: 100%; max-height: 42vh; padding: 12px 16px; box-sizing: border-box;' : 'flex: 1.1; padding: 20px;'}
+          background: #0D1322;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          overflow-y: auto;
+          color: #F6F8F3;
+        ">
           background: #0D1322;
           padding: 20px;
           display: flex;

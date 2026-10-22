@@ -277,4 +277,67 @@ describe('Johto Town Map Engine & UI (TICKET-FEATURE-TOWN-MAP-ENGINE-01)', () =>
       ui.close();
     });
   });
+
+  describe('3. Mobile Responsive Viewport Matrix (< 768px Full-Width Architecture)', () => {
+    it('computes responsive metrics across standard mobile and desktop viewports', () => {
+      // Mobile viewports (iPhone SE 360px, Galaxy 400px, iPhone 16 Pro Max 440px)
+      const mobileSE = TownMapUI.getResponsiveMetrics(360);
+      expect(mobileSE.isMobile).toBe(true);
+      expect(mobileSE.splitDirection).toBe('column');
+      expect(mobileSE.cardWidthPct).toBe(100);
+      expect(mobileSE.cardHeightPct).toBe(100);
+
+      const mobileFlagship = TownMapUI.getResponsiveMetrics(440);
+      expect(mobileFlagship.isMobile).toBe(true);
+      expect(mobileFlagship.splitDirection).toBe('column');
+
+      // Desktop viewport (1024px)
+      const desktop = TownMapUI.getResponsiveMetrics(1024);
+      expect(desktop.isMobile).toBe(false);
+      expect(desktop.splitDirection).toBe('row');
+      expect(desktop.cardWidthPct).toBe(96);
+    });
+
+    it('injects responsive CSS media queries for mobile viewports (< 768px)', () => {
+      new TownMapUI({ containerId: 'modal-container' });
+      const styleEl = mockDoc.getElementById('neo-kanto-town-map-styles');
+      expect(styleEl).not.toBeNull();
+      const css = (styleEl as any)?.textContent || '';
+
+      expect(css).toContain('@media (max-width: 768px)');
+      expect(css).toContain('#town-map-modal');
+      expect(css).toContain('width: 100vw !important');
+      expect(css).toContain('height: 100dvh !important');
+      expect(css).toContain('flex-direction: column !important');
+      expect(css).toContain('min-width: 24px');
+      expect(css).toContain('min-height: 24px');
+    });
+
+    it('renders stacked full-width layout and >=24px touch targets on mobile viewports', () => {
+      const origWidth = (globalThis as any).innerWidth;
+      try {
+        (globalThis as any).innerWidth = 375; // Mobile screen simulation
+        const ui = new TownMapUI({ containerId: 'modal-container' });
+        ui.open('new_bark_town');
+
+        const card = mockDoc.getElementById('town-map-card');
+        expect(card).not.toBeNull();
+        expect(card?.className).toContain('mobile-viewport');
+
+        const split = mockDoc.getElementById('town-map-split');
+        expect(split).not.toBeNull();
+        expect(split?.className).toContain('mobile-split');
+
+        const nodes = card?.querySelectorAll('.town-map-node') || [];
+        expect(nodes.length).toBeGreaterThan(0);
+        // Assert node touch targets have min 24px
+        const firstNode = nodes[0];
+        expect(firstNode.style.cssText).toMatch(/24px/);
+
+        ui.close();
+      } finally {
+        (globalThis as any).innerWidth = origWidth;
+      }
+    });
+  });
 });
