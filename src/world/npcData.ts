@@ -292,11 +292,20 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       ),
     ],
     cherrygrove_city: [
-      makeNpc('cg_guide_gent', 32, 6, 'DOWN', 'fat_man', '👴 GUIDE GENT', [
-        "You're a rookie trainer, aren't you? I can tell!",
-        "That's OK! Everyone is a rookie at some point!",
-        'POKéGEAR becomes more useful as you add CARDS. Head NORTH up ROUTE 30 to visit MR. POKéMON!',
-      ]),
+      makeNpc(
+        'cg_guide_gent',
+        32,
+        6,
+        'DOWN',
+        'fat_man',
+        '👴 GUIDE GENT',
+        [
+          "You're a rookie trainer, aren't you? I can tell!",
+          "That's OK! Everyone is a rookie at some point!",
+          'POKéGEAR becomes more useful as you add CARDS. Head NORTH up ROUTE 30 to visit MR. POKéMON!',
+        ],
+        { action: 'GUIDE_GENT_EVENT' }
+      ),
       makeNpc(
         'cg_teacher',
         27,

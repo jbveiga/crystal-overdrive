@@ -41,6 +41,7 @@ const body = new MockElement('body');
 import { INFINITE_TMS } from '../src/ui/BagAndMartUI';
 import { NamingModalUI } from '../src/ui/NamingModalUI';
 import { createNpcsByMap } from '../src/world/npcData';
+import { MissionManager } from '../src/world/MissionManager';
 
 describe('BUGFIX-PROGRESSION-NARRATIVE-02', () => {
   beforeEach(() => {
@@ -86,5 +87,23 @@ describe('BUGFIX-PROGRESSION-NARRATIVE-02', () => {
   it('places the peeking rival in New Bark Town (despawn handled by main.ts story flags)', () => {
     const npcs = createNpcsByMap();
     expect(npcs.new_bark_town.some((n) => n.id === 'nbt_rival')).toBe(true);
+  });
+
+  it('tags cg_guide_gent with GUIDE_GENT_EVENT and completes Mission S02 when has_map_card is earned', () => {
+    const npcs = createNpcsByMap();
+    const guideGent = npcs.cherrygrove_city.find((n) => n.id === 'cg_guide_gent');
+    expect(guideGent).toBeDefined();
+    expect(guideGent?.action).toBe('GUIDE_GENT_EVENT');
+
+    const missionManager = new MissionManager();
+    const missionS02 = missionManager.getMission('S02');
+    expect(missionS02).toBeDefined();
+    expect(missionS02?.status).toBe('ACTIVE');
+
+    const flags = new Set<string>(['has_map_card']);
+    missionManager.checkStoryFlags(flags);
+
+    expect(missionS02?.status).toBe('COMPLETED');
+    expect(missionS02?.steps[0].completed).toBe(true);
   });
 });

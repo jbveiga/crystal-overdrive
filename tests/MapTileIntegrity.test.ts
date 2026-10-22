@@ -279,6 +279,38 @@ describe('TICKET-UX-TMHM-RELEASE-MAP-INTEGRITY-01: Full Verification Suite', () 
         }
       });
     });
+
+    it('asserts Route 32 Union Cave mountain roof is solid 1, cave mouth is walkable 0, and Union Cave 1F warp lands on safe apron', () => {
+      const r32 = maps['route_32'];
+      const uc1f = maps['union_cave_1f'];
+      expect(r32).toBeDefined();
+      expect(uc1f).toBeDefined();
+
+      // Cave mouth doorway at (6, 79) is walkable 0
+      expect(r32.collisionGrid[79 * r32.width + 6]).toBe(0);
+      // Dirt path apron at (6, 80) is walkable 0
+      expect(r32.collisionGrid[80 * r32.width + 6]).toBe(0);
+
+      // Cliff tiles directly above and around cave mouth must be solid 1
+      expect(r32.collisionGrid[78 * r32.width + 5]).toBe(1);
+      expect(r32.collisionGrid[78 * r32.width + 6]).toBe(1);
+      expect(r32.collisionGrid[78 * r32.width + 7]).toBe(1);
+      expect(r32.collisionGrid[77 * r32.width + 6]).toBe(1);
+
+      // West cliff tiles (x: 0..4, y: 78..80) must be solid 1
+      for (let y = 78; y <= 80; y++) {
+        for (let x = 0; x <= 4; x++) {
+          expect(r32.collisionGrid[y * r32.width + x]).toBe(1);
+        }
+      }
+
+      // Union Cave 1F reciprocal exit warp targets safe apron at (6, 80)
+      const ucExitWarp = uc1f.warps?.find((w) => w.targetMapId === 'route_32');
+      expect(ucExitWarp).toBeDefined();
+      expect(ucExitWarp?.targetX).toBe(6);
+      expect(ucExitWarp?.targetY).toBe(80);
+      expect(r32.collisionGrid[ucExitWarp!.targetY * r32.width + ucExitWarp!.targetX]).toBe(0);
+    });
   });
 
   describe('2. Move Compatibility Domain (PokemonFactory.canLearnMove)', () => {

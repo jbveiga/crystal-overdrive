@@ -702,6 +702,12 @@ async function bootstrap() {
         partyUI.hide();
         bagUI.hide();
         missionLogUI.hide();
+        if (!storyFlags.has('has_map_card')) {
+          overworldHUD.showToast(
+            "⚠️ Your POKéGEAR doesn't have a MAP CARD installed yet! Talk to the GUIDE GENT in CHERRYGROVE CITY."
+          );
+          return;
+        }
         townMapUI.open(mapManager.getCurrentMap()?.id || initialMapId, visitedMaps, roamingManager.getActiveRoamers());
       },
       onOpenMissions: () => {
@@ -1892,6 +1898,44 @@ async function bootstrap() {
           overworldHUD.openDialogue(targetNpc.pages || [], targetNpc.speaker, () => {
             saveCurrentGame();
             overworldHUD.showToast('🧪 Received POTION from the Route 30 Berry House!');
+          });
+          return;
+        }
+
+        // Cherrygrove City Guide Gent tour & Map Card grant (Mission S02)
+        if (targetNpc.action === 'GUIDE_GENT_EVENT') {
+          if (storyFlags.has('has_map_card')) {
+            overworldHUD.openDialogue(
+              [
+                'GUIDE GENT: POKéGEAR becomes more useful as you add CARDS. I wish you luck on your journey!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          const tourPages = [
+            "GUIDE GENT: You're a rookie trainer, aren't you? I can tell!",
+            "That's OK! Everyone is a rookie at some point! If you'd like, I can teach you a few things. OK, then! Follow me!",
+            "This is a POKéMON CENTER. They heal your POKéMON in no time at all. You'll be relying on them a lot, so you ought to know about them.",
+            "This is a POKé MART. They sell BALLS for catching wild POKéMON and other useful items.",
+            "ROUTE 30 is out this way. Trainers will be battling their prized POKéMON there.",
+            "This is the sea, as you can see. Some POKéMON are found only in water.",
+            "Here... It's my house! Thanks for your company. I'd like you to have this!",
+            `${playerName}'s POKéGEAR now has a MAP!`,
+          ];
+
+          overworldHUD.openDialogue(tourPages, targetNpc.speaker, () => {
+            storyFlags.add('has_map_card');
+            if (!inventory.keyItems) inventory.keyItems = [];
+            if (!inventory.keyItems.includes('MAP CARD')) {
+              inventory.keyItems.push('MAP CARD');
+            }
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            missionManager.checkStoryFlags(storyFlags);
+            missionManager.completeMission('S02');
+            saveCurrentGame();
+            overworldHUD.showToast('🗺️ Received MAP CARD! POKéGEAR can now display the JOHTO TOWN MAP!');
           });
           return;
         }
