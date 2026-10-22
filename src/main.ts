@@ -2247,13 +2247,45 @@ async function bootstrap() {
           return;
         }
 
+        // Azalea Gym Guide Interaction
+        if (targetNpc.id === 'azalea_gym_guide') {
+          if (storyFlags.has('bugsy_defeated')) {
+            overworldHUD.openDialogue(
+              [
+                'GYM GUIDE: Well done! That was a great clash of talented young trainers.',
+                'With people like you, the future of POKéMON is bright!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            [
+              "GYM GUIDE: Yo, challenger! BUGSY's young, but his knowledge of bug POKéMON is for real.",
+              "Let's see… Bug POKéMON don't like fire. Flying-type moves are super-effective too.",
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
         // Azalea Gym Leader Boss: Bugsy
-        if (targetNpc.action === 'BUGSY_EVENT' && !storyFlags.has('bugsy_defeated')) {
+        if (targetNpc.action === 'BUGSY_EVENT') {
+          if (storyFlags.has('bugsy_defeated')) {
+            overworldHUD.openDialogue(
+              [
+                'BUGSY: Bug POKéMON are deep and complex. There are so many mysteries to unravel!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
           const introPages =
             targetNpc.challengePages && targetNpc.challengePages.length > 0
               ? targetNpc.challengePages
               : [
-                  "BUGSY: I'm BUGSY! I never lose when it comes to bug POKéMON. My research is going to make me an authority on bug POKéMON! Let me demonstrate what I've learned from my studies!",
+                  "BUGSY: I'm BUGSY! I never lose when it comes to bug POKéMON. My research is going to make me the authority on bug POKéMON! Let me demonstrate what I've learned from my studies!",
                 ];
           overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
             const team = buildTrainerTeamInstances(targetNpc);
@@ -2270,12 +2302,14 @@ async function bootstrap() {
                 if (!inventory.badges.includes('hive')) inventory.badges.push('hive');
                 if (!inventory.tms.includes('TM49')) inventory.tms.push('TM49');
                 missionManager.checkStoryFlags(storyFlags);
+                missionManager.completeMission('M03');
                 audioManager.playSfx('sfx_badge_get');
                 BattleAudio.playOverworldSound('KEY_ITEM');
                 overworldHUD.openDialogue(
                   [
-                    "BUGSY: Whoa, amazing! You're an expert on POKéMON! My research isn't complete yet, but you're definitely strong. Take the official POKéMON LEAGUE HIVEBADGE!",
-                    "BUGSY: Do you know the benefits of the HIVEBADGE? If you have it, POKéMON up to Lv. 30 will obey you, even traded ones. POKéMON that know CUT will also be able to use it outside of battle. Here, take this too—it's TM49 FURY CUTTER!",
+                    "BUGSY: Whoa, amazing! You're an expert on POKéMON! My research isn't complete yet… OK, you win. Take this BADGE.",
+                    `${playerName} received the HIVEBADGE from BUGSY!`,
+                    "BUGSY: If you have the HIVEBADGE, POKéMON up to Lv. 30 will obey you without question, even traded ones. POKéMON that know CUT will also be able to use it outside of battle to chop down small trees anytime! Here, I also want you to have this—TM49 FURY CUTTER!",
                   ],
                   targetNpc.speaker,
                   () => {
@@ -3411,6 +3445,24 @@ async function bootstrap() {
           townMapUI.open(currentMap.id, visitedMaps, roamingManager.getActiveRoamers());
         });
         return;
+      }
+
+      // Gym Statues Dynamic Winning Trainers Inspection
+      if (
+        bgEvent.speaker?.includes('STATUE') ||
+        (bgEvent.pages && bgEvent.pages.some((p) => p.includes('GYM STATUE') || p.includes('POKéMON GYM')))
+      ) {
+        if (currentMap.id === 'azalea_gym') {
+          const statuePages = [
+            'AZALEA TOWN POKéMON GYM',
+            'LEADER: BUGSY',
+            storyFlags.has('bugsy_defeated')
+              ? `WINNING TRAINERS: SILVER, ${playerName}`
+              : 'WINNING TRAINERS: SILVER',
+          ];
+          overworldHUD.openDialogue(statuePages, bgEvent.speaker);
+          return;
+        }
       }
 
       overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {

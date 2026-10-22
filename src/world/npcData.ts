@@ -1861,15 +1861,14 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'bug_catcher',
         '🐞 LEADER BUGSY',
         [
-          'BUGSY: My research is complete! The HIVEBADGE proves your incredible bond with POKéMON!',
-          'BUG POKéMON are deep and complex. Keep exploring and learning with your team!',
+          'BUGSY: Bug POKéMON are deep and complex. There are so many mysteries to unravel!',
         ],
         {
           action: 'BUGSY_EVENT',
           trainerId: 'bugsy',
           trainerName: 'Leader Bugsy',
           challengePages: [
-            "BUGSY: I'm BUGSY! I never lose when it comes to bug POKéMON. My research is going to make me an authority on bug POKéMON! Let me demonstrate what I've learned from my studies!",
+            "BUGSY: I'm BUGSY! I never lose when it comes to bug POKéMON. My research is going to make me the authority on bug POKéMON! Let me demonstrate what I've learned from my studies!",
           ],
           trainerPokemon: { speciesId: 'scyther', level: 16, moves: ['furycutter', 'quickattack', 'leer'] },
           trainerTeam: [
@@ -1886,13 +1885,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'DOWN',
         'bug_catcher',
         '🐞 BUG CATCHER BENNY',
-        ["Bug POKéMON evolve super fast! That's their secret strength!"],
+        ["Just evolving isn't enough!"],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'bug_catcher_benny',
           trainerName: 'Bug Catcher Benny',
           visionRange: 3,
-          challengePages: ['BUG CATCHER BENNY: BUGSY taught me all about insect evolution! Check this out!'],
+          challengePages: ['BUG CATCHER BENNY: Bug POKéMON evolve young. So they get stronger that much faster.'],
           trainerPokemon: { speciesId: 'weedle', level: 12, moves: ['poisonsting', 'stringshot'] },
           trainerTeam: [
             { speciesId: 'weedle', level: 12, moves: ['poisonsting', 'stringshot'] },
@@ -1908,13 +1907,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'LEFT',
         'bug_catcher',
         '🐞 BUG CATCHER AL',
-        ['They might look squishy, but bugs have strong determination!'],
+        ['You proved how tough you are…'],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'bug_catcher_al',
           trainerName: 'Bug Catcher Al',
           visionRange: 3,
-          challengePages: ['BUG CATCHER AL: They may be caterpillars now, but they will become magnificent!'],
+          challengePages: ["BUG CATCHER AL: Bug POKéMON are cool and tough! I'll prove it to you!"],
           trainerPokemon: { speciesId: 'caterpie', level: 12, moves: ['tackle', 'stringshot'] },
           trainerTeam: [
             { speciesId: 'caterpie', level: 12, moves: ['tackle', 'stringshot'] },
@@ -1929,13 +1928,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'RIGHT',
         'bug_catcher',
         '🐞 BUG CATCHER JOSH',
-        ['PARAS mushrooms hold mysterious powers!'],
+        ['Urrgggh!'],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'bug_catcher_josh',
           trainerName: 'Bug Catcher Josh',
           visionRange: 3,
-          challengePages: ["BUG CATCHER JOSH: You won't get past my spooky forest bug!"],
+          challengePages: ["BUG CATCHER JOSH: You saved all the SLOWPOKE? Whew, you're mighty! But my grown-up POKéMON are pretty tough too!"],
           trainerPokemon: { speciesId: 'paras', level: 13, moves: ['scratch', 'stunspore', 'poisonpowder'] },
           trainerTeam: [
             { speciesId: 'paras', level: 13, moves: ['scratch', 'stunspore', 'poisonpowder'] },
@@ -1949,13 +1948,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'DOWN',
         'girl',
         '👭 TWIN AMY',
-        ['MAY and I battle together with our companion bugs!'],
+        ['AMY: Oh, double goodness!'],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'twins_amy',
           trainerName: 'Twin Amy',
           visionRange: 2,
-          challengePages: ["TWIN AMY: Hi! I'm AMY! We love spider and ladybug POKéMON!"],
+          challengePages: ["TWIN AMY: Hi! You want to see the LEADER? We come first!"],
           trainerPokemon: { speciesId: 'spinarak', level: 10, moves: ['poisonsting', 'stringshot', 'scaryface'] },
           trainerTeam: [
             { speciesId: 'spinarak', level: 10, moves: ['poisonsting', 'stringshot', 'scaryface'] },
@@ -1969,13 +1968,13 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'DOWN',
         'girl',
         '👭 TWIN MAY',
-        ['AMY and I share all our berries and POKéMON secrets!'],
+        ['MAY: Our bug POKéMON lost! Oh, what a shame.'],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'twins_may',
           trainerName: 'Twin May',
           visionRange: 2,
-          challengePages: ["TWIN MAY: Hi! I'm MAY! Let me show you how strong LEDYBA is!"],
+          challengePages: ["TWIN MAY: Hi! You want to see the LEADER? We come first!"],
           trainerPokemon: { speciesId: 'ledyba', level: 10, moves: ['tackle', 'supersonic', 'cometpunch'] },
           trainerTeam: [
             { speciesId: 'ledyba', level: 10, moves: ['tackle', 'supersonic', 'cometpunch'] },
@@ -1990,9 +1989,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'fat_man',
         '🥊 GYM GUIDE',
         [
-          'Yo! CHAMP in the making!',
-          'BUGSY is young, but his knowledge of BUG-type POKéMON is real!',
-          "BUG POKéMON hate FIRE and FLYING moves! Bring those and you'll breeze right through!",
+          "Yo, challenger! BUGSY's young, but his knowledge of bug POKéMON is for real. Let's see… Bug POKéMON don't like fire. Flying-type moves are super-effective too.",
         ]
       ),
     ],

@@ -498,14 +498,14 @@
       "y": 15,
       "targetMapId": "azalea_town",
       "targetX": 10,
-      "targetY": 15
+      "targetY": 16
     },
     {
       "x": 5,
       "y": 15,
       "targetMapId": "azalea_town",
       "targetX": 10,
-      "targetY": 15
+      "targetY": 16
     }
   ],
   "bgEvents": [
@@ -515,7 +515,8 @@
       "speaker": "🏆 AZALEA GYM STATUE",
       "pages": [
         "AZALEA TOWN POKéMON GYM",
-        "LEADER: BUGSY"
+        "LEADER: BUGSY",
+        "WINNING TRAINERS: SILVER"
       ]
     },
     {
@@ -524,7 +525,8 @@
       "speaker": "🏆 AZALEA GYM STATUE",
       "pages": [
         "AZALEA TOWN POKéMON GYM",
-        "LEADER: BUGSY"
+        "LEADER: BUGSY",
+        "WINNING TRAINERS: SILVER"
       ]
     }
   ],

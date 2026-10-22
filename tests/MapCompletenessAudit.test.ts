@@ -578,4 +578,83 @@ describe('10-Point Completeness Audit for Previously Mapped Areas (TICKET-AUDIT-
       expect(audioManager.getTrackForMap('slowpoke_well_b2f')).toBe('bgm_sprout_tower');
     });
   });
+
+  describe('TICKET-WORLD-AZALEA-GYM-BUGSY-01: 10-Point Map Delivery Package (Azalea Gym & Leader Bugsy)', () => {
+    it('Dimension 1: asserts reciprocal navigation with safe doorstep apron target (10, 16) in Azalea Town', () => {
+      const azalea = loadMap('azalea_town');
+      const gym = loadMap('azalea_gym');
+
+      // Azalea Town -> Gym
+      const townToGym = azalea.warps.find((w) => w.targetMapId === 'azalea_gym');
+      expect(townToGym).toBeDefined();
+      expect(townToGym?.x).toBe(10);
+      expect(townToGym?.y).toBe(15);
+
+      // Gym -> Azalea Town (apron at targetY: 16)
+      expect(gym.warps.length).toBeGreaterThanOrEqual(2);
+      for (const w of gym.warps) {
+        expect(w.targetMapId).toBe('azalea_town');
+        expect(w.targetX).toBe(10);
+        expect(w.targetY).toBe(16);
+        expect([0, 2]).toContain(azalea.collisionGrid[16 * azalea.width + 10]);
+      }
+    });
+
+    it('Dimension 2 & 3: asserts complete NPC population across all 6 trainers, Gym Guide, and 100% walkability', () => {
+      const npcs = createNpcsByMap();
+      const gym = loadMap('azalea_gym');
+      const gymNpcs = npcs.azalea_gym;
+      expect(gymNpcs.length).toBeGreaterThanOrEqual(7);
+
+      // Leader Bugsy
+      const bugsy = gymNpcs.find((n) => n.id === 'bugsy');
+      expect(bugsy).toBeDefined();
+      expect(bugsy?.x).toBe(5);
+      expect(bugsy?.y).toBe(7);
+      expect(bugsy?.action).toBe('BUGSY_EVENT');
+      expect(bugsy?.challengePages?.[0]).toContain('BUGSY');
+
+      // Junior trainers
+      const benny = gymNpcs.find((n) => n.id === 'bug_catcher_benny');
+      const al = gymNpcs.find((n) => n.id === 'bug_catcher_al');
+      const josh = gymNpcs.find((n) => n.id === 'bug_catcher_josh');
+      const amy = gymNpcs.find((n) => n.id === 'twins_amy');
+      const may = gymNpcs.find((n) => n.id === 'twins_may');
+      const guide = gymNpcs.find((n) => n.id === 'azalea_gym_guide');
+
+      expect(benny).toBeDefined();
+      expect(al).toBeDefined();
+      expect(josh).toBeDefined();
+      expect(amy).toBeDefined();
+      expect(may).toBeDefined();
+      expect(guide).toBeDefined();
+
+      // 100% walkability check for all gym entities
+      for (const n of gymNpcs) {
+        const col = gym.collisionGrid[n.y * gym.width + n.x];
+        expect([0, 2], `Azalea Gym NPC ${n.id} at (${n.x}, ${n.y}) must stand on walkable tile`).toContain(col);
+      }
+    });
+
+    it('Dimension 4: asserts Gym Statues at (3, 13) and (6, 13) with dynamic winning trainers and guide advice', () => {
+      const gym = loadMap('azalea_gym');
+      expect(gym.bgEvents.length).toBeGreaterThanOrEqual(2);
+
+      const leftStatue = gym.bgEvents.find((b) => b.x === 3 && b.y === 13);
+      const rightStatue = gym.bgEvents.find((b) => b.x === 6 && b.y === 13);
+      expect(leftStatue).toBeDefined();
+      expect(rightStatue).toBeDefined();
+      expect(leftStatue?.pages.some((p) => p.includes('BUGSY'))).toBe(true);
+      expect(rightStatue?.pages.some((p) => p.includes('BUGSY'))).toBe(true);
+
+      // Statues are on solid tiles (1)
+      expect(gym.collisionGrid[13 * gym.width + 3]).toBe(1);
+      expect(gym.collisionGrid[13 * gym.width + 6]).toBe(1);
+    });
+
+    it('Dimension 10: asserts Azalea Gym resolves cleanly to bgm_gym in AudioManager', () => {
+      const audioManager = new AudioManager();
+      expect(audioManager.getTrackForMap('azalea_gym')).toBe('bgm_gym');
+    });
+  });
 });
