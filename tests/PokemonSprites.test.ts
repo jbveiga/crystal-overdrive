@@ -226,6 +226,48 @@ describe('Complete 251 Pokémon Sprites & Icons Integrity', () => {
     expect(fs.statSync(path.join(criesDir, '185.mp3')).size).toBeGreaterThan(0);
   });
 
+  it('verifies SPRINT-14 evolution items, Link Stone/Cable, and stones exist on disk', () => {
+    const itemsDir = path.resolve(__dirname, '../public/assets/sprites/items');
+    const expectedItems = [
+      'linking-cord.png',
+      'link_stone.png',
+      'link-cable.png',
+      'fire-stone.png',
+      'water-stone.png',
+      'thunder-stone.png',
+      'leaf-stone.png',
+      'moon-stone.png',
+      'everstone.png',
+      'metal-coat.png',
+      'dragon-scale.png',
+      'kings-rock.png',
+      'upgrade.png',
+    ];
+
+    for (const it of expectedItems) {
+      const p = path.join(itemsDir, it);
+      expect(fs.existsSync(p), `Missing evolution item: ${it}`).toBe(true);
+      expect(fs.statSync(p).size).toBeGreaterThan(0);
+    }
+  });
+
+  it('verifies SPRINT-14 evolution audio BGM and celebration fanfares exist on disk', () => {
+    const bgmDir = path.resolve(__dirname, '../public/assets/audio/bgm');
+    const sfxDir = path.resolve(__dirname, '../public/assets/audio/sfx');
+
+    expect(fs.existsSync(path.join(bgmDir, 'bgm_evolution.mp3'))).toBe(true);
+    expect(fs.existsSync(path.join(bgmDir, 'bgm_evolution.webm'))).toBe(true);
+    expect(fs.statSync(path.join(bgmDir, 'bgm_evolution.mp3')).size).toBeGreaterThan(0);
+
+    expect(fs.existsSync(path.join(sfxDir, 'sfx_evolution_complete.mp3'))).toBe(true);
+    expect(fs.existsSync(path.join(sfxDir, 'sfx_evolution_complete.webm'))).toBe(true);
+    expect(fs.statSync(path.join(sfxDir, 'sfx_evolution_complete.mp3')).size).toBeGreaterThan(0);
+
+    expect(fs.existsSync(path.join(sfxDir, 'sfx_evolution_pulse.mp3'))).toBe(true);
+    expect(fs.existsSync(path.join(sfxDir, 'sfx_evolution_pulse.webm'))).toBe(true);
+    expect(fs.statSync(path.join(sfxDir, 'sfx_evolution_pulse.mp3')).size).toBeGreaterThan(0);
+  });
+
   it('verifies Route 36 Sudowoodo overworld sprites are present and valid', () => {
     const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
     const spritesDir = path.resolve(__dirname, '../public/assets/sprites');
