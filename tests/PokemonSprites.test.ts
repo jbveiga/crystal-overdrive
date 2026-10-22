@@ -85,6 +85,88 @@ describe('Complete 251 Pokémon Sprites & Icons Integrity', () => {
     }
   });
 
+  it('verifies Goldenrod City NPC character sheets exist and match 144x32 specs', () => {
+    const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
+    const goldenrodSheets = [
+      'whitney.png',
+      'clerk.png',
+      'bike_shop_owner.png',
+      'receptionist.png',
+      'gentleman.png',
+      'lass.png',
+      'beauty.png',
+      'rocket_grunt_m.png',
+      'rocket_grunt_f.png',
+    ];
+
+    for (const sheet of goldenrodSheets) {
+      const filePath = path.join(charsDir, sheet);
+      expect(fs.existsSync(filePath), `Missing sheet: ${sheet}`).toBe(true);
+      const buf = fs.readFileSync(filePath);
+      expect(buf.readUInt32BE(16), `${sheet} width`).toBe(144);
+      expect(buf.readUInt32BE(20), `${sheet} height`).toBe(32);
+      expect(buf.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('verifies Goldenrod key items, equipment icons, and Johto badges exist on disk', () => {
+    const itemsDir = path.resolve(__dirname, '../public/assets/sprites/items');
+    const badgesDir = path.resolve(__dirname, '../public/assets/sprites/badges');
+
+    const expectedItems = [
+      'bicycle.png',
+      'squirtbottle.png',
+      'coin_case.png',
+      'radio_card.png',
+      'blue_card.png',
+      'card_key.png',
+      'basement_key.png',
+    ];
+
+    for (const it of expectedItems) {
+      const p = path.join(itemsDir, it);
+      expect(fs.existsSync(p), `Missing item icon: ${it}`).toBe(true);
+      expect(fs.statSync(p).size).toBeGreaterThan(0);
+    }
+
+    const expectedBadges = [
+      'badge_zephyr.png',
+      'badge_hive.png',
+      'badge_plain.png',
+      'badge_fog.png',
+      'badge_storm.png',
+      'badge_mineral.png',
+      'badge_glacier.png',
+      'badge_rising.png',
+    ];
+
+    for (const b of expectedBadges) {
+      const p = path.join(badgesDir, b);
+      expect(fs.existsSync(p), `Missing badge: ${b}`).toBe(true);
+      const buf = fs.readFileSync(p);
+      expect(buf.readUInt32BE(16), `${b} width`).toBe(16);
+      expect(buf.readUInt32BE(20), `${b} height`).toBe(16);
+    }
+  });
+
+  it('verifies Goldenrod City BGM tracks exist in both MP3 and WebM formats', () => {
+    const bgmDir = path.resolve(__dirname, '../public/assets/audio/bgm');
+    const expectedTracks = [
+      'bgm_goldenrod_city.mp3',
+      'bgm_goldenrod_city.webm',
+      'bgm_game_corner.mp3',
+      'bgm_game_corner.webm',
+      'bgm_gym.mp3',
+      'bgm_gym.webm',
+    ];
+
+    for (const track of expectedTracks) {
+      const p = path.join(bgmDir, track);
+      expect(fs.existsSync(p), `Missing BGM track: ${track}`).toBe(true);
+      expect(fs.statSync(p).size).toBeGreaterThan(0);
+    }
+  });
+
   it('verifies Route 36 Sudowoodo overworld sprites are present and valid', () => {
     const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
     const spritesDir = path.resolve(__dirname, '../public/assets/sprites');
