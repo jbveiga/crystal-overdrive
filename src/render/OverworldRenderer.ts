@@ -702,9 +702,37 @@ export class OverworldRenderer {
   }
 
   /**
+   * Returns the current alpha opacity of the transition fade overlay.
+   */
+  public getFadeOverlayAlpha(): number {
+    return this.fadeOverlay ? this.fadeOverlay.alpha : 0;
+  }
+
+  /**
+   * Returns whether the transition fade overlay is actively visible.
+   */
+  public isFadeOverlayVisible(): boolean {
+    return this.fadeOverlay ? this.fadeOverlay.visible : false;
+  }
+
+  /**
+   * Returns whether a tile texture key is buffered in memory.
+   */
+  public hasTileTexture(name: string): boolean {
+    return this.tileTextures.has(name);
+  }
+
+  /**
+   * Returns a cached tile texture by name, if loaded.
+   */
+  public getTileTexture(name: string): Texture | undefined {
+    return this.tileTextures.get(name);
+  }
+
+  /**
    * Plays a crisp authentic 160ms doorway fade-to-black / 160ms fade-in transition (320ms total)
    */
-  public async playDoorwayFade(onMidpoint: () => void, durationMs: number = 160): Promise<void> {
+  public async playDoorwayFade(onMidpoint: () => void | Promise<void>, durationMs: number = 160): Promise<void> {
     const w = this.app.screen.width;
     const h = this.app.screen.height;
     this.fadeOverlay.clear().rect(0, 0, w, h).fill({ color: 0x000000 });
@@ -727,12 +755,15 @@ export class OverworldRenderer {
       });
 
     await animateAlpha(0, 1, durationMs);
-    onMidpoint();
+    this.fadeOverlay.alpha = 1;
+    await onMidpoint();
     await animateAlpha(1, 0, durationMs);
+    this.fadeOverlay.alpha = 0;
     this.fadeOverlay.visible = false;
   }
 
   private renderMapChunk(map: MapData, offsetTileX: number, offsetTileY: number, isNight: boolean = false): void {
+    const isOutdoor = Object.keys(map.connections || {}).length > 0;
     const grassTex = this.tileTextures.get('grass') || Texture.WHITE;
     if (!map.tileMap || map.tileMap.length !== map.width * map.height) return;
 
@@ -743,8 +774,13 @@ export class OverworldRenderer {
         const px = (x + offsetTileX) * this.tileSize;
         const py = (y + offsetTileY) * this.tileSize;
 
-        const isOpaqueTile = tileName === 'water' || tileName.startsWith('jt_') || tileName.startsWith('in_');
-        if (!isOpaqueTile) {
+        const isOpaqueTile =
+          tileName === 'water' ||
+          tileName.startsWith('jt_') ||
+          tileName.startsWith('in_') ||
+          tileName.startsWith('kt_');
+
+        if (!isOpaqueTile && isOutdoor) {
           const baseSprite = new Sprite(grassTex);
           baseSprite.position.set(px, py);
           baseSprite.width = this.tileSize;
@@ -753,7 +789,13 @@ export class OverworldRenderer {
         }
 
         const waterFrames = this.waterAnimFrames.get(tileName);
-        const tex = waterFrames ? waterFrames[this.waterAnimStep] : this.tileTextures.get(tileName) || grassTex;
+        const resolvedTex = waterFrames
+          ? waterFrames[this.waterAnimStep]
+          : this.tileTextures.get(tileName);
+
+        // Zero fallback rendering: only use grassTex on outdoor maps where grass is expected;
+        // for cave and indoor maps, never flash grassTex!
+        const tex = resolvedTex || (isOutdoor ? grassTex : Texture.WHITE);
         const featureSprite = new Sprite(tex);
         featureSprite.position.set(px, py);
         featureSprite.width = this.tileSize;
@@ -792,23 +834,42 @@ export class OverworldRenderer {
   }
 
   /**
-   * Ensures all tiles referenced by a map (base tileMap and overlayMap) are loaded into tileTextures.
-   * Loads textures on-demand from ./assets/tiles/${name}.png so maps (such as Route 32 cave rocks
-   * and shoreline water) never fallback to grassTex.
+   * Ensures all tiles referenced by a map (base tileMap, overlayMap, and adjacent neighbor chunks) are loaded into tileTextures.
+   * Loads textures on-demand from ./assets/tiles/${name}.png so maps (such as Route 32 cave rocks,
+   * Union Cave, and shoreline water) never fallback to grassTex.
    */
-  public async ensureMapTilesLoaded(map: MapData): Promise<void> {
+  public async ensureMapTilesLoaded(
+    map: MapData,
+    lookupMap?: (mapId: string) => MapData | undefined
+  ): Promise<void> {
     if (!map.tileMap) return;
     const missingTileNames: string[] = [];
 
-    for (const name of map.tileMap) {
-      if (name && !this.tileTextures.has(name) && !missingTileNames.includes(name)) {
-        missingTileNames.push(name);
+    const collectMissing = (m: MapData) => {
+      if (m.tileMap) {
+        for (const name of m.tileMap) {
+          if (name && !this.tileTextures.has(name) && !missingTileNames.includes(name)) {
+            missingTileNames.push(name);
+          }
+        }
       }
-    }
-    if (map.overlayMap) {
-      for (const name of map.overlayMap) {
-        if (name && !this.tileTextures.has(name) && !missingTileNames.includes(name)) {
-          missingTileNames.push(name);
+      if (m.overlayMap) {
+        for (const name of m.overlayMap) {
+          if (name && !this.tileTextures.has(name) && !missingTileNames.includes(name)) {
+            missingTileNames.push(name);
+          }
+        }
+      }
+    };
+
+    collectMissing(map);
+
+    if (lookupMap && map.connections) {
+      for (const dir of ['WEST', 'EAST', 'NORTH', 'SOUTH'] as const) {
+        const conn = map.connections[dir];
+        if (conn) {
+          const neighbor = lookupMap(conn.mapId);
+          if (neighbor) collectMissing(neighbor);
         }
       }
     }
@@ -842,7 +903,10 @@ export class OverworldRenderer {
     if (map.tileMap) {
       const hasMissing = map.tileMap.some((name) => name && !this.tileTextures.has(name));
       if (hasMissing) {
-        this.ensureMapTilesLoaded(map).then(() => {
+        console.warn(
+          `[OverworldRenderer] renderMap invoked with unbuffered textures for map "${map.id}". Caller should await ensureMapTilesLoaded(map) before calling renderMap.`
+        );
+        this.ensureMapTilesLoaded(map, lookupMap).then(() => {
           if (this.currentRenderedMap === map) {
             this.renderMap(map, lookupMap);
           }

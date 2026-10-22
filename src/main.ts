@@ -880,7 +880,7 @@ async function bootstrap() {
     );
   };
 
-  await overworldRenderer.ensureMapTilesLoaded(initialMap);
+  await overworldRenderer.ensureMapTilesLoaded(initialMap, lookupMap);
   overworldRenderer.renderMap(initialMap, lookupMap);
   syncMapOverworldItems(initialMap);
 
@@ -964,6 +964,7 @@ async function bootstrap() {
       player.isMoving = false;
       player.progress = 0;
 
+      await overworldRenderer.ensureMapTilesLoaded(startMap, lookupMap);
       overworldRenderer.renderMap(startMap, lookupMap);
       syncMapOverworldItems(startMap);
       overworldHUD.updateRouteName(startMap.name);
@@ -1660,6 +1661,7 @@ async function bootstrap() {
           player.isMoving = false;
           player.progress = 0;
 
+          await overworldRenderer.ensureMapTilesLoaded(respawnMap, lookupMap);
           overworldRenderer.renderMap(respawnMap, lookupMap);
           syncMapOverworldItems(respawnMap);
           overworldHUD.updateRouteName(respawnMap.name);
@@ -2097,7 +2099,7 @@ async function bootstrap() {
     BattleAudio.playWarpSound(transitionConfig.soundCue);
 
     overworldRenderer
-      .playDoorwayFade(() => {
+      .playDoorwayFade(async () => {
         const targetMap = mapManager.setCurrentMap(transitionConfig.targetMapId);
         visitedMaps.add(targetMap.id);
         if (targetMap.id.endsWith('_poke_center')) {
@@ -2115,6 +2117,8 @@ async function bootstrap() {
         player.renderX = transitionConfig.landingX;
         player.renderY = transitionConfig.landingY;
 
+        // Strictly await 100% texture hydration while transition veil is 100% black (BUGFIX-ASYNC-TILE-TEXTURE-FADE-SYNC-01)
+        await overworldRenderer.ensureMapTilesLoaded(targetMap, lookupMap);
         overworldRenderer.renderMap(targetMap, lookupMap);
         syncMapOverworldItems(targetMap);
         overworldHUD.updateRouteName(targetMap.name);
