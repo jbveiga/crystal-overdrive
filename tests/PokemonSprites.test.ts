@@ -49,6 +49,42 @@ describe('Complete 251 Pokémon Sprites & Icons Integrity', () => {
     }
   });
 
+  it('verifies Egg battle sprites and party icon exist and are valid', () => {
+    const eggFront = path.join(pokemonDir, 'egg_front.png');
+    const eggBack = path.join(pokemonDir, 'egg_back.png');
+    const eggIcon = path.join(iconsDir, 'egg.png');
+
+    expect(fs.existsSync(eggFront)).toBe(true);
+    expect(fs.statSync(eggFront).size).toBeGreaterThan(0);
+    expect(fs.existsSync(eggBack)).toBe(true);
+    expect(fs.statSync(eggBack).size).toBeGreaterThan(0);
+    expect(fs.existsSync(eggIcon)).toBe(true);
+    expect(fs.statSync(eggIcon).size).toBeGreaterThan(0);
+  });
+
+  it('verifies Route 34 and Day-Care NPC character sheets exist and match 144x32 specs', () => {
+    const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
+    const expectedSheets = [
+      'gramps.png',
+      'granny.png',
+      'officer.png',
+      'camper.png',
+      'picnicker.png',
+      'youngster.png',
+      'pokefan_m.png',
+      'pokefan_f.png',
+      'cooltrainer_f.png',
+    ];
+
+    for (const sheet of expectedSheets) {
+      const filePath = path.join(charsDir, sheet);
+      expect(fs.existsSync(filePath), `Missing sheet: ${sheet}`).toBe(true);
+      const buf = fs.readFileSync(filePath);
+      expect(buf.readUInt32BE(16), `${sheet} width`).toBe(144);
+      expect(buf.readUInt32BE(20), `${sheet} height`).toBe(32);
+    }
+  });
+
   it('verifies Route 36 Sudowoodo overworld sprites are present and valid', () => {
     const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
     const spritesDir = path.resolve(__dirname, '../public/assets/sprites');
