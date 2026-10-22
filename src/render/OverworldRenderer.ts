@@ -702,20 +702,20 @@ export class OverworldRenderer {
   }
 
   /**
-   * Plays a crisp 0.15s doorway fade-to-black / fade-in transition
+   * Plays a crisp authentic 160ms doorway fade-to-black / 160ms fade-in transition (320ms total)
    */
-  public async playDoorwayFade(onMidpoint: () => void): Promise<void> {
+  public async playDoorwayFade(onMidpoint: () => void, durationMs: number = 160): Promise<void> {
     const w = this.app.screen.width;
     const h = this.app.screen.height;
     this.fadeOverlay.clear().rect(0, 0, w, h).fill({ color: 0x000000 });
     this.fadeOverlay.alpha = 0;
     this.fadeOverlay.visible = true;
 
-    const animateAlpha = (from: number, to: number, durationMs: number) =>
+    const animateAlpha = (from: number, to: number, ms: number) =>
       new Promise<void>((resolve) => {
         const start = performance.now();
         const tick = (now: number) => {
-          const t = Math.min(1, (now - start) / durationMs);
+          const t = Math.min(1, (now - start) / ms);
           this.fadeOverlay.alpha = from + (to - from) * t;
           if (t < 1) {
             requestAnimationFrame(tick);
@@ -726,9 +726,9 @@ export class OverworldRenderer {
         requestAnimationFrame(tick);
       });
 
-    await animateAlpha(0, 1, 140);
+    await animateAlpha(0, 1, durationMs);
     onMidpoint();
-    await animateAlpha(1, 0, 140);
+    await animateAlpha(1, 0, durationMs);
     this.fadeOverlay.visible = false;
   }
 

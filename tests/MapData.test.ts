@@ -1567,4 +1567,95 @@ describe('MapData & Authentic Tile Integrity', () => {
     const rendererSrc = fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldRenderer.ts'), 'utf8');
     expect(rendererSrc).toContain("sudowoodo: './assets/sprites/characters/sudowoodo.png'");
   });
+
+  describe('Authentic GBC Door Transitions & Doorstep Landing (TICKET-POLISH-AUTHENTIC-DOOR-MECHANICS-01)', () => {
+    const indoorHouse: MapData = {
+      id: 'players_house_1f',
+      name: "Player's House",
+      width: 10,
+      height: 8,
+      tileSize: 64,
+      groundLayer: [],
+      objectLayer: [],
+      collisionGrid: new Array(80).fill(0),
+      connections: {},
+      warps: [
+        { x: 6, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 5 },
+        { x: 9, y: 0, targetMapId: 'players_house_2f', targetX: 7, targetY: 1 },
+      ],
+      grassEncounters: [],
+    };
+
+    const outdoorTown: MapData = {
+      id: 'new_bark_town',
+      name: 'New Bark Town',
+      width: 20,
+      height: 18,
+      tileSize: 64,
+      groundLayer: [],
+      objectLayer: [],
+      collisionGrid: new Array(360).fill(0),
+      connections: {},
+      warps: [
+        { x: 13, y: 5, targetMapId: 'players_house_1f', targetX: 6, targetY: 6 },
+      ],
+      grassEncounters: [],
+    };
+
+    it('identifies carpet warps correctly vs stairs and outdoor doors', () => {
+      // Indoor exit warp at bottom of room is a carpet warp
+      expect(MapManager.isCarpetWarp(indoorHouse.warps[0], indoorHouse)).toBe(true);
+      // Indoor stairs at (9, 0) is NOT a carpet warp
+      expect(MapManager.isCarpetWarp(indoorHouse.warps[1], indoorHouse)).toBe(false);
+      // Outdoor entrance door is NOT a carpet warp
+      expect(MapManager.isCarpetWarp(outdoorTown.warps[0], outdoorTown)).toBe(false);
+    });
+
+    it('resolves outdoor exit landing 1 tile below the door (targetX, targetY + 1) facing DOWN with DOOR_EXIT audio', () => {
+      const exitWarp = indoorHouse.warps[0]; // targetX: 13, targetY: 5
+      const config = MapManager.resolveWarpTransition(exitWarp, indoorHouse, outdoorTown);
+
+      expect(config.isExitingToOverworld).toBe(true);
+      expect(config.isEnteringIndoor).toBe(false);
+      expect(config.landingX).toBe(13);
+      expect(config.landingY).toBe(6); // 5 + 1: Safe doorstep apron in front of door
+      expect(config.landingFacing).toBe('DOWN');
+      expect(config.soundCue).toBe('DOOR_EXIT');
+      expect(config.fadeDurationMs).toBe(160);
+    });
+
+    it('resolves indoor entrance landing at (targetX, targetY) facing UP with DOOR_ENTER audio', () => {
+      const enterWarp = outdoorTown.warps[0]; // targetX: 6, targetY: 6
+      const config = MapManager.resolveWarpTransition(enterWarp, outdoorTown, indoorHouse);
+
+      expect(config.isEnteringIndoor).toBe(true);
+      expect(config.isExitingToOverworld).toBe(false);
+      expect(config.landingX).toBe(6);
+      expect(config.landingY).toBe(6);
+      expect(config.landingFacing).toBe('UP');
+      expect(config.soundCue).toBe('DOOR_ENTER');
+      expect(config.fadeDurationMs).toBe(160);
+    });
+
+    it('resolves staircase warp to STAIRS_STEP audio cue', () => {
+      const stairWarp = indoorHouse.warps[1]; // players_house_2f (targetY: 1)
+      const house2f: MapData = { ...indoorHouse, id: 'players_house_2f' };
+      const config = MapManager.resolveWarpTransition(stairWarp, indoorHouse, house2f);
+
+      expect(config.isStairs).toBe(true);
+      expect(config.soundCue).toBe('STAIRS_STEP');
+      expect(config.landingFacing).toBe('DOWN');
+    });
+
+    it('resolves cave entrance and subterranean traversal to CAVE_WARP audio cue', () => {
+      const caveWarp = { x: 6, y: 79, targetMapId: 'union_cave_1f', targetX: 3, targetY: 5 };
+      const route32: MapData = { ...outdoorTown, id: 'route_32' };
+      const unionCave: MapData = { ...indoorHouse, id: 'union_cave_1f' };
+      const config = MapManager.resolveWarpTransition(caveWarp, route32, unionCave);
+
+      expect(config.isCave).toBe(true);
+      expect(config.soundCue).toBe('CAVE_WARP');
+      expect(config.landingFacing).toBe('DOWN');
+    });
+  });
 });

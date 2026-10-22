@@ -28,6 +28,7 @@ import { BoxManagementUI } from './ui/BoxManagementUI';
 import { TownMapUI } from './ui/TownMapUI';
 import type {
   MapData,
+  WarpEvent,
   Direction,
   PokeballId,
   PokemonInstance,
@@ -3856,6 +3857,118 @@ async function bootstrap() {
       const activeNpcs = currentMap ? npcsByMap[currentMap.id] || emptyNpcs : emptyNpcs;
 
       const heldDir = isCutsceneLocked ? null : overworldHUD.getHeldDirection();
+
+      const executeWarpTransition = (warp: WarpEvent) => {
+        const currentM = mapManager.getCurrentMap();
+        if (!currentM) return;
+
+        const targetMapExists = mapManager.getMap(warp.targetMapId);
+        if (!targetMapExists) {
+          player.isMoving = false;
+          player.progress = 0;
+          isCutsceneLocked = false;
+          BattleAudio.playMenuSound('CANCEL');
+          overworldHUD.openDialogue(
+            [
+              'The way ahead is closed for construction!',
+              'Workers and road crews are currently preparing this route. Please check back later!',
+            ],
+            '🚧 ROADBLOCK'
+          );
+          return;
+        }
+
+        if (warp.targetMapId === 'azalea_gym' && !storyFlags.has('slowpoke_well_cleared')) {
+          player.isMoving = false;
+          player.progress = 0;
+          isCutsceneLocked = false;
+          BattleAudio.playMenuSound('CANCEL');
+          overworldHUD.openDialogue(
+            [
+              'The GYM door is firmly locked!',
+              'A notice on the door says: "GYM temporarily closed due to disturbance in SLOWPOKE WELL."',
+            ],
+            '🔒 AZALEA GYM'
+          );
+          return;
+        }
+
+        if (
+          warp.targetMapId === 'slowpoke_well_b1f' &&
+          !storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') &&
+          !storyFlags.has('slowpoke_well_cleared')
+        ) {
+          player.isMoving = false;
+          player.progress = 0;
+          isCutsceneLocked = false;
+          BattleAudio.playMenuSound('CANCEL');
+          overworldHUD.openDialogue(
+            [
+              "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
+            ],
+            '⚡ ROCKET GRUNT'
+          );
+          return;
+        }
+
+        const previousMapId = currentM.id;
+        const transitionConfig = mapManager.resolveWarpTransition(warp);
+
+        player.isMoving = false;
+        player.progress = 0;
+        isCutsceneLocked = true;
+        BattleAudio.playWarpSound(transitionConfig.soundCue);
+
+        overworldRenderer
+          .playDoorwayFade(() => {
+            const targetMap = mapManager.setCurrentMap(transitionConfig.targetMapId);
+            visitedMaps.add(targetMap.id);
+            if (targetMap.id.endsWith('_poke_center')) {
+              lastVisitedPokecenter = {
+                mapId: targetMap.id,
+                x: transitionConfig.landingX,
+                y: Math.max(2, transitionConfig.landingY - 1),
+              };
+            }
+            player.direction = transitionConfig.landingFacing;
+            player.x = transitionConfig.landingX;
+            player.y = transitionConfig.landingY;
+            player.targetX = transitionConfig.landingX;
+            player.targetY = transitionConfig.landingY;
+            player.renderX = transitionConfig.landingX;
+            player.renderY = transitionConfig.landingY;
+
+            overworldRenderer.renderMap(targetMap, lookupMap);
+            syncMapOverworldItems(targetMap);
+            overworldHUD.updateRouteName(targetMap.name);
+            audioManager.playMapBgm(targetMap.id, 0.8);
+          }, transitionConfig.fadeDurationMs)
+          .then(() => {
+            isCutsceneLocked = false;
+
+            // Trigger Prof. Elm's emergency Pokégear phone call upon stepping out of Mr. Pokémon's House with the Mystery Egg
+            if (
+              previousMapId === 'mr_pokemons_house' &&
+              storyFlags.has('HAS_MYSTERY_EGG') &&
+              !storyFlags.has('ELM_CALLED_ABOUT_THEFT')
+            ) {
+              storyFlags.add('ELM_CALLED_ABOUT_THEFT');
+              BattleAudio.playOverworldSound('PHONE_RING');
+              overworldHUD.openDialogue(
+                [
+                  '📻 *BEEP! BEEP! Your POKéGEAR is ringing!*',
+                  "PROF. ELM: H-hello? GOLD? It's a disaster here at the LAB!",
+                  'A red-haired boy broke in! Please bring that MYSTERY EGG back to NEW BARK TOWN when you can!',
+                ],
+                '📻 PROF. ELM (POKéGEAR)',
+                () => {
+                  saveCurrentGame();
+                }
+              );
+            }
+          });
+      };
+
       GridPhysics.updateEntity(
         player,
         dtPlayer,
@@ -3868,107 +3981,13 @@ async function bootstrap() {
           // Check Building Door Warps (Poké Center, Poké Mart, Elm's Lab, Houses) with smooth fade & Safe Warp Interceptor
           const warp = mapManager.checkWarp(coord);
           if (warp) {
-            const targetMapExists = mapManager.getMap(warp.targetMapId);
-            if (!targetMapExists) {
-              player.isMoving = false;
-              player.progress = 0;
-              isCutsceneLocked = false;
-              BattleAudio.playMenuSound('CANCEL');
-              overworldHUD.openDialogue(
-                [
-                  'The way ahead is closed for construction!',
-                  'Workers and road crews are currently preparing this route. Please check back later!',
-                ],
-                '🚧 ROADBLOCK'
-              );
+            // Directional Rug Threshold (COLL_WARP_CARPET_DOWN):
+            // In indoor maps, moving across entrance rug sideways (LEFT, RIGHT) or UP does NOT trigger exit.
+            if (currentMap && MapManager.isCarpetWarp(warp, currentMap) && player.direction !== 'DOWN') {
               return;
             }
 
-            if (warp.targetMapId === 'azalea_gym' && !storyFlags.has('slowpoke_well_cleared')) {
-              player.isMoving = false;
-              player.progress = 0;
-              isCutsceneLocked = false;
-              BattleAudio.playMenuSound('CANCEL');
-              overworldHUD.openDialogue(
-                [
-                  'The GYM door is firmly locked!',
-                  'A notice on the door says: "GYM temporarily closed due to disturbance in SLOWPOKE WELL."',
-                ],
-                '🔒 AZALEA GYM'
-              );
-              return;
-            }
-
-            if (
-              warp.targetMapId === 'slowpoke_well_b1f' &&
-              !storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') &&
-              !storyFlags.has('slowpoke_well_cleared')
-            ) {
-              player.isMoving = false;
-              player.progress = 0;
-              isCutsceneLocked = false;
-              BattleAudio.playMenuSound('CANCEL');
-              overworldHUD.openDialogue(
-                [
-                  "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
-                ],
-                '⚡ ROCKET GRUNT'
-              );
-              return;
-            }
-
-            const previousMapId = currentMap?.id;
-            player.isMoving = false;
-            player.progress = 0;
-            isCutsceneLocked = true;
-            BattleAudio.playOverworldSound('DOOR');
-
-            overworldRenderer
-              .playDoorwayFade(() => {
-                const targetMap = mapManager.setCurrentMap(warp.targetMapId);
-                visitedMaps.add(targetMap.id);
-                if (targetMap.id.endsWith('_poke_center')) {
-                  lastVisitedPokecenter = { mapId: targetMap.id, x: warp.targetX, y: Math.max(2, warp.targetY - 1) };
-                }
-                const isEnteringIndoor = Object.keys(targetMap.connections || {}).length === 0;
-                player.direction =
-                  warp.direction ?? (warp.targetY <= 1 ? 'DOWN' : isEnteringIndoor ? 'UP' : 'DOWN');
-                player.x = warp.targetX;
-                player.y = warp.targetY;
-                player.targetX = warp.targetX;
-                player.targetY = warp.targetY;
-                player.renderX = warp.targetX;
-                player.renderY = warp.targetY;
-
-                overworldRenderer.renderMap(targetMap, lookupMap);
-                syncMapOverworldItems(targetMap);
-                overworldHUD.updateRouteName(targetMap.name);
-                audioManager.playMapBgm(targetMap.id, 0.8);
-              })
-              .then(() => {
-                isCutsceneLocked = false;
-
-                // Trigger Prof. Elm's emergency Pokégear phone call upon stepping out of Mr. Pokémon's House with the Mystery Egg
-                if (
-                  previousMapId === 'mr_pokemons_house' &&
-                  storyFlags.has('HAS_MYSTERY_EGG') &&
-                  !storyFlags.has('ELM_CALLED_ABOUT_THEFT')
-                ) {
-                  storyFlags.add('ELM_CALLED_ABOUT_THEFT');
-                  BattleAudio.playOverworldSound('PHONE_RING');
-                  overworldHUD.openDialogue(
-                    [
-                      '📻 *BEEP! BEEP! Your POKéGEAR is ringing!*',
-                      "PROF. ELM: H-hello? GOLD? It's a disaster here at the LAB!",
-                      'A red-haired boy broke in! Please bring that MYSTERY EGG back to NEW BARK TOWN when you can!',
-                    ],
-                    '📻 PROF. ELM (POKéGEAR)',
-                    () => {
-                      saveCurrentGame();
-                    }
-                  );
-                }
-              });
+            executeWarpTransition(warp);
             return;
           }
 
@@ -4077,6 +4096,15 @@ async function bootstrap() {
           handlePlayerBump();
         }
       );
+
+      // Directional Rug Threshold (COLL_WARP_CARPET_DOWN):
+      // If player is standing idle on an indoor entrance carpet and pressing DOWN, trigger egress warp
+      if (!player.isMoving && !isCutsceneLocked && heldDir === 'DOWN' && currentMap) {
+        const carpetWarp = mapManager.checkWarp({ x: player.x, y: player.y });
+        if (carpetWarp && MapManager.isCarpetWarp(carpetWarp, currentMap)) {
+          executeWarpTransition(carpetWarp);
+        }
+      }
 
       // Update NPCs with dtWorld (strictly 1.0x world speed), colliding with player and staying in bounds
       if (!overworldHUD.isDialogueOpen() && !isCutsceneLocked) {

@@ -117,6 +117,22 @@ export interface WarpEvent {
   direction?: Direction;
 }
 
+export type WarpSoundCue = 'DOOR_ENTER' | 'DOOR_EXIT' | 'STAIRS_STEP' | 'CAVE_WARP';
+
+export interface WarpTransitionConfig {
+  previousMapId: string;
+  targetMapId: string;
+  isEnteringIndoor: boolean;
+  isExitingToOverworld: boolean;
+  isStairs: boolean;
+  isCave: boolean;
+  landingX: number;
+  landingY: number;
+  landingFacing: Direction;
+  soundCue: WarpSoundCue;
+  fadeDurationMs: number;
+}
+
 export interface WildEncounterSlot {
   speciesId: string;
   minLevel: number;

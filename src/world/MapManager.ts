@@ -1,4 +1,4 @@
-import type { BgEvent, MapData, TileCoord, WarpEvent } from '../types/game';
+import type { BgEvent, Direction, MapData, TileCoord, WarpEvent, WarpSoundCue, WarpTransitionConfig } from '../types/game';
 
 export interface WildEncounterResult {
   speciesId: string;
@@ -367,5 +367,109 @@ export class MapManager {
       return !this.currentMap.isIndoor;
     }
     return MapManager.isOutdoorMap(this.currentMap.id);
+  }
+
+  /**
+   * Checks whether a map ID represents a cave, well, tunnel, or subterranean interior
+   */
+  public static isCaveMap(mapId: string): boolean {
+    return /cave|well|tunnel|whirl_island|ice_path|dragons_den|rock_tunnel|digletts_cave|mount_moon|victory_road|silver_cave|tohjo_falls/i.test(
+      mapId
+    );
+  }
+
+  /**
+   * Identifies whether a warp tile acts as an authentic GBC exit carpet (COLL_WARP_CARPET_DOWN).
+   * In indoor maps, entrance/exit carpets are situated at the doorway threshold (leading outdoor or at the bottom row).
+   */
+  public static isCarpetWarp(warp: WarpEvent, currentMap: MapData): boolean {
+    if (MapManager.isOutdoorMap(currentMap.id)) return false;
+    return MapManager.isOutdoorMap(warp.targetMapId) || warp.y >= currentMap.height - 2;
+  }
+
+  /**
+   * Resolves canonical building/cave/stair transition configuration adhering to pret/pokecrystal:
+   * - Exiting to overworld spawns 1 tile in front of the door (targetX, targetY + 1) facing DOWN
+   * - Entering indoor spawns at door facing UP
+   * - Selects authentic sound cues (DOOR_ENTER, DOOR_EXIT, STAIRS_STEP, CAVE_WARP)
+   * - Enforces 160ms/160ms transition pacing
+   */
+  public static resolveWarpTransition(
+    warp: WarpEvent,
+    currentMap: MapData,
+    targetMap?: MapData
+  ): WarpTransitionConfig {
+    const currentOutdoor = MapManager.isOutdoorMap(currentMap.id);
+    const targetOutdoor = MapManager.isOutdoorMap(warp.targetMapId);
+    const isEnteringIndoor = currentOutdoor && !targetOutdoor;
+    const isExitingToOverworld = !currentOutdoor && targetOutdoor;
+    const isCave = MapManager.isCaveMap(currentMap.id) || MapManager.isCaveMap(warp.targetMapId);
+    const isStairs = !isCave && !isEnteringIndoor && !isExitingToOverworld;
+
+    let soundCue: WarpSoundCue = 'DOOR_ENTER';
+    if (isCave) {
+      soundCue = 'CAVE_WARP';
+    } else if (isStairs) {
+      soundCue = 'STAIRS_STEP';
+    } else if (isExitingToOverworld) {
+      soundCue = 'DOOR_EXIT';
+    } else if (isEnteringIndoor) {
+      soundCue = 'DOOR_ENTER';
+    }
+
+    let landingX = warp.targetX;
+    let landingY = warp.targetY;
+    let landingFacing: Direction = 'DOWN';
+
+    if (warp.direction) {
+      landingFacing = warp.direction;
+    } else if (isCave) {
+      landingFacing = 'DOWN';
+    } else if (isExitingToOverworld) {
+      landingFacing = 'DOWN';
+    } else if (isEnteringIndoor) {
+      landingFacing = 'UP';
+    } else if (isStairs) {
+      landingFacing = warp.targetY <= 1 ? 'DOWN' : 'UP';
+    }
+
+    if (isExitingToOverworld) {
+      landingFacing = 'DOWN';
+      // Canonical Outdoor Doorstep Landing:
+      // If targetMap has an entrance warp at (targetX, targetY), or if targetMap is undefined,
+      // (targetX, targetY) is the door tile and the player spawns 1 tile in front of the door (targetY + 1).
+      // If targetMap already has targetY on the safe apron, preserve targetY.
+      const isDoorTile = targetMap
+        ? targetMap.warps?.some((w) => w.x === warp.targetX && w.y === warp.targetY) ?? true
+        : true;
+      if (isDoorTile) {
+        landingY = warp.targetY + 1;
+      }
+    }
+
+    return {
+      previousMapId: currentMap.id,
+      targetMapId: warp.targetMapId,
+      isEnteringIndoor,
+      isExitingToOverworld,
+      isStairs,
+      isCave,
+      landingX,
+      landingY,
+      landingFacing,
+      soundCue,
+      fadeDurationMs: 160,
+    };
+  }
+
+  public resolveWarpTransition(warp: WarpEvent): WarpTransitionConfig {
+    if (!this.currentMap) {
+      throw new Error('No current map set.');
+    }
+    return MapManager.resolveWarpTransition(
+      warp,
+      this.currentMap,
+      this.maps.get(warp.targetMapId)
+    );
   }
 }

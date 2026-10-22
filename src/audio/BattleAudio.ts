@@ -1,4 +1,5 @@
-import type { PokemonType, MoveCategory } from '../types/game';
+import type { PokemonType, MoveCategory, WarpSoundCue } from '../types/game';
+export type { WarpSoundCue };
 
 /**
  * Pure WebAudio retro sound synthesizer for authentic Game Boy / GBA Pokémon battle cries,
@@ -361,6 +362,103 @@ export class BattleAudio {
   }
 
   /**
+   * Plays dedicated building, cave, and staircase warp sound effects (DOOR_ENTER, DOOR_EXIT, STAIRS_STEP, CAVE_WARP)
+   */
+  public static playWarpSound(cue: WarpSoundCue): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    if (cue === 'DOOR_ENTER') {
+      // Classic Gen 2 door opening rising chime (E4 -> C5)
+      const notes = [
+        { f: 329.63, t: 0, d: 0.06 },
+        { f: 523.25, t: 0.055, d: 0.11 },
+      ];
+      for (const n of notes) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(n.f, now + n.t);
+        gain.gain.setValueAtTime(0.06, now + n.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + n.t);
+        osc.stop(now + n.t + n.d);
+      }
+    } else if (cue === 'DOOR_EXIT') {
+      // Gentle door closing latch & thud
+      const clicks = [
+        { f: 480, t: 0, d: 0.035, type: 'square' as OscillatorType, vol: 0.05 },
+        { f: 220, t: 0.03, d: 0.075, type: 'triangle' as OscillatorType, vol: 0.07 },
+      ];
+      for (const c of clicks) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = c.type;
+        osc.frequency.setValueAtTime(c.f, now + c.t);
+        gain.gain.setValueAtTime(c.vol, now + c.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + c.t + c.d);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + c.t);
+        osc.stop(now + c.t + c.d);
+      }
+    } else if (cue === 'STAIRS_STEP') {
+      // Rapid staircase footstep shuffle
+      const steps = [
+        { f: 440, t: 0, d: 0.035 },
+        { f: 370, t: 0.045, d: 0.035 },
+        { f: 494, t: 0.09, d: 0.05 },
+      ];
+      for (const s of steps) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(s.f, now + s.t);
+        gain.gain.setValueAtTime(0.05, now + s.t);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + s.t + s.d);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + s.t);
+        osc.stop(now + s.t + s.d);
+      }
+    } else if (cue === 'CAVE_WARP') {
+      // Deep cave reverberation and resonant descent
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      this.bindAutoDisconnect(osc1, gain1);
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(160, now);
+      osc1.frequency.exponentialRampToValueAtTime(65, now + 0.22);
+      gain1.gain.setValueAtTime(0.08, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.24);
+
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      this.bindAutoDisconnect(osc2, gain2);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(90, now);
+      osc2.frequency.exponentialRampToValueAtTime(45, now + 0.26);
+      gain2.gain.setValueAtTime(0.05, now);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now);
+      osc2.stop(now + 0.26);
+    }
+  }
+
+  /**
    * Plays authentic Game Boy Color overworld sound effects (Tall grass rustle, Ledge hop, Trainer '!' alert, Doorway, Key Item, Pokégear ring)
    */
   public static playOverworldSound(
@@ -369,12 +467,33 @@ export class BattleAudio {
       | 'HOP'
       | 'EXCLAMATION'
       | 'DOOR'
+      | 'DOOR_ENTER'
+      | 'DOOR_EXIT'
+      | 'STAIRS_STEP'
+      | 'CAVE_WARP'
       | 'KEY_ITEM'
       | 'PHONE_RING'
       | 'BUMP'
       | 'HEAL_JINGLE'
       | 'FANFARE'
   ): void {
+    if (type === 'DOOR' || type === 'DOOR_ENTER') {
+      this.playWarpSound('DOOR_ENTER');
+      return;
+    }
+    if (type === 'DOOR_EXIT') {
+      this.playWarpSound('DOOR_EXIT');
+      return;
+    }
+    if (type === 'STAIRS_STEP') {
+      this.playWarpSound('STAIRS_STEP');
+      return;
+    }
+    if (type === 'CAVE_WARP') {
+      this.playWarpSound('CAVE_WARP');
+      return;
+    }
+
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -426,19 +545,6 @@ export class BattleAudio {
         osc.start(now + n.t);
         osc.stop(now + n.t + n.d);
       }
-    } else if (type === 'DOOR') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      this.bindAutoDisconnect(osc, gain);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(380, now);
-      osc.frequency.exponentialRampToValueAtTime(160, now + 0.12);
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.13);
     } else if (type === 'KEY_ITEM') {
       const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
       notes.forEach((f, i) => {

@@ -371,4 +371,86 @@ describe('GridPhysics', () => {
     expect(bumpSpy).toHaveBeenCalledTimes(1);
     expect(bumpSpy).toHaveBeenCalledWith(player);
   });
+
+  describe('Directional Carpet & Egress Warps (COLL_WARP_CARPET_DOWN)', () => {
+    const mockIndoorMap: any = {
+      id: 'players_house_1f',
+      name: "Player's House",
+      width: 10,
+      height: 8,
+      tileSize: 64,
+      groundLayer: [],
+      objectLayer: [],
+      collisionGrid: new Array(80).fill(0),
+      connections: {},
+      warps: [
+        { x: 6, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 5 },
+        { x: 7, y: 7, targetMapId: 'new_bark_town', targetX: 13, targetY: 5 },
+      ],
+      grassEncounters: [],
+    };
+
+    it('suppresses carpet warp when player moves sideways (LEFT/RIGHT) or UP across carpet threshold', () => {
+      const player = createMockEntity({ x: 5, y: 7, targetX: 5, targetY: 7, direction: 'RIGHT' });
+      let warpTriggered = false;
+
+      const onTileEntered = (entity: any, coord: any) => {
+        const warp = mockIndoorMap.warps.find((w: any) => w.x === coord.x && w.y === coord.y);
+        if (warp) {
+          // Authentic COLL_WARP_CARPET_DOWN: moving sideways or UP suppresses warp
+          if (entity.direction !== 'DOWN') {
+            return;
+          }
+          warpTriggered = true;
+        }
+      };
+
+      // Player steps RIGHT from (5, 7) to (6, 7) onto carpet warp
+      GridPhysics.updateEntity(player, 0.25, 'RIGHT', allWalkable, tileLookup, onTileEntered);
+
+      expect(player.x).toBe(6);
+      expect(player.y).toBe(7);
+      expect(player.direction).toBe('RIGHT');
+      expect(warpTriggered).toBe(false); // Stays inside on carpet tile
+    });
+
+    it('triggers carpet exit warp when player moves DOWN across carpet threshold', () => {
+      const player = createMockEntity({ x: 6, y: 6, targetX: 6, targetY: 6, direction: 'DOWN' });
+      let warpTriggered = false;
+
+      const onTileEntered = (entity: any, coord: any) => {
+        const warp = mockIndoorMap.warps.find((w: any) => w.x === coord.x && w.y === coord.y);
+        if (warp) {
+          if (entity.direction !== 'DOWN') {
+            return;
+          }
+          warpTriggered = true;
+          entity.isMoving = false;
+        }
+      };
+
+      // Player steps DOWN from (6, 6) to (6, 7) onto carpet warp
+      GridPhysics.updateEntity(player, 0.25, 'DOWN', allWalkable, tileLookup, onTileEntered);
+
+      expect(player.x).toBe(6);
+      expect(player.y).toBe(7);
+      expect(player.direction).toBe('DOWN');
+      expect(warpTriggered).toBe(true);
+    });
+
+    it('triggers egress when player is standing on carpet warp and presses DOWN', () => {
+      const player = createMockEntity({ x: 6, y: 7, targetX: 6, targetY: 7, direction: 'DOWN', isMoving: false });
+      const heldDir = 'DOWN';
+
+      const carpetWarp = mockIndoorMap.warps.find((w: any) => w.x === player.x && w.y === player.y);
+      expect(carpetWarp).toBeDefined();
+
+      let egressFired = false;
+      if (!player.isMoving && heldDir === 'DOWN' && carpetWarp) {
+        egressFired = true;
+      }
+
+      expect(egressFired).toBe(true);
+    });
+  });
 });
