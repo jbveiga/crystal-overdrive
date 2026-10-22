@@ -657,4 +657,184 @@ describe('10-Point Completeness Audit for Previously Mapped Areas (TICKET-AUDIT-
       expect(audioManager.getTrackForMap('azalea_gym')).toBe('bgm_gym');
     });
   });
+
+  describe('TICKET-WORLD-ILEX-FOREST-01: 10-Point Map Delivery Package (Ilex Forest & Farfetch\'d Herding Quest)', () => {
+    it('Dimension 1: asserts reciprocal navigation between Azalea Town, Ilex Forest, and Route 34 Gate with safe landing thresholds', () => {
+      const forest = loadMap('ilex_forest');
+      const azalea = loadMap('azalea_town');
+      const gate = loadMap('route_34_ilex_forest_gate');
+
+      // East Exits to Azalea Town
+      const toAzalea1 = forest.warps.find((w) => w.targetMapId === 'azalea_town' && w.x === 3 && w.y === 42);
+      const toAzalea2 = forest.warps.find((w) => w.targetMapId === 'azalea_town' && w.x === 3 && w.y === 43);
+      expect(toAzalea1).toBeDefined();
+      expect(toAzalea2).toBeDefined();
+      expect(toAzalea1?.targetX).toBe(2);
+      expect(toAzalea1?.targetY).toBe(10);
+      expect(toAzalea2?.targetX).toBe(2);
+      expect(toAzalea2?.targetY).toBe(11);
+
+      // Reciprocal warps from Azalea Town to Ilex Forest
+      const fromAzalea1 = azalea.warps.find((w) => w.targetMapId === 'ilex_forest' && w.x === 2 && w.y === 10);
+      const fromAzalea2 = azalea.warps.find((w) => w.targetMapId === 'ilex_forest' && w.x === 2 && w.y === 11);
+      expect(fromAzalea1).toBeDefined();
+      expect(fromAzalea2).toBeDefined();
+      expect(fromAzalea1?.targetX).toBe(3);
+      expect(fromAzalea1?.targetY).toBe(42);
+      expect(fromAzalea2?.targetX).toBe(3);
+      expect(fromAzalea2?.targetY).toBe(43);
+
+      // North Exit to Route 34 Gate
+      const toGate = forest.warps.find((w) => w.targetMapId === 'route_34_ilex_forest_gate');
+      expect(toGate).toBeDefined();
+      expect(toGate?.x).toBe(1);
+      expect(toGate?.y).toBe(5);
+      expect(toGate?.targetX).toBe(4);
+      expect(toGate?.targetY).toBe(7);
+
+      // Reciprocal warps from Gate to Ilex Forest
+      const fromGate = gate.warps.filter((w) => w.targetMapId === 'ilex_forest');
+      expect(fromGate.length).toBeGreaterThanOrEqual(1);
+      for (const w of fromGate) {
+        expect(w.targetX).toBe(1);
+        expect(w.targetY).toBe(5);
+      }
+
+      // Assert 100% of landing tiles are safe and walkable
+      expect([0, 2]).toContain(azalea.collisionGrid[10 * azalea.width + 2]);
+      expect([0, 2]).toContain(azalea.collisionGrid[11 * azalea.width + 2]);
+      expect([0, 2]).toContain(gate.collisionGrid[7 * gate.width + 4]);
+      expect([0, 2]).toContain(forest.collisionGrid[42 * forest.width + 3]);
+      expect([0, 2]).toContain(forest.collisionGrid[43 * forest.width + 3]);
+      expect([0, 2]).toContain(forest.collisionGrid[5 * forest.width + 1]);
+    });
+
+    it('Dimension 2: asserts 100% of Ilex Forest NPCs stand on walkable tiles with complete combat and interaction data', () => {
+      const forest = loadMap('ilex_forest');
+      const npcs = createNpcsByMap();
+      const forestNpcs = (npcs as any).ilex_forest || [];
+      expect(forestNpcs.length).toBeGreaterThanOrEqual(5);
+
+      const apprentice = forestNpcs.find((n: any) => n.id === 'forest_apprentice');
+      const farfetchd = forestNpcs.find((n: any) => n.id === 'forest_farfetchd');
+      const master = forestNpcs.find((n: any) => n.id === 'cut_master');
+      const headbutt = forestNpcs.find((n: any) => n.id === 'headbutt_tutor');
+      const wayne = forestNpcs.find((n: any) => n.id === 'bug_catcher_wayne');
+
+      expect(apprentice).toBeDefined();
+      expect(farfetchd).toBeDefined();
+      expect(master).toBeDefined();
+      expect(headbutt).toBeDefined();
+      expect(wayne).toBeDefined();
+
+      // Wayne trainer combat attributes
+      expect(wayne.action).toBe('TRAINER_BATTLE');
+      expect(wayne.trainerId).toBe('bug_catcher_wayne');
+      expect(wayne.trainerTeam?.length).toBe(2);
+      expect(wayne.trainerTeam?.[0].speciesId).toBe('paras');
+      expect(wayne.trainerTeam?.[1].speciesId).toBe('spinarak');
+
+      // 100% walkability check across all forest entities
+      for (const n of forestNpcs) {
+        const col = forest.collisionGrid[n.y * forest.width + n.x];
+        expect([0, 2], `NPC ${n.id} at (${n.x}, ${n.y}) on ilex_forest must stand on walkable tile`).toContain(col);
+      }
+    });
+
+    it('Dimension 3 & 4: asserts Signpost, Shrine, and Cut Tree clearance opening Route 34 access', () => {
+      const forest = loadMap('ilex_forest');
+
+      // Signpost at (3, 17) and Shrine at (8, 22)
+      expect(forest.bgEvents.length).toBeGreaterThanOrEqual(2);
+      const signpost = forest.bgEvents.find((b) => b.x === 3 && b.y === 17);
+      const shrine = forest.bgEvents.find((b) => b.x === 8 && b.y === 22);
+      expect(signpost).toBeDefined();
+      expect(shrine).toBeDefined();
+      expect(shrine?.pages.some((p) => p.includes('CELEBI') || p.includes('SHRINE'))).toBe(true);
+
+      // Prior to Cut, path at (8, 25) is blocked (solid 1)
+      expect(forest.collisionGrid[25 * forest.width + 8]).toBe(1);
+
+      // Simulate cutting the tree: collision clears to 0 and connects south to north
+      const simulatedColl = [...forest.collisionGrid];
+      simulatedColl[25 * forest.width + 8] = 0;
+
+      // Flood-fill BFS to assert reachability from entrance (3, 42) to north exit (1, 5)
+      const visited = new Set<number>();
+      const queue: [number, number][] = [[3, 42]];
+      visited.add(42 * forest.width + 3);
+
+      while (queue.length > 0) {
+        const [x, y] = queue.shift()!;
+        for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+          const nx = x + dx;
+          const ny = y + dy;
+          if (nx >= 0 && nx < forest.width && ny >= 0 && ny < forest.height) {
+            const idx = ny * forest.width + nx;
+            const c = simulatedColl[idx];
+            if ((c === 0 || c === 2) && !visited.has(idx)) {
+              visited.add(idx);
+              queue.push([nx, ny]);
+            }
+          }
+        }
+      }
+
+      expect(visited.has(5 * forest.width + 1)).toBe(true);
+    });
+
+    it('Dimension 5: asserts all canonical Item Balls and Hidden Items are indexed on walkable tiles', () => {
+      const forest = loadMap('ilex_forest');
+      const itemManager = new OverworldItemManager();
+      const itemBalls = itemManager.getActiveItemBalls('ilex_forest');
+      const hiddenItems = itemManager.getHiddenItemsForMap('ilex_forest');
+
+      expect(itemBalls.length).toBeGreaterThanOrEqual(4);
+      expect(hiddenItems.length).toBeGreaterThanOrEqual(3);
+
+      // Required canonical items
+      expect(itemBalls.some((b) => b.itemId === 'revive')).toBe(true);
+      expect(itemBalls.some((b) => b.itemId === 'x_attack')).toBe(true);
+      expect(itemBalls.some((b) => b.itemId === 'antidote')).toBe(true);
+      expect(itemBalls.some((b) => b.itemId === 'ether')).toBe(true);
+
+      // 100% walkability check for items
+      for (const b of itemBalls) {
+        const col = forest.collisionGrid[b.y * forest.width + b.x];
+        expect([0, 2], `ItemBall ${b.id} at (${b.x}, ${b.y}) must be walkable`).toContain(col);
+      }
+      for (const h of hiddenItems) {
+        const col = forest.collisionGrid[h.y * forest.width + h.x];
+        expect([0, 2], `HiddenItem ${h.id} at (${h.x}, ${h.y}) must be walkable`).toContain(col);
+      }
+    });
+
+    it('Dimension 6: asserts time-of-day wild encounter distributions for Ilex Forest', () => {
+      const forest = loadMap('ilex_forest');
+      expect(forest.grassEncounters).toBeDefined();
+      const encounters = forest.grassEncounters!;
+      expect(encounters.length).toBeGreaterThanOrEqual(10);
+
+      const morning = encounters.filter((e) => e.timeOfDay === 'MORNING');
+      const day = encounters.filter((e) => e.timeOfDay === 'DAY');
+      const night = encounters.filter((e) => e.timeOfDay === 'NIGHT');
+
+      expect(morning.length).toBeGreaterThanOrEqual(5);
+      expect(day.length).toBeGreaterThanOrEqual(5);
+      expect(night.length).toBeGreaterThanOrEqual(5);
+
+      // Canonical species presence
+      expect(encounters.some((e) => e.speciesId === 'caterpie')).toBe(true);
+      expect(encounters.some((e) => e.speciesId === 'weedle')).toBe(true);
+      expect(encounters.some((e) => e.speciesId === 'paras')).toBe(true);
+      expect(night.some((e) => e.speciesId === 'oddish')).toBe(true);
+      expect(night.some((e) => e.speciesId === 'psyduck')).toBe(true);
+    });
+
+    it('Dimension 10: asserts canonical BGM track resolution for Ilex Forest and Gate', () => {
+      const audioManager = new AudioManager();
+      expect(audioManager.getTrackForMap('ilex_forest')).toBe('bgm_sprout_tower');
+      expect(audioManager.getTrackForMap('route_34_ilex_forest_gate')).toBe('bgm_sprout_tower');
+    });
+  });
 });

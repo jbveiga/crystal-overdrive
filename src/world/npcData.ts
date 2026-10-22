@@ -2208,12 +2208,12 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         15,
         23,
         'DOWN',
-        'fat_man',
+        'bird_keeper',
         '🦆 FARFETCH’D',
         [
-          'FARFETCH’D: Kwaaa! It clutches its fresh green onion stalk proudly!',
-          'It seems ready to return to the kiln now.',
-        ]
+          "FARFETCH'D: Quaaack! It clutches its fresh green onion stalk proudly!",
+        ],
+        { action: 'FARFETCHD_HERD_EVENT' }
       ),
       makeNpc(
         'cut_master',
@@ -2223,8 +2223,57 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'elder',
         '🧔 CHARCOAL MASTER',
         [
-          'Thank you for finding our FARFETCH’D! Without it, we couldn’t collect wood for the kiln!',
+          "Thank you for finding our FARFETCH'D! Without it, we couldn't collect wood for the kiln!",
           'As a reward, take HM01 CUT! With the HIVEBADGE, you can cut down small thorny trees blocking paths!',
+        ],
+        { action: 'CHARCOAL_MASTER_EVENT' }
+      ),
+      makeNpc(
+        'headbutt_tutor',
+        15,
+        14,
+        'RIGHT',
+        'boy',
+        '🥊 HEADBUTT GUY',
+        [
+          "What am I doing? I'm shaking trees using HEADBUTT! It's so much fun!",
+          "Rattle trees with HEADBUTT! Sometimes sleeping POKéMON fall right out on you!",
+        ],
+        { action: 'HEADBUTT_TUTOR_EVENT' }
+      ),
+      makeNpc(
+        'bug_catcher_wayne',
+        12,
+        1,
+        'DOWN',
+        'bug_catcher',
+        '🐛 BUG CATCHER WAYNE',
+        [
+          "BUG CATCHER WAYNE: I found all kinds of neat bug POKéMON in these woods! Don't step on them!",
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bug_catcher_wayne',
+          trainerName: 'Bug Catcher Wayne',
+          visionRange: 2,
+          challengePages: ["BUG CATCHER WAYNE: Don't sneak up on me in the dark forest!"],
+          trainerPokemon: { speciesId: 'paras', level: 10, moves: ['scratch', 'stunspore'] },
+          trainerTeam: [
+            { speciesId: 'paras', level: 10, moves: ['scratch', 'stunspore'] },
+            { speciesId: 'spinarak', level: 12, moves: ['poisonsting', 'stringshot', 'scaryface'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'forest_lass',
+        3,
+        24,
+        'RIGHT',
+        'girl',
+        '👧 LASS',
+        [
+          'Did something happen to the shrine deeper in the forest?',
+          'My grandma said a mythical POKéMON watches over all the trees in ILEX FOREST.',
         ]
       ),
     ],

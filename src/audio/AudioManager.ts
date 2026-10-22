@@ -59,6 +59,8 @@ const MAP_BGM_TABLE: Record<string, BgmTrackId> = {
   union_cave_b2f: 'bgm_sprout_tower',
   slowpoke_well_b1f: 'bgm_sprout_tower',
   slowpoke_well_b2f: 'bgm_sprout_tower',
+  ilex_forest: 'bgm_sprout_tower',
+  route_34_ilex_forest_gate: 'bgm_sprout_tower',
 
   // Violet City & Indoors
   violet_city: 'bgm_violet_city',

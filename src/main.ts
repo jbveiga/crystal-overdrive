@@ -865,6 +865,10 @@ async function bootstrap() {
 
   const syncMapOverworldItems = (map: MapData | null) => {
     if (!map) return;
+    if (map.id === 'ilex_forest' && storyFlags.has('ilex_tree_cut')) {
+      map.collisionGrid[25 * map.width + 8] = 0;
+      map.collisionGrid[22 * map.width + 8] = 0;
+    }
     const itemBalls = [...overworldItemManager.getActiveItemBalls(map.id)];
     if (map.id === 'elms_lab') {
       itemBalls.push(...OverworldItemManager.getStarterBallsForLab(storyFlags, detectChosenStarterSpecies()));
@@ -3375,6 +3379,169 @@ async function bootstrap() {
           return;
         }
 
+        // Ilex Forest: Farfetch'd Herding Puzzle (TICKET-WORLD-ILEX-FOREST-01)
+        if (targetNpc.action === 'FARFETCHD_HERD_EVENT' || targetNpc.id === 'forest_farfetchd') {
+          if (storyFlags.has('EVENT_HERDED_FARFETCHD')) {
+            overworldHUD.openDialogue(
+              [
+                "FARFETCH'D: Quaaack! It is resting happily beside the apprentice.",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          const FARFETCHD_WAYPOINTS = [
+            { x: 15, y: 23 },
+            { x: 15, y: 25 },
+            { x: 20, y: 24 },
+            { x: 22, y: 31 },
+            { x: 15, y: 29 },
+            { x: 10, y: 35 },
+            { x: 13, y: 30 },
+          ];
+
+          let currentWpIdx = FARFETCHD_WAYPOINTS.findIndex(
+            (wp) => wp.x === targetNpc.x && wp.y === targetNpc.y
+          );
+          if (currentWpIdx === -1) currentWpIdx = 0;
+          const nextWpIdx = currentWpIdx + 1;
+
+          if (nextWpIdx >= FARFETCHD_WAYPOINTS.length) {
+            storyFlags.add('EVENT_HERDED_FARFETCHD');
+            storyFlags.add('forest_farfetchd_herded');
+            BattleAudio.playCry('farfetchd');
+            overworldHUD.openDialogue(
+              [
+                "FARFETCH'D: Quaaack!",
+                "FARFETCH'D ran safely back to the Charcoal Apprentice!",
+                "APPRENTICE: You did it! You brought FARFETCH'D back! Look, the CHARCOAL MASTER is here too!",
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast("🦆 FARFETCH'D was safely returned to the Charcoal Apprentice!");
+              }
+            );
+            return;
+          }
+
+          const nextWp = FARFETCHD_WAYPOINTS[nextWpIdx];
+          targetNpc.x = nextWp.x;
+          targetNpc.y = nextWp.y;
+          targetNpc.gridX = nextWp.x;
+          targetNpc.gridY = nextWp.y;
+          targetNpc.renderX = nextWp.x;
+          targetNpc.renderY = nextWp.y;
+
+          BattleAudio.playCry('farfetchd');
+
+          if (nextWpIdx === FARFETCHD_WAYPOINTS.length - 1) {
+            storyFlags.add('EVENT_HERDED_FARFETCHD');
+            storyFlags.add('forest_farfetchd_herded');
+            overworldHUD.openDialogue(
+              [
+                "FARFETCH'D: Quaaack!",
+                "FARFETCH'D was steered all the way back to the Charcoal Apprentice!",
+                "APPRENTICE: Wow, thank you! The CHARCOAL MASTER has arrived to reward you!",
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast("🦆 FARFETCH'D was safely returned to the Charcoal Apprentice!");
+              }
+            );
+          } else {
+            overworldHUD.openDialogue(
+              [
+                "FARFETCH'D: Quaaack!",
+                "FARFETCH'D fluttered deeper along the path towards the apprentice!",
+              ],
+              targetNpc.speaker
+            );
+          }
+          return;
+        }
+
+        // Ilex Forest: Charcoal Master HM01 Cut Grant (TICKET-WORLD-ILEX-FOREST-01)
+        if (targetNpc.action === 'CHARCOAL_MASTER_EVENT' || targetNpc.id === 'cut_master') {
+          if (storyFlags.has('has_hm01_cut') || storyFlags.has('EVENT_GOT_HM01_CUT')) {
+            overworldHUD.openDialogue(
+              [
+                "CHARCOAL MASTER: The wood from ILEX FOREST makes the highest quality charcoal in all of JOHTO!",
+                "With HM01 CUT, you can chop down small thorny trees blocking paths throughout the region.",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          if (storyFlags.has('EVENT_HERDED_FARFETCHD') || storyFlags.has('forest_farfetchd_herded')) {
+            overworldHUD.openDialogue(
+              [
+                "CHARCOAL MASTER: Ah! You're the young trainer who rounded up my naughty FARFETCH'D!",
+                "That bird cuts charcoal wood for our kiln! Without it, our business was in big trouble.",
+                "Here, take this HM as my sincere thanks!",
+                `${playerName} received HM01 CUT!`,
+                "Teach it to a POKéMON, and with the HIVE BADGE you can cut down prickly trees!",
+              ],
+              targetNpc.speaker,
+              () => {
+                storyFlags.add('has_hm01_cut');
+                storyFlags.add('EVENT_GOT_HM01_CUT');
+                if (!inventory.tms) inventory.tms = [];
+                if (!inventory.tms.includes('HM01')) inventory.tms.push('HM01');
+                if (!inventory.tms.includes('HM01_CUT')) inventory.tms.push('HM01_CUT');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                saveCurrentGame();
+                overworldHUD.showToast("🪓 Received HM01 CUT from the Charcoal Master!");
+              }
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              "CHARCOAL MASTER: Oh no... Our FARFETCH'D ran off into the deep woods!",
+              "Without that bird, we can't collect any charcoal wood for our kiln!",
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        // Ilex Forest: Headbutt Move Tutor TM02 Grant (TICKET-WORLD-ILEX-FOREST-01)
+        if (targetNpc.action === 'HEADBUTT_TUTOR_EVENT' || targetNpc.id === 'headbutt_tutor') {
+          if (storyFlags.has('has_tm02_headbutt')) {
+            overworldHUD.openDialogue(
+              [
+                "HEADBUTT GUY: Rattle trees with HEADBUTT! Sometimes rare sleeping POKéMON fall right out on you!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              "HEADBUTT GUY: What am I doing? I'm shaking trees using HEADBUTT! It's so much fun!",
+              "Here, kid, take this TM and try it on trees yourself!",
+              `${playerName} received TM02 HEADBUTT!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              storyFlags.add('has_tm02_headbutt');
+              if (!inventory.tms) inventory.tms = [];
+              if (!inventory.tms.includes('TM02')) inventory.tms.push('TM02');
+              if (!inventory.tms.includes('TM02_HEADBUTT')) inventory.tms.push('TM02_HEADBUTT');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              saveCurrentGame();
+              overworldHUD.showToast("🥊 Received TM02 HEADBUTT from the Headbutt Guy!");
+            }
+          );
+          return;
+        }
+
         // Prof. Elm Lab Starter Dialogue & Errands (Ticket 6.1 & BUGFIX-NARRATIVE-01)
         if (targetNpc.id === 'elm_npc') {
           if (!storyFlags.has('starter_chosen')) {
@@ -3839,23 +4006,28 @@ async function bootstrap() {
     ) {
       const tileIdx = facingY * currentMap.width + facingX;
       const facingTileName = currentMap.tileMap[tileIdx] || '';
+      const isIlexCutTree =
+        currentMap.id === 'ilex_forest' &&
+        ((facingX === 8 && facingY === 25) || (facingX === 8 && facingY === 22));
       const isCutTree =
-        currentMap.collisionGrid[tileIdx] === 1 &&
-        (facingTileName === 'tree_short_0' ||
-          facingTileName.includes('13_15_45_1d') ||
-          facingTileName.includes('2d_2e_3d_3e') ||
-          facingTileName.includes('28_39_38_3a') ||
-          facingTileName.includes('_5b') ||
-          facingTileName.includes('_5f') ||
-          facingTileName.includes('_64') ||
-          facingTileName.includes('_65'));
+        isIlexCutTree ||
+        (currentMap.collisionGrid[tileIdx] === 1 &&
+          (facingTileName === 'tree_short_0' ||
+            facingTileName.includes('13_15_45_1d') ||
+            facingTileName.includes('2d_2e_3d_3e') ||
+            facingTileName.includes('28_39_38_3a') ||
+            facingTileName.includes('_5b') ||
+            facingTileName.includes('_5f') ||
+            facingTileName.includes('_64') ||
+            facingTileName.includes('_65')));
 
       if (isCutTree) {
         const hasCutAndBadge =
           (inventory.tms.includes('HM01') ||
+            inventory.tms.includes('HM01_CUT') ||
             storyFlags.has('has_hm01_cut') ||
-            playerParty.some((p) => p.moves.some((m) => m.moveId === 'cut'))) &&
-          inventory.badges.includes('hive');
+            playerParty.some((p) => p.moves.some((m) => m.moveId.toLowerCase() === 'cut'))) &&
+          (inventory.badges.includes('hive') || inventory.badges.includes('hive_badge'));
 
         if (hasCutAndBadge) {
           const cutter = playerParty.find((p) => !p.isEgg) || playerParty[0];
@@ -3869,9 +4041,16 @@ async function bootstrap() {
             '🌳 CUTTABLE TREE',
             () => {
               currentMap.collisionGrid[tileIdx] = 0;
+              if (currentMap.id === 'ilex_forest') {
+                currentMap.collisionGrid[25 * currentMap.width + 8] = 0;
+                currentMap.collisionGrid[22 * currentMap.width + 8] = 0;
+                storyFlags.add('ilex_tree_cut');
+              }
               currentMap.tileMap![tileIdx] = 'jt_07_07_07_07';
               overworldRenderer.renderMap(currentMap, lookupMap);
               syncMapOverworldItems(currentMap);
+              saveCurrentGame();
+              overworldHUD.showToast('🌳 The tree was cut down!');
             }
           );
         } else {
@@ -3880,6 +4059,7 @@ async function bootstrap() {
             '🌳 CUTTABLE TREE'
           );
         }
+        return;
       }
     }
   };
