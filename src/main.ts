@@ -38,8 +38,8 @@ import type {
   ExpShareMode,
 } from './types/game';
 import type { Graphics } from 'pixi.js';
-import { createNpcsByMap, DAY_SIBLINGS } from './world/npcData';
-export { npcsByMap, createNpcsByMap, DAY_SIBLINGS } from './world/npcData';
+import { createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS } from './world/npcData';
+export { npcsByMap, createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS } from './world/npcData';
 
 declare global {
   interface Window {
@@ -925,6 +925,7 @@ async function bootstrap() {
       const freshNpcs = createNpcsByMap();
       npcsByMap.mr_pokemons_house = freshNpcs.mr_pokemons_house;
       npcsByMap.new_bark_town = freshNpcs.new_bark_town;
+      npcsByMap.cherrygrove_city = freshNpcs.cherrygrove_city;
       npcsByMap.route_36 = freshNpcs.route_36;
       npcsByMap.elms_lab = freshNpcs.elms_lab;
       npcsByMap.azalea_town = freshNpcs.azalea_town;
@@ -1074,6 +1075,9 @@ async function bootstrap() {
     npcsByMap.new_bark_town
   ) {
     npcsByMap.new_bark_town = npcsByMap.new_bark_town.filter((n) => n.id !== 'nbt_rival');
+  }
+  if (storyFlags.has('has_map_card') && npcsByMap.cherrygrove_city) {
+    npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter((n) => n.id !== 'cg_guide_gent');
   }
   if ((storyFlags.has('HAS_MYSTERY_EGG') || storyFlags.has('HAS_POKEDEX')) && npcsByMap.mr_pokemons_house) {
     npcsByMap.mr_pokemons_house = npcsByMap.mr_pokemons_house.filter((n) => n.id !== 'prof_oak_npc');
@@ -1798,6 +1802,219 @@ async function bootstrap() {
     });
   };
 
+  /**
+   * Executes the 1:1 authentic Gen 2 Cherrygrove City Guide Gent Scripted Walking Tour:
+   * Leg 1: (32, 6) -> Pokemon Center (29, 5) facing UP; Player follows to (30, 5) facing UP. Stop 1 dialogue.
+   * Leg 2: Pokemon Center -> Poke Mart (23, 5) facing UP; Player follows to (24, 5) facing UP. Stop 2 dialogue.
+   * Leg 3: Poke Mart -> Route 30 road (16, 5) facing UP; Player follows to (17, 5) facing UP. Stop 3 dialogue.
+   * Leg 4: Route 30 -> The Sea (10, 7) facing LEFT; Player follows to (10, 6) facing LEFT. Stop 4 dialogue.
+   * Leg 5: The Sea -> Guide Gent's House porch (25, 11) facing LEFT; Player arrives at (24, 11) facing RIGHT. Stop 5 gift dialogue, awards Map Card.
+   * Leg 6: Guide Gent enters house at (25, 9) with DOOR sound. Despawns from Cherrygrove City. Unlocks isCutsceneLocked = false.
+   */
+  const runGuideGentWalkingTour = async (guide: GridEntity) => {
+    isCutsceneLocked = true;
+    player.isMoving = false;
+    player.progress = 0;
+
+    // If player interacted from the left (31, 6), reposition to (32, 7) facing UP so Guide Gent can step LEFT freely
+    if (player.x === 31 && player.y === 6) {
+      player.x = 32;
+      player.y = 7;
+      player.renderX = 32;
+      player.renderY = 7;
+      player.direction = 'UP';
+    }
+
+    const stepSimultaneous = async (
+      guideEntity: GridEntity,
+      guideDir: Direction,
+      follower: GridEntity,
+      followerTarget: { x: number; y: number } | null
+    ) => {
+      const d = GridPhysics.getDirectionDelta(guideDir);
+      const startGx = guideEntity.x;
+      const startGy = guideEntity.y;
+      const nextGx = startGx + d.dx;
+      const nextGy = startGy + d.dy;
+
+      guideEntity.direction = guideDir;
+      guideEntity.targetX = nextGx;
+      guideEntity.targetY = nextGy;
+      guideEntity.isMoving = true;
+      guideEntity.progress = 0;
+
+      const startPx = follower.x;
+      const startPy = follower.y;
+      let nextPx = startPx;
+      let nextPy = startPy;
+
+      if (followerTarget && (followerTarget.x !== startPx || followerTarget.y !== startPy)) {
+        nextPx = followerTarget.x;
+        nextPy = followerTarget.y;
+        if (nextPx > startPx) follower.direction = 'RIGHT';
+        else if (nextPx < startPx) follower.direction = 'LEFT';
+        else if (nextPy > startPy) follower.direction = 'DOWN';
+        else if (nextPy < startPy) follower.direction = 'UP';
+
+        follower.targetX = nextPx;
+        follower.targetY = nextPy;
+        follower.isMoving = true;
+        follower.progress = 0;
+      }
+
+      const stepMs = Math.max(16, Math.round((GridPhysics.BASE_TRAVERSAL_TIME * 1000) / (gameClock.playerSpeed || 1)));
+
+      await new Promise<void>((resolve) => {
+        if (typeof requestAnimationFrame === 'undefined') {
+          guideEntity.x = nextGx;
+          guideEntity.y = nextGy;
+          guideEntity.renderX = nextGx;
+          guideEntity.renderY = nextGy;
+          guideEntity.isMoving = false;
+          guideEntity.progress = 0;
+
+          follower.x = nextPx;
+          follower.y = nextPy;
+          follower.renderX = nextPx;
+          follower.renderY = nextPy;
+          follower.isMoving = false;
+          follower.progress = 0;
+          resolve();
+          return;
+        }
+
+        const t0 = performance.now();
+        const animate = (now: number) => {
+          const p = Math.min(1, (now - t0) / stepMs);
+          guideEntity.progress = p;
+          guideEntity.renderX = startGx + (nextGx - startGx) * p;
+          guideEntity.renderY = startGy + (nextGy - startGy) * p;
+
+          if (follower.isMoving) {
+            follower.progress = p;
+            follower.renderX = startPx + (nextPx - startPx) * p;
+            follower.renderY = startPy + (nextPy - startPy) * p;
+          }
+
+          if (p < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            guideEntity.x = nextGx;
+            guideEntity.y = nextGy;
+            guideEntity.renderX = nextGx;
+            guideEntity.renderY = nextGy;
+            guideEntity.isMoving = false;
+            guideEntity.progress = 0;
+
+            follower.x = nextPx;
+            follower.y = nextPy;
+            follower.renderX = nextPx;
+            follower.renderY = nextPy;
+            follower.isMoving = false;
+            follower.progress = 0;
+            resolve();
+          }
+        };
+        requestAnimationFrame(animate);
+      });
+    };
+
+    const walkLegSteps = async (steps: Direction[], isRetire = false) => {
+      for (const step of steps) {
+        const followerTarget = isRetire ? null : { x: guide.x, y: guide.y };
+        await stepSimultaneous(guide, step, player, followerTarget);
+      }
+    };
+
+    // Leg 1: (32, 6) -> Pokemon Center (29, 5)
+    await walkLegSteps(GUIDE_GENT_TOUR_LEGS[0].steps);
+    guide.direction = 'UP';
+    player.direction = 'UP';
+
+    overworldHUD.openDialogue(
+      GUIDE_GENT_TOUR_LEGS[0].dialoguePages || [],
+      guide.speaker,
+      async () => {
+        // Leg 2: Pokemon Center -> Poke Mart (23, 5)
+        await walkLegSteps(GUIDE_GENT_TOUR_LEGS[1].steps);
+        guide.direction = 'UP';
+        player.direction = 'UP';
+
+        overworldHUD.openDialogue(
+          GUIDE_GENT_TOUR_LEGS[1].dialoguePages || [],
+          guide.speaker,
+          async () => {
+            // Leg 3: Poke Mart -> Route 30 Road (16, 5)
+            await walkLegSteps(GUIDE_GENT_TOUR_LEGS[2].steps);
+            guide.direction = 'UP';
+            player.direction = 'UP';
+
+            overworldHUD.openDialogue(
+              GUIDE_GENT_TOUR_LEGS[2].dialoguePages || [],
+              guide.speaker,
+              async () => {
+                // Leg 4: Route 30 Road -> The Sea (10, 7)
+                await walkLegSteps(GUIDE_GENT_TOUR_LEGS[3].steps);
+                guide.direction = 'LEFT';
+                player.direction = 'LEFT';
+
+                overworldHUD.openDialogue(
+                  GUIDE_GENT_TOUR_LEGS[3].dialoguePages || [],
+                  guide.speaker,
+                  async () => {
+                    // Leg 5: The Sea -> Guide Gent's House porch (25, 11)
+                    await walkLegSteps(GUIDE_GENT_TOUR_LEGS[4].steps);
+                    guide.direction = 'UP';
+                    player.direction = 'UP';
+                    await new Promise((r) => setTimeout(r, 200));
+                    guide.direction = 'LEFT';
+                    player.direction = 'RIGHT';
+
+                    const giftPages = [
+                      "GUIDE GENT: Here... It's my house! Thanks for your company. I'd like you to have this!",
+                      `${playerName}'s POKéGEAR now has a MAP!`,
+                      "GUIDE GENT: POKéGEAR becomes more useful as you add CARDS. I wish you luck on your journey!",
+                    ];
+
+                    overworldHUD.openDialogue(
+                      giftPages,
+                      guide.speaker,
+                      async () => {
+                        storyFlags.add('has_map_card');
+                        if (!inventory.keyItems) inventory.keyItems = [];
+                        if (!inventory.keyItems.includes('MAP CARD')) {
+                          inventory.keyItems.push('MAP CARD');
+                        }
+                        BattleAudio.playOverworldSound('KEY_ITEM');
+                        missionManager.checkStoryFlags(storyFlags);
+                        missionManager.completeMission('S02');
+                        overworldHUD.showToast('🗺️ Received MAP CARD! POKéGEAR can now display the JOHTO TOWN MAP!');
+                        saveCurrentGame();
+
+                        // Leg 6: Guide Gent enters house at (25, 9)
+                        player.direction = 'UP';
+                        await walkLegSteps(GUIDE_GENT_TOUR_LEGS[5].steps, true);
+
+                        BattleAudio.playOverworldSound('DOOR');
+                        if (npcsByMap.cherrygrove_city) {
+                          npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter(
+                            (n) => n.id !== 'cg_guide_gent'
+                          );
+                        }
+                        isCutsceneLocked = false;
+                        saveCurrentGame();
+                      }
+                    );
+                  }
+                );
+              }
+            );
+          }
+        );
+      }
+    );
+  };
+
   handleInteract = () => {
     if (gameState !== 'OVERWORLD' || isCutsceneLocked || player.isMoving || overworldHUD.isDialogueOpen()) return;
     const currentMap = mapManager.getCurrentMap();
@@ -1902,7 +2119,7 @@ async function bootstrap() {
           return;
         }
 
-        // Cherrygrove City Guide Gent tour & Map Card grant (Mission S02)
+        // Cherrygrove City Guide Gent authentic scripted walking tour & Map Card grant (Mission S02)
         if (targetNpc.action === 'GUIDE_GENT_EVENT') {
           if (storyFlags.has('has_map_card')) {
             overworldHUD.openDialogue(
@@ -1914,28 +2131,14 @@ async function bootstrap() {
             return;
           }
 
-          const tourPages = [
+          const introPages = [
             "GUIDE GENT: You're a rookie trainer, aren't you? I can tell!",
-            "That's OK! Everyone is a rookie at some point! If you'd like, I can teach you a few things. OK, then! Follow me!",
-            "This is a POKéMON CENTER. They heal your POKéMON in no time at all. You'll be relying on them a lot, so you ought to know about them.",
-            "This is a POKé MART. They sell BALLS for catching wild POKéMON and other useful items.",
-            "ROUTE 30 is out this way. Trainers will be battling their prized POKéMON there.",
-            "This is the sea, as you can see. Some POKéMON are found only in water.",
-            "Here... It's my house! Thanks for your company. I'd like you to have this!",
-            `${playerName}'s POKéGEAR now has a MAP!`,
+            "That's OK! Everyone is a rookie at some point! If you'd like, I can teach you a few things.",
+            'OK, then! Follow me!',
           ];
 
-          overworldHUD.openDialogue(tourPages, targetNpc.speaker, () => {
-            storyFlags.add('has_map_card');
-            if (!inventory.keyItems) inventory.keyItems = [];
-            if (!inventory.keyItems.includes('MAP CARD')) {
-              inventory.keyItems.push('MAP CARD');
-            }
-            BattleAudio.playOverworldSound('KEY_ITEM');
-            missionManager.checkStoryFlags(storyFlags);
-            missionManager.completeMission('S02');
-            saveCurrentGame();
-            overworldHUD.showToast('🗺️ Received MAP CARD! POKéGEAR can now display the JOHTO TOWN MAP!');
+          overworldHUD.openDialogue(introPages, targetNpc.speaker, async () => {
+            await runGuideGentWalkingTour(targetNpc);
           });
           return;
         }

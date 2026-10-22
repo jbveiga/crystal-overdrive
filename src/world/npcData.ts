@@ -49,6 +49,162 @@ export const makeNpc = (
   trainerTeam: opts.trainerTeam,
 });
 
+export interface GuideGentTourLegDef {
+  leg: number;
+  name: string;
+  steps: Direction[];
+  guideEnd: { x: number; y: number; direction: Direction };
+  playerEnd: { x: number; y: number; direction: Direction };
+  dialoguePages?: string[];
+  isRetireLeg?: boolean;
+}
+
+export const GUIDE_GENT_TOUR_LEGS: GuideGentTourLegDef[] = [
+  {
+    leg: 1,
+    name: 'Pokemon Center',
+    steps: ['LEFT', 'LEFT', 'UP', 'LEFT'],
+    guideEnd: { x: 29, y: 5, direction: 'UP' },
+    playerEnd: { x: 30, y: 5, direction: 'UP' },
+    dialoguePages: [
+      "GUIDE GENT: This is a POKéMON CENTER. They heal your POKéMON in no time at all. You'll be relying on them a lot, so you ought to know about them.",
+    ],
+  },
+  {
+    leg: 2,
+    name: 'Pokemon Mart',
+    steps: ['LEFT', 'LEFT', 'LEFT', 'LEFT', 'LEFT', 'LEFT'],
+    guideEnd: { x: 23, y: 5, direction: 'UP' },
+    playerEnd: { x: 24, y: 5, direction: 'UP' },
+    dialoguePages: [
+      "GUIDE GENT: This is a POKéMON MART. They sell BALLS for catching wild POKéMON and other useful items.",
+    ],
+  },
+  {
+    leg: 3,
+    name: 'Route 30 Road',
+    steps: ['LEFT', 'LEFT', 'LEFT', 'LEFT', 'LEFT', 'LEFT', 'LEFT'],
+    guideEnd: { x: 16, y: 5, direction: 'UP' },
+    playerEnd: { x: 17, y: 5, direction: 'UP' },
+    dialoguePages: [
+      "GUIDE GENT: ROUTE 30 is out this way. Trainers will be battling their prized POKéMON there.",
+    ],
+  },
+  {
+    leg: 4,
+    name: 'The Sea',
+    steps: ['LEFT', 'LEFT', 'LEFT', 'DOWN', 'LEFT', 'LEFT', 'LEFT', 'DOWN'],
+    guideEnd: { x: 10, y: 7, direction: 'LEFT' },
+    playerEnd: { x: 10, y: 6, direction: 'LEFT' },
+    dialoguePages: [
+      "GUIDE GENT: This is the sea, as you can see. Some POKéMON are found only in water.",
+    ],
+  },
+  {
+    leg: 5,
+    name: "Guide Gent's House Porch",
+    steps: [
+      'DOWN',
+      'DOWN',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'DOWN',
+      'DOWN',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+      'RIGHT',
+    ],
+    guideEnd: { x: 25, y: 11, direction: 'LEFT' },
+    playerEnd: { x: 24, y: 11, direction: 'RIGHT' },
+    dialoguePages: [
+      "GUIDE GENT: Here... It's my house! Thanks for your company. I'd like you to have this!",
+    ],
+  },
+  {
+    leg: 6,
+    name: 'Retire Inside House',
+    steps: ['UP', 'UP'],
+    guideEnd: { x: 25, y: 9, direction: 'UP' },
+    playerEnd: { x: 24, y: 11, direction: 'UP' },
+    isRetireLeg: true,
+  },
+];
+
+export function calculateTourLegCoordinates(
+  initialGuidePos: { x: number; y: number } = { x: 32, y: 6 },
+  initialPlayerPos: { x: number; y: number } = { x: 32, y: 7 },
+  legs: GuideGentTourLegDef[] = GUIDE_GENT_TOUR_LEGS
+): Array<{
+  leg: number;
+  name: string;
+  guideEnd: { x: number; y: number; direction: Direction };
+  playerEnd: { x: number; y: number; direction: Direction };
+  path: Array<{
+    guide: { x: number; y: number };
+    player: { x: number; y: number };
+  }>;
+}> {
+  const deltas: Record<Direction, { dx: number; dy: number }> = {
+    UP: { dx: 0, dy: -1 },
+    DOWN: { dx: 0, dy: 1 },
+    LEFT: { dx: -1, dy: 0 },
+    RIGHT: { dx: 1, dy: 0 },
+  };
+
+  let curGuide = { ...initialGuidePos };
+  let curPlayer = { ...initialPlayerPos };
+  const results: Array<{
+    leg: number;
+    name: string;
+    guideEnd: { x: number; y: number; direction: Direction };
+    playerEnd: { x: number; y: number; direction: Direction };
+    path: Array<{
+      guide: { x: number; y: number };
+      player: { x: number; y: number };
+    }>;
+  }> = [];
+
+  for (const leg of legs) {
+    const path: Array<{
+      guide: { x: number; y: number };
+      player: { x: number; y: number };
+    }> = [];
+
+    for (const step of leg.steps) {
+      const d = deltas[step];
+      const nextGuide = { x: curGuide.x + d.dx, y: curGuide.y + d.dy };
+      if (!leg.isRetireLeg) {
+        curPlayer = { x: curGuide.x, y: curGuide.y };
+      }
+      curGuide = nextGuide;
+      path.push({
+        guide: { ...curGuide },
+        player: { ...curPlayer },
+      });
+    }
+
+    results.push({
+      leg: leg.leg,
+      name: leg.name,
+      guideEnd: { ...curGuide, direction: leg.guideEnd.direction },
+      playerEnd: { ...curPlayer, direction: leg.playerEnd.direction },
+      path,
+    });
+  }
+
+  return results;
+}
+
 export interface DaySiblingInfo {
   id: string;
   name: string;
