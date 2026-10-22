@@ -25,6 +25,7 @@ export interface TrainerPokemonSpec {
   speciesId: string;
   level: number;
   moves?: string[];
+  heldItem?: string;
 }
 
 export interface GridEntity {

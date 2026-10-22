@@ -27,6 +27,8 @@ import { StorageManager, BoxManager } from './world/StorageManager';
 import { BoxManagementUI } from './ui/BoxManagementUI';
 import { TownMapUI } from './ui/TownMapUI';
 import { RuinsPuzzleModalUI } from './ui/RuinsPuzzleModalUI';
+import { DayCareManager } from './world/DayCareManager';
+import { DayCareModalUI } from './ui/DayCareModalUI';
 import type {
   MapData,
   WarpEvent,
@@ -584,6 +586,7 @@ async function bootstrap() {
       seenSpecies: Array.from(seenSpecies),
       options: gameOptions,
       missions: missionManager.serialize(),
+      dayCare: dayCareManager.getState(),
     };
     await saveManager.saveGame(saveData);
     console.log('💾 Game state successfully saved to IndexedDB.');
@@ -639,6 +642,8 @@ async function bootstrap() {
   const boxManagementUI = new BoxManagementUI('modal-container');
   const townMapUI = new TownMapUI({ containerId: 'modal-container' });
   const ruinsPuzzleModalUI = new RuinsPuzzleModalUI('modal-container');
+  const dayCareManager = new DayCareManager(existingSave?.dayCare);
+  const dayCareModalUI = new DayCareModalUI(dayCareManager, 'modal-container');
   const visitedMaps = new Set<string>([initialMapId]);
 
   let handleInteract = () => {};
@@ -768,7 +773,8 @@ async function bootstrap() {
     boxManagementUI.isOpen() ||
     namingModalUI.isOpen() ||
     townMapUI.isOpen() ||
-    ruinsPuzzleModalUI.isOpen();
+    ruinsPuzzleModalUI.isOpen() ||
+    dayCareModalUI.isOpen();
 
   overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
@@ -778,6 +784,10 @@ async function bootstrap() {
       return audioManager.toggleMute();
     },
     onMenuToggle: () => {
+      if (dayCareModalUI.isOpen()) {
+        dayCareModalUI.close();
+        return;
+      }
       if (ruinsPuzzleModalUI.isOpen()) {
         ruinsPuzzleModalUI.close();
         return;
@@ -1710,18 +1720,20 @@ async function bootstrap() {
 
   const buildTrainerTeamInstances = (trainer: GridEntity): PokemonInstance[] => {
     if (trainer.trainerTeam && trainer.trainerTeam.length > 0) {
-      return trainer.trainerTeam.map((spec) =>
-        PokemonFactory.create(spec.speciesId, spec.level, spec.moves)
-      );
+      return trainer.trainerTeam.map((spec) => {
+        const pkmn = PokemonFactory.create(spec.speciesId, spec.level, spec.moves);
+        if (spec.heldItem) pkmn.heldItem = spec.heldItem;
+        return pkmn;
+      });
     }
     if (trainer.trainerPokemon) {
-      return [
-        PokemonFactory.create(
-          trainer.trainerPokemon.speciesId,
-          trainer.trainerPokemon.level,
-          trainer.trainerPokemon.moves
-        ),
-      ];
+      const pkmn = PokemonFactory.create(
+        trainer.trainerPokemon.speciesId,
+        trainer.trainerPokemon.level,
+        trainer.trainerPokemon.moves
+      );
+      if (trainer.trainerPokemon.heldItem) pkmn.heldItem = trainer.trainerPokemon.heldItem;
+      return [pkmn];
     }
     return [];
   };
@@ -1812,8 +1824,32 @@ async function bootstrap() {
         isTrainer: true,
         trainerName: trainer.trainerName || trainer.speaker || 'Trainer',
         trainerTeam: team,
+        onVictory: () => {
+          handleTrainerDefeatRewards(trainer);
+        },
       });
     });
+  };
+
+  const handleTrainerDefeatRewards = (trainer: GridEntity) => {
+    if (trainer.trainerId === 'camper_todd') {
+      storyFlags.add('TODD_REGISTERED');
+      overworldHUD.showToast("📱 Registered Todd's number in Pokégear!");
+      saveCurrentGame();
+    } else if (trainer.trainerId === 'picnicker_gina') {
+      storyFlags.add('GINA_REGISTERED');
+      overworldHUD.showToast("📱 Registered Gina's number in Pokégear!");
+      saveCurrentGame();
+    } else if (trainer.trainerId === 'cooltrainer_kate') {
+      if (!storyFlags.has('KATE_DEFEATED_REWARD')) {
+        storyFlags.add('KATE_DEFEATED_REWARD');
+        if (!inventory.items) inventory.items = {};
+        inventory.items['soft_sand'] = (inventory.items['soft_sand'] || 0) + 1;
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        overworldHUD.showToast('✨ Received SOFT SAND from Cooltrainer Kate!');
+        saveCurrentGame();
+      }
+    }
   };
 
   /**
@@ -2995,6 +3031,106 @@ async function bootstrap() {
           return;
         }
 
+        // Day-Care Man: Odd Egg Gift (Crystal Exclusive)
+        if (targetNpc.id === 'day_care_man') {
+          if (!storyFlags.has('HAS_ODD_EGG')) {
+            if (playerParty.length >= 6) {
+              overworldHUD.openDialogue(
+                [
+                  "DAY-CARE MAN: I'm the DAY-CARE MAN! We were shocked to find an EGG in the meadow!",
+                  "You've no room for this in your party. Make room using a PC and come right back!",
+                ],
+                targetNpc.speaker
+              );
+              return;
+            }
+
+            const oddEgg = PokemonFactory.createOddEgg();
+            playerParty.push(oddEgg);
+            storyFlags.add('HAS_ODD_EGG');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                "DAY-CARE MAN: I'm the DAY-CARE MAN! We were shocked to find a strange EGG in the meadow!",
+                "Wouldn't you like this EGG? Please take good care of it!",
+                `${playerName} received the ODD EGG!`,
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('🥚 Received the ODD EGG from the Day-Care Man!');
+              }
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              "DAY-CARE MAN: Are your POKéMON growing strong?",
+              "Raising POKéMON from EGGS creates unbreakable bonds!",
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        // Day-Care Lady: Day-Care Management Overlay (Google Stitch Neo-Kanto Protocol)
+        if (targetNpc.id === 'day_care_lady') {
+          dayCareModalUI.open({
+            onClose: () => {},
+            onDeposit: (pkmn) => {
+              if (pkmn.isEgg) return false;
+              if (playerParty.length <= 1) return false;
+              const slotIdx = dayCareManager.deposit(pkmn);
+              if (slotIdx >= 0) {
+                const idx = playerParty.indexOf(pkmn);
+                if (idx >= 0) playerParty.splice(idx, 1);
+                saveCurrentGame();
+                return true;
+              }
+              return false;
+            },
+            onWithdraw: (slotIdx) => {
+              const slot = dayCareManager.getSlot(slotIdx);
+              if (!slot) return null;
+              const fee = DayCareManager.calculateFee(slot);
+              if (inventory.money < fee || playerParty.length >= 6) return null;
+              inventory.money -= fee;
+              const pkmn = dayCareManager.withdraw(slotIdx);
+              if (pkmn) {
+                playerParty.push(pkmn);
+                saveCurrentGame();
+              }
+              return pkmn;
+            },
+            onCollectEgg: () => {
+              if (playerParty.length >= 6) return null;
+              const egg = dayCareManager.collectEgg();
+              if (egg) {
+                playerParty.push(egg);
+                saveCurrentGame();
+                overworldHUD.showToast('🥚 Received an Egg from the Day-Care!');
+              }
+              return egg;
+            },
+            getPlayerMoney: () => inventory.money,
+            getPlayerParty: () => playerParty,
+          });
+          return;
+        }
+
+        // Officer Keith: Night-time only challenge guard
+        if (targetNpc.id === 'officer_keith' && gameClock.getTimeOfDay() !== 'NIGHT') {
+          overworldHUD.openDialogue(
+            [
+              "OFFICER KEITH: I'm on patrol for suspicious individuals.",
+              "It's safe now, but trouble stirs after dark.",
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
         // Trainer NPC spoken to directly before being defeated
         if (
           targetNpc.action === 'TRAINER_BATTLE' &&
@@ -3014,6 +3150,9 @@ async function bootstrap() {
               isTrainer: true,
               trainerName: targetNpc.trainerName || targetNpc.speaker || 'Trainer',
               trainerTeam: team,
+              onVictory: () => {
+                handleTrainerDefeatRewards(targetNpc);
+              },
             });
           });
           return;
@@ -4321,7 +4460,10 @@ async function bootstrap() {
             refreshItemfinderRadar(true);
           }
 
-          // Step-based Egg Hatching (Ticket 5.4)
+          // Advance Day-Care growth & egg checks
+          dayCareManager.onStepTaken();
+
+          // Step-based Egg Hatching (Ticket 5.4 & TICKET-WORLD-ROUTE34-DAYCARE-01)
           for (let i = 0; i < playerParty.length; i++) {
             const p = playerParty[i];
             if (p.isEgg && typeof p.eggSteps === 'number') {
@@ -4329,29 +4471,54 @@ async function bootstrap() {
               if (p.eggSteps <= 0) {
                 p.isEgg = false;
                 p.eggSteps = 0;
-                p.nickname = 'TOGEPI';
-                p.moves = [
-                  { moveId: 'metronome', currentPp: 10, maxPp: 10 },
-                  { moveId: 'charm', currentPp: 20, maxPp: 20 },
-                ];
-                const hatchedTemplate = PokemonFactory.create(p.speciesId || 'togepi', 1, [
-                  'metronome',
-                  'charm',
-                ]);
+
+                const oddEggMoves: Record<string, string[]> = {
+                  pichu: ['thundershock', 'charm', 'dizzypunch'],
+                  cleffa: ['pound', 'charm', 'dizzypunch'],
+                  igglybuff: ['sing', 'charm', 'dizzypunch'],
+                  tyrogue: ['tackle', 'dizzypunch'],
+                  smoochum: ['pound', 'lick', 'dizzypunch'],
+                  elekid: ['quickattack', 'leer', 'dizzypunch'],
+                  magby: ['ember', 'leer', 'dizzypunch'],
+                };
+
+                const isOdd = p.isOddEgg || Boolean(oddEggMoves[p.speciesId]);
+                const hatchSpecies = p.speciesId || (isOdd ? 'pichu' : 'togepi');
+                const movesToSet = isOdd
+                  ? oddEggMoves[hatchSpecies] || ['tackle', 'dizzypunch']
+                  : ['metronome', 'charm'];
+
+                if (!isOdd) {
+                  p.nickname = 'TOGEPI';
+                } else {
+                  p.nickname = hatchSpecies.toUpperCase();
+                }
+                p.moves = movesToSet.map((m) => {
+                  const d = PokemonFactory.getMoveData(m);
+                  return { moveId: m, currentPp: d.pp, maxPp: d.pp };
+                });
+
+                const hatchedTemplate = PokemonFactory.create(hatchSpecies, 1, movesToSet);
                 p.baseStats = hatchedTemplate.baseStats;
                 p.stats = hatchedTemplate.stats;
                 p.currentHp = hatchedTemplate.stats.hp;
-                seenSpecies.add(p.speciesId || 'togepi');
+                seenSpecies.add(hatchSpecies);
+
                 player.isMoving = false;
                 player.progress = 0;
-                BattleAudio.playCry('togepi');
+                BattleAudio.playCry(hatchSpecies);
                 BattleAudio.playOverworldSound('KEY_ITEM');
+
+                const hatchMsg = isOdd
+                  ? `Huh? The EGG hatched! ... A lively ${p.nickname} hatched from the ODD EGG! It knows DIZZY PUNCH!`
+                  : 'Huh? The EGG hatched! ... A lively TOGEPI hatched from the EGG!';
+
                 overworldHUD.openDialogue(
-                  ['Huh? The EGG hatched! ... A lively TOGEPI hatched from the EGG!'],
+                  [hatchMsg],
                   '🥚 MYSTERY EGG',
                   () => {
                     saveCurrentGame();
-                    overworldHUD.showToast('🐣 TOGEPI hatched from the Mystery Egg!');
+                    overworldHUD.showToast(`🐣 ${p.nickname} hatched from the Egg!`);
                   }
                 );
                 return;
@@ -4369,8 +4536,12 @@ async function bootstrap() {
             mapManager.getTileType
           );
           if (spottedTrainer) {
-            runTrainerSightSequence(spottedTrainer);
-            return;
+            if (spottedTrainer.id === 'officer_keith' && gameClock.getTimeOfDay() !== 'NIGHT') {
+              // Officer Keith only challenges at night
+            } else {
+              runTrainerSightSequence(spottedTrainer);
+              return;
+            }
           }
 
           // Wild Encounter Check in Tall Grass (tile type 2) or Cave / Ruins floors (tile type 0)

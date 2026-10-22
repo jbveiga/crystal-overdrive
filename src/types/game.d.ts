@@ -238,11 +238,29 @@ export interface PokemonInstance {
   catchRate: number;
   isEgg?: boolean;
   eggSteps?: number;
+  isOddEgg?: boolean;
+  isShiny?: boolean;
   friendship?: number; // 0-255 (default 70 for wild caught, 120 for hatched eggs)
   heldItem?: string;
   ivs?: Partial<BaseStats>;
   evs?: Partial<BaseStats>;
   nature?: string;
+}
+
+export type OddEggCandidate =
+  | 'pichu'
+  | 'cleffa'
+  | 'igglybuff'
+  | 'tyrogue'
+  | 'smoochum'
+  | 'elekid'
+  | 'magby';
+
+export interface OddEggGrant {
+  isGranted: boolean;
+  speciesCandidate: OddEggCandidate;
+  specialMove: 'Dizzy Punch';
+  isShinyChance: number; // 14% Gen 2 crystal canon
 }
 
 export type EvolutionTriggerType = 'LEVEL_UP' | 'ITEM' | 'FRIENDSHIP';

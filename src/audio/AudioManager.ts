@@ -34,6 +34,8 @@ const MAP_BGM_TABLE: Record<string, BgmTrackId> = {
   route_31: 'bgm_route_29',
   route_32: 'bgm_route_29',
   route_33: 'bgm_route_29',
+  route_34: 'bgm_route_29',
+  day_care: 'bgm_route_29',
   mr_pokemons_house: 'bgm_route_29',
   route_30_berry_house: 'bgm_route_29',
 

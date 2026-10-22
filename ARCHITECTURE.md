@@ -22,6 +22,7 @@ flowchart TD
         BM["BagAndMartUI"]
         BMUI["BoxManagementUI"]
         MLUI["MissionLogUI"]
+        DCUI["DayCareModalUI"]
     end
 
     subgraph Render_Layer["Render Layer (PixiJS v8 WebGL/WebGPU)"]
@@ -43,6 +44,7 @@ flowchart TD
         EVM["EvolutionManager (Levels, Stones, Link Cable)"]
         OIM["OverworldItemManager (Balls, Hidden, Trees)"]
         MSM["MissionManager (Main & Side Quests)"]
+        DCM["DayCareManager (2 Slots, Compatibility, Fee Formula, Eggs)"]
     end
 
     subgraph Audio_Layer["Audio Layer (Howler.js & Web Audio API)"]
@@ -338,7 +340,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `RuinsPuzzleModalUI.ts` / `RuinsOfAlph` | `tests/RuinsPuzzleModalUI.test.ts` | 8 | ✅ Covered | Ruins of Alph 16-tile Kabuto sliding puzzle mini-game under Google Stitch Neo-Kanto Protocol: 4x4 matrix, mathematically solvable permutation scrambling, adjacent/directional sliding, reset & auto-solve mechanisms, victory sequence with screen shake tremor, story flag triggers (`unown_awakened_kabuto`, `EVENT_SOLVED_KABUTO_PUZZLE`, `EVENT_MADE_UNOWN_APPEAR_IN_RUINS`), trapdoor floor collapse at (4, 6) warping to Inner Chamber at safe landing coordinate (10, 11), wild Unown encounter awakening, and Research Center Unown Dex upgrade (TICKET-MINIGAME-RUINS-SLIDING-PUZZLE-01). |
 | `TransitionSync` / `OverworldRenderer.ts` | `tests/TransitionSync.test.ts` | 10 | ✅ Covered | Zero-texture-flash and black-veil transition synchronization: doorway fade opaque lock (`alpha = 1.0`) during async texture preloading (`ensureMapTilesLoaded`), zero fallback grass underlay on non-outdoor cave and indoor maps (`kt_`, `in_`), authentic asset existence verification for caves and ruins, and strict pre-render hydration order at boot, save continue, new game, and whiteout respawn (BUGFIX-ASYNC-TILE-TEXTURE-FADE-SYNC-01). |
 | `BattleSpeedAndPacing` / `BattleHUD` / `OverworldHUD` / `BattleRenderer` | `tests/BattleSpeedAndPacing.test.ts` | 12 | ✅ Covered | Battle 3x speed ceiling, interactive speed display cycling (1x/2x/3x) with crimson #dc2626 button styling, 12ms/char + 500ms dialogue typewriter pacing decoupled from speed multipliers across BattleHUD and OverworldHUD, and snappy BattleRenderer intro animation slide-in (0.30s), flash (0.05s), and 2-frame cry bounce (0.065s) (TICKET-UX-BATTLE-3X-SPEED-AND-PACING-01). |
-| **Current Baseline** | **35 Suites** | **348 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `DayCareManager.ts` / `DayCareModalUI.ts` / `Route34` | `tests/Route34DayCare.test.ts` | 21 | ✅ Covered | Route 34, Day-Care Center, and Odd Egg 10-Point Map Delivery Standard: reciprocal warps (`route_34`, `route_34_ilex_forest_gate`, `day_care`), 100% NPC walkability and trainer specifications (7 route trainers, 3 coastal inlet sisters, Day-Care Man & Lady), authentic Odd Egg candidate pool (7 baby species, shiny chance, party full check, flag `HAS_ODD_EGG`), Officer Keith night-only encounter, reward items (Soft Sand, Pink Bow), item balls & buried items, signposts & trainer tips, zone BGM (`bgm_route_29`), pure domain `DayCareManager` (2-slot deposit/withdrawal, level-up fee calculation, Gen 2 breeding compatibility tiers, step counting, egg generation), and interactive Google Stitch Neo-Kanto `DayCareModalUI` console with desktop and mobile responsive viewports (TICKET-WORLD-ROUTE34-DAYCARE-01). |
+| **Current Baseline** | **36 Suites** | **369 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)
 - `BattleStateMachine.ts`: Dedicated suite for turn priorities, 2-turn roamer flee rule, trapped state, and faint flows.

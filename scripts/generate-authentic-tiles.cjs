@@ -424,6 +424,13 @@ function buildMapFromBlk({
     collisionGrid[31 * width + 11] = 2;
   }
 
+  // For route_34, ensure canonical trainer coordinates are walkable (0)
+  if (id === 'route_34') {
+    collisionGrid[20 * width + 11] = 0; // Youngster Ian
+    collisionGrid[26 * width + 10] = 0; // Picnicker Gina
+    collisionGrid[28 * width + 18] = 0; // Pokefan Brandon
+  }
+
   // Ensure all warp door/carpet coordinates are walkable (0)
   for (const w of warps) {
     collisionGrid[w.y * width + w.x] = 0;
@@ -2012,13 +2019,22 @@ buildMapFromBlk({
       x: 12,
       y: 6,
       speaker: '🚏 ROUTE SIGN',
-      pages: ['ROUTE 34', 'NORTH TO GOLDENROD CITY'],
+      pages: ['ROUTE 34: GOLDENROD CITY - AZALEA TOWN', 'ILEX FOREST SOMEWHERE BETWEEN'],
     },
     {
       x: 10,
       y: 13,
       speaker: '🏡 DAY-CARE SIGN',
       pages: ['POKéMON DAY-CARE', 'LET US RAISE YOUR POKéMON!'],
+    },
+    {
+      x: 13,
+      y: 33,
+      speaker: '📋 TRAINER TIPS',
+      pages: [
+        'TRAINER TIPS: BERRY trees grow new BERRIES every day.',
+        'Make a note of which trees bear which BERRIES.',
+      ],
     },
   ],
   grassEncounters: [

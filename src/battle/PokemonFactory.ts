@@ -7,6 +7,7 @@ import type {
   StatusCondition,
   StatStages,
   ExpShareMode,
+  OddEggCandidate,
 } from '../types/game';
 
 export interface PartyExpAward {
@@ -250,6 +251,37 @@ export class PokemonFactory {
       moves: [],
       isEgg: true,
       eggSteps: hatchSteps,
+    };
+  }
+
+  public static readonly ODD_EGG_CANDIDATES: readonly OddEggCandidate[] = [
+    'pichu',
+    'cleffa',
+    'igglybuff',
+    'tyrogue',
+    'smoochum',
+    'elekid',
+    'magby',
+  ];
+
+  /**
+   * Instantiates the Crystal-exclusive Odd Egg (Ticket TICKET-WORLD-ROUTE34-DAYCARE-01).
+   * Generates one of the 7 baby Pokémon candidates with 14% shiny chance.
+   */
+  public static createOddEgg(
+    candidateSpeciesId?: OddEggCandidate,
+    isShinyChance: number = 0.14,
+    hatchSteps: number = 256
+  ): PokemonInstance {
+    const speciesId =
+      candidateSpeciesId ??
+      this.ODD_EGG_CANDIDATES[Math.floor(Math.random() * this.ODD_EGG_CANDIDATES.length)];
+    const egg = this.createEgg(speciesId, hatchSteps);
+    const isShiny = Math.random() < isShinyChance;
+    return {
+      ...egg,
+      isOddEgg: true,
+      isShiny,
     };
   }
 

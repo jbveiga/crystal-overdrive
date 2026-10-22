@@ -13,6 +13,7 @@ import type {
   PokemonStorageState,
 } from '../types/game';
 import { StorageManager } from '../world/StorageManager';
+import type { DayCareState } from '../world/DayCareManager';
 
 export interface SaveData {
   version: number;
@@ -52,6 +53,7 @@ export interface SaveData {
   collectedItemFlags?: string[];
   harvestedFruitTrees?: string[];
   fruitTreePicks?: Record<string, number>;
+  dayCare?: DayCareState;
 }
 
 const DB_NAME = 'crystal-overdrive-db';
