@@ -1,8 +1,9 @@
 import type { SpeedMultiplier, TouchControlStyle, ExpShareMode } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
 import { PokemonFactory } from '../battle/PokemonFactory';
+import { Dex } from '@pkmn/dex';
 
-const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = [
+export const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = [
   { id: 'cyndaquil', name: 'Cyndaquil', types: ['Fire'] },
   { id: 'sentret', name: 'Sentret', types: ['Normal'] },
   { id: 'pidgey', name: 'Pidgey', types: ['Normal', 'Flying'] },
@@ -28,6 +29,262 @@ const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = 
   { id: 'entei', name: 'Entei', types: ['Fire'] },
   { id: 'suicune', name: 'Suicune', types: ['Water'] },
 ];
+
+export interface DexSpeciesData {
+  num: number;
+  id: string;
+  name: string;
+  types: string[];
+  baseStats: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
+  bst: number;
+  weightkg: number;
+  heightm: number;
+  category: string;
+  lore: string;
+  gen: number;
+}
+
+const CANONICAL_SPECIES_DATA: Record<string, { category: string; heightm: number; lore: string }> = {
+  chikorita: {
+    category: 'Leaf Pokémon',
+    heightm: 0.9,
+    lore: 'A sweet aroma gently wafts from the leaf on its head. It is docile and loves to soak up the sun.',
+  },
+  bayleef: {
+    category: 'Leaf Pokémon',
+    heightm: 1.2,
+    lore: 'The scent of spices comes from around its neck. Somehow, sniffing it makes you want to fight.',
+  },
+  meganium: {
+    category: 'Herb Pokémon',
+    heightm: 1.8,
+    lore: 'The aroma that rises from its petals contains a substance that calms aggressive feelings.',
+  },
+  cyndaquil: {
+    category: 'Fire Mouse Pokémon',
+    heightm: 0.5,
+    lore: 'It is timid, and always curls itself up into a ball. If attacked, it flares up its back for protection.',
+  },
+  quilava: {
+    category: 'Volcano Pokémon',
+    heightm: 0.9,
+    lore: 'Be careful if it turns its back during battle. It means that it will attack with searing fire on its back.',
+  },
+  typhlosion: {
+    category: 'Volcano Pokémon',
+    heightm: 1.7,
+    lore: 'If its rage peaks, it becomes so hot that anything that touches it will instantly go up in flames.',
+  },
+  totodile: {
+    category: 'Big Jaw Pokémon',
+    heightm: 0.6,
+    lore: 'It is small but rough and tough. It will bite anything that moves in front of it without hesitation.',
+  },
+  croconaw: {
+    category: 'Big Jaw Pokémon',
+    heightm: 1.1,
+    lore: 'The tips of its fangs are slanted backward. Once those fangs clamp down, prey has no hope of escape.',
+  },
+  feraligatr: {
+    category: 'Big Jaw Pokémon',
+    heightm: 2.3,
+    lore: 'It is tough to hold back when it attacks. It swings its massive arms to bring down its opponents.',
+  },
+  sentret: {
+    category: 'Scout Pokémon',
+    heightm: 0.8,
+    lore: 'A very cautious Pokémon, it raises itself up on its tail to get a better view of its surroundings.',
+  },
+  furret: {
+    category: 'Long Body Pokémon',
+    heightm: 1.8,
+    lore: 'It makes a nest to suit its long and skinny body. The nest is impossible for other Pokémon to enter.',
+  },
+  hoothoot: {
+    category: 'Owl Pokémon',
+    heightm: 0.7,
+    lore: 'It always stands on one foot. It changes feet so fast, the movement can rarely be seen.',
+  },
+  noctowl: {
+    category: 'Owl Pokémon',
+    heightm: 1.6,
+    lore: 'Its eyes are specially adapted. They concentrate even faint light and enable it to see in the dark.',
+  },
+  ledyba: {
+    category: 'Five Star Pokémon',
+    heightm: 1.0,
+    lore: 'It is very timid. It will be afraid to move if it is alone. But it will be active if it is in a group.',
+  },
+  spinarak: {
+    category: 'String Spit Pokémon',
+    heightm: 0.5,
+    lore: 'It lies still in the same pose for days in its web, waiting for its unsuspecting prey to wander close.',
+  },
+  pidgey: {
+    category: 'Tiny Bird Pokémon',
+    heightm: 0.3,
+    lore: 'It usually hides in tall grass. Because it dislikes fighting, it protects itself by kicking up sand.',
+  },
+  pidgeotto: {
+    category: 'Bird Pokémon',
+    heightm: 1.1,
+    lore: 'It has outstanding vision. However high it flies, it is able to distinguish the movements of its prey.',
+  },
+  spearow: {
+    category: 'Tiny Bird Pokémon',
+    heightm: 0.3,
+    lore: 'It flaps its short wings diligently to fly among wild grass while searching for insects.',
+  },
+  rattata: {
+    category: 'Mouse Pokémon',
+    heightm: 0.3,
+    lore: 'Bites anything when it attacks. Small and very quick, it is a common sight in places across Johto.',
+  },
+  bellsprout: {
+    category: 'Flower Pokémon',
+    heightm: 0.7,
+    lore: 'Even though its body is extremely skinny, it is blindingly fast when catching its prey.',
+  },
+  geodude: {
+    category: 'Rock Pokémon',
+    heightm: 0.4,
+    lore: 'Most people do not notice, but when you look closely at rocks along paths, they may be Geodude.',
+  },
+  gastly: {
+    category: 'Gas Pokémon',
+    heightm: 1.3,
+    lore: 'Almost invisible, this gaseous Pokémon cloaks the target and puts it to sleep without warning.',
+  },
+  zubat: {
+    category: 'Bat Pokémon',
+    heightm: 0.8,
+    lore: 'Capable of flying safely in dark places, it emits ultrasonic cries to check for any obstacles.',
+  },
+  slowpoke: {
+    category: 'Dopey Pokémon',
+    heightm: 1.2,
+    lore: 'It is always vacantly lost in thought, but nobody knows what it is thinking about in Slowpoke Well.',
+  },
+  mareep: {
+    category: 'Wool Pokémon',
+    heightm: 0.6,
+    lore: 'Its fleece grows continually. In summer, the fleece is sheared, but it grows back in a week.',
+  },
+  marill: {
+    category: 'Aqua Mouse Pokémon',
+    heightm: 0.4,
+    lore: 'The tip of its tail, which contains oil lighter than water, lets it swim without drowning.',
+  },
+  sudowoodo: {
+    category: 'Imitation Pokémon',
+    heightm: 1.2,
+    lore: 'Although it always pretends to be a tree, its composition is closer to a rock than a plant.',
+  },
+  togepi: {
+    category: 'Spike Ball Pokémon',
+    heightm: 0.3,
+    lore: 'The shell seems to be filled with joy. It is said that it will share good luck when treated kindly.',
+  },
+  scyther: {
+    category: 'Mantis Pokémon',
+    heightm: 1.5,
+    lore: 'It slashes through grass with its sharp scythes, moving too fast for the human eye to track.',
+  },
+  heracross: {
+    category: 'Single Horn Pokémon',
+    heightm: 1.5,
+    lore: 'Usually docile, but if disturbed while sipping honey, it chases off intruders with its great horn.',
+  },
+  raikou: {
+    category: 'Thunder Pokémon',
+    heightm: 1.9,
+    lore: 'The rain clouds it carries let it fire thunderbolts at will. They say that it descended with lightning.',
+  },
+  entei: {
+    category: 'Volcano Pokémon',
+    heightm: 2.1,
+    lore: 'Volcanoes erupt when it barks. Unable to restrain its extreme power, it races headlong around the land.',
+  },
+  suicune: {
+    category: 'Aurora Pokémon',
+    heightm: 2.0,
+    lore: 'Said to be the reincarnation of north winds, it can instantly purify filthy, murky water.',
+  },
+  pikachu: {
+    category: 'Mouse Pokémon',
+    heightm: 0.4,
+    lore: 'When several of these Pokémon gather, their electricity could build and cause lightning storms.',
+  },
+  bulbasaur: {
+    category: 'Seed Pokémon',
+    heightm: 0.7,
+    lore: 'A strange seed was planted on its back at birth. The plant sprouts and grows with this Pokémon.',
+  },
+  charmander: {
+    category: 'Lizard Pokémon',
+    heightm: 0.6,
+    lore: 'The flame on its tail indicates its life force. If the Pokémon is healthy, the flame burns brightly.',
+  },
+  squirtle: {
+    category: 'Tiny Turtle Pokémon',
+    heightm: 0.5,
+    lore: 'Shoots water at prey while in the water. Withdraws into its shell when in danger from foes.',
+  },
+};
+
+function getNeoKantoTypeColor(type: string): { bg: string; text: string } {
+  switch (type.toLowerCase()) {
+    case 'fire': return { bg: '#EE4238', text: '#F6F8F3' };
+    case 'water': return { bg: '#2A75D3', text: '#F6F8F3' };
+    case 'grass': return { bg: '#48C774', text: '#0D1322' };
+    case 'electric': return { bg: '#FFD028', text: '#0D1322' };
+    case 'ice': return { bg: '#98D8D8', text: '#0D1322' };
+    case 'fighting': return { bg: '#C03028', text: '#F6F8F3' };
+    case 'poison': return { bg: '#9B51E0', text: '#F6F8F3' };
+    case 'ground': return { bg: '#E0C068', text: '#0D1322' };
+    case 'flying': return { bg: '#74B9FF', text: '#0D1322' };
+    case 'psychic': return { bg: '#F85888', text: '#F6F8F3' };
+    case 'bug': return { bg: '#A8B820', text: '#0D1322' };
+    case 'rock': return { bg: '#B8A038', text: '#F6F8F3' };
+    case 'ghost': return { bg: '#705898', text: '#F6F8F3' };
+    case 'dragon': return { bg: '#5E5CE6', text: '#F6F8F3' };
+    case 'steel': return { bg: '#8A9BA8', text: '#0D1322' };
+    case 'dark': return { bg: '#705746', text: '#F6F8F3' };
+    case 'fairy': return { bg: '#EE99AC', text: '#0D1322' };
+    default: return { bg: '#8A9BA8', text: '#0D1322' };
+  }
+}
+
+let cachedDexList: DexSpeciesData[] | null = null;
+function getCompleteDexSpecies(): DexSpeciesData[] {
+  if (cachedDexList) return cachedDexList;
+
+  const raw = Dex.species.all().filter((s) => s.num >= 1 && s.num <= 251 && !s.forme);
+  cachedDexList = raw.map((sp) => {
+    const custom = CANONICAL_SPECIES_DATA[sp.id];
+    const category = custom?.category || `${sp.types.join('/')} POKéMON`;
+    const heightm = custom?.heightm || Number(((sp.weightkg || 10) * 0.08 + 0.3).toFixed(1));
+    const lore =
+      custom?.lore ||
+      `Specimen #${String(sp.num).padStart(3, '0')} recorded in the regional Johto/Kanto research archives. Baseline battle telemetry BST is ${sp.bst}.`;
+
+    return {
+      num: sp.num,
+      id: sp.id,
+      name: sp.name,
+      types: sp.types,
+      baseStats: sp.baseStats,
+      bst: sp.bst,
+      weightkg: sp.weightkg,
+      heightm,
+      category,
+      lore,
+      gen: sp.gen || (sp.num <= 151 ? 1 : 2),
+    };
+  });
+
+  return cachedDexList;
+}
 
 export interface StartMenuStateProvider {
   getTrainerName: () => string;
@@ -86,6 +343,12 @@ export class StartMenuUI {
   private speedMultiplier: SpeedMultiplier = 1;
   private menuItems: Array<{ id: string; label: string; icon: string; shortcut: string; action: () => void }> = [];
 
+  // Pokedex interactive workstation state
+  private selectedDexSpeciesId: string = 'cyndaquil';
+  private dexFilter: 'ALL' | 'JOHTO' | 'KANTO' | 'CAUGHT' | 'SEEN' = 'ALL';
+  private dexSearchQuery: string = '';
+  private dexSort: 'num' | 'bst' | 'name' | 'mass' = 'num';
+
   constructor(
     containerId: string = 'modal-container',
     stateProvider: StartMenuStateProvider,
@@ -96,6 +359,7 @@ export class StartMenuUI {
     this.container = el;
     this.stateProvider = stateProvider;
     this.callbacks = callbacks;
+    this.ensureNeoKantoStyles();
 
     this.menuItems = [
       {
@@ -237,11 +501,89 @@ export class StartMenuUI {
     this.settingsModal.style.display = 'none';
   }
 
+  private ensureNeoKantoStyles(): void {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('neo-kanto-ui-styles')) return;
+
+    const style = document.createElement('style');
+    style.id = 'neo-kanto-ui-styles';
+    style.textContent = `
+      .neo-kanto-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .neo-kanto-scrollbar::-webkit-scrollbar-track {
+        background: #080E1D;
+        border-radius: 4px;
+      }
+      .neo-kanto-scrollbar::-webkit-scrollbar-thumb {
+        background: #22324F;
+        border-radius: 4px;
+      }
+      .neo-kanto-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #2A75D3;
+      }
+      .neo-kanto-tactile-btn {
+        transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.12s ease;
+      }
+      .neo-kanto-tactile-btn:hover {
+        filter: brightness(1.12);
+      }
+      .neo-kanto-tactile-btn:active {
+        transform: translateY(2px) !important;
+        box-shadow: 0 1px 0 0 #070B14 !important;
+      }
+      @keyframes neoKantoPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.45; transform: scale(0.9); }
+      }
+      .neo-kanto-pulse-dot {
+        animation: neoKantoPulse 1.8s ease-in-out infinite;
+      }
+      @media (max-width: 768px) {
+        #pokedex-modal {
+          width: 95vw !important;
+          height: 92dvh !important;
+          max-height: 92dvh !important;
+          padding: 12px !important;
+        }
+        #pokedex-modal-workstation {
+          flex-direction: column !important;
+          overflow-y: auto !important;
+        }
+        #dex-roster-column {
+          max-width: 100% !important;
+          flex: none !important;
+          max-height: 200px !important;
+        }
+        #dex-telemetry-column {
+          max-width: 100% !important;
+          flex: none !important;
+        }
+        #trainer-card-modal {
+          width: 95vw !important;
+          max-height: 92dvh !important;
+          padding: 14px !important;
+        }
+        #trainer-card-bento {
+          grid-template-columns: 1fr !important;
+          gap: 12px !important;
+        }
+      }
+    `;
+    document.head?.appendChild(style);
+  }
+
   public handleKeyDown(e: KeyboardEvent): boolean {
     if (!this.isOpen()) return false;
 
     if (this.pokedexModal.style.display === 'flex') {
-      if (e.code === 'Escape' || e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ') {
+      const activeEl = typeof document !== 'undefined' ? document.activeElement : null;
+      const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+      if (isInput && e.code !== 'Escape') {
+        return false;
+      }
+      if (e.code === 'Escape' || e.code === 'KeyZ') {
         e.preventDefault();
         BattleAudio.playMenuSound('CANCEL');
         this.pokedexModal.style.display = 'none';
@@ -376,7 +718,7 @@ export class StartMenuUI {
     this.container.appendChild(panel);
     this.menuPanel = panel;
 
-    // 1b. Johto Pokédex Modal
+    // 1b. Johto Pokédex Modal (Neo-Kanto Protocol Workstation)
     const dexModal = document.createElement('div');
     dexModal.id = 'pokedex-modal';
     dexModal.style.cssText = `
@@ -384,25 +726,27 @@ export class StartMenuUI {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 560px;
-      max-width: 95vw;
-      max-height: 86vh;
-      background: linear-gradient(180deg, #450a0a 0%, #1e1b4b 100%);
-      border: 3px solid #ef4444;
-      border-radius: 14px;
-      padding: 20px;
-      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.9);
+      width: min(1080px, 96vw);
+      height: min(720px, 90vh);
+      max-height: 90vh;
+      background: #0D1322;
+      border: 2px solid #22324F;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 6px 0 0 #070B14, 0 16px 48px rgba(0, 0, 0, 0.9);
       display: none;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       z-index: 65;
       pointer-events: auto;
-      color: #f8fafc;
+      color: #dde2f7;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     `;
     this.container.appendChild(dexModal);
     this.pokedexModal = dexModal;
 
-    // 2. Trainer Card Modal
+    // 2. Trainer Card Modal (Neo-Kanto Holographic ID Passport)
     const trainerModal = document.createElement('div');
     trainerModal.id = 'trainer-card-modal';
     trainerModal.style.cssText = `
@@ -410,19 +754,22 @@ export class StartMenuUI {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 480px;
-      max-width: 94vw;
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-      border: 3px solid #facc15;
-      border-radius: 14px;
-      padding: 22px;
-      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.88);
+      width: min(840px, 94vw);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #0D1322;
+      border: 2px solid #22324F;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 0 0 #070B14, 0 16px 48px rgba(0, 0, 0, 0.9);
       display: none;
       flex-direction: column;
       gap: 16px;
       z-index: 65;
       pointer-events: auto;
-      color: #f8fafc;
+      color: #dde2f7;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     `;
     this.container.appendChild(trainerModal);
     this.trainerCardModal = trainerModal;
@@ -552,6 +899,510 @@ export class StartMenuUI {
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
 
+  private filterAndSortDexList(
+    all: DexSpeciesData[],
+    caughtSet: Set<string>,
+    seenSet: Set<string>
+  ): DexSpeciesData[] {
+    let list = all;
+
+    if (this.dexFilter === 'JOHTO') {
+      list = list.filter((s) => s.num >= 152 && s.num <= 251);
+    } else if (this.dexFilter === 'KANTO') {
+      list = list.filter((s) => s.num >= 1 && s.num <= 151);
+    } else if (this.dexFilter === 'CAUGHT') {
+      list = list.filter((s) => caughtSet.has(s.id));
+    } else if (this.dexFilter === 'SEEN') {
+      list = list.filter((s) => caughtSet.has(s.id) || seenSet.has(s.id));
+    }
+
+    if (this.dexSearchQuery.trim()) {
+      const q = this.dexSearchQuery.trim().toLowerCase().replace(/^#/, '');
+      list = list.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.id.toLowerCase().includes(q) ||
+          String(s.num).includes(q) ||
+          s.types.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+
+    if (this.dexSort === 'bst') {
+      list = [...list].sort((a, b) => b.bst - a.bst);
+    } else if (this.dexSort === 'name') {
+      list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+    } else if (this.dexSort === 'mass') {
+      list = [...list].sort((a, b) => b.weightkg - a.weightkg);
+    } else {
+      list = [...list].sort((a, b) => a.num - b.num);
+    }
+
+    return list;
+  }
+
+  private renderPokedexModalShell(caughtSet: Set<string>, seenSet: Set<string>): void {
+    const activeBtnStyle = 'background: #FFD028; color: #0D1322; font-weight: 800; border: 1px solid #FFD028;';
+    const inactiveBtnStyle = 'background: #151B2B; color: #94A3B8; font-weight: 700; border: 1px solid #22324F;';
+
+    this.pokedexModal.innerHTML = `
+      <!-- Pokédex Header Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 12px; gap: 12px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="neo-kanto-pulse-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #FFD028; box-shadow: 0 0 8px #FFD028;"></span>
+          <div>
+            <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #FFD028; letter-spacing: 1px;">DEXSPHERE OS // KANTO-JOHTO ARCHIVE</div>
+            <h2 style="font-family: 'Space Mono', monospace; margin: 2px 0 0 0; font-size: 20px; font-weight: 900; color: #F6F8F3; letter-spacing: -0.5px;">📕 PROF. OAK DIGITAL POKéDEX</h2>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span id="dex-seen-pill" style="background: #141E33; border: 1.5px solid #2A75D3; color: #38BDF8; padding: 5px 10px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; box-shadow: 0 2px 0 0 #070B14;">SEEN: ${seenSet.size} / 251</span>
+          <span id="dex-owned-pill" style="background: #141E33; border: 1.5px solid #48C774; color: #4ADE80; padding: 5px 10px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; box-shadow: 0 2px 0 0 #070B14;">OWNED: ${caughtSet.size} / 251</span>
+          <button id="close-pokedex-btn" class="neo-kanto-tactile-btn" style="background: #1E293B; color: #F6F8F3; border: 1.5px solid #475569; border-radius: 6px; padding: 6px 12px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 0 #070B14;">← BACK TO MENU</button>
+        </div>
+      </div>
+
+      <!-- Tactical Search & Filter Ribbon -->
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; background: #141E33; border: 1px solid #22324F; padding: 8px 10px; border-radius: 8px;">
+        <div style="position: relative; flex: 1; min-width: 200px;">
+          <input
+            id="dex-search-input"
+            type="text"
+            placeholder="QUERY INDEX BY NAME, ID, OR TYPE..."
+            value="${this.dexSearchQuery}"
+            style="width: 100%; background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px 10px; font-family: 'Space Mono', monospace; font-size: 11px; color: #F6F8F3; outline: none; box-sizing: border-box;"
+          />
+        </div>
+
+        <div style="display: flex; gap: 4px; align-items: center; overflow-x: auto;">
+          <button id="dex-filter-all" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'ALL' ? activeBtnStyle : inactiveBtnStyle}">ALL (251)</button>
+          <button id="dex-filter-johto" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'JOHTO' ? activeBtnStyle : inactiveBtnStyle}">JOHTO (#152-251)</button>
+          <button id="dex-filter-kanto" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'KANTO' ? activeBtnStyle : inactiveBtnStyle}">KANTO (#001-151)</button>
+          <button id="dex-filter-caught" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'CAUGHT' ? activeBtnStyle : inactiveBtnStyle}">OWNED (${caughtSet.size})</button>
+          <button id="dex-filter-seen" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'SEEN' ? activeBtnStyle : inactiveBtnStyle}">SEEN (${seenSet.size})</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;">SORT:</span>
+          <select id="dex-sort-select" style="background: #080E1D; border: 1px solid #22324F; color: #FFD028; border-radius: 4px; padding: 4px 6px; font-family: 'Space Mono', monospace; font-size: 10px; outline: none; cursor: pointer;">
+            <option value="num" ${this.dexSort === 'num' ? 'selected' : ''}>#001 - #251 NUMERICAL</option>
+            <option value="bst" ${this.dexSort === 'bst' ? 'selected' : ''}>BASE STAT TOTAL (HIGH-LOW)</option>
+            <option value="name" ${this.dexSort === 'name' ? 'selected' : ''}>ALPHABETICAL (A-Z)</option>
+            <option value="mass" ${this.dexSort === 'mass' ? 'selected' : ''}>HEAVIEST MASS</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 3-Pane Workstation Matrix -->
+      <div id="pokedex-modal-workstation" style="display: flex; gap: 12px; flex: 1; min-height: 0; overflow: hidden;">
+        <!-- Left: Specimen Roster Column -->
+        <div id="dex-roster-column" style="flex: 0 0 310px; max-width: 330px; display: flex; flex-direction: column; background: #141E33; border: 1px solid #22324F; border-radius: 8px; padding: 8px; box-shadow: 0 4px 0 0 #070B14; min-height: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 6px; margin-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #FFD028; letter-spacing: 0.5px;">SPECIMEN ROSTER</span>
+            <span id="dex-roster-count" style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8; background: #080E1D; padding: 2px 6px; border-radius: 4px;">251</span>
+          </div>
+          <div id="dex-roster-list" class="neo-kanto-scrollbar" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 4px;"></div>
+        </div>
+
+        <!-- Center: Holographic Stage Bay -->
+        <div id="dex-stage-column" style="flex: 1.1; display: flex; flex-direction: column; gap: 10px; background: #141E33; border: 1px solid #22324F; border-radius: 8px; padding: 12px; box-shadow: 0 4px 0 0 #070B14; min-height: 0; overflow-y: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; color: #FFD028;">HOLOGRAPHIC SPECIMEN BAY</span>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button id="dex-prev-btn" class="neo-kanto-tactile-btn" style="background: #080E1D; border: 1px solid #22324F; color: #F6F8F3; border-radius: 4px; padding: 4px 8px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 0 0 #070B14;">◀ PREV</button>
+              <button id="dex-next-btn" class="neo-kanto-tactile-btn" style="background: #080E1D; border: 1px solid #22324F; color: #F6F8F3; border-radius: 4px; padding: 4px 8px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 0 0 #070B14;">NEXT ▶</button>
+            </div>
+          </div>
+
+          <!-- Stage Viewport Platform -->
+          <div style="position: relative; height: 180px; background: #080E1D; border: 1px solid #22324F; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);">
+            <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(42, 117, 211, 0.22) 0%, rgba(8, 14, 29, 0.95) 70%);"></div>
+            <div style="position: absolute; bottom: 20px; width: 140px; height: 26px; border-radius: 50%; background: rgba(255, 208, 40, 0.15); box-shadow: 0 0 16px rgba(255, 208, 40, 0.45); transform: rotateX(60deg);"></div>
+            <span id="dex-gen-pill" style="position: absolute; top: 8px; left: 8px; background: #141E33; border: 1px solid #22324F; color: #94A3B8; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; z-index: 2;">GEN II</span>
+            <span id="dex-scan-pill" style="position: absolute; top: 8px; right: 8px; background: #141E33; border: 1px solid #22324F; color: #FFD028; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; z-index: 2;">SCAN: 100%</span>
+
+            <img
+              id="dex-stage-sprite"
+              alt="Specimen Bay"
+              src="./assets/sprites/pokemon/unown_front.png"
+              onerror="this.onerror=null; this.src='./assets/sprites/pokemon/unown_front.png';"
+              style="width: 110px; height: 110px; object-fit: contain; image-rendering: pixelated; position: relative; z-index: 3; transition: transform 0.2s ease;"
+            />
+          </div>
+
+          <!-- Specimen Headline & Type Badges -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <span id="dex-stage-num" style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: #94A3B8; letter-spacing: 1px;">NO. 155</span>
+              <span id="dex-stage-status" style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; color: #4ADE80;">🔴 CAUGHT</span>
+            </div>
+            <h2 id="dex-stage-name" style="font-family: 'Space Mono', monospace; font-size: 24px; font-weight: 900; color: #FFD028; margin: 0; letter-spacing: -0.5px;">CYNDAQUIL</h2>
+            <div id="dex-stage-category" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600; color: #DDE2F7;">FIRE MOUSE POKéMON</div>
+            <div id="dex-stage-types" style="display: flex; gap: 6px; margin-top: 4px;"></div>
+          </div>
+        </div>
+
+        <!-- Right: Biometric Telemetry & Base Stats Column -->
+        <div id="dex-telemetry-column" style="flex: 0 0 290px; max-width: 310px; display: flex; flex-direction: column; gap: 8px; background: #141E33; border: 1px solid #22324F; border-radius: 8px; padding: 12px; box-shadow: 0 4px 0 0 #070B14; min-height: 0; overflow-y: auto;">
+          <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; color: #FFD028; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px;">
+            BIOMETRIC TELEMETRY
+          </div>
+
+          <!-- Vitals Bento -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+            <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px; text-align: center;">
+              <div style="font-family: 'Space Mono', monospace; font-size: 9px; color: #94A3B8; font-weight: 700;">HEIGHT</div>
+              <div id="dex-height-val" style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 2px;">0.5 m</div>
+            </div>
+            <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px; text-align: center;">
+              <div style="font-family: 'Space Mono', monospace; font-size: 9px; color: #94A3B8; font-weight: 700;">WEIGHT</div>
+              <div id="dex-weight-val" style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 2px;">7.9 kg</div>
+            </div>
+            <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px; text-align: center;">
+              <div style="font-family: 'Space Mono', monospace; font-size: 9px; color: #94A3B8; font-weight: 700;">BST</div>
+              <div id="dex-bst-val" style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #FFD028; margin-top: 2px;">309</div>
+            </div>
+          </div>
+
+          <!-- Base Stats Meters -->
+          <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 8px 10px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 800; color: #94A3B8; margin-bottom: 2px;">BASE STAT CALIBRATION</div>
+
+            <!-- HP -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">HP</span>
+              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+                <div id="dex-bar-hp" style="height: 100%; width: 25%; background: #EE4238; border-radius: 3px; transition: width 0.3s ease;"></div>
+              </div>
+              <span id="dex-val-hp" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">39</span>
+            </div>
+
+            <!-- ATK -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">ATK</span>
+              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+                <div id="dex-bar-atk" style="height: 100%; width: 32%; background: #FFD028; border-radius: 3px; transition: width 0.3s ease;"></div>
+              </div>
+              <span id="dex-val-atk" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">52</span>
+            </div>
+
+            <!-- DEF -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">DEF</span>
+              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+                <div id="dex-bar-def" style="height: 100%; width: 28%; background: #EE4238; border-radius: 3px; transition: width 0.3s ease;"></div>
+              </div>
+              <span id="dex-val-def" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">43</span>
+            </div>
+
+            <!-- SP.ATK -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">SP.ATK</span>
+              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+                <div id="dex-bar-spa" style="height: 100%; width: 38%; background: #FFD028; border-radius: 3px; transition: width 0.3s ease;"></div>
+              </div>
+              <span id="dex-val-spa" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">60</span>
+            </div>
+
+            <!-- SP.DEF -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">SP.DEF</span>
+              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+                <div id="dex-bar-spd" style="height: 100%; width: 31%; background: #EE4238; border-radius: 3px; transition: width 0.3s ease;"></div>
+              </div>
+              <span id="dex-val-spd" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">50</span>
+            </div>
+
+            <!-- SPEED -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">SPEED</span>
+              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+                <div id="dex-bar-spe" style="height: 100%; width: 40%; background: #FFD028; border-radius: 3px; transition: width 0.3s ease;"></div>
+              </div>
+              <span id="dex-val-spe" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">65</span>
+            </div>
+          </div>
+
+          <!-- Lore Observation Card -->
+          <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 8px 10px; flex: 1; display: flex; flex-direction: column;">
+            <div style="font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 800; color: #FFD028; margin-bottom: 4px;">PROF. OAK FIELD NOTES</div>
+            <p id="dex-lore-text" style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; line-height: 1.5; color: #DDE2F7; margin: 0;"></p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Hook Close Button
+    this.pokedexModal.querySelector('#close-pokedex-btn')?.addEventListener('click', () => {
+      BattleAudio.playMenuSound('CANCEL');
+      this.pokedexModal.style.display = 'none';
+      this.menuPanel.style.display = 'flex';
+    });
+
+    // Hook Search Input
+    const searchInput = this.pokedexModal.querySelector('#dex-search-input') as HTMLInputElement | null;
+    searchInput?.addEventListener('input', (e) => {
+      this.dexSearchQuery = (e.target as HTMLInputElement).value;
+      this.renderPokedexRoster(caughtSet, seenSet);
+    });
+
+    // Hook Filter Buttons
+    const filterIds: Array<{ id: string; filter: 'ALL' | 'JOHTO' | 'KANTO' | 'CAUGHT' | 'SEEN' }> = [
+      { id: '#dex-filter-all', filter: 'ALL' },
+      { id: '#dex-filter-johto', filter: 'JOHTO' },
+      { id: '#dex-filter-kanto', filter: 'KANTO' },
+      { id: '#dex-filter-caught', filter: 'CAUGHT' },
+      { id: '#dex-filter-seen', filter: 'SEEN' },
+    ];
+
+    filterIds.forEach(({ id, filter }) => {
+      this.pokedexModal.querySelector(id)?.addEventListener('click', () => {
+        BattleAudio.playMenuSound('CURSOR');
+        this.dexFilter = filter;
+        filterIds.forEach((f) => {
+          const btn = this.pokedexModal.querySelector(f.id) as HTMLButtonElement | null;
+          if (btn) btn.style.cssText = `border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${f.filter === filter ? activeBtnStyle : inactiveBtnStyle}`;
+        });
+        this.renderPokedexRoster(caughtSet, seenSet);
+      });
+    });
+
+    // Hook Sort Selector
+    const sortSelect = this.pokedexModal.querySelector('#dex-sort-select') as HTMLSelectElement | null;
+    sortSelect?.addEventListener('change', (e) => {
+      this.dexSort = (e.target as HTMLSelectElement).value as any;
+      this.renderPokedexRoster(caughtSet, seenSet);
+    });
+
+    // Hook Prev / Next specimen buttons
+    this.pokedexModal.querySelector('#dex-prev-btn')?.addEventListener('click', () => {
+      const all = getCompleteDexSpecies();
+      const list = this.filterAndSortDexList(all, caughtSet, seenSet);
+      if (list.length === 0) return;
+      const idx = list.findIndex((s) => s.id === this.selectedDexSpeciesId);
+      const nextIdx = (idx - 1 + list.length) % list.length;
+      BattleAudio.playMenuSound('CURSOR');
+      this.updatePokedexDetails(list[nextIdx].id, caughtSet, seenSet);
+    });
+
+    this.pokedexModal.querySelector('#dex-next-btn')?.addEventListener('click', () => {
+      const all = getCompleteDexSpecies();
+      const list = this.filterAndSortDexList(all, caughtSet, seenSet);
+      if (list.length === 0) return;
+      const idx = list.findIndex((s) => s.id === this.selectedDexSpeciesId);
+      const nextIdx = (idx + 1) % list.length;
+      BattleAudio.playMenuSound('CURSOR');
+      this.updatePokedexDetails(list[nextIdx].id, caughtSet, seenSet);
+    });
+  }
+
+  private renderPokedexRoster(caughtSet: Set<string>, seenSet: Set<string>): void {
+    const rosterList = this.pokedexModal.querySelector('#dex-roster-list');
+    const rosterCount = this.pokedexModal.querySelector('#dex-roster-count');
+    if (!rosterList) return;
+
+    const all = getCompleteDexSpecies();
+    const list = this.filterAndSortDexList(all, caughtSet, seenSet);
+
+    if (rosterCount) {
+      rosterCount.textContent = String(list.length);
+    }
+
+    if (list.length === 0) {
+      rosterList.innerHTML = `
+        <div style="background: #080E1D; border: 1px dashed #22324F; border-radius: 6px; padding: 16px; text-align: center; color: #94A3B8; font-family: 'Space Mono', monospace; font-size: 11px;">
+          NO SPECIMENS MATCH QUERY
+        </div>
+      `;
+      return;
+    }
+
+    // If currently selected specimen is not in the filtered list, select the first visible
+    if (!list.some((s) => s.id === this.selectedDexSpeciesId)) {
+      this.selectedDexSpeciesId = list[0].id;
+      this.updatePokedexDetails(this.selectedDexSpeciesId, caughtSet, seenSet);
+    }
+
+    const rowsHtml = list
+      .map((sp) => {
+        const isCaught = caughtSet.has(sp.id);
+        const isSeen = isCaught || seenSet.has(sp.id);
+        const isSelected = sp.id === this.selectedDexSpeciesId;
+        const dexNum = String(sp.num).padStart(3, '0');
+        const bCol = isSelected ? '#FFD028' : isCaught ? 'rgba(74, 222, 128, 0.4)' : isSeen ? 'rgba(56, 189, 248, 0.4)' : '#22324F';
+        const bg = isSelected ? '#192846' : '#080E1D';
+        const sCol = isCaught ? '#4ADE80' : isSeen ? '#38BDF8' : '#64748B';
+
+        const thumb = isSeen
+          ? `<img src="./assets/sprites/pokemon/${sp.id}_front.png" alt="${sp.name}" onerror="this.onerror=null; this.src='./assets/sprites/pokemon/unown_front.png';" style="width:28px;height:28px;image-rendering:pixelated;object-fit:contain;" />`
+          : '<div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:#141E33;border-radius:4px;font-family:\'Space Mono\',monospace;font-size:11px;font-weight:700;color:#64748B;">?</div>';
+
+        return `
+          <div
+            data-dex-id="${sp.id}"
+            class="neo-kanto-tactile-btn"
+            style="background:${bg};border:1.5px solid ${bCol};box-shadow:${isSelected ? '0 0 10px rgba(255,208,40,0.35), 0 2px 0 0 #070B14' : '0 2px 0 0 #070B14'};border-radius:6px;padding:6px 8px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;opacity:${isSeen ? 1 : 0.6};"
+          >
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#94A3B8;">#${dexNum}</span>
+              ${thumb}
+              <div>
+                <div style="font-family:'Space Mono',monospace;font-size:12px;font-weight:800;color:${isSelected ? '#FFD028' : '#F6F8F3'};">${isSeen ? sp.name.toUpperCase() : '-----'}</div>
+                <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;color:#94A3B8;">${isSeen ? sp.types.join(' / ') : 'Unknown Species'}</div>
+              </div>
+            </div>
+            <div style="font-family:'Space Mono',monospace;font-size:10px;font-weight:800;color:${sCol};">
+              ${isCaught ? '🔴 CAUGHT' : isSeen ? '👁️ SEEN' : '---'}
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    rosterList.innerHTML = rowsHtml;
+
+    // Attach row click listeners
+    const rows = rosterList.querySelectorAll('div[data-dex-id]');
+    rows.forEach((row) => {
+      row.addEventListener('click', () => {
+        const spId = row.getAttribute('data-dex-id');
+        if (spId && spId !== this.selectedDexSpeciesId) {
+          BattleAudio.playMenuSound('CURSOR');
+          this.updatePokedexDetails(spId, caughtSet, seenSet);
+        }
+      });
+    });
+  }
+
+  private updatePokedexDetails(speciesId: string, caughtSet: Set<string>, seenSet: Set<string>): void {
+    this.selectedDexSpeciesId = speciesId;
+    const all = getCompleteDexSpecies();
+    const sp = all.find((s) => s.id === speciesId);
+    if (!sp) return;
+
+    const isCaught = caughtSet.has(sp.id);
+    const isSeen = isCaught || seenSet.has(sp.id);
+    const dexNum = String(sp.num).padStart(3, '0');
+
+    // Update Stage Sprite
+    const stageSprite = this.pokedexModal.querySelector('#dex-stage-sprite') as HTMLImageElement | null;
+    if (stageSprite) {
+      stageSprite.src = `./assets/sprites/pokemon/${sp.id}_front.png`;
+      stageSprite.style.filter = isSeen ? 'none' : 'brightness(0)';
+      stageSprite.style.opacity = isSeen ? '1' : '0.25';
+    }
+
+    // Update Stage Labels
+    const stageNum = this.pokedexModal.querySelector('#dex-stage-num');
+    if (stageNum) stageNum.textContent = `NO. ${dexNum}`;
+
+    const stageName = this.pokedexModal.querySelector('#dex-stage-name');
+    if (stageName) stageName.textContent = isSeen ? sp.name.toUpperCase() : '-----';
+
+    const stageCat = this.pokedexModal.querySelector('#dex-stage-category');
+    if (stageCat) stageCat.textContent = isSeen ? sp.category.toUpperCase() : 'UNKNOWN CLASSIFICATION';
+
+    const genPill = this.pokedexModal.querySelector('#dex-gen-pill');
+    if (genPill) genPill.textContent = `GEN ${sp.gen === 1 ? 'I' : 'II'}`;
+
+    const scanPill = this.pokedexModal.querySelector('#dex-scan-pill') as HTMLElement | null;
+    if (scanPill) {
+      scanPill.textContent = isCaught ? '🔴 CAUGHT // 100%' : isSeen ? '👁️ OBSERVED' : '🔒 ENCRYPTED';
+      scanPill.style.color = isCaught ? '#4ADE80' : isSeen ? '#38BDF8' : '#94A3B8';
+    }
+
+    const stageStatus = this.pokedexModal.querySelector('#dex-stage-status') as HTMLElement | null;
+    if (stageStatus) {
+      stageStatus.textContent = isCaught ? '🔴 CAUGHT IN WILD' : isSeen ? '👁️ SEEN IN REGION' : '🔒 UNREGISTERED';
+      stageStatus.style.color = isCaught ? '#4ADE80' : isSeen ? '#38BDF8' : '#64748B';
+    }
+
+    // Update Type Capsules
+    const typeBay = this.pokedexModal.querySelector('#dex-stage-types');
+    if (typeBay) {
+      if (isSeen) {
+        typeBay.innerHTML = sp.types
+          .map((t) => {
+            const col = getNeoKantoTypeColor(t);
+            return `<span style="background:${col.bg};color:${col.text};padding:3px 10px;border-radius:4px;font-family:'Space Mono',monospace;font-size:10px;font-weight:800;letter-spacing:0.5px;box-shadow:0 2px 0 0 #070B14;">${t.toUpperCase()}</span>`;
+          })
+          .join('');
+      } else {
+        typeBay.innerHTML = `<span style="background:#080E1D;border:1px solid #22324F;color:#64748B;padding:3px 8px;border-radius:4px;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;">???</span>`;
+      }
+    }
+
+    // Update Biometrics
+    const heightVal = this.pokedexModal.querySelector('#dex-height-val');
+    if (heightVal) heightVal.textContent = isSeen ? `${sp.heightm.toFixed(1)} m` : '?.? m';
+
+    const weightVal = this.pokedexModal.querySelector('#dex-weight-val');
+    if (weightVal) weightVal.textContent = isSeen ? `${sp.weightkg.toFixed(1)} kg` : '?.? kg';
+
+    const bstVal = this.pokedexModal.querySelector('#dex-bst-val');
+    if (bstVal) bstVal.textContent = isCaught ? String(sp.bst) : isSeen ? `~${sp.bst}` : '---';
+
+    // Update Base Stat Meters
+    const statsMap: Array<{ key: keyof typeof sp.baseStats; barId: string; valId: string }> = [
+      { key: 'hp', barId: '#dex-bar-hp', valId: '#dex-val-hp' },
+      { key: 'atk', barId: '#dex-bar-atk', valId: '#dex-val-atk' },
+      { key: 'def', barId: '#dex-bar-def', valId: '#dex-val-def' },
+      { key: 'spa', barId: '#dex-bar-spa', valId: '#dex-val-spa' },
+      { key: 'spd', barId: '#dex-bar-spd', valId: '#dex-val-spd' },
+      { key: 'spe', barId: '#dex-bar-spe', valId: '#dex-val-spe' },
+    ];
+
+    statsMap.forEach(({ key, barId, valId }) => {
+      const bar = this.pokedexModal.querySelector(barId) as HTMLElement | null;
+      const valEl = this.pokedexModal.querySelector(valId);
+      if (!bar || !valEl) return;
+
+      if (isCaught || isSeen) {
+        const val = sp.baseStats[key];
+        const pct = Math.min(100, Math.round((val / 160) * 100));
+        const color = val >= 85 ? '#48C774' : val >= 55 ? '#FFD028' : '#EE4238';
+        bar.style.width = `${pct}%`;
+        bar.style.background = color;
+        valEl.textContent = String(val);
+      } else {
+        bar.style.width = '0%';
+        valEl.textContent = '???';
+      }
+    });
+
+    // Update Lore Text
+    const loreEl = this.pokedexModal.querySelector('#dex-lore-text');
+    if (loreEl) {
+      loreEl.textContent = isCaught || isSeen
+        ? sp.lore
+        : 'Undiscovered specimen. Telemetry encrypted. Encounter in wild habitats or defeat in trainer battles to catalog telemetry in DexSphere OS.';
+    }
+
+    // Update selection highlight in roster list without full reload
+    const rosterList = this.pokedexModal.querySelector('#dex-roster-list');
+    if (rosterList) {
+      const rows = rosterList.querySelectorAll('div[data-dex-id]');
+      rows.forEach((r) => {
+        const rid = r.getAttribute('data-dex-id');
+        const isTarget = rid === sp.id;
+        const rowEl = r as HTMLElement;
+        if (isTarget) {
+          rowEl.style.background = '#192846';
+          rowEl.style.borderColor = '#FFD028';
+          rowEl.style.boxShadow = '0 0 10px rgba(255,208,40,0.35), 0 2px 0 0 #070B14';
+        } else {
+          rowEl.style.background = '#080E1D';
+          const rCaught = caughtSet.has(rid || '');
+          const rSeen = rCaught || seenSet.has(rid || '');
+          rowEl.style.borderColor = rCaught ? 'rgba(74, 222, 128, 0.4)' : rSeen ? 'rgba(56, 189, 248, 0.4)' : '#22324F';
+          rowEl.style.boxShadow = '0 2px 0 0 #070B14';
+        }
+      });
+    }
+  }
+
   public openPokedex(): void {
     BattleAudio.playMenuSound('CONFIRM');
     this.menuPanel.style.display = 'none';
@@ -559,55 +1410,17 @@ export class StartMenuUI {
 
     const caughtSet = this.stateProvider.getCaughtSpeciesIds?.() ?? new Set<string>();
     const seenSet = this.stateProvider.getSeenSpeciesIds?.() ?? caughtSet;
-    const allSpecies = JOHTO_DEX_SPECIES;
+    const allSpecies = getCompleteDexSpecies();
 
-    const rowsHtml = allSpecies
-      .map((sp, idx) => {
-        const isCaught = caughtSet.has(sp.id);
-        const isSeen = isCaught || seenSet.has(sp.id);
-        const dexNum = String(idx + 1).padStart(3, '0');
-        const bCol = isCaught ? '#4ade80' : isSeen ? '#38bdf8' : 'rgba(255,255,255,0.1)';
-        const sCol = isCaught ? '#4ade80' : isSeen ? '#38bdf8' : '#64748b';
-        const img = isSeen
-          ? `<img src="./assets/sprites/pokemon/${sp.id}_front.png" alt="${sp.name}" style="width:36px;height:36px;image-rendering:pixelated;" />`
-          : '<div style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:#0f172a;border-radius:6px;font-weight:800;color:#64748b;">?</div>';
-        return `<div style="background:rgba(15,23,42,0.82);border:1px solid ${bCol};border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px;opacity:${isSeen ? 1 : 0.45};"><div style="display:flex;align-items:center;gap:10px;"><span style="font-family:monospace;font-size:12px;color:#94a3b8;">No.${dexNum}</span>${img}<div><div style="font-size:14px;font-weight:800;color:#f8fafc;">${isSeen ? sp.name.toUpperCase() : '-----'}</div><div style="font-size:11px;color:#94a3b8;">${isSeen ? sp.types.join(' / ') : 'Unknown Species'}</div></div></div><div style="font-size:12px;font-weight:800;color:${sCol};">${isCaught ? '🔴 CAUGHT' : isSeen ? '👁️ SEEN' : '---'}</div></div>`;
-      })
-      .join('');
+    if (!this.selectedDexSpeciesId || !allSpecies.some((s) => s.id === this.selectedDexSpeciesId)) {
+      const firstCaught = allSpecies.find((s) => caughtSet.has(s.id));
+      const firstSeen = allSpecies.find((s) => seenSet.has(s.id));
+      this.selectedDexSpeciesId = firstCaught?.id || firstSeen?.id || 'cyndaquil';
+    }
 
-    this.pokedexModal.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(239, 68, 68, 0.5); padding-bottom: 10px;">
-        <div>
-          <div style="font-size: 11px; font-weight: 800; color: #fca5a5; letter-spacing: 1px;">PROF. OAK'S JOHTO ENCYCLOPEDIA</div>
-          <h2 style="margin: 2px 0 0 0; font-size: 20px; font-weight: 900; color: #ffffff;">📕 NEW POKéDEX MODE</h2>
-        </div>
-        <div style="display: flex; gap: 8px; font-size: 12px; font-weight: 800;">
-          <span style="background: rgba(15, 23, 42, 0.85); border: 1px solid #38bdf8; color: #38bdf8; padding: 4px 10px; border-radius: 6px;">SEEN: ${seenSet.size}</span>
-          <span style="background: rgba(15, 23, 42, 0.85); border: 1px solid #4ade80; color: #4ade80; padding: 4px 10px; border-radius: 6px;">OWN: ${caughtSet.size}</span>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; max-height: 52vh; padding-right: 4px;">
-        ${rowsHtml}
-      </div>
-
-      <button id="close-pokedex-btn" style="
-        background: #334155;
-        color: #ffffff;
-        border: none;
-        border-radius: 8px;
-        padding: 10px;
-        font-size: 13px;
-        font-weight: 800;
-        cursor: pointer;
-      ">← BACK TO MENU</button>
-    `;
-
-    this.pokedexModal.querySelector('#close-pokedex-btn')!.addEventListener('click', () => {
-      BattleAudio.playMenuSound('CANCEL');
-      this.pokedexModal.style.display = 'none';
-      this.menuPanel.style.display = 'flex';
-    });
+    this.renderPokedexModalShell(caughtSet, seenSet);
+    this.renderPokedexRoster(caughtSet, seenSet);
+    this.updatePokedexDetails(this.selectedDexSpeciesId, caughtSet, seenSet);
   }
 
   public openTrainerCard(): void {
@@ -619,74 +1432,146 @@ export class StartMenuUI {
     const money = this.stateProvider.getMoney();
     const badges = this.stateProvider.getBadges();
     const caughtCount = this.stateProvider.getCaughtCount();
+    const seenCount = this.stateProvider.getSeenSpeciesIds?.()?.size ?? caughtCount;
     const keyItems = this.stateProvider.getKeyItems?.() ?? [];
     const playTime = this.formatPlayTime(this.stateProvider.getPlayTimeSeconds());
+
+    // Calculate clearance stars (0 to 5)
+    const starCount = badges.length >= 8 ? 5 : badges.length >= 6 ? 4 : badges.length >= 4 ? 3 : badges.length >= 2 ? 2 : badges.length >= 1 ? 1 : 0;
+    const starsGlyphs = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
 
     const badgesHtml = JOHTO_BADGES.map((b, i) => {
       const earned =
         badges.some((badge) => badge.toLowerCase().includes(b.id)) || i < badges.length;
-      const bg = earned ? 'rgba(250,204,21,0.22)' : 'rgba(15,23,42,0.65)';
-      const border = earned ? '#facc15' : 'rgba(255,255,255,0.12)';
-      const col = earned ? '#fef08a' : '#94a3b8';
-      const bText = earned ? `${b.icon} ${b.name.toUpperCase()}` : b.name.toUpperCase();
-      return `<div data-badge-id="${b.id}" data-earned="${earned}" style="background:${bg};border:1.5px solid ${border};box-shadow:${earned ? '0 0 12px rgba(250,204,21,0.45)' : 'none'};border-radius:8px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:${earned ? 1 : 0.45};"><span style="font-size:16px;">${earned ? b.icon : '🔒'}</span><span style="font-size:9px;font-weight:800;color:${col};">${bText}</span></div>`;
+      const bg = earned
+        ? 'linear-gradient(135deg, rgba(255, 208, 40, 0.18) 0%, rgba(20, 30, 51, 0.85) 100%)'
+        : '#080E1D';
+      const border = earned ? '#FFD028' : '#22324F';
+      const col = earned ? '#FEF08A' : '#64748B';
+      const shadow = earned ? '0 0 14px rgba(255,208,40,0.45), 0 3px 0 0 #070B14' : '0 2px 0 0 #070B14';
+      const bText = earned ? `${b.name.toUpperCase()}` : b.name.toUpperCase();
+      const statusText = earned ? `CLEARED // ${b.leader.toUpperCase()} GYM` : `LOCKED // ${b.leader.toUpperCase()} GYM`;
+
+      return `
+        <div
+          data-badge-id="${b.id}"
+          data-earned="${earned}"
+          class="neo-kanto-tactile-btn"
+          style="background:${bg};border:1.5px solid ${border};box-shadow:${shadow};border-radius:8px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;opacity:${earned ? 1 : 0.55};"
+        >
+          <span style="font-size:22px;filter:${earned ? 'drop-shadow(0 0 6px #FFD028)' : 'grayscale(1)'};">${earned ? b.icon : '🔒'}</span>
+          <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:800;color:${col};">${bText}</span>
+          <span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:700;color:${earned ? '#4ADE80' : '#475569'};">${statusText}</span>
+        </div>
+      `;
     }).join('');
 
-    const cBg = 'background:rgba(15,23,42,0.72);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,0.12);';
-    const cLbl = 'font-size:11px;color:#94a3b8;font-weight:700;';
+    const cBg = 'background:#080E1D;border-radius:8px;padding:10px 12px;border:1px solid #22324F;box-shadow:0 2px 0 0 #070B14;';
+    const cLbl = 'font-family:\'Space Mono\',monospace;font-size:9px;color:#94A3B8;font-weight:700;letter-spacing:0.5px;';
 
     this.trainerCardModal.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(250, 204, 21, 0.4); padding-bottom: 10px;">
-        <div>
-          <div style="font-size: 11px; font-weight: 800; color: #facc15; letter-spacing: 1px;">JOHTO LEAGUE TRAINER CARD</div>
-          <h2 style="margin: 2px 0 0 0; font-size: 20px; font-weight: 900; color: #ffffff;">🪪 ${name}</h2>
+      <!-- Top System Telemetry Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="neo-kanto-pulse-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #FFD028; box-shadow: 0 0 8px #FFD028;"></span>
+          <span style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #FFD028; letter-spacing: 0.8px;">REGISTRATION ACTIVE // INDIGO NETWORK VERIFIED</span>
         </div>
-        <span style="background: rgba(15, 23, 42, 0.8); border: 1px solid #38bdf8; color: #38bdf8; font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">IDNo. 25199</span>
-      </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div style="${cBg}">
-          <div style="${cLbl}">MONEY</div>
-          <div style="font-size: 16px; font-weight: 800; color: #fbbf24; margin-top: 2px;">$${money.toLocaleString()}</div>
-        </div>
-        <div style="${cBg}">
-          <div style="${cLbl}">PLAY TIME</div>
-          <div style="font-size: 16px; font-weight: 800; color: #38bdf8; margin-top: 2px;">⏱️ ${playTime}</div>
-        </div>
-        <div style="${cBg}">
-          <div style="${cLbl}">POKéDEX OWNED</div>
-          <div style="font-size: 16px; font-weight: 800; color: #4ade80; margin-top: 2px;">📕 ${caughtCount} Species</div>
-        </div>
-        <div style="${cBg}">
-          <div style="${cLbl}">KEY ITEMS</div>
-          <div style="font-size: 13px; font-weight: 800; color: #f8fafc; margin-top: 3px;">${
-            keyItems.length > 0 ? keyItems.join(', ') : 'POKéGEAR'
-          }</div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;">CHIP: <span style="color: #38BDF8;">SILPH-NFC-v9</span></span>
+          <span style="background: #141E33; border: 1px solid #2A75D3; color: #38BDF8; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">LVL-4 ENCRYPTED</span>
+          <button id="close-trainer-card-btn" class="neo-kanto-tactile-btn" style="background: #1E293B; color: #F6F8F3; border: 1.5px solid #475569; border-radius: 6px; padding: 6px 12px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 0 #070B14;">← BACK TO MENU</button>
         </div>
       </div>
 
-      <div>
-        <div style="font-size: 11px; font-weight: 800; color: #facc15; margin-bottom: 6px; letter-spacing: 0.5px;">
-          🏅 JOHTO GYM BADGES (${badges.length} / 8)
+      <!-- Main Bento Grid: Holographic Passport & Badges Rack -->
+      <div id="trainer-card-bento" style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; align-items: stretch;">
+        <!-- Left Column: Holographic Trainer Passport -->
+        <div style="background: linear-gradient(135deg, rgba(255, 208, 40, 0.4) 0%, rgba(42, 117, 211, 0.6) 50%, rgba(238, 66, 56, 0.3) 100%); padding: 2px; border-radius: 12px; box-shadow: 0 4px 0 0 #070B14;">
+          <div style="background: #080E1D; border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 14px; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;">
+            <!-- Background Watermark -->
+            <div style="position: absolute; right: -20px; bottom: -20px; width: 140px; height: 140px; border-radius: 50%; border: 12px solid rgba(255,255,255,0.03); pointer-events: none;"></div>
+
+            <!-- Card Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="background: #FFD028; color: #0D1322; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px;">LEAGUE ID</span>
+                  <span style="font-family: 'Space Mono', monospace; font-size: 9px; color: #94A3B8; letter-spacing: 0.5px;">INDIGO PLATEAU REGISTRATION</span>
+                </div>
+                <h1 style="font-family: 'Space Mono', monospace; font-size: 20px; font-weight: 900; color: #FFD028; margin: 4px 0 0 0; letter-spacing: -0.5px;">TRAINER PASSPORT</h1>
+              </div>
+
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">
+                <span style="font-family: 'Space Mono', monospace; font-size: 9px; color: #94A3B8;">CLEARANCE RANK</span>
+                <span style="font-family: 'Space Mono', monospace; font-size: 13px; color: #FFD028; letter-spacing: 2px;">${starsGlyphs}</span>
+              </div>
+            </div>
+
+            <!-- Profile Info Bay -->
+            <div style="display: flex; align-items: center; gap: 12px; background: #141E33; border: 1px solid #22324F; border-radius: 8px; padding: 10px 12px; box-shadow: 0 2px 0 0 #070B14;">
+              <div style="width: 44px; height: 44px; border-radius: 50%; background: #1E293B; border: 2px solid #FFD028; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 0 10px rgba(255,208,40,0.4);">
+                🧢
+              </div>
+              <div style="flex: 1;">
+                <div style="font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 900; color: #F6F8F3;">${name}</div>
+                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 600; color: #38BDF8;">JOHTO LEAGUE CHALLENGER</div>
+              </div>
+              <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 4px 8px; text-align: right;">
+                <div style="font-family: 'Space Mono', monospace; font-size: 8px; color: #94A3B8;">PASSPORT NO.</div>
+                <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; color: #FFD028;">IDNo. 25199</div>
+              </div>
+            </div>
+
+            <!-- Vitals 2x2 Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="${cBg}">
+                <div style="${cLbl}">MONEY ACCOUNTS</div>
+                <div style="font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 900; color: #FFD028; margin-top: 2px;">$${money.toLocaleString()}</div>
+              </div>
+              <div style="${cBg}">
+                <div style="${cLbl}">SYSTEM TIME</div>
+                <div style="font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 800; color: #38BDF8; margin-top: 2px;">⏱️ ${playTime}</div>
+              </div>
+              <div style="${cBg}">
+                <div style="${cLbl}">POKéDEX TELEMETRY</div>
+                <div style="font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 800; color: #4ADE80; margin-top: 2px;">📕 ${caughtCount} OWN / ${seenCount} SEEN</div>
+              </div>
+              <div style="${cBg}">
+                <div style="${cLbl}">REGISTERED GEAR</div>
+                <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 700; color: #F6F8F3; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${
+                  keyItems.length > 0 ? keyItems.join(', ') : 'POKéGEAR'
+                }</div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
-          ${badgesHtml}
+
+        <!-- Right Column: Official Johto League Gym Badges Rack -->
+        <div style="background: #141E33; border: 1px solid #22324F; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 0 0 #070B14;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #FFD028; letter-spacing: 0.5px;">JOHTO LEAGUE SANCTION</div>
+              <div style="font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 900; color: #F6F8F3;">GYM BADGE RACK</div>
+            </div>
+            <span style="background: #080E1D; border: 1.5px solid #FFD028; color: #FFD028; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">
+              ${badges.length} / 8 CLEARED
+            </span>
+          </div>
+
+          <p style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; color: #94A3B8; margin: 0; line-height: 1.4;">
+            Official commemorative badges accredited by the Indigo League Regulatory Commission.
+          </p>
+
+          <!-- 8 Badges Grid (4 columns x 2 rows) -->
+          <div class="trainer-badges-rack" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px;">
+            ${badgesHtml}
+          </div>
         </div>
       </div>
-
-      <button id="close-trainer-card-btn" style="
-        background: #334155;
-        color: #ffffff;
-        border: none;
-        border-radius: 8px;
-        padding: 10px;
-        font-size: 13px;
-        font-weight: 800;
-        cursor: pointer;
-      ">← BACK TO MENU</button>
     `;
 
-    this.trainerCardModal.querySelector('#close-trainer-card-btn')!.addEventListener('click', () => {
+    this.trainerCardModal.querySelector('#close-trainer-card-btn')?.addEventListener('click', () => {
       BattleAudio.playMenuSound('CANCEL');
       this.trainerCardModal.style.display = 'none';
       this.menuPanel.style.display = 'flex';
