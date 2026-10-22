@@ -28,7 +28,18 @@ export type NpcSpriteType =
   | 'lass'
   | 'beauty'
   | 'rocket_grunt_m'
-  | 'rocket_grunt_f';
+  | 'rocket_grunt_f'
+  | 'officer'
+  | 'camper'
+  | 'picnicker'
+  | 'psychic'
+  | 'schoolboy'
+  | 'juggler'
+  | 'firebreather'
+  | 'pokefan_m'
+  | 'pokefan_f'
+  | 'super_nerd'
+  | 'youngster';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
@@ -98,7 +109,10 @@ export interface GridEntity {
     | 'FARFETCHD_HERD_EVENT'
     | 'CHARCOAL_MASTER_EVENT'
     | 'HEADBUTT_TUTOR_EVENT'
-    | 'DEPT_ELEVATOR';
+    | 'DEPT_ELEVATOR'
+    | 'ROCK_SMASH_GUY_EVENT'
+    | 'QUICK_CLAW_EVENT'
+    | 'BUG_CONTEST_OFFICER_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

@@ -2197,7 +2197,16 @@
       "speaker": "🚏 ROUTE 35 SIGN",
       "pages": [
         "ROUTE 35",
-        "NATIONAL PARK SOUTH GATE"
+        "GOLDENROD CITY - NATIONAL PARK"
+      ]
+    },
+    {
+      "x": 11,
+      "y": 31,
+      "speaker": "📘 TRAINER TIPS",
+      "pages": [
+        "TRAINER TIPS",
+        "POKéMON with high SPEED attack first in battle!"
       ]
     }
   ],

@@ -10,6 +10,7 @@ export type BgmTrackId =
   | 'bgm_sprout_tower'
   | 'bgm_gym'
   | 'bgm_goldenrod_city'
+  | 'bgm_national_park'
   | 'bgm_game_corner'
   | 'bgm_wild_battle'
   | 'bgm_trainer_battle'
@@ -37,6 +38,12 @@ const MAP_BGM_TABLE: Record<string, BgmTrackId> = {
   route_32: 'bgm_route_29',
   route_33: 'bgm_route_29',
   route_34: 'bgm_route_29',
+  route_35: 'bgm_route_29',
+  route_35_national_park_gate: 'bgm_national_park',
+  national_park: 'bgm_national_park',
+  route_36_national_park_gate: 'bgm_national_park',
+  route_36: 'bgm_route_29',
+  route_36_ruins_of_alph_gate: 'bgm_route_29',
   day_care: 'bgm_route_29',
   mr_pokemons_house: 'bgm_route_29',
   route_30_berry_house: 'bgm_route_29',

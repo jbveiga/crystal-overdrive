@@ -516,6 +516,17 @@ export class OverworldRenderer {
       beauty: './assets/sprites/characters/beauty.png',
       rocket_grunt_m: './assets/sprites/characters/rocket_grunt_m.png',
       rocket_grunt_f: './assets/sprites/characters/rocket_grunt_f.png',
+      officer: './assets/sprites/characters/officer.png',
+      camper: './assets/sprites/characters/camper.png',
+      picnicker: './assets/sprites/characters/picnicker.png',
+      psychic: './assets/sprites/characters/psychic.png',
+      schoolboy: './assets/sprites/characters/schoolboy.png',
+      juggler: './assets/sprites/characters/juggler.png',
+      firebreather: './assets/sprites/characters/firebreather.png',
+      pokefan_m: './assets/sprites/characters/pokefan_m.png',
+      pokefan_f: './assets/sprites/characters/pokefan_f.png',
+      super_nerd: './assets/sprites/characters/super_nerd.png',
+      youngster: './assets/sprites/characters/youngster.png',
     };
 
     await Promise.all(

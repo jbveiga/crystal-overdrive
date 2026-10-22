@@ -3306,6 +3306,33 @@
       ]
     },
     {
+      "x": 45,
+      "y": 11,
+      "speaker": "🏛️ RUINS NOTICE",
+      "pages": [
+        "RUINS OF ALPH",
+        "NORTH ENTRANCE"
+      ]
+    },
+    {
+      "x": 21,
+      "y": 7,
+      "speaker": "📘 TRAINER TIPS",
+      "pages": [
+        "TRAINER TIPS",
+        "Plant berries every day to harvest fresh fruit!"
+      ]
+    },
+    {
+      "x": 29,
+      "y": 1,
+      "speaker": "🚏 ROUTE 36 FORK SIGN",
+      "pages": [
+        "ROUTE 36",
+        "NORTH TO ROUTE 37 & ECRUTEAK CITY"
+      ]
+    },
+    {
       "x": 35,
       "y": 7,
       "speaker": "🌳 STRANGE TREE",

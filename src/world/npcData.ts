@@ -3138,38 +3138,80 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     route_35: [
       makeNpc(
         'camper_ivan',
-        12,
-        9,
+        4,
+        19,
         'DOWN',
-        'boy',
+        'camper',
         '⛺ CAMPER IVAN',
         ['I’ve been practicing ground maneuvers in the grass!'],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'camper_ivan',
           trainerName: 'Camper Ivan',
-          visionRange: 3,
-          challengePages: ['CAMPER IVAN: The path between the big city and the park is packed with strong trainers!'],
-          trainerPokemon: { speciesId: 'diglett', level: 14, moves: ['scratch', 'sandattack', 'growl'] },
+          visionRange: 2,
+          challengePages: ['CAMPER IVAN: I’ve been practicing ground maneuvers in the grass!'],
+          trainerPokemon: { speciesId: 'diglett', level: 10, moves: ['scratch', 'growl'] },
           trainerTeam: [
-            { speciesId: 'diglett', level: 14, moves: ['scratch', 'sandattack', 'growl'] },
-            { speciesId: 'zubat', level: 14, moves: ['leechlife', 'bite', 'confuseray'] },
+            { speciesId: 'diglett', level: 10, moves: ['scratch', 'growl'] },
+            { speciesId: 'zubat', level: 10, moves: ['leechlife', 'supersonic'] },
+            { speciesId: 'diglett', level: 14, moves: ['magnitude', 'scratch', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'camper_elliot',
+        8,
+        20,
+        'DOWN',
+        'camper',
+        '⛺ CAMPER ELLIOT',
+        ["I'm heading up to the Bug-Catching Contest!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'camper_elliot',
+          trainerName: 'Camper Elliot',
+          visionRange: 3,
+          challengePages: ["CAMPER ELLIOT: I'm off to the Bug-Catching Contest! Let's warm up!"],
+          trainerPokemon: { speciesId: 'sandshrew', level: 13, moves: ['scratch', 'defensecurl'] },
+          trainerTeam: [
+            { speciesId: 'sandshrew', level: 13, moves: ['scratch', 'defensecurl'] },
+            { speciesId: 'marill', level: 15, moves: ['tackle', 'defensecurl', 'watergun'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'picnicker_brooke',
+        7,
+        20,
+        'DOWN',
+        'picnicker',
+        '🧺 PICNICKER BROOKE',
+        ['My Pikachu is the cutest in all Johto!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'picnicker_brooke',
+          trainerName: 'Picnicker Brooke',
+          visionRange: 3,
+          challengePages: ['PICNICKER BROOKE: My Pikachu is the cutest in all Johto!'],
+          trainerPokemon: { speciesId: 'pikachu', level: 16, moves: ['thundershock', 'growl', 'quickattack', 'tailwhip'] },
+          trainerTeam: [
+            { speciesId: 'pikachu', level: 16, moves: ['thundershock', 'growl', 'quickattack', 'tailwhip'] },
           ],
         }
       ),
       makeNpc(
         'picnicker_kim',
         10,
-        22,
+        26,
         'LEFT',
-        'girl',
+        'picnicker',
         '👧 PICNICKER KIM',
         ['My VULPIX loves sunbathing by the roadside!'],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'picnicker_kim',
           trainerName: 'Picnicker Kim',
-          visionRange: 3,
+          visionRange: 1,
           challengePages: ['PICNICKER KIM: Are you heading to the NATIONAL PARK? Let’s battle first!'],
           trainerPokemon: { speciesId: 'vulpix', level: 15, moves: ['ember', 'tailwhip', 'quickattack'] },
           trainerTeam: [
@@ -3181,7 +3223,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'bird_keeper_bryan',
         14,
         28,
-        'LEFT',
+        'DOWN',
         'bird_keeper',
         '🦅 BIRD KEEPER BRYAN',
         ['Bird POKéMON glide high above the Goldenrod skyline!'],
@@ -3200,21 +3242,86 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       ),
       makeNpc(
         'firebreather_walt',
-        3,
-        14,
+        2,
+        10,
         'RIGHT',
-        'fat_man',
+        'firebreather',
         '🔥 FIREBREATHER WALT',
         ['I blow fiery embers into the night sky!'],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'firebreather_walt',
           trainerName: 'Firebreather Walt',
-          visionRange: 3,
+          visionRange: 2,
           challengePages: ['FIREBREATHER WALT: Breathe deep and ignite the flame!'],
-          trainerPokemon: { speciesId: 'magmar', level: 14, moves: ['ember', 'smog', 'leer'] },
+          trainerPokemon: { speciesId: 'magmar', level: 11, moves: ['ember', 'leer'] },
           trainerTeam: [
-            { speciesId: 'magmar', level: 14, moves: ['ember', 'smog', 'leer'] },
+            { speciesId: 'magmar', level: 11, moves: ['ember', 'leer'] },
+            { speciesId: 'magmar', level: 13, moves: ['ember', 'smog'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'bug_catcher_arnie',
+        16,
+        7,
+        'DOWN',
+        'bug_catcher',
+        '🐛 BUG CATCHER ARNIE',
+        ["I'll call you whenever a Yanma swarm appears!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bug_catcher_arnie',
+          trainerName: 'Bug Catcher Arnie',
+          visionRange: 3,
+          challengePages: ["BUG CATCHER ARNIE: I'll show you my prized bug Pokémon!"],
+          trainerPokemon: { speciesId: 'venonat', level: 15, moves: ['tackle', 'disable', 'leechlife'] },
+          trainerTeam: [
+            { speciesId: 'venonat', level: 15, moves: ['tackle', 'disable', 'leechlife'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'juggler_irwin',
+        5,
+        10,
+        'RIGHT',
+        'juggler',
+        '🎪 JUGGLER IRWIN',
+        ['Behold my incredible juggling act!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'juggler_irwin',
+          trainerName: 'Juggler Irwin',
+          visionRange: 2,
+          challengePages: ['JUGGLER IRWIN: Behold my incredible juggling act!'],
+          trainerPokemon: { speciesId: 'voltorb', level: 2, moves: ['tackle', 'screech'] },
+          trainerTeam: [
+            { speciesId: 'voltorb', level: 2, moves: ['tackle', 'screech'] },
+            { speciesId: 'voltorb', level: 6, moves: ['tackle', 'sonicboom'] },
+            { speciesId: 'voltorb', level: 10, moves: ['tackle', 'sonicboom'] },
+            { speciesId: 'voltorb', level: 14, moves: ['spark', 'sonicboom'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'officer_dirk',
+        5,
+        6,
+        'DOWN',
+        'officer',
+        '👮 OFFICER DIRK',
+        ['I patrol Route 35 to keep trainers safe at night.'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'officer_dirk',
+          trainerName: 'Officer Dirk',
+          visionRange: 2,
+          challengePages: ['OFFICER DIRK: Halt! Who goes there after dark?'],
+          trainerPokemon: { speciesId: 'growlithe', level: 14, moves: ['bite', 'roar'] },
+          trainerTeam: [
+            { speciesId: 'growlithe', level: 14, moves: ['bite', 'roar'] },
+            { speciesId: 'growlithe', level: 14, moves: ['bite', 'ember'] },
           ],
         }
       ),
@@ -3225,21 +3332,46 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         2,
         3,
         'DOWN',
-        'fat_man',
+        'officer',
         '👮 PARK OFFICER',
         [
           'Welcome to the NATIONAL PARK!',
           'The Bug-Catching Contest is held every Tuesday, Thursday, and Saturday! You could win a rare SUN STONE!',
-        ]
+        ],
+        { action: 'BUG_CONTEST_OFFICER_EVENT' }
+      ),
+      makeNpc(
+        'gate_civilian',
+        6,
+        4,
+        'DOWN',
+        'youngster',
+        '👦 VISITOR',
+        ['The Bug-Catching Contest is tough! High level and rare species score higher!']
       ),
     ],
     national_park: [
       makeNpc(
+        'quick_claw_teacher',
+        27,
+        40,
+        'DOWN',
+        'teacher',
+        '👩‍🏫 TEACHER',
+        [
+          'Pay attention, please!',
+          '…Oops, I have to quit thinking like a teacher all the time.',
+          "You must be a POKéMON trainer.",
+          "Since you're working so hard, I want you to have this.",
+        ],
+        { action: 'QUICK_CLAW_EVENT' }
+      ),
+      makeNpc(
         'schoolboy_jack',
-        18,
-        30,
-        'UP',
-        'boy',
+        27,
+        23,
+        'LEFT',
+        'schoolboy',
         '👦 SCHOOLBOY JACK',
         ['I read all about electric and grass types in my academy textbooks!'],
         {
@@ -3248,63 +3380,91 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           trainerName: 'Schoolboy Jack',
           visionRange: 3,
           challengePages: ['SCHOOLBOY JACK: The Bug-Catching Contest is thrilling, but regular battles are great too!'],
-          trainerPokemon: { speciesId: 'oddish', level: 14, moves: ['absorb', 'sweetscent', 'poisonpowder'] },
+          trainerPokemon: { speciesId: 'oddish', level: 12, moves: ['absorb', 'sweetscent'] },
           trainerTeam: [
-            { speciesId: 'oddish', level: 14, moves: ['absorb', 'sweetscent', 'poisonpowder'] },
-            { speciesId: 'voltorb', level: 14, moves: ['tackle', 'screech', 'sonicboom'] },
+            { speciesId: 'oddish', level: 12, moves: ['absorb', 'sweetscent'] },
+            { speciesId: 'voltorb', level: 15, moves: ['tackle', 'screech', 'sonicboom'] },
           ],
         }
       ),
       makeNpc(
-        'pokefan_beverly',
-        24,
-        40,
-        'LEFT',
-        'girl',
+        'pokefan_m_william',
+        16,
+        9,
+        'DOWN',
+        'pokefan_m',
+        '🧢 POKéFAN WILLIAM',
+        ['We take great pride in our beloved companions!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokefan_m_william',
+          trainerName: 'Pokéfan William',
+          visionRange: 2,
+          challengePages: ['POKéFAN WILLIAM: We take great pride in our beloved companions!'],
+          trainerPokemon: { speciesId: 'raichu', level: 14, moves: ['thundershock', 'tailwhip', 'quickattack'] },
+          trainerTeam: [
+            { speciesId: 'raichu', level: 14, moves: ['thundershock', 'tailwhip', 'quickattack'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'pokefan_f_beverly',
+        18,
+        29,
+        'DOWN',
+        'pokefan_f',
         '🎀 POKéFAN BEVERLY',
         ['My SNUBBULL has the best manners!'],
         {
           action: 'TRAINER_BATTLE',
-          trainerId: 'pokefan_beverly',
-          trainerName: 'Pokefan Beverly',
-          visionRange: 3,
+          trainerId: 'pokefan_f_beverly',
+          trainerName: 'Pokéfan Beverly',
+          visionRange: 2,
           challengePages: ['POKéFAN BEVERLY: My darling POKéMON loves greeting new trainers!'],
           trainerPokemon: { speciesId: 'snubbull', level: 14, moves: ['tackle', 'scaryface', 'charm'] },
           trainerTeam: [
-            { speciesId: 'snubbull', level: 14, moves: ['tackle', 'scaryface', 'charm'] },
+            { speciesId: 'snubbull', level: 14, moves: ['tackle', 'scaryface', 'charm', 'bite'] },
           ],
         }
       ),
       makeNpc(
-        'lass_kril',
-        13,
-        17,
+        'lass_krise',
+        8,
+        14,
         'RIGHT',
-        'girl',
-        '👧 LASS KRIL',
-        ['Water-type POKéMON love playing near the fountain!'],
+        'lass',
+        '👧 LASS KRISE',
+        ['Have you seen the cute Bug Pokémon in the grass?'],
         {
           action: 'TRAINER_BATTLE',
-          trainerId: 'lass_kril',
-          trainerName: 'Lass Kril',
+          trainerId: 'lass_krise',
+          trainerName: 'Lass Krise',
           visionRange: 3,
-          challengePages: ['LASS KRIL: Watch out for my round blue companion!'],
-          trainerPokemon: { speciesId: 'marill', level: 15, moves: ['watergun', 'tackle', 'tailwhip', 'rollout'] },
+          challengePages: ['LASS KRISE: Have you seen the cute Bug Pokémon in the grass?'],
+          trainerPokemon: { speciesId: 'oddish', level: 12, moves: ['absorb', 'poisonpowder'] },
           trainerTeam: [
-            { speciesId: 'marill', level: 15, moves: ['watergun', 'tackle', 'tailwhip', 'rollout'] },
+            { speciesId: 'oddish', level: 12, moves: ['absorb', 'poisonpowder'] },
+            { speciesId: 'cubone', level: 15, moves: ['growl', 'boneclub', 'tailwhip'] },
           ],
         }
       ),
       makeNpc(
-        'game_host',
-        11,
-        44,
+        'park_gameboy_kid',
+        26,
+        6,
         'DOWN',
-        'fat_man',
-        '🎤 CONTEST OFFICIAL',
-        [
-          'The Bug-Catching Contest tests your skill at finding high-level, rare insect POKéMON like SCYTHER and PINSIR!',
-        ]
+        'youngster',
+        '👦 GAMEBOY KID',
+        ["I'm trading mail with my buddy over the Game Link cable!"]
+      ),
+      makeNpc(
+        'park_fountain_lass',
+        15,
+        24,
+        'DOWN',
+        'lass',
+        '👧 PARK VISITOR',
+        ['Relaxation Square in the center of the park is so peaceful!']
       ),
     ],
     route_36_national_park_gate: [
@@ -3313,7 +3473,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         4,
         2,
         'DOWN',
-        'fat_man',
+        'officer',
         '👮 GATE OFFICER',
         [
           'ROUTE 36 is straight ahead to the east.',
@@ -3330,17 +3490,31 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'sudowoodo',
         '🌲 SUDOWOODO',
         [
-          'An odd tree is blocking the path! It seems to wiggle when touched.',
-          'The weird tree attacked in surprise!',
+          "It's a weird tree. It seems to wiggle when touched!",
+          'Sudowoodo hated the water! It attacked!',
         ],
         { action: 'SUDOWOODO_EVENT' }
       ),
       makeNpc(
+        'hard_rock_guy',
+        44,
+        9,
+        'LEFT',
+        'fisherman',
+        '🥊 ROCK SMASH GUY',
+        [
+          'Wa-hey!',
+          'I was going to snap that tree with my straight-arm punch.',
+          "But I couldn't! I'm a failure!",
+        ],
+        { action: 'ROCK_SMASH_GUY_EVENT' }
+      ),
+      makeNpc(
         'psychic_mark',
-        25,
-        12,
-        'UP',
-        'boy',
+        20,
+        13,
+        'RIGHT',
+        'psychic',
         '🔮 PSYCHIC MARK',
         ['I foresaw that you would approach this intersection!'],
         {
@@ -3349,26 +3523,27 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           trainerName: 'Psychic Mark',
           visionRange: 3,
           challengePages: ['PSYCHIC MARK: Can you outthink the power of telekinesis?'],
-          trainerPokemon: { speciesId: 'abra', level: 14, moves: ['teleport'] },
+          trainerPokemon: { speciesId: 'abra', level: 13, moves: ['teleport'] },
           trainerTeam: [
-            { speciesId: 'abra', level: 14, moves: ['teleport'] },
-            { speciesId: 'kadabra', level: 16, moves: ['confusion', 'kinesis', 'disable'] },
+            { speciesId: 'abra', level: 13, moves: ['teleport'] },
+            { speciesId: 'abra', level: 13, moves: ['teleport'] },
+            { speciesId: 'kadabra', level: 15, moves: ['confusion', 'kinesis', 'disable'] },
           ],
         }
       ),
       makeNpc(
         'schoolboy_alan',
-        30,
-        4,
-        'DOWN',
-        'boy',
+        31,
+        14,
+        'LEFT',
+        'schoolboy',
         '👦 SCHOOLBOY ALAN',
         ['TANGELA vines are remarkably stretchy!'],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'schoolboy_alan',
           trainerName: 'Schoolboy Alan',
-          visionRange: 3,
+          visionRange: 5,
           challengePages: ['SCHOOLBOY ALAN: My grass POKéMON loves sunny days on Route 36!'],
           trainerPokemon: { speciesId: 'tangela', level: 16, moves: ['constrict', 'vinewhip', 'absorb'] },
           trainerTeam: [
@@ -3377,29 +3552,26 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         }
       ),
       makeNpc(
-        'hard_rock_guy',
-        42,
-        9,
-        'LEFT',
-        'fat_man',
-        '🪨 GEOLOGIST',
-        [
-          'That tree blocking the junction hates water because it’s made of solid mineral stone!',
-          'If you use a SQUIRTBOTTLE on it, it will jump right out of the ground!',
-        ]
-      ),
-      makeNpc(
         'arthur_of_thursday',
-        20,
-        12,
+        46,
+        6,
         'DOWN',
-        'boy',
+        'youngster',
         '🪨 ARTHUR OF THURSDAY',
         [
           "ARTHUR: Who am I? I'm ARTHUR of Thursday! Pleased to make your acquaintance!",
-          "Here, take this HARD STONE! It powers up ROCK-type moves!",
+          'Here, take this HARD STONE! It powers up ROCK-type moves!',
         ],
         { action: 'DAY_SIBLING_EVENT' }
+      ),
+      makeNpc(
+        'route_36_lass',
+        51,
+        8,
+        'LEFT',
+        'lass',
+        '👧 VIOLET TRAVELER',
+        ['VIOLET CITY is just through this path past the trees!']
       ),
     ],
     route_36_ruins_of_alph_gate: [
@@ -3408,7 +3580,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         4,
         2,
         'DOWN',
-        'fat_man',
+        'officer',
         '👮 OFFICER',
         ['The northern chamber entrance to RUINS OF ALPH is down these stairs.']
       ),
@@ -4376,7 +4548,7 @@ export function getNpcsForMap(
   if (mapId === 'mr_pokemons_house' && (storyFlags.has('HAS_MYSTERY_EGG') || storyFlags.has('HAS_POKEDEX'))) {
     return list.filter((n) => n.id !== 'prof_oak_npc');
   }
-  if (mapId === 'route_36' && storyFlags.has('sudowoodo_cleared')) {
+  if (mapId === 'route_36' && (storyFlags.has('sudowoodo_cleared') || storyFlags.has('EVENT_FOUGHT_SUDOWOODO'))) {
     return list.filter((n) => n.id !== 'sudowoodo');
   }
   return list;

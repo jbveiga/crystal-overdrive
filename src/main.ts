@@ -31,6 +31,9 @@ import { DayCareManager } from './world/DayCareManager';
 import { DayCareModalUI } from './ui/DayCareModalUI';
 import { DeptStoreElevatorUI, type DeptStoreFloor } from './ui/DeptStoreElevatorUI';
 import { RadioTowerQuizUI } from './ui/RadioTowerQuizUI';
+import { BugContestManager, isContestDay } from './world/BugContestManager';
+import { BugContestHUDWidget } from './ui/BugContestHUDWidget';
+import { BugContestSpecimenSwapModal } from './ui/BugContestSpecimenSwapModal';
 import type {
   MapData,
   WarpEvent,
@@ -648,6 +651,8 @@ async function bootstrap() {
   const dayCareModalUI = new DayCareModalUI(dayCareManager, 'modal-container');
   const deptStoreElevatorUI = new DeptStoreElevatorUI('modal-container');
   const radioTowerQuizUI = new RadioTowerQuizUI('modal-container');
+  const bugContestManager = new BugContestManager();
+  const bugContestHUD = new BugContestHUDWidget('overworld-hud-container');
   const visitedMaps = new Set<string>([initialMapId]);
 
   let handleInteract = () => {};
@@ -1486,6 +1491,35 @@ async function bootstrap() {
 
       if (result.isBattleOver) {
         if (result.caught) {
+          if (bugContestManager.state.isActive) {
+            const catchResult = bugContestManager.recordCatch(opponentPokemon);
+            if (catchResult.promptSwap && bugContestManager.state.bestCaughtPokemon) {
+              new BugContestSpecimenSwapModal('modal-container', {
+                currentSpecimen: bugContestManager.state.bestCaughtPokemon,
+                newCatch: opponentPokemon,
+                ballsRemaining: bugContestManager.state.ballsRemaining,
+                timeRemainingSec: bugContestManager.state.timeRemainingSec,
+                onDecision: (choice) => {
+                  if (choice === 'replace') {
+                    bugContestManager.swapSpecimen(opponentPokemon);
+                  } else {
+                    bugContestManager.keepCurrentSpecimen();
+                  }
+                  bugContestHUD.update(
+                    bugContestManager.state.ballsRemaining,
+                    bugContestManager.state.timeRemainingSec,
+                    bugContestManager.state.bestCaughtPokemon
+                  );
+                },
+              });
+            } else {
+              bugContestHUD.update(
+                bugContestManager.state.ballsRemaining,
+                bugContestManager.state.timeRemainingSec,
+                bugContestManager.state.bestCaughtPokemon
+              );
+            }
+          }
           if (options.isRoamer) {
             roamingManager.markCaught(opponentPokemon.speciesId);
             overworldHUD.hideRoamerAlert();
@@ -3509,7 +3543,13 @@ async function bootstrap() {
             targetNpc.renderX = origX;
           };
 
-          if (!storyFlags.has('has_squirtbottle')) {
+          const hasSquirtbottle =
+            storyFlags.has('has_squirtbottle') ||
+            storyFlags.has('HAS_SQUIRTBOTTLE') ||
+            storyFlags.has('EVENT_GOT_SQUIRTBOTTLE') ||
+            (inventory.keyItems || []).includes('squirtbottle');
+
+          if (!hasSquirtbottle) {
             BattleAudio.playOverworldSound('RUSTLE');
             wiggleTree();
             overworldHUD.openDialogue(
@@ -3525,20 +3565,21 @@ async function bootstrap() {
             [
               "It's a weird tree. Use SQUIRTBOTTLE?",
               `${playerName} sprinkled water with the SQUIRTBOTTLE!`,
-              "The weird tree doesn't like the SQUIRTBOTTLE! The weird tree attacked!",
+              "Sudowoodo hated the water! It attacked!",
             ],
             '🌲 SUDOWOODO',
             () => {
               BattleAudio.playCry('sudowoodo');
               const sudowoodoPkmn = PokemonFactory.create('sudowoodo', 20, [
                 'rockthrow',
+                'flail',
                 'lowkick',
                 'mimic',
-                'flail',
               ]);
               triggerBattle(sudowoodoPkmn, {
                 onBattleEnd: () => {
                   storyFlags.add('sudowoodo_cleared');
+                  storyFlags.add('EVENT_FOUGHT_SUDOWOODO');
                   if (npcsByMap.route_36) {
                     npcsByMap.route_36 = npcsByMap.route_36.filter((n) => n.id !== 'sudowoodo');
                   }
@@ -3550,6 +3591,160 @@ async function bootstrap() {
                   saveCurrentGame();
                 },
               });
+            }
+          );
+          return;
+        }
+
+        // Route 36 Rock Smash Guy TM08 Event
+        if (targetNpc.action === 'ROCK_SMASH_GUY_EVENT' || targetNpc.id === 'hard_rock_guy') {
+          if (storyFlags.has('EVENT_GOT_TM08_ROCK_SMASH')) {
+            overworldHUD.openDialogue(
+              [
+                "That happens to be ROCK SMASH.",
+                "You can shatter rocks with just a single well-aimed smack.",
+                "If any rocks are in your way, just smash 'em up!"
+              ],
+              '🥊 ROCK SMASH GUY'
+            );
+            return;
+          }
+
+          if (storyFlags.has('EVENT_FOUGHT_SUDOWOODO') || storyFlags.has('sudowoodo_cleared')) {
+            overworldHUD.openDialogue(
+              [
+                "Did you clear that wretched tree?",
+                "I'm impressed! I want you to have this."
+              ],
+              '🥊 ROCK SMASH GUY',
+              () => {
+                BattleAudio.playOverworldSound('FANFARE');
+                addOverworldItemToInventory('TM08');
+                storyFlags.add('EVENT_GOT_TM08_ROCK_SMASH');
+                saveCurrentGame();
+                overworldHUD.showToast('Received TM08 (ROCK SMASH)!');
+                overworldHUD.openDialogue(
+                  [
+                    "That happens to be ROCK SMASH.",
+                    "You can shatter rocks with just a single well-aimed smack.",
+                    "If any rocks are in your way, just smash 'em up!"
+                  ],
+                  '🥊 ROCK SMASH GUY'
+                );
+              }
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              "Wa-hey!",
+              "I was going to snap that tree with my straight-arm punch.",
+              "But I couldn't! I'm a failure!"
+            ],
+            '🥊 ROCK SMASH GUY'
+          );
+          return;
+        }
+
+        // National Park Quick Claw Teacher Event
+        if (targetNpc.action === 'QUICK_CLAW_EVENT' || targetNpc.id === 'quick_claw_teacher') {
+          if (storyFlags.has('EVENT_GOT_QUICK_CLAW')) {
+            overworldHUD.openDialogue(
+              [
+                "Let a POKéMON hold that QUICK CLAW.",
+                "Sometimes it will strike first during battle."
+              ],
+              '👩‍🏫 TEACHER'
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              "Pay attention, please!",
+              "…Oops, I have to quit thinking like a teacher all the time.",
+              "You must be a POKéMON trainer.",
+              "Since you're working so hard, I want you to have this."
+            ],
+            '👩‍🏫 TEACHER',
+            () => {
+              BattleAudio.playOverworldSound('FANFARE');
+              addOverworldItemToInventory('quick_claw');
+              storyFlags.add('EVENT_GOT_QUICK_CLAW');
+              saveCurrentGame();
+              overworldHUD.showToast('Received QUICK CLAW!');
+              overworldHUD.openDialogue(
+                [
+                  "Let a POKéMON hold that QUICK CLAW.",
+                  "Sometimes it will strike first during battle."
+                ],
+                '👩‍🏫 TEACHER'
+              );
+            }
+          );
+          return;
+        }
+
+        // Bug-Catching Contest Officer Event (Route 35 & 36 National Park Gates)
+        if (targetNpc.action === 'BUG_CONTEST_OFFICER_EVENT' || targetNpc.id === 'park_gate_officer') {
+          const dayIndex = gameClock.getDayOfWeek();
+          const isContestActiveToday = isContestDay(dayIndex);
+
+          if (!isContestActiveToday) {
+            overworldHUD.openDialogue(
+              [
+                "The Bug-Catching Contest is held on Tuesday, Thursday and Saturday.",
+                "Not only do you earn a prize just for participating, you also get to keep the bug #MON you catch!"
+              ],
+              '👮 PARK OFFICER'
+            );
+            return;
+          }
+
+          if (bugContestManager.state.isActive) {
+            overworldHUD.openDialogue(
+              [
+                "You're currently participating in the Bug-Catching Contest!",
+                "Would you like to conclude your contest and tally your score now?"
+              ],
+              '👮 PARK OFFICER',
+              () => {
+                const result = bugContestManager.endContest();
+                bugContestHUD.destroy();
+                BattleAudio.playOverworldSound('FANFARE');
+                addOverworldItemToInventory(result.prizeItem);
+                storyFlags.add('EVENT_BUG_CATCHING_CONTEST_COMPLETED');
+                if (result.rank === 1) {
+                  storyFlags.add('EVENT_BUG_CATCHING_CONTEST_1ST_PRIZE');
+                }
+                saveCurrentGame();
+                overworldHUD.showToast(`Received 1st Prize: ${result.prizeName}!`);
+                overworldHUD.openDialogue(
+                  [
+                    `CONTEST RESULTS: You placed Rank ${result.rank}!`,
+                    `Evaluated Grade: ${result.grade} with ${result.score} Points!`,
+                    `Here is your prize: ${result.prizeName}! Congratulations!`
+                  ],
+                  '🎤 CONTEST JUDGE'
+                );
+              }
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              "Today is the Bug-Catching Contest!",
+              "You get 20 Park Balls and 20 minutes to catch the strongest bug POKéMON in the park!",
+              "Here are your 20 Park Balls! Good luck!"
+            ],
+            '👮 PARK OFFICER',
+            () => {
+              bugContestManager.startContest();
+              bugContestHUD.mount(20, 1200);
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              overworldHUD.showToast('Bug-Catching Contest Started! (20 Park Balls)');
             }
           );
           return;
