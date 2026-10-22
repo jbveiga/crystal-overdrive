@@ -14,7 +14,8 @@ export type BgmTrackId =
   | 'bgm_game_corner'
   | 'bgm_wild_battle'
   | 'bgm_trainer_battle'
-  | 'bgm_gym_leader_battle';
+  | 'bgm_gym_leader_battle'
+  | 'bgm_evolution';
 
 export type BattleBgmType = 'wild' | 'trainer' | 'gym_leader';
 
@@ -462,9 +463,16 @@ export class AudioManager {
   }
 
   /**
-   * Plays a one-shot authentic SFX audio asset (e.g. `sfx_badge_get`).
+   * Crossfades into the canonical evolution theme (`bgm_evolution`).
    */
-  public playSfx(sfxId: 'sfx_badge_get'): void {
+  public playEvolutionBgm(): void {
+    this.crossfadeTo('bgm_evolution', 0.2);
+  }
+
+  /**
+   * Plays a one-shot authentic SFX audio asset (e.g. `sfx_badge_get`, `sfx_evolution_pulse`, `sfx_evolution_complete`).
+   */
+  public playSfx(sfxId: 'sfx_badge_get' | 'sfx_evolution_pulse' | 'sfx_evolution_complete'): void {
     if (this.muted || !this.isBrowserAudioAvailable()) return;
     try {
       const sfx = new Howl({

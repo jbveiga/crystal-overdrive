@@ -23,6 +23,16 @@ const TYPE_COLORS: Record<string, string> = {
   Dark: '#705848',
 };
 
+export const HM_MOVES: ReadonlySet<string> = new Set([
+  'cut',
+  'fly',
+  'surf',
+  'strength',
+  'flash',
+  'whirlpool',
+  'waterfall',
+]);
+
 /**
  * MoveReplacementModalUI — Standalone Neo-Kanto move replacement screen
  * Conforms to Google Stitch specifications and Neo-Kanto Protocol design tokens.

@@ -137,7 +137,10 @@ export class EvolutionManager {
     const currentLevel = context.level ?? pokemon.level;
     const currentFriendship = pokemon.friendship ?? 70;
     const usedItemNorm = context.itemId ? this.normalizeId(context.itemId) : null;
-    const isLinkCable = usedItemNorm === 'linkcable' || usedItemNorm === 'linkstone';
+    const isLinkCable =
+      usedItemNorm === 'linkcable' ||
+      usedItemNorm === 'linkstone' ||
+      usedItemNorm === 'linkingcord';
 
     for (const evoName of species.evos) {
       const evoSpecies = Dex.species.get(evoName);

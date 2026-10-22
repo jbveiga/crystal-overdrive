@@ -268,6 +268,63 @@ describe('Complete 251 Pokémon Sprites & Icons Integrity', () => {
     expect(fs.statSync(path.join(sfxDir, 'sfx_evolution_pulse.mp3')).size).toBeGreaterThan(0);
   });
 
+  it('verifies Route 37 and Ecruteak City character walk sheets match 144x32 specs', () => {
+    const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
+    const expectedSheets = [
+      'morty.png',
+      'kimono_girl.png',
+      'eusine.png',
+      'raikou.png',
+      'entei.png',
+      'suicune.png',
+    ];
+
+    for (const sheet of expectedSheets) {
+      const p = path.join(charsDir, sheet);
+      expect(fs.existsSync(p), `Missing sheet: ${sheet}`).toBe(true);
+      const buf = fs.readFileSync(p);
+      expect(buf.readUInt32BE(16), `${sheet} width`).toBe(144);
+      expect(buf.readUInt32BE(20), `${sheet} height`).toBe(32);
+      expect(buf.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('verifies Ecruteak trainer battle front sprites and beast event sprites exist on disk', () => {
+    const trainersDir = path.resolve(__dirname, '../public/assets/sprites/trainers');
+    const spritesDir = path.resolve(__dirname, '../public/assets/sprites');
+
+    const expectedTrainers = [
+      'morty_front.png',
+      'kimono_girl_front.png',
+      'eusine_front.png',
+    ];
+
+    for (const t of expectedTrainers) {
+      const p = path.join(trainersDir, t);
+      expect(fs.existsSync(p), `Missing trainer sprite: ${t}`).toBe(true);
+      expect(fs.statSync(p).size).toBeGreaterThan(0);
+    }
+
+    const expectedBeasts = ['raikou.png', 'entei.png', 'suicune.png'];
+    for (const b of expectedBeasts) {
+      const p = path.join(spritesDir, b);
+      expect(fs.existsSync(p), `Missing beast event sprite: ${b}`).toBe(true);
+      expect(fs.statSync(p).size).toBeGreaterThan(0);
+    }
+  });
+
+  it('verifies Ecruteak City BGM tracks exist in both MP3 and WebM formats', () => {
+    const bgmDir = path.resolve(__dirname, '../public/assets/audio/bgm');
+
+    expect(fs.existsSync(path.join(bgmDir, 'bgm_ecruteak_city.mp3'))).toBe(true);
+    expect(fs.existsSync(path.join(bgmDir, 'bgm_ecruteak_city.webm'))).toBe(true);
+    expect(fs.statSync(path.join(bgmDir, 'bgm_ecruteak_city.mp3')).size).toBeGreaterThan(0);
+
+    expect(fs.existsSync(path.join(bgmDir, 'bgm_ecruteak.mp3'))).toBe(true);
+    expect(fs.existsSync(path.join(bgmDir, 'bgm_ecruteak.webm'))).toBe(true);
+    expect(fs.statSync(path.join(bgmDir, 'bgm_ecruteak.mp3')).size).toBeGreaterThan(0);
+  });
+
   it('verifies Route 36 Sudowoodo overworld sprites are present and valid', () => {
     const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
     const spritesDir = path.resolve(__dirname, '../public/assets/sprites');
