@@ -236,7 +236,8 @@ export const INFINITE_TMS: Record<string, TMDefinition> = {
 
 export type BagTabId = 'ITEMS' | 'TMS' | 'BALLS' | 'MART';
 
-const CARD_STYLE = 'background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px;';
+const CARD_STYLE =
+  'background:#141E33;border:1.5px solid #22324F;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 3px 0 0 #070B14;';
 
 export class BagAndMartUI {
   private container: HTMLElement;
@@ -300,91 +301,109 @@ export class BagAndMartUI {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 580px;
+      width: 620px;
       max-width: 94vw;
-      max-height: 86vh;
-      background: rgba(15, 23, 42, 0.96);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 14px;
-      padding: 22px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+      max-height: 88vh;
+      background: #0D1322;
+      border: 2px solid #22324F;
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 6px 0 0 #070B14, 0 16px 48px rgba(0, 0, 0, 0.9);
       display: none;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       z-index: 50;
       pointer-events: auto;
-      color: #f8fafc;
+      color: #dde2f7;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      box-sizing: border-box;
     `;
 
     modal.innerHTML = `
       <!-- Header -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding-bottom: 12px;">
-        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-          <h2 id="bag-modal-title" style="font-size: 18px; font-weight: 800; color: #38bdf8; margin: 0;">🎒 POKéMON BAG</h2>
-          <span id="bag-money" style="font-size: 13px; font-weight: 800; background: rgba(251, 191, 36, 0.15); color: #fbbf24; padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(251, 191, 36, 0.3);">$3,000</span>
-          <span id="bag-badges" style="font-size: 12px; font-weight: 700; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 3px 8px; border-radius: 6px;">🏅 0 Badges</span>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #FFD028; box-shadow: 0 0 8px #FFD028;"></span>
+          <div>
+            <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #FFD028; letter-spacing: 1px;">TACTICAL INVENTORY // STASH</div>
+            <h2 id="bag-modal-title" style="font-family: 'Space Mono', monospace; margin: 2px 0 0 0; font-size: 19px; font-weight: 900; color: #F6F8F3; letter-spacing: -0.5px;">🎒 POKéMON BAG</h2>
+          </div>
         </div>
-        <button id="close-bag-modal-btn" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span id="bag-money" style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; background: #141E33; color: #FFD028; padding: 5px 10px; border-radius: 6px; border: 1.5px solid #FFD028; box-shadow: 0 2px 0 0 #070B14;">$3,000</span>
+          <span id="bag-badges" style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; background: #141E33; color: #38BDF8; padding: 5px 10px; border-radius: 6px; border: 1.5px solid #22324F; box-shadow: 0 2px 0 0 #070B14;">🏅 0 Badges</span>
+          <button id="close-bag-modal-btn" style="background: #1E293B; color: #F6F8F3; border: 1.5px solid #475569; border-radius: 6px; padding: 5px 12px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 0 #070B14;">✕ CLOSE</button>
+        </div>
       </div>
 
       <!-- Feedback Banner -->
       <div id="bag-feedback-banner" style="
         display: none;
-        background: rgba(16, 185, 129, 0.2);
-        border: 1px solid #10b981;
+        background: #141E33;
+        border: 1.5px solid #10b981;
         color: #a7f3d0;
-        padding: 8px 12px;
+        padding: 9px 14px;
         border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
+        font-family: 'Space Mono', monospace;
+        font-size: 11px;
+        font-weight: 700;
+        box-shadow: 0 2px 0 0 #070B14;
       "></div>
 
       <!-- Tab Buttons -->
-      <div id="bag-tabs-bar" style="display: flex; gap: 6px; flex-wrap: wrap;">
+      <div id="bag-tabs-bar" style="display: flex; gap: 8px; flex-wrap: wrap;">
         <button id="tab-items" style="
           flex: 1;
-          padding: 9px 6px;
-          border: none;
+          padding: 8px 10px;
+          border: 1.5px solid #FFD028;
           border-radius: 6px;
-          background: #2563eb;
-          color: white;
-          font-weight: 700;
-          font-size: 12px;
+          background: #FFD028;
+          color: #070B14;
+          font-family: 'Space Mono', monospace;
+          font-weight: 800;
+          font-size: 11px;
           cursor: pointer;
+          box-shadow: 0 3px 0 0 #070B14;
         ">🧪 ITEMS</button>
         <button id="tab-tms" style="
           flex: 1;
-          padding: 9px 6px;
-          border: none;
+          padding: 8px 10px;
+          border: 1.5px solid #22324F;
           border-radius: 6px;
-          background: #334155;
+          background: #141E33;
           color: #94a3b8;
-          font-weight: 700;
-          font-size: 12px;
+          font-family: 'Space Mono', monospace;
+          font-weight: 800;
+          font-size: 11px;
           cursor: pointer;
+          box-shadow: 0 2px 0 0 #070B14;
         ">💿 TMS & HMS</button>
         <button id="tab-balls" style="
           flex: 1;
-          padding: 9px 6px;
-          border: none;
+          padding: 8px 10px;
+          border: 1.5px solid #22324F;
           border-radius: 6px;
-          background: #334155;
+          background: #141E33;
           color: #94a3b8;
-          font-weight: 700;
-          font-size: 12px;
+          font-family: 'Space Mono', monospace;
+          font-weight: 800;
+          font-size: 11px;
           cursor: pointer;
+          box-shadow: 0 2px 0 0 #070B14;
         ">🔴 MY BALLS</button>
         <button id="tab-mart" style="
           flex: 1;
-          padding: 9px 6px;
-          border: none;
+          padding: 8px 10px;
+          border: 1.5px solid #22324F;
           border-radius: 6px;
-          background: #334155;
+          background: #141E33;
           color: #94a3b8;
-          font-weight: 700;
-          font-size: 12px;
+          font-family: 'Space Mono', monospace;
+          font-weight: 800;
+          font-size: 11px;
           cursor: pointer;
+          box-shadow: 0 2px 0 0 #070B14;
         ">🏪 POKÉ MART</button>
       </div>
 
@@ -393,7 +412,7 @@ export class BagAndMartUI {
         display: flex;
         flex-direction: column;
         gap: 10px;
-        max-height: 52vh;
+        max-height: 56vh;
         overflow-y: auto;
         padding-right: 4px;
       "></div>
@@ -438,8 +457,17 @@ export class BagAndMartUI {
     const tabMart = this.bagModal.querySelector('#tab-mart') as HTMLButtonElement;
 
     const setActive = (btn: HTMLButtonElement, active: boolean) => {
-      btn.style.background = active ? '#2563eb' : '#334155';
-      btn.style.color = active ? '#ffffff' : '#94a3b8';
+      if (active) {
+        btn.style.background = '#FFD028';
+        btn.style.color = '#070B14';
+        btn.style.borderColor = '#FFD028';
+        btn.style.boxShadow = '0 3px 0 0 #070B14';
+      } else {
+        btn.style.background = '#141E33';
+        btn.style.color = '#94a3b8';
+        btn.style.borderColor = '#22324F';
+        btn.style.boxShadow = '0 2px 0 0 #070B14';
+      }
     };
 
     setActive(tabItems, tab === 'ITEMS');
@@ -496,9 +524,9 @@ export class BagAndMartUI {
 
   private showFeedback(message: string, isError: boolean = false): void {
     this.feedbackBanner.style.display = 'block';
-    this.feedbackBanner.style.background = isError ? 'rgba(220, 38, 38, 0.2)' : 'rgba(16, 185, 129, 0.2)';
-    this.feedbackBanner.style.borderColor = isError ? '#ef4444' : '#10b981';
-    this.feedbackBanner.style.color = isError ? '#fca5a5' : '#a7f3d0';
+    this.feedbackBanner.style.background = isError ? '#1F131D' : '#0B1F1C';
+    this.feedbackBanner.style.borderColor = isError ? '#EE4238' : '#10B981';
+    this.feedbackBanner.style.color = isError ? '#FCA5A5' : '#A7F3D0';
     this.feedbackBanner.innerText = message;
   }
 
@@ -515,58 +543,62 @@ export class BagAndMartUI {
   private renderPartyTargetSelector(container: HTMLElement, onSelect: () => void): void {
     const bar = document.createElement('div');
     bar.style.cssText = `
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.28);
-      border-radius: 8px;
-      padding: 10px 12px;
+      background: #080E1D;
+      border: 1.5px solid #22324F;
+      border-radius: 10px;
+      padding: 10px 14px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      box-shadow: 0 3px 0 0 #070B14;
     `;
 
     const title = document.createElement('div');
-    title.style.cssText = 'font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;';
+    title.style.cssText =
+      "font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px;";
     title.innerText = 'Target Party Member (Click to Select):';
     bar.appendChild(title);
 
     const pillsRow = document.createElement('div');
-    pillsRow.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap;';
+    pillsRow.style.cssText = 'display: flex; gap: 8px; flex-wrap: wrap;';
 
     this.party.forEach((pkmn, idx) => {
       const isSelected = idx === this.selectedPartyIndex;
       const pct = Math.max(0, Math.min(100, (pkmn.currentHp / pkmn.stats.hp) * 100));
-      const hpColor = pct > 50 ? '#22c55e' : pct > 20 ? '#eab308' : '#ef4444';
+      const hpColor = pct > 50 ? '#48C774' : pct > 20 ? '#FFD028' : '#EE4238';
 
       const pill = document.createElement('button');
       pill.style.cssText = `
-        background: ${isSelected ? '#1e3a8a' : '#0f172a'};
-        border: 1.5px solid ${isSelected ? '#38bdf8' : 'rgba(255, 255, 255, 0.14)'};
-        border-radius: 6px;
+        background: ${isSelected ? '#141E33' : '#0D1322'};
+        border: 2px solid ${isSelected ? '#38BDF8' : '#22324F'};
+        box-shadow: ${isSelected ? '0 0 10px rgba(56, 189, 248, 0.3), 0 3px 0 0 #070B14' : '0 2px 0 0 #070B14'};
+        border-radius: 8px;
         padding: 6px 10px;
-        color: #f8fafc;
+        color: #F6F8F3;
         cursor: pointer;
         display: flex;
         flex-direction: column;
         gap: 3px;
-        min-width: 120px;
+        min-width: 124px;
         text-align: left;
+        transition: all 0.1s ease;
       `;
 
       const statusBadge =
         pkmn.status !== 'NONE'
-          ? `<span style="background: #eab308; color: #0f172a; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px;">${pkmn.status}</span>`
+          ? `<span style="background: #EE4238; color: #FFFFFF; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; font-family: 'Space Mono', monospace;">${pkmn.status}</span>`
           : '';
 
       pill.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; font-weight: 800;">
           <span>${pkmn.nickname}</span>
           ${statusBadge}
-          <span style="font-size: 10px; color: #facc15;">Lv.${pkmn.level}</span>
+          <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #FFD028;">Lv.${pkmn.level}</span>
         </div>
-        <div style="width: 100%; height: 4px; background: #334155; border-radius: 2px; overflow: hidden;">
+        <div style="width: 100%; height: 5px; background: #080E1D; border-radius: 3px; overflow: hidden; border: 1px solid #22324F;">
           <div style="width: ${pct}%; height: 100%; background: ${hpColor};"></div>
         </div>
-        <div style="font-size: 10px; color: #cbd5e1;">HP ${pkmn.currentHp}/${pkmn.stats.hp}</div>
+        <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;">HP ${pkmn.currentHp}/${pkmn.stats.hp}</div>
       `;
 
       pill.addEventListener('click', () => {
@@ -595,7 +627,7 @@ export class BagAndMartUI {
     const ownedItems = MART_MEDICINE_CATALOG.filter((m) => (this.inventory.items?.[m.id] ?? 0) > 0);
     const hasBerries = Object.values(this.inventory.berries || {}).some((c) => (c ?? 0) > 0);
     if (ownedItems.length === 0 && !this.onUseItemfinder && !hasBerries) {
-      container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 20px;">No medicine items in bag. Visit a Poké Mart to stock up!</div>`;
+      container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; background: #141E33; border: 1px dashed #22324F; border-radius: 10px; box-shadow: 0 3px 0 0 #070B14;">No medicine items in bag. Visit a Poké Mart to stock up!</div>`;
       return;
     }
 
@@ -610,22 +642,24 @@ export class BagAndMartUI {
       card.innerHTML = `
         <div style="flex: 1;">
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 700; color: #ffffff;">${med.icon} ${med.name}</span>
-            <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${med.badgeLabel}</span>
-            <span style="font-size: 12px; font-weight: 800; color: #38bdf8;">x${count}</span>
+            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${med.icon} ${med.name}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${med.badgeLabel}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #FFD028;">x${count}</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">${med.desc}</div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${med.desc}</div>
         </div>
         <button class="use-med-btn" style="
-          background: #16a34a;
+          background: #16A34A;
           color: white;
-          border: none;
+          border: 1.5px solid #22C55E;
           border-radius: 6px;
           padding: 8px 14px;
+          font-family: 'Space Mono', monospace;
           font-weight: 800;
-          font-size: 12px;
+          font-size: 11px;
           cursor: pointer;
           white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
         ">USE ON ${targetPkmn ? targetPkmn.nickname.toUpperCase() : 'PARTY'}</button>
       `;
 
@@ -643,21 +677,23 @@ export class BagAndMartUI {
       finderCard.innerHTML = `
         <div style="flex: 1;">
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 700; color: #38bdf8;">📡 ITEMFINDER</span>
-            <span style="font-size: 10px; background: #0284c7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">KEY ITEM</span>
+            <span style="font-weight: 800; color: #38BDF8; font-size: 14px;">📡 ITEMFINDER</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">KEY ITEM</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">A high-tech dowsing machine that detects hidden items within 8 paces and casts a live directional radar beam toward their location.</div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">A high-tech dowsing machine that detects hidden items within 8 paces and casts a live directional radar beam toward their location.</div>
         </div>
         <button class="use-itemfinder-btn" style="
-          background: #0284c7;
+          background: #0284C7;
           color: white;
-          border: none;
+          border: 1.5px solid #38BDF8;
           border-radius: 6px;
           padding: 8px 14px;
+          font-family: 'Space Mono', monospace;
           font-weight: 800;
-          font-size: 12px;
+          font-size: 11px;
           cursor: pointer;
           white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
         ">SCAN NEARBY</button>
       `;
       const scanBtn = finderCard.querySelector('.use-itemfinder-btn') as HTMLButtonElement;
@@ -676,12 +712,12 @@ export class BagAndMartUI {
       berryCard.innerHTML = `
         <div style="flex: 1;">
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 700; color: #f43f5e;">🍒 ${formattedName}</span>
-            <span style="font-size: 10px; background: #be123c; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">BERRY / APRICORN</span>
+            <span style="font-weight: 800; color: #F43F5E; font-size: 14px;">🍒 ${formattedName}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #BE123C; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">BERRY / APRICORN</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">Picked fresh from a fruit-bearing tree in Johto or Kanto.</div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">Picked fresh from a fruit-bearing tree in Johto or Kanto.</div>
         </div>
-        <div style="font-size: 15px; font-weight: 800; color: #fb7185;">x${count}</div>
+        <div style="font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 800; color: #FB7185;">x${count}</div>
       `;
       container.appendChild(berryCard);
     }
@@ -773,38 +809,41 @@ export class BagAndMartUI {
       // Party Compatibility View
       const headerBox = document.createElement('div');
       headerBox.style.cssText = `
-        background: rgba(15, 23, 42, 0.9);
-        border: 1.5px solid #38bdf8;
-        border-radius: 8px;
+        background: #080E1D;
+        border: 2px solid #38BDF8;
+        border-radius: 10px;
         padding: 12px 14px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
         gap: 8px;
+        box-shadow: 0 4px 0 0 #070B14;
       `;
       headerBox.innerHTML = `
         <div style="flex: 1;">
-          <div style="font-size: 10px; font-weight: 800; color: #38bdf8; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">
+          <div style="font-size: 10px; font-weight: 800; color: #38BDF8; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">
             PARTY COMPATIBILITY // SELECT POKÉMON TO TEACH:
           </div>
-          <div style="font-size: 16px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 8px; margin-top: 2px;">
+          <div style="font-size: 16px; font-weight: 800; color: #FFFFFF; display: flex; align-items: center; gap: 8px; margin-top: 2px; font-family: 'Space Mono', monospace;">
             <span>${tm.id}: ${tm.name}</span>
-            <span style="font-size: 10px; background: #334155; padding: 2px 6px; border-radius: 4px; color: #cbd5e1;">${tm.type.toUpperCase()}</span>
+            <span style="font-size: 10px; background: #22324F; padding: 2px 6px; border-radius: 4px; color: #CBD5E1;">${tm.type.toUpperCase()}</span>
             <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">INFINITE USE</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">${tm.desc}</div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">${tm.desc}</div>
         </div>
         <button id="btn-back-to-tms" style="
-          background: #334155;
-          color: #f8fafc;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: #1E293B;
+          color: #F8FAFC;
+          border: 1.5px solid #475569;
           border-radius: 6px;
           padding: 8px 14px;
-          font-size: 12px;
+          font-family: 'Space Mono', monospace;
+          font-size: 11px;
           font-weight: 800;
           cursor: pointer;
           white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
         ">← BACK TO TM LIST</button>
       `;
 
@@ -838,9 +877,10 @@ export class BagAndMartUI {
         const card = document.createElement('div');
         card.className = 'party-compat-card';
         card.style.cssText = `
-          background: #1e293b;
-          border: 1.5px solid ${alreadyKnows ? 'rgba(56, 189, 248, 0.3)' : canLearn ? 'rgba(34, 197, 94, 0.4)' : 'rgba(100, 116, 139, 0.2)'};
-          border-radius: 8px;
+          background: #141E33;
+          border: 1.5px solid ${alreadyKnows ? '#38BDF8' : canLearn ? '#22C55E' : '#22324F'};
+          box-shadow: 0 3px 0 0 #070B14;
+          border-radius: 10px;
           padding: 10px 14px;
           display: flex;
           justify-content: space-between;
@@ -851,31 +891,37 @@ export class BagAndMartUI {
 
         const badgeHtml = alreadyKnows
           ? `<span class="compat-badge-learned" style="
-              background: #0284c7;
+              background: #0284C7;
               color: white;
               padding: 6px 12px;
               border-radius: 6px;
+              font-family: 'Space Mono', monospace;
               font-weight: 800;
               font-size: 11px;
               white-space: nowrap;
+              box-shadow: 0 2px 0 0 #070B14;
             ">LEARNED ✓</span>`
           : canLearn
             ? `<button class="teach-pokemon-btn" data-index="${i}" style="
-                background: #16a34a;
+                background: #16A34A;
                 color: white;
-                border: none;
+                border: 1.5px solid #22C55E;
                 border-radius: 6px;
                 padding: 8px 14px;
+                font-family: 'Space Mono', monospace;
                 font-weight: 800;
-                font-size: 12px;
+                font-size: 11px;
                 cursor: pointer;
                 white-space: nowrap;
+                box-shadow: 0 3px 0 0 #070B14;
               ">ABLE — TEACH</button>`
             : `<span class="compat-badge-not-able" style="
-                background: #334155;
-                color: #94a3b8;
+                background: #1E293B;
+                color: #94A3B8;
+                border: 1px solid #334155;
                 padding: 6px 12px;
                 border-radius: 6px;
+                font-family: 'Space Mono', monospace;
                 font-weight: 700;
                 font-size: 11px;
                 white-space: nowrap;
@@ -884,12 +930,12 @@ export class BagAndMartUI {
         card.innerHTML = `
           <div style="flex: 1;">
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-              <span style="font-weight: 800; font-size: 14px; color: #ffffff;">${pkmn.nickname}</span>
-              <span style="font-size: 11px; color: #38bdf8; font-weight: 700;">Lv. ${pkmn.level}</span>
-              <span style="font-size: 11px; color: #cbd5e1;">HP: ${pkmn.currentHp}/${pkmn.stats.hp}</span>
+              <span style="font-weight: 800; font-size: 14px; color: #FFFFFF;">${pkmn.nickname}</span>
+              <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #38BDF8; font-weight: 700;">Lv. ${pkmn.level}</span>
+              <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #CBD5E1;">HP: ${pkmn.currentHp}/${pkmn.stats.hp}</span>
             </div>
-            <div style="font-size: 11px; color: #94a3b8; margin-top: 3px;">
-              Moves: <span style="color: #e2e8f0;">${movesSummary}</span>
+            <div style="font-size: 11px; color: #94A3B8; margin-top: 3px;">
+              Moves: <span style="color: #E2E8F0;">${movesSummary}</span>
             </div>
           </div>
           <div>${badgeHtml}</div>
@@ -922,20 +968,21 @@ export class BagAndMartUI {
         .join(' • ');
       const partyInfo = document.createElement('div');
       partyInfo.style.cssText = `
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(56, 189, 248, 0.25);
-        border-radius: 8px;
-        padding: 10px 12px;
+        background: #080E1D;
+        border: 1.5px solid #22324F;
+        border-radius: 10px;
+        padding: 10px 14px;
         font-size: 12px;
-        color: #cbd5e1;
+        color: #CBD5E1;
+        box-shadow: 0 3px 0 0 #070B14;
       `;
-      partyInfo.innerHTML = `<strong>Selected Pokémon:</strong> ${targetPkmn.nickname} (Lv. ${targetPkmn.level}) — <span style="color: #38bdf8;">${movesSummary}</span>`;
+      partyInfo.innerHTML = `<strong>Selected Pokémon:</strong> ${targetPkmn.nickname} (Lv. ${targetPkmn.level}) — <span style="color: #38BDF8; font-family: 'Space Mono', monospace;">${movesSummary}</span>`;
       container.appendChild(partyInfo);
     }
 
     const tms = this.inventory.tms;
     if (tms.length === 0) {
-      container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 20px;">No TMs acquired yet.</div>`;
+      container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; background: #141E33; border: 1px dashed #22324F; border-radius: 10px; box-shadow: 0 3px 0 0 #070B14;">No TMs acquired yet.</div>`;
       return;
     }
 
@@ -954,22 +1001,25 @@ export class BagAndMartUI {
       card.innerHTML = `
         <div style="flex: 1;">
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 800; color: #38bdf8;">${tm.id}</span>
-            <span style="font-weight: 700; color: #ffffff;">${tm.name}</span>
-            <span style="font-size: 10px; background: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${tm.type.toUpperCase()}</span>
-            <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">INFINITE USE</span>
+            <span style="font-family: 'Space Mono', monospace; font-weight: 800; color: #38BDF8; font-size: 13px;">${tm.id}</span>
+            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${tm.name}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #22324F; padding: 2px 6px; border-radius: 4px; font-weight: 700; color: #CBD5E1;">${tm.type.toUpperCase()}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">INFINITE USE</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">${tm.desc}</div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${tm.desc}</div>
         </div>
         <button class="teach-tm-btn" style="
-          background: #2563eb;
+          background: #2563EB;
           color: white;
-          border: none;
+          border: 1.5px solid #38BDF8;
           border-radius: 6px;
           padding: 8px 14px;
-          font-weight: 700;
-          font-size: 12px;
+          font-family: 'Space Mono', monospace;
+          font-weight: 800;
+          font-size: 11px;
           cursor: pointer;
+          white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
         ">TEACH</button>
       `;
 
@@ -992,7 +1042,7 @@ export class BagAndMartUI {
       [PokeballId, number]
     >;
     if (ballEntries.length === 0) {
-      container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">No Pokéballs in bag. Visit a Poké Mart to stock up!</div>`;
+      container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; background: #141E33; border: 1px dashed #22324F; border-radius: 10px; box-shadow: 0 3px 0 0 #070B14;">No Pokéballs in bag. Visit a Poké Mart to stock up!</div>`;
       return;
     }
 
@@ -1006,14 +1056,14 @@ export class BagAndMartUI {
       card.style.cssText = CARD_STYLE;
 
       card.innerHTML = `
-        <div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-weight: 700; color: #ffffff;">🔴 ${formattedName}</span>
-            <span style="font-size: 10px; background: #0284c7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${mult}</span>
+        <div style="flex: 1;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">🔴 ${formattedName}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${mult}</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">${desc}</div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${desc}</div>
         </div>
-        <div style="font-size: 15px; font-weight: 800; color: #38bdf8;">x${count}</div>
+        <div style="font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 800; color: #38BDF8;">x${count}</div>
       `;
 
       container.appendChild(card);
@@ -1026,25 +1076,26 @@ export class BagAndMartUI {
 
     const currentBadges = this.inventory.badges.length;
 
-    // Badge Progression Display (Read-only, reflecting actual player achievements)
+    // Badge Progression Display
     const badgeBar = document.createElement('div');
     badgeBar.style.cssText = `
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 8px;
-      padding: 10px 12px;
+      background: #080E1D;
+      border: 1.5px solid #22324F;
+      border-radius: 10px;
+      padding: 10px 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
+      box-shadow: 0 3px 0 0 #070B14;
     `;
 
     badgeBar.innerHTML = `
-      <div style="font-size: 12px; font-weight: 700; color: #cbd5e1;">
-        🏅 Gym Badges Earned: <strong style="color: #38bdf8;">${currentBadges} / 8</strong>
+      <div style="font-size: 12px; font-weight: 700; color: #CBD5E1;">
+        🏅 Gym Badges Earned: <strong style="color: #38BDF8; font-family: 'Space Mono', monospace;">${currentBadges} / 8</strong>
       </div>
-      <div style="font-size: 11px; color: #94a3b8;">
+      <div style="font-size: 11px; color: #94A3B8; font-family: 'Space Mono', monospace;">
         New badges unlock specialty Pokéballs.
       </div>
     `;
@@ -1052,7 +1103,8 @@ export class BagAndMartUI {
 
     // Medicine Section Header
     const medHeader = document.createElement('div');
-    medHeader.style.cssText = 'font-size: 12px; font-weight: 800; color: #38bdf8; margin-top: 4px; letter-spacing: 0.5px;';
+    medHeader.style.cssText =
+      "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 4px; letter-spacing: 0.5px;";
     medHeader.innerText = '🧪 MEDICINE & STATUS HEALERS';
     container.appendChild(medHeader);
 
@@ -1068,22 +1120,24 @@ export class BagAndMartUI {
       card.innerHTML = `
         <div style="flex: 1;">
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 700; color: #ffffff;">${med.icon} ${med.name}</span>
-            <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${med.badgeLabel}</span>
-            <span style="font-size: 11px; color: #94a3b8;">Owned: x${ownedCount}</span>
+            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${med.icon} ${med.name}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${med.badgeLabel}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94A3B8;">Owned: x${ownedCount}</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">${med.desc}</div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${med.desc}</div>
         </div>
         <button class="buy-med-btn" style="
-          background: #16a34a;
+          background: #16A34A;
           color: white;
-          border: none;
+          border: 1.5px solid #22C55E;
           border-radius: 6px;
           padding: 8px 12px;
+          font-family: 'Space Mono', monospace;
           font-weight: 800;
-          font-size: 12px;
+          font-size: 11px;
           cursor: pointer;
           white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
         ">BUY $${med.price}</button>
       `;
 
@@ -1108,7 +1162,8 @@ export class BagAndMartUI {
 
     // Pokéball Section Header
     const ballHeader = document.createElement('div');
-    ballHeader.style.cssText = 'font-size: 12px; font-weight: 800; color: #38bdf8; margin-top: 8px; letter-spacing: 0.5px;';
+    ballHeader.style.cssText =
+      "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 8px; letter-spacing: 0.5px;";
     ballHeader.innerText = '🔴 SPECIALTY & STANDARD POKÉ BALLS';
     container.appendChild(ballHeader);
 
@@ -1124,21 +1179,24 @@ export class BagAndMartUI {
       card.innerHTML = `
         <div style="flex: 1;">
           <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 700; color: #ffffff;">🔴 ${item.name}</span>
-            <span style="font-size: 10px; background: #0284c7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${item.multiplierLabel}</span>
-            <span style="font-size: 11px; color: #94a3b8;">Owned: x${ownedCount}</span>
+            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">🔴 ${item.name}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${item.multiplierLabel}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94A3B8;">Owned: x${ownedCount}</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">${item.desc}</div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${item.desc}</div>
         </div>
         <button class="buy-ball-btn" style="
-          background: #16a34a;
+          background: #16A34A;
           color: white;
-          border: none;
+          border: 1.5px solid #22C55E;
           border-radius: 6px;
           padding: 8px 12px;
+          font-family: 'Space Mono', monospace;
           font-weight: 800;
-          font-size: 12px;
+          font-size: 11px;
           cursor: pointer;
+          white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
         ">BUY $${item.price}</button>
       `;
 
