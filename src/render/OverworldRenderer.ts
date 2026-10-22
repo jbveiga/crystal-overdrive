@@ -22,6 +22,9 @@ interface GrassParticle {
   maxLife: number;
 }
 
+import { ANIMATED_WATER_TILES } from './tileConstants';
+export { ANIMATED_WATER_TILES };
+
 export class OverworldRenderer {
   public app!: Application;
   private stageContainer!: Container;
@@ -217,6 +220,14 @@ export class OverworldRenderer {
       'in_players_house_1c_40_01_01',
       'in_players_house_22_24_15_35',
       'in_players_house_23_22_25_15',
+      'in_cave_14_14_14_14',
+      'in_cave_0a_26_17_14',
+      'in_cave_26_26_14_14',
+      'in_cave_26_0b_14_15',
+      'in_cave_17_14_17_14',
+      'in_cave_14_15_14_15',
+      'in_cave_14_25_14_14',
+      'in_cave_27_14_14_14',
       'in_players_house_25_15_33_32',
       'in_players_house_25_35_25_35',
       'in_players_house_25_35_33_34',
@@ -456,18 +467,7 @@ export class OverworldRenderer {
     );
 
     // Load 4-step authentic water animation frames (0 -> 1 -> 2 -> 1) from pret/pokecrystal water.png
-    const animatedWaterTileNames = [
-      'jt_14_14_14_14',
-      'jt_14_3b_14_3b',
-      'jt_14_4b_14_14',
-      'jt_3d_14_3d_14',
-      'jt_4c_4c_14_14',
-      'jt_4d_14_14_14',
-      'jt_4c_5d_14_3b',
-      'jt_5c_4c_3d_14',
-    ];
-
-    for (const wName of animatedWaterTileNames) {
+    for (const wName of ANIMATED_WATER_TILES) {
       const f0 = this.tileTextures.get(wName);
       if (!f0) continue;
       try {
@@ -750,6 +750,20 @@ export class OverworldRenderer {
   }
 
   /**
+   * Returns whether a tile has 4-step animated water frames registered.
+   */
+  public hasWaterAnimFrames(name: string): boolean {
+    return this.waterAnimFrames.has(name);
+  }
+
+  /**
+   * Returns 4-step animated water frames for a tile, if registered.
+   */
+  public getWaterAnimFrames(name: string): [Texture, Texture, Texture, Texture] | undefined {
+    return this.waterAnimFrames.get(name);
+  }
+
+  /**
    * Plays a crisp authentic 160ms doorway fade-to-black / 160ms fade-in transition (320ms total)
    */
   public async playDoorwayFade(onMidpoint: () => void | Promise<void>, durationMs: number = 160): Promise<void> {
@@ -903,6 +917,13 @@ export class OverworldRenderer {
           if (tex) {
             tex.source.scaleMode = 'nearest';
             this.tileTextures.set(name, tex);
+          }
+          if (ANIMATED_WATER_TILES.includes(name) && !this.waterAnimFrames.has(name) && tex) {
+            const f1 = await Assets.load<Texture>(`./assets/tiles/${name}__w1.png`);
+            const f2 = await Assets.load<Texture>(`./assets/tiles/${name}__w2.png`);
+            f1.source.scaleMode = 'nearest';
+            f2.source.scaleMode = 'nearest';
+            this.waterAnimFrames.set(name, [tex, f1, f2, f1]);
           }
         } catch (err) {
           console.warn(`Could not load tile ${name}:`, err);
