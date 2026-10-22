@@ -29,6 +29,8 @@ import { TownMapUI } from './ui/TownMapUI';
 import { RuinsPuzzleModalUI } from './ui/RuinsPuzzleModalUI';
 import { DayCareManager } from './world/DayCareManager';
 import { DayCareModalUI } from './ui/DayCareModalUI';
+import { DeptStoreElevatorUI, type DeptStoreFloor } from './ui/DeptStoreElevatorUI';
+import { RadioTowerQuizUI } from './ui/RadioTowerQuizUI';
 import type {
   MapData,
   WarpEvent,
@@ -644,6 +646,8 @@ async function bootstrap() {
   const ruinsPuzzleModalUI = new RuinsPuzzleModalUI('modal-container');
   const dayCareManager = new DayCareManager(existingSave?.dayCare);
   const dayCareModalUI = new DayCareModalUI(dayCareManager, 'modal-container');
+  const deptStoreElevatorUI = new DeptStoreElevatorUI('modal-container');
+  const radioTowerQuizUI = new RadioTowerQuizUI('modal-container');
   const visitedMaps = new Set<string>([initialMapId]);
 
   let handleInteract = () => {};
@@ -774,7 +778,9 @@ async function bootstrap() {
     namingModalUI.isOpen() ||
     townMapUI.isOpen() ||
     ruinsPuzzleModalUI.isOpen() ||
-    dayCareModalUI.isOpen();
+    dayCareModalUI.isOpen() ||
+    deptStoreElevatorUI.isOpen() ||
+    radioTowerQuizUI.isOpen();
 
   overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => {
@@ -2531,7 +2537,7 @@ async function bootstrap() {
           return;
         }
 
-        // Goldenrod Gym Leader Boss: Whitney
+        // Goldenrod Gym Leader Boss: Whitney (Crying Tantrum Mechanism)
         if (targetNpc.action === 'WHITNEY_EVENT' && !storyFlags.has('whitney_defeated')) {
           const introPages =
             targetNpc.challengePages && targetNpc.challengePages.length > 0
@@ -2550,25 +2556,84 @@ async function bootstrap() {
               onVictory: () => {
                 defeatedTrainers.add('whitney');
                 storyFlags.add('whitney_defeated');
-                if (!inventory.badges.includes('plain')) inventory.badges.push('plain');
-                if (!inventory.tms.includes('TM45')) inventory.tms.push('TM45');
-                audioManager.playSfx('sfx_badge_get');
-                BattleAudio.playOverworldSound('KEY_ITEM');
                 overworldHUD.openDialogue(
                   [
-                    "WHITNEY: …Sniff… …Waaaaah! What a meanie! I lost! You're horrible!",
-                    "WHITNEY: …Sniff… …Sigh… It's okay. You won fair and square. Take the PLAINBADGE!",
-                    "WHITNEY: The PLAINBADGE boosts your POKéMON's SPEED stat! It also lets your POKéMON use STRENGTH outside of battle. Oh, and take this too—it's TM45 ATTRACT!",
+                    "WHITNEY: …Sniff… …Waaaaaaah! What a meanie! I lost! You're horrible!",
+                    "WHITNEY: …Sob… I can't believe I lost! Leave me alone! Waaaaah!",
                   ],
                   targetNpc.speaker,
                   () => {
                     saveCurrentGame();
-                    overworldHUD.showToast('🎀 Received PLAIN BADGE & TM45 ATTRACT from Leader Whitney!');
                   }
                 );
               },
             });
           });
+          return;
+        }
+
+        if (targetNpc.action === 'WHITNEY_EVENT' && storyFlags.has('whitney_defeated')) {
+          if (!storyFlags.has('whitney_calmed')) {
+            overworldHUD.openDialogue(
+              [
+                "WHITNEY: …Sniffle… …Waaaaaaah! What a meanie! Leave me alone! Waaaaah!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          if (!storyFlags.has('plain_badge_received')) {
+            storyFlags.add('plain_badge_received');
+            storyFlags.add('ENGINE_PLAINBADGE');
+            if (!inventory.badges.includes('plain')) inventory.badges.push('plain');
+            if (!inventory.tms.includes('TM45')) inventory.tms.push('TM45');
+            audioManager.playSfx('sfx_badge_get');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                "WHITNEY: …Sniff… …Sigh… It's okay. You won fair and square. Take the PLAINBADGE!",
+                `${playerName} received the PLAINBADGE from WHITNEY!`,
+                "WHITNEY: The PLAINBADGE boosts your POKéMON's SPEED stat! It also lets your POKéMON use STRENGTH outside of battle. Oh, and take this too—it's TM45 ATTRACT!",
+                `${playerName} received TM45 ATTRACT!`,
+                "WHITNEY: Normal-type POKéMON have so much versatility. Keep believing in your team!",
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('🎀 Received PLAIN BADGE & TM45 ATTRACT from Leader Whitney!');
+              }
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            [
+              "WHITNEY: The PLAINBADGE proves your strength! Normal-type POKéMON have so much versatility. Keep believing in your team!",
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        // Lass Bridget: calms Whitney after her defeat
+        if (targetNpc.id === 'lass_bridget' && storyFlags.has('whitney_defeated')) {
+          if (!storyFlags.has('whitney_calmed')) {
+            storyFlags.add('whitney_calmed');
+            overworldHUD.openDialogue(
+              [
+                "LASS BRIDGET: Oh, no. You made WHITNEY cry.",
+                "It's OK. She'll stop soon. She always cries when she loses.",
+                "Go on back and talk to her now. She should be calmed down.",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            [
+              "LASS BRIDGET: Did WHITNEY give you the PLAINBADGE? Don't feel bad about her crying!",
+            ],
+            targetNpc.speaker
+          );
           return;
         }
 
@@ -3158,31 +3223,266 @@ async function bootstrap() {
           return;
         }
 
-        // Goldenrod Flower Shop: Squirtbottle Gift (Task 3)
+        // Goldenrod Flower Shop: Squirtbottle Gift (gated behind Plain Badge)
         if (targetNpc.id === 'florist') {
-          if (storyFlags.has('has_squirtbottle')) {
+          if (storyFlags.has('has_squirtbottle') || storyFlags.has('HAS_SQUIRTBOTTLE') || storyFlags.has('EVENT_GOT_SQUIRTBOTTLE')) {
             overworldHUD.openDialogue(
               ['FLORIST: Did you try using that SQUIRTBOTTLE on the weird tree on ROUTE 36?'],
               targetNpc.speaker
             );
-          } else {
-            storyFlags.add('has_squirtbottle');
-            if (!inventory.keyItems) inventory.keyItems = [];
-            if (!inventory.keyItems.includes('SQUIRTBOTTLE')) inventory.keyItems.push('SQUIRTBOTTLE');
+            return;
+          }
+          if (!inventory.badges.includes('plain') && !storyFlags.has('plain_badge_received') && !storyFlags.has('ENGINE_PLAINBADGE')) {
+            overworldHUD.openDialogue(
+              [
+                'FLORIST: Have you seen that weird, wiggling tree on ROUTE 36? Whenever anyone splashes water on it, it gets furious!',
+                "I have a SQUIRTBOTTLE here, but it's dangerous outside. I can only lend it to a certified trainer who has conquered the GOLDENROD GYM and earned the PLAINBADGE!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          storyFlags.add('has_squirtbottle');
+          storyFlags.add('HAS_SQUIRTBOTTLE');
+          storyFlags.add('EVENT_GOT_SQUIRTBOTTLE');
+          if (!inventory.keyItems) inventory.keyItems = [];
+          if (!inventory.keyItems.includes('SQUIRTBOTTLE')) inventory.keyItems.push('SQUIRTBOTTLE');
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          overworldHUD.openDialogue(
+            [
+              'FLORIST: Wow! You earned the PLAINBADGE from WHITNEY! You must be a really skilled trainer!',
+              'Take this SQUIRTBOTTLE! Use it on that strange wiggling tree on ROUTE 36 and see what happens!',
+              `${playerName} received the SQUIRTBOTTLE!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('💧 Received SQUIRTBOTTLE from Goldenrod Flower Shop!');
+            }
+          );
+          return;
+        }
+
+        // Goldenrod Bike Shop: Bicycle Loan
+        if (targetNpc.id === 'bike_shop_owner') {
+          if (storyFlags.has('HAS_BICYCLE') || storyFlags.has('EVENT_GOT_BICYCLE')) {
+            overworldHUD.openDialogue(
+              ['BIKE SHOP OWNER: My BICYCLES are first-rate! Keep riding it around to advertise for me!'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          storyFlags.add('HAS_BICYCLE');
+          storyFlags.add('EVENT_GOT_BICYCLE');
+          if (!inventory.keyItems) inventory.keyItems = [];
+          if (!inventory.keyItems.includes('BICYCLE')) inventory.keyItems.push('BICYCLE');
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          overworldHUD.openDialogue(
+            [
+              'BIKE SHOP OWNER: Welcome to MIRACLE CYCLE! I moved here from CERULEAN CITY, but nobody knows my bikes yet!',
+              "Would you take one of our BICYCLES and ride it everywhere to advertise for me? It'll double your travel speed!",
+              `${playerName} borrowed a BICYCLE!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('🚲 Received BICYCLE from Miracle Cycle!');
+            }
+          );
+          return;
+        }
+
+        // Goldenrod Bill's House: Phone Number & Eevee Gift
+        if (targetNpc.id === 'bills_sister') {
+          if (!storyFlags.has('PHONE_BILL')) {
+            storyFlags.add('PHONE_BILL');
             BattleAudio.playOverworldSound('KEY_ITEM');
             overworldHUD.openDialogue(
               [
-                'Have you seen that weird, wiggling tree on ROUTE 36? Whenever anyone splashes water on it, it gets furious!',
-                'Take this SQUIRTBOTTLE! Use it on that tree and see what happens!',
-                `${playerName} received the SQUIRTBOTTLE!`,
+                "BILL'S SISTER: Are you a trainer? My big brother BILL created the PC Storage System!",
+                "Here, take his phone number! You can call him anytime to check your Box storage status!",
+                `${playerName} registered BILL in the Pokégear!`,
               ],
               targetNpc.speaker,
               () => {
                 saveCurrentGame();
-                overworldHUD.showToast('💧 Received SQUIRTBOTTLE from Goldenrod Flower Shop!');
+                overworldHUD.showToast("📞 Registered BILL in Pokégear!");
               }
             );
+            return;
           }
+          overworldHUD.openDialogue(
+            [
+              "BILL'S SISTER: My big brother loves EEVEE! He brought an EEVEE home for a trustworthy trainer.",
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        if (targetNpc.id === 'bill') {
+          if (storyFlags.has('HAS_BILLS_EEVEE') || storyFlags.has('EVENT_GOT_EEVEE')) {
+            overworldHUD.openDialogue(
+              [
+                'BILL: How is that EEVEE doing? It has so many potential evolutions depending on stones, happiness, and time of day!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          if (playerParty.length >= 6) {
+            overworldHUD.openDialogue(
+              ['BILL: Whoa, your party is full! Make room in your party and come back!'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          const eevee = PokemonFactory.create('eevee', 20);
+          playerParty.push(eevee);
+          storyFlags.add('HAS_BILLS_EEVEE');
+          storyFlags.add('EVENT_GOT_EEVEE');
+          BattleAudio.playOverworldSound('FANFARE');
+          overworldHUD.openDialogue(
+            [
+              'BILL: Hi, Gold! Thanks for helping out with the PC Storage System!',
+              "I was given this rare EEVEE by a friend, but I think you're the right trainer to raise it!",
+              `${playerName} received EEVEE (Lv. 20) from BILL!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('🦊 Received EEVEE (Lv. 20) from Bill!');
+            }
+          );
+          return;
+        }
+
+        // Goldenrod Name Rater
+        if (targetNpc.id === 'name_rater') {
+          if (playerParty.length === 0) {
+            overworldHUD.openDialogue(
+              ['NAME RATER: Hello, hello! I am the official NAME RATER! But you don’t have any POKéMON with you!'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          const leadPkmn = playerParty[0];
+          if (leadPkmn.isEgg) {
+            overworldHUD.openDialogue(
+              ["NAME RATER: Whoa, that's just an EGG! You can't rename an EGG until it hatches!"],
+              targetNpc.speaker
+            );
+            return;
+          }
+          if (leadPkmn.originalTrainer && leadPkmn.originalTrainer !== playerName && leadPkmn.originalTrainer !== '') {
+            overworldHUD.openDialogue(
+              [
+                `NAME RATER: What a magnificent nickname! "${leadPkmn.nickname || leadPkmn.speciesId.toUpperCase()}" is truly impeccable! It reflects the love of its original trainer, so we shouldn't change it!`,
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            [
+              `NAME RATER: Shall I evaluate the nickname of your ${leadPkmn.nickname || leadPkmn.speciesId.toUpperCase()}? It is quite fine, but let's give it an even better name!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              namingModalUI.open(
+                {
+                  onConfirm: (newName) => {
+                    leadPkmn.nickname = newName.trim();
+                    BattleAudio.playOverworldSound('KEY_ITEM');
+                    overworldHUD.openDialogue(
+                      [
+                        `NAME RATER: Done! From now on, this POKéMON shall be known as "${leadPkmn.nickname}"! What a magnificent name!`,
+                      ],
+                      targetNpc.speaker,
+                      () => {
+                        saveCurrentGame();
+                        overworldHUD.showToast(`✨ Nicknamed ${leadPkmn.nickname}!`);
+                      }
+                    );
+                  },
+                },
+                leadPkmn.nickname || leadPkmn.speciesId.toUpperCase()
+              );
+            }
+          );
+          return;
+        }
+
+        // Goldenrod Radio Tower Quiz Receptionist
+        if (targetNpc.id === 'radio_rec') {
+          if (storyFlags.has('has_radio_card') || storyFlags.has('ENGINE_RADIO_CARD') || storyFlags.has('HAS_RADIO_CARD')) {
+            overworldHUD.openDialogue(
+              [
+                "QUIZ RECEPTIONIST: You're all certified! Tune in to our broadcasts with your POKéGEAR's RADIO CARD anytime!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            [
+              'QUIZ RECEPTIONIST: Welcome to GOLDENROD RADIO TOWER!',
+              'We are running a special promotional campaign! Answer our 5-question radio certification quiz to earn the official RADIO CARD for your POKéGEAR!',
+            ],
+            targetNpc.speaker,
+            () => {
+              radioTowerQuizUI.open({
+                onComplete: () => {
+                  storyFlags.add('has_radio_card');
+                  storyFlags.add('ENGINE_RADIO_CARD');
+                  storyFlags.add('HAS_RADIO_CARD');
+                  if (!inventory.keyItems) inventory.keyItems = [];
+                  if (!inventory.keyItems.includes('RADIO CARD')) inventory.keyItems.push('RADIO CARD');
+                  BattleAudio.playOverworldSound('KEY_ITEM');
+                  overworldHUD.openDialogue(
+                    [
+                      'QUIZ RECEPTIONIST: Congratulations! You got all 5 questions right!',
+                      `${playerName} received the RADIO CARD for the POKéGEAR!`,
+                      'QUIZ RECEPTIONIST: You can now tune into music, news, and Pokémon talk shows anywhere across Johto!',
+                    ],
+                    targetNpc.speaker,
+                    () => {
+                      saveCurrentGame();
+                      overworldHUD.showToast('📻 Upgraded POKéGEAR with RADIO CARD!');
+                    }
+                  );
+                },
+                onClose: () => {},
+              });
+            }
+          );
+          return;
+        }
+
+        // Goldenrod Dept Store Elevator Attendant
+        if (targetNpc.action === 'DEPT_ELEVATOR' || targetNpc.id.startsWith('dept_elevator')) {
+          const currentM = mapManager.getCurrentMap();
+          deptStoreElevatorUI.open({
+            currentMapId: currentM?.id || 'goldenrod_dept_store_1f',
+            onSelectFloor: (floor: DeptStoreFloor) => {
+              if (floor.mapId === currentM?.id) {
+                overworldHUD.openDialogue(
+                  [`ELEVATOR ATTENDANT: You are already on ${floor.shortName}!`],
+                  targetNpc.speaker
+                );
+                return;
+              }
+              executeWarpTransition({
+                x: player.x,
+                y: player.y,
+                targetMapId: floor.mapId,
+                targetX: floor.mapId === 'goldenrod_dept_store_roof' ? 13 : 2,
+                targetY: floor.mapId === 'goldenrod_dept_store_roof' ? 2 : 1,
+                direction: 'DOWN',
+              });
+            },
+            onClose: () => {},
+          });
           return;
         }
 

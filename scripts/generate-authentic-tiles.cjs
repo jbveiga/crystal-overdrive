@@ -431,6 +431,11 @@ function buildMapFromBlk({
     collisionGrid[28 * width + 18] = 0; // Pokefan Brandon
   }
 
+  // For goldenrod_underground, ensure Coin Case item ball at (7, 25) is walkable (0)
+  if (id === 'goldenrod_underground') {
+    collisionGrid[25 * width + 7] = 0;
+  }
+
   // Ensure all warp door/carpet coordinates are walkable (0)
   for (const w of warps) {
     collisionGrid[w.y * width + w.x] = 0;
@@ -2120,6 +2125,30 @@ buildMapFromBlk({
       y: 21,
       speaker: '🎰 GAME CORNER',
       pages: ['Your Playground! GOLDENROD GAME CORNER'],
+    },
+    {
+      x: 17,
+      y: 7,
+      speaker: '👴 NAME RATER',
+      pages: ['NAME RATER', 'Get Your POKéMON Nicknames Evaluated!'],
+    },
+    {
+      x: 31,
+      y: 5,
+      speaker: '🌸 FLOWER SHOP',
+      pages: ['Blooming Beautiful! GOLDENROD FLOWER SHOP'],
+    },
+    {
+      x: 11,
+      y: 13,
+      speaker: '🚅 MAGNET TRAIN STATION',
+      pages: ['GOLDENROD CITY STATION', 'Super High-Speed Magnet Train to KANTO'],
+    },
+    {
+      x: 13,
+      y: 29,
+      speaker: '🚇 UNDERGROUND TUNNEL',
+      pages: ['UNDERGROUND ENTRANCE', 'Travel Beneath Goldenrod City'],
     },
   ],
 });

@@ -241,6 +241,8 @@ export interface PokemonInstance {
   isOddEgg?: boolean;
   isShiny?: boolean;
   friendship?: number; // 0-255 (default 70 for wild caught, 120 for hatched eggs)
+  originalTrainer?: string;
+  otId?: string;
   heldItem?: string;
   ivs?: Partial<BaseStats>;
   evs?: Partial<BaseStats>;

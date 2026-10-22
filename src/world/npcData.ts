@@ -2586,7 +2586,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       makeNpc(
         'lass_carrie',
         9,
-        6,
+        13,
         'DOWN',
         'girl',
         '👧 LASS CARRIE',
@@ -2597,9 +2597,33 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           trainerName: 'Lass Carrie',
           visionRange: 3,
           challengePages: ['LASS CARRIE: You want to see WHITNEY? You have to get through me first!'],
-          trainerPokemon: { speciesId: 'snubbull', level: 17, moves: ['tackle', 'scaryface', 'bite'] },
+          trainerPokemon: { speciesId: 'snubbull', level: 18, moves: ['tackle', 'scaryface', 'bite'] },
           trainerTeam: [
-            { speciesId: 'snubbull', level: 17, moves: ['tackle', 'scaryface', 'bite'] },
+            { speciesId: 'snubbull', level: 18, moves: ['tackle', 'scaryface', 'bite'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'lass_bridget',
+        9,
+        6,
+        'LEFT',
+        'girl',
+        '👧 LASS BRIDGET',
+        [
+          'WHITNEY is so pretty, but she gets emotional after tough battles!',
+        ],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'lass_bridget',
+          trainerName: 'Lass Bridget',
+          visionRange: 3,
+          challengePages: ['LASS BRIDGET: I like cute POKéMON! Do you like cute POKéMON too?'],
+          trainerPokemon: { speciesId: 'jigglypuff', level: 15, moves: ['sing', 'pound', 'defensecurl'] },
+          trainerTeam: [
+            { speciesId: 'jigglypuff', level: 15, moves: ['sing', 'pound', 'defensecurl'] },
+            { speciesId: 'jigglypuff', level: 15, moves: ['sing', 'pound', 'defensecurl'] },
+            { speciesId: 'jigglypuff', level: 15, moves: ['sing', 'pound', 'defensecurl'] },
           ],
         }
       ),
@@ -2617,9 +2641,11 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           trainerName: 'Beauty Victoria',
           visionRange: 3,
           challengePages: ['BEAUTY VICTORIA: Oh, what a cute challenger! Let’s have a lovely battle!'],
-          trainerPokemon: { speciesId: 'sentret', level: 15, moves: ['tackle', 'defensecurl', 'quickattack'] },
+          trainerPokemon: { speciesId: 'sentret', level: 17, moves: ['tackle', 'defensecurl', 'quickattack'] },
           trainerTeam: [
-            { speciesId: 'sentret', level: 15, moves: ['tackle', 'defensecurl', 'quickattack'] },
+            { speciesId: 'sentret', level: 9, moves: ['tackle', 'defensecurl'] },
+            { speciesId: 'sentret', level: 13, moves: ['tackle', 'defensecurl', 'quickattack'] },
+            { speciesId: 'sentret', level: 17, moves: ['tackle', 'defensecurl', 'quickattack'] },
           ],
         }
       ),
@@ -2639,6 +2665,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           challengePages: ['BEAUTY SAMANTHA: Don’t blink or my MEOWTH will take your prize money!'],
           trainerPokemon: { speciesId: 'meowth', level: 16, moves: ['scratch', 'growl', 'bite', 'payday'] },
           trainerTeam: [
+            { speciesId: 'meowth', level: 16, moves: ['scratch', 'growl', 'bite', 'payday'] },
             { speciesId: 'meowth', level: 16, moves: ['scratch', 'growl', 'bite', 'payday'] },
           ],
         }
@@ -2774,6 +2801,18 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         "👧 BILL'S SISTER",
         ['My big brother loves EEVEE! If you visit our family in Ecruteak, he might have a gift for you!']
       ),
+      makeNpc(
+        'bill',
+        2,
+        4,
+        'RIGHT',
+        'boy',
+        '💻 BILL',
+        [
+          'BILL: Hi, Gold! Thanks for helping out with the PC Storage System!',
+          'I have this rare EEVEE that was sent to me. Would you take good care of it?',
+        ]
+      ),
     ],
     goldenrod_magnet_train_station: [
       makeNpc(
@@ -2843,6 +2882,16 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
     goldenrod_dept_store_1f: [
       makeNpc(
+        'dept_elevator_1f',
+        2,
+        0,
+        'DOWN',
+        'clerk',
+        '🛗 ELEVATOR ATTENDANT',
+        ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
+        { action: 'DEPT_ELEVATOR' }
+      ),
+      makeNpc(
         'dept_rec',
         7,
         2,
@@ -2858,6 +2907,16 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
     goldenrod_dept_store_2f: [
       makeNpc(
+        'dept_elevator_2f',
+        2,
+        0,
+        'DOWN',
+        'clerk',
+        '🛗 ELEVATOR ATTENDANT',
+        ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
+        { action: 'DEPT_ELEVATOR' }
+      ),
+      makeNpc(
         'dept_clerk_2f',
         13,
         5,
@@ -2869,6 +2928,16 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_dept_store_3f: [
+      makeNpc(
+        'dept_elevator_3f',
+        2,
+        0,
+        'DOWN',
+        'clerk',
+        '🛗 ELEVATOR ATTENDANT',
+        ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
+        { action: 'DEPT_ELEVATOR' }
+      ),
       makeNpc(
         'dept_clerk_3f',
         13,
@@ -2882,6 +2951,16 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
     goldenrod_dept_store_4f: [
       makeNpc(
+        'dept_elevator_4f',
+        2,
+        0,
+        'DOWN',
+        'clerk',
+        '🛗 ELEVATOR ATTENDANT',
+        ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
+        { action: 'DEPT_ELEVATOR' }
+      ),
+      makeNpc(
         'dept_clerk_4f',
         13,
         5,
@@ -2893,6 +2972,16 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_dept_store_5f: [
+      makeNpc(
+        'dept_elevator_5f',
+        2,
+        0,
+        'DOWN',
+        'clerk',
+        '🛗 ELEVATOR ATTENDANT',
+        ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
+        { action: 'DEPT_ELEVATOR' }
+      ),
       makeNpc(
         'dept_clerk_5f',
         13,
@@ -2906,6 +2995,16 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
     goldenrod_dept_store_6f: [
       makeNpc(
+        'dept_elevator_6f',
+        2,
+        0,
+        'DOWN',
+        'clerk',
+        '🛗 ELEVATOR ATTENDANT',
+        ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
+        { action: 'DEPT_ELEVATOR' }
+      ),
+      makeNpc(
         'dept_girl_6f',
         6,
         2,
@@ -2918,6 +3017,16 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_dept_store_roof: [
+      makeNpc(
+        'dept_elevator_roof',
+        2,
+        1,
+        'DOWN',
+        'clerk',
+        '🛗 ELEVATOR ATTENDANT',
+        ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
+        { action: 'DEPT_ELEVATOR' }
+      ),
       makeNpc(
         'rooftop_camper',
         7,

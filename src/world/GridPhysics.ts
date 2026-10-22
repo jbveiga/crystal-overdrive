@@ -19,7 +19,16 @@ export type NpcSpriteType =
   | 'earl'
   | 'oak'
   | 'sudowoodo'
-  | 'lapras';
+  | 'lapras'
+  | 'whitney'
+  | 'bike_shop_owner'
+  | 'clerk'
+  | 'receptionist'
+  | 'gentleman'
+  | 'lass'
+  | 'beauty'
+  | 'rocket_grunt_m'
+  | 'rocket_grunt_f';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
@@ -88,7 +97,8 @@ export interface GridEntity {
     | 'UNOWN_DEX_EVENT'
     | 'FARFETCHD_HERD_EVENT'
     | 'CHARCOAL_MASTER_EVENT'
-    | 'HEADBUTT_TUTOR_EVENT';
+    | 'HEADBUTT_TUTOR_EVENT'
+    | 'DEPT_ELEVATOR';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

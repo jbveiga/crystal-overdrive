@@ -507,6 +507,15 @@ export class OverworldRenderer {
       earl: './assets/sprites/characters/earl.png',
       oak: './assets/sprites/characters/oak.png',
       lapras: './assets/sprites/characters/lapras.png',
+      whitney: './assets/sprites/characters/whitney.png',
+      bike_shop_owner: './assets/sprites/characters/bike_shop_owner.png',
+      clerk: './assets/sprites/characters/clerk.png',
+      receptionist: './assets/sprites/characters/receptionist.png',
+      gentleman: './assets/sprites/characters/gentleman.png',
+      lass: './assets/sprites/characters/lass.png',
+      beauty: './assets/sprites/characters/beauty.png',
+      rocket_grunt_m: './assets/sprites/characters/rocket_grunt_m.png',
+      rocket_grunt_f: './assets/sprites/characters/rocket_grunt_f.png',
     };
 
     await Promise.all(

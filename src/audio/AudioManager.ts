@@ -9,6 +9,8 @@ export type BgmTrackId =
   | 'bgm_violet_city'
   | 'bgm_sprout_tower'
   | 'bgm_gym'
+  | 'bgm_goldenrod_city'
+  | 'bgm_game_corner'
   | 'bgm_wild_battle'
   | 'bgm_trainer_battle'
   | 'bgm_gym_leader_battle';
@@ -63,6 +65,30 @@ const MAP_BGM_TABLE: Record<string, BgmTrackId> = {
   slowpoke_well_b2f: 'bgm_sprout_tower',
   ilex_forest: 'bgm_sprout_tower',
   route_34_ilex_forest_gate: 'bgm_sprout_tower',
+
+  // Goldenrod City Metropolis & Interiors
+  goldenrod_city: 'bgm_goldenrod_city',
+  goldenrod_bike_shop: 'bgm_goldenrod_city',
+  goldenrod_bill_house: 'bgm_goldenrod_city',
+  goldenrod_magnet_train_station: 'bgm_goldenrod_city',
+  goldenrod_flower_shop: 'bgm_goldenrod_city',
+  goldenrod_name_rater: 'bgm_goldenrod_city',
+  goldenrod_dept_store_1f: 'bgm_goldenrod_city',
+  goldenrod_dept_store_2f: 'bgm_goldenrod_city',
+  goldenrod_dept_store_3f: 'bgm_goldenrod_city',
+  goldenrod_dept_store_4f: 'bgm_goldenrod_city',
+  goldenrod_dept_store_5f: 'bgm_goldenrod_city',
+  goldenrod_dept_store_6f: 'bgm_goldenrod_city',
+  goldenrod_dept_store_roof: 'bgm_goldenrod_city',
+  goldenrod_poke_center: 'bgm_goldenrod_city',
+  goldenrod_underground: 'bgm_goldenrod_city',
+  radio_tower_1f: 'bgm_goldenrod_city',
+  radio_tower_2f: 'bgm_goldenrod_city',
+  radio_tower_3f: 'bgm_goldenrod_city',
+  radio_tower_4f: 'bgm_goldenrod_city',
+  radio_tower_5f: 'bgm_goldenrod_city',
+  goldenrod_game_corner: 'bgm_game_corner',
+  goldenrod_gym: 'bgm_gym',
 
   // Violet City & Indoors
   violet_city: 'bgm_violet_city',
