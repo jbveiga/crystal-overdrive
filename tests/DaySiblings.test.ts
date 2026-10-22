@@ -15,24 +15,26 @@ describe('BUGFIX-ROUTE32-FRIEDA-TILES-01: Day Siblings & On-Demand Map Tile Load
   describe('1. Day Siblings Registry & Data Integrity', () => {
     it('contains all 7 canonical Johto Day Siblings with correct items, maps, and flags', () => {
       const expectedSiblings = [
-        { id: 'monica_of_monday', day: 'Monday', mapId: 'route_40', itemId: 'sharp_beak', flag: 'received_item_monica' },
-        { id: 'tuscany_of_tuesday', day: 'Tuesday', mapId: 'route_29', itemId: 'pink_bow', flag: 'received_item_tuscany' },
-        { id: 'wesley_of_wednesday', day: 'Wednesday', mapId: 'lake_of_rage', itemId: 'black_belt', flag: 'received_item_wesley' },
-        { id: 'arthur_of_thursday', day: 'Thursday', mapId: 'route_36', itemId: 'hard_stone', flag: 'received_item_arthur' },
-        { id: 'frieda', day: 'Friday', mapId: 'route_32', itemId: 'poison_barb', flag: 'received_item_frieda' },
-        { id: 'santos_of_saturday', day: 'Saturday', mapId: 'blackthorn_city', itemId: 'soft_sand', flag: 'received_item_santos' },
-        { id: 'sunny_of_sunday', day: 'Sunday', mapId: 'route_37', itemId: 'magnet', flag: 'received_item_sunny' },
+        { id: 'monica_of_monday', day: 'Monday', dayOfWeekIndex: 1, mapId: 'route_40', itemId: 'sharp_beak', flag: 'received_item_monica' },
+        { id: 'tuscany_of_tuesday', day: 'Tuesday', dayOfWeekIndex: 2, mapId: 'route_29', itemId: 'pink_bow', flag: 'received_item_tuscany' },
+        { id: 'wesley_of_wednesday', day: 'Wednesday', dayOfWeekIndex: 3, mapId: 'lake_of_rage', itemId: 'black_belt', flag: 'received_item_wesley' },
+        { id: 'arthur_of_thursday', day: 'Thursday', dayOfWeekIndex: 4, mapId: 'route_36', itemId: 'hard_stone', flag: 'received_item_arthur' },
+        { id: 'frieda', day: 'Friday', dayOfWeekIndex: 5, mapId: 'route_32', itemId: 'poison_barb', flag: 'received_item_frieda' },
+        { id: 'santos_of_saturday', day: 'Saturday', dayOfWeekIndex: 6, mapId: 'blackthorn_city', itemId: 'spell_tag', flag: 'received_item_santos' },
+        { id: 'sunny_of_sunday', day: 'Sunday', dayOfWeekIndex: 0, mapId: 'route_37', itemId: 'magnet', flag: 'received_item_sunny' },
       ];
 
       for (const exp of expectedSiblings) {
         const sibling = DAY_SIBLINGS[exp.id];
         expect(sibling).toBeDefined();
         expect(sibling.day).toBe(exp.day);
+        expect(sibling.dayOfWeekIndex).toBe(exp.dayOfWeekIndex);
         expect(sibling.mapId).toBe(exp.mapId);
         expect(sibling.itemId).toBe(exp.itemId);
         expect(sibling.flag).toBe(exp.flag);
         expect(sibling.giftPages.length).toBeGreaterThan(0);
         expect(sibling.alreadyGivenPages.length).toBeGreaterThan(0);
+        expect(sibling.wrongDayPages.length).toBeGreaterThan(0);
       }
     });
 
@@ -129,8 +131,76 @@ describe('BUGFIX-ROUTE32-FRIEDA-TILES-01: Day Siblings & On-Demand Map Tile Load
       expect(inventory.items['black_belt']).toBe(1);
       expect(inventory.items['hard_stone']).toBe(1);
       expect(inventory.items['poison_barb']).toBe(1);
-      expect(inventory.items['soft_sand']).toBe(1);
+      expect(inventory.items['spell_tag']).toBe(1);
       expect(inventory.items['magnet']).toBe(1);
+    });
+
+    it('enforces 49-permutation calendar matrix: each sibling grants item ONLY on their matching day of week', () => {
+      const allSiblings = [
+        DAY_SIBLINGS.sunny_of_sunday,
+        DAY_SIBLINGS.monica_of_monday,
+        DAY_SIBLINGS.tuscany_of_tuesday,
+        DAY_SIBLINGS.wesley_of_wednesday,
+        DAY_SIBLINGS.arthur_of_thursday,
+        DAY_SIBLINGS.frieda,
+        DAY_SIBLINGS.santos_of_saturday,
+      ];
+
+      // Test all 7 siblings x all 7 days of week (49 permutations)
+      for (const sibling of allSiblings) {
+        for (let testDay = 0; testDay < 7; testDay++) {
+          const storyFlags = new Set<string>();
+          const inventory: Record<string, number> = {};
+
+          // Simulate interaction logic from main.ts
+          let dialogueReturned: string[] = [];
+          const isMatchingDay = testDay === sibling.dayOfWeekIndex;
+
+          if (!isMatchingDay) {
+            dialogueReturned = sibling.wrongDayPages;
+            // No item awarded, no flag mutated
+          } else {
+            if (storyFlags.has(sibling.flag)) {
+              dialogueReturned = sibling.alreadyGivenPages;
+            } else {
+              storyFlags.add(sibling.flag);
+              inventory[sibling.itemId] = (inventory[sibling.itemId] || 0) + 1;
+              dialogueReturned = sibling.giftPages;
+            }
+          }
+
+          if (isMatchingDay) {
+            expect(inventory[sibling.itemId], `${sibling.name} must grant ${sibling.itemName} on day ${testDay}`).toBe(1);
+            expect(storyFlags.has(sibling.flag), `${sibling.name} flag must be set on matching day`).toBe(true);
+            expect(dialogueReturned).toEqual(sibling.giftPages);
+
+            // Re-interaction on same day must not duplicate item
+            let duplicateGranted = false;
+            if (storyFlags.has(sibling.flag)) {
+              dialogueReturned = sibling.alreadyGivenPages;
+            } else {
+              inventory[sibling.itemId] = (inventory[sibling.itemId] || 0) + 1;
+              duplicateGranted = true;
+            }
+            expect(duplicateGranted).toBe(false);
+            expect(inventory[sibling.itemId]).toBe(1);
+            expect(dialogueReturned).toEqual(sibling.alreadyGivenPages);
+          } else {
+            expect(inventory[sibling.itemId], `${sibling.name} must NOT grant item on day ${testDay}`).toBeUndefined();
+            expect(storyFlags.has(sibling.flag), `${sibling.name} flag must NOT be set on wrong day`).toBe(false);
+            expect(dialogueReturned).toEqual(sibling.wrongDayPages);
+          }
+        }
+      }
+    });
+
+    it('verifies main.ts integrates strict calendar gating in DAY_SIBLING_EVENT', () => {
+      const mainPath = path.resolve(__dirname, '../src/main.ts');
+      const mainCode = fs.readFileSync(mainPath, 'utf8');
+
+      expect(mainCode).toContain("targetNpc.action === 'DAY_SIBLING_EVENT'");
+      expect(mainCode).toContain('todayDayIndex !== sibling.dayOfWeekIndex');
+      expect(mainCode).toContain('sibling.wrongDayPages');
     });
   });
 

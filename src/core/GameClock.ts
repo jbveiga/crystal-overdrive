@@ -22,6 +22,7 @@ export class GameClock {
   private _playerSpeed: SpeedMultiplier = GameClock.DEFAULT_PLAYER_SPEED;
   private _battleSpeed: SpeedMultiplier = 1;
   private _simulatedHour?: number;
+  private _simulatedDayOfWeek?: number; // 0 = Sunday, 1 = Monday ... 6 = Saturday
   private readonly maxDelta: number = 0.1; // Max 100ms clamp to prevent spiral of death
 
   constructor(
@@ -38,6 +39,21 @@ export class GameClock {
 
   public getSimulatedHour(): number | undefined {
     return this._simulatedHour;
+  }
+
+  public setSimulatedDayOfWeek(day: number | undefined): void {
+    this._simulatedDayOfWeek = day;
+  }
+
+  public getSimulatedDayOfWeek(): number | undefined {
+    return this._simulatedDayOfWeek;
+  }
+
+  /**
+   * Returns current day of week (0 = Sunday ... 6 = Saturday), respecting simulatedDayOfWeek if set.
+   */
+  public getDayOfWeek(date: Date = new Date()): number {
+    return this._simulatedDayOfWeek !== undefined ? this._simulatedDayOfWeek : date.getDay();
   }
 
   /**

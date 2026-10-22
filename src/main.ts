@@ -2368,6 +2368,18 @@ async function bootstrap() {
             );
 
           if (sibling) {
+            const todayDayIndex = gameClock ? gameClock.getDayOfWeek() : new Date().getDay();
+
+            // Strict Calendar Day-of-Week gating (BUGFIX-CALENDAR-DAY-SIBLINGS-INTEGRITY-01)
+            if (todayDayIndex !== sibling.dayOfWeekIndex) {
+              const wrongPages =
+                sibling.wrongDayPages && sibling.wrongDayPages.length > 0
+                  ? sibling.wrongDayPages
+                  : [`${sibling.name.toUpperCase()}: Today's not ${sibling.day}. How disappointing.`];
+              overworldHUD.openDialogue(wrongPages, targetNpc.speaker);
+              return;
+            }
+
             if (storyFlags.has(sibling.flag)) {
               overworldHUD.openDialogue(sibling.alreadyGivenPages, targetNpc.speaker);
               return;

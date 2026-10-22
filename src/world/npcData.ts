@@ -208,7 +208,8 @@ export function calculateTourLegCoordinates(
 export interface DaySiblingInfo {
   id: string;
   name: string;
-  day: string;
+  day: 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | string;
+  dayOfWeekIndex: number; // 0 = Sunday, 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday, 5 = Friday, 6 = Saturday
   mapId: string;
   itemId: string;
   itemName: string;
@@ -216,6 +217,7 @@ export interface DaySiblingInfo {
   speaker: string;
   giftPages: string[];
   alreadyGivenPages: string[];
+  wrongDayPages: string[];
 }
 
 export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
@@ -223,6 +225,7 @@ export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
     id: 'monica_of_monday',
     name: 'Monica of Monday',
     day: 'Monday',
+    dayOfWeekIndex: 1,
     mapId: 'route_40',
     itemId: 'sharp_beak',
     itemName: 'SHARP BEAK',
@@ -235,11 +238,15 @@ export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
     alreadyGivenPages: [
       "MONICA: My siblings are all across JOHTO! Did you meet them yet?",
     ],
+    wrongDayPages: [
+      "MONICA: Today's not Monday. How disappointing.",
+    ],
   },
   tuscany_of_tuesday: {
     id: 'tuscany_of_tuesday',
     name: 'Tuscany of Tuesday',
     day: 'Tuesday',
+    dayOfWeekIndex: 2,
     mapId: 'route_29',
     itemId: 'pink_bow',
     itemName: 'PINK BOW',
@@ -252,11 +259,15 @@ export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
     alreadyGivenPages: [
       "TUSCANY: Do my siblings know you? We appear on different days of the week!",
     ],
+    wrongDayPages: [
+      "TUSCANY: Today's not Tuesday. How disappointing.",
+    ],
   },
   wesley_of_wednesday: {
     id: 'wesley_of_wednesday',
     name: 'Wesley of Wednesday',
     day: 'Wednesday',
+    dayOfWeekIndex: 3,
     mapId: 'lake_of_rage',
     itemId: 'black_belt',
     itemName: 'BLACK BELT',
@@ -269,11 +280,15 @@ export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
     alreadyGivenPages: [
       "WESLEY: Keep training! Dedication is the path to strength!",
     ],
+    wrongDayPages: [
+      "WESLEY: Today's not Wednesday. How disappointing.",
+    ],
   },
   arthur_of_thursday: {
     id: 'arthur_of_thursday',
     name: 'Arthur of Thursday',
     day: 'Thursday',
+    dayOfWeekIndex: 4,
     mapId: 'route_36',
     itemId: 'hard_stone',
     itemName: 'HARD STONE',
@@ -286,11 +301,15 @@ export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
     alreadyGivenPages: [
       "ARTHUR: A stone is solid and unwavering. Be like a rock in your journey!",
     ],
+    wrongDayPages: [
+      "ARTHUR: Today's not Thursday. How disappointing.",
+    ],
   },
   frieda: {
     id: 'frieda',
     name: 'Frieda of Friday',
     day: 'Friday',
+    dayOfWeekIndex: 5,
     mapId: 'route_32',
     itemId: 'poison_barb',
     itemName: 'POISON BARB',
@@ -303,28 +322,36 @@ export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
     alreadyGivenPages: [
       "FRIEDA: Isn't Friday wonderful? I hope your weekend is full of adventures!",
     ],
+    wrongDayPages: [
+      "FRIEDA: Today's not Friday. How disappointing.",
+    ],
   },
   santos_of_saturday: {
     id: 'santos_of_saturday',
     name: 'Santos of Saturday',
     day: 'Saturday',
+    dayOfWeekIndex: 6,
     mapId: 'blackthorn_city',
-    itemId: 'soft_sand',
-    itemName: 'SOFT SAND',
+    itemId: 'spell_tag',
+    itemName: 'SPELL TAG',
     flag: 'received_item_santos',
-    speaker: '🏖️ SANTOS OF SATURDAY',
+    speaker: '👻 SANTOS OF SATURDAY',
     giftPages: [
       "SANTOS: It's Saturday! I'm SANTOS of Saturday! Good to see you, trainer!",
-      "Take this SOFT SAND! It boosts the power of GROUND-type moves!",
+      "Take this SPELL TAG! It boosts the power of GHOST-type moves!",
     ],
     alreadyGivenPages: [
       "SANTOS: Have you met my other six siblings? We are scattered all over!",
+    ],
+    wrongDayPages: [
+      "SANTOS: Today's not Saturday. How disappointing.",
     ],
   },
   sunny_of_sunday: {
     id: 'sunny_of_sunday',
     name: 'Sunny of Sunday',
     day: 'Sunday',
+    dayOfWeekIndex: 0,
     mapId: 'route_37',
     itemId: 'magnet',
     itemName: 'MAGNET',
@@ -336,6 +363,9 @@ export const DAY_SIBLINGS: Record<string, DaySiblingInfo> = {
     ],
     alreadyGivenPages: [
       "SUNNY: Sunday is the best day to recharge! Enjoy your day!",
+    ],
+    wrongDayPages: [
+      "SUNNY: Today's not Sunday. How disappointing.",
     ],
   },
 };
