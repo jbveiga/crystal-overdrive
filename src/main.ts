@@ -3143,6 +3143,40 @@ async function bootstrap() {
           }
         }
 
+        // Slowpoke Well B2F: Cavern Explorer King's Rock Grant
+        if (targetNpc.action === 'KINGS_ROCK_EVENT' || targetNpc.id === 'well_guide') {
+          if (storyFlags.has('GOT_KINGS_ROCK_IN_SLOWPOKE_WELL')) {
+            overworldHUD.openDialogue(
+              [
+                "CAVERN EXPLORER: I'm going to be like SLOWPOKE. I'll wait patiently, so I can see one evolve.",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              "CAVERN EXPLORER: I'm waiting to see SLOWPOKE's moment of evolution.",
+              "Through observation, I made a new discovery.",
+              "A SLOWPOKE with a KING'S ROCK often gets bitten by a SHELLDER.",
+              "Here, I'll share a KING'S ROCK with you!",
+              `${playerName} received KING'S ROCK!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              storyFlags.add('GOT_KINGS_ROCK_IN_SLOWPOKE_WELL');
+              if (!inventory.items) inventory.items = {};
+              inventory.items['kings_rock'] = (inventory.items['kings_rock'] || 0) + 1;
+              inventory.items['kings-rock'] = (inventory.items['kings-rock'] || 0) + 1;
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              saveCurrentGame();
+              overworldHUD.showToast("👑 Received KING'S ROCK from the Cavern Explorer!");
+            }
+          );
+          return;
+        }
+
         // Prof. Elm Lab Starter Dialogue & Errands (Ticket 6.1 & BUGFIX-NARRATIVE-01)
         if (targetNpc.id === 'elm_npc') {
           if (!storyFlags.has('starter_chosen')) {

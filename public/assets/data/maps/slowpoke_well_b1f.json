@@ -1108,19 +1108,64 @@
       "targetY": 3
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 17,
+      "y": 14,
+      "pages": [
+        "SLOWPOKE WELL B1F — Water reservoir for AZALEA TOWN. Watch your step!"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 10,
+      "pages": [
+        "DANGER! Deep underground spring ahead. Lower cavern entrance."
+      ]
+    }
+  ],
   "grassEncounters": [
+    {
+      "speciesId": "zubat",
+      "minLevel": 5,
+      "maxLevel": 8,
+      "weight": 55,
+      "timeOfDay": "MORNING"
+    },
     {
       "speciesId": "slowpoke",
       "minLevel": 6,
       "maxLevel": 8,
-      "weight": 45
+      "weight": 45,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "zubat",
       "minLevel": 5,
       "maxLevel": 8,
-      "weight": 55
+      "weight": 55,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 6,
+      "maxLevel": 8,
+      "weight": 45,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 5,
+      "maxLevel": 8,
+      "weight": 55,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 6,
+      "maxLevel": 8,
+      "weight": 45,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

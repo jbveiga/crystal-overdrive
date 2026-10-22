@@ -1099,21 +1099,94 @@
       "targetMapId": "slowpoke_well_b1f",
       "targetX": 7,
       "targetY": 11
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "targetMapId": "slowpoke_well_b1f",
+      "targetX": 7,
+      "targetY": 11
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 3,
+      "y": 2,
+      "pages": [
+        "SLOWPOKE WELL B2F — Deep subterranean lake. SURF and STRENGTH required to explore the far caverns."
+      ]
+    },
+    {
+      "x": 9,
+      "y": 10,
+      "pages": [
+        "SUBTERRANEAN LAKE: Pristine waters fed by underground aquifers."
+      ]
+    },
+    {
+      "x": 15,
+      "y": 6,
+      "pages": [
+        "DEPTH MARKER: Pristine spring waters flow from Mt. Silver into Azalea."
+      ]
+    }
+  ],
   "grassEncounters": [
+    {
+      "speciesId": "zubat",
+      "minLevel": 14,
+      "maxLevel": 18,
+      "weight": 50,
+      "timeOfDay": "MORNING"
+    },
     {
       "speciesId": "slowpoke",
       "minLevel": 14,
       "maxLevel": 18,
-      "weight": 50
+      "weight": 50,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "zubat",
       "minLevel": 14,
       "maxLevel": 18,
-      "weight": 50
+      "weight": 50,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 14,
+      "maxLevel": 18,
+      "weight": 50,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 14,
+      "maxLevel": 18,
+      "weight": 50,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 14,
+      "maxLevel": 18,
+      "weight": 50,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 15,
+      "maxLevel": 20,
+      "weight": 85
+    },
+    {
+      "speciesId": "slowbro",
+      "minLevel": 20,
+      "maxLevel": 25,
+      "weight": 15
     }
   ]
 }

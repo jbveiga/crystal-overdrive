@@ -2047,17 +2047,17 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'DOWN',
         'silver',
         '⚡ ROCKET GRUNT',
-        ['Hyuck! The BOSS will hear about this!'],
+        ["Sure, we've been hacking the tails off SLOWPOKE and selling them. Everything we do is for profit. That's right! We're TEAM ROCKET, and we'll do anything for money!"],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'rocket_grunt_1',
           trainerName: 'Rocket Grunt',
           visionRange: 3,
-          challengePages: ["ROCKET GRUNT: Hey, kid! What do you think you're doing meddling in TEAM ROCKET business?!"],
+          challengePages: ["ROCKET GRUNT: Darn! I was standing guard up top when some old coot yelled at me. He startled me so much that I fell down here. I think I'll vent my anger by taking it out on you!"],
           trainerPokemon: { speciesId: 'rattata', level: 9, moves: ['tackle', 'quickattack'] },
           trainerTeam: [
             { speciesId: 'rattata', level: 9, moves: ['tackle', 'quickattack'] },
-            { speciesId: 'zubat', level: 9, moves: ['leechlife', 'bite'] },
+            { speciesId: 'rattata', level: 9, moves: ['tackle', 'quickattack'] },
           ],
         }
       ),
@@ -2068,16 +2068,17 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'RIGHT',
         'silver',
         '⚡ ROCKET GRUNT',
-        ["Don't think you've stopped TEAM ROCKET! We are everywhere!"],
+        ["We need the money, but selling SLOWPOKETAILS? It's tough being a ROCKET GRUNT!"],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'rocket_grunt_2',
           trainerName: 'Rocket Grunt',
           visionRange: 3,
-          challengePages: ['ROCKET GRUNT: Quit snooping around! Those tails will make us a fortune!'],
-          trainerPokemon: { speciesId: 'koffing', level: 11, moves: ['tackle', 'smog', 'poisongas'] },
+          challengePages: ['ROCKET GRUNT: Quit taking SLOWPOKETAILS? If we obeyed you, TEAM ROCKET\'s rep would be ruined!'],
+          trainerPokemon: { speciesId: 'zubat', level: 9, moves: ['leechlife', 'bite'] },
           trainerTeam: [
-            { speciesId: 'koffing', level: 11, moves: ['tackle', 'smog', 'poisongas'] },
+            { speciesId: 'zubat', level: 9, moves: ['leechlife', 'bite'] },
+            { speciesId: 'ekans', level: 11, moves: ['wrap', 'leer', 'poisonsting'] },
           ],
         }
       ),
@@ -2088,16 +2089,18 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'LEFT',
         'girl',
         '⚡ ROCKET GRUNT',
-        ["A child defeated me?! The EXECUTIVES won't be pleased!"],
+        ["SLOWPOKETAILS grow back fast! What's wrong with selling them?"],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'rocket_grunt_3',
           trainerName: 'Rocket Grunt',
           visionRange: 3,
-          challengePages: ["ROCKET GRUNT: You think you're a hero? Team Rocket will crush you!"],
-          trainerPokemon: { speciesId: 'ekans', level: 11, moves: ['wrap', 'leer', 'poisonsting'] },
+          challengePages: ["ROCKET GRUNT: Stop taking TAILS? Yeah, just try to defeat all of us!"],
+          trainerPokemon: { speciesId: 'rattata', level: 7, moves: ['tackle', 'quickattack'] },
           trainerTeam: [
-            { speciesId: 'ekans', level: 11, moves: ['wrap', 'leer', 'poisonsting'] },
+            { speciesId: 'rattata', level: 7, moves: ['tackle', 'quickattack'] },
+            { speciesId: 'zubat', level: 9, moves: ['leechlife', 'bite'] },
+            { speciesId: 'zubat', level: 9, moves: ['leechlife', 'bite'] },
           ],
         }
       ),
@@ -2132,8 +2135,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'elder',
         '👴 KURT',
         [
-          'KURT: Oof... my back! I rushed in and tumbled down the well ledge!',
-          'Please, Gold! Chase those TEAM ROCKET scoundrels out and save our SLOWPOKE!',
+          "KURT: Hey there, rookie! The guard up top took off when I shouted at him. But then I took a tumble down the WELL. I slammed down hard on my back, so I can't move. Rats! Show them how gutsy you are in my place!",
         ]
       ),
       makeNpc(
@@ -2145,7 +2147,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         '🦛 RESCUED SLOWPOKE',
         [
           'SLOWPOKE: ... ... ...',
-          'It rubs gently against your leg with relief and gratitude.',
+          'A SLOWPOKE with its TAIL cut off…',
         ]
       ),
       makeNpc(
@@ -2157,7 +2159,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         '🦛 RESCUED SLOWPOKE',
         [
           'SLOWPOKE: ... ... ...',
-          'Its tail has a neat bandage on it. It wags happily!',
+          'A SLOWPOKE with its TAIL cut off… Huh? It has MAIL.',
+          "<PLAYER> read the MAIL: 'Be good and look after the house with Grandpa and SLOWPOKE. Love, Dad'",
         ]
       ),
     ],
@@ -2170,9 +2173,10 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'fat_man',
         '🔦 CAVERN EXPLORER',
         [
-          'Deep underground springs feed this lower level. If you bring STRENGTH and SURF, you can explore the depths!',
-          "A quiet man living down here gave me the KING'S ROCK, an item that evolves SLOWPOKE into SLOWKING!",
-        ]
+          "CAVERN EXPLORER: I'm waiting to see SLOWPOKE's moment of evolution. Through observation, I made a new discovery.",
+          "A SLOWPOKE with a KING'S ROCK often gets bitten by a SHELLDER. Here, I'll share a KING'S ROCK with you!",
+        ],
+        { action: 'KINGS_ROCK_EVENT' }
       ),
     ],
     ilex_forest: [

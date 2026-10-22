@@ -82,7 +82,8 @@ export interface GridEntity {
     | 'PROTON_EVENT'
     | 'DAY_SIBLING_EVENT'
     | 'LAPRAS_EVENT'
-    | 'GUIDE_GENT_EVENT';
+    | 'GUIDE_GENT_EVENT'
+    | 'KINGS_ROCK_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

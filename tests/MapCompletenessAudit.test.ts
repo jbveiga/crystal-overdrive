@@ -412,4 +412,170 @@ describe('10-Point Completeness Audit for Previously Mapped Areas (TICKET-AUDIT-
       expect(audioManager.getTrackForMap('azalea_gym')).toBe('bgm_gym');
     });
   });
+
+  describe('TICKET-WORLD-SLOWPOKE-WELL-01: 10-Point Map Delivery Package (Slowpoke Well B1F & B2F)', () => {
+    it('Dimension 1: asserts reciprocal navigation between Azalea Town, B1F, and B2F with safe landing thresholds', () => {
+      const azalea = loadMap('azalea_town');
+      const b1f = loadMap('slowpoke_well_b1f');
+      const b2f = loadMap('slowpoke_well_b2f');
+
+      // Azalea Town <-> B1F
+      const azaleaToB1f = azalea.warps.find((w) => w.targetMapId === 'slowpoke_well_b1f');
+      expect(azaleaToB1f).toBeDefined();
+      expect(azaleaToB1f?.x).toBe(31);
+      expect(azaleaToB1f?.y).toBe(7);
+      expect(azaleaToB1f?.targetX).toBe(17);
+      expect(azaleaToB1f?.targetY).toBe(15);
+
+      const b1fToAzalea = b1f.warps.find((w) => w.targetMapId === 'azalea_town');
+      expect(b1fToAzalea).toBeDefined();
+      expect(b1fToAzalea?.x).toBe(17);
+      expect(b1fToAzalea?.y).toBe(15);
+      expect(b1fToAzalea?.targetX).toBe(31);
+      expect(b1fToAzalea?.targetY).toBe(7);
+
+      // B1F <-> B2F
+      const b1fToB2f = b1f.warps.find((w) => w.targetMapId === 'slowpoke_well_b2f');
+      expect(b1fToB2f).toBeDefined();
+      expect(b1fToB2f?.x).toBe(7);
+      expect(b1fToB2f?.y).toBe(11);
+
+      const b2fToB1f = b2f.warps.find((w) => w.targetMapId === 'slowpoke_well_b1f');
+      expect(b2fToB1f).toBeDefined();
+      expect(b2fToB1f?.targetX).toBe(7);
+      expect(b2fToB1f?.targetY).toBe(11);
+
+      // All warp landing tiles must be strictly walkable
+      expect([0, 2]).toContain(b1f.collisionGrid[15 * b1f.width + 17]);
+      expect([0, 2]).toContain(azalea.collisionGrid[7 * azalea.width + 31]);
+      expect([0, 2]).toContain(b2f.collisionGrid[b1fToB2f!.targetY * b2f.width + b1fToB2f!.targetX]);
+    });
+
+    it('Dimension 2 & 3: asserts complete NPC population, 100% walkability, and authentic dialogue across B1F and B2F', () => {
+      const npcs = createNpcsByMap();
+      const b1f = loadMap('slowpoke_well_b1f');
+      const b2f = loadMap('slowpoke_well_b2f');
+
+      const b1fNpcs = npcs.slowpoke_well_b1f;
+      expect(b1fNpcs.length).toBeGreaterThanOrEqual(7);
+
+      // Injured Kurt
+      const kurt = b1fNpcs.find((n) => n.id === 'well_kurt');
+      expect(kurt).toBeDefined();
+      expect(kurt?.x).toBe(16);
+      expect(kurt?.y).toBe(14);
+      expect(kurt?.pages?.[0]).toContain('KURT');
+
+      // 4 Rocket Grunts / Proton gauntlet
+      const proton = b1fNpcs.find((n) => n.id === 'executive_proton');
+      expect(proton).toBeDefined();
+      expect(proton?.action).toBe('PROTON_EVENT');
+      expect(proton?.x).toBe(5);
+      expect(proton?.y).toBe(2);
+
+      const grunt1 = b1fNpcs.find((n) => n.id === 'rocket_grunt_1');
+      const grunt2 = b1fNpcs.find((n) => n.id === 'rocket_grunt_2');
+      const grunt3 = b1fNpcs.find((n) => n.id === 'rocket_grunt_3');
+      expect(grunt1).toBeDefined();
+      expect(grunt2).toBeDefined();
+      expect(grunt3).toBeDefined();
+
+      // Tailless Slowpokes
+      const slowpoke1 = b1fNpcs.find((n) => n.id === 'well_slowpoke');
+      const slowpoke2 = b1fNpcs.find((n) => n.id === 'well_slowpoke_2');
+      expect(slowpoke1).toBeDefined();
+      expect(slowpoke2).toBeDefined();
+
+      // B2F Explorer
+      const b2fNpcs = npcs.slowpoke_well_b2f;
+      const guide = b2fNpcs.find((n) => n.id === 'well_guide');
+      expect(guide).toBeDefined();
+      expect(guide?.action).toBe('KINGS_ROCK_EVENT');
+      expect(guide?.x).toBe(16);
+      expect(guide?.y).toBe(5);
+
+      // 100% Walkability check for all B1F and B2F NPCs
+      for (const n of b1fNpcs) {
+        const col = b1f.collisionGrid[n.y * b1f.width + n.x];
+        expect([0, 2], `B1F NPC ${n.id} at (${n.x}, ${n.y}) must stand on walkable tile`).toContain(col);
+      }
+      for (const n of b2fNpcs) {
+        const col = b2f.collisionGrid[n.y * b2f.width + n.x];
+        expect([0, 2], `B2F NPC ${n.id} at (${n.x}, ${n.y}) must stand on walkable tile`).toContain(col);
+      }
+    });
+
+    it('Dimension 4: asserts Executive Proton defeat clears the well and despawns Rockets', () => {
+      const npcs = createNpcsByMap();
+      const storyFlags = new Set<string>(['slowpoke_well_cleared', 'proton_defeated']);
+
+      const remainingB1fNpcs = npcs.slowpoke_well_b1f.filter(
+        (n) => !(storyFlags.has('slowpoke_well_cleared') && (n.id.startsWith('rocket_grunt') || n.id === 'executive_proton'))
+      );
+      expect(remainingB1fNpcs.some((n) => n.id === 'executive_proton')).toBe(false);
+      expect(remainingB1fNpcs.some((n) => n.id.startsWith('rocket_grunt'))).toBe(false);
+      expect(remainingB1fNpcs.some((n) => n.id === 'well_kurt')).toBe(true);
+    });
+
+    it('Dimension 5: asserts canonical overworld item balls on walkable tiles on B1F and B2F', () => {
+      const itemManager = new OverworldItemManager();
+      const b1fItems = itemManager.getActiveItemBalls('slowpoke_well_b1f');
+      const b2fItems = itemManager.getActiveItemBalls('slowpoke_well_b2f');
+
+      const b1f = loadMap('slowpoke_well_b1f');
+      const b2f = loadMap('slowpoke_well_b2f');
+
+      expect(b1fItems.length).toBeGreaterThanOrEqual(1);
+      const superPotion = b1fItems.find((i) => i.itemId === 'super_potion');
+      expect(superPotion).toBeDefined();
+      expect(superPotion?.x).toBe(10);
+      expect(superPotion?.y).toBe(3);
+      expect([0, 2]).toContain(b1f.collisionGrid[3 * b1f.width + 10]);
+
+      expect(b2fItems.length).toBeGreaterThanOrEqual(1);
+      const tmRainDance = b2fItems.find((i) => i.itemId === 'tm_rain_dance');
+      expect(tmRainDance).toBeDefined();
+      expect(tmRainDance?.x).toBe(15);
+      expect(tmRainDance?.y).toBe(5);
+      expect([0, 2]).toContain(b2f.collisionGrid[5 * b2f.width + 15]);
+    });
+
+    it('Dimension 6: asserts time-of-day wild grass and water encounter distributions for B1F and B2F', () => {
+      const b1f = loadMap('slowpoke_well_b1f');
+      const b2f = loadMap('slowpoke_well_b2f');
+
+      expect(b1f.grassEncounters && b1f.grassEncounters.length).toBeGreaterThanOrEqual(6);
+      const b1fTimes = new Set((b1f.grassEncounters || []).map((e) => (e as any).timeOfDay));
+      expect(b1fTimes.has('MORNING')).toBe(true);
+      expect(b1fTimes.has('DAY')).toBe(true);
+      expect(b1fTimes.has('NIGHT')).toBe(true);
+
+      expect(b2f.grassEncounters && b2f.grassEncounters.length).toBeGreaterThanOrEqual(6);
+      const b2fTimes = new Set((b2f.grassEncounters || []).map((e) => (e as any).timeOfDay));
+      expect(b2fTimes.has('MORNING')).toBe(true);
+      expect(b2fTimes.has('DAY')).toBe(true);
+      expect(b2fTimes.has('NIGHT')).toBe(true);
+
+      expect(b2f.waterEncounters && b2f.waterEncounters.length).toBeGreaterThanOrEqual(2);
+      expect(b2f.waterEncounters?.some((w) => w.speciesId === 'slowpoke')).toBe(true);
+      expect(b2f.waterEncounters?.some((w) => w.speciesId === 'slowbro')).toBe(true);
+    });
+
+    it('Dimension 7: asserts subterranean warning signposts and depth markers on B1F and B2F', () => {
+      const b1f = loadMap('slowpoke_well_b1f');
+      const b2f = loadMap('slowpoke_well_b2f');
+
+      expect(b1f.bgEvents && b1f.bgEvents.length).toBeGreaterThanOrEqual(2);
+      expect(b1f.bgEvents?.some((b) => b.pages.some((p) => p.includes('SLOWPOKE WELL')))).toBe(true);
+
+      expect(b2f.bgEvents && b2f.bgEvents.length).toBeGreaterThanOrEqual(2);
+      expect(b2f.bgEvents?.some((b) => b.pages.some((p) => p.includes('SUBTERRANEAN LAKE') || p.includes('SLOWPOKE WELL')))).toBe(true);
+    });
+
+    it('Dimension 10: asserts B1F and B2F resolve cleanly to bgm_sprout_tower in AudioManager', () => {
+      const audioManager = new AudioManager();
+      expect(audioManager.getTrackForMap('slowpoke_well_b1f')).toBe('bgm_sprout_tower');
+      expect(audioManager.getTrackForMap('slowpoke_well_b2f')).toBe('bgm_sprout_tower');
+    });
+  });
 });
