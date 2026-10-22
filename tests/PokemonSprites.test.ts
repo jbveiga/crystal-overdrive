@@ -167,6 +167,65 @@ describe('Complete 251 Pokémon Sprites & Icons Integrity', () => {
     }
   });
 
+  it('verifies Route 35 and National Park NPC character sheets exist and match 144x32 specs', () => {
+    const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
+    const expectedSheets = [
+      'firebreather.png',
+      'psychic.png',
+      'psychic_m.png',
+      'schoolboy.png',
+      'school_kid_m.png',
+      'super_nerd.png',
+      'juggler.png',
+      'officer.png',
+      'bird_keeper.png',
+    ];
+
+    for (const sheet of expectedSheets) {
+      const filePath = path.join(charsDir, sheet);
+      expect(fs.existsSync(filePath), `Missing sheet: ${sheet}`).toBe(true);
+      const buf = fs.readFileSync(filePath);
+      expect(buf.readUInt32BE(16), `${sheet} width`).toBe(144);
+      expect(buf.readUInt32BE(20), `${sheet} height`).toBe(32);
+      expect(buf.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('verifies Route 35 and National Park key items, TM, and Park Ball exist on disk', () => {
+    const itemsDir = path.resolve(__dirname, '../public/assets/sprites/items');
+    const expectedItems = [
+      'tm_fighting.png',
+      'tm-fighting.png',
+      'tm08.png',
+      'quick_claw.png',
+      'quick-claw.png',
+      'sun_stone.png',
+      'sun-stone.png',
+      'park_ball.png',
+      'park-ball.png',
+      'parkball.png',
+    ];
+
+    for (const it of expectedItems) {
+      const p = path.join(itemsDir, it);
+      expect(fs.existsSync(p), `Missing item icon: ${it}`).toBe(true);
+      expect(fs.statSync(p).size).toBeGreaterThan(0);
+    }
+  });
+
+  it('verifies National Park BGM and Sudowoodo cry audio exist on disk', () => {
+    const bgmDir = path.resolve(__dirname, '../public/assets/audio/bgm');
+    const criesDir = path.resolve(__dirname, '../public/assets/audio/cries');
+
+    expect(fs.existsSync(path.join(bgmDir, 'bgm_national_park.mp3'))).toBe(true);
+    expect(fs.existsSync(path.join(bgmDir, 'bgm_national_park.webm'))).toBe(true);
+    expect(fs.statSync(path.join(bgmDir, 'bgm_national_park.mp3')).size).toBeGreaterThan(0);
+
+    expect(fs.existsSync(path.join(criesDir, '185.mp3'))).toBe(true);
+    expect(fs.existsSync(path.join(criesDir, 'sudowoodo.mp3'))).toBe(true);
+    expect(fs.statSync(path.join(criesDir, '185.mp3')).size).toBeGreaterThan(0);
+  });
+
   it('verifies Route 36 Sudowoodo overworld sprites are present and valid', () => {
     const charsDir = path.resolve(__dirname, '../public/assets/sprites/characters');
     const spritesDir = path.resolve(__dirname, '../public/assets/sprites');
