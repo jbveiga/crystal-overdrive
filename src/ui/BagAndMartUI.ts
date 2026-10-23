@@ -1,4 +1,4 @@
-import type { PokemonInstance, PokeballId, MedicineId, SpeedMultiplier, MoveData } from '../types/game';
+import type { PokemonInstance, PokeballId, MedicineId, RepelId, SpeedMultiplier, MoveData } from '../types/game';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { BattleAudio } from '../audio/BattleAudio';
 import { OverworldItemManager } from '../world/OverworldItemManager';
@@ -88,6 +88,46 @@ export const MART_MEDICINE_CATALOG: MedicineItemDef[] = [
     badgeLabel: 'REVIVE 50%',
     desc: 'A medicine that revives a fainted Pokémon and restores half its maximum HP.',
     icon: '💎',
+  },
+];
+
+export interface RepelItemDef {
+  id: RepelId;
+  name: string;
+  price: number;
+  steps: number;
+  badgeLabel: string;
+  desc: string;
+  icon: string;
+}
+
+export const MART_REPEL_CATALOG: RepelItemDef[] = [
+  {
+    id: 'repel',
+    name: 'Repel',
+    price: 350,
+    steps: 100,
+    badgeLabel: '100 STEPS',
+    desc: 'An aerosol spray that keeps wild Pokémon away for 100 steps.',
+    icon: '🛡️',
+  },
+  {
+    id: 'super-repel',
+    name: 'Super Repel',
+    price: 500,
+    steps: 200,
+    badgeLabel: '200 STEPS',
+    desc: 'Keeps wild Pokémon away for 200 steps. Lasts twice as long as standard Repel.',
+    icon: '🛡️',
+  },
+  {
+    id: 'max-repel',
+    name: 'Max Repel',
+    price: 700,
+    steps: 250,
+    badgeLabel: '250 STEPS',
+    desc: 'Maximum-strength spray that keeps wild Pokémon away for 250 steps.',
+    icon: '🛡️',
   },
 ];
 
@@ -250,13 +290,15 @@ export class BagAndMartUI {
   private speedMultiplier: SpeedMultiplier = 1;
   private onInventoryChanged?: () => void;
   private onUseItemfinder?: () => void;
+  private onUseRepel?: (steps: number, itemName: string) => void;
 
   constructor(
     containerId: string = 'modal-container',
     inventory: BagInventory,
     party: PokemonInstance[],
     onInventoryChanged?: () => void,
-    onUseItemfinder?: () => void
+    onUseItemfinder?: () => void,
+    onUseRepel?: (steps: number, itemName: string) => void
   ) {
     const el = document.getElementById(containerId);
     if (!el) throw new Error(`UI Container #${containerId} not found`);
@@ -278,7 +320,12 @@ export class BagAndMartUI {
     this.party = party;
     this.onInventoryChanged = onInventoryChanged;
     this.onUseItemfinder = onUseItemfinder;
+    this.onUseRepel = onUseRepel;
     this.createUI();
+  }
+
+  public setOnUseRepel(handler: (steps: number, itemName: string) => void): void {
+    this.onUseRepel = handler;
   }
 
   public setSpeedMultiplier(speed: SpeedMultiplier): void {
@@ -625,13 +672,48 @@ export class BagAndMartUI {
     }
 
     const ownedItems = MART_MEDICINE_CATALOG.filter((m) => (this.inventory.items?.[m.id] ?? 0) > 0);
+    const ownedRepels = MART_REPEL_CATALOG.filter((r) => (this.inventory.items?.[r.id] ?? 0) > 0);
     const hasBerries = Object.values(this.inventory.berries || {}).some((c) => (c ?? 0) > 0);
-    if (ownedItems.length === 0 && !this.onUseItemfinder && !hasBerries) {
+    if (ownedItems.length === 0 && ownedRepels.length === 0 && !this.onUseItemfinder && !hasBerries) {
       container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; background: #141E33; border: 1px dashed #22324F; border-radius: 10px; box-shadow: 0 3px 0 0 #070B14;">No medicine items in bag. Visit a Poké Mart to stock up!</div>`;
       return;
     }
 
     const targetPkmn = this.party[this.selectedPartyIndex] || this.party[0];
+
+    for (const repel of ownedRepels) {
+      const count = this.inventory.items[repel.id] ?? 0;
+      const card = document.createElement('div');
+      card.style.cssText = CARD_STYLE;
+      card.innerHTML = `
+        <div style="flex: 1;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${repel.icon} ${repel.name}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${repel.badgeLabel}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #FFD028;">x${count}</span>
+          </div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${repel.desc}</div>
+        </div>
+        <button class="use-repel-btn" style="
+          background: #0284C7;
+          color: white;
+          border: 1.5px solid #38BDF8;
+          border-radius: 6px;
+          padding: 8px 14px;
+          font-family: 'Space Mono', monospace;
+          font-weight: 800;
+          font-size: 11px;
+          cursor: pointer;
+          white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
+        ">SPRAY (${repel.steps} STEPS)</button>
+      `;
+      const useRepelBtn = card.querySelector('.use-repel-btn') as HTMLButtonElement;
+      useRepelBtn.addEventListener('click', () => {
+        this.useRepelItem(repel);
+      });
+      container.appendChild(card);
+    }
 
     for (const med of ownedItems) {
       const count = this.inventory.items[med.id] ?? 0;
@@ -721,6 +803,22 @@ export class BagAndMartUI {
       `;
       container.appendChild(berryCard);
     }
+  }
+
+  public useRepelItem(repel: RepelItemDef): boolean {
+    if (!this.inventory.items) return false;
+    const currentCount = this.inventory.items[repel.id] ?? 0;
+    if (currentCount <= 0) return false;
+
+    this.inventory.items[repel.id] = currentCount - 1;
+    BattleAudio.playMenuSound('CONFIRM');
+    this.showFeedback(`🛡️ Sprayed ${repel.name}! Wild Pokémon warded off for ${repel.steps} steps.`);
+    if (this.onUseRepel) {
+      this.onUseRepel(repel.steps, repel.name);
+    }
+    this.renderItemsTab();
+    if (this.onInventoryChanged) this.onInventoryChanged();
+    return true;
   }
 
   public useMedicineOnTarget(med: MedicineItemDef, target: PokemonInstance | undefined): boolean {
@@ -1153,6 +1251,61 @@ export class BagAndMartUI {
         this.inventory.items![med.id] = (this.inventory.items![med.id] ?? 0) + 1;
         this.updateHeaderDisplay();
         this.showFeedback(`Purchased 1x ${med.name}! (Now holding x${this.inventory.items![med.id]})`);
+        this.renderMartTab();
+        if (this.onInventoryChanged) this.onInventoryChanged();
+      });
+
+      container.appendChild(card);
+    }
+
+    // Field Repels Section Header
+    const repelHeader = document.createElement('div');
+    repelHeader.style.cssText =
+      "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 8px; letter-spacing: 0.5px;";
+    repelHeader.innerText = '🛡️ FIELD REPELS (WARD OFF WILD POKÉMON)';
+    container.appendChild(repelHeader);
+
+    for (const repel of MART_REPEL_CATALOG) {
+      const ownedCount = this.inventory.items[repel.id] ?? 0;
+      const card = document.createElement('div');
+      card.style.cssText = CARD_STYLE;
+
+      card.innerHTML = `
+        <div style="flex: 1;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${repel.icon} ${repel.name}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${repel.badgeLabel}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94A3B8;">Owned: x${ownedCount}</span>
+          </div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${repel.desc}</div>
+        </div>
+        <button class="buy-repel-btn" style="
+          background: #16A34A;
+          color: white;
+          border: 1.5px solid #22C55E;
+          border-radius: 6px;
+          padding: 8px 12px;
+          font-family: 'Space Mono', monospace;
+          font-weight: 800;
+          font-size: 11px;
+          cursor: pointer;
+          white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
+        ">BUY $${repel.price}</button>
+      `;
+
+      const buyRepelBtn = card.querySelector('.buy-repel-btn') as HTMLButtonElement;
+      buyRepelBtn.addEventListener('click', () => {
+        if (this.inventory.money < repel.price) {
+          BattleAudio.playMenuSound('CANCEL');
+          this.showFeedback(`Not enough money to buy ${repel.name}! ($${repel.price} required)`, true);
+          return;
+        }
+        BattleAudio.playMenuSound('CONFIRM');
+        this.inventory.money -= repel.price;
+        this.inventory.items![repel.id] = (this.inventory.items![repel.id] ?? 0) + 1;
+        this.updateHeaderDisplay();
+        this.showFeedback(`Purchased 1x ${repel.name}! (Now holding x${this.inventory.items![repel.id]})`);
         this.renderMartTab();
         if (this.onInventoryChanged) this.onInventoryChanged();
       });

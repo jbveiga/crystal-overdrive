@@ -47,6 +47,7 @@ import type {
   GameOptions,
   SpeedMultiplier,
   ExpShareMode,
+  EncounterRateMode,
 } from './types/game';
 import type { Graphics } from 'pixi.js';
 import { createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS } from './world/npcData';
@@ -103,6 +104,7 @@ async function bootstrap() {
       'parlyz-heal': 2,
       awakening: 2,
       revive: 1,
+      repel: 2,
     },
     berries: {},
     tms: ['TM54', 'TM73', 'TM99'],
@@ -627,6 +629,11 @@ async function bootstrap() {
 
   let triggerItemfinderScan = () => {};
 
+  mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
+  if (gameOptions.encounterRateMode) {
+    mapManager.setEncounterRateMode(gameOptions.encounterRateMode);
+  }
+
   // 5. Initialize HUDs, Party Management, Start Menu & Renderers
   const bagUI = new BagAndMartUI(
     'modal-container',
@@ -637,6 +644,12 @@ async function bootstrap() {
     },
     () => {
       triggerItemfinderScan();
+    },
+    (steps: number, itemName: string) => {
+      mapManager.setRepelSteps(steps);
+      if (overworldHUD) {
+        overworldHUD.showToast(`🛡️ ${itemName} active! Wild encounters warded off for ${steps} steps.`);
+      }
     }
   );
 
@@ -741,6 +754,7 @@ async function bootstrap() {
       isGamepadActive: () => overworldHUD?.isGamepadActive() ?? false,
       getTouchControlStyle: () => overworldHUD?.getTouchControlStyle() ?? gameOptions.touchControlStyle ?? 'DPAD',
       getExpShareMode: () => gameOptions.expShare ?? 'CAPPED',
+      getEncounterRateMode: () => mapManager.getEncounterRateMode(),
     },
     {
       onOpenParty: () => {
@@ -799,6 +813,12 @@ async function bootstrap() {
       },
       onSetExpShareMode: (mode: ExpShareMode) => {
         gameOptions.expShare = mode;
+        saveCurrentGame();
+        return mode;
+      },
+      onSetEncounterRateMode: (mode: EncounterRateMode) => {
+        gameOptions.encounterRateMode = mode;
+        mapManager.setEncounterRateMode(mode);
         saveCurrentGame();
         return mode;
       },
@@ -1351,6 +1371,9 @@ async function bootstrap() {
         overworldHUD.hideRoamerAlert();
       }
 
+      // Reset 4-step grace period on route transition
+      mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
+
       // Autosave on route transition
       saveCurrentGame();
     }
@@ -1458,6 +1481,7 @@ async function bootstrap() {
               eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
             }
             await battleHUD.showMessage('Got away safely!');
+            mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
             battleRenderer.endBattle();
             battleHUD.hide();
             gameState = 'OVERWORLD';
@@ -1688,9 +1712,11 @@ async function bootstrap() {
           }
 
           if (options.isTrainer) {
-            inventory.money += 200;
+            const fullTrainerTeam = options.trainerTeam || [opponentPokemon];
+            const prizeMoney = BattleStateMachine.calculateTrainerPayout(fullTrainerTeam);
+            inventory.money += prizeMoney;
             await battleHUD.showMessage(`You defeated ${options.trainerName}!`);
-            await battleHUD.showMessage(`You got $200 for winning!`);
+            await battleHUD.showMessage(`You got $${prizeMoney} for winning!`);
           }
         } else if (result.winner === 'ENEMY') {
           const remainingConscious = playerParty.filter((p) => !p.isEgg && p.currentHp > 0);
@@ -1729,6 +1755,7 @@ async function bootstrap() {
             eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
           }
 
+          mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
           battleRenderer.endBattle();
           battleHUD.hide();
           gameState = 'OVERWORLD';
@@ -1772,6 +1799,7 @@ async function bootstrap() {
           eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
         }
         await battleHUD.showMessage('Battle concluded! Returning to overworld...');
+        mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
         battleRenderer.endBattle();
         battleHUD.hide();
         gameState = 'OVERWORLD';
@@ -5166,6 +5194,13 @@ async function bootstrap() {
               runTrainerSightSequence(spottedTrainer);
               return;
             }
+          }
+
+          // Decrement active Repel step counter and alert when it expires
+          const repelStepStatus = mapManager.decrementRepelStep();
+          if (repelStepStatus.expiredJustNow) {
+            BattleAudio.playMenuSound('CANCEL');
+            overworldHUD.showToast("🛡️ Repel's effect wore off!");
           }
 
           // Wild Encounter Check in Tall Grass (tile type 2) or Cave / Ruins floors (tile type 0)

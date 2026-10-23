@@ -1,4 +1,4 @@
-import type { SpeedMultiplier, TouchControlStyle, ExpShareMode } from '../types/game';
+import type { SpeedMultiplier, TouchControlStyle, ExpShareMode, EncounterRateMode } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { Dex } from '@pkmn/dex';
@@ -302,6 +302,9 @@ export interface StartMenuStateProvider {
   isGamepadActive?: () => boolean;
   getTouchControlStyle?: () => TouchControlStyle;
   getExpShareMode?: () => ExpShareMode;
+  getEncounterRateMode?: () => EncounterRateMode;
+  getLevelCap?: () => number;
+  getGymAceLevel?: () => number;
 }
 
 export interface StartMenuCallbacks {
@@ -317,6 +320,7 @@ export interface StartMenuCallbacks {
   onToggleTouchControlStyle?: () => TouchControlStyle;
   onCycleExpShareMode?: () => ExpShareMode;
   onSetExpShareMode?: (mode: ExpShareMode) => ExpShareMode | void;
+  onSetEncounterRateMode?: (mode: EncounterRateMode) => EncounterRateMode | void;
 }
 
 const JOHTO_BADGES = [
@@ -1671,6 +1675,9 @@ export class StartMenuUI {
     const expShareMode: ExpShareMode = this.stateProvider.getExpShareMode
       ? this.stateProvider.getExpShareMode()
       : 'CAPPED';
+    const encounterRateMode: EncounterRateMode = this.stateProvider.getEncounterRateMode
+      ? this.stateProvider.getEncounterRateMode()
+      : 'NORMAL';
     const currentBadges = this.stateProvider.getBadges ? this.stateProvider.getBadges().length : 0;
     const currentLevelCap = PokemonFactory.getLevelCapForBadges(currentBadges);
 
@@ -1690,6 +1697,12 @@ export class StartMenuUI {
       if (mode === 'OFF') return '#94a3b8';
       if (mode === 'ALL') return '#34d399';
       return '#c084fc';
+    };
+
+    const getEncounterRateLabel = (mode: EncounterRateMode) => {
+      if (mode === 'RELAXED') return '🌿 RELAXED (4.0% Cap)';
+      if (mode === 'CLASSIC') return '⚡ CLASSIC (10.0% Cap)';
+      return '⚖️ NORMAL (6.25% Cap)';
     };
 
     const rowStyle = 'background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;';
@@ -1837,6 +1850,62 @@ export class StartMenuUI {
             ">[ 🧢 CAPPED ]</button>
           </div>
         </div>
+
+        <!-- Wild Encounter Rate Cap Toggle (RELAXED 4.0% | NORMAL 6.25% | CLASSIC 10.0%) -->
+        <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="${titleLabelStyle}">WILD ENCOUNTER RATE</div>
+              <div style="${subLabelStyle}">4-step grace buffer + step probability cap</div>
+            </div>
+            <button id="settings-encounter-rate-btn" style="
+              background: #0284c7;
+              color: #ffffff;
+              border: 1px solid #38bdf8;
+              border-radius: 6px;
+              padding: 7px 12px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+              min-width: 130px;
+            ">${getEncounterRateLabel(encounterRateMode)}</button>
+          </div>
+          <div id="settings-encounter-segmented-group" style="display:flex;gap:6px;width:100%;">
+            <button id="settings-enc-relaxed-btn" style="
+              flex: 1;
+              background: ${encounterRateMode === 'RELAXED' ? '#059669' : '#0f172a'};
+              color: ${encounterRateMode === 'RELAXED' ? '#ffffff' : '#94a3b8'};
+              border: 1px solid ${encounterRateMode === 'RELAXED' ? '#34d399' : 'rgba(255,255,255,0.12)'};
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ RELAXED 4% ]</button>
+            <button id="settings-enc-normal-btn" style="
+              flex: 1;
+              background: ${encounterRateMode === 'NORMAL' ? '#0284c7' : '#0f172a'};
+              color: ${encounterRateMode === 'NORMAL' ? '#ffffff' : '#94a3b8'};
+              border: 1px solid ${encounterRateMode === 'NORMAL' ? '#38bdf8' : 'rgba(255,255,255,0.12)'};
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ NORMAL 6.25% ]</button>
+            <button id="settings-enc-classic-btn" style="
+              flex: 1;
+              background: ${encounterRateMode === 'CLASSIC' ? '#d97706' : '#0f172a'};
+              color: ${encounterRateMode === 'CLASSIC' ? '#ffffff' : '#94a3b8'};
+              border: 1px solid ${encounterRateMode === 'CLASSIC' ? '#fbbf24' : 'rgba(255,255,255,0.12)'};
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ CLASSIC 10% ]</button>
+          </div>
+        </div>
       </div>
 
       <button id="close-settings-btn" style="
@@ -1860,6 +1929,10 @@ export class StartMenuUI {
     const expOffBtn = this.settingsModal.querySelector('#settings-exp-off-btn') as HTMLButtonElement;
     const expAllBtn = this.settingsModal.querySelector('#settings-exp-all-btn') as HTMLButtonElement;
     const expCappedBtn = this.settingsModal.querySelector('#settings-exp-capped-btn') as HTMLButtonElement;
+    const encRateBtn = this.settingsModal.querySelector('#settings-encounter-rate-btn') as HTMLButtonElement;
+    const encRelaxedBtn = this.settingsModal.querySelector('#settings-enc-relaxed-btn') as HTMLButtonElement;
+    const encNormalBtn = this.settingsModal.querySelector('#settings-enc-normal-btn') as HTMLButtonElement;
+    const encClassicBtn = this.settingsModal.querySelector('#settings-enc-classic-btn') as HTMLButtonElement;
     const closeBtn = this.settingsModal.querySelector('#close-settings-btn') as HTMLButtonElement;
     const closeXBtn = this.settingsModal.querySelector('#close-settings-x-btn') as HTMLButtonElement;
 
@@ -1906,6 +1979,40 @@ export class StartMenuUI {
     expOffBtn.addEventListener('click', () => applyExpMode('OFF'));
     expAllBtn.addEventListener('click', () => applyExpMode('ALL'));
     expCappedBtn.addEventListener('click', () => applyExpMode('CAPPED'));
+
+    let activeEncMode: EncounterRateMode = encounterRateMode;
+    const syncEncounterButtons = (mode: EncounterRateMode) => {
+      activeEncMode = mode;
+      encRateBtn.innerText = getEncounterRateLabel(mode);
+      encRelaxedBtn.style.background = mode === 'RELAXED' ? '#059669' : '#0f172a';
+      encRelaxedBtn.style.color = mode === 'RELAXED' ? '#ffffff' : '#94a3b8';
+      encRelaxedBtn.style.borderColor = mode === 'RELAXED' ? '#34d399' : 'rgba(255,255,255,0.12)';
+
+      encNormalBtn.style.background = mode === 'NORMAL' ? '#0284c7' : '#0f172a';
+      encNormalBtn.style.color = mode === 'NORMAL' ? '#ffffff' : '#94a3b8';
+      encNormalBtn.style.borderColor = mode === 'NORMAL' ? '#38bdf8' : 'rgba(255,255,255,0.12)';
+
+      encClassicBtn.style.background = mode === 'CLASSIC' ? '#d97706' : '#0f172a';
+      encClassicBtn.style.color = mode === 'CLASSIC' ? '#ffffff' : '#94a3b8';
+      encClassicBtn.style.borderColor = mode === 'CLASSIC' ? '#fbbf24' : 'rgba(255,255,255,0.12)';
+    };
+
+    const applyEncMode = (nextMode: EncounterRateMode) => {
+      BattleAudio.playMenuSound('CONFIRM');
+      if (this.callbacks.onSetEncounterRateMode) {
+        this.callbacks.onSetEncounterRateMode(nextMode);
+      }
+      syncEncounterButtons(nextMode);
+    };
+
+    encRateBtn.addEventListener('click', () => {
+      const order: EncounterRateMode[] = ['RELAXED', 'NORMAL', 'CLASSIC'];
+      const nextMode = order[(order.indexOf(activeEncMode) + 1) % order.length];
+      applyEncMode(nextMode);
+    });
+    encRelaxedBtn.addEventListener('click', () => applyEncMode('RELAXED'));
+    encNormalBtn.addEventListener('click', () => applyEncMode('NORMAL'));
+    encClassicBtn.addEventListener('click', () => applyEncMode('CLASSIC'));
 
     soundBtn.addEventListener('click', () => {
       if (this.callbacks.onToggleMute) {

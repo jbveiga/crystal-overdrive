@@ -24,6 +24,8 @@ export type SpriteType =
 export type TouchControlStyle = 'DPAD' | 'JOYSTICK';
 export type ExpShareMode = 'OFF' | 'ALL' | 'CAPPED';
 export type ExpShareSetting = ExpShareMode;
+export type EncounterRateMode = 'NORMAL' | 'RELAXED' | 'CLASSIC';
+export type RepelId = 'repel' | 'super-repel' | 'max-repel';
 
 export interface PlayerProfile {
   name: string;
@@ -40,6 +42,7 @@ export interface GameOptions {
   battleSpeedMultiplier?: SpeedMultiplier; // (default: 1)
   touchControlStyle?: TouchControlStyle; // (default: 'DPAD')
   expShare?: ExpShareMode;  // (default: 'CAPPED')
+  encounterRateMode?: EncounterRateMode; // (default: 'NORMAL' [6.25% cap])
 }
 
 export interface RadarPing {
@@ -179,6 +182,7 @@ export interface MapData {
   warps: WarpEvent[];
   bgEvents?: BgEvent[];
   grassEncounters: WildEncounterSlot[];
+  waterEncounters?: WildEncounterSlot[];
 }
 
 export interface MoveData {

@@ -1,4 +1,4 @@
-import type { BgEvent, Direction, MapData, TileCoord, WarpEvent, WarpSoundCue, WarpTransitionConfig } from '../types/game';
+import type { BgEvent, Direction, EncounterRateMode, MapData, TileCoord, WarpEvent, WarpSoundCue, WarpTransitionConfig } from '../types/game';
 
 export interface WildEncounterResult {
   speciesId: string;
@@ -7,9 +7,22 @@ export interface WildEncounterResult {
 }
 
 export class MapManager {
+  public static readonly GRACE_STEPS_DEFAULT = 4;
+  public static readonly GRASS_CAP_NORMAL = 0.0625;  // 6.25% (1 in 16 steps)
+  public static readonly GRASS_CAP_RELAXED = 0.04;   // 4.00% (1 in 25 steps)
+  public static readonly GRASS_CAP_CLASSIC = 0.10;   // 10.0% (1 in 10 steps)
+  public static readonly CAVE_CAP_NORMAL = 0.04;     // 4.00% (1 in 25 steps)
+  public static readonly CAVE_CAP_RELAXED = 0.025;   // 2.50% (1 in 40 steps)
+  public static readonly CAVE_CAP_CLASSIC = 0.0625;  // 6.25% (1 in 16 steps)
+
   private currentMap: MapData | null = null;
   private neighborScratchMap: MapData | null = null;
   private maps: Map<string, MapData> = new Map();
+  private graceStepsRemaining: number = 0;
+  private stepsSinceGraceEnd: number = 4;
+  private pacingEnabled: boolean = false;
+  private repelStepsRemaining: number = 0;
+  private encounterRateMode: EncounterRateMode = 'NORMAL';
 
   registerMap(map: MapData): void {
     this.maps.set(map.id, map);
@@ -154,8 +167,89 @@ export class MapManager {
   }
 
   /**
+   * Activates the post-battle / route-entry grace buffer (default 4 guaranteed safe steps with 0% encounter chance)
+   * and resets the step ramp counter so players never experience back-to-back encounters.
+   */
+  public activateEncounterGracePeriod(graceSteps: number = MapManager.GRACE_STEPS_DEFAULT): void {
+    this.graceStepsRemaining = Math.max(0, Math.floor(graceSteps));
+    this.stepsSinceGraceEnd = 0;
+    this.pacingEnabled = true;
+  }
+
+  public getGraceStepsRemaining(): number {
+    return this.graceStepsRemaining;
+  }
+
+  public getStepsSinceLastEncounter(): number {
+    if (this.graceStepsRemaining > 0) {
+      return Math.max(0, MapManager.GRACE_STEPS_DEFAULT - this.graceStepsRemaining);
+    }
+    return MapManager.GRACE_STEPS_DEFAULT + this.stepsSinceGraceEnd;
+  }
+
+  public setEncounterRateMode(mode: EncounterRateMode): void {
+    this.encounterRateMode = mode;
+  }
+
+  public getEncounterRateMode(): EncounterRateMode {
+    return this.encounterRateMode;
+  }
+
+  public setRepelSteps(steps: number): void {
+    this.repelStepsRemaining = Math.max(0, Math.floor(steps));
+  }
+
+  public getRepelSteps(): number {
+    return this.repelStepsRemaining;
+  }
+
+  public decrementRepelStep(): { active: boolean; expiredJustNow: boolean; remaining: number } {
+    if (this.repelStepsRemaining <= 0) {
+      return { active: false, expiredJustNow: false, remaining: 0 };
+    }
+    this.repelStepsRemaining--;
+    return {
+      active: this.repelStepsRemaining > 0,
+      expiredJustNow: this.repelStepsRemaining === 0,
+      remaining: this.repelStepsRemaining,
+    };
+  }
+
+  public getMaxEncounterCap(isCaveOrRuins: boolean = false): number {
+    if (isCaveOrRuins) {
+      if (this.encounterRateMode === 'RELAXED') return MapManager.CAVE_CAP_RELAXED;
+      if (this.encounterRateMode === 'CLASSIC') return MapManager.CAVE_CAP_CLASSIC;
+      return MapManager.CAVE_CAP_NORMAL;
+    }
+    if (this.encounterRateMode === 'RELAXED') return MapManager.GRASS_CAP_RELAXED;
+    if (this.encounterRateMode === 'CLASSIC') return MapManager.GRASS_CAP_CLASSIC;
+    return MapManager.GRASS_CAP_NORMAL;
+  }
+
+  /**
+   * Computes the current step's encounter probability threshold:
+   * - If Repel is active or within the 4-step grace period: 0%
+   * - Step 4 (1st step after grace): 2.0% (scaled proportionally to max cap)
+   * - Step 5 (2nd step after grace): 3.5%
+   * - Step 6 (3rd step after grace): 5.0%
+   * - Step 7+ (4th+ step after grace): Capped at 6.25% in Grass (4.0% in Caves)
+   */
+  public getEncounterProbabilityForStep(stepAfterGrace: number, isCaveOrRuins: boolean = false): number {
+    if (this.repelStepsRemaining > 0 || this.graceStepsRemaining > 0 || stepAfterGrace <= 0) {
+      return 0;
+    }
+    const maxCap = this.getMaxEncounterCap(isCaveOrRuins);
+    const scale = maxCap / MapManager.GRASS_CAP_NORMAL;
+    if (stepAfterGrace === 1) return Number((0.02 * scale).toFixed(5));
+    if (stepAfterGrace === 2) return Number((0.035 * scale).toFixed(5));
+    if (stepAfterGrace === 3) return Number((0.05 * scale).toFixed(5));
+    return maxCap;
+  }
+
+  /**
    * Evaluates wild encounter on entering a tile.
-   * In tall grass (type 2), rolls for wild encounter.
+   * In tall grass (type 2) or cave/ruins floor (type 0), rolls for wild encounter using the
+   * 4-step grace buffer and ramping probability capped at 6.25% (Grass) / 4.0% (Caves).
    * If a roaming beast is on this route, gives it a 25% priority encounter rate.
    */
   rollWildEncounter(
@@ -174,21 +268,44 @@ export class MapManager {
       return null;
     }
 
-    // Typical grass encounter chance per step (~12.5% or 1/8)
-    const encounterRoll = rng();
-    if (encounterRoll > 0.125) {
+    // Active Repel suppresses wild encounters completely
+    if (this.repelStepsRemaining > 0) {
       return null;
     }
+
+    // Guaranteed 4-step grace buffer after a battle or route transition
+    if (this.graceStepsRemaining > 0) {
+      this.graceStepsRemaining--;
+      return null;
+    }
+
+    if (this.pacingEnabled) {
+      this.stepsSinceGraceEnd++;
+    }
+
+    const threshold = this.getEncounterProbabilityForStep(this.stepsSinceGraceEnd, isCaveOrRuins);
+    const encounterRoll = rng();
+    if (encounterRoll > threshold) {
+      return null;
+    }
+
+    const finalizeEncounter = (result: WildEncounterResult): WildEncounterResult => {
+      if (this.pacingEnabled) {
+        this.graceStepsRemaining = MapManager.GRACE_STEPS_DEFAULT;
+        this.stepsSinceGraceEnd = 0;
+      }
+      return result;
+    };
 
     // If an active roaming beast is present on this route, 25% chance of encountering it
     if (activeRoamerSpeciesId) {
       const roamerRoll = rng();
       if (roamerRoll < 0.25) {
-        return {
+        return finalizeEncounter({
           speciesId: activeRoamerSpeciesId,
           level: 40,
           isRoamer: true,
-        };
+        });
       }
     }
 
@@ -213,21 +330,21 @@ export class MapManager {
     for (const slot of slots) {
       if (chosenWeight < slot.weight) {
         const level = Math.floor(rng() * (slot.maxLevel - slot.minLevel + 1)) + slot.minLevel;
-        return {
+        return finalizeEncounter({
           speciesId: slot.speciesId,
           level,
           isRoamer: false,
-        };
+        });
       }
       chosenWeight -= slot.weight;
     }
 
     const last = slots[slots.length - 1];
-    return {
+    return finalizeEncounter({
       speciesId: last.speciesId,
       level: last.minLevel,
       isRoamer: false,
-    };
+    });
   }
 
   private checkConnectionWalkable(x: number, y: number): boolean {

@@ -58,6 +58,7 @@ export class BattleStateMachine {
   public enemyPokemon: PokemonInstance;
   public isRoamer: boolean;
   public turnCount: number = 0;
+  public escapeAttempts: number = 0;
   public isBattleOver: boolean = false;
 
   constructor(playerPokemon: PokemonInstance, enemyPokemon: PokemonInstance, isRoamer: boolean = false) {
@@ -75,6 +76,37 @@ export class BattleStateMachine {
   }
 
   /**
+   * Authentic Gen 2 Run escape calculation:
+   * F = floor((PlayerSpeed * 128) / EnemySpeed) + 30 * escapeAttempts
+   * Always succeeds if PlayerSpeed >= EnemySpeed or F >= 255.
+   */
+  public calculateEscapeSuccess(rng: () => number = Math.random): boolean {
+    this.escapeAttempts++;
+    const playerSpeed = this.getEffectiveSpeed(this.playerPokemon);
+    const enemySpeed = Math.max(1, this.getEffectiveSpeed(this.enemyPokemon));
+    if (playerSpeed >= enemySpeed) {
+      return true;
+    }
+    const f = Math.floor((playerSpeed * 128) / enemySpeed) + 30 * this.escapeAttempts;
+    if (f >= 255) {
+      return true;
+    }
+    return Math.floor(rng() * 256) < f;
+  }
+
+  /**
+   * Computes canonical Gen 2 trainer victory payout based on highest level Pokémon in the trainer's party.
+   */
+  public static calculateTrainerPayout(
+    trainerTeam: PokemonInstance[],
+    baseRewardPerLevel: number = 40
+  ): number {
+    if (!trainerTeam || trainerTeam.length === 0) return 200;
+    const maxLevel = Math.max(...trainerTeam.map((p) => p.level || 5));
+    return Math.max(200, maxLevel * baseRewardPerLevel);
+  }
+
+  /**
    * Executes a full battle round based on player's chosen action
    */
   public executeRound(playerAction: BattleAction): BattleTurnResult {
@@ -87,6 +119,8 @@ export class BattleStateMachine {
 
     // 1. Handle Run action
     if (playerAction.type === 'RUN') {
+      this.escapeAttempts++;
+      events.push({ type: 'FLEE', runnerId: this.playerPokemon.uid, success: true });
       events.push({ type: 'MESSAGE', text: 'Got away safely!' });
       this.isBattleOver = true;
       return {
