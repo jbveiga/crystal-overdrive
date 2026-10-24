@@ -60,6 +60,7 @@ export class BattleStateMachine {
   public turnCount: number = 0;
   public escapeAttempts: number = 0;
   public isBattleOver: boolean = false;
+  public furyCutterStreaks: Map<string, number> = new Map();
 
   constructor(playerPokemon: PokemonInstance, enemyPokemon: PokemonInstance, isRoamer: boolean = false) {
     this.playerPokemon = playerPokemon;
@@ -436,6 +437,10 @@ export class BattleStateMachine {
       text: `${attacker.nickname} used ${move.name}!`,
     });
 
+    if (move.id !== 'furycutter') {
+      this.furyCutterStreaks.set(attacker.uid, 0);
+    }
+
     // 4. Accuracy & Evasion Check (Self-targeting status moves and Swift never miss)
     if (move.statChanges?.target !== 'self' && move.id !== 'swift') {
       const accStage = attacker.statStages?.acc ?? 0;
@@ -445,6 +450,7 @@ export class BattleStateMachine {
       const hitChance = (move.accuracy / 100) * (accMult / evaMult);
 
       if (Math.random() > hitChance) {
+        this.furyCutterStreaks.set(attacker.uid, 0);
         events.push({ type: 'MISS', attackerId: attacker.uid });
         events.push({
           type: 'MESSAGE',
@@ -540,8 +546,16 @@ export class BattleStateMachine {
       return;
     }
 
-    // 8. Calculate & Apply Direct Damage
-    const result = DamageCalculator.calculate(attacker, defender, move);
+    // 8. Calculate & Apply Direct Damage (including TM49 Fury Cutter consecutive streak doubling)
+    let effectiveMove = move;
+    if (move.id === 'furycutter') {
+      const streak = this.furyCutterStreaks.get(attacker.uid) ?? 0;
+      const scaledPower = Math.min(160, move.power * Math.pow(2, streak));
+      effectiveMove = { ...move, power: scaledPower };
+      this.furyCutterStreaks.set(attacker.uid, Math.min(4, streak + 1));
+    }
+
+    const result = DamageCalculator.calculate(attacker, defender, effectiveMove);
 
     defender.currentHp = Math.max(0, defender.currentHp - result.damage);
 
@@ -566,7 +580,41 @@ export class BattleStateMachine {
       events.push({ type: 'MESSAGE', text: `It doesn't affect ${defender.nickname}...` });
     }
 
-    // 9. Secondary Status Effect Check (e.g. Ember 10% Burn, Spark 30% Paralysis)
+    // 9. Secondary Stat Stage Effect on Damaging Moves (e.g. TM31 Mud-Slap accuracy drop)
+    if (
+      move.statChanges &&
+      move.category !== 'Status' &&
+      defender.currentHp > 0 &&
+      result.effectiveness > 0
+    ) {
+      const targetPkmn = move.statChanges.target === 'self' ? attacker : defender;
+      if (!targetPkmn.statStages) {
+        targetPkmn.statStages = PokemonFactory.createDefaultStatStages();
+      }
+      const stat = move.statChanges.stat;
+      const delta = move.statChanges.stages;
+      const currentStage = targetPkmn.statStages[stat];
+      const nextStage = Math.max(-6, Math.min(6, currentStage + delta));
+      const statLabel = STAT_LABELS[stat];
+
+      if (nextStage !== currentStage) {
+        targetPkmn.statStages[stat] = nextStage;
+        events.push({
+          type: 'STAT_CHANGE',
+          targetId: targetPkmn.uid,
+          stat,
+          stages: delta,
+        });
+        const changeText =
+          delta >= 2 ? 'sharply rose!' : delta === 1 ? 'rose!' : delta <= -2 ? 'harshly fell!' : 'fell!';
+        events.push({
+          type: 'MESSAGE',
+          text: `${targetPkmn.nickname}'s ${statLabel} ${changeText}`,
+        });
+      }
+    }
+
+    // 10. Secondary Status Effect Check (e.g. Ember 10% Burn, Spark 30% Paralysis)
     if (
       move.secondaryStatus &&
       defender.currentHp > 0 &&

@@ -452,6 +452,76 @@ export class OverworldRenderer {
       'jt_95_96_52_52',
       'jt_95_96_98_98',
       'jt_96_1c_98_99',
+      // Authentic johto_modern tiles for Azalea Town, Slowpoke Well entrance & Route 33
+      'jt_m_1e_1f_13_15',
+      'jt_m_13_15_3e_3f',
+      'jt_m_1e_1f_3e_3f',
+      'jt_m_05_05_05_05',
+      'jt_m_2b_2c_3b_3c',
+      'jt_m_2c_2d_3c_3d',
+      'jt_m_3b_3c_4b_4c',
+      'jt_m_3c_3d_4c_4d',
+      'jt_m_3b_3b_3b_3b',
+      'jt_m_3c_3c_3c_3c',
+      'jt_m_10_11_0d_0e_az',
+      'jt_m_11_11_0e_0e_az',
+      'jt_m_0d_0e_0a_0b_az',
+      'jt_m_0e_0e_0b_0b_az',
+      'jt_m_11_12_0e_0f_az',
+      'jt_m_0e_0f_0b_0c_az',
+      'jt_m_3b_4b_4b_4c',
+      'jt_m_4c_4c_4c_4c',
+      'jt_m_10_11_0a_0b_az',
+      'jt_m_11_11_0b_0b_az',
+      'jt_m_1a_1b_01_02',
+      'jt_m_37_38_39_3a',
+      'jt_m_11_12_0b_0c_az',
+      'jt_m_1b_1b_02_02',
+      'jt_m_1b_1c_02_16',
+      'jt_m_1a_07_1a_07_az',
+      'jt_m_07_07_07_07_az',
+      'jt_m_1a_07_01_02_az',
+      'jt_m_07_1c_07_1c_az',
+      'jt_m_18_19_17_17',
+      'jt_m_07_1c_02_16_az',
+      'jt_m_05_05_4c_4c',
+      'jt_m_06_06_06_06',
+      'jt_m_06_06_4c_4c',
+      'jt_m_06_06_5b_5b',
+      'jt_m_4e_4f_5e_5f',
+      'jt_m_29_2a_4b_48',
+      'jt_m_55_57_35_35',
+      'jt_m_29_2a_47_48',
+      'jt_m_32_32_46_46',
+      'jt_m_32_34_46_44',
+      'jt_m_46_46_52_52',
+      'jt_m_46_44_52_54',
+      'jt_m_5a_5a_59_59',
+      'jt_m_06_4a_06_4a',
+      'jt_m_08_09_17_17',
+      'jt_m_3b_4c_4b_4c',
+      'jt_m_5b_5b_5b_5b',
+      'jt_m_4c_3d_4c_4d',
+      'jt_m_1b_1b_1b_26',
+      'jt_m_1b_1c_26_1c',
+      'jt_m_40_40_40_40',
+      'jt_m_00_00_00_00',
+      'jt_m_06_00_00_00',
+      'jt_m_05_05_5b_5b',
+      'jt_m_1a_1b_1a_26',
+      'jt_m_1b_1b_26_1b',
+      'jt_m_23_24_1b_1b',
+      'jt_m_1b_1b_1b_1b',
+      'jt_m_3d_3d_3d_3d',
+      'jt_m_4c_4c_4c_3b',
+      'jt_m_45_22_27_28',
+      'jt_m_4d_3d_4c_4d',
+      'jt_m_3b_05_3b_05',
+      'jt_m_05_2b_2b_3b',
+      'jt_m_2c_2c_3c_3c',
+      'jt_m_2d_05_3d_2d',
+      'jt_m_3b_05_4b_4c',
+      'jt_m_04_04_04_04',
     ];
 
     await Promise.all(
@@ -656,6 +726,79 @@ export class OverworldRenderer {
         maxLife: 0.28,
       });
     }
+  }
+
+  /**
+   * Plays a crisp diagonal blade slash and foliage burst when HM01 Cut chops a tree in the field
+   */
+  public playCutSlashEffect(tileX: number, tileY: number): void {
+    if (!this.foregroundContainer) return;
+    const centerX = (tileX + 0.5) * this.tileSize;
+    const centerY = (tileY + 0.5) * this.tileSize;
+
+    // 1. Diagonal silver-white blade arc
+    const slash = new Graphics();
+    slash
+      .moveTo(-26, -26)
+      .lineTo(26, 26)
+      .stroke({ color: 0xffffff, width: 6 });
+    slash
+      .moveTo(26, -26)
+      .lineTo(-26, 26)
+      .stroke({ color: 0xe2e8f0, width: 4 });
+    slash.position.set(centerX, centerY);
+    this.foregroundContainer.addChild(slash);
+    this.grassParticles.push({
+      graphic: slash,
+      vx: 0,
+      vy: 0,
+      life: 0,
+      maxLife: 0.24,
+    });
+
+    // 2. Scatter 6 cut leaf particles
+    const angles = [-2.6, -2.0, -1.5, -1.0, -0.5, 0.2];
+    for (let i = 0; i < angles.length; i++) {
+      const leaf = new Graphics();
+      leaf.rect(-5, -4, 10, 8).fill({ color: i % 2 === 0 ? 0x4ade80 : 0x16a34a });
+      leaf.position.set(centerX + (i - 2.5) * 6, centerY);
+      this.foregroundContainer.addChild(leaf);
+      this.grassParticles.push({
+        graphic: leaf,
+        vx: Math.cos(angles[i]) * 78,
+        vy: Math.sin(angles[i]) * 88,
+        life: 0,
+        maxLife: 0.35,
+      });
+    }
+  }
+
+  /**
+   * Plays a radiant golden-white illumination pulse across the screen when HM05 Flash is used in the field
+   */
+  public async playFlashEffect(durationMs: number = 380): Promise<void> {
+    if (!this.fadeOverlay || !this.app) return;
+    const w = this.app.screen.width;
+    const h = this.app.screen.height;
+    this.fadeOverlay.clear().rect(0, 0, w, h).fill({ color: 0xfef08a });
+    this.fadeOverlay.alpha = 0.85;
+    this.fadeOverlay.visible = true;
+
+    await new Promise<void>((resolve) => {
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / durationMs);
+        this.fadeOverlay.alpha = 0.85 * (1 - t);
+        if (t < 1) {
+          requestAnimationFrame(step);
+        } else {
+          this.fadeOverlay.alpha = 0;
+          this.fadeOverlay.visible = false;
+          resolve();
+        }
+      };
+      requestAnimationFrame(step);
+    });
   }
 
   /**

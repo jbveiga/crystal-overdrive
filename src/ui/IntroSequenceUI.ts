@@ -626,7 +626,7 @@ export class IntroSequenceUI {
               ">✨ MARILL!</div>
               <img src="./assets/sprites/pokemon/marill_front.png"
                    alt="Marill"
-                   style="width: 56px; height: 56px; image-rendering: pixelated; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));" />
+                   style="width: 56px; height: 56px; image-rendering: pixelated; object-fit: contain; background: transparent; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));" />
             </div>
           `
               : ''
@@ -753,7 +753,9 @@ export class IntroSequenceUI {
       ">${ch}</span>`;
     }).join('');
 
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const qwertyRow1 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
+    const qwertyRow2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
+    const qwertyRow3 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
 
     this.stageViewport.innerHTML = `
       <div style="
@@ -802,46 +804,102 @@ export class IntroSequenceUI {
             .join('')}
         </div>
 
-        <!-- Virtual On-Screen Keyboard Grid -->
-        <div style="display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; width: 100%;">
-          ${alphabet
-            .map(
-              (letter) => `
-            <button data-key-char="${letter}" style="
-              padding: 7px 0;
+        <!-- Virtual On-Screen QWERTY Keyboard -->
+        <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+          <!-- Row 1: Q - P (10 keys) -->
+          <div style="display: flex; gap: 5px; width: 100%; justify-content: center;">
+            ${qwertyRow1
+              .map(
+                (letter) => `
+              <button data-key-char="${letter}" style="
+                flex: 1;
+                min-width: 0;
+                padding: 9px 0;
+                border-radius: 6px;
+                font-size: clamp(12px, 3.2vw, 15px);
+                font-weight: 800;
+                background: #1e293b;
+                color: #f8fafc;
+                border: 1px solid #334155;
+                cursor: pointer;
+                touch-action: manipulation;
+              ">${letter}</button>
+            `
+              )
+              .join('')}
+          </div>
+
+          <!-- Row 2: A - L (9 keys, centered) -->
+          <div style="display: flex; gap: 5px; width: 100%; justify-content: center; padding: 0 4%;">
+            ${qwertyRow2
+              .map(
+                (letter) => `
+              <button data-key-char="${letter}" style="
+                flex: 1;
+                min-width: 0;
+                padding: 9px 0;
+                border-radius: 6px;
+                font-size: clamp(12px, 3.2vw, 15px);
+                font-weight: 800;
+                background: #1e293b;
+                color: #f8fafc;
+                border: 1px solid #334155;
+                cursor: pointer;
+                touch-action: manipulation;
+              ">${letter}</button>
+            `
+              )
+              .join('')}
+          </div>
+
+          <!-- Row 3: DEL + Z - M + OK -->
+          <div style="display: flex; gap: 5px; width: 100%; justify-content: center;">
+            <button id="intro-key-back" style="
+              flex: 1.5;
+              min-width: 0;
+              padding: 9px 0;
               border-radius: 6px;
-              font-size: 13px;
+              font-size: clamp(11px, 2.6vw, 13px);
               font-weight: 800;
-              background: #1e293b;
-              color: #f8fafc;
-              border: 1px solid #334155;
+              background: #dc2626;
+              color: #ffffff;
+              border: 1px solid #fca5a5;
               cursor: pointer;
-            ">${letter}</button>
-          `
-            )
-            .join('')}
-          <button id="intro-key-back" style="
-            grid-column: span 2;
-            padding: 7px 0;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 800;
-            background: #dc2626;
-            color: #ffffff;
-            border: 1px solid #fca5a5;
-            cursor: pointer;
-          ">⌫ DEL</button>
-          <button id="intro-key-ok" style="
-            grid-column: span 3;
-            padding: 7px 0;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 900;
-            background: #16a34a;
-            color: #ffffff;
-            border: 1px solid #86efac;
-            cursor: pointer;
-          ">✓ OK</button>
+              touch-action: manipulation;
+            ">⌫ DEL</button>
+            ${qwertyRow3
+              .map(
+                (letter) => `
+              <button data-key-char="${letter}" style="
+                flex: 1;
+                min-width: 0;
+                padding: 9px 0;
+                border-radius: 6px;
+                font-size: clamp(12px, 3.2vw, 15px);
+                font-weight: 800;
+                background: #1e293b;
+                color: #f8fafc;
+                border: 1px solid #334155;
+                cursor: pointer;
+                touch-action: manipulation;
+              ">${letter}</button>
+            `
+              )
+              .join('')}
+            <button id="intro-key-ok" style="
+              flex: 1.5;
+              min-width: 0;
+              padding: 9px 0;
+              border-radius: 6px;
+              font-size: clamp(11px, 2.6vw, 13px);
+              font-weight: 900;
+              background: #16a34a;
+              color: #ffffff;
+              border: 1px solid #86efac;
+              cursor: pointer;
+              touch-action: manipulation;
+            ">✓ OK</button>
+          </div>
         </div>
       </div>
     `;

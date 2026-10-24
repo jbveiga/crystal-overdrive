@@ -930,17 +930,23 @@ export class BattleHUD {
         </div>
       `;
 
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         if (isEgg) {
-          this.showMessage("An EGG can't battle!");
+          await this.showMessage("An EGG can't battle!");
+          this.partyMenu.style.display = 'grid';
+          this.messageBox.style.display = 'none';
           return;
         }
         if (isActive) {
-          this.showMessage(`${pkmn.nickname} is already in battle!`);
+          await this.showMessage(`${pkmn.nickname} is already in battle!`);
+          this.partyMenu.style.display = 'grid';
+          this.messageBox.style.display = 'none';
           return;
         }
         if (isFainted) {
-          this.showMessage(`${pkmn.nickname} has no energy left to battle!`);
+          await this.showMessage(`${pkmn.nickname} has no energy left to battle!`);
+          this.partyMenu.style.display = 'grid';
+          this.messageBox.style.display = 'none';
           return;
         }
         this.isForcedPartySwitch = false;

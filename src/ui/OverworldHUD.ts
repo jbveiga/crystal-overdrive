@@ -39,6 +39,7 @@ export class OverworldHUD {
   private dialogueCharIndex: number = 0;
   private dialogueTypeTimer?: ReturnType<typeof setInterval>;
   private dialogueOnComplete?: () => void;
+  private dialogueOnPageChange?: (pageIndex: number) => void;
   private dialogueActive: boolean = false;
   private rootElement!: HTMLDivElement;
   private gamepadContainer!: HTMLDivElement;
@@ -821,7 +822,7 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
   }
 
   /**
-   * Plays a canonical Game Boy Color field rest blackout fade (Mom, Prof. Elm, Mr. Pokémon)
+   * Plays a canonical Game Boy Color field rest whitish flash/fade (Mom, Prof. Elm, Mr. Pokémon)
    * with recovery jingle while keeping the 6-slot counter tray exclusive to Pokémon Centers.
    */
   public playFieldRestAnimation(onComplete?: () => void): void {
@@ -836,7 +837,7 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
         left: 0;
         width: 100%;
         height: 100%;
-        background: #000000;
+        background: #ffffff;
         z-index: 60;
         opacity: 0;
         pointer-events: auto;
@@ -844,20 +845,22 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
         transition: opacity 0.22s ease-in-out;
       `;
       this.rootElement.appendChild(overlay);
+    } else {
+      overlay.style.background = '#ffffff';
     }
 
     overlay.style.display = 'block';
     overlay.style.opacity = '1';
     BattleAudio.playOverworldSound('HEAL_JINGLE');
 
-    // Step 1-3: Fade to black (220ms) + Hold blackout (650ms) = 870ms
+    // Step 1-3: Fade to whitish screen (220ms) + Hold whiteout (650ms) = 870ms
     setTimeout(() => {
       if (overlay) {
         overlay.style.opacity = '0';
       }
     }, 870);
 
-    // Step 4-5: Fade from black (250ms) -> clean up and invoke callback at 1120ms
+    // Step 4-5: Fade from white (250ms) -> clean up and invoke callback at 1120ms
     setTimeout(() => {
       if (overlay) {
         overlay.style.display = 'none';
@@ -1113,13 +1116,19 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
     });
   }
 
-  public openDialogue(pages: string[], speaker?: string, onComplete?: () => void): void {
+  public openDialogue(
+    pages: string[],
+    speaker?: string,
+    onComplete?: () => void,
+    onPageChange?: (pageIndex: number) => void
+  ): void {
     if (!pages || pages.length === 0) return;
     if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
 
     this.dialoguePages = pages;
     this.dialoguePageIndex = 0;
     this.dialogueOnComplete = onComplete;
+    this.dialogueOnPageChange = onPageChange;
     this.dialogueActive = true;
     this.activeDirection = null;
 
@@ -1132,6 +1141,9 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
 
     this.dialogueBox.style.display = 'block';
     this.startPageTypewriter();
+    if (this.dialogueOnPageChange) {
+      this.dialogueOnPageChange(0);
+    }
   }
 
   private startPageTypewriter(): void {
@@ -1174,6 +1186,9 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
     if (this.dialoguePageIndex + 1 < this.dialoguePages.length) {
       this.dialoguePageIndex++;
       this.startPageTypewriter();
+      if (this.dialogueOnPageChange) {
+        this.dialogueOnPageChange(this.dialoguePageIndex);
+      }
       return;
     }
 

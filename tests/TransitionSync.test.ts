@@ -3,7 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Mock minimal browser globals for PixiJS environment hydration in node
-(globalThis as any).navigator = { userAgent: 'node' };
+Object.defineProperty(globalThis, 'navigator', {
+  value: { userAgent: 'node' },
+  configurable: true,
+  writable: true,
+});
 (globalThis as any).window = globalThis;
 if (!(globalThis as any).document) {
   (globalThis as any).document = {

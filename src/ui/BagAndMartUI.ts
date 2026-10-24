@@ -249,7 +249,14 @@ export const INFINITE_TMS: Record<string, TMDefinition> = {
     moveId: 'flash',
     name: 'Flash',
     type: 'Normal',
-    desc: "Illuminates dark caves and reduces the target's accuracy in battle.",
+    desc: "Illuminates dark caves in the field (Zephyr Badge; no move slot needed) and lowers target accuracy in battle.",
+  },
+  TM13: {
+    id: 'TM13',
+    moveId: 'snore',
+    name: 'Snore',
+    type: 'Normal',
+    desc: '40 Power Normal attack that can be used while asleep and may cause flinching.',
   },
   TM31: {
     id: 'TM31',
@@ -270,7 +277,14 @@ export const INFINITE_TMS: Record<string, TMDefinition> = {
     moveId: 'cut',
     name: 'Cut',
     type: 'Normal',
-    desc: '50 Power Normal attack that cuts down small trees on the overworld.',
+    desc: '50 Power Normal attack. Cuts down small overworld trees (Hive Badge; no move slot needed).',
+  },
+  HM01_CUT: {
+    id: 'HM01',
+    moveId: 'cut',
+    name: 'Cut',
+    type: 'Normal',
+    desc: '50 Power Normal attack. Cuts down small overworld trees (Hive Badge; no move slot needed).',
   },
 };
 
@@ -305,14 +319,7 @@ export class BagAndMartUI {
     this.container = el;
     this.inventory = inventory;
     if (!this.inventory.items) {
-      this.inventory.items = {
-        potion: 5,
-        'super-potion': 2,
-        antidote: 3,
-        'parlyz-heal': 2,
-        awakening: 2,
-        revive: 1,
-      };
+      this.inventory.items = {};
     }
     if (!this.inventory.berries) {
       this.inventory.berries = {};
@@ -1084,6 +1091,7 @@ export class BagAndMartUI {
       return;
     }
 
+    const seenCanonicalIds = new Set<string>();
     for (const tmId of tms) {
       const tm: TMDefinition = INFINITE_TMS[tmId] || {
         id: tmId,
@@ -1092,6 +1100,13 @@ export class BagAndMartUI {
         type: 'Normal',
         desc: `Teaches ${OverworldItemManager.formatItemName(tmId)} to a compatible Pokémon.`,
       };
+      if (seenCanonicalIds.has(tm.id)) continue;
+      seenCanonicalIds.add(tm.id);
+
+      const isFieldHM = tm.id.startsWith('HM');
+      const fieldBadgeHtml = isFieldHM
+        ? `<span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #D97706; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">FIELD READY (NO SLOT NEEDED)</span>`
+        : '';
 
       const card = document.createElement('div');
       card.style.cssText = CARD_STYLE;
@@ -1103,6 +1118,7 @@ export class BagAndMartUI {
             <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${tm.name}</span>
             <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #22324F; padding: 2px 6px; border-radius: 4px; font-weight: 700; color: #CBD5E1;">${tm.type.toUpperCase()}</span>
             <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">INFINITE USE</span>
+            ${fieldBadgeHtml}
           </div>
           <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${tm.desc}</div>
         </div>

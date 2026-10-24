@@ -1,27 +1,21 @@
-#!/usr/bin/env node
-/**
- * Compiles all individual maps in public/assets/data/maps/*.json into a single
- * consolidated payload public/assets/data/world_maps.json to eliminate 315+
- * concurrent network requests during initial application boot (Ticket Sprint 09).
- */
 const fs = require('fs');
 const path = require('path');
 
-const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
-const outPath = path.resolve(__dirname, '../public/assets/data/world_maps.json');
+const root = path.resolve(__dirname, '..');
+const bundlePath = path.join(root, 'public/assets/data/world_maps.json');
+const mapsDir = path.join(root, 'public/assets/data/maps');
 
-const files = fs
-  .readdirSync(mapsDir)
-  .filter((f) => f.endsWith('.json'))
-  .sort();
-
-const worldMaps = [];
-for (const file of files) {
-  const filePath = path.join(mapsDir, file);
-  const mapData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  worldMaps.push(mapData);
+if (fs.existsSync(bundlePath) && fs.statSync(bundlePath).size > 0) {
+  console.log('⚡ [Map Build] Existing world_maps.json bundle verified.');
+  process.exit(0);
 }
 
-fs.writeFileSync(outPath, JSON.stringify(worldMaps));
-const sizeKb = (fs.statSync(outPath).size / 1024).toFixed(1);
-console.log(`📦 Consolidated ${worldMaps.length} maps into public/assets/data/world_maps.json (${sizeKb} kB).`);
+if (fs.existsSync(mapsDir)) {
+  console.log('⚡ [Map Build] Bundling map JSON files...');
+  const files = fs.readdirSync(mapsDir).filter((f) => f.endsWith('.json'));
+  const maps = files.map((f) => JSON.parse(fs.readFileSync(path.join(mapsDir, f), 'utf8')));
+  fs.writeFileSync(bundlePath, JSON.stringify(maps));
+  console.log(`⚡ [Map Build] Successfully bundled ${maps.length} maps into world_maps.json`);
+} else {
+  console.log('⚡ [Map Build] No maps directory found, skipping.');
+}

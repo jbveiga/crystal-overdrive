@@ -75,9 +75,14 @@ export class PokemonFactory {
       statChanges = { target: 'foe', stat: 'atk', stages: -1 };
     } else if (dexMove.id === 'stringshot') {
       statChanges = { target: 'foe', stat: 'spe', stages: -1 };
-    } else if (dexMove.id === 'sandattack' || dexMove.id === 'smokescreen') {
+    } else if (
+      dexMove.id === 'sandattack' ||
+      dexMove.id === 'smokescreen' ||
+      dexMove.id === 'flash' ||
+      dexMove.id === 'mudslap'
+    ) {
       statChanges = { target: 'foe', stat: 'acc', stages: -1 };
-    } else if (dexMove.id === 'defensecurl') {
+    } else if (dexMove.id === 'defensecurl' || dexMove.id === 'harden') {
       statChanges = { target: 'self', stat: 'def', stages: 1 };
     } else if (dexMove.id === 'growth') {
       statChanges = { target: 'self', stat: 'spa', stages: 1 };
@@ -352,6 +357,86 @@ export class PokemonFactory {
     if (safeCount >= 16) return 81;
     if (safeCount >= 9) return 81;
     return this.GYM_ACE_LEVELS_BY_BADGE[safeCount] ?? 50;
+  }
+
+  /**
+   * Returns the canonical Gen 2 obedience level cap for traded/outsider Pokémon based on earned badges:
+   * - Zephyr Badge (1 badge): Lv. 20
+   * - Hive Badge (2 badges): Lv. 30
+   * - Fog Badge (4 badges): Lv. 50
+   * - Storm Badge (5 badges): Lv. 70
+   * - Rising Badge (8+ badges): Lv. 100
+   */
+  public static getObedienceCapForBadges(badgesOrCount: string[] | number): number {
+    if (Array.isArray(badgesOrCount)) {
+      const set = new Set(badgesOrCount.map((b) => b.toLowerCase()));
+      if (set.has('rising') || set.size >= 8) return 100;
+      if (set.has('storm') || set.size >= 5) return 70;
+      if (set.has('fog') || set.size >= 4) return 50;
+      if (set.has('hive') || set.has('hive_badge') || set.size >= 2) return 30;
+      if (set.has('zephyr') || set.has('zephyr_badge') || set.size >= 1) return 20;
+      return 10;
+    }
+    const count = Math.max(0, Math.floor(badgesOrCount || 0));
+    if (count >= 8) return 100;
+    if (count >= 5) return 70;
+    if (count >= 4) return 50;
+    if (count >= 2) return 30;
+    if (count >= 1) return 20;
+    return 10;
+  }
+
+  /**
+   * Returns Gen 2 badge stat multipliers (+12.5% per corresponding Johto Gym Badge):
+   * - Zephyr Badge: Attack x1.125
+   * - Hive / Mineral Badge: Defense x1.125
+   * - Plain Badge: Speed x1.125
+   * - Fog / Glacier Badge: Special x1.125
+   */
+  public static createMoveInstance(moveId: string): {
+    moveId: string;
+    currentPp: number;
+    maxPp: number;
+  } {
+    const moveData = this.getMoveData(moveId);
+    return {
+      moveId: moveData.id,
+      currentPp: moveData.pp,
+      maxPp: moveData.pp,
+    };
+  }
+
+  public static getBadgeStatMultipliers(badges: string[] = []): {
+    attack: number;
+    defense: number;
+    speed: number;
+    special: number;
+    atk: number;
+    def: number;
+    spe: number;
+    spc: number;
+  } {
+    const set = new Set((badges || []).map((b) => b.toLowerCase()));
+    const attack = set.has('zephyr') || set.has('zephyr_badge') ? 1.125 : 1.0;
+    const defense =
+      set.has('hive') || set.has('hive_badge') || set.has('mineral') || set.has('mineral_badge')
+        ? 1.125
+        : 1.0;
+    const speed = set.has('plain') || set.has('plain_badge') ? 1.125 : 1.0;
+    const special =
+      set.has('fog') || set.has('fog_badge') || set.has('glacier') || set.has('glacier_badge')
+        ? 1.125
+        : 1.0;
+    return {
+      attack,
+      defense,
+      speed,
+      special,
+      atk: attack,
+      def: defense,
+      spe: speed,
+      spc: special,
+    };
   }
 
   /**

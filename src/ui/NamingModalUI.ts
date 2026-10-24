@@ -8,9 +8,13 @@ export interface NamingModalCallbacks {
 export const RIVAL_NAME_PRESETS: readonly string[] = ['SILVER', 'KAZU', 'KAMON', 'RED'];
 
 /**
- * Rival Naming Modal (Ticket SPRINT-13-RIVAL-AND-AZALEA).
- * Centered crimson card with circular portrait, 1-15 character input,
- * quick preset chips, and physical/virtual keyboard support.
+ * Rival Naming Modal (Ticket SPRINT-13-RIVAL-AND-AZALEA / QWERTY Keyboard Parity).
+ * Immersive crimson/slate card matching the character creation naming screen:
+ * - Animated walking Silver sprite (48x96 upscale from canonical 16x32 overworld sheet)
+ * - 15-character slot readout with dynamic highlights and underlines
+ * - Canonical Johto preset chips (SILVER, KAZU, KAMON, RED)
+ * - Complete 3-row QWERTY virtual keyboard with tactile DEL and CONFIRM buttons
+ * - Physical keyboard typing, Backspace deletion, and Enter confirmation support
  */
 export class NamingModalUI {
   public static readonly MAX_NAME_LENGTH = 15;
@@ -58,7 +62,23 @@ export class NamingModalUI {
     if (this.inputElement) {
       this.inputElement.value = clean;
     }
+    this.updateSlots();
     this.updatePresetHighlights();
+  }
+
+  public appendChar(ch: string): void {
+    const upper = ch.toUpperCase();
+    if (!/^[A-Z0-9!?.\- ]$/.test(upper)) return;
+    if (this.currentName.length >= NamingModalUI.MAX_NAME_LENGTH) return;
+    this.setName(this.currentName + upper);
+    BattleAudio.playMenuSound('CURSOR');
+  }
+
+  public backspace(): void {
+    if (this.currentName.length > 0) {
+      this.setName(this.currentName.slice(0, -1));
+      BattleAudio.playMenuSound('CANCEL');
+    }
   }
 
   public confirm(): string {
@@ -93,7 +113,7 @@ export class NamingModalUI {
       width: 100vw;
       height: 100dvh;
       overflow-y: auto;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.78);
       backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
@@ -101,6 +121,7 @@ export class NamingModalUI {
       z-index: 1000;
       font-family: 'Courier New', Courier, monospace;
       padding: 16px;
+      box-sizing: border-box;
     `;
 
     const card = document.createElement('div');
@@ -108,144 +129,218 @@ export class NamingModalUI {
     card.className = 'interactive';
     card.style.cssText = `
       pointer-events: auto !important;
-      width: 380px;
-      max-width: 95vw;
+      width: min(560px, 94vw);
       max-height: calc(100dvh - 32px);
       overflow-y: auto;
-      min-height: 340px;
-      background: #0f172a;
-      border: 3px solid #ef4444;
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4), inset 0 0 16px rgba(0, 0, 0, 0.8);
+      background: rgba(15, 23, 42, 0.94);
+      border: 2px solid rgba(239, 68, 68, 0.6);
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 24px rgba(239, 68, 68, 0.3);
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 14px;
       padding: 18px 20px 20px;
       box-sizing: border-box;
       color: #f8fafc;
     `;
 
-    card.innerHTML = `
-      <div style="font-size: 13px; font-weight: 900; letter-spacing: 1.5px; color: #f87171; margin-bottom: 12px; text-transform: uppercase;">
-        POLICE INVESTIGATION
-      </div>
-      
-      <div id="rival-portrait-frame" style="
-        width: 72px;
-        height: 72px;
-        border-radius: 50%;
-        border: 2px solid #ef4444;
-        background: #1e293b;
-        display: flex;
+    const slots = Array.from({ length: NamingModalUI.MAX_NAME_LENGTH }, (_, idx) => {
+      const ch = this.currentName[idx] || '_';
+      const isFilled = idx < this.currentName.length;
+      return `<span class="rival-slot-char" data-slot-idx="${idx}" style="
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
-        margin-bottom: 12px;
-        box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
-      ">
-        <img id="rival-portrait-img" src="/assets/sprites/characters/silver.png" alt="Rival" style="
-          width: 52px;
-          height: 52px;
-          object-fit: contain;
-          image-rendering: pixelated;
-        " onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-        <div style="display: none; font-size: 32px;">🦹</div>
-      </div>
+        width: clamp(15px, 4.2vw, 22px);
+        height: 30px;
+        border-bottom: 3px solid ${isFilled ? '#ef4444' : '#475569'};
+        font-size: clamp(14px, 3.8vw, 18px);
+        font-weight: 900;
+        color: ${isFilled ? '#fef08a' : '#64748b'};
+      ">${ch}</span>`;
+    }).join('');
 
-      <div style="font-size: 11px; color: #cbd5e1; text-align: center; margin-bottom: 12px; line-height: 1.3;">
-        "What was the name of the red-haired boy who stole the POKéMON?"
-      </div>
+    const qwertyRow1 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
+    const qwertyRow2 = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
+    const qwertyRow3 = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
 
-      <div style="width: 100%; display: flex; gap: 8px; align-items: stretch; margin-bottom: 14px;">
-        <input id="rival-name-input" type="text" maxlength="15" value="${this.currentName}" placeholder="NAME..."
-          inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" style="
-          pointer-events: auto !important;
-          flex: 1;
-          min-width: 0;
-          height: 48px;
-          min-height: 44px;
-          background: #020617;
-          border: 2px solid #ef4444;
-          border-radius: 8px;
-          padding: 0 12px;
-          font-family: inherit;
-          font-size: 16px;
-          font-weight: 800;
-          color: #fef08a;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          box-sizing: border-box;
-          outline: none;
-          text-align: center;
-          -webkit-user-select: text;
-          user-select: text;
-          touch-action: manipulation;
-        " />
-        <button id="rival-clear-btn" type="button" class="interactive" style="
-          pointer-events: auto !important;
-          height: 48px;
-          min-height: 44px;
-          min-width: 72px;
-          background: #1e293b;
-          color: #e2e8f0;
-          border: 1px solid #475569;
-          border-radius: 8px;
-          font-family: inherit;
+    card.innerHTML = `
+      <!-- Header Badge & Narrative Prompt -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;">
+        <div style="
           font-size: 11px;
-          font-weight: 800;
-          cursor: pointer;
-          touch-action: manipulation;
-        ">✕ CLEAR</button>
+          font-weight: 900;
+          letter-spacing: 1.5px;
+          color: #f87171;
+          background: rgba(239, 68, 68, 0.15);
+          border: 1px solid rgba(239, 68, 68, 0.4);
+          border-radius: 999px;
+          padding: 3px 12px;
+          text-transform: uppercase;
+        ">
+          🚨 POLICE INVESTIGATION
+        </div>
+        <div style="font-size: 11px; color: #cbd5e1; line-height: 1.3; max-width: 440px;">
+          "What was the name of the red-haired boy who stole the POKéMON?"
+        </div>
       </div>
 
-      <div style="font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">
-        PRESET SUGGESTIONS
+      <!-- Character Sprite + 15-Slot Readout -->
+      <div style="display: flex; align-items: center; gap: 14px; width: 100%; justify-content: center; flex-wrap: wrap;">
+        <div data-walk-sprite="rival" class="intro-pixel-sprite" style="
+          width: 48px;
+          height: 96px;
+          background-image: url('./assets/sprites/characters/silver.png');
+          background-size: 432px 96px;
+          background-position: 0px 0px;
+          image-rendering: pixelated;
+          filter: drop-shadow(0 6px 14px rgba(239, 68, 68, 0.45));
+        "></div>
+        <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; max-width: 100%;">
+          <span style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 1px;">RIVAL'S NAME (1–15 CHARS)</span>
+          <div id="rival-slots-container" style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 100%;">${slots}</div>
+        </div>
       </div>
-      <div id="rival-preset-container" style="
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-        justify-content: center;
-        width: 100%;
-        margin-bottom: 18px;
-      ">
+
+      <!-- Canonical Johto Presets -->
+      <div id="rival-preset-container" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%;">
         ${RIVAL_NAME_PRESETS.map(
           (preset) => `
-            <button class="rival-preset-btn interactive" data-name="${preset}" style="
-              pointer-events: auto !important;
-              background: ${preset === this.currentName ? '#ef4444' : '#1e293b'};
-              color: ${preset === this.currentName ? '#ffffff' : '#e2e8f0'};
-              border: 1px solid ${preset === this.currentName ? '#fca5a5' : '#475569'};
-              border-radius: 6px;
-              padding: 6px 12px;
-              font-family: inherit;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-              letter-spacing: 1px;
-              transition: all 0.15s ease;
-            ">[ ${preset} ]</button>
-          `
+          <button class="rival-preset-btn interactive" data-name="${preset}" style="
+            pointer-events: auto !important;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            background: ${preset === this.currentName ? '#ef4444' : '#1e293b'};
+            color: #ffffff;
+            border: 1px solid ${preset === this.currentName ? '#fca5a5' : '#475569'};
+            transition: all 0.12s ease;
+          ">★ ${preset}</button>
+        `
         ).join('')}
       </div>
 
-      <div style="display: flex; gap: 10px; width: 100%; margin-top: auto;">
-        <button id="rival-confirm-btn" class="interactive" style="
-          pointer-events: auto !important;
-          flex: 1;
-          height: 40px;
-          background: #ef4444;
-          color: #ffffff;
-          border: 2px solid #fca5a5;
-          border-radius: 8px;
-          font-family: inherit;
-          font-size: 13px;
-          font-weight: 900;
-          letter-spacing: 1.5px;
-          cursor: pointer;
-          transition: background 0.15s ease;
-        ">CONFIRM</button>
+      <!-- Virtual On-Screen QWERTY Keyboard -->
+      <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+        <!-- Row 1: Q - P (10 keys) -->
+        <div style="display: flex; gap: 5px; width: 100%; justify-content: center;">
+          ${qwertyRow1
+            .map(
+              (letter) => `
+            <button data-key-char="${letter}" class="interactive" style="
+              pointer-events: auto !important;
+              flex: 1;
+              min-width: 0;
+              padding: 9px 0;
+              border-radius: 6px;
+              font-size: clamp(12px, 3.2vw, 15px);
+              font-weight: 800;
+              background: #1e293b;
+              color: #f8fafc;
+              border: 1px solid #334155;
+              cursor: pointer;
+              touch-action: manipulation;
+            ">${letter}</button>
+          `
+            )
+            .join('')}
+        </div>
+
+        <!-- Row 2: A - L (9 keys, centered) -->
+        <div style="display: flex; gap: 5px; width: 100%; justify-content: center; padding: 0 4%;">
+          ${qwertyRow2
+            .map(
+              (letter) => `
+            <button data-key-char="${letter}" class="interactive" style="
+              pointer-events: auto !important;
+              flex: 1;
+              min-width: 0;
+              padding: 9px 0;
+              border-radius: 6px;
+              font-size: clamp(12px, 3.2vw, 15px);
+              font-weight: 800;
+              background: #1e293b;
+              color: #f8fafc;
+              border: 1px solid #334155;
+              cursor: pointer;
+              touch-action: manipulation;
+            ">${letter}</button>
+          `
+            )
+            .join('')}
+        </div>
+
+        <!-- Row 3: DEL + Z - M + CONFIRM -->
+        <div style="display: flex; gap: 5px; width: 100%; justify-content: center;">
+          <button id="rival-clear-btn" class="interactive" style="
+            pointer-events: auto !important;
+            flex: 1.5;
+            min-width: 0;
+            padding: 9px 0;
+            border-radius: 6px;
+            font-size: clamp(11px, 2.6vw, 13px);
+            font-weight: 800;
+            background: #dc2626;
+            color: #ffffff;
+            border: 1px solid #fca5a5;
+            cursor: pointer;
+            touch-action: manipulation;
+          ">⌫ DEL</button>
+          ${qwertyRow3
+            .map(
+              (letter) => `
+            <button data-key-char="${letter}" class="interactive" style="
+              pointer-events: auto !important;
+              flex: 1;
+              min-width: 0;
+              padding: 9px 0;
+              border-radius: 6px;
+              font-size: clamp(12px, 3.2vw, 15px);
+              font-weight: 800;
+              background: #1e293b;
+              color: #f8fafc;
+              border: 1px solid #334155;
+              cursor: pointer;
+              touch-action: manipulation;
+            ">${letter}</button>
+          `
+            )
+            .join('')}
+          <button id="rival-confirm-btn" class="interactive" style="
+            pointer-events: auto !important;
+            flex: 1.5;
+            min-width: 0;
+            padding: 9px 0;
+            border-radius: 6px;
+            font-size: clamp(11px, 2.6vw, 13px);
+            font-weight: 900;
+            background: #ef4444;
+            color: #ffffff;
+            border: 1px solid #fca5a5;
+            cursor: pointer;
+            touch-action: manipulation;
+          ">✓ OK</button>
+        </div>
       </div>
+
+      <!-- Mobile & Test Compatible Synchronized Input -->
+      <input id="rival-name-input" type="text" maxlength="15" value="${this.currentName}" placeholder="NAME..."
+        inputmode="text" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" style="
+        pointer-events: auto !important;
+        position: absolute;
+        opacity: 0.001;
+        width: 1px;
+        height: 1px;
+        font-size: 16px;
+        outline: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        pointer-events: none;
+      " />
     `;
 
     backdrop.appendChild(card);
@@ -254,17 +349,17 @@ export class NamingModalUI {
 
     this.inputElement = card.querySelector('#rival-name-input') as HTMLInputElement;
     if (this.inputElement) {
-      this.inputElement.focus();
       this.inputElement.addEventListener('input', () => {
-        this.currentName = this.inputElement?.value.toUpperCase().slice(0, NamingModalUI.MAX_NAME_LENGTH) || '';
-        if (this.inputElement) this.inputElement.value = this.currentName;
-        this.updatePresetHighlights();
+        const next = this.inputElement?.value.toUpperCase().slice(0, NamingModalUI.MAX_NAME_LENGTH) || '';
+        this.setName(next);
       });
     }
 
+    // Preset chips
     const presetButtons = card.querySelectorAll('.rival-preset-btn');
     presetButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const target = e.currentTarget as HTMLElement;
         const name = target.getAttribute('data-name');
         if (name) {
@@ -274,28 +369,66 @@ export class NamingModalUI {
       });
     });
 
+    // Virtual keyboard characters
+    const charBtns = card.querySelectorAll('[data-key-char]');
+    charBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ch = (btn as HTMLElement).getAttribute('data-key-char') || '';
+        this.appendChar(ch);
+      });
+    });
+
+    // Delete button
     const clearBtn = card.querySelector('#rival-clear-btn') as HTMLButtonElement;
     if (clearBtn) {
-      clearBtn.addEventListener('click', () => {
-        this.setName('');
-        this.inputElement?.focus();
+      clearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.backspace();
       });
     }
 
+    // Confirm button
     const confirmBtn = card.querySelector('#rival-confirm-btn') as HTMLButtonElement;
     if (confirmBtn) {
-      confirmBtn.addEventListener('click', () => {
+      confirmBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.confirm();
       });
     }
 
+    // Physical keyboard listener
     this.boundKeyHandler = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         this.confirm();
+        return;
+      }
+      if (e.key === 'Backspace') {
+        e.preventDefault();
+        this.backspace();
+        return;
+      }
+      if (e.key && e.key.length === 1 && /^[a-zA-Z0-9!?.\- ]$/.test(e.key)) {
+        if (document.activeElement !== this.inputElement) {
+          e.preventDefault();
+          this.appendChar(e.key);
+        }
       }
     };
     window.addEventListener('keydown', this.boundKeyHandler);
+  }
+
+  private updateSlots(): void {
+    if (!this.modalElement) return;
+    const slotEls = this.modalElement.querySelectorAll('.rival-slot-char');
+    slotEls.forEach((el, idx) => {
+      const ch = this.currentName[idx] || '_';
+      const isFilled = idx < this.currentName.length;
+      (el as HTMLElement).textContent = ch;
+      (el as HTMLElement).style.borderBottomColor = isFilled ? '#ef4444' : '#475569';
+      (el as HTMLElement).style.color = isFilled ? '#fef08a' : '#64748b';
+    });
   }
 
   private updatePresetHighlights(): void {

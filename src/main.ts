@@ -36,6 +36,7 @@ import { BugContestHUDWidget } from './ui/BugContestHUDWidget';
 import { BugContestSpecimenSwapModal } from './ui/BugContestSpecimenSwapModal';
 import { KurtCraftingManager } from './world/KurtCraftingManager';
 import { KurtCraftingModalUI } from './ui/KurtCraftingModalUI';
+import { ModernHMHandler } from './world/ModernHMHandler';
 import type {
   MapData,
   WarpEvent,
@@ -88,26 +89,10 @@ async function bootstrap() {
   playerBox = boxManager.flatten();
   let playTimeSeconds = 0;
   const inventory: BagInventory = {
-    balls: {
-      'quick-ball': 5,
-      'fast-ball': 5,
-      'net-ball': 5,
-      'ultra-ball': 10,
-      'great-ball': 15,
-      'poke-ball': 30,
-      'master-ball': 1,
-    },
-    items: {
-      potion: 5,
-      'super-potion': 2,
-      antidote: 3,
-      'parlyz-heal': 2,
-      awakening: 2,
-      revive: 1,
-      repel: 2,
-    },
+    balls: {},
+    items: {},
     berries: {},
-    tms: ['TM54', 'TM73', 'TM99'],
+    tms: [],
     money: 3000,
     badges: [],
     keyItems: [],
@@ -2513,7 +2498,9 @@ async function bootstrap() {
               onVictory: () => {
                 defeatedTrainers.add('elder_li');
                 storyFlags.add('sprout_tower_cleared');
+                storyFlags.add('EVENT_GOT_HM05_FLASH');
                 if (!inventory.tms.includes('HM05')) inventory.tms.push('HM05');
+                missionManager.checkStoryFlags(storyFlags);
                 BattleAudio.playOverworldSound('KEY_ITEM');
                 overworldHUD.openDialogue(
                   [
@@ -2532,7 +2519,16 @@ async function bootstrap() {
         }
 
         // Violet Gym Leader Boss: Falkner (Ticket 5.3)
-        if (targetNpc.action === 'FALKNER_EVENT' && !storyFlags.has('falkner_defeated')) {
+        if (targetNpc.action === 'FALKNER_EVENT') {
+          if (storyFlags.has('falkner_defeated')) {
+            overworldHUD.openDialogue(
+              [
+                "FALKNER: A trainer's real strength comes from their devotion to their POKéMON. Keep soaring toward the POKéMON LEAGUE!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
           const introPages =
             targetNpc.challengePages && targetNpc.challengePages.length > 0
               ? targetNpc.challengePages
@@ -2550,14 +2546,16 @@ async function bootstrap() {
               onVictory: () => {
                 defeatedTrainers.add('falkner');
                 storyFlags.add('falkner_defeated');
+                storyFlags.add('CAN_USE_FLASH');
                 if (!inventory.badges.includes('zephyr')) inventory.badges.push('zephyr');
                 if (!inventory.tms.includes('TM31')) inventory.tms.push('TM31');
+                missionManager.checkStoryFlags(storyFlags);
                 audioManager.playSfx('sfx_badge_get');
                 BattleAudio.playOverworldSound('KEY_ITEM');
                 overworldHUD.openDialogue(
                   [
                     "FALKNER: …Darn! My dad's cherished bird POKéMON… All right. Take this. It's the official POKéMON LEAGUE ZEPHYRBADGE!",
-                    "FALKNER: Here—take this too. It's TM31 MUD-SLAP! By using a TM, a POKéMON will instantly learn a new move. Think before you act—a TM can be used only once!",
+                    "FALKNER: The ZEPHYRBADGE raises the ATTACK power of POKéMON and enables them to use FLASH anytime in dark caves! Here—take this too. It's TM31 MUD-SLAP!",
                   ],
                   targetNpc.speaker,
                   () => {
@@ -3848,6 +3846,80 @@ async function bootstrap() {
           return;
         }
         if (targetNpc.id === 'nbt_rival') {
+          const executeShove = () => {
+            BattleAudio.playOverworldSound('BUMP');
+            const canvas = document.getElementById('game-canvas');
+            if (canvas) {
+              canvas.classList.add('screen-shake');
+              setTimeout(() => canvas.classList.remove('screen-shake'), 400);
+            }
+
+            // In Pokémon Crystal, Silver shoves the player away from the lab window into the open path
+            let pushX = player.x;
+            let pushY = player.y;
+
+            // Priority 1: Shove SOUTH (DOWN) away from the north lab window into the open yard
+            const activeMapNpcs = npcsByMap[currentMap?.id || ''] || [];
+            if (
+              mapManager.isWalkable(player.x, player.y + 1) &&
+              !GridPhysics.isTileOccupiedByEntities(player.x, player.y + 1, player, activeMapNpcs)
+            ) {
+              pushX = player.x;
+              pushY = player.y + 1;
+            } else {
+              // Priority 2: Shove opposite of player approach facing
+              const backDir = getOppositeDirection(player.direction);
+              const bdx = backDir === 'LEFT' ? -1 : backDir === 'RIGHT' ? 1 : 0;
+              const bdy = backDir === 'UP' ? -1 : backDir === 'DOWN' ? 1 : 0;
+              if (
+                mapManager.isWalkable(player.x + bdx, player.y + bdy) &&
+                !GridPhysics.isTileOccupiedByEntities(player.x + bdx, player.y + bdy, player, activeMapNpcs)
+              ) {
+                pushX = player.x + bdx;
+                pushY = player.y + bdy;
+              } else {
+                // Priority 3: Any adjacent walkable tile
+                const offsets = [
+                  { dx: 0, dy: 1 },
+                  { dx: -1, dy: 0 },
+                  { dx: 1, dy: 0 },
+                  { dx: 0, dy: -1 },
+                ];
+                for (const off of offsets) {
+                  const ox = player.x + off.dx;
+                  const oy = player.y + off.dy;
+                  if (
+                    mapManager.isWalkable(ox, oy) &&
+                    !GridPhysics.isTileOccupiedByEntities(ox, oy, player, activeMapNpcs)
+                  ) {
+                    pushX = ox;
+                    pushY = oy;
+                    break;
+                  }
+                }
+              }
+            }
+
+            if (pushX !== player.x || pushY !== player.y) {
+              player.isMoving = true;
+              player.targetX = pushX;
+              player.targetY = pushY;
+              player.progress = 0.0;
+              if (pushY > targetNpc.y) {
+                player.direction = 'UP';
+              } else if (pushX < targetNpc.x) {
+                player.direction = 'RIGHT';
+              }
+            }
+          };
+
+          // Silver turns to face player initially
+          if (player.x < targetNpc.x) targetNpc.direction = 'LEFT';
+          else if (player.y > targetNpc.y) targetNpc.direction = 'DOWN';
+          else if (player.x > targetNpc.x) targetNpc.direction = 'RIGHT';
+          else if (player.y < targetNpc.y) targetNpc.direction = 'UP';
+
+          let shoved = false;
           overworldHUD.openDialogue(
             [
               '<……>\nSo this is the famous ELM POKéMON LAB…',
@@ -3856,23 +3928,18 @@ async function bootstrap() {
             ],
             '❓ RIVAL ???',
             () => {
-              BattleAudio.playOverworldSound('BUMP');
-              const backDir = getOppositeDirection(player.direction);
-              const dx = backDir === 'LEFT' ? -1 : backDir === 'RIGHT' ? 1 : 0;
-              const dy = backDir === 'UP' ? -1 : backDir === 'DOWN' ? 1 : 0;
-              const nx = player.x + dx;
-              const ny = player.y + dy;
-              if (mapManager.isWalkable(nx, ny)) {
-                const faceDir = player.direction;
-                player.x = nx;
-                player.y = ny;
-                player.targetX = nx;
-                player.targetY = ny;
-                player.renderX = nx;
-                player.renderY = ny;
-                player.isMoving = false;
-                player.progress = 0;
-                player.direction = faceDir;
+              if (!shoved) {
+                shoved = true;
+                executeShove();
+              }
+              setTimeout(() => {
+                targetNpc.direction = 'RIGHT';
+              }, 450);
+            },
+            (pageIndex) => {
+              if (pageIndex === 2 && !shoved) {
+                shoved = true;
+                executeShove();
               }
             }
           );
@@ -4449,6 +4516,51 @@ async function bootstrap() {
           return;
         }
 
+        if (targetNpc.id === 'mom_npc') {
+          let momPages: string[];
+          const hasStarter = storyFlags.has('starter_chosen') || playerParty.length > 0;
+          const hasEgg = storyFlags.has('HAS_MYSTERY_EGG');
+          const deliveredEgg = storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM');
+          const badgeCount = inventory.badges.length;
+
+          if (!hasStarter) {
+            momPages = [
+              `Oh, ${playerName}…! Your POKéMON GEAR is back from the repair shop.`,
+              'PROF. ELM was looking for you. He said he had a favor to ask. You will go over to the LAB right now, won\'t you?',
+            ];
+          } else if (hasEgg && !deliveredEgg) {
+            momPages = [
+              `Oh, ${playerName}! Did you hear? Someone broke into PROF. ELM's LAB!`,
+              'PROF. ELM is waiting for you! Go see him right away, dear!',
+            ];
+          } else if (!deliveredEgg) {
+            momPages = [
+              'So, PROF. ELM gave you a POKéMON! How cute!',
+              'Mr. POKéMON lives just north of CHERRYGROVE CITY. Take care on your errand!',
+              'Rest up for a moment, sweetheart! Your POKéMON are looking fit and energized!',
+            ];
+          } else {
+            const badgeLine =
+              badgeCount > 0
+                ? `Wow, look at your TRAINER CARD! You have already earned ${badgeCount} GYM ${badgeCount === 1 ? 'BADGE' : 'BADGES'}! I am so proud of you, sweetheart!`
+                : 'Taking on the JOHTO GYM LEADERS sounds like such a grand journey! I am cheering for you!';
+            momPages = [
+              `Hi, ${playerName}! Welcome home! You are trying very hard, I see.`,
+              badgeLine,
+              'Rest up for a moment, darling! A good rest will do you and your POKéMON a world of good!',
+            ];
+          }
+
+          overworldHUD.openDialogue(momPages, '🏠 MOM', () => {
+            if (hasStarter) {
+              healPlayerParty(false);
+              saveCurrentGame();
+              overworldHUD.playFieldRestAnimation();
+            }
+          });
+          return;
+        }
+
         if (targetNpc.pages && targetNpc.pages.length > 0) {
           overworldHUD.openDialogue(targetNpc.pages, targetNpc.speaker, () => {
             if (targetNpc.action === 'HEAL_AND_SAVE') {
@@ -4611,6 +4723,17 @@ async function bootstrap() {
         bgEvent.speaker?.includes('STATUE') ||
         (bgEvent.pages && bgEvent.pages.some((p) => p.includes('GYM STATUE') || p.includes('POKéMON GYM')))
       ) {
+        if (currentMap.id === 'violet_gym') {
+          const statuePages = [
+            'VIOLET CITY POKéMON GYM',
+            'LEADER: FALKNER',
+            storyFlags.has('falkner_defeated')
+              ? `WINNING TRAINERS: SILVER, ${playerName}`
+              : 'WINNING TRAINERS: SILVER',
+          ];
+          overworldHUD.openDialogue(statuePages, bgEvent.speaker);
+          return;
+        }
         if (currentMap.id === 'azalea_gym') {
           const statuePages = [
             'AZALEA TOWN POKéMON GYM',
@@ -4622,6 +4745,47 @@ async function bootstrap() {
           overworldHUD.openDialogue(statuePages, bgEvent.speaker);
           return;
         }
+      }
+
+      // Dark Cave Entrance on Route 31 (HM05 Flash Field Technique)
+      if (currentMap.id === 'route_31' && facingX === 34 && facingY === 5) {
+        const flashCheck = ModernHMHandler.checkFlash(inventory, storyFlags, playerParty);
+        if (flashCheck.canUse) {
+          const userPkmn = flashCheck.userPokemon;
+          const userName = userPkmn ? userPkmn.nickname : playerName;
+          overworldRenderer.playFlashEffect();
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          const firstClear = !storyFlags.has('dark_cave_cleared');
+          storyFlags.add('dark_cave_cleared');
+          missionManager.checkStoryFlags(storyFlags);
+          missionManager.completeMission('S06');
+          const pages = [
+            `Pitch-black darkness ahead… ${userName} used FLASH to illuminate DARK CAVE!`,
+            firstClear
+              ? 'Deep inside the illuminated cavern, you discovered TM13 SNORE and startled a rare DUNSPARCE!'
+              : 'A wild DUNSPARCE emerged from the illuminated cavern depths!',
+          ];
+          if (firstClear && !inventory.tms.includes('TM13')) {
+            inventory.tms.push('TM13');
+          }
+          overworldHUD.openDialogue(pages, '⛰️ DARK CAVE (FLASH)', () => {
+            saveCurrentGame();
+            if (firstClear) {
+              overworldHUD.showToast('✨ Illuminated Dark Cave & found TM13 SNORE!');
+            }
+            const wildDunsparce = PokemonFactory.create('dunsparce', 6);
+            triggerBattle(wildDunsparce, { isTrainer: false });
+          });
+        } else {
+          overworldHUD.openDialogue(
+            [
+              'DARK CAVE — Pitch-black cavern ahead.',
+              flashCheck.missingReason || 'A blinding FLASH of light is required to navigate safely.',
+            ],
+            '⛰️ DARK CAVE'
+          );
+        }
+        return;
       }
 
       // Ruins of Alph Kabuto Chamber Altar & Inscription Interaction
@@ -4817,17 +4981,13 @@ async function bootstrap() {
             facingTileName.includes('_65')));
 
       if (isCutTree) {
-        const hasCutAndBadge =
-          (inventory.tms.includes('HM01') ||
-            inventory.tms.includes('HM01_CUT') ||
-            storyFlags.has('has_hm01_cut') ||
-            playerParty.some((p) => p.moves.some((m) => m.moveId.toLowerCase() === 'cut'))) &&
-          (inventory.badges.includes('hive') || inventory.badges.includes('hive_badge'));
+        const cutCheck = ModernHMHandler.checkCut(inventory, storyFlags, playerParty);
 
-        if (hasCutAndBadge) {
-          const cutter = playerParty.find((p) => !p.isEgg) || playerParty[0];
+        if (cutCheck.canUse) {
+          const cutter = cutCheck.userPokemon || playerParty.find((p) => !p.isEgg) || playerParty[0];
           const cutterName = cutter ? cutter.nickname : playerName;
           BattleAudio.playOverworldSound('RUSTLE');
+          overworldRenderer.playCutSlashEffect(facingX, facingY);
           overworldHUD.openDialogue(
             [
               'This tree looks like it can be CUT down!',
@@ -4840,6 +5000,8 @@ async function bootstrap() {
                 currentMap.collisionGrid[25 * currentMap.width + 8] = 0;
                 currentMap.collisionGrid[22 * currentMap.width + 8] = 0;
                 storyFlags.add('ilex_tree_cut');
+                storyFlags.add('cut_used_in_ilex');
+                missionManager.checkStoryFlags(storyFlags);
               }
               currentMap.tileMap![tileIdx] = 'jt_07_07_07_07';
               overworldRenderer.renderMap(currentMap, lookupMap);
@@ -4850,7 +5012,10 @@ async function bootstrap() {
           );
         } else {
           overworldHUD.openDialogue(
-            ['This tree looks like it can be CUT down with a special move!'],
+            [
+              'This tree looks like it can be CUT down!',
+              cutCheck.missingReason || 'Obtain HM01 CUT and the HIVE BADGE to clear this obstacle.',
+            ],
             '🌳 CUTTABLE TREE'
           );
         }
