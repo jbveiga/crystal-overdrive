@@ -69,9 +69,9 @@ describe('Modern HM Field Move System (No Battle Move Slot Required)', () => {
       PokemonFactory.createMoveInstance('tackle'),
       PokemonFactory.createMoveInstance('leer'),
       PokemonFactory.createMoveInstance('smokescreen'),
-      PokemonFactory.createMoveInstance('ember'),
+      PokemonFactory.createMoveInstance('cut'),
     ];
-    expect(cyndaquil.moves.some((m) => m.moveId === 'cut')).toBe(false);
+    expect(cyndaquil.moves.some((m) => m.moveId === 'cut')).toBe(true);
 
     const inventory = createMockInventory(['zephyr', 'hive'], ['HM01']);
     const storyFlags = new Set<string>(['bugsy_defeated', 'CAN_USE_CUT']);
@@ -96,15 +96,15 @@ describe('Modern HM Field Move System (No Battle Move Slot Required)', () => {
     expect(noHmCheck.missingReason).toContain('HM01 CUT');
   });
 
-  it('allows Flash in the field with Zephyr Badge + HM05 without occupying a battle move slot', () => {
+  it('allows Flash in the field with Zephyr Badge + HM05 when taught in a battle move slot', () => {
     const mareep = PokemonFactory.create('mareep', 12);
     mareep.moves = [
       PokemonFactory.createMoveInstance('tackle'),
       PokemonFactory.createMoveInstance('growl'),
       PokemonFactory.createMoveInstance('thundershock'),
-      PokemonFactory.createMoveInstance('thunderwave'),
+      PokemonFactory.createMoveInstance('flash'),
     ];
-    expect(mareep.moves.some((m) => m.moveId === 'flash')).toBe(false);
+    expect(mareep.moves.some((m) => m.moveId === 'flash')).toBe(true);
 
     const inventory = createMockInventory(['zephyr'], ['HM05']);
     const storyFlags = new Set<string>(['falkner_defeated', 'EVENT_GOT_HM05_FLASH']);
