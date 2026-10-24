@@ -11,3 +11,5 @@ copilot-instructions.md
 .project_agents.json
 AGENTS.md
 .gemini/
+.aistudio/
+
