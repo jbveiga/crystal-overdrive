@@ -37,6 +37,7 @@ import { BugContestSpecimenSwapModal } from './ui/BugContestSpecimenSwapModal';
 import { KurtCraftingManager } from './world/KurtCraftingManager';
 import { KurtCraftingModalUI } from './ui/KurtCraftingModalUI';
 import { ModernHMHandler } from './world/ModernHMHandler';
+import { isEcruteakGymSafeTile, ECRUTEAK_GYM_RESPAWN } from './world/ecruteakGymMaze';
 import type {
   MapData,
   WarpEvent,
@@ -166,8 +167,8 @@ async function bootstrap() {
     gameOptions.playerSpeedDefault = gameClock.playerSpeed;
     gameOptions.battleSpeedMultiplier = gameClock.battleSpeed;
 
-    // Only awaken Legendary Beasts if player has reached the Ecruteak Burned Tower story milestone (4+ Badges)
-    if (inventory.badges.length >= 4) {
+    // Only awaken Legendary Beasts if player has reached the Ecruteak Burned Tower story milestone
+    if (existingSave.storyFlags?.includes('beasts_awakened') || storyFlags.has('beasts_awakened') || inventory.badges.length >= 4) {
       roamingManager.awakenBeasts();
     } else {
       roamingManager.sleepBeasts();
@@ -2215,6 +2216,38 @@ async function bootstrap() {
       return;
     }
 
+    if (warp.targetMapId === 'ecruteak_gym' && !storyFlags.has('beasts_awakened')) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        [
+          'The GYM door is firmly locked!',
+          'A note on the door reads: "LEADER MORTY is currently investigating ancient phenomena at the BURNED TOWER."',
+        ],
+        '🔒 ECRUTEAK GYM'
+      );
+      return;
+    }
+
+    if (
+      warp.targetMapId === 'burned_tower_b1f' &&
+      !storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')
+    ) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        [
+          "SILVER: Hey, hold it right there! You're not going down that hole before me!",
+        ],
+        '❓ RIVAL SILVER'
+      );
+      return;
+    }
+
     const previousMapId = currentM.id;
     const transitionConfig = mapManager.resolveWarpTransition(warp);
 
@@ -2745,44 +2778,93 @@ async function bootstrap() {
           return;
         }
 
-        // Ecruteak Gym Leader Boss: Morty
-        if (targetNpc.action === 'MORTY_EVENT' && !storyFlags.has('morty_defeated')) {
-          const introPages =
-            targetNpc.challengePages && targetNpc.challengePages.length > 0
-              ? targetNpc.challengePages
-              : [
-                  "MORTY: Where is the legendary rainbow bird? I have meditated with ghost POKéMON in solitude waiting for its arrival. I see a shadow of greatness within you… Let us test your spirit!",
-                ];
-          overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
-            const team = buildTrainerTeamInstances(targetNpc);
-            if (team.length === 0) return;
-            triggerBattle(team[0], {
-              isTrainer: true,
-              isGymLeader: true,
-              trainerName: targetNpc.trainerName || 'Leader Morty',
-              trainerTeam: team,
-              onVictory: () => {
-                defeatedTrainers.add('morty');
-                storyFlags.add('morty_defeated');
-                if (!inventory.badges.includes('fog')) inventory.badges.push('fog');
-                if (!inventory.tms.includes('TM30')) inventory.tms.push('TM30');
-                audioManager.playSfx('sfx_badge_get');
-                BattleAudio.playOverworldSound('KEY_ITEM');
-                overworldHUD.openDialogue(
-                  [
-                    "MORTY: I see… I was not the chosen one. Your bond with your POKéMON has guided you beyond my spectral realm. Take the official POKéMON LEAGUE FOGBADGE!",
-                    "MORTY: By holding the FOGBADGE, POKéMON up to Lv. 50 will obey your every command. Your POKéMON will also be able to use SURF to cross open waters! Take this TM30 SHADOW BALL as well!",
-                  ],
-                  targetNpc.speaker,
-                  () => {
-                    saveCurrentGame();
-                    overworldHUD.showToast('👻 Received FOG BADGE & TM30 SHADOW BALL from Leader Morty!');
-                  }
-                );
-              },
-            });
-          });
+        // Burned Tower 1F Rival Silver Battle
+        if (targetNpc.action === 'RIVAL_BURNED_TOWER_BATTLE' || targetNpc.id === 'silver_burned') {
+          if (storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')) {
+            overworldHUD.openDialogue(
+              [
+                "SILVER: …Tch! Keep moving! I don't want to look at your face!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          triggerBurnedTowerRivalBattle();
           return;
+        }
+
+        // Burned Tower B1F Beasts Awakening
+        if (targetNpc.action === 'BEASTS_AWAKENING' || targetNpc.id === 'beasts') {
+          triggerBeastsAwakeningCutscene();
+          return;
+        }
+
+        // Ecruteak Gym Guide Gating
+        if (targetNpc.id === 'ecruteak_gym_guide') {
+          if (!storyFlags.has('beasts_awakened')) {
+            overworldHUD.openDialogue(
+              [
+                'Yo! CHAMP in the making!',
+                'LEADER MORTY is not here right now! He went to the BURNED TOWER in the northwest of town.',
+                'The rumors say the ancient legendary beasts have stirred beneath the charred beams!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+        }
+
+        // Ecruteak Gym Leader Boss: Morty
+        if (targetNpc.action === 'MORTY_EVENT') {
+          if (!storyFlags.has('beasts_awakened')) {
+            overworldHUD.openDialogue(
+              [
+                'MORTY: The sacred fire of the BURNED TOWER must not be disturbed without pure purpose.',
+                'I am contemplating the legendary beasts. Please excuse me for now.',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          if (!storyFlags.has('morty_defeated')) {
+            const introPages =
+              targetNpc.challengePages && targetNpc.challengePages.length > 0
+                ? targetNpc.challengePages
+                : [
+                    "MORTY: Where is the legendary rainbow bird? I have meditated with ghost POKéMON in solitude waiting for its arrival. I see a shadow of greatness within you… Let us test your spirit!",
+                  ];
+            overworldHUD.openDialogue(introPages, targetNpc.speaker, () => {
+              const team = buildTrainerTeamInstances(targetNpc);
+              if (team.length === 0) return;
+              triggerBattle(team[0], {
+                isTrainer: true,
+                isGymLeader: true,
+                trainerName: targetNpc.trainerName || 'Leader Morty',
+                trainerTeam: team,
+                onVictory: () => {
+                  defeatedTrainers.add('morty');
+                  storyFlags.add('morty_defeated');
+                  if (!inventory.badges.includes('fog')) inventory.badges.push('fog');
+                  if (!inventory.tms.includes('TM30')) inventory.tms.push('TM30');
+                  audioManager.playSfx('sfx_badge_get');
+                  BattleAudio.playOverworldSound('KEY_ITEM');
+                  overworldHUD.openDialogue(
+                    [
+                      "MORTY: I see… I was not the chosen one. Your bond with your POKéMON has guided you beyond my spectral realm. Take the official POKéMON LEAGUE FOGBADGE!",
+                      "MORTY: By holding the FOGBADGE, POKéMON up to Lv. 50 will obey your every command. Your POKéMON will also be able to use SURF to cross open waters! Take this TM30 SHADOW BALL as well!",
+                    ],
+                    targetNpc.speaker,
+                    () => {
+                      saveCurrentGame();
+                      overworldHUD.showToast('👻 Received FOG BADGE & TM30 SHADOW BALL from Leader Morty!');
+                    }
+                  );
+                },
+              });
+            });
+            return;
+          }
         }
 
         // Cianwood Pharmacy: SecretPotion Event
@@ -5195,6 +5277,124 @@ async function bootstrap() {
     );
   };
 
+  // Rival Silver Ambush Encounter (Burned Tower 1F)
+  const triggerBurnedTowerRivalBattle = () => {
+    isCutsceneLocked = true;
+    player.isMoving = false;
+    player.progress = 0;
+    player.direction = 'UP';
+
+    let starterSpeciesId: 'croconaw' | 'bayleef' | 'quilava' = 'croconaw';
+    let starterMoves = ['watergun', 'bite', 'rage', 'scaryface'];
+
+    if (storyFlags.has('starter_cyndaquil') || playerParty.some((p) => p.speciesId === 'cyndaquil' || p.speciesId === 'quilava' || p.speciesId === 'typhlosion')) {
+      starterSpeciesId = 'croconaw';
+      starterMoves = ['watergun', 'bite', 'rage', 'scaryface'];
+    } else if (storyFlags.has('starter_totodile') || playerParty.some((p) => p.speciesId === 'totodile' || p.speciesId === 'croconaw' || p.speciesId === 'feraligatr')) {
+      starterSpeciesId = 'bayleef';
+      starterMoves = ['razorleaf', 'poisonpowder', 'reflect', 'tackle'];
+    } else {
+      starterSpeciesId = 'quilava';
+      starterMoves = ['flamewheel', 'ember', 'quickattack', 'smokescreen'];
+    }
+
+    const rivalTeam = [
+      PokemonFactory.create('haunter', 20, ['nightshade', 'curse', 'spite', 'hypnosis']),
+      PokemonFactory.create('magnemite', 18, ['thundershock', 'supersonic', 'sonicboom', 'tackle']),
+      PokemonFactory.create('zubat', 20, ['bite', 'confuseray', 'wingattack', 'supersonic']),
+      PokemonFactory.create(starterSpeciesId, 22, starterMoves),
+    ];
+
+    audioManager.playBattleBgm('trainer');
+    overworldHUD.openDialogue(
+      [
+        'SILVER: …Hmph! You followed me all the way to ECRUTEAK?',
+        "Don't tell me you're chasing myths about legendary beasts too! Weaklings need legends. I only need supreme power!",
+        "Get out of my way! I'll show you what real strength looks like!",
+      ],
+      '❓ RIVAL SILVER',
+      () => {
+        triggerBattle(rivalTeam[0], {
+          isTrainer: true,
+          trainerName: rivalName || 'Rival Silver',
+          trainerTeam: rivalTeam,
+          onVictory: () => {
+            storyFlags.add('EVENT_BEAT_BURNED_TOWER_SILVER');
+            defeatedTrainers.add('silver_burned');
+            audioManager.playSfx('sfx_badge_get');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                "SILVER: …Tch! Why can't I beat you?!",
+                'I am training as hard as anyone, but my POKéMON are still lacking something…',
+                "…Whatever! I don't need useless legends anyway! Get lost!",
+              ],
+              '❓ RIVAL SILVER',
+              () => {
+                isCutsceneLocked = false;
+                const mapNpcs = npcsByMap['burned_tower_1f'] || [];
+                const silverNpc = mapNpcs.find((n) => n.id === 'silver_burned');
+                if (silverNpc) {
+                  silverNpc.x = 8;
+                  silverNpc.y = 10;
+                }
+                saveCurrentGame();
+                overworldHUD.showToast('Rival Silver stepped aside from the Burned Tower hole!');
+              }
+            );
+          },
+        });
+      }
+    );
+  };
+
+  // Legendary Beasts Awakening Cutscene (Burned Tower B1F)
+  const triggerBeastsAwakeningCutscene = () => {
+    if (storyFlags.has('beasts_awakened')) return;
+    isCutsceneLocked = true;
+    player.isMoving = false;
+    player.progress = 0;
+
+    BattleAudio.playOverworldSound('KEY_ITEM');
+
+    overworldHUD.openDialogue(
+      [
+        '⚡ Three legendary beasts stand frozen like statues atop ancient stone pedestals…',
+        'As you step forward, their stony skin shatters with radiant celestial energy!',
+      ],
+      '⚡ LEGENDARY BEASTS',
+      () => {
+        BattleAudio.playCry('raikou');
+        setTimeout(() => BattleAudio.playCry('entei'), 400);
+        setTimeout(() => BattleAudio.playCry('suicune'), 800);
+
+        setTimeout(() => {
+          overworldHUD.openDialogue(
+            [
+              'RAIKOU and ENTEI roar fiercely and leap into the ceiling shafts, scattering across the Johto skies!',
+              'SUICUNE slowly steps down from its pedestal… It locks its crystal-clear gaze directly into your eyes.',
+              'With a swift, graceful leap across the subterranean pool, SUICUNE vanishes into the mist!',
+              '🎩 EUSINE rushes down the ladder: "Did you see that?! That was SUICUNE! It acknowledged you before it departed!"',
+              'EUSINE: "I have dedicated my life to pursuing SUICUNE. I will find it across Johto!"',
+              'LEADER MORTY has returned to the ECRUTEAK GYM to await your challenge.',
+            ],
+            '⚡ MYTHICAL AWAKENING',
+            () => {
+              storyFlags.add('beasts_awakened');
+              storyFlags.add('EVENT_RELEASED_THE_BEASTS');
+              roamingManager.awakenBeasts();
+              eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
+              overworldHUD.updatePokegear(roamingManager.getAllRoamers());
+              isCutsceneLocked = false;
+              saveCurrentGame();
+              overworldHUD.showToast('⚡ Raikou & Entei are now roaming Johto! Ecruteak Gym is open!');
+            }
+          );
+        }, 1200);
+      }
+    );
+  };
+
   const isTileWalkableForPlayer = (x: number, y: number): boolean => {
     if (!mapManager.isWalkable(x, y)) return false;
     const activeMap = mapManager.getCurrentMap();
@@ -5264,6 +5464,41 @@ async function bootstrap() {
           ) {
             triggerCherrygroveRivalAmbush();
             return;
+          }
+
+          // Burned Tower 1F Rival Ambush
+          if (
+            currentMap?.id === 'burned_tower_1f' &&
+            coord.x === 10 &&
+            coord.y === 10 &&
+            !storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')
+          ) {
+            triggerBurnedTowerRivalBattle();
+            return;
+          }
+
+          // Burned Tower B1F Beasts Awakening Cutscene
+          if (
+            currentMap?.id === 'burned_tower_b1f' &&
+            coord.y <= 6 &&
+            coord.x >= 8 &&
+            coord.x <= 12 &&
+            !storyFlags.has('beasts_awakened')
+          ) {
+            triggerBeastsAwakeningCutscene();
+            return;
+          }
+
+          // Ecruteak Gym Invisible Floor Pitfall Maze
+          if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15) {
+            if (!isEcruteakGymSafeTile(coord.x, coord.y)) {
+              BattleAudio.playOverworldSound('BUMP');
+              player.x = ECRUTEAK_GYM_RESPAWN.x;
+              player.y = ECRUTEAK_GYM_RESPAWN.y;
+              player.direction = ECRUTEAK_GYM_RESPAWN.direction;
+              overworldHUD.showToast('Whoa! Stepped off the invisible path! Returned to entrance.');
+              return;
+            }
           }
 
           // Tall Grass Rustle FX + Sound

@@ -3751,6 +3751,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           trainerPokemon: { speciesId: 'gastly', level: 20, moves: ['lick', 'spite', 'nightshade'] },
           trainerTeam: [
             { speciesId: 'gastly', level: 20, moves: ['lick', 'spite', 'nightshade'] },
+            { speciesId: 'haunter', level: 20, moves: ['spite', 'curse', 'nightshade'] },
           ],
         }
       ),
@@ -3771,6 +3772,47 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           trainerPokemon: { speciesId: 'haunter', level: 22, moves: ['nightshade', 'curse', 'hypnosis'] },
           trainerTeam: [
             { speciesId: 'haunter', level: 22, moves: ['nightshade', 'curse', 'hypnosis'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'medium_grace',
+        3,
+        13,
+        'RIGHT',
+        'girl',
+        '🔮 MEDIUM GRACE',
+        ['The spirits illuminate only those who tread with steady resolve.'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'medium_grace',
+          trainerName: 'Medium Grace',
+          visionRange: 3,
+          challengePages: ['MEDIUM GRACE: You shall vanish into the shadow realm!'],
+          trainerPokemon: { speciesId: 'gastly', level: 20, moves: ['hypnosis', 'lick', 'dreameater'] },
+          trainerTeam: [
+            { speciesId: 'gastly', level: 20, moves: ['hypnosis', 'lick', 'dreameater'] },
+            { speciesId: 'haunter', level: 20, moves: ['nightshade', 'curse', 'confuseray'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'sage_jeffrey',
+        6,
+        5,
+        'LEFT',
+        'sage',
+        '🙏 SAGE JEFFREY',
+        ['Beyond this misty bridge awaits LEADER MORTY himself!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sage_jeffrey',
+          trainerName: 'Sage Jeffrey',
+          visionRange: 3,
+          challengePages: ['SAGE JEFFREY: Prove that your heart does not harbor fear!'],
+          trainerPokemon: { speciesId: 'haunter', level: 22, moves: ['nightshade', 'hypnosis', 'dreameater'] },
+          trainerTeam: [
+            { speciesId: 'haunter', level: 22, moves: ['nightshade', 'hypnosis', 'dreameater'] },
           ],
         }
       ),
@@ -3927,6 +3969,20 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         [
           "I'm EUSINE! I’ve spent my entire life pursuing the legendary SUICUNE across the world!",
           'It is said to represent the north wind and pure water!',
+          'Morty and I have been investigating the mysterious aura pulsating beneath this floor.',
+        ]
+      ),
+      makeNpc(
+        'morty_burned',
+        12,
+        12,
+        'LEFT',
+        'sage',
+        '👻 MORTY',
+        [
+          'ECRUTEAK GYM LEADER MORTY: The BURNED TOWER burned down 150 years ago in a lightning storm.',
+          'Three nameless POKéMON perished here, but were revived by the rainbow phoenix into legends.',
+          'Until the spirits show themselves, I meditate here in solemn contemplation.',
         ]
       ),
       makeNpc(
@@ -3939,7 +3995,17 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         [
           'SILVER: …Hmph! What are you doing here?',
           'Only weak trainers talk about legendaries. I only care about strong, ruthless POKéMON!',
-        ]
+        ],
+        {
+          action: 'RIVAL_BURNED_TOWER_BATTLE',
+          trainerId: 'silver_burned',
+          trainerName: 'Passerby Silver',
+          challengePages: [
+            'SILVER: …Hmph! You followed me all the way to ECRUTEAK?',
+            "Don't tell me you're chasing myths about legendary beasts too! Weaklings need legends. I only need supreme power!",
+            "Get out of my way! I'll show you what real strength looks like!",
+          ],
+        }
       ),
     ],
     burned_tower_b1f: [
@@ -3954,7 +4020,10 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           'Three majestic beasts stand petrified in stone: RAIKOU, ENTEI, and SUICUNE!',
           'As you approach, their eyes glow with ancient celestial energy!',
           'They roar and leap from the subterranean cavern, scattering across the Johto overworld!',
-        ]
+        ],
+        {
+          action: 'BEASTS_AWAKENING',
+        }
       ),
     ],
     tin_tower_1f: [

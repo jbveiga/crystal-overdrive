@@ -1,6 +1,6 @@
 {
-  "summary":  "Thorough plan addressing dev server recovery, fixing the battle party menu lock when selecting active/fainted/egg Pokemon, and outlining next roadmap milestones.",
-  "updatedAt":  "2026-10-24T12:15:11.515726323Z",
+  "summary":  "Comprehensive implementation plan addressing the GitHub Actions build-and-deploy CI failure (package-lock.json out of sync on npm ci) and the full Ecruteak City / Burned Tower / Gym Leader Morty sequence.",
+  "updatedAt":  "2026-10-24T13:29:06.109377408Z",
   "requestFeedback":  true,
   "userFacing":  true
 }

@@ -112,7 +112,9 @@ export interface GridEntity {
     | 'DEPT_ELEVATOR'
     | 'ROCK_SMASH_GUY_EVENT'
     | 'QUICK_CLAW_EVENT'
-    | 'BUG_CONTEST_OFFICER_EVENT';
+    | 'BUG_CONTEST_OFFICER_EVENT'
+    | 'RIVAL_BURNED_TOWER_BATTLE'
+    | 'BEASTS_AWAKENING';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

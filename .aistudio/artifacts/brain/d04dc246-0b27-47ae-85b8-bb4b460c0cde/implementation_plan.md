@@ -1,56 +1,103 @@
-# Crystal Overdrive: Dev Server Stabilization, Battle Menu Unfreeze & Next Milestones
+# Implementation Plan: GitHub CI Fix & Ecruteak City / Burned Tower / Morty Sequence
 
-Thorough implementation plan to resolve the dev server startup failure, fix the battle freeze when clicking an invalid party member (such as the active Pokémon), and map out the next development milestones for Crystal Overdrive.
-
-***
-
-## 1. Problem Analysis & Diagnostics
-
-### A. Dev Server Startup Failure
-- **Root Cause**: During an environment reboot, several source files in `src/core/`, `src/ui/`, `src/audio/`, and build scripts were missing from the local workspace. Because TypeScript (`tsc`) and Vite could not resolve imports (`BattleHUD`, `GameClock`, `GridPhysics`, etc.), the development server failed to compile and crashed.
-- **Resolution**:
-  - Restored all missing source modules and scripts.
-  - Verified `scripts/build-world-maps.cjs` bundle handler.
-  - Restarted dev server process on port 3000.
-
-### B. Battle Freeze Bug ("<Pokemon> is already in battle!")
-- **Root Cause**: In `src/ui/BattleHUD.ts` (lines 933–945), when the player opens the Party menu during combat and clicks a Pokémon:
-  ```ts
-  if (isActive) {
-    this.showMessage(`${pkmn.nickname} is already in battle!`);
-    return;
-  }
-  ```
-  `showMessage()` hides all menus (`fightMenu`, `bagMenu`, `partyMenu`, `actionMenu`), displays `messageBox`, types out the message, and then completes. However, because the click handler was synchronous and never restored `partyMenu` or `actionMenu`, the UI was left with only the message box displayed, completely freezing battle progression.
-- **Resolution**:
-  - Convert party selection handlers to `async`.
-  - When clicking an invalid choice (Active Pokémon, Egg, or Fainted):
-    1. Display the notification message.
-    2. Await the brief display timeout (or allow user to click/press Space to skip).
-    3. Smoothly restore `partyMenu` (or `actionMenu` if returning) so the player can pick another Pokémon or click `← BACK` to return to combat commands.
-  - Additionally, add an inline toast / status hint directly on the party member card or top banner, preventing menu flicker.
+Thorough plan addressing:
+1. Fixing the GitHub Actions `build-and-deploy` workflow failure.
+2. Implementing the complete Ecruteak City sequence (Burned Tower Rival battle, Legendary Beasts awakening cutscene, and Ecruteak Gym invisible floor pitfall puzzle with Leader Morty).
 
 ***
 
-## 2. Next Major Milestones Roadmap
+## 1. Diagnostics: GitHub Actions `build-and-deploy` Failure
 
-| Area | Feature / Milestone | Value & Details |
-| :--- | :--- | :--- |
-| **1. Battle UX Polish** | Unfreeze party invalid click + In-battle Shift/Summary modal | Prevents locks when selecting active Pokémon, allows checking moves & stats mid-battle. |
-| **2. Phase 9: Ecruteak City & Morty** | Burned Tower, Legendary Beasts awakening, Ecruteak Gym & Fog Badge | Complete Gym 4 progression with Ghost-type Leader Morty, Gengar, TM30 Shadow Ball, and Surf authorization. |
-| **3. National Park & Bug-Catching Contest** | Tuesday/Thursday/Saturday Park Contests | Authentic 20-minute timed contest with 20 Sport Balls, Park Grunt scoring, Sun Stone rewards, and Pinsir/Scyther encounters. |
-| **4. PokéGear Radio & Phonebook** | Broadcast audio channels & Trainer rematches | Prof. Oak's Pokémon Talk, Pokémon Music Channel, and calls from Joey, Wade, and Elm. |
+### Root Cause Analysis
+- We queried the GitHub Actions API for run `40095175350` (`Deploy to GitHub Pages`):
+  - Job `build-and-deploy` failed at step **"Install Dependencies"** running `npm ci`.
+  - Local reproduction revealed error:
+    ```
+    npm error code EUSAGE
+    npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync.
+    npm error Missing: @types/pngjs@6.0.5 from lock file
+    npm error Missing: pngjs@7.0.0 from lock file
+    ```
+  - When `pngjs` and `@types/pngjs` were added to `package.json`, `package-lock.json` was not regenerated and pushed, causing GitHub's strict `npm ci` check to reject the build immediately.
+
+### CI Resolution
+- Synchronize `package-lock.json` with `package.json`.
+- Verified locally: `npm ci` completes with code 0 (`added 70 packages, and audited 71 packages in 8s`).
+- Commit and push `package-lock.json` to GitHub so GitHub Actions runs cleanly.
 
 ***
 
-## 3. Implementation Steps for Current Fixes
+## 2. Feature Implementation: Ecruteak City & Burned Tower Sequence
 
-1. **BattleHUD Unfreeze**:
-   - In `src/ui/BattleHUD.ts`, update party selection listener:
-     - `await this.showMessage(...)`
-     - Restore `this.partyMenu.style.display = 'grid'` and `this.messageBox.style.display = 'none'`
-     - Ensure `backBtn` is active so the player is never trapped.
-2. **Automated Test Coverage**:
-   - Add unit test in `tests/BattleSpeedAndPacing.test.ts` or new test verifying that clicking an active or fainted Pokémon does not leave the battle HUD in a deadlocked state.
-3. **Compilation & Verification**:
-   - Run `compile_applet` and `npm test` across all 42 test suites.
+### A. Burned Tower 1F — Rival Silver Ambush
+- **Map**: `burned_tower_1f` (20x18 grid)
+- **NPCs**:
+  - `silver_burned` at coordinates `(10, 10)`, facing `DOWN`.
+  - `eusine` at `(10, 12)`, facing `UP` or `DOWN`.
+  - `morty_burned` at `(12, 12)`.
+- **Logic**:
+  - Interacting with `silver_burned` or stepping onto the corridor towards `(10, 9)` triggers Silver's challenge:
+    *"SILVER: …Hmph! What are you doing here? Only weak trainers babble about legendaries. I only care about strong, ruthless POKéMON! Let me show you what that means!"*
+  - **Starter-Scaled Rival Team**:
+    - If Player picked Cyndaquil: Croconaw Lv. 22, Magnemite Lv. 18, Zubat Lv. 20, Haunter Lv. 20
+    - If Player picked Totodile: Bayleef Lv. 22, Magnemite Lv. 18, Zubat Lv. 20, Haunter Lv. 20
+    - If Player picked Chikorita: Quilava Lv. 22, Magnemite Lv. 18, Zubat Lv. 20, Haunter Lv. 20
+  - On defeat, Silver steps aside and sets `EVENT_BEAT_BURNED_TOWER_SILVER`, clearing access to the hole at `(10, 9)`.
+
+### B. Burned Tower B1F — Legendary Beasts Awakening
+- **Map**: `burned_tower_b1f`
+- **Cutscene Trigger**: Player drops through the hole at `(10, 9)` and approaches the stone statues at `(10, 3)`:
+  - Freeze player movement during event (`isCutsceneLocked = true`).
+  - Screen shake and flash sequence.
+  - Authentic cries: Raikou, Entei, and Suicune.
+  - Dialogue sequence:
+    1. *"Three legendary beasts stand frozen like statues…"*
+    2. *"The stone glows with ancient celestial brilliance!"*
+    3. *"RAIKOU and ENTEI roar and leap from the cavern, scattering across the Johto overworld!"*
+    4. *"SUICUNE steps forward, stares deep into your eyes, and gracefully bounds into the mist!"*
+  - Activation:
+    - Sets `storyFlags.add('beasts_awakened')` and `storyFlags.add('EVENT_RELEASED_THE_BEASTS')`.
+    - Activates Raikou and Entei into `RoamingManager`.
+    - Eusine descends to express his awe at Suicune's interaction with the player.
+    - Morty returns to Ecruteak Gym to await the player's challenge.
+
+### C. Ecruteak Gym — Invisible Floor Pitfall Maze
+- **Map**: `ecruteak_gym` (10x18 grid)
+- **Gating**:
+  - If `!storyFlags.has('beasts_awakened')`:
+    - Gym Guide informs the player that Leader Morty is meditating at the Burned Tower.
+- **Maze Safe Coordinates**:
+  - Spanning y: 4 through y: 15.
+  - Definitive safe path connecting the entrance landing `(4, 16)/(5, 16)` through Medium Martha `(2, 7)` and Sage Ping `(7, 9)` to Leader Morty `(4, 3)`.
+  - Stepping onto any non-safe floor tile triggers pitfall physics:
+    - Screen shake + `BUMP` sound effect.
+    - Warps the player back to `(4, 16)` facing `UP`.
+    - Toast: *"Whoa! Stepped off the invisible path!"*
+
+### D. Gym Leader Morty Battle & Rewards
+- **Morty's Team**:
+  - Gastly Lv. 21 (Lick, Spite, Curse, Mean Look)
+  - Haunter Lv. 21 (Hypnosis, Dream Eater, Curse, Night Shade)
+  - Gengar Lv. 25 (Shadow Ball, Hypnosis, Dream Eater, Mean Look)
+  - Haunter Lv. 23 (Spite, Curse, Night Shade, Confuse Ray)
+- **Victory Rewards**:
+  - `FOG BADGE` awarded to `inventory.badges` (all Pokémon up to Lv. 50 obey).
+  - Authorizes overworld field usage of `HM03 SURF`.
+  - Awards `TM30 SHADOW BALL` (infinite TM).
+  - Updates Trainer Card and sets `storyFlags.add('morty_defeated')`.
+
+***
+
+## 3. Verification Plan
+
+1. **Automated Unit Tests**:
+   - Create `tests/EcruteakCityAndMorty.test.ts`:
+     - Test Silver Burned Tower 1F encounter and starter scaling.
+     - Test Legendary Beasts awakening flags and RoamingManager registration.
+     - Test Ecruteak Gym invisible floor safe path matrix and pitfall warp trigger.
+     - Test Leader Morty victory rewards (Fog Badge, TM30, Surf unlock).
+   - Run full suite: `npm test` (all 451+ tests passing).
+2. **Build & CI Verification**:
+   - `compile_applet` clean build.
+   - Commit and push to GitHub repository with synced `package-lock.json`.
+   - Verify GitHub Actions workflow run passes.
