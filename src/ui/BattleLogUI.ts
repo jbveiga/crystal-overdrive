@@ -104,6 +104,14 @@ export class BattleLogUI {
     return this.isOpen;
   }
 
+  public hideRoot(): void {
+    if (this.rootElement) this.rootElement.classList.add('hidden');
+  }
+
+  public showRoot(): void {
+    if (this.rootElement) this.rootElement.classList.remove('hidden');
+  }
+
   public clear(): void {
     this.entries = [];
     this.currentTurn = 0;
