@@ -5428,31 +5428,168 @@
       "speciesId": "geodude",
       "minLevel": 23,
       "maxLevel": 23,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "graveler",
       "minLevel": 23,
       "maxLevel": 23,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "gligar",
       "minLevel": 24,
       "maxLevel": 24,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "donphan",
       "minLevel": 25,
-      "maxLevel": 30,
-      "weight": 15
+      "maxLevel": 25,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "phanpy",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "skarmory",
       "minLevel": 27,
       "maxLevel": 27,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "skarmory",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "gligar",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "donphan",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "donphan",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "skarmory",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "skarmory",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "gligar",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "magikarp",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 60
+    },
+    {
+      "speciesId": "magikarp",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 30
+    },
+    {
+      "speciesId": "magikarp",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 10
     }
   ]
 }

@@ -3299,51 +3299,149 @@
     {
       "speciesId": "pidgey",
       "minLevel": 2,
-      "maxLevel": 4,
-      "weight": 50,
-      "timeOfDay": "DAY"
+      "maxLevel": 2,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "sentret",
       "minLevel": 2,
+      "maxLevel": 2,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 3,
       "maxLevel": 3,
-      "weight": 40,
-      "timeOfDay": "DAY"
+      "weight": 20,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "sentret",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 2,
+      "maxLevel": 2,
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 1,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "pidgey",
       "minLevel": 2,
-      "maxLevel": 4,
-      "weight": 50,
-      "timeOfDay": "MORNING"
+      "maxLevel": 2,
+      "weight": 30,
+      "timeOfDay": "DAY"
     },
     {
       "speciesId": "sentret",
       "minLevel": 2,
+      "maxLevel": 2,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 3,
       "maxLevel": 3,
-      "weight": 40,
-      "timeOfDay": "MORNING"
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "sentret",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 2,
+      "maxLevel": 2,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 1,
+      "timeOfDay": "DAY"
     },
     {
       "speciesId": "hoothoot",
       "minLevel": 2,
-      "maxLevel": 4,
-      "weight": 60,
+      "maxLevel": 2,
+      "weight": 30,
       "timeOfDay": "NIGHT"
     },
     {
       "speciesId": "rattata",
       "minLevel": 2,
-      "maxLevel": 4,
-      "weight": 40,
+      "maxLevel": 2,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 20,
       "timeOfDay": "NIGHT"
     },
     {
       "speciesId": "rattata",
-      "minLevel": 2,
-      "maxLevel": 4,
+      "minLevel": 3,
+      "maxLevel": 3,
       "weight": 10,
-      "timeOfDay": "ANY"
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 2,
+      "maxLevel": 2,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

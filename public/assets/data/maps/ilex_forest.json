@@ -4918,77 +4918,77 @@
     {
       "speciesId": "caterpie",
       "minLevel": 5,
-      "maxLevel": 6,
-      "weight": 25,
+      "maxLevel": 5,
+      "weight": 30,
       "timeOfDay": "MORNING"
     },
     {
       "speciesId": "weedle",
       "minLevel": 5,
-      "maxLevel": 6,
-      "weight": 25,
+      "maxLevel": 5,
+      "weight": 30,
       "timeOfDay": "MORNING"
     },
     {
       "speciesId": "metapod",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 15,
+      "weight": 20,
       "timeOfDay": "MORNING"
     },
     {
       "speciesId": "kakuna",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 15,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 5,
       "timeOfDay": "MORNING"
     },
     {
       "speciesId": "paras",
       "minLevel": 6,
       "maxLevel": 6,
-      "weight": 10,
+      "weight": 4,
       "timeOfDay": "MORNING"
     },
     {
-      "speciesId": "zubat",
-      "minLevel": 5,
-      "maxLevel": 7,
-      "weight": 10,
+      "speciesId": "paras",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
       "timeOfDay": "MORNING"
     },
     {
       "speciesId": "caterpie",
       "minLevel": 5,
-      "maxLevel": 6,
-      "weight": 25,
+      "maxLevel": 5,
+      "weight": 30,
       "timeOfDay": "DAY"
     },
     {
       "speciesId": "weedle",
       "minLevel": 5,
-      "maxLevel": 6,
-      "weight": 25,
+      "maxLevel": 5,
+      "weight": 30,
       "timeOfDay": "DAY"
     },
     {
       "speciesId": "metapod",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 15,
+      "weight": 20,
       "timeOfDay": "DAY"
     },
     {
       "speciesId": "kakuna",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 15,
-      "timeOfDay": "DAY"
-    },
-    {
-      "speciesId": "paras",
-      "minLevel": 6,
-      "maxLevel": 6,
       "weight": 10,
       "timeOfDay": "DAY"
     },
@@ -4996,20 +4996,41 @@
       "speciesId": "pidgey",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 10,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "paras",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "paras",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
       "timeOfDay": "DAY"
     },
     {
       "speciesId": "oddish",
       "minLevel": 5,
-      "maxLevel": 7,
+      "maxLevel": 5,
       "weight": 30,
       "timeOfDay": "NIGHT"
     },
     {
       "speciesId": "venonat",
       "minLevel": 5,
-      "maxLevel": 6,
+      "maxLevel": 5,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "oddish",
+      "minLevel": 7,
+      "maxLevel": 7,
       "weight": 20,
       "timeOfDay": "NIGHT"
     },
@@ -5017,29 +5038,49 @@
       "speciesId": "psyduck",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 15,
+      "weight": 10,
       "timeOfDay": "NIGHT"
     },
     {
       "speciesId": "hoothoot",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 15,
+      "weight": 5,
       "timeOfDay": "NIGHT"
     },
     {
       "speciesId": "paras",
       "minLevel": 6,
-      "maxLevel": 7,
-      "weight": 10,
+      "maxLevel": 6,
+      "weight": 4,
       "timeOfDay": "NIGHT"
     },
     {
-      "speciesId": "zubat",
-      "minLevel": 5,
-      "maxLevel": 7,
-      "weight": 10,
+      "speciesId": "paras",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
       "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "psyduck",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 60
+    },
+    {
+      "speciesId": "psyduck",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 30
+    },
+    {
+      "speciesId": "golduck",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 10
     }
   ]
 }

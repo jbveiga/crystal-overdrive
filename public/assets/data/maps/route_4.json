@@ -2196,37 +2196,148 @@
       "speciesId": "spearow",
       "minLevel": 5,
       "maxLevel": 5,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "rattata",
       "minLevel": 5,
       "maxLevel": 5,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "ekans",
       "minLevel": 8,
       "maxLevel": 8,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "raticate",
       "minLevel": 10,
       "maxLevel": 10,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "arbok",
       "minLevel": 10,
       "maxLevel": 10,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "sandshrew",
       "minLevel": 10,
       "maxLevel": 10,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "sandshrew",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "spearow",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "ekans",
+      "minLevel": 8,
+      "maxLevel": 8,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "arbok",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "sandshrew",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "sandshrew",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "clefairy",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "clefairy",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

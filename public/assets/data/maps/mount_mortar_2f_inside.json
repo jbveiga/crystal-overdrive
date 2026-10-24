@@ -4354,37 +4354,168 @@
       "speciesId": "graveler",
       "minLevel": 31,
       "maxLevel": 31,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "machoke",
       "minLevel": 32,
       "maxLevel": 32,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "geodude",
       "minLevel": 31,
       "maxLevel": 31,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "raticate",
       "minLevel": 30,
       "maxLevel": 30,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "machop",
       "minLevel": 28,
       "maxLevel": 28,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "golbat",
       "minLevel": 30,
       "maxLevel": 30,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 31,
+      "maxLevel": 31,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "machoke",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 31,
+      "maxLevel": 31,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "machop",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 31,
+      "maxLevel": 31,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 31,
+      "maxLevel": 31,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "marill",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "goldeen",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 60
+    },
+    {
+      "speciesId": "marill",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 30
+    },
+    {
+      "speciesId": "seaking",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 10
     }
   ]
 }

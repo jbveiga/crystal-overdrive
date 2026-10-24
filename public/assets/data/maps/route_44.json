@@ -3276,24 +3276,167 @@
       "speciesId": "tangela",
       "minLevel": 23,
       "maxLevel": 23,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "lickitung",
       "minLevel": 22,
-      "maxLevel": 26,
-      "weight": 40
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "bellsprout",
       "minLevel": 22,
       "maxLevel": 22,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "weepinbell",
       "minLevel": 24,
       "maxLevel": 24,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "lickitung",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "lickitung",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "lickitung",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "lickitung",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "bellsprout",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "weepinbell",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "lickitung",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "lickitung",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "lickitung",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "poliwag",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "bellsprout",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "weepinbell",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "poliwag",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 60
+    },
+    {
+      "speciesId": "poliwag",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 30
+    },
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 25,
+      "maxLevel": 25,
       "weight": 10
     }
   ]

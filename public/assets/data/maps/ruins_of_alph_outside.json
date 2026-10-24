@@ -2249,5 +2249,25 @@
       "maxLevel": 5,
       "weight": 100
     }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "wooper",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 60
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 30
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 10
+    }
   ]
 }

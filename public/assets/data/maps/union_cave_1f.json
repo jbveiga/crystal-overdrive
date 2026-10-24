@@ -2207,25 +2207,168 @@
     {
       "speciesId": "geodude",
       "minLevel": 6,
-      "maxLevel": 8,
-      "weight": 35
-    },
-    {
-      "speciesId": "zubat",
-      "minLevel": 5,
-      "maxLevel": 7,
-      "weight": 35
+      "maxLevel": 6,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "sandshrew",
       "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 20,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 7,
       "maxLevel": 7,
-      "weight": 20
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "onix",
       "minLevel": 6,
-      "maxLevel": 8,
+      "maxLevel": 6,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "sandshrew",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "wooper",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "wooper",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 60
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 30
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 15,
+      "maxLevel": 15,
       "weight": 10
     }
   ]

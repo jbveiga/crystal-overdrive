@@ -4945,5 +4945,25 @@
       ]
     }
   ],
-  "grassEncounters": []
+  "grassEncounters": [],
+  "waterEncounters": [
+    {
+      "speciesId": "tentacool",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 60
+    },
+    {
+      "speciesId": "tentacool",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 30
+    },
+    {
+      "speciesId": "tentacruel",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10
+    }
+  ]
 }

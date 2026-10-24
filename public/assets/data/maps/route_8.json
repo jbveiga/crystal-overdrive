@@ -2203,37 +2203,148 @@
       "speciesId": "snubbull",
       "minLevel": 17,
       "maxLevel": 17,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "pidgeotto",
       "minLevel": 19,
       "maxLevel": 19,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "abra",
       "minLevel": 16,
       "maxLevel": 16,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "growlithe",
       "minLevel": 17,
       "maxLevel": 17,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "jigglypuff",
       "minLevel": 16,
       "maxLevel": 16,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "kadabra",
       "minLevel": 18,
       "maxLevel": 18,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "kadabra",
+      "minLevel": 18,
+      "maxLevel": 18,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "snubbull",
+      "minLevel": 17,
+      "maxLevel": 17,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgeotto",
+      "minLevel": 19,
+      "maxLevel": 19,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "abra",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "growlithe",
+      "minLevel": 17,
+      "maxLevel": 17,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "jigglypuff",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "kadabra",
+      "minLevel": 18,
+      "maxLevel": 18,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "kadabra",
+      "minLevel": 18,
+      "maxLevel": 18,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "meowth",
+      "minLevel": 17,
+      "maxLevel": 17,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "abra",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "haunter",
+      "minLevel": 17,
+      "maxLevel": 17,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "jigglypuff",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "kadabra",
+      "minLevel": 18,
+      "maxLevel": 18,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "kadabra",
+      "minLevel": 18,
+      "maxLevel": 18,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

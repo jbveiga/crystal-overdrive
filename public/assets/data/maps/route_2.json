@@ -3304,31 +3304,148 @@
       "speciesId": "caterpie",
       "minLevel": 3,
       "maxLevel": 3,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "ledyba",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "pidgey",
-      "minLevel": 3,
+      "minLevel": 5,
       "maxLevel": 5,
-      "weight": 50
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "butterfree",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
-      "speciesId": "pidgeotto",
+      "speciesId": "ledian",
       "minLevel": 7,
       "maxLevel": 7,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "pikachu",
       "minLevel": 4,
       "maxLevel": 4,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "pikachu",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "caterpie",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "butterfree",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgeotto",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pikachu",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pikachu",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "spinarak",
+      "minLevel": 3,
+      "maxLevel": 3,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "ariados",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

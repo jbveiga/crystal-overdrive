@@ -2187,26 +2187,149 @@
     {
       "speciesId": "tangela",
       "minLevel": 30,
-      "maxLevel": 35,
-      "weight": 50
+      "maxLevel": 30,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "rattata",
       "minLevel": 25,
       "maxLevel": 25,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 35,
+      "maxLevel": 35,
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "raticate",
       "minLevel": 20,
       "maxLevel": 20,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "mrmime",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "mrmime",
       "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "mrmime",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 30,
       "maxLevel": 30,
-      "weight": 10
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 35,
+      "maxLevel": 35,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "mrmime",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "mrmime",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "mrmime",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 35,
+      "maxLevel": 35,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

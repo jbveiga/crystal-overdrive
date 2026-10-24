@@ -262,9 +262,16 @@ export class MapManager {
       return null;
     }
 
+    const isWaterTile = tileType === 3;
     const isCaveOrRuins =
-      MapManager.isCaveMap(this.currentMap.id) || this.currentMap.id.includes('ruins_of_alph');
-    if (tileType !== 2 && !(isCaveOrRuins && tileType === 0)) {
+      MapManager.isCaveMap(this.currentMap.id) ||
+      this.currentMap.id.includes('ruins_of_alph') ||
+      this.currentMap.id.includes('sprout_tower') ||
+      this.currentMap.id.includes('burned_tower') ||
+      this.currentMap.id.includes('tin_tower') ||
+      this.currentMap.id.includes('mount_mortar') ||
+      this.currentMap.id === 'ilex_forest';
+    if (tileType !== 2 && !isWaterTile && !(isCaveOrRuins && tileType === 0)) {
       return null;
     }
 
@@ -283,7 +290,10 @@ export class MapManager {
       this.stepsSinceGraceEnd++;
     }
 
-    const threshold = this.getEncounterProbabilityForStep(this.stepsSinceGraceEnd, isCaveOrRuins);
+    const threshold = this.getEncounterProbabilityForStep(
+      this.stepsSinceGraceEnd,
+      isCaveOrRuins || isWaterTile
+    );
     const encounterRoll = rng();
     if (encounterRoll > threshold) {
       return null;
@@ -309,7 +319,9 @@ export class MapManager {
       }
     }
 
-    let slots = this.currentMap.grassEncounters;
+    let slots = isWaterTile
+      ? this.currentMap.waterEncounters
+      : this.currentMap.grassEncounters;
     if (!slots || slots.length === 0) {
       return null;
     }

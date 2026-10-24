@@ -4365,5 +4365,153 @@
     }
   ],
   "bgEvents": [],
-  "grassEncounters": []
+  "grassEncounters": [
+    {
+      "speciesId": "doduo",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "arbok",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 20,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "doduo",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "ponyta",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "dodrio",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "dodrio",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "doduo",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "arbok",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "doduo",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "ponyta",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "dodrio",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "dodrio",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ]
 }

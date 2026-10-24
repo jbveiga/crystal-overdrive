@@ -4359,37 +4359,168 @@
       "speciesId": "tangela",
       "minLevel": 41,
       "maxLevel": 41,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "ponyta",
       "minLevel": 42,
       "maxLevel": 42,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "arbok",
       "minLevel": 42,
       "maxLevel": 42,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "rapidash",
       "minLevel": 44,
       "maxLevel": 44,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "doduo",
       "minLevel": 41,
       "maxLevel": 41,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "dodrio",
       "minLevel": 43,
       "maxLevel": 43,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "dodrio",
+      "minLevel": 43,
+      "maxLevel": 43,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 41,
+      "maxLevel": 41,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "ponyta",
+      "minLevel": 42,
+      "maxLevel": 42,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "arbok",
+      "minLevel": 42,
+      "maxLevel": 42,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rapidash",
+      "minLevel": 44,
+      "maxLevel": 44,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "doduo",
+      "minLevel": 41,
+      "maxLevel": 41,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "dodrio",
+      "minLevel": 43,
+      "maxLevel": 43,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "dodrio",
+      "minLevel": 43,
+      "maxLevel": 43,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "tangela",
+      "minLevel": 41,
+      "maxLevel": 41,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 42,
+      "maxLevel": 42,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 42,
+      "maxLevel": 42,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 44,
+      "maxLevel": 44,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 40,
+      "maxLevel": 40,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 44,
+      "maxLevel": 44,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 44,
+      "maxLevel": 44,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 35,
+      "maxLevel": 35,
+      "weight": 60
+    },
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 40,
+      "maxLevel": 40,
+      "weight": 30
+    },
+    {
+      "speciesId": "poliwag",
+      "minLevel": 35,
+      "maxLevel": 35,
+      "weight": 10
     }
   ]
 }

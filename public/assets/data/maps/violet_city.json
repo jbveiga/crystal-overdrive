@@ -4468,5 +4468,25 @@
       ]
     }
   ],
-  "grassEncounters": []
+  "grassEncounters": [],
+  "waterEncounters": [
+    {
+      "speciesId": "poliwag",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 60
+    },
+    {
+      "speciesId": "poliwag",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 30
+    },
+    {
+      "speciesId": "poliwhirl",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10
+    }
+  ]
 }

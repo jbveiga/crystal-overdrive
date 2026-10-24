@@ -3343,34 +3343,151 @@
   ],
   "grassEncounters": [
     {
+      "speciesId": "ledyba",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
       "speciesId": "pidgey",
-      "minLevel": 13,
-      "maxLevel": 15,
-      "weight": 30
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
-      "speciesId": "nidoran-m",
-      "minLevel": 13,
-      "maxLevel": 13,
-      "weight": 15
-    },
-    {
-      "speciesId": "nidoran-f",
-      "minLevel": 13,
-      "maxLevel": 13,
-      "weight": 15
+      "speciesId": "bellsprout",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "growlithe",
-      "minLevel": 13,
-      "maxLevel": 15,
-      "weight": 20
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
-      "speciesId": "vulpix",
-      "minLevel": 13,
-      "maxLevel": 15,
-      "weight": 20
+      "speciesId": "pidgey",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "bellsprout",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "growlithe",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "spinarak",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "bellsprout",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "gastly",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "gastly",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

@@ -5490,53 +5490,171 @@
   ],
   "grassEncounters": [
     {
-      "speciesId": "bellsprout",
-      "minLevel": 6,
-      "maxLevel": 7,
-      "weight": 35,
-      "timeOfDay": "ANY"
-    },
-    {
       "speciesId": "ekans",
       "minLevel": 4,
-      "maxLevel": 6,
+      "maxLevel": 4,
       "weight": 30,
-      "timeOfDay": "DAY"
+      "timeOfDay": "MORNING"
     },
     {
-      "speciesId": "pidgey",
-      "minLevel": 6,
-      "maxLevel": 8,
-      "weight": 25,
+      "speciesId": "rattata",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "bellsprout",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 20,
       "timeOfDay": "MORNING"
     },
     {
       "speciesId": "hoppip",
       "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "pidgey",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "ekans",
+      "minLevel": 4,
+      "maxLevel": 4,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "bellsprout",
+      "minLevel": 7,
       "maxLevel": 7,
       "weight": 20,
       "timeOfDay": "DAY"
     },
     {
-      "speciesId": "wooper",
-      "minLevel": 4,
+      "speciesId": "hoppip",
+      "minLevel": 6,
       "maxLevel": 6,
-      "weight": 40,
-      "timeOfDay": "NIGHT"
+      "weight": 10,
+      "timeOfDay": "DAY"
     },
     {
-      "speciesId": "zubat",
-      "minLevel": 5,
+      "speciesId": "pidgey",
+      "minLevel": 7,
       "maxLevel": 7,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "wooper",
+      "minLevel": 4,
+      "maxLevel": 4,
       "weight": 30,
       "timeOfDay": "NIGHT"
     },
     {
-      "speciesId": "gastly",
-      "minLevel": 6,
-      "maxLevel": 8,
+      "speciesId": "rattata",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "bellsprout",
+      "minLevel": 7,
+      "maxLevel": 7,
       "weight": 20,
       "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 6,
+      "maxLevel": 6,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hoothoot",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "gastly",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "gastly",
+      "minLevel": 7,
+      "maxLevel": 7,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "tentacool",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 60
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 30
+    },
+    {
+      "speciesId": "tentacruel",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10
     }
   ]
 }

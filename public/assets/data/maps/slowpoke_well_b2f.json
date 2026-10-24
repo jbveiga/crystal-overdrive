@@ -1134,44 +1134,149 @@
   "grassEncounters": [
     {
       "speciesId": "zubat",
-      "minLevel": 14,
-      "maxLevel": 18,
-      "weight": 50,
-      "timeOfDay": "MORNING"
-    },
-    {
-      "speciesId": "slowpoke",
-      "minLevel": 14,
-      "maxLevel": 18,
-      "weight": 50,
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 30,
       "timeOfDay": "MORNING"
     },
     {
       "speciesId": "zubat",
-      "minLevel": 14,
-      "maxLevel": 18,
-      "weight": 50,
-      "timeOfDay": "DAY"
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 19,
+      "maxLevel": 19,
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "slowpoke",
-      "minLevel": 14,
-      "maxLevel": 18,
-      "weight": 50,
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 30,
       "timeOfDay": "DAY"
     },
     {
       "speciesId": "zubat",
-      "minLevel": 14,
-      "maxLevel": 18,
-      "weight": 50,
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 19,
+      "maxLevel": 19,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 19,
+      "maxLevel": 19,
+      "weight": 20,
       "timeOfDay": "NIGHT"
     },
     {
       "speciesId": "slowpoke",
-      "minLevel": 14,
-      "maxLevel": 18,
-      "weight": 50,
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
       "timeOfDay": "NIGHT"
     }
   ],
@@ -1179,14 +1284,20 @@
     {
       "speciesId": "slowpoke",
       "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 60
+    },
+    {
+      "speciesId": "slowpoke",
+      "minLevel": 20,
       "maxLevel": 20,
-      "weight": 85
+      "weight": 30
     },
     {
       "speciesId": "slowbro",
       "minLevel": 20,
-      "maxLevel": 25,
-      "weight": 15
+      "maxLevel": 20,
+      "weight": 10
     }
   ]
 }

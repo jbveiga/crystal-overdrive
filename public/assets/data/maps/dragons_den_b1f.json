@@ -4349,5 +4349,25 @@
     }
   ],
   "bgEvents": [],
-  "grassEncounters": []
+  "grassEncounters": [],
+  "waterEncounters": [
+    {
+      "speciesId": "magikarp",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 60
+    },
+    {
+      "speciesId": "magikarp",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 30
+    },
+    {
+      "speciesId": "dratini",
+      "minLevel": 10,
+      "maxLevel": 10,
+      "weight": 10
+    }
+  ]
 }

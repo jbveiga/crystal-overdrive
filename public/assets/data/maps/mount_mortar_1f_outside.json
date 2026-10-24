@@ -4403,37 +4403,168 @@
       "speciesId": "rattata",
       "minLevel": 14,
       "maxLevel": 14,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "zubat",
       "minLevel": 13,
       "maxLevel": 13,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "machop",
       "minLevel": 14,
       "maxLevel": 14,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "golbat",
       "minLevel": 13,
       "maxLevel": 13,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "geodude",
       "minLevel": 14,
       "maxLevel": 14,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "raticate",
       "minLevel": 16,
       "maxLevel": 16,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 14,
+      "maxLevel": 14,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 13,
+      "maxLevel": 13,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "machop",
+      "minLevel": 14,
+      "maxLevel": 14,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 13,
+      "maxLevel": 13,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 14,
+      "maxLevel": 14,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 14,
+      "maxLevel": 14,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 13,
+      "maxLevel": 13,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "marill",
+      "minLevel": 14,
+      "maxLevel": 14,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 13,
+      "maxLevel": 13,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 14,
+      "maxLevel": 14,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "goldeen",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 60
+    },
+    {
+      "speciesId": "marill",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 30
+    },
+    {
+      "speciesId": "seaking",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10
     }
   ]
 }

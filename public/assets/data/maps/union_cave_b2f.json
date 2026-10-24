@@ -2184,28 +2184,178 @@
   "bgEvents": [],
   "grassEncounters": [
     {
-      "speciesId": "lapras",
+      "speciesId": "zubat",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 20,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "geodude",
       "minLevel": 20,
       "maxLevel": 20,
-      "weight": 20
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 21,
+      "maxLevel": 21,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     },
     {
       "speciesId": "wooper",
       "minLevel": 18,
       "maxLevel": 22,
-      "weight": 35
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "tentacool",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 60
     },
     {
       "speciesId": "quagsire",
       "minLevel": 20,
-      "maxLevel": 24,
-      "weight": 25
+      "maxLevel": 20,
+      "weight": 30
     },
     {
-      "speciesId": "golbat",
+      "speciesId": "tentacruel",
       "minLevel": 20,
-      "maxLevel": 22,
-      "weight": 20
+      "maxLevel": 20,
+      "weight": 10
     }
   ]
 }

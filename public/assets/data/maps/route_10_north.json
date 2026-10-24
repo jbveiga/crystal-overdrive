@@ -1116,37 +1116,148 @@
       "speciesId": "spearow",
       "minLevel": 15,
       "maxLevel": 15,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "voltorb",
       "minLevel": 17,
       "maxLevel": 17,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "raticate",
       "minLevel": 15,
       "maxLevel": 15,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "fearow",
       "minLevel": 15,
       "maxLevel": 15,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "marowak",
       "minLevel": 15,
       "maxLevel": 15,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "electabuzz",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "electabuzz",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "spearow",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "voltorb",
+      "minLevel": 17,
+      "maxLevel": 17,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "fearow",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "marowak",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 5,
+      "timeOfDay": "DAY"
     },
     {
       "speciesId": "electabuzz",
       "minLevel": 18,
       "maxLevel": 18,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "electabuzz",
+      "minLevel": 18,
+      "maxLevel": 18,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "venonat",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "voltorb",
+      "minLevel": 17,
+      "maxLevel": 17,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "venomoth",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "electabuzz",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "electabuzz",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

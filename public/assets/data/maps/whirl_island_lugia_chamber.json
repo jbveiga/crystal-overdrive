@@ -1112,5 +1112,173 @@
       ]
     }
   ],
-  "grassEncounters": []
+  "grassEncounters": [
+    {
+      "speciesId": "krabby",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "seel",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 20,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "krabby",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "seel",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "seel",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "krabby",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "seel",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "krabby",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "seel",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "seel",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "krabby",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 26,
+      "maxLevel": 26,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "krabby",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "krabby",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 28,
+      "maxLevel": 28,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
+    }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "horsea",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 60
+    },
+    {
+      "speciesId": "tentacruel",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 30
+    },
+    {
+      "speciesId": "seadra",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10
+    }
+  ]
 }

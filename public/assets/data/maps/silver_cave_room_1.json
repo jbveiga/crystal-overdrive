@@ -2194,37 +2194,148 @@
       "speciesId": "graveler",
       "minLevel": 43,
       "maxLevel": 43,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "ursaring",
       "minLevel": 44,
       "maxLevel": 44,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "onix",
       "minLevel": 42,
       "maxLevel": 42,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "magmar",
       "minLevel": 45,
       "maxLevel": 45,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "golbat",
       "minLevel": 45,
       "maxLevel": 45,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "larvitar",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 4,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "larvitar",
       "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 43,
+      "maxLevel": 43,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "ursaring",
+      "minLevel": 44,
+      "maxLevel": 44,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 42,
+      "maxLevel": 42,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "magmar",
+      "minLevel": 45,
+      "maxLevel": 45,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 45,
+      "maxLevel": 45,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "larvitar",
+      "minLevel": 20,
       "maxLevel": 20,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "larvitar",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 43,
+      "maxLevel": 43,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 44,
+      "maxLevel": 44,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "onix",
+      "minLevel": 42,
+      "maxLevel": 42,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 42,
+      "maxLevel": 42,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golduck",
+      "minLevel": 45,
+      "maxLevel": 45,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 46,
+      "maxLevel": 46,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 46,
+      "maxLevel": 46,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

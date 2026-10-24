@@ -5442,26 +5442,149 @@
     {
       "speciesId": "fearow",
       "minLevel": 30,
-      "maxLevel": 32,
-      "weight": 40
-    },
-    {
-      "speciesId": "slugma",
-      "minLevel": 29,
-      "maxLevel": 32,
-      "weight": 35
+      "maxLevel": 30,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "grimer",
       "minLevel": 29,
       "maxLevel": 29,
-      "weight": 20
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "grimer",
+      "minLevel": 31,
+      "maxLevel": 31,
+      "weight": 20,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "fearow",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "grimer",
+      "minLevel": 33,
+      "maxLevel": 33,
+      "weight": 5,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "muk",
       "minLevel": 33,
       "maxLevel": 33,
-      "weight": 5
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "muk",
+      "minLevel": 33,
+      "maxLevel": 33,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "fearow",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "slugma",
+      "minLevel": 29,
+      "maxLevel": 29,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "grimer",
+      "minLevel": 29,
+      "maxLevel": 29,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "fearow",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "slugma",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "muk",
+      "minLevel": 33,
+      "maxLevel": 33,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "muk",
+      "minLevel": 33,
+      "maxLevel": 33,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "grimer",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "grimer",
+      "minLevel": 29,
+      "maxLevel": 29,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "grimer",
+      "minLevel": 31,
+      "maxLevel": 31,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "grimer",
+      "minLevel": 32,
+      "maxLevel": 32,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "grimer",
+      "minLevel": 33,
+      "maxLevel": 33,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "muk",
+      "minLevel": 33,
+      "maxLevel": 33,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "muk",
+      "minLevel": 33,
+      "maxLevel": 33,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

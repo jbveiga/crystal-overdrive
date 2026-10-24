@@ -2235,26 +2235,149 @@
     {
       "speciesId": "swinub",
       "minLevel": 22,
-      "maxLevel": 24,
-      "weight": 40
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "zubat",
       "minLevel": 23,
       "maxLevel": 23,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "golbat",
       "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 20,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "swinub",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 25,
       "maxLevel": 25,
-      "weight": 29
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "jynx",
       "minLevel": 22,
       "maxLevel": 22,
-      "weight": 1
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "swinub",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "swinub",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "jynx",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "delibird",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "delibird",
+      "minLevel": 24,
+      "maxLevel": 24,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "sneasel",
+      "minLevel": 22,
+      "maxLevel": 22,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

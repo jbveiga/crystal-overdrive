@@ -2203,31 +2203,148 @@
       "speciesId": "nidorino",
       "minLevel": 23,
       "maxLevel": 23,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "nidorina",
       "minLevel": 23,
       "maxLevel": 23,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "pidgeotto",
       "minLevel": 25,
       "maxLevel": 25,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "hoppip",
       "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 27,
       "maxLevel": 27,
-      "weight": 19
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 4,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "chansey",
       "minLevel": 25,
       "maxLevel": 25,
-      "weight": 1
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "nidorino",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "nidorina",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgeotto",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 27,
+      "maxLevel": 27,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "chansey",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "venonat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "venomoth",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "quagsire",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "chansey",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

@@ -28,6 +28,24 @@ export class PokemonFactory {
   }
 
   /**
+   * Formats a species ID into its canonical Gen 2 display name (e.g. NIDORAN♂ and NIDORAN♀)
+   */
+  public static formatSpeciesName(speciesId: string, fallbackName?: string): string {
+    const id = speciesId.toLowerCase().trim();
+    if (id === 'nidoran-m' || id === 'nidoranm') return 'NIDORAN♂';
+    if (id === 'nidoran-f' || id === 'nidoranf') return 'NIDORAN♀';
+    if (id === 'mr__mime' || id === 'mr_mime' || id === 'mrmime') return 'MR. MIME';
+    if (id === 'ho_oh' || id === 'ho-oh') return 'HO-OH';
+    if (fallbackName) return fallbackName;
+    try {
+      const sp = Dex.species.get(speciesId);
+      return sp.exists ? sp.name.toUpperCase() : speciesId.toUpperCase();
+    } catch {
+      return speciesId.toUpperCase();
+    }
+  }
+
+  /**
    * Looks up MoveData from Showdown Dex
    */
   public static getMoveData(moveId: string): MoveData {
@@ -223,10 +241,17 @@ export class PokemonFactory {
       catchRate = 45;
     }
 
+    let nickname: string = species.name;
+    if (species.id === 'nidoranm' || speciesId === 'nidoran-m' || speciesId === 'nidoranm') {
+      nickname = 'NIDORAN♂';
+    } else if (species.id === 'nidoranf' || speciesId === 'nidoran-f' || speciesId === 'nidoranf') {
+      nickname = 'NIDORAN♀';
+    }
+
     return {
       uid: `${species.id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       speciesId: species.id,
-      nickname: species.name,
+      nickname,
       level,
       types,
       baseStats,

@@ -2187,32 +2187,149 @@
     {
       "speciesId": "hoppip",
       "minLevel": 14,
-      "maxLevel": 16,
-      "weight": 35
+      "maxLevel": 14,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "raticate",
       "minLevel": 13,
       "maxLevel": 13,
-      "weight": 30
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "magnemite",
       "minLevel": 15,
       "maxLevel": 15,
-      "weight": 20
+      "weight": 20,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "pidgeotto",
       "minLevel": 16,
       "maxLevel": 16,
-      "weight": 10
+      "weight": 10,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "rattata",
       "minLevel": 16,
       "maxLevel": 16,
-      "weight": 5
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 14,
+      "maxLevel": 14,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 13,
+      "maxLevel": 13,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "magnemite",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "pidgeotto",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "rattata",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "hoppip",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "drowzee",
+      "minLevel": 14,
+      "maxLevel": 14,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "meowth",
+      "minLevel": 13,
+      "maxLevel": 13,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "magnemite",
+      "minLevel": 15,
+      "maxLevel": 15,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "noctowl",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "raticate",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hypno",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "hypno",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }

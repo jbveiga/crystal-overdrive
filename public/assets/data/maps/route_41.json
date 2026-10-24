@@ -8181,5 +8181,25 @@
       "maxLevel": 20,
       "weight": 20
     }
+  ],
+  "waterEncounters": [
+    {
+      "speciesId": "tentacool",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 60
+    },
+    {
+      "speciesId": "tentacruel",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 30
+    },
+    {
+      "speciesId": "mantine",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10
+    }
   ]
 }
