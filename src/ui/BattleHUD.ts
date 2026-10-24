@@ -2,6 +2,7 @@ import type { PokemonInstance, SpeedMultiplier, PokeballId, PokemonType, StatId,
 import { EffectivenessHelper } from '../battle/EffectivenessHelper';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { BattleAudio } from '../audio/BattleAudio';
+import { BattleLogUI } from './BattleLogUI';
 
 export interface BattleHUDCallbacks {
   onMoveSelected: (moveId: string) => void;
@@ -57,6 +58,7 @@ export class BattleHUD {
   private enemyHpText!: HTMLSpanElement;
   private playerPartyDock!: HTMLDivElement;
   private speedButton!: HTMLButtonElement;
+  public battleLogUI!: BattleLogUI;
 
   private playerPokemon!: PokemonInstance;
   private enemyPokemon!: PokemonInstance;
@@ -515,6 +517,8 @@ export class BattleHUD {
     root.querySelector('#btn-pokemon')!.addEventListener('click', () => {
       this.showPartyMenu();
     });
+
+    this.battleLogUI = new BattleLogUI(this.container);
   }
 
   private setupKeyboardShortcuts(): void {
@@ -587,6 +591,9 @@ export class BattleHUD {
     this.playerParty = playerParty.length > 0 ? playerParty : [playerPokemon];
     this.caughtSpeciesIds = caughtSpeciesIds;
     this.rootElement.style.display = 'flex';
+    if (this.battleLogUI) {
+      this.battleLogUI.clear();
+    }
 
     // Populate Player Card
     this.setActivePlayerPokemon(playerPokemon);
@@ -1079,6 +1086,28 @@ export class BattleHUD {
     this.messageBox.className = 'full-width-dialogue';
     this.messageBox.style.width = '100%';
     this.updateStatusBadges();
+
+    if (this.battleLogUI && text) {
+      if (text.startsWith('--- TURN')) {
+        const turnMatch = text.match(/TURN\s+(\d+)/i);
+        const turnNum = turnMatch ? parseInt(turnMatch[1], 10) : undefined;
+        if (turnNum !== undefined) {
+          this.battleLogUI.startTurn(turnNum);
+        }
+      } else if (text.includes('used ') || text.includes('uses ')) {
+        this.battleLogUI.addEntry('move', text);
+      } else if (text.includes('effective') || text.includes('critical hit') || text.includes('damage') || text.includes('lost ')) {
+        this.battleLogUI.addEntry('damage', text);
+      } else if (text.includes('paralyzed') || text.includes('poisoned') || text.includes('burned') || text.includes('asleep') || text.includes('frozen') || text.includes('confused')) {
+        this.battleLogUI.addEntry('status', text);
+      } else if (text.includes('rose!') || text.includes('fell!')) {
+        this.battleLogUI.addEntry('stat', text);
+      } else if (text.includes('fainted!')) {
+        this.battleLogUI.addEntry('faint', text);
+      } else {
+        this.battleLogUI.addEntry('info', text);
+      }
+    }
 
     this.messageBox.innerText = '';
     for (let i = 1; i <= text.length; i++) {
