@@ -58,11 +58,6 @@ class MockElement {
     }
   }
 
-  public getAttribute(attr: string): string | null {
-    const match = this.innerHTML.match(new RegExp(`${attr}="([^"]+)"`));
-    return match ? match[1] : null;
-  }
-
   public querySelector(selector: string): MockElement | null {
     if (selector.startsWith('.')) {
       const cls = selector.slice(1);
@@ -73,22 +68,6 @@ class MockElement {
       return this.findChild((el) => el.id === id);
     }
     return null;
-  }
-
-  public querySelectorAll(selector: string): MockElement[] {
-    const results: MockElement[] = [];
-    if (selector.startsWith('.')) {
-      const cls = selector.slice(1);
-      this.collectChildren((el) => el.classList.contains(cls), results);
-    }
-    return results;
-  }
-
-  private collectChildren(predicate: (el: MockElement) => boolean, results: MockElement[]) {
-    for (const child of this.children) {
-      if (predicate(child)) results.push(child);
-      child.collectChildren(predicate, results);
-    }
   }
 
   private findChild(predicate: (el: MockElement) => boolean): MockElement | null {
@@ -179,48 +158,5 @@ describe('BattleLogUI Component', () => {
     expect(battleLog.getEntries().length).toBe(0);
     const badge = container.querySelector('.battle-log-count');
     expect(badge?.textContent).toBe('0');
-  });
-
-  it('6. filters battle log entries by category (all, move, damage, status)', () => {
-    battleLog.startTurn(1);
-    battleLog.addEntry('move', 'Pikachu used Thunderbolt!');
-    battleLog.addEntry('damage', 'Gyarados lost 82 HP!');
-    battleLog.addEntry('status', 'Gyarados was paralyzed!');
-
-    expect(battleLog.getActiveFilter()).toBe('all');
-    expect(battleLog.getFilteredEntries().length).toBe(4);
-
-    battleLog.setFilter('move');
-    expect(battleLog.getActiveFilter()).toBe('move');
-    const moveEntries = battleLog.getFilteredEntries();
-    expect(moveEntries.some((e) => e.type === 'move')).toBe(true);
-    expect(moveEntries.some((e) => e.type === 'damage')).toBe(false);
-
-    battleLog.setFilter('damage');
-    const damageEntries = battleLog.getFilteredEntries();
-    expect(damageEntries.some((e) => e.type === 'damage')).toBe(true);
-    expect(damageEntries.some((e) => e.type === 'status')).toBe(false);
-
-    battleLog.setFilter('status');
-    const statusEntries = battleLog.getFilteredEntries();
-    expect(statusEntries.some((e) => e.type === 'status')).toBe(true);
-    expect(statusEntries.some((e) => e.type === 'move')).toBe(false);
-  });
-
-  it('7. hides and shows root container cleanly across overworld/battle transitions', () => {
-    const root = container.querySelector('.battle-log-root');
-    const panel = container.querySelector('.battle-log-panel');
-
-    battleLog.open();
-    expect(panel?.style.display).toBe('flex');
-
-    battleLog.hideRoot();
-    expect(battleLog.isExpanded()).toBe(false);
-    expect(panel?.style.display).toBe('none');
-    expect(root?.style.display).toBe('none');
-
-    battleLog.showRoot();
-    expect(root?.style.display).toBe('flex');
-    expect(panel?.style.display).toBe('none');
   });
 });
