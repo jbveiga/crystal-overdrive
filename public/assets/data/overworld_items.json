@@ -1,0 +1,5251 @@
+{
+  "summary": {
+    "totalItemBalls": 136,
+    "totalHiddenItems": 80,
+    "totalFruitTrees": 30,
+    "total": 246,
+    "totalMapsWithItems": 93,
+    "johto": {
+      "itemBalls": 103,
+      "hiddenItems": 48,
+      "fruitTrees": 22,
+      "total": 173
+    },
+    "kanto": {
+      "itemBalls": 33,
+      "hiddenItems": 32,
+      "fruitTrees": 8,
+      "total": 73
+    }
+  },
+  "itemBalls": [
+    {
+      "id": "burned_tower_1f_14_2_hp_up",
+      "mapId": "burned_tower_1f",
+      "region": "johto",
+      "x": 14,
+      "y": 2,
+      "itemId": "hp_up",
+      "eventFlag": "EVENT_BURNED_TOWER_1F_HP_UP"
+    },
+    {
+      "id": "burned_tower_b1f_16_4_tm_endure",
+      "mapId": "burned_tower_b1f",
+      "region": "johto",
+      "x": 16,
+      "y": 4,
+      "itemId": "tm_endure",
+      "eventFlag": "EVENT_BURNED_TOWER_B1F_TM_ENDURE"
+    },
+    {
+      "id": "dragons_den_b1f_30_4_calcium",
+      "mapId": "dragons_den_b1f",
+      "region": "johto",
+      "x": 30,
+      "y": 4,
+      "itemId": "calcium",
+      "eventFlag": "EVENT_DRAGONS_DEN_B1F_CALCIUM"
+    },
+    {
+      "id": "dragons_den_b1f_5_20_max_elixer",
+      "mapId": "dragons_den_b1f",
+      "region": "johto",
+      "x": 5,
+      "y": 20,
+      "itemId": "max_elixer",
+      "eventFlag": "EVENT_DRAGONS_DEN_B1F_MAX_ELIXER"
+    },
+    {
+      "id": "fighting_dojo_3_1_focus_band",
+      "mapId": "fighting_dojo",
+      "region": "kanto",
+      "x": 3,
+      "y": 1,
+      "itemId": "focus_band",
+      "eventFlag": "EVENT_PICKED_UP_FOCUS_BAND"
+    },
+    {
+      "id": "goldenrod_underground_7_25_coin_case",
+      "mapId": "goldenrod_underground",
+      "region": "johto",
+      "x": 7,
+      "y": 25,
+      "itemId": "coin_case",
+      "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_COIN_CASE"
+    },
+    {
+      "id": "goldenrod_underground_switch_room_entrances_1_12_smoke_ball",
+      "mapId": "goldenrod_underground_switch_room_entrances",
+      "region": "johto",
+      "x": 1,
+      "y": 12,
+      "itemId": "smoke_ball",
+      "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_SWITCH_ROOM_ENTRANCES_SMOKE_BALL"
+    },
+    {
+      "id": "goldenrod_underground_switch_room_entrances_14_9_full_heal",
+      "mapId": "goldenrod_underground_switch_room_entrances",
+      "region": "johto",
+      "x": 14,
+      "y": 9,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_SWITCH_ROOM_ENTRANCES_FULL_HEAL"
+    },
+    {
+      "id": "ice_path_1f_31_7_hm_waterfall",
+      "mapId": "ice_path_1f",
+      "region": "johto",
+      "x": 31,
+      "y": 7,
+      "itemId": "hm_waterfall",
+      "eventFlag": "EVENT_GOT_HM07_WATERFALL"
+    },
+    {
+      "id": "ice_path_1f_32_23_pp_up",
+      "mapId": "ice_path_1f",
+      "region": "johto",
+      "x": 32,
+      "y": 23,
+      "itemId": "pp_up",
+      "eventFlag": "EVENT_ICE_PATH_1F_PP_UP"
+    },
+    {
+      "id": "ice_path_1f_35_9_protein",
+      "mapId": "ice_path_1f",
+      "region": "johto",
+      "x": 35,
+      "y": 9,
+      "itemId": "protein",
+      "eventFlag": "EVENT_ICE_PATH_1F_PROTEIN"
+    },
+    {
+      "id": "ice_path_b1f_5_35_iron",
+      "mapId": "ice_path_b1f",
+      "region": "johto",
+      "x": 5,
+      "y": 35,
+      "itemId": "iron",
+      "eventFlag": "EVENT_ICE_PATH_B1F_IRON"
+    },
+    {
+      "id": "ice_path_b2f_blackthorn_side_8_16_tm_rest",
+      "mapId": "ice_path_b2f_blackthorn_side",
+      "region": "johto",
+      "x": 8,
+      "y": 16,
+      "itemId": "tm_rest",
+      "eventFlag": "EVENT_ICE_PATH_B2F_BLACKTHORN_SIDE_TM_REST"
+    },
+    {
+      "id": "ice_path_b2f_mahogany_side_8_9_full_heal",
+      "mapId": "ice_path_b2f_mahogany_side",
+      "region": "johto",
+      "x": 8,
+      "y": 9,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_ICE_PATH_B2F_MAHOGANY_SIDE_FULL_HEAL"
+    },
+    {
+      "id": "ice_path_b2f_mahogany_side_0_2_max_potion",
+      "mapId": "ice_path_b2f_mahogany_side",
+      "region": "johto",
+      "x": 0,
+      "y": 2,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_ICE_PATH_B2F_MAHOGANY_SIDE_MAX_POTION"
+    },
+    {
+      "id": "ice_path_b3f_5_7_nevermeltice",
+      "mapId": "ice_path_b3f",
+      "region": "johto",
+      "x": 5,
+      "y": 7,
+      "itemId": "nevermeltice",
+      "eventFlag": "EVENT_ICE_PATH_B3F_NEVERMELTICE"
+    },
+    {
+      "id": "ilex_forest_20_32_revive",
+      "mapId": "ilex_forest",
+      "region": "johto",
+      "x": 20,
+      "y": 32,
+      "itemId": "revive",
+      "eventFlag": "EVENT_ILEX_FOREST_REVIVE"
+    },
+    {
+      "id": "ilex_forest_9_17_x_attack",
+      "mapId": "ilex_forest",
+      "region": "johto",
+      "x": 9,
+      "y": 17,
+      "itemId": "x_attack",
+      "eventFlag": "EVENT_ILEX_FOREST_X_ATTACK"
+    },
+    {
+      "id": "ilex_forest_17_7_antidote",
+      "mapId": "ilex_forest",
+      "region": "johto",
+      "x": 17,
+      "y": 7,
+      "itemId": "antidote",
+      "eventFlag": "EVENT_ILEX_FOREST_ANTIDOTE"
+    },
+    {
+      "id": "ilex_forest_27_1_ether",
+      "mapId": "ilex_forest",
+      "region": "johto",
+      "x": 27,
+      "y": 1,
+      "itemId": "ether",
+      "eventFlag": "EVENT_ILEX_FOREST_ETHER"
+    },
+    {
+      "id": "lake_of_rage_7_10_elixer",
+      "mapId": "lake_of_rage",
+      "region": "johto",
+      "x": 7,
+      "y": 10,
+      "itemId": "elixer",
+      "eventFlag": "EVENT_LAKE_OF_RAGE_ELIXER"
+    },
+    {
+      "id": "lake_of_rage_35_2_tm_detect",
+      "mapId": "lake_of_rage",
+      "region": "johto",
+      "x": 35,
+      "y": 2,
+      "itemId": "tm_detect",
+      "eventFlag": "EVENT_LAKE_OF_RAGE_TM_DETECT"
+    },
+    {
+      "id": "mount_mortar_1f_inside_35_38_escape_rope",
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "x": 35,
+      "y": 38,
+      "itemId": "escape_rope",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_ESCAPE_ROPE"
+    },
+    {
+      "id": "mount_mortar_1f_inside_16_10_max_revive",
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "x": 16,
+      "y": 10,
+      "itemId": "max_revive",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_MAX_REVIVE"
+    },
+    {
+      "id": "mount_mortar_1f_inside_10_27_hyper_potion",
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "x": 10,
+      "y": 27,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_HYPER_POTION"
+    },
+    {
+      "id": "mount_mortar_1f_inside_22_20_max_potion",
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "x": 22,
+      "y": 20,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_MAX_POTION"
+    },
+    {
+      "id": "mount_mortar_1f_inside_35_19_nugget",
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "x": 35,
+      "y": 19,
+      "itemId": "nugget",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_NUGGET"
+    },
+    {
+      "id": "mount_mortar_1f_inside_8_16_iron",
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "x": 8,
+      "y": 16,
+      "itemId": "iron",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_IRON"
+    },
+    {
+      "id": "mount_mortar_1f_inside_17_17_ultra_ball",
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "x": 17,
+      "y": 17,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_ULTRA_BALL"
+    },
+    {
+      "id": "mount_mortar_1f_outside_13_15_ether",
+      "mapId": "mount_mortar_1f_outside",
+      "region": "johto",
+      "x": 13,
+      "y": 15,
+      "itemId": "ether",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_OUTSIDE_ETHER"
+    },
+    {
+      "id": "mount_mortar_1f_outside_31_18_revive",
+      "mapId": "mount_mortar_1f_outside",
+      "region": "johto",
+      "x": 31,
+      "y": 18,
+      "itemId": "revive",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_OUTSIDE_REVIVE"
+    },
+    {
+      "id": "mount_mortar_2f_inside_28_22_max_potion",
+      "mapId": "mount_mortar_2f_inside",
+      "region": "johto",
+      "x": 28,
+      "y": 22,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_MAX_POTION"
+    },
+    {
+      "id": "mount_mortar_2f_inside_2_33_rare_candy",
+      "mapId": "mount_mortar_2f_inside",
+      "region": "johto",
+      "x": 2,
+      "y": 33,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_RARE_CANDY"
+    },
+    {
+      "id": "mount_mortar_2f_inside_19_17_tm_defense_curl",
+      "mapId": "mount_mortar_2f_inside",
+      "region": "johto",
+      "x": 19,
+      "y": 17,
+      "itemId": "tm_defense_curl",
+      "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_TM_DEFENSE_CURL"
+    },
+    {
+      "id": "mount_mortar_2f_inside_16_5_dragon_scale",
+      "mapId": "mount_mortar_2f_inside",
+      "region": "johto",
+      "x": 16,
+      "y": 5,
+      "itemId": "dragon_scale",
+      "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_DRAGON_SCALE"
+    },
+    {
+      "id": "mount_mortar_2f_inside_9_11_elixer",
+      "mapId": "mount_mortar_2f_inside",
+      "region": "johto",
+      "x": 9,
+      "y": 11,
+      "itemId": "elixer",
+      "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_ELIXER"
+    },
+    {
+      "id": "mount_mortar_2f_inside_28_5_escape_rope",
+      "mapId": "mount_mortar_2f_inside",
+      "region": "johto",
+      "x": 28,
+      "y": 5,
+      "itemId": "escape_rope",
+      "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_ESCAPE_ROPE"
+    },
+    {
+      "id": "mount_mortar_b1f_29_12_hyper_potion",
+      "mapId": "mount_mortar_b1f",
+      "region": "johto",
+      "x": 29,
+      "y": 12,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_MOUNT_MORTAR_B1F_HYPER_POTION"
+    },
+    {
+      "id": "mount_mortar_b1f_4_16_carbos",
+      "mapId": "mount_mortar_b1f",
+      "region": "johto",
+      "x": 4,
+      "y": 16,
+      "itemId": "carbos",
+      "eventFlag": "EVENT_MOUNT_MORTAR_B1F_CARBOS"
+    },
+    {
+      "id": "mount_mortar_b1f_34_24_full_restore",
+      "mapId": "mount_mortar_b1f",
+      "region": "johto",
+      "x": 34,
+      "y": 24,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_MOUNT_MORTAR_B1F_FULL_RESTORE"
+    },
+    {
+      "id": "mount_mortar_b1f_32_3_max_ether",
+      "mapId": "mount_mortar_b1f",
+      "region": "johto",
+      "x": 32,
+      "y": 3,
+      "itemId": "max_ether",
+      "eventFlag": "EVENT_MOUNT_MORTAR_B1F_MAX_ETHER"
+    },
+    {
+      "id": "mount_mortar_b1f_21_26_pp_up",
+      "mapId": "mount_mortar_b1f",
+      "region": "johto",
+      "x": 21,
+      "y": 26,
+      "itemId": "pp_up",
+      "eventFlag": "EVENT_MOUNT_MORTAR_B1F_PP_UP"
+    },
+    {
+      "id": "national_park_35_12_parlyz_heal",
+      "mapId": "national_park",
+      "region": "johto",
+      "x": 35,
+      "y": 12,
+      "itemId": "parlyz_heal",
+      "eventFlag": "EVENT_NATIONAL_PARK_PARLYZ_HEAL"
+    },
+    {
+      "id": "national_park_1_43_tm_dig",
+      "mapId": "national_park",
+      "region": "johto",
+      "x": 1,
+      "y": 43,
+      "itemId": "tm_dig",
+      "eventFlag": "EVENT_NATIONAL_PARK_TM_DIG"
+    },
+    {
+      "id": "olivine_lighthouse_3f_8_2_ether",
+      "mapId": "olivine_lighthouse_3f",
+      "region": "johto",
+      "x": 8,
+      "y": 2,
+      "itemId": "ether",
+      "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_3F_ETHER"
+    },
+    {
+      "id": "olivine_lighthouse_5f_15_12_rare_candy",
+      "mapId": "olivine_lighthouse_5f",
+      "region": "johto",
+      "x": 15,
+      "y": 12,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_RARE_CANDY"
+    },
+    {
+      "id": "olivine_lighthouse_5f_6_15_super_repel",
+      "mapId": "olivine_lighthouse_5f",
+      "region": "johto",
+      "x": 6,
+      "y": 15,
+      "itemId": "super_repel",
+      "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_SUPER_REPEL"
+    },
+    {
+      "id": "olivine_lighthouse_5f_2_13_tm_swagger",
+      "mapId": "olivine_lighthouse_5f",
+      "region": "johto",
+      "x": 2,
+      "y": 13,
+      "itemId": "tm_swagger",
+      "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_TM_SWAGGER"
+    },
+    {
+      "id": "olivine_lighthouse_6f_3_4_super_potion",
+      "mapId": "olivine_lighthouse_6f",
+      "region": "johto",
+      "x": 3,
+      "y": 4,
+      "itemId": "super_potion",
+      "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_6F_SUPER_POTION"
+    },
+    {
+      "id": "radio_tower_5f_8_5_ultra_ball",
+      "mapId": "radio_tower_5f",
+      "region": "johto",
+      "x": 8,
+      "y": 5,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_RADIO_TOWER_5F_ULTRA_BALL"
+    },
+    {
+      "id": "rock_tunnel_1f_4_18_elixer",
+      "mapId": "rock_tunnel_1f",
+      "region": "kanto",
+      "x": 4,
+      "y": 18,
+      "itemId": "elixer",
+      "eventFlag": "EVENT_ROCK_TUNNEL_1F_ELIXER"
+    },
+    {
+      "id": "rock_tunnel_1f_10_15_tm_steel_wing",
+      "mapId": "rock_tunnel_1f",
+      "region": "kanto",
+      "x": 10,
+      "y": 15,
+      "itemId": "tm_steel_wing",
+      "eventFlag": "EVENT_ROCK_TUNNEL_1F_TM_STEEL_WING"
+    },
+    {
+      "id": "rock_tunnel_b1f_7_25_iron",
+      "mapId": "rock_tunnel_b1f",
+      "region": "kanto",
+      "x": 7,
+      "y": 25,
+      "itemId": "iron",
+      "eventFlag": "EVENT_ROCK_TUNNEL_B1F_IRON"
+    },
+    {
+      "id": "rock_tunnel_b1f_6_17_pp_up",
+      "mapId": "rock_tunnel_b1f",
+      "region": "kanto",
+      "x": 6,
+      "y": 17,
+      "itemId": "pp_up",
+      "eventFlag": "EVENT_ROCK_TUNNEL_B1F_PP_UP"
+    },
+    {
+      "id": "rock_tunnel_b1f_15_2_revive",
+      "mapId": "rock_tunnel_b1f",
+      "region": "kanto",
+      "x": 15,
+      "y": 2,
+      "itemId": "revive",
+      "eventFlag": "EVENT_ROCK_TUNNEL_B1F_REVIVE"
+    },
+    {
+      "id": "route_12_5_43_calcium",
+      "mapId": "route_12",
+      "region": "kanto",
+      "x": 5,
+      "y": 43,
+      "itemId": "calcium",
+      "eventFlag": "EVENT_ROUTE_12_CALCIUM"
+    },
+    {
+      "id": "route_12_5_51_nugget",
+      "mapId": "route_12",
+      "region": "kanto",
+      "x": 5,
+      "y": 51,
+      "itemId": "nugget",
+      "eventFlag": "EVENT_ROUTE_12_NUGGET"
+    },
+    {
+      "id": "route_15_12_5_pp_up",
+      "mapId": "route_15",
+      "region": "kanto",
+      "x": 12,
+      "y": 5,
+      "itemId": "pp_up",
+      "eventFlag": "EVENT_ROUTE_15_PP_UP"
+    },
+    {
+      "id": "route_2_0_29_dire_hit",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 0,
+      "y": 29,
+      "itemId": "dire_hit",
+      "eventFlag": "EVENT_ROUTE_2_DIRE_HIT"
+    },
+    {
+      "id": "route_2_2_23_max_potion",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 2,
+      "y": 23,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_ROUTE_2_MAX_POTION"
+    },
+    {
+      "id": "route_2_19_2_carbos",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 19,
+      "y": 2,
+      "itemId": "carbos",
+      "eventFlag": "EVENT_ROUTE_2_CARBOS"
+    },
+    {
+      "id": "route_2_14_50_elixer",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 14,
+      "y": 50,
+      "itemId": "elixer",
+      "eventFlag": "EVENT_ROUTE_2_ELIXER"
+    },
+    {
+      "id": "route_25_32_4_protein",
+      "mapId": "route_25",
+      "region": "kanto",
+      "x": 32,
+      "y": 4,
+      "itemId": "protein",
+      "eventFlag": "EVENT_ROUTE_25_PROTEIN"
+    },
+    {
+      "id": "route_26_9_15_max_elixer",
+      "mapId": "route_26",
+      "region": "kanto",
+      "x": 9,
+      "y": 15,
+      "itemId": "max_elixer",
+      "eventFlag": "EVENT_ROUTE_26_MAX_ELIXER"
+    },
+    {
+      "id": "route_27_60_12_tm_solarbeam",
+      "mapId": "route_27",
+      "region": "kanto",
+      "x": 60,
+      "y": 12,
+      "itemId": "tm_solarbeam",
+      "eventFlag": "EVENT_ROUTE_27_TM_SOLARBEAM"
+    },
+    {
+      "id": "route_27_53_12_rare_candy",
+      "mapId": "route_27",
+      "region": "kanto",
+      "x": 53,
+      "y": 12,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_ROUTE_27_RARE_CANDY"
+    },
+    {
+      "id": "route_29_48_2_potion",
+      "mapId": "route_29",
+      "region": "johto",
+      "x": 48,
+      "y": 2,
+      "itemId": "potion",
+      "eventFlag": "EVENT_ROUTE_29_POTION"
+    },
+    {
+      "id": "route_30_8_35_antidote",
+      "mapId": "route_30",
+      "region": "johto",
+      "x": 8,
+      "y": 35,
+      "itemId": "antidote",
+      "eventFlag": "EVENT_ROUTE_30_ANTIDOTE"
+    },
+    {
+      "id": "route_31_29_5_potion",
+      "mapId": "route_31",
+      "region": "johto",
+      "x": 29,
+      "y": 5,
+      "itemId": "potion",
+      "eventFlag": "EVENT_ROUTE_31_POTION"
+    },
+    {
+      "id": "route_31_19_15_poke_ball",
+      "mapId": "route_31",
+      "region": "johto",
+      "x": 19,
+      "y": 15,
+      "itemId": "poke_ball",
+      "eventFlag": "EVENT_ROUTE_31_POKE_BALL"
+    },
+    {
+      "id": "route_32_6_53_great_ball",
+      "mapId": "route_32",
+      "region": "johto",
+      "x": 6,
+      "y": 53,
+      "itemId": "great_ball",
+      "eventFlag": "EVENT_ROUTE_32_GREAT_BALL"
+    },
+    {
+      "id": "route_32_3_30_repel",
+      "mapId": "route_32",
+      "region": "johto",
+      "x": 3,
+      "y": 30,
+      "itemId": "repel",
+      "eventFlag": "EVENT_ROUTE_32_REPEL"
+    },
+    {
+      "id": "route_34_7_30_nugget",
+      "mapId": "route_34",
+      "region": "johto",
+      "x": 7,
+      "y": 30,
+      "itemId": "nugget",
+      "eventFlag": "EVENT_ROUTE_34_NUGGET"
+    },
+    {
+      "id": "route_35_13_16_tm_rollout",
+      "mapId": "route_35",
+      "region": "johto",
+      "x": 13,
+      "y": 16,
+      "itemId": "tm_rollout",
+      "eventFlag": "EVENT_ROUTE_35_TM_ROLLOUT"
+    },
+    {
+      "id": "route_4_26_3_hp_up",
+      "mapId": "route_4",
+      "region": "kanto",
+      "x": 26,
+      "y": 3,
+      "itemId": "hp_up",
+      "eventFlag": "EVENT_ROUTE_4_HP_UP"
+    },
+    {
+      "id": "route_42_6_4_ultra_ball",
+      "mapId": "route_42",
+      "region": "johto",
+      "x": 6,
+      "y": 4,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_ROUTE_42_ULTRA_BALL"
+    },
+    {
+      "id": "route_42_33_8_super_potion",
+      "mapId": "route_42",
+      "region": "johto",
+      "x": 33,
+      "y": 8,
+      "itemId": "super_potion",
+      "eventFlag": "EVENT_ROUTE_42_SUPER_POTION"
+    },
+    {
+      "id": "route_43_12_32_max_ether",
+      "mapId": "route_43",
+      "region": "johto",
+      "x": 12,
+      "y": 32,
+      "itemId": "max_ether",
+      "eventFlag": "EVENT_ROUTE_43_MAX_ETHER"
+    },
+    {
+      "id": "route_44_30_8_max_revive",
+      "mapId": "route_44",
+      "region": "johto",
+      "x": 30,
+      "y": 8,
+      "itemId": "max_revive",
+      "eventFlag": "EVENT_ROUTE_44_MAX_REVIVE"
+    },
+    {
+      "id": "route_44_45_4_ultra_ball",
+      "mapId": "route_44",
+      "region": "johto",
+      "x": 45,
+      "y": 4,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_ROUTE_44_ULTRA_BALL"
+    },
+    {
+      "id": "route_44_14_9_max_repel",
+      "mapId": "route_44",
+      "region": "johto",
+      "x": 14,
+      "y": 9,
+      "itemId": "max_repel",
+      "eventFlag": "EVENT_ROUTE_44_MAX_REPEL"
+    },
+    {
+      "id": "route_45_6_51_nugget",
+      "mapId": "route_45",
+      "region": "johto",
+      "x": 6,
+      "y": 51,
+      "itemId": "nugget",
+      "eventFlag": "EVENT_ROUTE_45_NUGGET"
+    },
+    {
+      "id": "route_45_5_66_revive",
+      "mapId": "route_45",
+      "region": "johto",
+      "x": 5,
+      "y": 66,
+      "itemId": "revive",
+      "eventFlag": "EVENT_ROUTE_45_REVIVE"
+    },
+    {
+      "id": "route_45_6_20_elixer",
+      "mapId": "route_45",
+      "region": "johto",
+      "x": 6,
+      "y": 20,
+      "itemId": "elixer",
+      "eventFlag": "EVENT_ROUTE_45_ELIXER"
+    },
+    {
+      "id": "route_45_7_33_max_potion",
+      "mapId": "route_45",
+      "region": "johto",
+      "x": 7,
+      "y": 33,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_ROUTE_45_MAX_POTION"
+    },
+    {
+      "id": "route_46_1_15_x_speed",
+      "mapId": "route_46",
+      "region": "johto",
+      "x": 1,
+      "y": 15,
+      "itemId": "x_speed",
+      "eventFlag": "EVENT_ROUTE_46_X_SPEED"
+    },
+    {
+      "id": "silver_cave_item_rooms_6_3_max_revive",
+      "mapId": "silver_cave_item_rooms",
+      "region": "kanto",
+      "x": 6,
+      "y": 3,
+      "itemId": "max_revive",
+      "eventFlag": "EVENT_SILVER_CAVE_ITEM_ROOMS_MAX_REVIVE"
+    },
+    {
+      "id": "silver_cave_item_rooms_15_11_full_restore",
+      "mapId": "silver_cave_item_rooms",
+      "region": "kanto",
+      "x": 15,
+      "y": 11,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_SILVER_CAVE_ITEM_ROOMS_FULL_RESTORE"
+    },
+    {
+      "id": "silver_cave_room_1_4_9_max_elixer",
+      "mapId": "silver_cave_room_1",
+      "region": "kanto",
+      "x": 4,
+      "y": 9,
+      "itemId": "max_elixer",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_MAX_ELIXER"
+    },
+    {
+      "id": "silver_cave_room_1_15_29_protein",
+      "mapId": "silver_cave_room_1",
+      "region": "kanto",
+      "x": 15,
+      "y": 29,
+      "itemId": "protein",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_PROTEIN"
+    },
+    {
+      "id": "silver_cave_room_1_5_30_escape_rope",
+      "mapId": "silver_cave_room_1",
+      "region": "kanto",
+      "x": 5,
+      "y": 30,
+      "itemId": "escape_rope",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_ESCAPE_ROPE"
+    },
+    {
+      "id": "silver_cave_room_1_7_18_ultra_ball",
+      "mapId": "silver_cave_room_1",
+      "region": "kanto",
+      "x": 7,
+      "y": 18,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_ULTRA_BALL"
+    },
+    {
+      "id": "silver_cave_room_2_24_10_calcium",
+      "mapId": "silver_cave_room_2",
+      "region": "kanto",
+      "x": 24,
+      "y": 10,
+      "itemId": "calcium",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_2_CALCIUM"
+    },
+    {
+      "id": "silver_cave_room_2_22_24_ultra_ball",
+      "mapId": "silver_cave_room_2",
+      "region": "kanto",
+      "x": 22,
+      "y": 24,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_2_ULTRA_BALL"
+    },
+    {
+      "id": "silver_cave_room_2_4_20_pp_up",
+      "mapId": "silver_cave_room_2",
+      "region": "kanto",
+      "x": 4,
+      "y": 20,
+      "itemId": "pp_up",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_2_PP_UP"
+    },
+    {
+      "id": "slowpoke_well_b1f_10_3_super_potion",
+      "mapId": "slowpoke_well_b1f",
+      "region": "johto",
+      "x": 10,
+      "y": 3,
+      "itemId": "super_potion",
+      "eventFlag": "EVENT_SLOWPOKE_WELL_B1F_SUPER_POTION"
+    },
+    {
+      "id": "slowpoke_well_b2f_15_5_tm_rain_dance",
+      "mapId": "slowpoke_well_b2f",
+      "region": "johto",
+      "x": 15,
+      "y": 5,
+      "itemId": "tm_rain_dance",
+      "eventFlag": "EVENT_SLOWPOKE_WELL_B2F_TM_RAIN_DANCE"
+    },
+    {
+      "id": "sprout_tower_1f_16_7_parlyz_heal",
+      "mapId": "sprout_tower_1f",
+      "region": "johto",
+      "x": 16,
+      "y": 7,
+      "itemId": "parlyz_heal",
+      "eventFlag": "EVENT_SPROUT_TOWER_1F_PARLYZ_HEAL"
+    },
+    {
+      "id": "sprout_tower_2f_3_1_x_accuracy",
+      "mapId": "sprout_tower_2f",
+      "region": "johto",
+      "x": 3,
+      "y": 1,
+      "itemId": "x_accuracy",
+      "eventFlag": "EVENT_SPROUT_TOWER_2F_X_ACCURACY"
+    },
+    {
+      "id": "sprout_tower_3f_6_14_potion",
+      "mapId": "sprout_tower_3f",
+      "region": "johto",
+      "x": 6,
+      "y": 14,
+      "itemId": "potion",
+      "eventFlag": "EVENT_SPROUT_TOWER_3F_POTION"
+    },
+    {
+      "id": "sprout_tower_3f_14_1_escape_rope",
+      "mapId": "sprout_tower_3f",
+      "region": "johto",
+      "x": 14,
+      "y": 1,
+      "itemId": "escape_rope",
+      "eventFlag": "EVENT_SPROUT_TOWER_3F_ESCAPE_ROPE"
+    },
+    {
+      "id": "team_rocket_base_b1f_27_6_hyper_potion",
+      "mapId": "team_rocket_base_b1f",
+      "region": "johto",
+      "x": 27,
+      "y": 6,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B1F_HYPER_POTION"
+    },
+    {
+      "id": "team_rocket_base_b1f_14_15_nugget",
+      "mapId": "team_rocket_base_b1f",
+      "region": "johto",
+      "x": 14,
+      "y": 15,
+      "itemId": "nugget",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B1F_NUGGET"
+    },
+    {
+      "id": "team_rocket_base_b1f_21_12_guard_spec",
+      "mapId": "team_rocket_base_b1f",
+      "region": "johto",
+      "x": 21,
+      "y": 12,
+      "itemId": "guard_spec",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B1F_GUARD_SPEC"
+    },
+    {
+      "id": "team_rocket_base_b2f_3_10_tm_thief",
+      "mapId": "team_rocket_base_b2f",
+      "region": "johto",
+      "x": 3,
+      "y": 10,
+      "itemId": "tm_thief",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B2F_TM_THIEF"
+    },
+    {
+      "id": "team_rocket_base_b3f_1_12_protein",
+      "mapId": "team_rocket_base_b3f",
+      "region": "johto",
+      "x": 1,
+      "y": 12,
+      "itemId": "protein",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_PROTEIN"
+    },
+    {
+      "id": "team_rocket_base_b3f_3_12_x_special",
+      "mapId": "team_rocket_base_b3f",
+      "region": "johto",
+      "x": 3,
+      "y": 12,
+      "itemId": "x_special",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_X_SPECIAL"
+    },
+    {
+      "id": "team_rocket_base_b3f_28_9_full_heal",
+      "mapId": "team_rocket_base_b3f",
+      "region": "johto",
+      "x": 28,
+      "y": 9,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_FULL_HEAL"
+    },
+    {
+      "id": "team_rocket_base_b3f_17_2_ice_heal",
+      "mapId": "team_rocket_base_b3f",
+      "region": "johto",
+      "x": 17,
+      "y": 2,
+      "itemId": "ice_heal",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_ICE_HEAL"
+    },
+    {
+      "id": "team_rocket_base_b3f_14_10_ultra_ball",
+      "mapId": "team_rocket_base_b3f",
+      "region": "johto",
+      "x": 14,
+      "y": 10,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_ULTRA_BALL"
+    },
+    {
+      "id": "tohjo_falls_2_6_moon_stone",
+      "mapId": "tohjo_falls",
+      "region": "kanto",
+      "x": 2,
+      "y": 6,
+      "itemId": "moon_stone",
+      "eventFlag": "EVENT_TOHJO_FALLS_MOON_STONE"
+    },
+    {
+      "id": "union_cave_1f_17_21_great_ball",
+      "mapId": "union_cave_1f",
+      "region": "johto",
+      "x": 17,
+      "y": 21,
+      "itemId": "great_ball",
+      "eventFlag": "EVENT_UNION_CAVE_1F_GREAT_BALL"
+    },
+    {
+      "id": "union_cave_1f_4_2_x_attack",
+      "mapId": "union_cave_1f",
+      "region": "johto",
+      "x": 4,
+      "y": 2,
+      "itemId": "x_attack",
+      "eventFlag": "EVENT_UNION_CAVE_1F_X_ATTACK"
+    },
+    {
+      "id": "union_cave_1f_4_17_potion",
+      "mapId": "union_cave_1f",
+      "region": "johto",
+      "x": 4,
+      "y": 17,
+      "itemId": "potion",
+      "eventFlag": "EVENT_UNION_CAVE_1F_POTION"
+    },
+    {
+      "id": "union_cave_1f_12_33_awakening",
+      "mapId": "union_cave_1f",
+      "region": "johto",
+      "x": 12,
+      "y": 33,
+      "itemId": "awakening",
+      "eventFlag": "EVENT_UNION_CAVE_1F_AWAKENING"
+    },
+    {
+      "id": "union_cave_b1f_2_16_tm_swift",
+      "mapId": "union_cave_b1f",
+      "region": "johto",
+      "x": 2,
+      "y": 16,
+      "itemId": "tm_swift",
+      "eventFlag": "EVENT_UNION_CAVE_B1F_TM_SWIFT"
+    },
+    {
+      "id": "union_cave_b1f_17_23_x_defend",
+      "mapId": "union_cave_b1f",
+      "region": "johto",
+      "x": 17,
+      "y": 23,
+      "itemId": "x_defend",
+      "eventFlag": "EVENT_UNION_CAVE_B1F_X_DEFEND"
+    },
+    {
+      "id": "union_cave_b2f_16_2_elixer",
+      "mapId": "union_cave_b2f",
+      "region": "johto",
+      "x": 16,
+      "y": 2,
+      "itemId": "elixer",
+      "eventFlag": "EVENT_UNION_CAVE_B2F_ELIXER"
+    },
+    {
+      "id": "union_cave_b2f_12_19_hyper_potion",
+      "mapId": "union_cave_b2f",
+      "region": "johto",
+      "x": 12,
+      "y": 19,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_UNION_CAVE_B2F_HYPER_POTION"
+    },
+    {
+      "id": "victory_road_3_28_tm_earthquake",
+      "mapId": "victory_road",
+      "region": "kanto",
+      "x": 3,
+      "y": 28,
+      "itemId": "tm_earthquake",
+      "eventFlag": "EVENT_VICTORY_ROAD_TM_EARTHQUAKE"
+    },
+    {
+      "id": "victory_road_12_48_max_revive",
+      "mapId": "victory_road",
+      "region": "kanto",
+      "x": 12,
+      "y": 48,
+      "itemId": "max_revive",
+      "eventFlag": "EVENT_VICTORY_ROAD_MAX_REVIVE"
+    },
+    {
+      "id": "victory_road_18_29_full_restore",
+      "mapId": "victory_road",
+      "region": "kanto",
+      "x": 18,
+      "y": 29,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_VICTORY_ROAD_FULL_RESTORE"
+    },
+    {
+      "id": "victory_road_15_48_full_heal",
+      "mapId": "victory_road",
+      "region": "kanto",
+      "x": 15,
+      "y": 48,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_VICTORY_ROAD_FULL_HEAL"
+    },
+    {
+      "id": "victory_road_7_38_hp_up",
+      "mapId": "victory_road",
+      "region": "kanto",
+      "x": 7,
+      "y": 38,
+      "itemId": "hp_up",
+      "eventFlag": "EVENT_VICTORY_ROAD_HP_UP"
+    },
+    {
+      "id": "violet_city_4_1_pp_up",
+      "mapId": "violet_city",
+      "region": "johto",
+      "x": 4,
+      "y": 1,
+      "itemId": "pp_up",
+      "eventFlag": "EVENT_VIOLET_CITY_PP_UP"
+    },
+    {
+      "id": "violet_city_35_5_rare_candy",
+      "mapId": "violet_city",
+      "region": "johto",
+      "x": 35,
+      "y": 5,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_VIOLET_CITY_RARE_CANDY"
+    },
+    {
+      "id": "whirl_island_b1f_7_13_full_restore",
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "x": 7,
+      "y": 13,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B1F_FULL_RESTORE"
+    },
+    {
+      "id": "whirl_island_b1f_2_18_carbos",
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "x": 2,
+      "y": 18,
+      "itemId": "carbos",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B1F_CARBOS"
+    },
+    {
+      "id": "whirl_island_b1f_33_23_calcium",
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "x": 33,
+      "y": 23,
+      "itemId": "calcium",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B1F_CALCIUM"
+    },
+    {
+      "id": "whirl_island_b1f_17_8_nugget",
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "x": 17,
+      "y": 8,
+      "itemId": "nugget",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B1F_NUGGET"
+    },
+    {
+      "id": "whirl_island_b1f_19_26_escape_rope",
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "x": 19,
+      "y": 26,
+      "itemId": "escape_rope",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B1F_ESCAPE_ROPE"
+    },
+    {
+      "id": "whirl_island_b2f_10_11_full_restore",
+      "mapId": "whirl_island_b2f",
+      "region": "johto",
+      "x": 10,
+      "y": 11,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B2F_FULL_RESTORE"
+    },
+    {
+      "id": "whirl_island_b2f_6_4_max_revive",
+      "mapId": "whirl_island_b2f",
+      "region": "johto",
+      "x": 6,
+      "y": 4,
+      "itemId": "max_revive",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B2F_MAX_REVIVE"
+    },
+    {
+      "id": "whirl_island_b2f_5_12_max_elixer",
+      "mapId": "whirl_island_b2f",
+      "region": "johto",
+      "x": 5,
+      "y": 12,
+      "itemId": "max_elixer",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B2F_MAX_ELIXER"
+    },
+    {
+      "id": "whirl_island_ne_11_11_ultra_ball",
+      "mapId": "whirl_island_ne",
+      "region": "johto",
+      "x": 11,
+      "y": 11,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_WHIRL_ISLAND_NE_ULTRA_BALL"
+    },
+    {
+      "id": "whirl_island_sw_15_2_ultra_ball",
+      "mapId": "whirl_island_sw",
+      "region": "johto",
+      "x": 15,
+      "y": 2,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_WHIRL_ISLAND_SW_ULTRA_BALL"
+    }
+  ],
+  "hiddenItems": [
+    {
+      "id": "azalea_town_hidden_31_6_full_heal",
+      "mapId": "azalea_town",
+      "region": "johto",
+      "x": 31,
+      "y": 6,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_AZALEA_TOWN_HIDDEN_FULL_HEAL"
+    },
+    {
+      "id": "burned_tower_1f_hidden_8_7_ether",
+      "mapId": "burned_tower_1f",
+      "region": "johto",
+      "x": 8,
+      "y": 7,
+      "itemId": "ether",
+      "eventFlag": "EVENT_BURNED_TOWER_1F_HIDDEN_ETHER"
+    },
+    {
+      "id": "burned_tower_1f_hidden_13_11_ultra_ball",
+      "mapId": "burned_tower_1f",
+      "region": "johto",
+      "x": 13,
+      "y": 11,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_BURNED_TOWER_1F_HIDDEN_ULTRA_BALL"
+    },
+    {
+      "id": "celadon_city_hidden_37_21_pp_up",
+      "mapId": "celadon_city",
+      "region": "kanto",
+      "x": 37,
+      "y": 21,
+      "itemId": "pp_up",
+      "eventFlag": "EVENT_CELADON_CITY_HIDDEN_PP_UP"
+    },
+    {
+      "id": "cerulean_city_hidden_2_12_berserk_gene",
+      "mapId": "cerulean_city",
+      "region": "kanto",
+      "x": 2,
+      "y": 12,
+      "itemId": "berserk_gene",
+      "eventFlag": "EVENT_FOUND_BERSERK_GENE_IN_CERULEAN_CITY"
+    },
+    {
+      "id": "cerulean_gym_hidden_3_8_machine_part",
+      "mapId": "cerulean_gym",
+      "region": "kanto",
+      "x": 3,
+      "y": 8,
+      "itemId": "machine_part",
+      "eventFlag": "EVENT_FOUND_MACHINE_PART_IN_CERULEAN_GYM"
+    },
+    {
+      "id": "cianwood_city_hidden_4_19_revive",
+      "mapId": "cianwood_city",
+      "region": "johto",
+      "x": 4,
+      "y": 19,
+      "itemId": "revive",
+      "eventFlag": "EVENT_CIANWOOD_CITY_HIDDEN_REVIVE"
+    },
+    {
+      "id": "cianwood_city_hidden_5_29_max_ether",
+      "mapId": "cianwood_city",
+      "region": "johto",
+      "x": 5,
+      "y": 29,
+      "itemId": "max_ether",
+      "eventFlag": "EVENT_CIANWOOD_CITY_HIDDEN_MAX_ETHER"
+    },
+    {
+      "id": "cinnabar_island_hidden_9_1_rare_candy",
+      "mapId": "cinnabar_island",
+      "region": "kanto",
+      "x": 9,
+      "y": 1,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_CINNABAR_ISLAND_HIDDEN_RARE_CANDY"
+    },
+    {
+      "id": "digletts_cave_hidden_6_11_max_revive",
+      "mapId": "digletts_cave",
+      "region": "kanto",
+      "x": 6,
+      "y": 11,
+      "itemId": "max_revive",
+      "eventFlag": "EVENT_DIGLETTS_CAVE_HIDDEN_MAX_REVIVE"
+    },
+    {
+      "id": "dragons_den_b1f_hidden_33_29_revive",
+      "mapId": "dragons_den_b1f",
+      "region": "johto",
+      "x": 33,
+      "y": 29,
+      "itemId": "revive",
+      "eventFlag": "EVENT_DRAGONS_DEN_B1F_HIDDEN_REVIVE"
+    },
+    {
+      "id": "dragons_den_b1f_hidden_21_17_max_potion",
+      "mapId": "dragons_den_b1f",
+      "region": "johto",
+      "x": 21,
+      "y": 17,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_DRAGONS_DEN_B1F_HIDDEN_MAX_POTION"
+    },
+    {
+      "id": "dragons_den_b1f_hidden_31_15_max_elixer",
+      "mapId": "dragons_den_b1f",
+      "region": "johto",
+      "x": 31,
+      "y": 15,
+      "itemId": "max_elixer",
+      "eventFlag": "EVENT_DRAGONS_DEN_B1F_HIDDEN_MAX_ELIXER"
+    },
+    {
+      "id": "ecruteak_city_hidden_23_14_hyper_potion",
+      "mapId": "ecruteak_city",
+      "region": "johto",
+      "x": 23,
+      "y": 14,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_ECRUTEAK_CITY_HIDDEN_HYPER_POTION"
+    },
+    {
+      "id": "goldenrod_underground_hidden_6_13_parlyz_heal",
+      "mapId": "goldenrod_underground",
+      "region": "johto",
+      "x": 6,
+      "y": 13,
+      "itemId": "parlyz_heal",
+      "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_HIDDEN_PARLYZ_HEAL"
+    },
+    {
+      "id": "goldenrod_underground_hidden_4_18_super_potion",
+      "mapId": "goldenrod_underground",
+      "region": "johto",
+      "x": 4,
+      "y": 18,
+      "itemId": "super_potion",
+      "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_HIDDEN_SUPER_POTION"
+    },
+    {
+      "id": "goldenrod_underground_hidden_17_8_antidote",
+      "mapId": "goldenrod_underground",
+      "region": "johto",
+      "x": 17,
+      "y": 8,
+      "itemId": "antidote",
+      "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_HIDDEN_ANTIDOTE"
+    },
+    {
+      "id": "goldenrod_underground_switch_room_entrances_hidden_8_9_max_potion",
+      "mapId": "goldenrod_underground_switch_room_entrances",
+      "region": "johto",
+      "x": 8,
+      "y": 9,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_SWITCH_ROOM_ENTRANCES_HIDDEN_MAX_POTION"
+    },
+    {
+      "id": "goldenrod_underground_switch_room_entrances_hidden_1_8_revive",
+      "mapId": "goldenrod_underground_switch_room_entrances",
+      "region": "johto",
+      "x": 1,
+      "y": 8,
+      "itemId": "revive",
+      "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_SWITCH_ROOM_ENTRANCES_HIDDEN_REVIVE"
+    },
+    {
+      "id": "ice_path_b1f_hidden_17_30_max_potion",
+      "mapId": "ice_path_b1f",
+      "region": "johto",
+      "x": 17,
+      "y": 30,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_ICE_PATH_B1F_HIDDEN_MAX_POTION"
+    },
+    {
+      "id": "ice_path_b2f_blackthorn_side_hidden_2_10_ice_heal",
+      "mapId": "ice_path_b2f_blackthorn_side",
+      "region": "johto",
+      "x": 2,
+      "y": 10,
+      "itemId": "ice_heal",
+      "eventFlag": "EVENT_ICE_PATH_B2F_BLACKTHORN_SIDE_HIDDEN_ICE_HEAL"
+    },
+    {
+      "id": "ice_path_b2f_mahogany_side_hidden_0_17_carbos",
+      "mapId": "ice_path_b2f_mahogany_side",
+      "region": "johto",
+      "x": 0,
+      "y": 17,
+      "itemId": "carbos",
+      "eventFlag": "EVENT_ICE_PATH_B2F_MAHOGANY_SIDE_HIDDEN_CARBOS"
+    },
+    {
+      "id": "ilex_forest_hidden_11_7_ether",
+      "mapId": "ilex_forest",
+      "region": "johto",
+      "x": 11,
+      "y": 7,
+      "itemId": "ether",
+      "eventFlag": "EVENT_ILEX_FOREST_HIDDEN_ETHER"
+    },
+    {
+      "id": "ilex_forest_hidden_22_14_super_potion",
+      "mapId": "ilex_forest",
+      "region": "johto",
+      "x": 22,
+      "y": 14,
+      "itemId": "super_potion",
+      "eventFlag": "EVENT_ILEX_FOREST_HIDDEN_SUPER_POTION"
+    },
+    {
+      "id": "ilex_forest_hidden_1_17_full_heal",
+      "mapId": "ilex_forest",
+      "region": "johto",
+      "x": 1,
+      "y": 17,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_ILEX_FOREST_HIDDEN_FULL_HEAL"
+    },
+    {
+      "id": "lake_of_rage_hidden_11_28_full_restore",
+      "mapId": "lake_of_rage",
+      "region": "johto",
+      "x": 11,
+      "y": 28,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_LAKE_OF_RAGE_HIDDEN_FULL_RESTORE"
+    },
+    {
+      "id": "lake_of_rage_hidden_4_4_rare_candy",
+      "mapId": "lake_of_rage",
+      "region": "johto",
+      "x": 4,
+      "y": 4,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_LAKE_OF_RAGE_HIDDEN_RARE_CANDY"
+    },
+    {
+      "id": "lake_of_rage_hidden_35_5_max_potion",
+      "mapId": "lake_of_rage",
+      "region": "johto",
+      "x": 35,
+      "y": 5,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_LAKE_OF_RAGE_HIDDEN_MAX_POTION"
+    },
+    {
+      "id": "mount_moon_square_hidden_7_7_moon_stone",
+      "mapId": "mount_moon_square",
+      "region": "kanto",
+      "x": 7,
+      "y": 7,
+      "itemId": "moon_stone",
+      "eventFlag": "EVENT_MOUNT_MOON_SQUARE_HIDDEN_MOON_STONE"
+    },
+    {
+      "id": "mount_mortar_1f_inside_hidden_30_11_max_repel",
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "x": 30,
+      "y": 11,
+      "itemId": "max_repel",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_HIDDEN_MAX_REPEL"
+    },
+    {
+      "id": "mount_mortar_1f_outside_hidden_25_22_hyper_potion",
+      "mapId": "mount_mortar_1f_outside",
+      "region": "johto",
+      "x": 25,
+      "y": 22,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_MOUNT_MORTAR_1F_OUTSIDE_HIDDEN_HYPER_POTION"
+    },
+    {
+      "id": "mount_mortar_2f_inside_hidden_24_8_full_restore",
+      "mapId": "mount_mortar_2f_inside",
+      "region": "johto",
+      "x": 24,
+      "y": 8,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_HIDDEN_FULL_RESTORE"
+    },
+    {
+      "id": "mount_mortar_b1f_hidden_4_6_max_revive",
+      "mapId": "mount_mortar_b1f",
+      "region": "johto",
+      "x": 4,
+      "y": 6,
+      "itemId": "max_revive",
+      "eventFlag": "EVENT_MOUNT_MORTAR_B1F_HIDDEN_MAX_REVIVE"
+    },
+    {
+      "id": "national_park_hidden_6_47_full_heal",
+      "mapId": "national_park",
+      "region": "johto",
+      "x": 6,
+      "y": 47,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_NATIONAL_PARK_HIDDEN_FULL_HEAL"
+    },
+    {
+      "id": "olivine_lighthouse_5f_hidden_3_13_hyper_potion",
+      "mapId": "olivine_lighthouse_5f",
+      "region": "johto",
+      "x": 3,
+      "y": 13,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_HIDDEN_HYPER_POTION"
+    },
+    {
+      "id": "olivine_port_hidden_1_22_protein",
+      "mapId": "olivine_port",
+      "region": "johto",
+      "x": 1,
+      "y": 22,
+      "itemId": "protein",
+      "eventFlag": "EVENT_OLIVINE_PORT_HIDDEN_PROTEIN"
+    },
+    {
+      "id": "rock_tunnel_1f_hidden_24_4_x_accuracy",
+      "mapId": "rock_tunnel_1f",
+      "region": "kanto",
+      "x": 24,
+      "y": 4,
+      "itemId": "x_accuracy",
+      "eventFlag": "EVENT_ROCK_TUNNEL_1F_HIDDEN_X_ACCURACY"
+    },
+    {
+      "id": "rock_tunnel_1f_hidden_21_15_x_defend",
+      "mapId": "rock_tunnel_1f",
+      "region": "kanto",
+      "x": 21,
+      "y": 15,
+      "itemId": "x_defend",
+      "eventFlag": "EVENT_ROCK_TUNNEL_1F_HIDDEN_X_DEFEND"
+    },
+    {
+      "id": "rock_tunnel_b1f_hidden_4_14_max_potion",
+      "mapId": "rock_tunnel_b1f",
+      "region": "kanto",
+      "x": 4,
+      "y": 14,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_ROCK_TUNNEL_B1F_HIDDEN_MAX_POTION"
+    },
+    {
+      "id": "route_11_hidden_32_5_revive",
+      "mapId": "route_11",
+      "region": "kanto",
+      "x": 32,
+      "y": 5,
+      "itemId": "revive",
+      "eventFlag": "EVENT_ROUTE_11_HIDDEN_REVIVE"
+    },
+    {
+      "id": "route_12_hidden_14_13_elixer",
+      "mapId": "route_12",
+      "region": "kanto",
+      "x": 14,
+      "y": 13,
+      "itemId": "elixer",
+      "eventFlag": "EVENT_ROUTE_12_HIDDEN_ELIXER"
+    },
+    {
+      "id": "route_13_hidden_30_13_calcium",
+      "mapId": "route_13",
+      "region": "kanto",
+      "x": 30,
+      "y": 13,
+      "itemId": "calcium",
+      "eventFlag": "EVENT_ROUTE_13_HIDDEN_CALCIUM"
+    },
+    {
+      "id": "route_17_hidden_9_54_max_ether",
+      "mapId": "route_17",
+      "region": "kanto",
+      "x": 9,
+      "y": 54,
+      "itemId": "max_ether",
+      "eventFlag": "EVENT_ROUTE_17_HIDDEN_MAX_ETHER"
+    },
+    {
+      "id": "route_17_hidden_8_77_max_elixer",
+      "mapId": "route_17",
+      "region": "kanto",
+      "x": 8,
+      "y": 77,
+      "itemId": "max_elixer",
+      "eventFlag": "EVENT_ROUTE_17_HIDDEN_MAX_ELIXER"
+    },
+    {
+      "id": "route_2_hidden_7_23_max_ether",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 7,
+      "y": 23,
+      "itemId": "max_ether",
+      "eventFlag": "EVENT_ROUTE_2_HIDDEN_MAX_ETHER"
+    },
+    {
+      "id": "route_2_hidden_4_14_full_heal",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 4,
+      "y": 14,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_ROUTE_2_HIDDEN_FULL_HEAL"
+    },
+    {
+      "id": "route_2_hidden_4_27_full_restore",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 4,
+      "y": 27,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_ROUTE_2_HIDDEN_FULL_RESTORE"
+    },
+    {
+      "id": "route_2_hidden_11_30_revive",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 11,
+      "y": 30,
+      "itemId": "revive",
+      "eventFlag": "EVENT_ROUTE_2_HIDDEN_REVIVE"
+    },
+    {
+      "id": "route_25_hidden_4_5_potion",
+      "mapId": "route_25",
+      "region": "kanto",
+      "x": 4,
+      "y": 5,
+      "itemId": "potion",
+      "eventFlag": "EVENT_ROUTE_25_HIDDEN_POTION"
+    },
+    {
+      "id": "route_28_hidden_25_2_rare_candy",
+      "mapId": "route_28",
+      "region": "kanto",
+      "x": 25,
+      "y": 2,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_ROUTE_28_HIDDEN_RARE_CANDY"
+    },
+    {
+      "id": "route_30_hidden_14_9_potion",
+      "mapId": "route_30",
+      "region": "johto",
+      "x": 14,
+      "y": 9,
+      "itemId": "potion",
+      "eventFlag": "EVENT_ROUTE_30_HIDDEN_POTION"
+    },
+    {
+      "id": "route_32_hidden_12_67_great_ball",
+      "mapId": "route_32",
+      "region": "johto",
+      "x": 12,
+      "y": 67,
+      "itemId": "great_ball",
+      "eventFlag": "EVENT_ROUTE_32_HIDDEN_GREAT_BALL"
+    },
+    {
+      "id": "route_32_hidden_11_40_super_potion",
+      "mapId": "route_32",
+      "region": "johto",
+      "x": 11,
+      "y": 40,
+      "itemId": "super_potion",
+      "eventFlag": "EVENT_ROUTE_32_HIDDEN_SUPER_POTION"
+    },
+    {
+      "id": "route_34_hidden_8_32_rare_candy",
+      "mapId": "route_34",
+      "region": "johto",
+      "x": 8,
+      "y": 32,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_ROUTE_34_HIDDEN_RARE_CANDY"
+    },
+    {
+      "id": "route_34_hidden_17_19_super_potion",
+      "mapId": "route_34",
+      "region": "johto",
+      "x": 17,
+      "y": 19,
+      "itemId": "super_potion",
+      "eventFlag": "EVENT_ROUTE_34_HIDDEN_SUPER_POTION"
+    },
+    {
+      "id": "route_37_hidden_4_2_ether",
+      "mapId": "route_37",
+      "region": "johto",
+      "x": 4,
+      "y": 2,
+      "itemId": "ether",
+      "eventFlag": "EVENT_ROUTE_37_HIDDEN_ETHER"
+    },
+    {
+      "id": "route_39_hidden_5_13_nugget",
+      "mapId": "route_39",
+      "region": "johto",
+      "x": 5,
+      "y": 13,
+      "itemId": "nugget",
+      "eventFlag": "EVENT_ROUTE_39_HIDDEN_NUGGET"
+    },
+    {
+      "id": "route_4_hidden_10_3_ultra_ball",
+      "mapId": "route_4",
+      "region": "kanto",
+      "x": 10,
+      "y": 3,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_ROUTE_4_HIDDEN_ULTRA_BALL"
+    },
+    {
+      "id": "route_40_hidden_7_8_hyper_potion",
+      "mapId": "route_40",
+      "region": "johto",
+      "x": 7,
+      "y": 8,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_ROUTE_40_HIDDEN_HYPER_POTION"
+    },
+    {
+      "id": "route_41_hidden_9_35_max_ether",
+      "mapId": "route_41",
+      "region": "johto",
+      "x": 9,
+      "y": 35,
+      "itemId": "max_ether",
+      "eventFlag": "EVENT_ROUTE_41_HIDDEN_MAX_ETHER"
+    },
+    {
+      "id": "route_42_hidden_16_11_max_potion",
+      "mapId": "route_42",
+      "region": "johto",
+      "x": 16,
+      "y": 11,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_ROUTE_42_HIDDEN_MAX_POTION"
+    },
+    {
+      "id": "route_44_hidden_32_9_elixer",
+      "mapId": "route_44",
+      "region": "johto",
+      "x": 32,
+      "y": 9,
+      "itemId": "elixer",
+      "eventFlag": "EVENT_ROUTE_44_HIDDEN_ELIXER"
+    },
+    {
+      "id": "route_45_hidden_13_80_pp_up",
+      "mapId": "route_45",
+      "region": "johto",
+      "x": 13,
+      "y": 80,
+      "itemId": "pp_up",
+      "eventFlag": "EVENT_ROUTE_45_HIDDEN_PP_UP"
+    },
+    {
+      "id": "route_9_hidden_41_15_ether",
+      "mapId": "route_9",
+      "region": "kanto",
+      "x": 41,
+      "y": 15,
+      "itemId": "ether",
+      "eventFlag": "EVENT_ROUTE_9_HIDDEN_ETHER"
+    },
+    {
+      "id": "silver_cave_outside_hidden_9_25_full_restore",
+      "mapId": "silver_cave_outside",
+      "region": "kanto",
+      "x": 9,
+      "y": 25,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_SILVER_CAVE_OUTSIDE_HIDDEN_FULL_RESTORE"
+    },
+    {
+      "id": "silver_cave_room_1_hidden_16_23_dire_hit",
+      "mapId": "silver_cave_room_1",
+      "region": "kanto",
+      "x": 16,
+      "y": 23,
+      "itemId": "dire_hit",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_HIDDEN_DIRE_HIT"
+    },
+    {
+      "id": "silver_cave_room_1_hidden_17_12_ultra_ball",
+      "mapId": "silver_cave_room_1",
+      "region": "kanto",
+      "x": 17,
+      "y": 12,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_HIDDEN_ULTRA_BALL"
+    },
+    {
+      "id": "silver_cave_room_2_hidden_14_31_max_potion",
+      "mapId": "silver_cave_room_2",
+      "region": "kanto",
+      "x": 14,
+      "y": 31,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_SILVER_CAVE_ROOM_2_HIDDEN_MAX_POTION"
+    },
+    {
+      "id": "team_rocket_base_b1f_hidden_3_11_revive",
+      "mapId": "team_rocket_base_b1f",
+      "region": "johto",
+      "x": 3,
+      "y": 11,
+      "itemId": "revive",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B1F_HIDDEN_REVIVE"
+    },
+    {
+      "id": "team_rocket_base_b2f_hidden_26_7_full_heal",
+      "mapId": "team_rocket_base_b2f",
+      "region": "johto",
+      "x": 26,
+      "y": 7,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_TEAM_ROCKET_BASE_B2F_HIDDEN_FULL_HEAL"
+    },
+    {
+      "id": "underground_path_hidden_3_9_full_restore",
+      "mapId": "underground_path",
+      "region": "kanto",
+      "x": 3,
+      "y": 9,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_UNDERGROUND_PATH_HIDDEN_FULL_RESTORE"
+    },
+    {
+      "id": "underground_path_hidden_1_19_x_special",
+      "mapId": "underground_path",
+      "region": "kanto",
+      "x": 1,
+      "y": 19,
+      "itemId": "x_special",
+      "eventFlag": "EVENT_UNDERGROUND_PATH_HIDDEN_X_SPECIAL"
+    },
+    {
+      "id": "vermilion_city_hidden_12_19_full_heal",
+      "mapId": "vermilion_city",
+      "region": "kanto",
+      "x": 12,
+      "y": 19,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_VERMILION_CITY_HIDDEN_FULL_HEAL"
+    },
+    {
+      "id": "vermilion_port_hidden_16_13_iron",
+      "mapId": "vermilion_port",
+      "region": "kanto",
+      "x": 16,
+      "y": 13,
+      "itemId": "iron",
+      "eventFlag": "EVENT_VERMILION_PORT_HIDDEN_IRON"
+    },
+    {
+      "id": "victory_road_hidden_3_29_max_potion",
+      "mapId": "victory_road",
+      "region": "kanto",
+      "x": 3,
+      "y": 29,
+      "itemId": "max_potion",
+      "eventFlag": "EVENT_VICTORY_ROAD_HIDDEN_MAX_POTION"
+    },
+    {
+      "id": "victory_road_hidden_3_65_full_heal",
+      "mapId": "victory_road",
+      "region": "kanto",
+      "x": 3,
+      "y": 65,
+      "itemId": "full_heal",
+      "eventFlag": "EVENT_VICTORY_ROAD_HIDDEN_FULL_HEAL"
+    },
+    {
+      "id": "violet_city_hidden_37_14_hyper_potion",
+      "mapId": "violet_city",
+      "region": "johto",
+      "x": 37,
+      "y": 14,
+      "itemId": "hyper_potion",
+      "eventFlag": "EVENT_VIOLET_CITY_HIDDEN_HYPER_POTION"
+    },
+    {
+      "id": "whirl_island_b1f_hidden_30_4_rare_candy",
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "x": 30,
+      "y": 4,
+      "itemId": "rare_candy",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B1F_HIDDEN_RARE_CANDY"
+    },
+    {
+      "id": "whirl_island_b1f_hidden_36_18_ultra_ball",
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "x": 36,
+      "y": 18,
+      "itemId": "ultra_ball",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B1F_HIDDEN_ULTRA_BALL"
+    },
+    {
+      "id": "whirl_island_b1f_hidden_2_23_full_restore",
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "x": 2,
+      "y": 23,
+      "itemId": "full_restore",
+      "eventFlag": "EVENT_WHIRL_ISLAND_B1F_HIDDEN_FULL_RESTORE"
+    }
+  ],
+  "fruitTrees": [
+    {
+      "id": "azalea_town_tree_8_2_wht_apricorn",
+      "mapId": "azalea_town",
+      "region": "johto",
+      "x": 8,
+      "y": 2,
+      "berryId": "wht_apricorn",
+      "treeId": "FRUITTREE_AZALEA_TOWN"
+    },
+    {
+      "id": "fuchsia_city_tree_8_1_burnt_berry",
+      "mapId": "fuchsia_city",
+      "region": "kanto",
+      "x": 8,
+      "y": 1,
+      "berryId": "burnt_berry",
+      "treeId": "FRUITTREE_FUCHSIA_CITY"
+    },
+    {
+      "id": "pewter_city_tree_32_3_ice_berry",
+      "mapId": "pewter_city",
+      "region": "kanto",
+      "x": 32,
+      "y": 3,
+      "berryId": "ice_berry",
+      "treeId": "FRUITTREE_PEWTER_CITY_1"
+    },
+    {
+      "id": "pewter_city_tree_30_3_mint_berry",
+      "mapId": "pewter_city",
+      "region": "kanto",
+      "x": 30,
+      "y": 3,
+      "berryId": "mint_berry",
+      "treeId": "FRUITTREE_PEWTER_CITY_2"
+    },
+    {
+      "id": "route_1_tree_3_7_bitter_berry",
+      "mapId": "route_1",
+      "region": "kanto",
+      "x": 3,
+      "y": 7,
+      "berryId": "bitter_berry",
+      "treeId": "FRUITTREE_ROUTE_1"
+    },
+    {
+      "id": "route_11_tree_32_2_berry",
+      "mapId": "route_11",
+      "region": "kanto",
+      "x": 32,
+      "y": 2,
+      "berryId": "berry",
+      "treeId": "FRUITTREE_ROUTE_11"
+    },
+    {
+      "id": "route_2_tree_10_14_psncureberry",
+      "mapId": "route_2",
+      "region": "kanto",
+      "x": 10,
+      "y": 14,
+      "berryId": "psncureberry",
+      "treeId": "FRUITTREE_ROUTE_2"
+    },
+    {
+      "id": "route_26_tree_14_54_ice_berry",
+      "mapId": "route_26",
+      "region": "kanto",
+      "x": 14,
+      "y": 54,
+      "berryId": "ice_berry",
+      "treeId": "FRUITTREE_ROUTE_26"
+    },
+    {
+      "id": "route_29_tree_12_2_berry",
+      "mapId": "route_29",
+      "region": "johto",
+      "x": 12,
+      "y": 2,
+      "berryId": "berry",
+      "treeId": "FRUITTREE_ROUTE_29"
+    },
+    {
+      "id": "route_30_tree_5_39_berry",
+      "mapId": "route_30",
+      "region": "johto",
+      "x": 5,
+      "y": 39,
+      "berryId": "berry",
+      "treeId": "FRUITTREE_ROUTE_30_1"
+    },
+    {
+      "id": "route_30_tree_11_5_psncureberry",
+      "mapId": "route_30",
+      "region": "johto",
+      "x": 11,
+      "y": 5,
+      "berryId": "psncureberry",
+      "treeId": "FRUITTREE_ROUTE_30_2"
+    },
+    {
+      "id": "route_31_tree_16_7_bitter_berry",
+      "mapId": "route_31",
+      "region": "johto",
+      "x": 16,
+      "y": 7,
+      "berryId": "bitter_berry",
+      "treeId": "FRUITTREE_ROUTE_31"
+    },
+    {
+      "id": "route_33_tree_14_16_psncureberry",
+      "mapId": "route_33",
+      "region": "johto",
+      "x": 14,
+      "y": 16,
+      "berryId": "psncureberry",
+      "treeId": "FRUITTREE_ROUTE_33"
+    },
+    {
+      "id": "route_35_tree_2_25_mysteryberry",
+      "mapId": "route_35",
+      "region": "johto",
+      "x": 2,
+      "y": 25,
+      "berryId": "mysteryberry",
+      "treeId": "FRUITTREE_ROUTE_35"
+    },
+    {
+      "id": "route_36_tree_21_4_ice_berry",
+      "mapId": "route_36",
+      "region": "johto",
+      "x": 21,
+      "y": 4,
+      "berryId": "ice_berry",
+      "treeId": "FRUITTREE_ROUTE_36"
+    },
+    {
+      "id": "route_37_tree_13_5_red_apricorn",
+      "mapId": "route_37",
+      "region": "johto",
+      "x": 13,
+      "y": 5,
+      "berryId": "red_apricorn",
+      "treeId": "FRUITTREE_ROUTE_37_1"
+    },
+    {
+      "id": "route_37_tree_16_5_blu_apricorn",
+      "mapId": "route_37",
+      "region": "johto",
+      "x": 16,
+      "y": 5,
+      "berryId": "blu_apricorn",
+      "treeId": "FRUITTREE_ROUTE_37_2"
+    },
+    {
+      "id": "route_37_tree_15_7_blk_apricorn",
+      "mapId": "route_37",
+      "region": "johto",
+      "x": 15,
+      "y": 7,
+      "berryId": "blk_apricorn",
+      "treeId": "FRUITTREE_ROUTE_37_3"
+    },
+    {
+      "id": "route_38_tree_12_10_berry",
+      "mapId": "route_38",
+      "region": "johto",
+      "x": 12,
+      "y": 10,
+      "berryId": "berry",
+      "treeId": "FRUITTREE_ROUTE_38"
+    },
+    {
+      "id": "route_39_tree_9_3_mint_berry",
+      "mapId": "route_39",
+      "region": "johto",
+      "x": 9,
+      "y": 3,
+      "berryId": "mint_berry",
+      "treeId": "FRUITTREE_ROUTE_39"
+    },
+    {
+      "id": "route_42_tree_27_16_pnk_apricorn",
+      "mapId": "route_42",
+      "region": "johto",
+      "x": 27,
+      "y": 16,
+      "berryId": "pnk_apricorn",
+      "treeId": "FRUITTREE_ROUTE_42_1"
+    },
+    {
+      "id": "route_42_tree_28_16_grn_apricorn",
+      "mapId": "route_42",
+      "region": "johto",
+      "x": 28,
+      "y": 16,
+      "berryId": "grn_apricorn",
+      "treeId": "FRUITTREE_ROUTE_42_2"
+    },
+    {
+      "id": "route_42_tree_29_16_ylw_apricorn",
+      "mapId": "route_42",
+      "region": "johto",
+      "x": 29,
+      "y": 16,
+      "berryId": "ylw_apricorn",
+      "treeId": "FRUITTREE_ROUTE_42_3"
+    },
+    {
+      "id": "route_43_tree_1_26_bitter_berry",
+      "mapId": "route_43",
+      "region": "johto",
+      "x": 1,
+      "y": 26,
+      "berryId": "bitter_berry",
+      "treeId": "FRUITTREE_ROUTE_43"
+    },
+    {
+      "id": "route_44_tree_9_5_burnt_berry",
+      "mapId": "route_44",
+      "region": "johto",
+      "x": 9,
+      "y": 5,
+      "berryId": "burnt_berry",
+      "treeId": "FRUITTREE_ROUTE_44"
+    },
+    {
+      "id": "route_45_tree_16_82_mysteryberry",
+      "mapId": "route_45",
+      "region": "johto",
+      "x": 16,
+      "y": 82,
+      "berryId": "mysteryberry",
+      "treeId": "FRUITTREE_ROUTE_45"
+    },
+    {
+      "id": "route_46_tree_7_5_berry",
+      "mapId": "route_46",
+      "region": "johto",
+      "x": 7,
+      "y": 5,
+      "berryId": "berry",
+      "treeId": "FRUITTREE_ROUTE_46_1"
+    },
+    {
+      "id": "route_46_tree_8_6_przcureberry",
+      "mapId": "route_46",
+      "region": "johto",
+      "x": 8,
+      "y": 6,
+      "berryId": "przcureberry",
+      "treeId": "FRUITTREE_ROUTE_46_2"
+    },
+    {
+      "id": "route_8_tree_33_5_przcureberry",
+      "mapId": "route_8",
+      "region": "kanto",
+      "x": 33,
+      "y": 5,
+      "berryId": "przcureberry",
+      "treeId": "FRUITTREE_ROUTE_8"
+    },
+    {
+      "id": "violet_city_tree_14_29_przcureberry",
+      "mapId": "violet_city",
+      "region": "johto",
+      "x": 14,
+      "y": 29,
+      "berryId": "przcureberry",
+      "treeId": "FRUITTREE_VIOLET_CITY"
+    }
+  ],
+  "byMap": {
+    "azalea_town": {
+      "mapId": "azalea_town",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "azalea_town_hidden_31_6_full_heal",
+          "mapId": "azalea_town",
+          "region": "johto",
+          "x": 31,
+          "y": 6,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_AZALEA_TOWN_HIDDEN_FULL_HEAL"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "azalea_town_tree_8_2_wht_apricorn",
+          "mapId": "azalea_town",
+          "region": "johto",
+          "x": 8,
+          "y": 2,
+          "berryId": "wht_apricorn",
+          "treeId": "FRUITTREE_AZALEA_TOWN"
+        }
+      ]
+    },
+    "burned_tower_1f": {
+      "mapId": "burned_tower_1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "burned_tower_1f_14_2_hp_up",
+          "mapId": "burned_tower_1f",
+          "region": "johto",
+          "x": 14,
+          "y": 2,
+          "itemId": "hp_up",
+          "eventFlag": "EVENT_BURNED_TOWER_1F_HP_UP"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "burned_tower_1f_hidden_8_7_ether",
+          "mapId": "burned_tower_1f",
+          "region": "johto",
+          "x": 8,
+          "y": 7,
+          "itemId": "ether",
+          "eventFlag": "EVENT_BURNED_TOWER_1F_HIDDEN_ETHER"
+        },
+        {
+          "id": "burned_tower_1f_hidden_13_11_ultra_ball",
+          "mapId": "burned_tower_1f",
+          "region": "johto",
+          "x": 13,
+          "y": 11,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_BURNED_TOWER_1F_HIDDEN_ULTRA_BALL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "burned_tower_b1f": {
+      "mapId": "burned_tower_b1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "burned_tower_b1f_16_4_tm_endure",
+          "mapId": "burned_tower_b1f",
+          "region": "johto",
+          "x": 16,
+          "y": 4,
+          "itemId": "tm_endure",
+          "eventFlag": "EVENT_BURNED_TOWER_B1F_TM_ENDURE"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "celadon_city": {
+      "mapId": "celadon_city",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "celadon_city_hidden_37_21_pp_up",
+          "mapId": "celadon_city",
+          "region": "kanto",
+          "x": 37,
+          "y": 21,
+          "itemId": "pp_up",
+          "eventFlag": "EVENT_CELADON_CITY_HIDDEN_PP_UP"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "cerulean_city": {
+      "mapId": "cerulean_city",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "cerulean_city_hidden_2_12_berserk_gene",
+          "mapId": "cerulean_city",
+          "region": "kanto",
+          "x": 2,
+          "y": 12,
+          "itemId": "berserk_gene",
+          "eventFlag": "EVENT_FOUND_BERSERK_GENE_IN_CERULEAN_CITY"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "cerulean_gym": {
+      "mapId": "cerulean_gym",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "cerulean_gym_hidden_3_8_machine_part",
+          "mapId": "cerulean_gym",
+          "region": "kanto",
+          "x": 3,
+          "y": 8,
+          "itemId": "machine_part",
+          "eventFlag": "EVENT_FOUND_MACHINE_PART_IN_CERULEAN_GYM"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "cianwood_city": {
+      "mapId": "cianwood_city",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "cianwood_city_hidden_4_19_revive",
+          "mapId": "cianwood_city",
+          "region": "johto",
+          "x": 4,
+          "y": 19,
+          "itemId": "revive",
+          "eventFlag": "EVENT_CIANWOOD_CITY_HIDDEN_REVIVE"
+        },
+        {
+          "id": "cianwood_city_hidden_5_29_max_ether",
+          "mapId": "cianwood_city",
+          "region": "johto",
+          "x": 5,
+          "y": 29,
+          "itemId": "max_ether",
+          "eventFlag": "EVENT_CIANWOOD_CITY_HIDDEN_MAX_ETHER"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "cinnabar_island": {
+      "mapId": "cinnabar_island",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "cinnabar_island_hidden_9_1_rare_candy",
+          "mapId": "cinnabar_island",
+          "region": "kanto",
+          "x": 9,
+          "y": 1,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_CINNABAR_ISLAND_HIDDEN_RARE_CANDY"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "digletts_cave": {
+      "mapId": "digletts_cave",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "digletts_cave_hidden_6_11_max_revive",
+          "mapId": "digletts_cave",
+          "region": "kanto",
+          "x": 6,
+          "y": 11,
+          "itemId": "max_revive",
+          "eventFlag": "EVENT_DIGLETTS_CAVE_HIDDEN_MAX_REVIVE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "dragons_den_b1f": {
+      "mapId": "dragons_den_b1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "dragons_den_b1f_30_4_calcium",
+          "mapId": "dragons_den_b1f",
+          "region": "johto",
+          "x": 30,
+          "y": 4,
+          "itemId": "calcium",
+          "eventFlag": "EVENT_DRAGONS_DEN_B1F_CALCIUM"
+        },
+        {
+          "id": "dragons_den_b1f_5_20_max_elixer",
+          "mapId": "dragons_den_b1f",
+          "region": "johto",
+          "x": 5,
+          "y": 20,
+          "itemId": "max_elixer",
+          "eventFlag": "EVENT_DRAGONS_DEN_B1F_MAX_ELIXER"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "dragons_den_b1f_hidden_33_29_revive",
+          "mapId": "dragons_den_b1f",
+          "region": "johto",
+          "x": 33,
+          "y": 29,
+          "itemId": "revive",
+          "eventFlag": "EVENT_DRAGONS_DEN_B1F_HIDDEN_REVIVE"
+        },
+        {
+          "id": "dragons_den_b1f_hidden_21_17_max_potion",
+          "mapId": "dragons_den_b1f",
+          "region": "johto",
+          "x": 21,
+          "y": 17,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_DRAGONS_DEN_B1F_HIDDEN_MAX_POTION"
+        },
+        {
+          "id": "dragons_den_b1f_hidden_31_15_max_elixer",
+          "mapId": "dragons_den_b1f",
+          "region": "johto",
+          "x": 31,
+          "y": 15,
+          "itemId": "max_elixer",
+          "eventFlag": "EVENT_DRAGONS_DEN_B1F_HIDDEN_MAX_ELIXER"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "ecruteak_city": {
+      "mapId": "ecruteak_city",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "ecruteak_city_hidden_23_14_hyper_potion",
+          "mapId": "ecruteak_city",
+          "region": "johto",
+          "x": 23,
+          "y": 14,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_ECRUTEAK_CITY_HIDDEN_HYPER_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "fighting_dojo": {
+      "mapId": "fighting_dojo",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "fighting_dojo_3_1_focus_band",
+          "mapId": "fighting_dojo",
+          "region": "kanto",
+          "x": 3,
+          "y": 1,
+          "itemId": "focus_band",
+          "eventFlag": "EVENT_PICKED_UP_FOCUS_BAND"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "fuchsia_city": {
+      "mapId": "fuchsia_city",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "fuchsia_city_tree_8_1_burnt_berry",
+          "mapId": "fuchsia_city",
+          "region": "kanto",
+          "x": 8,
+          "y": 1,
+          "berryId": "burnt_berry",
+          "treeId": "FRUITTREE_FUCHSIA_CITY"
+        }
+      ]
+    },
+    "goldenrod_underground": {
+      "mapId": "goldenrod_underground",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "goldenrod_underground_7_25_coin_case",
+          "mapId": "goldenrod_underground",
+          "region": "johto",
+          "x": 7,
+          "y": 25,
+          "itemId": "coin_case",
+          "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_COIN_CASE"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "goldenrod_underground_hidden_6_13_parlyz_heal",
+          "mapId": "goldenrod_underground",
+          "region": "johto",
+          "x": 6,
+          "y": 13,
+          "itemId": "parlyz_heal",
+          "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_HIDDEN_PARLYZ_HEAL"
+        },
+        {
+          "id": "goldenrod_underground_hidden_4_18_super_potion",
+          "mapId": "goldenrod_underground",
+          "region": "johto",
+          "x": 4,
+          "y": 18,
+          "itemId": "super_potion",
+          "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_HIDDEN_SUPER_POTION"
+        },
+        {
+          "id": "goldenrod_underground_hidden_17_8_antidote",
+          "mapId": "goldenrod_underground",
+          "region": "johto",
+          "x": 17,
+          "y": 8,
+          "itemId": "antidote",
+          "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_HIDDEN_ANTIDOTE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "goldenrod_underground_switch_room_entrances": {
+      "mapId": "goldenrod_underground_switch_room_entrances",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "goldenrod_underground_switch_room_entrances_1_12_smoke_ball",
+          "mapId": "goldenrod_underground_switch_room_entrances",
+          "region": "johto",
+          "x": 1,
+          "y": 12,
+          "itemId": "smoke_ball",
+          "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_SWITCH_ROOM_ENTRANCES_SMOKE_BALL"
+        },
+        {
+          "id": "goldenrod_underground_switch_room_entrances_14_9_full_heal",
+          "mapId": "goldenrod_underground_switch_room_entrances",
+          "region": "johto",
+          "x": 14,
+          "y": 9,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_SWITCH_ROOM_ENTRANCES_FULL_HEAL"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "goldenrod_underground_switch_room_entrances_hidden_8_9_max_potion",
+          "mapId": "goldenrod_underground_switch_room_entrances",
+          "region": "johto",
+          "x": 8,
+          "y": 9,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_SWITCH_ROOM_ENTRANCES_HIDDEN_MAX_POTION"
+        },
+        {
+          "id": "goldenrod_underground_switch_room_entrances_hidden_1_8_revive",
+          "mapId": "goldenrod_underground_switch_room_entrances",
+          "region": "johto",
+          "x": 1,
+          "y": 8,
+          "itemId": "revive",
+          "eventFlag": "EVENT_GOLDENROD_UNDERGROUND_SWITCH_ROOM_ENTRANCES_HIDDEN_REVIVE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "ice_path_1f": {
+      "mapId": "ice_path_1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "ice_path_1f_31_7_hm_waterfall",
+          "mapId": "ice_path_1f",
+          "region": "johto",
+          "x": 31,
+          "y": 7,
+          "itemId": "hm_waterfall",
+          "eventFlag": "EVENT_GOT_HM07_WATERFALL"
+        },
+        {
+          "id": "ice_path_1f_32_23_pp_up",
+          "mapId": "ice_path_1f",
+          "region": "johto",
+          "x": 32,
+          "y": 23,
+          "itemId": "pp_up",
+          "eventFlag": "EVENT_ICE_PATH_1F_PP_UP"
+        },
+        {
+          "id": "ice_path_1f_35_9_protein",
+          "mapId": "ice_path_1f",
+          "region": "johto",
+          "x": 35,
+          "y": 9,
+          "itemId": "protein",
+          "eventFlag": "EVENT_ICE_PATH_1F_PROTEIN"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "ice_path_b1f": {
+      "mapId": "ice_path_b1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "ice_path_b1f_5_35_iron",
+          "mapId": "ice_path_b1f",
+          "region": "johto",
+          "x": 5,
+          "y": 35,
+          "itemId": "iron",
+          "eventFlag": "EVENT_ICE_PATH_B1F_IRON"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "ice_path_b1f_hidden_17_30_max_potion",
+          "mapId": "ice_path_b1f",
+          "region": "johto",
+          "x": 17,
+          "y": 30,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_ICE_PATH_B1F_HIDDEN_MAX_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "ice_path_b2f_blackthorn_side": {
+      "mapId": "ice_path_b2f_blackthorn_side",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "ice_path_b2f_blackthorn_side_8_16_tm_rest",
+          "mapId": "ice_path_b2f_blackthorn_side",
+          "region": "johto",
+          "x": 8,
+          "y": 16,
+          "itemId": "tm_rest",
+          "eventFlag": "EVENT_ICE_PATH_B2F_BLACKTHORN_SIDE_TM_REST"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "ice_path_b2f_blackthorn_side_hidden_2_10_ice_heal",
+          "mapId": "ice_path_b2f_blackthorn_side",
+          "region": "johto",
+          "x": 2,
+          "y": 10,
+          "itemId": "ice_heal",
+          "eventFlag": "EVENT_ICE_PATH_B2F_BLACKTHORN_SIDE_HIDDEN_ICE_HEAL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "ice_path_b2f_mahogany_side": {
+      "mapId": "ice_path_b2f_mahogany_side",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "ice_path_b2f_mahogany_side_8_9_full_heal",
+          "mapId": "ice_path_b2f_mahogany_side",
+          "region": "johto",
+          "x": 8,
+          "y": 9,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_ICE_PATH_B2F_MAHOGANY_SIDE_FULL_HEAL"
+        },
+        {
+          "id": "ice_path_b2f_mahogany_side_0_2_max_potion",
+          "mapId": "ice_path_b2f_mahogany_side",
+          "region": "johto",
+          "x": 0,
+          "y": 2,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_ICE_PATH_B2F_MAHOGANY_SIDE_MAX_POTION"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "ice_path_b2f_mahogany_side_hidden_0_17_carbos",
+          "mapId": "ice_path_b2f_mahogany_side",
+          "region": "johto",
+          "x": 0,
+          "y": 17,
+          "itemId": "carbos",
+          "eventFlag": "EVENT_ICE_PATH_B2F_MAHOGANY_SIDE_HIDDEN_CARBOS"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "ice_path_b3f": {
+      "mapId": "ice_path_b3f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "ice_path_b3f_5_7_nevermeltice",
+          "mapId": "ice_path_b3f",
+          "region": "johto",
+          "x": 5,
+          "y": 7,
+          "itemId": "nevermeltice",
+          "eventFlag": "EVENT_ICE_PATH_B3F_NEVERMELTICE"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "ilex_forest": {
+      "mapId": "ilex_forest",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "ilex_forest_20_32_revive",
+          "mapId": "ilex_forest",
+          "region": "johto",
+          "x": 20,
+          "y": 32,
+          "itemId": "revive",
+          "eventFlag": "EVENT_ILEX_FOREST_REVIVE"
+        },
+        {
+          "id": "ilex_forest_9_17_x_attack",
+          "mapId": "ilex_forest",
+          "region": "johto",
+          "x": 9,
+          "y": 17,
+          "itemId": "x_attack",
+          "eventFlag": "EVENT_ILEX_FOREST_X_ATTACK"
+        },
+        {
+          "id": "ilex_forest_17_7_antidote",
+          "mapId": "ilex_forest",
+          "region": "johto",
+          "x": 17,
+          "y": 7,
+          "itemId": "antidote",
+          "eventFlag": "EVENT_ILEX_FOREST_ANTIDOTE"
+        },
+        {
+          "id": "ilex_forest_27_1_ether",
+          "mapId": "ilex_forest",
+          "region": "johto",
+          "x": 27,
+          "y": 1,
+          "itemId": "ether",
+          "eventFlag": "EVENT_ILEX_FOREST_ETHER"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "ilex_forest_hidden_11_7_ether",
+          "mapId": "ilex_forest",
+          "region": "johto",
+          "x": 11,
+          "y": 7,
+          "itemId": "ether",
+          "eventFlag": "EVENT_ILEX_FOREST_HIDDEN_ETHER"
+        },
+        {
+          "id": "ilex_forest_hidden_22_14_super_potion",
+          "mapId": "ilex_forest",
+          "region": "johto",
+          "x": 22,
+          "y": 14,
+          "itemId": "super_potion",
+          "eventFlag": "EVENT_ILEX_FOREST_HIDDEN_SUPER_POTION"
+        },
+        {
+          "id": "ilex_forest_hidden_1_17_full_heal",
+          "mapId": "ilex_forest",
+          "region": "johto",
+          "x": 1,
+          "y": 17,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_ILEX_FOREST_HIDDEN_FULL_HEAL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "lake_of_rage": {
+      "mapId": "lake_of_rage",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "lake_of_rage_7_10_elixer",
+          "mapId": "lake_of_rage",
+          "region": "johto",
+          "x": 7,
+          "y": 10,
+          "itemId": "elixer",
+          "eventFlag": "EVENT_LAKE_OF_RAGE_ELIXER"
+        },
+        {
+          "id": "lake_of_rage_35_2_tm_detect",
+          "mapId": "lake_of_rage",
+          "region": "johto",
+          "x": 35,
+          "y": 2,
+          "itemId": "tm_detect",
+          "eventFlag": "EVENT_LAKE_OF_RAGE_TM_DETECT"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "lake_of_rage_hidden_11_28_full_restore",
+          "mapId": "lake_of_rage",
+          "region": "johto",
+          "x": 11,
+          "y": 28,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_LAKE_OF_RAGE_HIDDEN_FULL_RESTORE"
+        },
+        {
+          "id": "lake_of_rage_hidden_4_4_rare_candy",
+          "mapId": "lake_of_rage",
+          "region": "johto",
+          "x": 4,
+          "y": 4,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_LAKE_OF_RAGE_HIDDEN_RARE_CANDY"
+        },
+        {
+          "id": "lake_of_rage_hidden_35_5_max_potion",
+          "mapId": "lake_of_rage",
+          "region": "johto",
+          "x": 35,
+          "y": 5,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_LAKE_OF_RAGE_HIDDEN_MAX_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "mount_moon_square": {
+      "mapId": "mount_moon_square",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "mount_moon_square_hidden_7_7_moon_stone",
+          "mapId": "mount_moon_square",
+          "region": "kanto",
+          "x": 7,
+          "y": 7,
+          "itemId": "moon_stone",
+          "eventFlag": "EVENT_MOUNT_MOON_SQUARE_HIDDEN_MOON_STONE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "mount_mortar_1f_inside": {
+      "mapId": "mount_mortar_1f_inside",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "mount_mortar_1f_inside_35_38_escape_rope",
+          "mapId": "mount_mortar_1f_inside",
+          "region": "johto",
+          "x": 35,
+          "y": 38,
+          "itemId": "escape_rope",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_ESCAPE_ROPE"
+        },
+        {
+          "id": "mount_mortar_1f_inside_16_10_max_revive",
+          "mapId": "mount_mortar_1f_inside",
+          "region": "johto",
+          "x": 16,
+          "y": 10,
+          "itemId": "max_revive",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_MAX_REVIVE"
+        },
+        {
+          "id": "mount_mortar_1f_inside_10_27_hyper_potion",
+          "mapId": "mount_mortar_1f_inside",
+          "region": "johto",
+          "x": 10,
+          "y": 27,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_HYPER_POTION"
+        },
+        {
+          "id": "mount_mortar_1f_inside_22_20_max_potion",
+          "mapId": "mount_mortar_1f_inside",
+          "region": "johto",
+          "x": 22,
+          "y": 20,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_MAX_POTION"
+        },
+        {
+          "id": "mount_mortar_1f_inside_35_19_nugget",
+          "mapId": "mount_mortar_1f_inside",
+          "region": "johto",
+          "x": 35,
+          "y": 19,
+          "itemId": "nugget",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_NUGGET"
+        },
+        {
+          "id": "mount_mortar_1f_inside_8_16_iron",
+          "mapId": "mount_mortar_1f_inside",
+          "region": "johto",
+          "x": 8,
+          "y": 16,
+          "itemId": "iron",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_IRON"
+        },
+        {
+          "id": "mount_mortar_1f_inside_17_17_ultra_ball",
+          "mapId": "mount_mortar_1f_inside",
+          "region": "johto",
+          "x": 17,
+          "y": 17,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_ULTRA_BALL"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "mount_mortar_1f_inside_hidden_30_11_max_repel",
+          "mapId": "mount_mortar_1f_inside",
+          "region": "johto",
+          "x": 30,
+          "y": 11,
+          "itemId": "max_repel",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_INSIDE_HIDDEN_MAX_REPEL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "mount_mortar_1f_outside": {
+      "mapId": "mount_mortar_1f_outside",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "mount_mortar_1f_outside_13_15_ether",
+          "mapId": "mount_mortar_1f_outside",
+          "region": "johto",
+          "x": 13,
+          "y": 15,
+          "itemId": "ether",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_OUTSIDE_ETHER"
+        },
+        {
+          "id": "mount_mortar_1f_outside_31_18_revive",
+          "mapId": "mount_mortar_1f_outside",
+          "region": "johto",
+          "x": 31,
+          "y": 18,
+          "itemId": "revive",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_OUTSIDE_REVIVE"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "mount_mortar_1f_outside_hidden_25_22_hyper_potion",
+          "mapId": "mount_mortar_1f_outside",
+          "region": "johto",
+          "x": 25,
+          "y": 22,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_MOUNT_MORTAR_1F_OUTSIDE_HIDDEN_HYPER_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "mount_mortar_2f_inside": {
+      "mapId": "mount_mortar_2f_inside",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "mount_mortar_2f_inside_28_22_max_potion",
+          "mapId": "mount_mortar_2f_inside",
+          "region": "johto",
+          "x": 28,
+          "y": 22,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_MAX_POTION"
+        },
+        {
+          "id": "mount_mortar_2f_inside_2_33_rare_candy",
+          "mapId": "mount_mortar_2f_inside",
+          "region": "johto",
+          "x": 2,
+          "y": 33,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_RARE_CANDY"
+        },
+        {
+          "id": "mount_mortar_2f_inside_19_17_tm_defense_curl",
+          "mapId": "mount_mortar_2f_inside",
+          "region": "johto",
+          "x": 19,
+          "y": 17,
+          "itemId": "tm_defense_curl",
+          "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_TM_DEFENSE_CURL"
+        },
+        {
+          "id": "mount_mortar_2f_inside_16_5_dragon_scale",
+          "mapId": "mount_mortar_2f_inside",
+          "region": "johto",
+          "x": 16,
+          "y": 5,
+          "itemId": "dragon_scale",
+          "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_DRAGON_SCALE"
+        },
+        {
+          "id": "mount_mortar_2f_inside_9_11_elixer",
+          "mapId": "mount_mortar_2f_inside",
+          "region": "johto",
+          "x": 9,
+          "y": 11,
+          "itemId": "elixer",
+          "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_ELIXER"
+        },
+        {
+          "id": "mount_mortar_2f_inside_28_5_escape_rope",
+          "mapId": "mount_mortar_2f_inside",
+          "region": "johto",
+          "x": 28,
+          "y": 5,
+          "itemId": "escape_rope",
+          "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_ESCAPE_ROPE"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "mount_mortar_2f_inside_hidden_24_8_full_restore",
+          "mapId": "mount_mortar_2f_inside",
+          "region": "johto",
+          "x": 24,
+          "y": 8,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_MOUNT_MORTAR_2F_INSIDE_HIDDEN_FULL_RESTORE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "mount_mortar_b1f": {
+      "mapId": "mount_mortar_b1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "mount_mortar_b1f_29_12_hyper_potion",
+          "mapId": "mount_mortar_b1f",
+          "region": "johto",
+          "x": 29,
+          "y": 12,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_MOUNT_MORTAR_B1F_HYPER_POTION"
+        },
+        {
+          "id": "mount_mortar_b1f_4_16_carbos",
+          "mapId": "mount_mortar_b1f",
+          "region": "johto",
+          "x": 4,
+          "y": 16,
+          "itemId": "carbos",
+          "eventFlag": "EVENT_MOUNT_MORTAR_B1F_CARBOS"
+        },
+        {
+          "id": "mount_mortar_b1f_34_24_full_restore",
+          "mapId": "mount_mortar_b1f",
+          "region": "johto",
+          "x": 34,
+          "y": 24,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_MOUNT_MORTAR_B1F_FULL_RESTORE"
+        },
+        {
+          "id": "mount_mortar_b1f_32_3_max_ether",
+          "mapId": "mount_mortar_b1f",
+          "region": "johto",
+          "x": 32,
+          "y": 3,
+          "itemId": "max_ether",
+          "eventFlag": "EVENT_MOUNT_MORTAR_B1F_MAX_ETHER"
+        },
+        {
+          "id": "mount_mortar_b1f_21_26_pp_up",
+          "mapId": "mount_mortar_b1f",
+          "region": "johto",
+          "x": 21,
+          "y": 26,
+          "itemId": "pp_up",
+          "eventFlag": "EVENT_MOUNT_MORTAR_B1F_PP_UP"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "mount_mortar_b1f_hidden_4_6_max_revive",
+          "mapId": "mount_mortar_b1f",
+          "region": "johto",
+          "x": 4,
+          "y": 6,
+          "itemId": "max_revive",
+          "eventFlag": "EVENT_MOUNT_MORTAR_B1F_HIDDEN_MAX_REVIVE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "national_park": {
+      "mapId": "national_park",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "national_park_35_12_parlyz_heal",
+          "mapId": "national_park",
+          "region": "johto",
+          "x": 35,
+          "y": 12,
+          "itemId": "parlyz_heal",
+          "eventFlag": "EVENT_NATIONAL_PARK_PARLYZ_HEAL"
+        },
+        {
+          "id": "national_park_1_43_tm_dig",
+          "mapId": "national_park",
+          "region": "johto",
+          "x": 1,
+          "y": 43,
+          "itemId": "tm_dig",
+          "eventFlag": "EVENT_NATIONAL_PARK_TM_DIG"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "national_park_hidden_6_47_full_heal",
+          "mapId": "national_park",
+          "region": "johto",
+          "x": 6,
+          "y": 47,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_NATIONAL_PARK_HIDDEN_FULL_HEAL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "olivine_lighthouse_3f": {
+      "mapId": "olivine_lighthouse_3f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "olivine_lighthouse_3f_8_2_ether",
+          "mapId": "olivine_lighthouse_3f",
+          "region": "johto",
+          "x": 8,
+          "y": 2,
+          "itemId": "ether",
+          "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_3F_ETHER"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "olivine_lighthouse_5f": {
+      "mapId": "olivine_lighthouse_5f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "olivine_lighthouse_5f_15_12_rare_candy",
+          "mapId": "olivine_lighthouse_5f",
+          "region": "johto",
+          "x": 15,
+          "y": 12,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_RARE_CANDY"
+        },
+        {
+          "id": "olivine_lighthouse_5f_6_15_super_repel",
+          "mapId": "olivine_lighthouse_5f",
+          "region": "johto",
+          "x": 6,
+          "y": 15,
+          "itemId": "super_repel",
+          "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_SUPER_REPEL"
+        },
+        {
+          "id": "olivine_lighthouse_5f_2_13_tm_swagger",
+          "mapId": "olivine_lighthouse_5f",
+          "region": "johto",
+          "x": 2,
+          "y": 13,
+          "itemId": "tm_swagger",
+          "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_TM_SWAGGER"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "olivine_lighthouse_5f_hidden_3_13_hyper_potion",
+          "mapId": "olivine_lighthouse_5f",
+          "region": "johto",
+          "x": 3,
+          "y": 13,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_HIDDEN_HYPER_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "olivine_lighthouse_6f": {
+      "mapId": "olivine_lighthouse_6f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "olivine_lighthouse_6f_3_4_super_potion",
+          "mapId": "olivine_lighthouse_6f",
+          "region": "johto",
+          "x": 3,
+          "y": 4,
+          "itemId": "super_potion",
+          "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_6F_SUPER_POTION"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "olivine_port": {
+      "mapId": "olivine_port",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "olivine_port_hidden_1_22_protein",
+          "mapId": "olivine_port",
+          "region": "johto",
+          "x": 1,
+          "y": 22,
+          "itemId": "protein",
+          "eventFlag": "EVENT_OLIVINE_PORT_HIDDEN_PROTEIN"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "pewter_city": {
+      "mapId": "pewter_city",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "pewter_city_tree_32_3_ice_berry",
+          "mapId": "pewter_city",
+          "region": "kanto",
+          "x": 32,
+          "y": 3,
+          "berryId": "ice_berry",
+          "treeId": "FRUITTREE_PEWTER_CITY_1"
+        },
+        {
+          "id": "pewter_city_tree_30_3_mint_berry",
+          "mapId": "pewter_city",
+          "region": "kanto",
+          "x": 30,
+          "y": 3,
+          "berryId": "mint_berry",
+          "treeId": "FRUITTREE_PEWTER_CITY_2"
+        }
+      ]
+    },
+    "radio_tower_5f": {
+      "mapId": "radio_tower_5f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "radio_tower_5f_8_5_ultra_ball",
+          "mapId": "radio_tower_5f",
+          "region": "johto",
+          "x": 8,
+          "y": 5,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_RADIO_TOWER_5F_ULTRA_BALL"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "rock_tunnel_1f": {
+      "mapId": "rock_tunnel_1f",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "rock_tunnel_1f_4_18_elixer",
+          "mapId": "rock_tunnel_1f",
+          "region": "kanto",
+          "x": 4,
+          "y": 18,
+          "itemId": "elixer",
+          "eventFlag": "EVENT_ROCK_TUNNEL_1F_ELIXER"
+        },
+        {
+          "id": "rock_tunnel_1f_10_15_tm_steel_wing",
+          "mapId": "rock_tunnel_1f",
+          "region": "kanto",
+          "x": 10,
+          "y": 15,
+          "itemId": "tm_steel_wing",
+          "eventFlag": "EVENT_ROCK_TUNNEL_1F_TM_STEEL_WING"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "rock_tunnel_1f_hidden_24_4_x_accuracy",
+          "mapId": "rock_tunnel_1f",
+          "region": "kanto",
+          "x": 24,
+          "y": 4,
+          "itemId": "x_accuracy",
+          "eventFlag": "EVENT_ROCK_TUNNEL_1F_HIDDEN_X_ACCURACY"
+        },
+        {
+          "id": "rock_tunnel_1f_hidden_21_15_x_defend",
+          "mapId": "rock_tunnel_1f",
+          "region": "kanto",
+          "x": 21,
+          "y": 15,
+          "itemId": "x_defend",
+          "eventFlag": "EVENT_ROCK_TUNNEL_1F_HIDDEN_X_DEFEND"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "rock_tunnel_b1f": {
+      "mapId": "rock_tunnel_b1f",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "rock_tunnel_b1f_7_25_iron",
+          "mapId": "rock_tunnel_b1f",
+          "region": "kanto",
+          "x": 7,
+          "y": 25,
+          "itemId": "iron",
+          "eventFlag": "EVENT_ROCK_TUNNEL_B1F_IRON"
+        },
+        {
+          "id": "rock_tunnel_b1f_6_17_pp_up",
+          "mapId": "rock_tunnel_b1f",
+          "region": "kanto",
+          "x": 6,
+          "y": 17,
+          "itemId": "pp_up",
+          "eventFlag": "EVENT_ROCK_TUNNEL_B1F_PP_UP"
+        },
+        {
+          "id": "rock_tunnel_b1f_15_2_revive",
+          "mapId": "rock_tunnel_b1f",
+          "region": "kanto",
+          "x": 15,
+          "y": 2,
+          "itemId": "revive",
+          "eventFlag": "EVENT_ROCK_TUNNEL_B1F_REVIVE"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "rock_tunnel_b1f_hidden_4_14_max_potion",
+          "mapId": "rock_tunnel_b1f",
+          "region": "kanto",
+          "x": 4,
+          "y": 14,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_ROCK_TUNNEL_B1F_HIDDEN_MAX_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_1": {
+      "mapId": "route_1",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_1_tree_3_7_bitter_berry",
+          "mapId": "route_1",
+          "region": "kanto",
+          "x": 3,
+          "y": 7,
+          "berryId": "bitter_berry",
+          "treeId": "FRUITTREE_ROUTE_1"
+        }
+      ]
+    },
+    "route_11": {
+      "mapId": "route_11",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_11_hidden_32_5_revive",
+          "mapId": "route_11",
+          "region": "kanto",
+          "x": 32,
+          "y": 5,
+          "itemId": "revive",
+          "eventFlag": "EVENT_ROUTE_11_HIDDEN_REVIVE"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "route_11_tree_32_2_berry",
+          "mapId": "route_11",
+          "region": "kanto",
+          "x": 32,
+          "y": 2,
+          "berryId": "berry",
+          "treeId": "FRUITTREE_ROUTE_11"
+        }
+      ]
+    },
+    "route_12": {
+      "mapId": "route_12",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "route_12_5_43_calcium",
+          "mapId": "route_12",
+          "region": "kanto",
+          "x": 5,
+          "y": 43,
+          "itemId": "calcium",
+          "eventFlag": "EVENT_ROUTE_12_CALCIUM"
+        },
+        {
+          "id": "route_12_5_51_nugget",
+          "mapId": "route_12",
+          "region": "kanto",
+          "x": 5,
+          "y": 51,
+          "itemId": "nugget",
+          "eventFlag": "EVENT_ROUTE_12_NUGGET"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_12_hidden_14_13_elixer",
+          "mapId": "route_12",
+          "region": "kanto",
+          "x": 14,
+          "y": 13,
+          "itemId": "elixer",
+          "eventFlag": "EVENT_ROUTE_12_HIDDEN_ELIXER"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_13": {
+      "mapId": "route_13",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_13_hidden_30_13_calcium",
+          "mapId": "route_13",
+          "region": "kanto",
+          "x": 30,
+          "y": 13,
+          "itemId": "calcium",
+          "eventFlag": "EVENT_ROUTE_13_HIDDEN_CALCIUM"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_15": {
+      "mapId": "route_15",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "route_15_12_5_pp_up",
+          "mapId": "route_15",
+          "region": "kanto",
+          "x": 12,
+          "y": 5,
+          "itemId": "pp_up",
+          "eventFlag": "EVENT_ROUTE_15_PP_UP"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "route_17": {
+      "mapId": "route_17",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_17_hidden_9_54_max_ether",
+          "mapId": "route_17",
+          "region": "kanto",
+          "x": 9,
+          "y": 54,
+          "itemId": "max_ether",
+          "eventFlag": "EVENT_ROUTE_17_HIDDEN_MAX_ETHER"
+        },
+        {
+          "id": "route_17_hidden_8_77_max_elixer",
+          "mapId": "route_17",
+          "region": "kanto",
+          "x": 8,
+          "y": 77,
+          "itemId": "max_elixer",
+          "eventFlag": "EVENT_ROUTE_17_HIDDEN_MAX_ELIXER"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_2": {
+      "mapId": "route_2",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "route_2_0_29_dire_hit",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 0,
+          "y": 29,
+          "itemId": "dire_hit",
+          "eventFlag": "EVENT_ROUTE_2_DIRE_HIT"
+        },
+        {
+          "id": "route_2_2_23_max_potion",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 2,
+          "y": 23,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_ROUTE_2_MAX_POTION"
+        },
+        {
+          "id": "route_2_19_2_carbos",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 19,
+          "y": 2,
+          "itemId": "carbos",
+          "eventFlag": "EVENT_ROUTE_2_CARBOS"
+        },
+        {
+          "id": "route_2_14_50_elixer",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 14,
+          "y": 50,
+          "itemId": "elixer",
+          "eventFlag": "EVENT_ROUTE_2_ELIXER"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_2_hidden_7_23_max_ether",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 7,
+          "y": 23,
+          "itemId": "max_ether",
+          "eventFlag": "EVENT_ROUTE_2_HIDDEN_MAX_ETHER"
+        },
+        {
+          "id": "route_2_hidden_4_14_full_heal",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 4,
+          "y": 14,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_ROUTE_2_HIDDEN_FULL_HEAL"
+        },
+        {
+          "id": "route_2_hidden_4_27_full_restore",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 4,
+          "y": 27,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_ROUTE_2_HIDDEN_FULL_RESTORE"
+        },
+        {
+          "id": "route_2_hidden_11_30_revive",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 11,
+          "y": 30,
+          "itemId": "revive",
+          "eventFlag": "EVENT_ROUTE_2_HIDDEN_REVIVE"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "route_2_tree_10_14_psncureberry",
+          "mapId": "route_2",
+          "region": "kanto",
+          "x": 10,
+          "y": 14,
+          "berryId": "psncureberry",
+          "treeId": "FRUITTREE_ROUTE_2"
+        }
+      ]
+    },
+    "route_25": {
+      "mapId": "route_25",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "route_25_32_4_protein",
+          "mapId": "route_25",
+          "region": "kanto",
+          "x": 32,
+          "y": 4,
+          "itemId": "protein",
+          "eventFlag": "EVENT_ROUTE_25_PROTEIN"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_25_hidden_4_5_potion",
+          "mapId": "route_25",
+          "region": "kanto",
+          "x": 4,
+          "y": 5,
+          "itemId": "potion",
+          "eventFlag": "EVENT_ROUTE_25_HIDDEN_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_26": {
+      "mapId": "route_26",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "route_26_9_15_max_elixer",
+          "mapId": "route_26",
+          "region": "kanto",
+          "x": 9,
+          "y": 15,
+          "itemId": "max_elixer",
+          "eventFlag": "EVENT_ROUTE_26_MAX_ELIXER"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_26_tree_14_54_ice_berry",
+          "mapId": "route_26",
+          "region": "kanto",
+          "x": 14,
+          "y": 54,
+          "berryId": "ice_berry",
+          "treeId": "FRUITTREE_ROUTE_26"
+        }
+      ]
+    },
+    "route_27": {
+      "mapId": "route_27",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "route_27_60_12_tm_solarbeam",
+          "mapId": "route_27",
+          "region": "kanto",
+          "x": 60,
+          "y": 12,
+          "itemId": "tm_solarbeam",
+          "eventFlag": "EVENT_ROUTE_27_TM_SOLARBEAM"
+        },
+        {
+          "id": "route_27_53_12_rare_candy",
+          "mapId": "route_27",
+          "region": "kanto",
+          "x": 53,
+          "y": 12,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_ROUTE_27_RARE_CANDY"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "route_28": {
+      "mapId": "route_28",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_28_hidden_25_2_rare_candy",
+          "mapId": "route_28",
+          "region": "kanto",
+          "x": 25,
+          "y": 2,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_ROUTE_28_HIDDEN_RARE_CANDY"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_29": {
+      "mapId": "route_29",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_29_48_2_potion",
+          "mapId": "route_29",
+          "region": "johto",
+          "x": 48,
+          "y": 2,
+          "itemId": "potion",
+          "eventFlag": "EVENT_ROUTE_29_POTION"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_29_tree_12_2_berry",
+          "mapId": "route_29",
+          "region": "johto",
+          "x": 12,
+          "y": 2,
+          "berryId": "berry",
+          "treeId": "FRUITTREE_ROUTE_29"
+        }
+      ]
+    },
+    "route_30": {
+      "mapId": "route_30",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_30_8_35_antidote",
+          "mapId": "route_30",
+          "region": "johto",
+          "x": 8,
+          "y": 35,
+          "itemId": "antidote",
+          "eventFlag": "EVENT_ROUTE_30_ANTIDOTE"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_30_hidden_14_9_potion",
+          "mapId": "route_30",
+          "region": "johto",
+          "x": 14,
+          "y": 9,
+          "itemId": "potion",
+          "eventFlag": "EVENT_ROUTE_30_HIDDEN_POTION"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "route_30_tree_5_39_berry",
+          "mapId": "route_30",
+          "region": "johto",
+          "x": 5,
+          "y": 39,
+          "berryId": "berry",
+          "treeId": "FRUITTREE_ROUTE_30_1"
+        },
+        {
+          "id": "route_30_tree_11_5_psncureberry",
+          "mapId": "route_30",
+          "region": "johto",
+          "x": 11,
+          "y": 5,
+          "berryId": "psncureberry",
+          "treeId": "FRUITTREE_ROUTE_30_2"
+        }
+      ]
+    },
+    "route_31": {
+      "mapId": "route_31",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_31_29_5_potion",
+          "mapId": "route_31",
+          "region": "johto",
+          "x": 29,
+          "y": 5,
+          "itemId": "potion",
+          "eventFlag": "EVENT_ROUTE_31_POTION"
+        },
+        {
+          "id": "route_31_19_15_poke_ball",
+          "mapId": "route_31",
+          "region": "johto",
+          "x": 19,
+          "y": 15,
+          "itemId": "poke_ball",
+          "eventFlag": "EVENT_ROUTE_31_POKE_BALL"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_31_tree_16_7_bitter_berry",
+          "mapId": "route_31",
+          "region": "johto",
+          "x": 16,
+          "y": 7,
+          "berryId": "bitter_berry",
+          "treeId": "FRUITTREE_ROUTE_31"
+        }
+      ]
+    },
+    "route_32": {
+      "mapId": "route_32",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_32_6_53_great_ball",
+          "mapId": "route_32",
+          "region": "johto",
+          "x": 6,
+          "y": 53,
+          "itemId": "great_ball",
+          "eventFlag": "EVENT_ROUTE_32_GREAT_BALL"
+        },
+        {
+          "id": "route_32_3_30_repel",
+          "mapId": "route_32",
+          "region": "johto",
+          "x": 3,
+          "y": 30,
+          "itemId": "repel",
+          "eventFlag": "EVENT_ROUTE_32_REPEL"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_32_hidden_12_67_great_ball",
+          "mapId": "route_32",
+          "region": "johto",
+          "x": 12,
+          "y": 67,
+          "itemId": "great_ball",
+          "eventFlag": "EVENT_ROUTE_32_HIDDEN_GREAT_BALL"
+        },
+        {
+          "id": "route_32_hidden_11_40_super_potion",
+          "mapId": "route_32",
+          "region": "johto",
+          "x": 11,
+          "y": 40,
+          "itemId": "super_potion",
+          "eventFlag": "EVENT_ROUTE_32_HIDDEN_SUPER_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_33": {
+      "mapId": "route_33",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_33_tree_14_16_psncureberry",
+          "mapId": "route_33",
+          "region": "johto",
+          "x": 14,
+          "y": 16,
+          "berryId": "psncureberry",
+          "treeId": "FRUITTREE_ROUTE_33"
+        }
+      ]
+    },
+    "route_34": {
+      "mapId": "route_34",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_34_7_30_nugget",
+          "mapId": "route_34",
+          "region": "johto",
+          "x": 7,
+          "y": 30,
+          "itemId": "nugget",
+          "eventFlag": "EVENT_ROUTE_34_NUGGET"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_34_hidden_8_32_rare_candy",
+          "mapId": "route_34",
+          "region": "johto",
+          "x": 8,
+          "y": 32,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_ROUTE_34_HIDDEN_RARE_CANDY"
+        },
+        {
+          "id": "route_34_hidden_17_19_super_potion",
+          "mapId": "route_34",
+          "region": "johto",
+          "x": 17,
+          "y": 19,
+          "itemId": "super_potion",
+          "eventFlag": "EVENT_ROUTE_34_HIDDEN_SUPER_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_35": {
+      "mapId": "route_35",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_35_13_16_tm_rollout",
+          "mapId": "route_35",
+          "region": "johto",
+          "x": 13,
+          "y": 16,
+          "itemId": "tm_rollout",
+          "eventFlag": "EVENT_ROUTE_35_TM_ROLLOUT"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_35_tree_2_25_mysteryberry",
+          "mapId": "route_35",
+          "region": "johto",
+          "x": 2,
+          "y": 25,
+          "berryId": "mysteryberry",
+          "treeId": "FRUITTREE_ROUTE_35"
+        }
+      ]
+    },
+    "route_36": {
+      "mapId": "route_36",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_36_tree_21_4_ice_berry",
+          "mapId": "route_36",
+          "region": "johto",
+          "x": 21,
+          "y": 4,
+          "berryId": "ice_berry",
+          "treeId": "FRUITTREE_ROUTE_36"
+        }
+      ]
+    },
+    "route_37": {
+      "mapId": "route_37",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_37_hidden_4_2_ether",
+          "mapId": "route_37",
+          "region": "johto",
+          "x": 4,
+          "y": 2,
+          "itemId": "ether",
+          "eventFlag": "EVENT_ROUTE_37_HIDDEN_ETHER"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "route_37_tree_13_5_red_apricorn",
+          "mapId": "route_37",
+          "region": "johto",
+          "x": 13,
+          "y": 5,
+          "berryId": "red_apricorn",
+          "treeId": "FRUITTREE_ROUTE_37_1"
+        },
+        {
+          "id": "route_37_tree_16_5_blu_apricorn",
+          "mapId": "route_37",
+          "region": "johto",
+          "x": 16,
+          "y": 5,
+          "berryId": "blu_apricorn",
+          "treeId": "FRUITTREE_ROUTE_37_2"
+        },
+        {
+          "id": "route_37_tree_15_7_blk_apricorn",
+          "mapId": "route_37",
+          "region": "johto",
+          "x": 15,
+          "y": 7,
+          "berryId": "blk_apricorn",
+          "treeId": "FRUITTREE_ROUTE_37_3"
+        }
+      ]
+    },
+    "route_38": {
+      "mapId": "route_38",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_38_tree_12_10_berry",
+          "mapId": "route_38",
+          "region": "johto",
+          "x": 12,
+          "y": 10,
+          "berryId": "berry",
+          "treeId": "FRUITTREE_ROUTE_38"
+        }
+      ]
+    },
+    "route_39": {
+      "mapId": "route_39",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_39_hidden_5_13_nugget",
+          "mapId": "route_39",
+          "region": "johto",
+          "x": 5,
+          "y": 13,
+          "itemId": "nugget",
+          "eventFlag": "EVENT_ROUTE_39_HIDDEN_NUGGET"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "route_39_tree_9_3_mint_berry",
+          "mapId": "route_39",
+          "region": "johto",
+          "x": 9,
+          "y": 3,
+          "berryId": "mint_berry",
+          "treeId": "FRUITTREE_ROUTE_39"
+        }
+      ]
+    },
+    "route_4": {
+      "mapId": "route_4",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "route_4_26_3_hp_up",
+          "mapId": "route_4",
+          "region": "kanto",
+          "x": 26,
+          "y": 3,
+          "itemId": "hp_up",
+          "eventFlag": "EVENT_ROUTE_4_HP_UP"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_4_hidden_10_3_ultra_ball",
+          "mapId": "route_4",
+          "region": "kanto",
+          "x": 10,
+          "y": 3,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_ROUTE_4_HIDDEN_ULTRA_BALL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_40": {
+      "mapId": "route_40",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_40_hidden_7_8_hyper_potion",
+          "mapId": "route_40",
+          "region": "johto",
+          "x": 7,
+          "y": 8,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_ROUTE_40_HIDDEN_HYPER_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_41": {
+      "mapId": "route_41",
+      "region": "johto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_41_hidden_9_35_max_ether",
+          "mapId": "route_41",
+          "region": "johto",
+          "x": 9,
+          "y": 35,
+          "itemId": "max_ether",
+          "eventFlag": "EVENT_ROUTE_41_HIDDEN_MAX_ETHER"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "route_42": {
+      "mapId": "route_42",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_42_6_4_ultra_ball",
+          "mapId": "route_42",
+          "region": "johto",
+          "x": 6,
+          "y": 4,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_ROUTE_42_ULTRA_BALL"
+        },
+        {
+          "id": "route_42_33_8_super_potion",
+          "mapId": "route_42",
+          "region": "johto",
+          "x": 33,
+          "y": 8,
+          "itemId": "super_potion",
+          "eventFlag": "EVENT_ROUTE_42_SUPER_POTION"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_42_hidden_16_11_max_potion",
+          "mapId": "route_42",
+          "region": "johto",
+          "x": 16,
+          "y": 11,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_ROUTE_42_HIDDEN_MAX_POTION"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "route_42_tree_27_16_pnk_apricorn",
+          "mapId": "route_42",
+          "region": "johto",
+          "x": 27,
+          "y": 16,
+          "berryId": "pnk_apricorn",
+          "treeId": "FRUITTREE_ROUTE_42_1"
+        },
+        {
+          "id": "route_42_tree_28_16_grn_apricorn",
+          "mapId": "route_42",
+          "region": "johto",
+          "x": 28,
+          "y": 16,
+          "berryId": "grn_apricorn",
+          "treeId": "FRUITTREE_ROUTE_42_2"
+        },
+        {
+          "id": "route_42_tree_29_16_ylw_apricorn",
+          "mapId": "route_42",
+          "region": "johto",
+          "x": 29,
+          "y": 16,
+          "berryId": "ylw_apricorn",
+          "treeId": "FRUITTREE_ROUTE_42_3"
+        }
+      ]
+    },
+    "route_43": {
+      "mapId": "route_43",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_43_12_32_max_ether",
+          "mapId": "route_43",
+          "region": "johto",
+          "x": 12,
+          "y": 32,
+          "itemId": "max_ether",
+          "eventFlag": "EVENT_ROUTE_43_MAX_ETHER"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_43_tree_1_26_bitter_berry",
+          "mapId": "route_43",
+          "region": "johto",
+          "x": 1,
+          "y": 26,
+          "berryId": "bitter_berry",
+          "treeId": "FRUITTREE_ROUTE_43"
+        }
+      ]
+    },
+    "route_44": {
+      "mapId": "route_44",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_44_30_8_max_revive",
+          "mapId": "route_44",
+          "region": "johto",
+          "x": 30,
+          "y": 8,
+          "itemId": "max_revive",
+          "eventFlag": "EVENT_ROUTE_44_MAX_REVIVE"
+        },
+        {
+          "id": "route_44_45_4_ultra_ball",
+          "mapId": "route_44",
+          "region": "johto",
+          "x": 45,
+          "y": 4,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_ROUTE_44_ULTRA_BALL"
+        },
+        {
+          "id": "route_44_14_9_max_repel",
+          "mapId": "route_44",
+          "region": "johto",
+          "x": 14,
+          "y": 9,
+          "itemId": "max_repel",
+          "eventFlag": "EVENT_ROUTE_44_MAX_REPEL"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_44_hidden_32_9_elixer",
+          "mapId": "route_44",
+          "region": "johto",
+          "x": 32,
+          "y": 9,
+          "itemId": "elixer",
+          "eventFlag": "EVENT_ROUTE_44_HIDDEN_ELIXER"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "route_44_tree_9_5_burnt_berry",
+          "mapId": "route_44",
+          "region": "johto",
+          "x": 9,
+          "y": 5,
+          "berryId": "burnt_berry",
+          "treeId": "FRUITTREE_ROUTE_44"
+        }
+      ]
+    },
+    "route_45": {
+      "mapId": "route_45",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_45_6_51_nugget",
+          "mapId": "route_45",
+          "region": "johto",
+          "x": 6,
+          "y": 51,
+          "itemId": "nugget",
+          "eventFlag": "EVENT_ROUTE_45_NUGGET"
+        },
+        {
+          "id": "route_45_5_66_revive",
+          "mapId": "route_45",
+          "region": "johto",
+          "x": 5,
+          "y": 66,
+          "itemId": "revive",
+          "eventFlag": "EVENT_ROUTE_45_REVIVE"
+        },
+        {
+          "id": "route_45_6_20_elixer",
+          "mapId": "route_45",
+          "region": "johto",
+          "x": 6,
+          "y": 20,
+          "itemId": "elixer",
+          "eventFlag": "EVENT_ROUTE_45_ELIXER"
+        },
+        {
+          "id": "route_45_7_33_max_potion",
+          "mapId": "route_45",
+          "region": "johto",
+          "x": 7,
+          "y": 33,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_ROUTE_45_MAX_POTION"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "route_45_hidden_13_80_pp_up",
+          "mapId": "route_45",
+          "region": "johto",
+          "x": 13,
+          "y": 80,
+          "itemId": "pp_up",
+          "eventFlag": "EVENT_ROUTE_45_HIDDEN_PP_UP"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "route_45_tree_16_82_mysteryberry",
+          "mapId": "route_45",
+          "region": "johto",
+          "x": 16,
+          "y": 82,
+          "berryId": "mysteryberry",
+          "treeId": "FRUITTREE_ROUTE_45"
+        }
+      ]
+    },
+    "route_46": {
+      "mapId": "route_46",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "route_46_1_15_x_speed",
+          "mapId": "route_46",
+          "region": "johto",
+          "x": 1,
+          "y": 15,
+          "itemId": "x_speed",
+          "eventFlag": "EVENT_ROUTE_46_X_SPEED"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_46_tree_7_5_berry",
+          "mapId": "route_46",
+          "region": "johto",
+          "x": 7,
+          "y": 5,
+          "berryId": "berry",
+          "treeId": "FRUITTREE_ROUTE_46_1"
+        },
+        {
+          "id": "route_46_tree_8_6_przcureberry",
+          "mapId": "route_46",
+          "region": "johto",
+          "x": 8,
+          "y": 6,
+          "berryId": "przcureberry",
+          "treeId": "FRUITTREE_ROUTE_46_2"
+        }
+      ]
+    },
+    "route_8": {
+      "mapId": "route_8",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [],
+      "fruitTrees": [
+        {
+          "id": "route_8_tree_33_5_przcureberry",
+          "mapId": "route_8",
+          "region": "kanto",
+          "x": 33,
+          "y": 5,
+          "berryId": "przcureberry",
+          "treeId": "FRUITTREE_ROUTE_8"
+        }
+      ]
+    },
+    "route_9": {
+      "mapId": "route_9",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "route_9_hidden_41_15_ether",
+          "mapId": "route_9",
+          "region": "kanto",
+          "x": 41,
+          "y": 15,
+          "itemId": "ether",
+          "eventFlag": "EVENT_ROUTE_9_HIDDEN_ETHER"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "silver_cave_item_rooms": {
+      "mapId": "silver_cave_item_rooms",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "silver_cave_item_rooms_6_3_max_revive",
+          "mapId": "silver_cave_item_rooms",
+          "region": "kanto",
+          "x": 6,
+          "y": 3,
+          "itemId": "max_revive",
+          "eventFlag": "EVENT_SILVER_CAVE_ITEM_ROOMS_MAX_REVIVE"
+        },
+        {
+          "id": "silver_cave_item_rooms_15_11_full_restore",
+          "mapId": "silver_cave_item_rooms",
+          "region": "kanto",
+          "x": 15,
+          "y": 11,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_SILVER_CAVE_ITEM_ROOMS_FULL_RESTORE"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "silver_cave_outside": {
+      "mapId": "silver_cave_outside",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "silver_cave_outside_hidden_9_25_full_restore",
+          "mapId": "silver_cave_outside",
+          "region": "kanto",
+          "x": 9,
+          "y": 25,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_SILVER_CAVE_OUTSIDE_HIDDEN_FULL_RESTORE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "silver_cave_room_1": {
+      "mapId": "silver_cave_room_1",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "silver_cave_room_1_4_9_max_elixer",
+          "mapId": "silver_cave_room_1",
+          "region": "kanto",
+          "x": 4,
+          "y": 9,
+          "itemId": "max_elixer",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_MAX_ELIXER"
+        },
+        {
+          "id": "silver_cave_room_1_15_29_protein",
+          "mapId": "silver_cave_room_1",
+          "region": "kanto",
+          "x": 15,
+          "y": 29,
+          "itemId": "protein",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_PROTEIN"
+        },
+        {
+          "id": "silver_cave_room_1_5_30_escape_rope",
+          "mapId": "silver_cave_room_1",
+          "region": "kanto",
+          "x": 5,
+          "y": 30,
+          "itemId": "escape_rope",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_ESCAPE_ROPE"
+        },
+        {
+          "id": "silver_cave_room_1_7_18_ultra_ball",
+          "mapId": "silver_cave_room_1",
+          "region": "kanto",
+          "x": 7,
+          "y": 18,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_ULTRA_BALL"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "silver_cave_room_1_hidden_16_23_dire_hit",
+          "mapId": "silver_cave_room_1",
+          "region": "kanto",
+          "x": 16,
+          "y": 23,
+          "itemId": "dire_hit",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_HIDDEN_DIRE_HIT"
+        },
+        {
+          "id": "silver_cave_room_1_hidden_17_12_ultra_ball",
+          "mapId": "silver_cave_room_1",
+          "region": "kanto",
+          "x": 17,
+          "y": 12,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_1_HIDDEN_ULTRA_BALL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "silver_cave_room_2": {
+      "mapId": "silver_cave_room_2",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "silver_cave_room_2_24_10_calcium",
+          "mapId": "silver_cave_room_2",
+          "region": "kanto",
+          "x": 24,
+          "y": 10,
+          "itemId": "calcium",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_2_CALCIUM"
+        },
+        {
+          "id": "silver_cave_room_2_22_24_ultra_ball",
+          "mapId": "silver_cave_room_2",
+          "region": "kanto",
+          "x": 22,
+          "y": 24,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_2_ULTRA_BALL"
+        },
+        {
+          "id": "silver_cave_room_2_4_20_pp_up",
+          "mapId": "silver_cave_room_2",
+          "region": "kanto",
+          "x": 4,
+          "y": 20,
+          "itemId": "pp_up",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_2_PP_UP"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "silver_cave_room_2_hidden_14_31_max_potion",
+          "mapId": "silver_cave_room_2",
+          "region": "kanto",
+          "x": 14,
+          "y": 31,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_SILVER_CAVE_ROOM_2_HIDDEN_MAX_POTION"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "slowpoke_well_b1f": {
+      "mapId": "slowpoke_well_b1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "slowpoke_well_b1f_10_3_super_potion",
+          "mapId": "slowpoke_well_b1f",
+          "region": "johto",
+          "x": 10,
+          "y": 3,
+          "itemId": "super_potion",
+          "eventFlag": "EVENT_SLOWPOKE_WELL_B1F_SUPER_POTION"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "slowpoke_well_b2f": {
+      "mapId": "slowpoke_well_b2f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "slowpoke_well_b2f_15_5_tm_rain_dance",
+          "mapId": "slowpoke_well_b2f",
+          "region": "johto",
+          "x": 15,
+          "y": 5,
+          "itemId": "tm_rain_dance",
+          "eventFlag": "EVENT_SLOWPOKE_WELL_B2F_TM_RAIN_DANCE"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "sprout_tower_1f": {
+      "mapId": "sprout_tower_1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "sprout_tower_1f_16_7_parlyz_heal",
+          "mapId": "sprout_tower_1f",
+          "region": "johto",
+          "x": 16,
+          "y": 7,
+          "itemId": "parlyz_heal",
+          "eventFlag": "EVENT_SPROUT_TOWER_1F_PARLYZ_HEAL"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "sprout_tower_2f": {
+      "mapId": "sprout_tower_2f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "sprout_tower_2f_3_1_x_accuracy",
+          "mapId": "sprout_tower_2f",
+          "region": "johto",
+          "x": 3,
+          "y": 1,
+          "itemId": "x_accuracy",
+          "eventFlag": "EVENT_SPROUT_TOWER_2F_X_ACCURACY"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "sprout_tower_3f": {
+      "mapId": "sprout_tower_3f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "sprout_tower_3f_6_14_potion",
+          "mapId": "sprout_tower_3f",
+          "region": "johto",
+          "x": 6,
+          "y": 14,
+          "itemId": "potion",
+          "eventFlag": "EVENT_SPROUT_TOWER_3F_POTION"
+        },
+        {
+          "id": "sprout_tower_3f_14_1_escape_rope",
+          "mapId": "sprout_tower_3f",
+          "region": "johto",
+          "x": 14,
+          "y": 1,
+          "itemId": "escape_rope",
+          "eventFlag": "EVENT_SPROUT_TOWER_3F_ESCAPE_ROPE"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "team_rocket_base_b1f": {
+      "mapId": "team_rocket_base_b1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "team_rocket_base_b1f_27_6_hyper_potion",
+          "mapId": "team_rocket_base_b1f",
+          "region": "johto",
+          "x": 27,
+          "y": 6,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B1F_HYPER_POTION"
+        },
+        {
+          "id": "team_rocket_base_b1f_14_15_nugget",
+          "mapId": "team_rocket_base_b1f",
+          "region": "johto",
+          "x": 14,
+          "y": 15,
+          "itemId": "nugget",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B1F_NUGGET"
+        },
+        {
+          "id": "team_rocket_base_b1f_21_12_guard_spec",
+          "mapId": "team_rocket_base_b1f",
+          "region": "johto",
+          "x": 21,
+          "y": 12,
+          "itemId": "guard_spec",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B1F_GUARD_SPEC"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "team_rocket_base_b1f_hidden_3_11_revive",
+          "mapId": "team_rocket_base_b1f",
+          "region": "johto",
+          "x": 3,
+          "y": 11,
+          "itemId": "revive",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B1F_HIDDEN_REVIVE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "team_rocket_base_b2f": {
+      "mapId": "team_rocket_base_b2f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "team_rocket_base_b2f_3_10_tm_thief",
+          "mapId": "team_rocket_base_b2f",
+          "region": "johto",
+          "x": 3,
+          "y": 10,
+          "itemId": "tm_thief",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B2F_TM_THIEF"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "team_rocket_base_b2f_hidden_26_7_full_heal",
+          "mapId": "team_rocket_base_b2f",
+          "region": "johto",
+          "x": 26,
+          "y": 7,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B2F_HIDDEN_FULL_HEAL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "team_rocket_base_b3f": {
+      "mapId": "team_rocket_base_b3f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "team_rocket_base_b3f_1_12_protein",
+          "mapId": "team_rocket_base_b3f",
+          "region": "johto",
+          "x": 1,
+          "y": 12,
+          "itemId": "protein",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_PROTEIN"
+        },
+        {
+          "id": "team_rocket_base_b3f_3_12_x_special",
+          "mapId": "team_rocket_base_b3f",
+          "region": "johto",
+          "x": 3,
+          "y": 12,
+          "itemId": "x_special",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_X_SPECIAL"
+        },
+        {
+          "id": "team_rocket_base_b3f_28_9_full_heal",
+          "mapId": "team_rocket_base_b3f",
+          "region": "johto",
+          "x": 28,
+          "y": 9,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_FULL_HEAL"
+        },
+        {
+          "id": "team_rocket_base_b3f_17_2_ice_heal",
+          "mapId": "team_rocket_base_b3f",
+          "region": "johto",
+          "x": 17,
+          "y": 2,
+          "itemId": "ice_heal",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_ICE_HEAL"
+        },
+        {
+          "id": "team_rocket_base_b3f_14_10_ultra_ball",
+          "mapId": "team_rocket_base_b3f",
+          "region": "johto",
+          "x": 14,
+          "y": 10,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_TEAM_ROCKET_BASE_B3F_ULTRA_BALL"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "tohjo_falls": {
+      "mapId": "tohjo_falls",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "tohjo_falls_2_6_moon_stone",
+          "mapId": "tohjo_falls",
+          "region": "kanto",
+          "x": 2,
+          "y": 6,
+          "itemId": "moon_stone",
+          "eventFlag": "EVENT_TOHJO_FALLS_MOON_STONE"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "underground_path": {
+      "mapId": "underground_path",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "underground_path_hidden_3_9_full_restore",
+          "mapId": "underground_path",
+          "region": "kanto",
+          "x": 3,
+          "y": 9,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_UNDERGROUND_PATH_HIDDEN_FULL_RESTORE"
+        },
+        {
+          "id": "underground_path_hidden_1_19_x_special",
+          "mapId": "underground_path",
+          "region": "kanto",
+          "x": 1,
+          "y": 19,
+          "itemId": "x_special",
+          "eventFlag": "EVENT_UNDERGROUND_PATH_HIDDEN_X_SPECIAL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "union_cave_1f": {
+      "mapId": "union_cave_1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "union_cave_1f_17_21_great_ball",
+          "mapId": "union_cave_1f",
+          "region": "johto",
+          "x": 17,
+          "y": 21,
+          "itemId": "great_ball",
+          "eventFlag": "EVENT_UNION_CAVE_1F_GREAT_BALL"
+        },
+        {
+          "id": "union_cave_1f_4_2_x_attack",
+          "mapId": "union_cave_1f",
+          "region": "johto",
+          "x": 4,
+          "y": 2,
+          "itemId": "x_attack",
+          "eventFlag": "EVENT_UNION_CAVE_1F_X_ATTACK"
+        },
+        {
+          "id": "union_cave_1f_4_17_potion",
+          "mapId": "union_cave_1f",
+          "region": "johto",
+          "x": 4,
+          "y": 17,
+          "itemId": "potion",
+          "eventFlag": "EVENT_UNION_CAVE_1F_POTION"
+        },
+        {
+          "id": "union_cave_1f_12_33_awakening",
+          "mapId": "union_cave_1f",
+          "region": "johto",
+          "x": 12,
+          "y": 33,
+          "itemId": "awakening",
+          "eventFlag": "EVENT_UNION_CAVE_1F_AWAKENING"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "union_cave_b1f": {
+      "mapId": "union_cave_b1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "union_cave_b1f_2_16_tm_swift",
+          "mapId": "union_cave_b1f",
+          "region": "johto",
+          "x": 2,
+          "y": 16,
+          "itemId": "tm_swift",
+          "eventFlag": "EVENT_UNION_CAVE_B1F_TM_SWIFT"
+        },
+        {
+          "id": "union_cave_b1f_17_23_x_defend",
+          "mapId": "union_cave_b1f",
+          "region": "johto",
+          "x": 17,
+          "y": 23,
+          "itemId": "x_defend",
+          "eventFlag": "EVENT_UNION_CAVE_B1F_X_DEFEND"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "union_cave_b2f": {
+      "mapId": "union_cave_b2f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "union_cave_b2f_16_2_elixer",
+          "mapId": "union_cave_b2f",
+          "region": "johto",
+          "x": 16,
+          "y": 2,
+          "itemId": "elixer",
+          "eventFlag": "EVENT_UNION_CAVE_B2F_ELIXER"
+        },
+        {
+          "id": "union_cave_b2f_12_19_hyper_potion",
+          "mapId": "union_cave_b2f",
+          "region": "johto",
+          "x": 12,
+          "y": 19,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_UNION_CAVE_B2F_HYPER_POTION"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "vermilion_city": {
+      "mapId": "vermilion_city",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "vermilion_city_hidden_12_19_full_heal",
+          "mapId": "vermilion_city",
+          "region": "kanto",
+          "x": 12,
+          "y": 19,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_VERMILION_CITY_HIDDEN_FULL_HEAL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "vermilion_port": {
+      "mapId": "vermilion_port",
+      "region": "kanto",
+      "itemBalls": [],
+      "hiddenItems": [
+        {
+          "id": "vermilion_port_hidden_16_13_iron",
+          "mapId": "vermilion_port",
+          "region": "kanto",
+          "x": 16,
+          "y": 13,
+          "itemId": "iron",
+          "eventFlag": "EVENT_VERMILION_PORT_HIDDEN_IRON"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "victory_road": {
+      "mapId": "victory_road",
+      "region": "kanto",
+      "itemBalls": [
+        {
+          "id": "victory_road_3_28_tm_earthquake",
+          "mapId": "victory_road",
+          "region": "kanto",
+          "x": 3,
+          "y": 28,
+          "itemId": "tm_earthquake",
+          "eventFlag": "EVENT_VICTORY_ROAD_TM_EARTHQUAKE"
+        },
+        {
+          "id": "victory_road_12_48_max_revive",
+          "mapId": "victory_road",
+          "region": "kanto",
+          "x": 12,
+          "y": 48,
+          "itemId": "max_revive",
+          "eventFlag": "EVENT_VICTORY_ROAD_MAX_REVIVE"
+        },
+        {
+          "id": "victory_road_18_29_full_restore",
+          "mapId": "victory_road",
+          "region": "kanto",
+          "x": 18,
+          "y": 29,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_VICTORY_ROAD_FULL_RESTORE"
+        },
+        {
+          "id": "victory_road_15_48_full_heal",
+          "mapId": "victory_road",
+          "region": "kanto",
+          "x": 15,
+          "y": 48,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_VICTORY_ROAD_FULL_HEAL"
+        },
+        {
+          "id": "victory_road_7_38_hp_up",
+          "mapId": "victory_road",
+          "region": "kanto",
+          "x": 7,
+          "y": 38,
+          "itemId": "hp_up",
+          "eventFlag": "EVENT_VICTORY_ROAD_HP_UP"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "victory_road_hidden_3_29_max_potion",
+          "mapId": "victory_road",
+          "region": "kanto",
+          "x": 3,
+          "y": 29,
+          "itemId": "max_potion",
+          "eventFlag": "EVENT_VICTORY_ROAD_HIDDEN_MAX_POTION"
+        },
+        {
+          "id": "victory_road_hidden_3_65_full_heal",
+          "mapId": "victory_road",
+          "region": "kanto",
+          "x": 3,
+          "y": 65,
+          "itemId": "full_heal",
+          "eventFlag": "EVENT_VICTORY_ROAD_HIDDEN_FULL_HEAL"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "violet_city": {
+      "mapId": "violet_city",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "violet_city_4_1_pp_up",
+          "mapId": "violet_city",
+          "region": "johto",
+          "x": 4,
+          "y": 1,
+          "itemId": "pp_up",
+          "eventFlag": "EVENT_VIOLET_CITY_PP_UP"
+        },
+        {
+          "id": "violet_city_35_5_rare_candy",
+          "mapId": "violet_city",
+          "region": "johto",
+          "x": 35,
+          "y": 5,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_VIOLET_CITY_RARE_CANDY"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "violet_city_hidden_37_14_hyper_potion",
+          "mapId": "violet_city",
+          "region": "johto",
+          "x": 37,
+          "y": 14,
+          "itemId": "hyper_potion",
+          "eventFlag": "EVENT_VIOLET_CITY_HIDDEN_HYPER_POTION"
+        }
+      ],
+      "fruitTrees": [
+        {
+          "id": "violet_city_tree_14_29_przcureberry",
+          "mapId": "violet_city",
+          "region": "johto",
+          "x": 14,
+          "y": 29,
+          "berryId": "przcureberry",
+          "treeId": "FRUITTREE_VIOLET_CITY"
+        }
+      ]
+    },
+    "whirl_island_b1f": {
+      "mapId": "whirl_island_b1f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "whirl_island_b1f_7_13_full_restore",
+          "mapId": "whirl_island_b1f",
+          "region": "johto",
+          "x": 7,
+          "y": 13,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B1F_FULL_RESTORE"
+        },
+        {
+          "id": "whirl_island_b1f_2_18_carbos",
+          "mapId": "whirl_island_b1f",
+          "region": "johto",
+          "x": 2,
+          "y": 18,
+          "itemId": "carbos",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B1F_CARBOS"
+        },
+        {
+          "id": "whirl_island_b1f_33_23_calcium",
+          "mapId": "whirl_island_b1f",
+          "region": "johto",
+          "x": 33,
+          "y": 23,
+          "itemId": "calcium",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B1F_CALCIUM"
+        },
+        {
+          "id": "whirl_island_b1f_17_8_nugget",
+          "mapId": "whirl_island_b1f",
+          "region": "johto",
+          "x": 17,
+          "y": 8,
+          "itemId": "nugget",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B1F_NUGGET"
+        },
+        {
+          "id": "whirl_island_b1f_19_26_escape_rope",
+          "mapId": "whirl_island_b1f",
+          "region": "johto",
+          "x": 19,
+          "y": 26,
+          "itemId": "escape_rope",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B1F_ESCAPE_ROPE"
+        }
+      ],
+      "hiddenItems": [
+        {
+          "id": "whirl_island_b1f_hidden_30_4_rare_candy",
+          "mapId": "whirl_island_b1f",
+          "region": "johto",
+          "x": 30,
+          "y": 4,
+          "itemId": "rare_candy",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B1F_HIDDEN_RARE_CANDY"
+        },
+        {
+          "id": "whirl_island_b1f_hidden_36_18_ultra_ball",
+          "mapId": "whirl_island_b1f",
+          "region": "johto",
+          "x": 36,
+          "y": 18,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B1F_HIDDEN_ULTRA_BALL"
+        },
+        {
+          "id": "whirl_island_b1f_hidden_2_23_full_restore",
+          "mapId": "whirl_island_b1f",
+          "region": "johto",
+          "x": 2,
+          "y": 23,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B1F_HIDDEN_FULL_RESTORE"
+        }
+      ],
+      "fruitTrees": []
+    },
+    "whirl_island_b2f": {
+      "mapId": "whirl_island_b2f",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "whirl_island_b2f_10_11_full_restore",
+          "mapId": "whirl_island_b2f",
+          "region": "johto",
+          "x": 10,
+          "y": 11,
+          "itemId": "full_restore",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B2F_FULL_RESTORE"
+        },
+        {
+          "id": "whirl_island_b2f_6_4_max_revive",
+          "mapId": "whirl_island_b2f",
+          "region": "johto",
+          "x": 6,
+          "y": 4,
+          "itemId": "max_revive",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B2F_MAX_REVIVE"
+        },
+        {
+          "id": "whirl_island_b2f_5_12_max_elixer",
+          "mapId": "whirl_island_b2f",
+          "region": "johto",
+          "x": 5,
+          "y": 12,
+          "itemId": "max_elixer",
+          "eventFlag": "EVENT_WHIRL_ISLAND_B2F_MAX_ELIXER"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "whirl_island_ne": {
+      "mapId": "whirl_island_ne",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "whirl_island_ne_11_11_ultra_ball",
+          "mapId": "whirl_island_ne",
+          "region": "johto",
+          "x": 11,
+          "y": 11,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_WHIRL_ISLAND_NE_ULTRA_BALL"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    },
+    "whirl_island_sw": {
+      "mapId": "whirl_island_sw",
+      "region": "johto",
+      "itemBalls": [
+        {
+          "id": "whirl_island_sw_15_2_ultra_ball",
+          "mapId": "whirl_island_sw",
+          "region": "johto",
+          "x": 15,
+          "y": 2,
+          "itemId": "ultra_ball",
+          "eventFlag": "EVENT_WHIRL_ISLAND_SW_ULTRA_BALL"
+        }
+      ],
+      "hiddenItems": [],
+      "fruitTrees": []
+    }
+  }
+}

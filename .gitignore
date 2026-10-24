@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.DS_Store
+*.local
+.env
+.env.*
+coverage/
+*.mov
+*.mp4
+copilot-instructions.md
+.project_agents.json
+AGENTS.md
+.gemini/
+.aistudio/
+
