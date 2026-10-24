@@ -223,17 +223,17 @@ export class ModernHMHandler {
       );
     }
 
-    if (!compatiblePokemon) {
+    if (!partyKnowsCut) {
       return this.makeResult(
         false,
-        true,
-        true,
-        null,
-        'You need an active POKéMON in your party to use CUT!'
+        hasBadge,
+        hasHM,
+        compatiblePokemon,
+        'A POKéMON in your party must know CUT in its battle moves to clear this tree!'
       );
     }
 
-    return this.makeResult(true, true, true, compatiblePokemon);
+    return this.makeResult(true, true, true, partyKnowsCut);
   }
 
   /**
@@ -309,17 +309,17 @@ export class ModernHMHandler {
       );
     }
 
-    if (!compatiblePokemon) {
+    if (!partyKnowsFlash) {
       return this.makeResult(
         false,
-        true,
-        true,
-        null,
-        'You need an active POKéMON in your party to use FLASH!'
+        hasBadge,
+        hasHM,
+        compatiblePokemon,
+        'A POKéMON in your party must know FLASH in its battle moves to light up the dark!'
       );
     }
 
-    return this.makeResult(true, true, true, compatiblePokemon);
+    return this.makeResult(true, true, true, partyKnowsFlash);
   }
 
   /**
@@ -388,17 +388,17 @@ export class ModernHMHandler {
       );
     }
 
-    if (!compatiblePokemon) {
+    if (!partyKnowsSurf) {
       return this.makeResult(
         false,
-        true,
-        true,
-        null,
-        'You need an active POKéMON in your party to SURF!'
+        hasBadge,
+        hasHM,
+        compatiblePokemon,
+        'A POKéMON in your party must know SURF in its battle moves to surf on water!'
       );
     }
 
-    return this.makeResult(true, true, true, compatiblePokemon);
+    return this.makeResult(true, true, true, partyKnowsSurf);
   }
 
   /**
@@ -467,17 +467,17 @@ export class ModernHMHandler {
       );
     }
 
-    if (!compatiblePokemon) {
+    if (!partyKnowsStrength) {
       return this.makeResult(
         false,
-        true,
-        true,
-        null,
-        'You need an active POKéMON in your party to use STRENGTH!'
+        hasBadge,
+        hasHM,
+        compatiblePokemon,
+        'A POKéMON in your party must know STRENGTH in its battle moves to push boulders!'
       );
     }
 
-    return this.makeResult(true, true, true, compatiblePokemon);
+    return this.makeResult(true, true, true, partyKnowsStrength);
   }
 
   /**
@@ -546,16 +546,16 @@ export class ModernHMHandler {
       );
     }
 
-    if (!compatiblePokemon) {
+    if (!partyKnowsFly) {
       return this.makeResult(
         false,
-        true,
-        true,
-        null,
-        'You need an active Flying POKéMON in your party to use FLY!'
+        hasBadge,
+        hasHM,
+        compatiblePokemon,
+        'A POKéMON in your party must know FLY in its battle moves to fly across the sky!'
       );
     }
 
-    return this.makeResult(true, true, true, compatiblePokemon);
+    return this.makeResult(true, true, true, partyKnowsFly);
   }
 }
