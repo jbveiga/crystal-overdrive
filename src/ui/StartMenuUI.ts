@@ -303,6 +303,7 @@ export interface StartMenuStateProvider {
   getTouchControlStyle?: () => TouchControlStyle;
   getExpShareMode?: () => ExpShareMode;
   getEncounterRateMode?: () => EncounterRateMode;
+  getAutoHm?: () => boolean;
   getLevelCap?: () => number;
   getGymAceLevel?: () => number;
 }
@@ -321,6 +322,7 @@ export interface StartMenuCallbacks {
   onCycleExpShareMode?: () => ExpShareMode;
   onSetExpShareMode?: (mode: ExpShareMode) => ExpShareMode | void;
   onSetEncounterRateMode?: (mode: EncounterRateMode) => EncounterRateMode | void;
+  onToggleAutoHm?: (enabled: boolean) => boolean | void;
 }
 
 const JOHTO_BADGES = [
@@ -1678,6 +1680,9 @@ export class StartMenuUI {
     const encounterRateMode: EncounterRateMode = this.stateProvider.getEncounterRateMode
       ? this.stateProvider.getEncounterRateMode()
       : 'NORMAL';
+    const isAutoHm: boolean = this.stateProvider.getAutoHm
+      ? this.stateProvider.getAutoHm()
+      : true;
     const currentBadges = this.stateProvider.getBadges ? this.stateProvider.getBadges().length : 0;
     const currentLevelCap = PokemonFactory.getLevelCapForBadges(currentBadges);
 
@@ -1906,6 +1911,51 @@ export class StartMenuUI {
             ">[ CLASSIC 10% ]</button>
           </div>
         </div>
+
+        <!-- Auto-HM Mode Toggle (UNBOUND STYLE) -->
+        <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="${titleLabelStyle}">AUTO-HM MODE (UNBOUND)</div>
+              <div style="${subLabelStyle}">Use Surf, Cut & Strength without move slots or prompts</div>
+            </div>
+            <button id="settings-autohm-btn" style="
+              background: ${isAutoHm ? '#059669' : '#334155'};
+              color: #ffffff;
+              border: 1px solid ${isAutoHm ? '#34d399' : '#64748b'};
+              border-radius: 6px;
+              padding: 7px 12px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+              min-width: 130px;
+            ">${isAutoHm ? '🌊 AUTO-HM: ON' : '💬 AUTO-HM: OFF'}</button>
+          </div>
+          <div id="settings-autohm-segmented-group" style="display:flex;gap:6px;width:100%;">
+            <button id="settings-autohm-on-btn" style="
+              flex: 1;
+              background: ${isAutoHm ? '#059669' : '#0f172a'};
+              color: ${isAutoHm ? '#ffffff' : '#94a3b8'};
+              border: 1px solid ${isAutoHm ? '#34d399' : 'rgba(255,255,255,0.12)'};
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ ON: AUTO SURF & OBSTACLES ]</button>
+            <button id="settings-autohm-off-btn" style="
+              flex: 1;
+              background: ${!isAutoHm ? '#334155' : '#0f172a'};
+              color: ${!isAutoHm ? '#ffffff' : '#94a3b8'};
+              border: 1px solid ${!isAutoHm ? '#94a3b8' : 'rgba(255,255,255,0.12)'};
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ OFF: CLASSIC PROMPTS ]</button>
+          </div>
+        </div>
       </div>
 
       <button id="close-settings-btn" style="
@@ -1933,6 +1983,9 @@ export class StartMenuUI {
     const encRelaxedBtn = this.settingsModal.querySelector('#settings-enc-relaxed-btn') as HTMLButtonElement;
     const encNormalBtn = this.settingsModal.querySelector('#settings-enc-normal-btn') as HTMLButtonElement;
     const encClassicBtn = this.settingsModal.querySelector('#settings-enc-classic-btn') as HTMLButtonElement;
+    const autoHmBtn = this.settingsModal.querySelector('#settings-autohm-btn') as HTMLButtonElement;
+    const autoHmOnBtn = this.settingsModal.querySelector('#settings-autohm-on-btn') as HTMLButtonElement;
+    const autoHmOffBtn = this.settingsModal.querySelector('#settings-autohm-off-btn') as HTMLButtonElement;
     const closeBtn = this.settingsModal.querySelector('#close-settings-btn') as HTMLButtonElement;
     const closeXBtn = this.settingsModal.querySelector('#close-settings-x-btn') as HTMLButtonElement;
 
@@ -2013,6 +2066,34 @@ export class StartMenuUI {
     encRelaxedBtn.addEventListener('click', () => applyEncMode('RELAXED'));
     encNormalBtn.addEventListener('click', () => applyEncMode('NORMAL'));
     encClassicBtn.addEventListener('click', () => applyEncMode('CLASSIC'));
+
+    let activeAutoHm = isAutoHm;
+    const syncAutoHmButtons = (enabled: boolean) => {
+      activeAutoHm = enabled;
+      autoHmBtn.innerText = enabled ? '🌊 AUTO-HM: ON' : '💬 AUTO-HM: OFF';
+      autoHmBtn.style.background = enabled ? '#059669' : '#334155';
+      autoHmBtn.style.borderColor = enabled ? '#34d399' : '#64748b';
+
+      autoHmOnBtn.style.background = enabled ? '#059669' : '#0f172a';
+      autoHmOnBtn.style.color = enabled ? '#ffffff' : '#94a3b8';
+      autoHmOnBtn.style.borderColor = enabled ? '#34d399' : 'rgba(255,255,255,0.12)';
+
+      autoHmOffBtn.style.background = !enabled ? '#334155' : '#0f172a';
+      autoHmOffBtn.style.color = !enabled ? '#ffffff' : '#94a3b8';
+      autoHmOffBtn.style.borderColor = !enabled ? '#94a3b8' : 'rgba(255,255,255,0.12)';
+    };
+
+    const applyAutoHm = (enabled: boolean) => {
+      BattleAudio.playMenuSound('CONFIRM');
+      syncAutoHmButtons(enabled);
+      if (this.callbacks.onToggleAutoHm) {
+        this.callbacks.onToggleAutoHm(enabled);
+      }
+    };
+
+    autoHmBtn.addEventListener('click', () => applyAutoHm(!activeAutoHm));
+    autoHmOnBtn.addEventListener('click', () => applyAutoHm(true));
+    autoHmOffBtn.addEventListener('click', () => applyAutoHm(false));
 
     soundBtn.addEventListener('click', () => {
       if (this.callbacks.onToggleMute) {

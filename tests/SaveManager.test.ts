@@ -97,6 +97,8 @@ describe('SaveManager Data Contracts & Ticket 4.1 Extensions', () => {
       battleSpeedMultiplier: 1,
       touchControlStyle: 'DPAD',
       expShare: 'CAPPED',
+      encounterRateMode: 'NORMAL',
+      autoHm: true,
     });
   });
 

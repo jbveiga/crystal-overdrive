@@ -741,6 +741,7 @@ async function bootstrap() {
       getTouchControlStyle: () => overworldHUD?.getTouchControlStyle() ?? gameOptions.touchControlStyle ?? 'DPAD',
       getExpShareMode: () => gameOptions.expShare ?? 'CAPPED',
       getEncounterRateMode: () => mapManager.getEncounterRateMode(),
+      getAutoHm: () => gameOptions.autoHm ?? true,
     },
     {
       onOpenParty: () => {
@@ -807,6 +808,16 @@ async function bootstrap() {
         mapManager.setEncounterRateMode(mode);
         saveCurrentGame();
         return mode;
+      },
+      onToggleAutoHm: (enabled: boolean) => {
+        gameOptions.autoHm = enabled;
+        const surfCheck = ModernHMHandler.checkSurf(inventory, storyFlags, playerParty);
+        mapManager.setSurfEnabled(enabled && surfCheck.canUse);
+        saveCurrentGame();
+        overworldHUD.showToast(
+          enabled ? '🌊 Auto-HM Mode: ON (Unbound Style)' : '💬 Auto-HM Mode: OFF (Classic Prompts)'
+        );
+        return enabled;
       },
     }
   );
@@ -2865,6 +2876,165 @@ async function bootstrap() {
             });
             return;
           }
+        }
+
+        // Chuck's Wife: HM02 Fly Event
+        if (targetNpc.id === 'chucks_wife') {
+          if (storyFlags.has('chuck_defeated') || inventory.badges.includes('storm')) {
+            if (!storyFlags.has('has_hm02_fly')) {
+              storyFlags.add('has_hm02_fly');
+              storyFlags.add('EVENT_GOT_HM02_FLY');
+              if (!inventory.tms.includes('HM02')) inventory.tms.push('HM02');
+              audioManager.playSfx('sfx_badge_get');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              overworldHUD.openDialogue(
+                [
+                  'CHUCK’S WIFE: You defeated my husband Chuck? Amazing!',
+                  'Take this HM02 FLY! It lets your Flying POKéMON carrying you to any town you’ve previously visited!',
+                ],
+                targetNpc.speaker,
+                () => {
+                  saveCurrentGame();
+                  overworldHUD.showToast('🦅 Received HM02 FLY from Chuck’s Wife!');
+                }
+              );
+              return;
+            }
+            overworldHUD.openDialogue(
+              ['CHUCK’S WIFE: Use FLY to soar through the skies across Johto anytime!'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            ['CHUCK’S WIFE: My husband Chuck is training inside the Gym! Defeat him to earn his respect!'],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        // Olivine Café Sailor: HM04 Strength Event
+        if (targetNpc.id === 'cafe_sailor') {
+          if (!storyFlags.has('has_hm04_strength')) {
+            storyFlags.add('has_hm04_strength');
+            storyFlags.add('EVENT_GOT_HM04_STRENGTH');
+            if (!inventory.tms.includes('HM04')) inventory.tms.push('HM04');
+            audioManager.playSfx('sfx_badge_get');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                'SAILOR: Whew! That meal filled me up with muscular power!',
+                'You look like a tough trainer. Take this HM04 STRENGTH!',
+                'Use STRENGTH to push heavy boulders out of your way in caves and routes!',
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('💪 Received HM04 STRENGTH from Olivine Sailor!');
+              }
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            ['SAILOR: Muscle through any boulder blocking your path with STRENGTH!'],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        // Olivine Good Rod Guru
+        if (targetNpc.id === 'good_rod_guru') {
+          if (!storyFlags.has('has_good_rod')) {
+            storyFlags.add('has_good_rod');
+            storyFlags.add('EVENT_GOT_GOOD_ROD');
+            if (!inventory.keyItems) inventory.keyItems = [];
+            if (!inventory.keyItems.includes('good_rod')) inventory.keyItems.push('good_rod');
+            audioManager.playSfx('sfx_badge_get');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                'FISHING GURU: The sea is vast and full of wondrous POKéMON!',
+                'Take this GOOD ROD! It can catch bigger, stronger water species than an Old Rod!',
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('🎣 Received GOOD ROD from Fishing Guru!');
+              }
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            ['FISHING GURU: Cast your GOOD ROD into any lake or ocean shore!'],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        // Route 39 Barn Moomoo Miltank & Farmhouse
+        if (targetNpc.id === 'moomoo_miltank') {
+          if (storyFlags.has('moomoo_healed')) {
+            overworldHUD.openDialogue(
+              ['MILTANK: Mooo! (Moomoo is bursting with energy and happiness!)'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          const berryCount = inventory.berries ? Object.values(inventory.berries).reduce((a, b) => a + (b || 0), 0) : 0;
+          if (berryCount > 0) {
+            storyFlags.add('moomoo_healed');
+            overworldHUD.openDialogue(
+              [
+                `${playerName} fed a sweet BERRY to MOOMOO!`,
+                'MOOMOO munched happily… Its energy came rushing back!',
+                'MILTANK: Mooo! Mooooo!',
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('🐮 Moomoo Miltank was restored to full health!');
+              }
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            ['MILTANK: …Moo… (Moomoo looks sick and weak… It needs sweet BERRYS to recover!)'],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        if (targetNpc.id === 'dairy_farmer') {
+          if (storyFlags.has('moomoo_healed')) {
+            if (!storyFlags.has('has_tm13_snore')) {
+              storyFlags.add('has_tm13_snore');
+              if (!inventory.tms.includes('TM13')) inventory.tms.push('TM13');
+              audioManager.playSfx('sfx_badge_get');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              overworldHUD.openDialogue(
+                [
+                  'DAIRY FARMER: You healed our Moomoo? Bless your kind heart!',
+                  'Take this TM13 SNORE as a token of our appreciation!',
+                ],
+                targetNpc.speaker,
+                () => {
+                  saveCurrentGame();
+                  overworldHUD.showToast('🐮 Received TM13 SNORE from Dairy Farmer!');
+                }
+              );
+              return;
+            }
+            overworldHUD.openDialogue(
+              ['DAIRY FARMER: Fresh MOOMOO MILK is the finest drink in Johto!'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            ['DAIRY FARMER: Our Moomoo in the barn is sick… Feed it sweet BERRYS to nurse it back to health!'],
+            targetNpc.speaker
+          );
+          return;
         }
 
         // Cianwood Pharmacy: SecretPotion Event
@@ -5099,6 +5269,36 @@ async function bootstrap() {
               cutCheck.missingReason || 'Obtain HM01 CUT and the HIVE BADGE to clear this obstacle.',
             ],
             '🌳 CUTTABLE TREE'
+          );
+        }
+        return;
+      }
+
+      // 4. Check Water Tile Surfing Interaction (Classic Mode or Manual Prompt)
+      if (currentMap.collisionGrid[tileIdx] === 3) {
+        const surfCheck = ModernHMHandler.checkSurf(inventory, storyFlags, playerParty);
+        if (surfCheck.canUse) {
+          const surfer = surfCheck.userPokemon || playerParty.find((p) => !p.isEgg) || playerParty[0];
+          const surferName = surfer ? surfer.nickname : playerName;
+          overworldHUD.openDialogue(
+            [
+              'The water is dyed a deep blue...',
+              `${surferName} used SURF!`,
+            ],
+            '🌊 WATER',
+            () => {
+              mapManager.setSurfEnabled(true);
+              saveCurrentGame();
+              overworldHUD.showToast(`🌊 Surfing on the water with ${surferName}!`);
+            }
+          );
+        } else {
+          overworldHUD.openDialogue(
+            [
+              'The water is dyed a deep blue...',
+              surfCheck.missingReason || 'You need HM03 SURF and the FOG BADGE to surf on water!',
+            ],
+            '🌊 WATER'
           );
         }
         return;

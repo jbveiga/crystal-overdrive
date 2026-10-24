@@ -23,6 +23,15 @@ export class MapManager {
   private pacingEnabled: boolean = false;
   private repelStepsRemaining: number = 0;
   private encounterRateMode: EncounterRateMode = 'NORMAL';
+  private surfEnabled: boolean = false;
+
+  public setSurfEnabled(enabled: boolean): void {
+    this.surfEnabled = enabled;
+  }
+
+  public isSurfEnabled(): boolean {
+    return this.surfEnabled;
+  }
 
   registerMap(map: MapData): void {
     this.maps.set(map.id, map);
@@ -60,7 +69,10 @@ export class MapManager {
 
     const index = y * this.currentMap.width + x;
     const tileType = this.currentMap.collisionGrid[index];
-    // Walkable on normal ground (0) and tall grass (2). Solid (1) and Water (3) are blocked.
+    // Walkable on normal ground (0) and tall grass (2). Water (3) is walkable if Surfing is enabled. Solid (1) is blocked.
+    if (tileType === 3) {
+      return this.surfEnabled;
+    }
     return tileType === 0 || tileType === 2;
   };
 

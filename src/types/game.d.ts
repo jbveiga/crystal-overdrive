@@ -43,6 +43,7 @@ export interface GameOptions {
   touchControlStyle?: TouchControlStyle; // (default: 'DPAD')
   expShare?: ExpShareMode;  // (default: 'CAPPED')
   encounterRateMode?: EncounterRateMode; // (default: 'NORMAL' [6.25% cap])
+  autoHm?: boolean;         // (default: true [Unbound-style Auto-HM])
 }
 
 export interface RadarPing {

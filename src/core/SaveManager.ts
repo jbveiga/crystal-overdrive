@@ -123,6 +123,8 @@ export class SaveManager {
       battleSpeedMultiplier: 1,
       touchControlStyle: 'DPAD',
       expShare: 'CAPPED',
+      encounterRateMode: 'NORMAL',
+      autoHm: true,
     };
   }
 

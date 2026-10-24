@@ -1,7 +1,7 @@
 import type { PokemonInstance } from '../types/game';
 import type { BagInventory } from '../ui/BagAndMartUI';
 
-export type HMFieldMoveId = 'cut' | 'flash';
+export type HMFieldMoveId = 'cut' | 'flash' | 'surf' | 'strength' | 'fly';
 
 export interface HMFieldCheckResult {
   allowed: boolean;
@@ -87,6 +87,31 @@ const FLASH_COMPATIBLE_SPECIES = new Set<string>([
   'mewtwo', 'mew', 'celebi',
 ]);
 
+const SURF_COMPATIBLE_SPECIES = new Set<string>([
+  'totodile', 'croconaw', 'feraligatr', 'squirtle', 'wartortle', 'blastoise',
+  'poliwag', 'poliwhirl', 'poliwrath', 'politoed', 'psyduck', 'golduck',
+  'tentacool', 'tentacruel', 'slowpoke', 'slowbro', 'slowking', 'seel', 'dewgong',
+  'shellder', 'cloyster', 'krabby', 'kingler', 'horsea', 'seadra', 'kingdra',
+  'goldeen', 'seaking', 'staryu', 'starmie', 'gyarados', 'lapras', 'vaporeon',
+  'omanyte', 'omastar', 'kabuto', 'kabutops', 'snorlax', 'dratini', 'dragonair', 'dragonite',
+  'wooper', 'quagsire', 'qwilfish', 'corsola', 'remoraid', 'octillery', 'mantine',
+  'suicune', 'lugia', 'mewtwo', 'mew', 'furret', 'sentret', 'azumarill', 'marill', 'chinchou', 'lanturn',
+]);
+
+const STRENGTH_COMPATIBLE_SPECIES = new Set<string>([
+  'totodile', 'croconaw', 'feraligatr', 'meganium', 'typhlosion',
+  'geodude', 'graveler', 'golem', 'onix', 'steelix', 'machop', 'machoke', 'machamp',
+  'heracross', 'snorlax', 'ursaring', 'teddiursa', 'phanpy', 'donphan', 'tyranitar', 'pupitar', 'larvitar',
+  'rhyhorn', 'rhydon', 'tauros', 'miltank', 'kangaskhan', 'pinsir', 'scizor', 'gyarados', 'poliwrath',
+  'entei', 'raikou', 'suicune', 'mewtwo', 'mew',
+]);
+
+const FLY_COMPATIBLE_SPECIES = new Set<string>([
+  'pidgey', 'pidgeotto', 'pidgeot', 'spearow', 'fearow', 'zubat', 'golbat', 'crobat',
+  'farfetchd', 'doduo', 'dodrio', 'aerodactyl', 'dragonite', 'hoothoot', 'noctowl',
+  'togetic', 'xatu', 'natu', 'murkrow', 'skarmory', 'charizard', 'lugia', 'ho-oh', 'mew',
+]);
+
 export class ModernHMHandler {
   /**
    * Checks whether a given species is innately compatible with the specified HM field move.
@@ -99,6 +124,15 @@ export class ModernHMHandler {
     }
     if (moveId === 'flash') {
       return FLASH_COMPATIBLE_SPECIES.has(normalized);
+    }
+    if (moveId === 'surf') {
+      return SURF_COMPATIBLE_SPECIES.has(normalized);
+    }
+    if (moveId === 'strength') {
+      return STRENGTH_COMPATIBLE_SPECIES.has(normalized);
+    }
+    if (moveId === 'fly') {
+      return FLY_COMPATIBLE_SPECIES.has(normalized);
     }
     return false;
   }
@@ -282,6 +316,243 @@ export class ModernHMHandler {
         true,
         null,
         'You need an active POKéMON in your party to use FLASH!'
+      );
+    }
+
+    return this.makeResult(true, true, true, compatiblePokemon);
+  }
+
+  /**
+   * Evaluates whether the player can use HM03 Surf in the overworld right now.
+   */
+  public static checkSurf(
+    inventory: BagInventory,
+    storyFlags: Set<string>,
+    party: PokemonInstance[]
+  ): HMFieldCheckResult {
+    const badges = inventory?.badges || [];
+    const tms = inventory?.tms || [];
+
+    const hasBadge =
+      badges.includes('fog') ||
+      badges.includes('fog_badge') ||
+      storyFlags.has('morty_defeated') ||
+      storyFlags.has('CAN_USE_SURF');
+
+    const partyKnowsSurf = party.find(
+      (p) => !p.isEgg && p.moves.some((m) => m.moveId.toLowerCase() === 'surf')
+    );
+
+    const hasHM =
+      tms.includes('HM03') ||
+      tms.includes('HM03_SURF') ||
+      storyFlags.has('has_hm03_surf') ||
+      storyFlags.has('EVENT_GOT_HM03_SURF') ||
+      Boolean(partyKnowsSurf);
+
+    const nonEggParty = party.filter((p) => !p.isEgg);
+    const compatiblePokemon =
+      partyKnowsSurf ||
+      nonEggParty.find((p) => this.canSpeciesUseFieldHM(p.speciesId, 'surf')) ||
+      nonEggParty.find((p) => p.types.includes('Water')) ||
+      nonEggParty[0] ||
+      null;
+
+    if (!hasBadge && !hasHM) {
+      return this.makeResult(
+        false,
+        false,
+        false,
+        compatiblePokemon,
+        'The water is dyed a deep blue... You need HM03 SURF and the FOG BADGE from Ecruteak Gym to surf!'
+      );
+    }
+
+    if (!hasHM) {
+      return this.makeResult(
+        false,
+        true,
+        false,
+        compatiblePokemon,
+        'The water is dyed a deep blue... Defeat the Kimono Girls at Ecruteak Dance Theater to receive HM03 SURF!'
+      );
+    }
+
+    if (!hasBadge) {
+      return this.makeResult(
+        false,
+        false,
+        true,
+        compatiblePokemon,
+        'The water is dyed a deep blue... Defeat Leader Morty at Ecruteak Gym to earn the FOG BADGE and surf across water!'
+      );
+    }
+
+    if (!compatiblePokemon) {
+      return this.makeResult(
+        false,
+        true,
+        true,
+        null,
+        'You need an active POKéMON in your party to SURF!'
+      );
+    }
+
+    return this.makeResult(true, true, true, compatiblePokemon);
+  }
+
+  /**
+   * Evaluates whether the player can use HM04 Strength in the overworld right now.
+   */
+  public static checkStrength(
+    inventory: BagInventory,
+    storyFlags: Set<string>,
+    party: PokemonInstance[]
+  ): HMFieldCheckResult {
+    const badges = inventory?.badges || [];
+    const tms = inventory?.tms || [];
+
+    const hasBadge =
+      badges.includes('plain') ||
+      badges.includes('plain_badge') ||
+      storyFlags.has('whitney_defeated') ||
+      storyFlags.has('CAN_USE_STRENGTH');
+
+    const partyKnowsStrength = party.find(
+      (p) => !p.isEgg && p.moves.some((m) => m.moveId.toLowerCase() === 'strength')
+    );
+
+    const hasHM =
+      tms.includes('HM04') ||
+      tms.includes('HM04_STRENGTH') ||
+      storyFlags.has('has_hm04_strength') ||
+      storyFlags.has('EVENT_GOT_HM04_STRENGTH') ||
+      Boolean(partyKnowsStrength);
+
+    const nonEggParty = party.filter((p) => !p.isEgg);
+    const compatiblePokemon =
+      partyKnowsStrength ||
+      nonEggParty.find((p) => this.canSpeciesUseFieldHM(p.speciesId, 'strength')) ||
+      nonEggParty.find((p) => p.types.includes('Rock') || p.types.includes('Fighting') || p.types.includes('Normal')) ||
+      nonEggParty[0] ||
+      null;
+
+    if (!hasBadge && !hasHM) {
+      return this.makeResult(
+        false,
+        false,
+        false,
+        compatiblePokemon,
+        'A boulder is blocking the path! You need HM04 STRENGTH and the PLAIN BADGE from Goldenrod Gym.'
+      );
+    }
+
+    if (!hasHM) {
+      return this.makeResult(
+        false,
+        true,
+        false,
+        compatiblePokemon,
+        'A boulder is blocking the path! Visit the Sailor at Olivine Café to receive HM04 STRENGTH.'
+      );
+    }
+
+    if (!hasBadge) {
+      return this.makeResult(
+        false,
+        false,
+        true,
+        compatiblePokemon,
+        'A boulder is blocking the path! Defeat Leader Whitney at Goldenrod Gym to earn the PLAIN BADGE and move boulders.'
+      );
+    }
+
+    if (!compatiblePokemon) {
+      return this.makeResult(
+        false,
+        true,
+        true,
+        null,
+        'You need an active POKéMON in your party to use STRENGTH!'
+      );
+    }
+
+    return this.makeResult(true, true, true, compatiblePokemon);
+  }
+
+  /**
+   * Evaluates whether the player can use HM02 Fly in the overworld right now.
+   */
+  public static checkFly(
+    inventory: BagInventory,
+    storyFlags: Set<string>,
+    party: PokemonInstance[]
+  ): HMFieldCheckResult {
+    const badges = inventory?.badges || [];
+    const tms = inventory?.tms || [];
+
+    const hasBadge =
+      badges.includes('storm') ||
+      badges.includes('storm_badge') ||
+      storyFlags.has('chuck_defeated') ||
+      storyFlags.has('CAN_USE_FLY');
+
+    const partyKnowsFly = party.find(
+      (p) => !p.isEgg && p.moves.some((m) => m.moveId.toLowerCase() === 'fly')
+    );
+
+    const hasHM =
+      tms.includes('HM02') ||
+      tms.includes('HM02_FLY') ||
+      storyFlags.has('has_hm02_fly') ||
+      storyFlags.has('EVENT_GOT_HM02_FLY') ||
+      Boolean(partyKnowsFly);
+
+    const nonEggParty = party.filter((p) => !p.isEgg);
+    const compatiblePokemon =
+      partyKnowsFly ||
+      nonEggParty.find((p) => this.canSpeciesUseFieldHM(p.speciesId, 'fly')) ||
+      nonEggParty.find((p) => p.types.includes('Flying')) ||
+      nonEggParty[0] ||
+      null;
+
+    if (!hasBadge && !hasHM) {
+      return this.makeResult(
+        false,
+        false,
+        false,
+        compatiblePokemon,
+        'You need HM02 FLY and the STORM BADGE from Cianwood Gym to fly to previously visited towns!'
+      );
+    }
+
+    if (!hasHM) {
+      return this.makeResult(
+        false,
+        true,
+        false,
+        compatiblePokemon,
+        'Talk to Chuck\'s Wife outside Cianwood Gym to receive HM02 FLY!'
+      );
+    }
+
+    if (!hasBadge) {
+      return this.makeResult(
+        false,
+        false,
+        true,
+        compatiblePokemon,
+        'Defeat Leader Chuck at Cianwood Gym to earn the STORM BADGE and use FLY in the field!'
+      );
+    }
+
+    if (!compatiblePokemon) {
+      return this.makeResult(
+        false,
+        true,
+        true,
+        null,
+        'You need an active Flying POKéMON in your party to use FLY!'
       );
     }
 
