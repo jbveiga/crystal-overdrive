@@ -1,5 +1,6 @@
 import { GameClock } from './core/GameClock';
 import { eventBus } from './core/EventBus';
+import { AssetManifestQueue } from './core/AssetManifestQueue';
 import { MapManager } from './world/MapManager';
 import { GridPhysics, type GridEntity } from './world/GridPhysics';
 import { OverworldRenderer } from './render/OverworldRenderer';
@@ -59,8 +60,20 @@ import type {
   GbcPaletteMode,
 } from './types/game';
 import type { Graphics } from 'pixi.js';
-import { createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS } from './world/npcData';
-export { npcsByMap, createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS } from './world/npcData';
+import {
+  createNpcsByMap,
+  DAY_SIBLINGS,
+  GUIDE_GENT_TOUR_LEGS,
+  isNpcActiveForStoryFlags,
+} from './world/npcData';
+import { TrackedStoryFlagSet, ActiveNpcCache } from './world/ActiveNpcCache';
+export {
+  npcsByMap,
+  createNpcsByMap,
+  DAY_SIBLINGS,
+  GUIDE_GENT_TOUR_LEGS,
+  isNpcActiveForStoryFlags,
+} from './world/npcData';
 
 declare global {
   interface Window {
@@ -106,7 +119,8 @@ async function bootstrap() {
     keyItems: [],
   };
   const defeatedTrainers: Set<string> = new Set();
-  const storyFlags: Set<string> = new Set();
+  const storyFlags = new TrackedStoryFlagSet();
+  const activeNpcCache = new ActiveNpcCache();
   const seenSpecies: Set<string> = new Set();
 
   let initialMapId = 'new_bark_town';
@@ -517,27 +531,71 @@ async function bootstrap() {
     'route_21',
   ];
 
-  window.updateLoaderProgress?.(20, 'Loading Johto & Kanto maps...');
-  let loadedMaps: MapData[] = [];
-  try {
-    const bundleRes = await fetch('./assets/data/world_maps.json');
-    if (bundleRes.ok) {
-      loadedMaps = await bundleRes.json();
-    } else {
-      throw new Error(`HTTP ${bundleRes.status}`);
+  const ensureMapAndNeighborsLoaded = async (targetId: string): Promise<MapData | undefined> => {
+    const map = await mapManager.ensureMapLoaded(targetId);
+    if (!map) return undefined;
+    const neighborIds: string[] = [];
+    if (map.connections) {
+      for (const dir of ['WEST', 'EAST', 'NORTH', 'SOUTH'] as const) {
+        const conn = map.connections[dir];
+        if (conn?.mapId && !mapManager.getMap(conn.mapId)) {
+          neighborIds.push(conn.mapId);
+        }
+      }
     }
-  } catch {
-    loadedMaps = await Promise.all(
-      mapIds.map(async (id) => {
-        const res = await fetch(`./assets/data/maps/${id}.json`);
-        return res.json();
-      })
-    );
-  }
+    if (neighborIds.length > 0) {
+      await Promise.all(neighborIds.map((id) => mapManager.ensureMapLoaded(id)));
+    }
+    // Prefetch immediate warp destinations in the background without blocking
+    if (map.warps) {
+      for (const w of map.warps) {
+        if (w.targetMapId && !mapManager.getMap(w.targetMapId)) {
+          void mapManager.ensureMapLoaded(w.targetMapId);
+        }
+      }
+    }
+    return map;
+  };
 
-  for (const m of loadedMaps) {
-    mapManager.registerMap(m);
+  const criticalBootMapIds = Array.from(
+    new Set([initialMapId, 'new_bark_town', 'players_house_2f', 'players_house_1f'])
+  );
+  const bootMapManifest = new AssetManifestQueue();
+  for (const mapId of criticalBootMapIds) {
+    bootMapManifest.enqueue({
+      id: `boot_map:${mapId}`,
+      label: `Loading map ${mapId}.json`,
+      category: 'MAP_JSON',
+      execute: async () => {
+        await ensureMapAndNeighborsLoaded(mapId);
+      },
+    });
   }
+  await bootMapManifest.run({
+    startPercent: 12,
+    endPercent: 40,
+    concurrency: 4,
+    onProgress: (snap) => {
+      window.updateLoaderProgress?.(snap.percent, snap.currentLabel);
+    },
+  });
+
+  // Hydrate remaining world maps lazily in the background after boot
+  setTimeout(async () => {
+    try {
+      const bundleRes = await fetch('./assets/data/world_maps.json');
+      if (bundleRes.ok) {
+        const bundleMaps: MapData[] = await bundleRes.json();
+        for (const m of bundleMaps) {
+          if (!mapManager.getMap(m.id)) {
+            mapManager.registerMap(m);
+          }
+        }
+      }
+    } catch {
+      // Individual maps will continue to load on-demand via mapManager.ensureMapLoaded
+    }
+  }, 1500);
 
   let initialMap = mapManager.setCurrentMap(initialMapId);
   if (!mapManager.isWalkable(initialPlayerX, initialPlayerY)) {
@@ -546,6 +604,7 @@ async function bootstrap() {
     initialPlayerX = 13;
     initialPlayerY = 6;
   }
+  missionManager.registerMapEntry(initialMap.id, storyFlags);
 
   // 4. Save Game Helper
   const saveCurrentGame = async () => {
@@ -964,9 +1023,16 @@ async function bootstrap() {
     },
   });
 
-  window.updateLoaderProgress?.(70, 'Mounting overworld engine...');
+  window.updateLoaderProgress?.(40, 'Mounting overworld engine...');
   const overworldRenderer = new OverworldRenderer();
-  await overworldRenderer.init(canvasContainer);
+  await overworldRenderer.init(canvasContainer, {
+    startPercent: 40,
+    endPercent: 72,
+    concurrency: 6,
+    onProgress: (snap) => {
+      window.updateLoaderProgress?.(snap.percent, snap.currentLabel);
+    },
+  });
   overworldRenderer.setPlayerGender(playerGender);
   const lookupMap = (id: string) => mapManager.getMap(id);
 
@@ -998,10 +1064,18 @@ async function bootstrap() {
     );
   };
 
-  await overworldRenderer.ensureMapTilesLoaded(initialMap, lookupMap);
+  await overworldRenderer.ensureMapTilesLoaded(initialMap, lookupMap, {
+    startPercent: 72,
+    endPercent: 95,
+    concurrency: 8,
+    onProgress: (snap) => {
+      window.updateLoaderProgress?.(snap.percent, snap.currentLabel);
+    },
+  });
   overworldRenderer.renderMap(initialMap, lookupMap);
   syncMapOverworldItems(initialMap);
 
+  window.updateLoaderProgress?.(97, 'Initializing battle engine...');
   const battleRenderer = new BattleRenderer(overworldRenderer.app);
   battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
   const battleHUD = new BattleHUD('battle-hud-container');
@@ -1248,25 +1322,31 @@ async function bootstrap() {
   const npcObstaclesScratch: GridEntity[] = [];
   const worldNpcsScratch: GridEntity[] = [];
 
+  const getActiveMapNpcs = (mapId: string): GridEntity[] =>
+    activeNpcCache.getActiveNpcs(
+      mapId,
+      npcsByMap[mapId],
+      storyFlags,
+      isNpcActiveForStoryFlags
+    );
+
   const populateWorldNpcs = (map: MapData | null): GridEntity[] => {
     worldNpcsScratch.length = 0;
     if (!map) return worldNpcsScratch;
 
-    const currentList = npcsByMap[map.id];
-    if (currentList) {
-      for (let i = 0; i < currentList.length; i++) {
-        const n = currentList[i];
-        n.worldOffsetX = 0;
-        n.worldOffsetY = 0;
-        worldNpcsScratch.push(n);
-      }
+    const currentList = getActiveMapNpcs(map.id);
+    for (let i = 0; i < currentList.length; i++) {
+      const n = currentList[i];
+      n.worldOffsetX = 0;
+      n.worldOffsetY = 0;
+      worldNpcsScratch.push(n);
     }
 
     if (map.connections.WEST) {
       const conn = map.connections.WEST;
       const westMap = mapManager.getMap(conn.mapId);
-      const westList = westMap ? npcsByMap[westMap.id] : undefined;
-      if (westMap && westList) {
+      if (westMap) {
+        const westList = getActiveMapNpcs(westMap.id);
         for (let i = 0; i < westList.length; i++) {
           const n = westList[i];
           n.worldOffsetX = -westMap.width;
@@ -1279,8 +1359,8 @@ async function bootstrap() {
     if (map.connections.EAST) {
       const conn = map.connections.EAST;
       const eastMap = mapManager.getMap(conn.mapId);
-      const eastList = eastMap ? npcsByMap[eastMap.id] : undefined;
-      if (eastMap && eastList) {
+      if (eastMap) {
+        const eastList = getActiveMapNpcs(eastMap.id);
         for (let i = 0; i < eastList.length; i++) {
           const n = eastList[i];
           n.worldOffsetX = map.width;
@@ -1293,8 +1373,8 @@ async function bootstrap() {
     if (map.connections.NORTH) {
       const conn = map.connections.NORTH;
       const northMap = mapManager.getMap(conn.mapId);
-      const northList = northMap ? npcsByMap[northMap.id] : undefined;
-      if (northMap && northList) {
+      if (northMap) {
+        const northList = getActiveMapNpcs(northMap.id);
         for (let i = 0; i < northList.length; i++) {
           const n = northList[i];
           n.worldOffsetX = conn.offset;
@@ -1307,8 +1387,8 @@ async function bootstrap() {
     if (map.connections.SOUTH) {
       const conn = map.connections.SOUTH;
       const southMap = mapManager.getMap(conn.mapId);
-      const southList = southMap ? npcsByMap[southMap.id] : undefined;
-      if (southMap && southList) {
+      if (southMap) {
+        const southList = getActiveMapNpcs(southMap.id);
         for (let i = 0; i < southList.length; i++) {
           const n = southList[i];
           n.worldOffsetX = conn.offset;
@@ -1399,6 +1479,8 @@ async function bootstrap() {
     }
 
     if (nextMapId) {
+      visitedMaps.add(nextMapId);
+      missionManager.registerMapEntry(nextMapId, storyFlags);
       entity.x = targetX;
       entity.targetX = targetX;
       entity.renderX = targetX;
@@ -1417,6 +1499,9 @@ async function bootstrap() {
       } else {
         overworldHUD.hideRoamerAlert();
       }
+
+      // Prefetch newly connected neighbor maps in the background
+      void ensureMapAndNeighborsLoaded(nextMapId);
 
       // Reset 4-step grace period on route transition
       mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
@@ -2376,11 +2461,14 @@ async function bootstrap() {
     );
   };
 
-  const executeWarpTransition = (warp: WarpEvent) => {
+  const executeWarpTransition = async (warp: WarpEvent) => {
     const currentM = mapManager.getCurrentMap();
     if (!currentM) return;
 
-    const targetMapExists = mapManager.getMap(warp.targetMapId);
+    let targetMapExists = mapManager.getMap(warp.targetMapId);
+    if (!targetMapExists) {
+      targetMapExists = await ensureMapAndNeighborsLoaded(warp.targetMapId);
+    }
     if (!targetMapExists) {
       player.isMoving = false;
       player.progress = 0;
@@ -2469,6 +2557,29 @@ async function bootstrap() {
       return;
     }
 
+    if (
+      currentM.id === 'azalea_town' &&
+      warp.targetMapId === 'ilex_forest' &&
+      !storyFlags.has('azalea_rival_defeated')
+    ) {
+      player.isMoving = false;
+      player.progress = 0;
+      if (!storyFlags.has('slowpoke_well_cleared') && !storyFlags.has('bugsy_defeated')) {
+        isCutsceneLocked = false;
+        BattleAudio.playMenuSound('CANCEL');
+        overworldHUD.openDialogue(
+          [
+            'TEAM ROCKET is causing a commotion in AZALEA TOWN!',
+            'Visit KURT in his house and help clear SLOWPOKE WELL before venturing into ILEX FOREST!',
+          ],
+          '🌲 ILEX FOREST GATE'
+        );
+        return;
+      }
+      triggerAzaleaRivalAmbush();
+      return;
+    }
+
     const previousMapId = currentM.id;
     const transitionConfig = mapManager.resolveWarpTransition(warp);
 
@@ -2479,8 +2590,10 @@ async function bootstrap() {
 
     overworldRenderer
       .playDoorwayFade(async () => {
+        await ensureMapAndNeighborsLoaded(transitionConfig.targetMapId);
         const targetMap = mapManager.setCurrentMap(transitionConfig.targetMapId);
         visitedMaps.add(targetMap.id);
+        missionManager.registerMapEntry(targetMap.id, storyFlags);
         if (targetMap.id.endsWith('_poke_center')) {
           lastVisitedPokecenter = {
             mapId: targetMap.id,
@@ -3368,8 +3481,234 @@ async function bootstrap() {
           return;
         }
 
-        // Pryce Gym Leader Boss
-        if (targetNpc.action === 'PRYCE_EVENT' && !storyFlags.has('pryce_defeated')) {
+        // Phase 11: Lake of Rage - Shiny Red Gyarados Boss Encounter
+        if (targetNpc.action === 'RED_GYARADOS_EVENT' || targetNpc.id === 'lake_of_rage_red_gyarados') {
+          if (storyFlags.has('red_gyarados_subdued')) {
+            return;
+          }
+          BattleAudio.playCry('gyarados');
+          overworldHUD.openDialogue(
+            [
+              "GYARADOS: Gyashaa!!",
+              "The lake's surface churns violently as the crimson Gyarados thrashes with uncontrollable fury!",
+              "It lunges at you from the swirling waters!"
+            ],
+            '🐉 RED GYARADOS',
+            () => {
+              const redGyarados = PokemonFactory.createShinyRedGyarados(30);
+              triggerBattle(redGyarados, {
+                onBattleEnd: (result) => {
+                  if (result.winner === 'PLAYER' || result.caught) {
+                    storyFlags.add('red_gyarados_subdued');
+                    addOverworldItemToInventory('red_scale');
+                    missionManager.checkStoryFlags(storyFlags);
+                    audioManager.playSfx('sfx_badge_get');
+                    BattleAudio.playOverworldSound('KEY_ITEM');
+                    overworldHUD.openDialogue(
+                      [
+                        "GYARADOS calmed down and submerged into the serene depths of the lake...",
+                        "As the waters quieted, you recovered the dropped RED SCALE!"
+                      ],
+                      '🐉 RED GYARADOS',
+                      () => {
+                        const curMap = mapManager.getCurrentMap();
+                        if (curMap) {
+                          overworldRenderer.renderMap(curMap, lookupMap);
+                          syncMapOverworldItems(curMap);
+                        }
+                        saveCurrentGame();
+                        overworldHUD.showToast('🐉 Obtained RED SCALE! Meet Lance at the shoreline.');
+                      }
+                    );
+                  }
+                }
+              });
+            }
+          );
+          return;
+        }
+
+        // Phase 11: Lake of Rage Shoreline - Lance Briefing
+        if (targetNpc.action === 'LANCE_LAKE_EVENT' || targetNpc.id === 'lake_of_rage_lance') {
+          if (!storyFlags.has('red_gyarados_subdued')) {
+            overworldHUD.openDialogue(
+              [
+                "LANCE: ...Something unnatural is disturbing this lake. Look at the water churn!"
+              ],
+              '🏆 LANCE'
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            [
+              "LANCE: ...So you're the trainer who quelled that raging Gyarados. Outstanding courage and skill!",
+              "My name is LANCE. I'm a dragon trainer investigating the rumors of forced evolution in this lake.",
+              "The Magikarp here were forced to evolve by a sinister, high-frequency radio broadcast.",
+              "The signal originates from MAHOGANY TOWN. There must be a subterranean TEAM ROCKET base hidden there!",
+              "Will you join forces with me to storm their hideout and shut down the transmitter?",
+              "Splendid! Rendezvous with me inside the souvenir shop in Mahogany Town. I will go on ahead!"
+            ],
+            '🏆 LANCE',
+            () => {
+              storyFlags.add('lance_lake_talked');
+              missionManager.checkStoryFlags(storyFlags);
+              const curMap = mapManager.getCurrentMap();
+              if (curMap) {
+                overworldRenderer.renderMap(curMap, lookupMap);
+                syncMapOverworldItems(curMap);
+              }
+              saveCurrentGame();
+              overworldHUD.showToast('Rendezvous with Lance at the Mahogany Souvenir Shop!');
+            }
+          );
+          return;
+        }
+
+        // Phase 11: Mahogany Town - Gym Entrance Blocker
+        if (targetNpc.action === 'MAHOGANY_GYM_BLOCKER' || targetNpc.id === 'mahogany_gym_blocker') {
+          overworldHUD.openDialogue(
+            [
+              "TOWN RESIDENT: Gym Leader Pryce went to the Lake of Rage to investigate the strange disturbance.",
+              "The Gym is closed until the emergency at the lake and the souvenir shop is fully resolved!"
+            ],
+            'TOWN RESIDENT'
+          );
+          return;
+        }
+
+        // Phase 11: Mahogany Mart - Lance Secret Staircase Reveal
+        if (targetNpc.action === 'LANCE_MART_EVENT' || targetNpc.id === 'mahogany_mart_lance') {
+          overworldHUD.openDialogue(
+            [
+              "LANCE: You made it! The transmitter signal is emanating directly from beneath this floor.",
+              "Lance firmly slides the heavy oak cabinet aside, revealing a concealed stairway leading underground!",
+              "LANCE: Team Rocket has set up an entire subterranean facility below this shop.",
+              "Follow me down! We must fight our way to the power generator and free the Electrodes powering their machine!"
+            ],
+            '🏆 LANCE',
+            () => {
+              storyFlags.add('lance_hideout_briefed');
+              missionManager.checkStoryFlags(storyFlags);
+              saveCurrentGame();
+              overworldHUD.showToast('Infiltrate Team Rocket Hideout B1F via secret stairs!');
+            }
+          );
+          return;
+        }
+
+        // Phase 11: Team Rocket Base B2F - Lance Mid-Infiltration Field Medic
+        if (targetNpc.action === 'LANCE_BASE_HEAL' || targetNpc.id === 'team_rocket_base_b2f_lance') {
+          healPlayerParty(true);
+          overworldHUD.openDialogue(
+            [
+              "LANCE: Are your Pokémon holding up? Here, let me restore your team to peak fighting condition!",
+              "Your Pokémon were fully healed and refreshed!",
+              "LANCE: The central power room is located just down the stairs on B3F. Stay alert—Team Rocket executives are guarding it!"
+            ],
+            '🏆 LANCE',
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('✨ Team fully restored by Lance!');
+            }
+          );
+          return;
+        }
+
+        // Phase 11: Team Rocket Base B3F - Generator Electrodes Sabotage
+        if (targetNpc.action === 'ROCKET_GENERATOR_ELECTRODE' || targetNpc.id.startsWith('b3f_electrode_')) {
+          if (storyFlags.has(targetNpc.id + '_cleared') || storyFlags.has('rocket_base_generator_cleared')) {
+            overworldHUD.openDialogue(
+              ['The power pod is offline and humming faintly.'],
+              '⚡ GENERATOR'
+            );
+            return;
+          }
+          BattleAudio.playCry('electrode');
+          overworldHUD.openDialogue(
+            [
+              "⚡ The ELECTRODE is locked into the generator housing, radiating frantic, crackling electricity!",
+              "It turned toward you and attacked in wild agitation!"
+            ],
+            '⚡ ELECTRODE',
+            () => {
+              const electrodePkmn = PokemonFactory.create('electrode', 23, [
+                'spark',
+                'sonicboom',
+                'screech',
+                'selfdestruct'
+              ]);
+              triggerBattle(electrodePkmn, {
+                onBattleEnd: (result) => {
+                  if (result.winner === 'PLAYER' || result.caught) {
+                    storyFlags.add(targetNpc.id + '_cleared');
+                    const clearedCount = [1, 2, 3, 4, 5, 6].filter((i) =>
+                      storyFlags.has(`b3f_electrode_${i}_cleared`)
+                    ).length;
+
+                    if (clearedCount >= 3) {
+                      storyFlags.add('rocket_base_generator_cleared');
+                      if (!inventory.tms.includes('HM06')) {
+                        inventory.tms.push('HM06');
+                      }
+                      missionManager.checkStoryFlags(storyFlags);
+                      audioManager.playSfx('sfx_badge_get');
+                      BattleAudio.playOverworldSound('KEY_ITEM');
+                      overworldHUD.openDialogue(
+                        [
+                          "The generator's heavy hum abruptly sputters and dies! The broadcast transmitter has gone dead!",
+                          "LANCE: Magnificent work, trainer! The forced evolution signal has been completely disabled!",
+                          "The wild Magikarp and the Lake of Rage are peaceful once more.",
+                          "Please, take this as a token of my sincere respect for your valor: HM06 WHIRLPOOL!",
+                          "LANCE: With WHIRLPOOL, your Pokémon can safely carry you across dangerous ocean vortexes.",
+                          "I must return to the Pokémon League at Indigo Plateau. Pryce should be waiting at the Mahogany Gym now. Good luck, trainer!"
+                        ],
+                        '🏆 LANCE',
+                        () => {
+                          const curMap = mapManager.getCurrentMap();
+                          if (curMap) {
+                            overworldRenderer.renderMap(curMap, lookupMap);
+                            syncMapOverworldItems(curMap);
+                          }
+                          saveCurrentGame();
+                          overworldHUD.showToast('⚡ Transmitter Shut Down! Received HM06 WHIRLPOOL!');
+                        }
+                      );
+                    } else {
+                      overworldHUD.openDialogue(
+                        [
+                          `The ELECTRODE broke free from the generator pod! (${clearedCount}/3 generator cores disabled)`
+                        ],
+                        '⚡ GENERATOR',
+                        () => {
+                          const curMap = mapManager.getCurrentMap();
+                          if (curMap) {
+                            overworldRenderer.renderMap(curMap, lookupMap);
+                            syncMapOverworldItems(curMap);
+                          }
+                          saveCurrentGame();
+                        }
+                      );
+                    }
+                  }
+                }
+              });
+            }
+          );
+          return;
+        }
+
+        // Pryce Gym Leader Boss (Phase 11 Mission M08 Climax)
+        if (targetNpc.action === 'PRYCE_EVENT') {
+          if (storyFlags.has('pryce_defeated')) {
+            overworldHUD.openDialogue(
+              [
+                "PRYCE: POKéMON and humans both grow stronger as they endure life's bitter cold.",
+                "Continue striving with an unyielding spirit!"
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
           overworldHUD.openDialogue(
             targetNpc.challengePages && targetNpc.challengePages.length > 0 ? targetNpc.challengePages : ['PRYCE: In my 60 years of training, I have seen it all. Let me show you the power of ice!'],
             targetNpc.speaker,
@@ -3388,6 +3727,8 @@ async function bootstrap() {
                   if (!inventory.tms.includes('TM16')) inventory.tms.push('TM16');
                   audioManager.playSfx('sfx_badge_get');
                   BattleAudio.playOverworldSound('KEY_ITEM');
+                  missionManager.checkStoryFlags(storyFlags);
+                  missionManager.completeMission('M08');
                   overworldHUD.openDialogue(
                     ['PRYCE: Your strong bond is clear. Take the GLACIERBADGE and TM16 ICY WIND!'],
                     targetNpc.speaker,
@@ -4473,7 +4814,245 @@ async function bootstrap() {
           return;
         }
 
-        // Azalea Town: Kurt's House Post-Well Interaction & Apricorn Crafting
+        // Violet City: Kyle's Bellsprout-for-Onix In-Game Trade (Side Mission S03)
+        if (targetNpc.id === 'kyle') {
+          if (storyFlags.has('traded_onix_rocky')) {
+            overworldHUD.openDialogue(
+              [
+                'KYLE: How is that ONIX I traded you doing? ROCKY loves battling strong Gym Leaders!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              'KYLE: I collect POKéMON! Do you have a BELLSPROUT?',
+              'Want to trade your BELLSPROUT for my ONIX?',
+            ],
+            targetNpc.speaker,
+            () => {
+              const existingTradeModal = document.getElementById('kyle-trade-confirm-modal');
+              existingTradeModal?.remove();
+
+              const tradeModal = document.createElement('div');
+              tradeModal.id = 'kyle-trade-confirm-modal';
+              tradeModal.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(2, 6, 23, 0.78);
+                backdrop-filter: blur(6px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 95;
+                pointer-events: auto;
+              `;
+              tradeModal.innerHTML = `
+                <div style="
+                  width: 380px;
+                  max-width: 92vw;
+                  background: rgba(15, 23, 42, 0.98);
+                  border: 3px solid #38bdf8;
+                  border-radius: 14px;
+                  padding: 20px;
+                  color: #f8fafc;
+                  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+                  display: flex;
+                  flex-direction: column;
+                  gap: 14px;
+                ">
+                  <div style="font-size: 16px; font-weight: 900; color: #38bdf8;">🔄 KYLE'S POKéMON TRADE</div>
+                  <div style="font-size: 13px; line-height: 1.5; color: #e2e8f0;">
+                    Trade your <strong>BELLSPROUT</strong> for Kyle's <strong>ONIX ("ROCKY")</strong> holding a Bitter Berry?
+                  </div>
+                  <div style="display: flex; gap: 10px;">
+                    <button id="kyle-trade-yes-btn" style="
+                      flex: 1;
+                      background: #0284c7;
+                      color: #fff;
+                      border: 1px solid #38bdf8;
+                      border-radius: 8px;
+                      padding: 10px 12px;
+                      font-size: 13px;
+                      font-weight: 800;
+                      cursor: pointer;
+                    ">YES, TRADE</button>
+                    <button id="kyle-trade-no-btn" style="
+                      flex: 1;
+                      background: #334155;
+                      color: #f8fafc;
+                      border: 1px solid rgba(148, 163, 184, 0.4);
+                      border-radius: 8px;
+                      padding: 10px 12px;
+                      font-size: 13px;
+                      font-weight: 800;
+                      cursor: pointer;
+                    ">NO THANKS</button>
+                  </div>
+                </div>
+              `;
+              document.body.appendChild(tradeModal);
+
+              const yesBtn = tradeModal.querySelector('#kyle-trade-yes-btn') as HTMLButtonElement;
+              const noBtn = tradeModal.querySelector('#kyle-trade-no-btn') as HTMLButtonElement;
+
+              yesBtn?.addEventListener('click', () => {
+                tradeModal.remove();
+                const partyIdx = playerParty.findIndex((p) => p.speciesId === 'bellsprout');
+                const boxState = boxManager.getState();
+                let boxFound: { boxIdx: number; slotIdx: number; level: number } | null = null;
+                if (partyIdx === -1) {
+                  for (let b = 0; b < boxState.boxes.length; b++) {
+                    const idx = boxState.boxes[b].pokemon.findIndex((p) => p.speciesId === 'bellsprout');
+                    if (idx !== -1) {
+                      boxFound = { boxIdx: b, slotIdx: idx, level: boxState.boxes[b].pokemon[idx].level };
+                      break;
+                    }
+                  }
+                }
+
+                if (partyIdx === -1 && !boxFound) {
+                  BattleAudio.playMenuSound('CANCEL');
+                  overworldHUD.openDialogue(
+                    [
+                      "KYLE: Awww! You don't have a BELLSPROUT!",
+                      'You can catch wild BELLSPROUT in the tall grass on ROUTE 31 or ROUTE 32. Come back when you have one!',
+                    ],
+                    targetNpc.speaker
+                  );
+                  return;
+                }
+
+                const tradeLevel =
+                  partyIdx !== -1 ? Math.max(5, playerParty[partyIdx].level) : Math.max(5, boxFound!.level);
+                const rockyOnix = PokemonFactory.create('onix', tradeLevel);
+                rockyOnix.nickname = 'ROCKY';
+                rockyOnix.heldItem = 'persim-berry';
+
+                if (partyIdx !== -1) {
+                  playerParty[partyIdx] = rockyOnix;
+                } else if (boxFound) {
+                  boxState.boxes[boxFound.boxIdx].pokemon[boxFound.slotIdx] = rockyOnix;
+                }
+
+                storyFlags.add('traded_onix_rocky');
+                missionManager.checkStoryFlags(storyFlags);
+                BattleAudio.playOverworldSound('FANFARE');
+                overworldHUD.showToast('🪨 Traded BELLSPROUT for ONIX ("ROCKY")!');
+                saveCurrentGame();
+
+                overworldHUD.openDialogue(
+                  [
+                    'KYLE: Yay! Thanks! We traded BELLSPROUT for ONIX!',
+                    'Take good care of ROCKY! Rock-type moves are super effective against FALKNER at the VIOLET GYM!',
+                  ],
+                  targetNpc.speaker
+                );
+              });
+
+              noBtn?.addEventListener('click', () => {
+                tradeModal.remove();
+                BattleAudio.playMenuSound('CANCEL');
+                overworldHUD.openDialogue(
+                  ["KYLE: Oh, you don't want to trade? That's okay then."],
+                  targetNpc.speaker
+                );
+              });
+            }
+          );
+          return;
+        }
+
+        // Violet City: Earl's Pokémon Academy Lecture & Graduation Reward (Side Mission S04)
+        if (targetNpc.id === 'earl_teacher') {
+          if (!storyFlags.has('earls_academy_graduated')) {
+            storyFlags.add('earls_academy_graduated');
+            inventory.items['parlyz-heal'] = (inventory.items['parlyz-heal'] || 0) + 1;
+            inventory.items['antidote'] = (inventory.items['antidote'] || 0) + 1;
+            inventory.items['awakening'] = (inventory.items['awakening'] || 0) + 1;
+            missionManager.checkStoryFlags(storyFlags);
+            BattleAudio.playOverworldSound('FANFARE');
+            overworldHUD.showToast('🎓 Received Status Cure Kit (Parlyz Heal, Antidote & Awakening)!');
+            saveCurrentGame();
+            overworldHUD.openDialogue(
+              [
+                "Twirl! Welcome to EARL'S POKéMON ACADEMY!",
+                "In battle, a move matching your POKéMON's own type deals 1.5x damage! And always carry cures for status conditions!",
+                'Received the STATUS CURE KIT (PARLYZ HEAL, ANTIDOTE, and AWAKENING) from PROF. EARL!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+        }
+
+        // Azalea Town: Kurt's House Briefing, Post-Well Interaction & Apricorn Crafting
+        if (targetNpc.id === 'kurt_granddaughter') {
+          const isWellCleared =
+            storyFlags.has('slowpoke_well_cleared') ||
+            storyFlags.has('cleared_slowpoke_well') ||
+            storyFlags.has('EVENT_CLEARED_SLOWPOKE_WELL');
+          if (storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') && !isWellCleared) {
+            overworldHUD.openDialogue(
+              [
+                "GRANDDAUGHTER: Grandpa dashed off to SLOWPOKE WELL all by himself!",
+                "I'm so worried about him—please go to SLOWPOKE WELL and help Grandpa!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+        }
+
+        if (targetNpc.id === 'kiln_boss') {
+          const isFarfetchdReturned =
+            storyFlags.has('EVENT_HERDED_FARFETCHD') ||
+            storyFlags.has('forest_farfetchd_herded') ||
+            storyFlags.has('has_hm01_cut') ||
+            storyFlags.has('EVENT_GOT_HM01_CUT');
+          if (!isFarfetchdReturned) {
+            overworldHUD.openDialogue(
+              [
+                "KILN BOSS: All the SLOWPOKE have disappeared from the town... TEAM ROCKET must be up to no good.",
+                "And my apprentice went into ILEX FOREST to look for our runaway FARFETCH'D!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+        }
+
+        if (targetNpc.action === 'CHARCOAL_KILN_APPRENTICE_EVENT' || targetNpc.id === 'kiln_apprentice') {
+          if (storyFlags.has('got_charcoal_from_kiln')) {
+            overworldHUD.openDialogue(
+              [
+                "APPRENTICE: FARFETCH'D is back and our charcoal kiln is burning bright! Have a Pokémon hold CHARCOAL to boost FIRE-type moves!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          storyFlags.add('got_charcoal_from_kiln');
+          if (!inventory.items) inventory.items = {};
+          inventory.items['charcoal'] = (inventory.items['charcoal'] || 0) + 1;
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          overworldHUD.openDialogue(
+            [
+              "APPRENTICE: Thank you so much for chasing down FARFETCH'D in ILEX FOREST!",
+              "Please take this CHARCOAL that we cured in our kiln! Having a POKéMON hold it powers up FIRE-type moves!",
+              `${playerName} received CHARCOAL!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('🔥 Received CHARCOAL from the Charcoal Kiln!');
+            }
+          );
+          return;
+        }
+
         if (targetNpc.id === 'kurt_house_kurt') {
           const isWellCleared =
             storyFlags.has('slowpoke_well_cleared') ||
@@ -4483,10 +5062,20 @@ async function bootstrap() {
           if (!isWellCleared) {
             overworldHUD.openDialogue(
               [
-                'KURT: TEAM ROCKET is cutting off SLOWPOKE tails in the well outside!',
-                'We have to put a stop to their cruelty!',
+                'KURT: Hmph! TEAM ROCKET is back and chopping off priceless SLOWPOKE tails at the well!',
+                "I won't let them get away with this! I'm going to SLOWPOKE WELL to drive them off myself! Follow me, kid!",
+                'Kurt grabbed his walking stick and bolted out the door towards SLOWPOKE WELL!',
               ],
-              targetNpc.speaker
+              targetNpc.speaker,
+              () => {
+                BattleAudio.playOverworldSound('DOOR');
+                storyFlags.add('EVENT_KURT_LEFT_FOR_WELL');
+                if (npcsByMap.azalea_town) {
+                  npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_well_grunt');
+                }
+                saveCurrentGame();
+                overworldHUD.showToast('👴 Kurt rushed into Slowpoke Well!');
+              }
             );
             return;
           }
@@ -4649,6 +5238,7 @@ async function bootstrap() {
                         audioManager.playMapBgm(kurtMap.id, 0.8);
 
                         inventory.balls['lure-ball'] = (inventory.balls['lure-ball'] || 0) + 1;
+                        storyFlags.add('EVENT_KURT_GAVE_YOU_LURE_BALL');
                         storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
                         missionManager.checkStoryFlags(storyFlags);
                         BattleAudio.playOverworldSound('KEY_ITEM');
@@ -4867,6 +5457,38 @@ async function bootstrap() {
               BattleAudio.playOverworldSound('KEY_ITEM');
               saveCurrentGame();
               overworldHUD.showToast("🥊 Received TM02 HEADBUTT from the Headbutt Guy!");
+            }
+          );
+          return;
+        }
+
+        // Route 34 Ilex Forest Gate: Sweet Scent TM12 Teacher
+        if (targetNpc.action === 'SWEET_SCENT_TEACHER_EVENT' || targetNpc.id === 'gate_teacher') {
+          if (storyFlags.has('has_tm12_sweet_scent')) {
+            overworldHUD.openDialogue(
+              [
+                "TEACHER: It's SWEET SCENT. Use it wherever POKéMON appear, and wild POKéMON will be enticed by the fragrance!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              "TEACHER: Oh, honey. You're making a POKéDEX? That must be tough trying to find rare POKéMON in the tall grass!",
+              'Take this TM! It will help you draw wild POKéMON right out of hiding!',
+              `${playerName} received TM12 SWEET SCENT!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              storyFlags.add('has_tm12_sweet_scent');
+              if (!inventory.tms) inventory.tms = [];
+              if (!inventory.tms.includes('TM12')) inventory.tms.push('TM12');
+              if (!inventory.tms.includes('TM12_SWEET_SCENT')) inventory.tms.push('TM12_SWEET_SCENT');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              saveCurrentGame();
+              overworldHUD.showToast('🌸 Received TM12 SWEET SCENT!');
             }
           );
           return;
@@ -5294,7 +5916,20 @@ async function bootstrap() {
       }
 
       overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
-        if (bgEvent.action === 'HEAL_AND_SAVE') {
+        if (
+          currentMap.id === 'earls_pokemon_academy' &&
+          bgEvent.speaker.includes('BLACKBOARD') &&
+          !storyFlags.has('earls_academy_graduated')
+        ) {
+          storyFlags.add('earls_academy_graduated');
+          inventory.items['parlyz-heal'] = (inventory.items['parlyz-heal'] || 0) + 1;
+          inventory.items['antidote'] = (inventory.items['antidote'] || 0) + 1;
+          inventory.items['awakening'] = (inventory.items['awakening'] || 0) + 1;
+          missionManager.checkStoryFlags(storyFlags);
+          BattleAudio.playOverworldSound('FANFARE');
+          overworldHUD.showToast('🎓 Blackboard studied! Received Status Cure Kit!');
+          saveCurrentGame();
+        } else if (bgEvent.action === 'HEAL_AND_SAVE') {
           healPlayerParty(false);
           saveCurrentGame();
           if (currentMap.id.endsWith('_poke_center')) {
@@ -5595,7 +6230,7 @@ async function bootstrap() {
   ): void => {
     if (!neighborMapId) return;
     const neighborMap = mapManager.getMap(neighborMapId);
-    const neighborNpcs = neighborMap ? npcsByMap[neighborMap.id] : undefined;
+    const neighborNpcs = neighborMap ? getActiveMapNpcs(neighborMap.id) : undefined;
     if (!neighborMap || !neighborNpcs) return;
 
     mapManager.setNeighborScratchMap(neighborMap);
@@ -5619,6 +6254,163 @@ async function bootstrap() {
       );
     }
     mapManager.setNeighborScratchMap(null);
+  };
+
+  // Slowpoke Well B1F: First Team Rocket Grunt Approaches & Blocks Corridor Path
+  const triggerSlowpokeWellGruntIntercept = async (grunt: GridEntity) => {
+    if (!grunt.trainerId || !grunt.trainerPokemon || defeatedTrainers.has(grunt.trainerId)) return;
+    isCutsceneLocked = true;
+    player.isMoving = false;
+    player.progress = 0;
+
+    BattleAudio.playOverworldSound('EXCLAMATION');
+    await overworldRenderer.showExclamationBubble(grunt, Math.round(520 / gameClock.playerSpeed));
+
+    const animateNpcStep = async (entity: GridEntity, nextX: number, nextY: number, dir: Direction) => {
+      const startX = entity.x;
+      const startY = entity.y;
+      entity.direction = dir;
+      entity.targetX = nextX;
+      entity.targetY = nextY;
+      entity.isMoving = true;
+      entity.progress = 0;
+      const stepMs = (GridPhysics.BASE_TRAVERSAL_TIME * 1000) / gameClock.playerSpeed;
+      await new Promise<void>((resolve) => {
+        const t0 = performance.now();
+        const animate = (now: number) => {
+          const p = Math.min(1, (now - t0) / stepMs);
+          entity.progress = p;
+          entity.renderX = startX + (nextX - startX) * p;
+          entity.renderY = startY + (nextY - startY) * p;
+          if (p < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            entity.x = nextX;
+            entity.y = nextY;
+            entity.gridX = nextX;
+            entity.gridY = nextY;
+            entity.renderX = nextX;
+            entity.renderY = nextY;
+            entity.isMoving = false;
+            entity.progress = 0;
+            resolve();
+          }
+        };
+        requestAnimationFrame(animate);
+      });
+    };
+
+    // Align horizontally with player's column in the corridor so the grunt physically blocks their path
+    while (grunt.x !== player.x) {
+      const stepDir: Direction = player.x < grunt.x ? 'LEFT' : 'RIGHT';
+      const nextX = grunt.x + (stepDir === 'LEFT' ? -1 : 1);
+      await animateNpcStep(grunt, nextX, grunt.y, stepDir);
+    }
+
+    // Walk down to 1 tile north of the player to block the tunnel
+    grunt.direction = 'DOWN';
+    const targetY = Math.max(grunt.y, player.y - 1);
+    while (grunt.y < targetY) {
+      await animateNpcStep(grunt, grunt.x, grunt.y + 1, 'DOWN');
+    }
+
+    player.direction = 'UP';
+    const dialoguePages =
+      grunt.challengePages && grunt.challengePages.length > 0
+        ? grunt.challengePages
+        : grunt.pages || ["ROCKET GRUNT: Hold it right there, brat! You're not getting past me!"];
+
+    overworldHUD.openDialogue(dialoguePages, grunt.speaker, () => {
+      isCutsceneLocked = false;
+      const team = buildTrainerTeamInstances(grunt);
+      if (team.length === 0) return;
+      triggerBattle(team[0], {
+        isTrainer: true,
+        trainerName: grunt.trainerName || grunt.speaker || 'Rocket Grunt',
+        trainerTeam: team,
+        onVictory: () => {
+          defeatedTrainers.add(grunt.trainerId!);
+          handleTrainerDefeatRewards(grunt);
+          saveCurrentGame();
+        },
+      });
+    });
+  };
+
+  // Azalea Town West Gate: Rival Silver Ambush Encounter (Rival Battle 2)
+  const triggerAzaleaRivalAmbush = () => {
+    isCutsceneLocked = true;
+    player.isMoving = false;
+    player.progress = 0;
+    player.direction = 'LEFT';
+
+    let starterSpeciesId: 'croconaw' | 'bayleef' | 'quilava' = 'croconaw';
+    let starterMoves = ['scratch', 'leer', 'rage', 'watergun'];
+
+    if (
+      storyFlags.has('starter_cyndaquil') ||
+      playerParty.some((p) => p.speciesId === 'cyndaquil' || p.speciesId === 'quilava' || p.speciesId === 'typhlosion')
+    ) {
+      starterSpeciesId = 'croconaw';
+      starterMoves = ['scratch', 'leer', 'rage', 'watergun'];
+    } else if (
+      storyFlags.has('starter_totodile') ||
+      playerParty.some((p) => p.speciesId === 'totodile' || p.speciesId === 'croconaw' || p.speciesId === 'feraligatr')
+    ) {
+      starterSpeciesId = 'bayleef';
+      starterMoves = ['tackle', 'growl', 'razorleaf', 'reflect'];
+    } else {
+      starterSpeciesId = 'quilava';
+      starterMoves = ['tackle', 'leer', 'smokescreen', 'ember'];
+    }
+
+    const rivalTeam = [
+      PokemonFactory.create('gastly', 12, ['lick', 'spite', 'meanlook', 'curse']),
+      PokemonFactory.create('zubat', 14, ['leechlife', 'supersonic', 'bite']),
+      PokemonFactory.create(starterSpeciesId, 16, starterMoves),
+    ];
+
+    audioManager.playBattleBgm('trainer');
+    overworldHUD.openDialogue(
+      [
+        `${rivalName || 'SILVER'}: …Tell me something. Is it true that TEAM ROCKET has returned?`,
+        "What? You beat them? Hah! Quit lying!",
+        "You're not joking? Then let's see how good you really are!",
+      ],
+      `❓ RIVAL ${rivalName || 'SILVER'}`,
+      () => {
+        triggerBattle(rivalTeam[0], {
+          isTrainer: true,
+          trainerName: `Rival ${rivalName || 'Silver'}`,
+          trainerTeam: rivalTeam,
+          onVictory: () => {
+            storyFlags.add('azalea_rival_defeated');
+            storyFlags.add('EVENT_BEAT_RIVAL_IN_AZALEA');
+            defeatedTrainers.add('rival_azalea');
+            overworldHUD.openDialogue(
+              [
+                `${rivalName || 'SILVER'}: …Humph! Useless POKéMON!`,
+                'Listen, you. You only won because my POKéMON were weak!',
+                "I hate the weak. POKéMON, trainers. It doesn't matter who or what.",
+                "I'm going to be strong and wipe out the weak. That goes for TEAM ROCKET too.",
+                `Rival ${rivalName || 'Silver'} glared coldly and strode away!`,
+              ],
+              `❓ RIVAL ${rivalName || 'SILVER'}`,
+              () => {
+                isCutsceneLocked = false;
+                saveCurrentGame();
+                overworldHUD.showToast(`⚔️ Defeated Rival ${rivalName || 'Silver'}! The way to Ilex Forest is open!`);
+              }
+            );
+          },
+          onBattleEnd: (res) => {
+            if (res.winner !== 'PLAYER') {
+              isCutsceneLocked = false;
+            }
+          },
+        });
+      }
+    );
   };
 
   // Passerby Rival 1 Ambush Encounter (Cherrygrove East Exit)
@@ -5829,7 +6621,17 @@ async function bootstrap() {
     return true;
   };
 
-  // 8. Decoupled Main Ticker Loop
+  // 8. Decoupled Main Ticker Loop & Visibility Throttling
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        overworldRenderer.app.ticker.stop();
+      } else {
+        overworldRenderer.app.ticker.start();
+      }
+    });
+  }
+
   overworldRenderer.app.ticker.add((ticker) => {
     const rawDeltaSec = ticker.deltaMS / 1000;
     const { dtWorld, dtPlayer } = gameClock.tick(rawDeltaSec);
@@ -5842,8 +6644,8 @@ async function bootstrap() {
     overworldRenderer.updateAmbientLighting(currentTimeOfDay, isOutdoor);
 
     if (gameState === 'OVERWORLD') {
-      // Active NPCs on this map (Zero per-frame array allocations)
-      const activeNpcs = currentMap ? npcsByMap[currentMap.id] || emptyNpcs : emptyNpcs;
+      // Active NPCs on this map retrieved via O(1) memoized story-flag cache (zero per-frame array allocation)
+      const activeNpcs = currentMap ? getActiveMapNpcs(currentMap.id) : emptyNpcs;
 
       const heldDir = isCutsceneLocked ? null : overworldHUD.getHeldDirection();
 
@@ -5880,6 +6682,34 @@ async function bootstrap() {
           ) {
             triggerCherrygroveRivalAmbush();
             return;
+          }
+
+          // Azalea Town West Gate Rival 2 Ambush
+          if (
+            currentMap?.id === 'azalea_town' &&
+            coord.x <= 4 &&
+            (coord.y === 10 || coord.y === 11) &&
+            (storyFlags.has('slowpoke_well_cleared') || storyFlags.has('bugsy_defeated')) &&
+            !storyFlags.has('azalea_rival_defeated')
+          ) {
+            triggerAzaleaRivalAmbush();
+            return;
+          }
+
+          // Slowpoke Well B1F: First Team Rocket Grunt Approaches & Blocks Corridor Path
+          if (
+            currentMap?.id === 'slowpoke_well_b1f' &&
+            (coord.x === 14 || coord.x === 15) &&
+            coord.y <= 10 &&
+            !defeatedTrainers.has('rocket_grunt_1') &&
+            !storyFlags.has('slowpoke_well_cleared')
+          ) {
+            const wellNpcs = getActiveMapNpcs('slowpoke_well_b1f');
+            const grunt1 = wellNpcs.find((n) => n.id === 'rocket_grunt_1');
+            if (grunt1) {
+              triggerSlowpokeWellGruntIntercept(grunt1);
+              return;
+            }
           }
 
           // Burned Tower 1F Rival Ambush
@@ -5996,7 +6826,7 @@ async function bootstrap() {
 
           // Check Line-of-Sight Trainer Encounters on active map
           const latestMap = mapManager.getCurrentMap();
-          const latestNpcs = latestMap ? npcsByMap[latestMap.id] || emptyNpcs : emptyNpcs;
+          const latestNpcs = latestMap ? getActiveMapNpcs(latestMap.id) : emptyNpcs;
           const spottedTrainer = GridPhysics.checkTrainerLineOfSight(
             player,
             latestNpcs,
@@ -6119,6 +6949,171 @@ async function bootstrap() {
       overworldRenderer.update(player, npcsToRender, dtWorld);
     }
   });
+
+  // 9. Always-Available Top-Right GitHub Issue Report Button with Clipboard Screenshot
+  const mountGitHubReportButton = () => {
+    const uiOverlay = document.getElementById('ui-overlay') || document.body;
+    if (document.getElementById('github-report-issue-btn')) return;
+
+    const reportBtn = document.createElement('button');
+    reportBtn.id = 'github-report-issue-btn';
+    reportBtn.setAttribute('aria-label', 'Report Issue on GitHub with Screenshot');
+    reportBtn.title = 'Capture Screenshot to Clipboard & Report Issue on GitHub';
+    reportBtn.style.cssText = `
+      position: fixed;
+      top: max(54px, calc(env(safe-area-inset-top, 12px) + 42px));
+      right: max(12px, env(safe-area-inset-right, 12px));
+      z-index: 98;
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(10px);
+      color: #f8fafc;
+      border: 1.5px solid #38bdf8;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+      transition: transform 0.15s ease, background 0.15s ease;
+    `;
+    reportBtn.innerHTML = `<span>🐛</span><span>REPORT</span>`;
+
+    reportBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      BattleAudio.playMenuSound('CONFIRM');
+
+      let screenshotDataUrl = '';
+      let copiedToClipboard = false;
+
+      try {
+        const canvas = overworldRenderer.app?.canvas as HTMLCanvasElement | undefined;
+        if (canvas) {
+          screenshotDataUrl = canvas.toDataURL('image/png');
+          const blob = await new Promise<Blob | null>((resolve) =>
+            canvas.toBlob((b) => resolve(b), 'image/png')
+          );
+          if (blob && navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+            copiedToClipboard = true;
+          }
+        }
+      } catch (err) {
+        console.warn('Screenshot capture fallback:', err);
+      }
+
+      const activeMapId = mapManager.getCurrentMap()?.id || 'unknown';
+      const issueTitle = encodeURIComponent(
+        `[Bug Report] Issue at ${activeMapId} (${player.x}, ${player.y})`
+      );
+      const issueBody = encodeURIComponent(
+        [
+          '### Issue Description',
+          'Describe what happened:',
+          '',
+          '### Screenshot',
+          copiedToClipboard
+            ? '*(📸 Screenshot is copied to your clipboard — press **Ctrl+V** or **Cmd+V** right here to paste it!)*'
+            : '*(Attach or drag-and-drop your downloaded screenshot below)*',
+          '',
+          '### Game Diagnostics',
+          `- **Map**: \`${activeMapId}\` (\`${player.x}, ${player.y}\`, facing \`${player.direction}\`)`,
+          `- **State**: \`${gameState}\``,
+          `- **Badges**: ${inventory.badges.length} (${inventory.badges.join(', ') || 'none'})`,
+          `- **Party**: ${playerParty.map((p) => `${p.nickname || p.speciesId} Lv.${p.level}`).join(', ') || 'Empty'}`,
+          `- **Viewport**: ${window.innerWidth}x${window.innerHeight}`,
+        ].join('\n')
+      );
+      const githubIssueUrl = `https://github.com/jbveiga/crystal-overdrive/issues/new?title=${issueTitle}&body=${issueBody}`;
+
+      const existingCard = document.getElementById('github-report-modal-card');
+      existingCard?.remove();
+
+      const modalCard = document.createElement('div');
+      modalCard.id = 'github-report-modal-card';
+      modalCard.style.cssText = `
+        position: fixed;
+        top: max(94px, calc(env(safe-area-inset-top, 12px) + 82px));
+        right: max(12px, env(safe-area-inset-right, 12px));
+        width: 310px;
+        max-width: 90vw;
+        background: rgba(15, 23, 42, 0.98);
+        border: 2px solid #38bdf8;
+        border-radius: 12px;
+        padding: 14px;
+        z-index: 99;
+        pointer-events: auto;
+        color: #f8fafc;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      `;
+      modalCard.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; font-weight: 900; color: #38bdf8;">📸 SCREENSHOT CAPTURED</span>
+          <button id="close-report-card-btn" aria-label="Close Report Dialog" style="background: none; border: none; color: #94a3b8; font-size: 15px; cursor: pointer;">✕</button>
+        </div>
+        ${
+          screenshotDataUrl
+            ? `<img src="${screenshotDataUrl}" alt="Current Screen Capture" style="width: 100%; height: 110px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.4);" />`
+            : ''
+        }
+        <div style="font-size: 11px; color: #cbd5e1; line-height: 1.4;">
+          ${
+            copiedToClipboard
+              ? '✅ Screenshot copied to clipboard! Paste it (Ctrl+V / Cmd+V) directly into the GitHub issue.'
+              : '💾 Download the screenshot below and drag it into the GitHub issue page.'
+          }
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <a id="github-issues-redirect-link" href="${githubIssueUrl}" target="_blank" rel="noopener noreferrer" style="
+            flex: 1.4;
+            text-align: center;
+            text-decoration: none;
+            background: #0284c7;
+            color: #ffffff;
+            border: 1px solid #38bdf8;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 12px;
+            font-weight: 800;
+          ">OPEN GITHUB ISSUE ↗</a>
+          ${
+            screenshotDataUrl
+              ? `<a id="github-screenshot-download-link" href="${screenshotDataUrl}" download="crystal-overdrive-${activeMapId}.png" style="
+                  flex: 1;
+                  text-align: center;
+                  text-decoration: none;
+                  background: #334155;
+                  color: #f8fafc;
+                  border: 1px solid rgba(148, 163, 184, 0.4);
+                  border-radius: 8px;
+                  padding: 8px 8px;
+                  font-size: 11px;
+                  font-weight: 800;
+                ">⬇ SAVE PNG</a>`
+              : ''
+          }
+        </div>
+      `;
+      uiOverlay.appendChild(modalCard);
+
+      modalCard.querySelector('#close-report-card-btn')?.addEventListener('click', () => {
+        modalCard.remove();
+      });
+
+      const directLink = modalCard.querySelector('#github-issues-redirect-link') as HTMLAnchorElement | null;
+      directLink?.click();
+    });
+
+    uiOverlay.appendChild(reportBtn);
+  };
+  mountGitHubReportButton();
 
   console.log('⚡ Crystal Overdrive Vertical Slice 100% playable & booted!');
 }

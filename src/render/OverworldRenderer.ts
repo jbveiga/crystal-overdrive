@@ -1,6 +1,11 @@
-import { Application, Container, Sprite, Texture, Rectangle, Assets, Graphics, Text, TextStyle } from 'pixi.js';
+import { Application, Container, Sprite, Texture, Rectangle, Assets, Graphics, Text, TextStyle, loadTextures } from 'pixi.js';
 import type { MapData, Direction, OverworldItemBall, OverworldFruitTree } from '../types/game';
 import type { GridEntity, NpcSpriteType } from '../world/GridPhysics';
+import {
+  AssetManifestQueue,
+  type ManifestQueueOptions,
+} from '../core/AssetManifestQueue';
+import { GraphicParticlePool } from './GraphicParticlePool';
 
 interface CharacterFrames {
   downStand: Texture;
@@ -25,6 +30,48 @@ interface GrassParticle {
 import { ANIMATED_WATER_TILES } from './tileConstants';
 export { ANIMATED_WATER_TILES };
 
+const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
+  boy: './assets/sprites/characters/npc_boy.png',
+  girl: './assets/sprites/characters/npc_girl.png',
+  fat_man: './assets/sprites/characters/npc_fat_man.png',
+  sudowoodo: './assets/sprites/characters/sudowoodo.png',
+  kris: './assets/sprites/characters/kris_walk.png',
+  silver: './assets/sprites/characters/silver.png',
+  fisherman: './assets/sprites/characters/fisherman.png',
+  bug_catcher: './assets/sprites/characters/bug_catcher.png',
+  teacher: './assets/sprites/characters/teacher.png',
+  mom: './assets/sprites/characters/mom.png',
+  prof_elm: './assets/sprites/characters/prof_elm.png',
+  sage: './assets/sprites/characters/sage.png',
+  elder: './assets/sprites/characters/elder.png',
+  elder_li: './assets/sprites/characters/elder_li.png',
+  falkner: './assets/sprites/characters/falkner.png',
+  bird_keeper: './assets/sprites/characters/bird_keeper.png',
+  earl: './assets/sprites/characters/earl.png',
+  oak: './assets/sprites/characters/oak.png',
+  lapras: './assets/sprites/characters/lapras.png',
+  whitney: './assets/sprites/characters/whitney.png',
+  bike_shop_owner: './assets/sprites/characters/bike_shop_owner.png',
+  clerk: './assets/sprites/characters/clerk.png',
+  receptionist: './assets/sprites/characters/receptionist.png',
+  gentleman: './assets/sprites/characters/gentleman.png',
+  lass: './assets/sprites/characters/lass.png',
+  beauty: './assets/sprites/characters/beauty.png',
+  rocket_grunt_m: './assets/sprites/characters/rocket_grunt_m.png',
+  rocket_grunt_f: './assets/sprites/characters/rocket_grunt_f.png',
+  officer: './assets/sprites/characters/officer.png',
+  camper: './assets/sprites/characters/camper.png',
+  picnicker: './assets/sprites/characters/picnicker.png',
+  psychic: './assets/sprites/characters/psychic.png',
+  schoolboy: './assets/sprites/characters/schoolboy.png',
+  juggler: './assets/sprites/characters/juggler.png',
+  firebreather: './assets/sprites/characters/firebreather.png',
+  pokefan_m: './assets/sprites/characters/pokefan_m.png',
+  pokefan_f: './assets/sprites/characters/pokefan_f.png',
+  super_nerd: './assets/sprites/characters/super_nerd.png',
+  youngster: './assets/sprites/characters/youngster.png',
+};
+
 export class OverworldRenderer {
   public app!: Application;
   private stageContainer!: Container;
@@ -41,6 +88,7 @@ export class OverworldRenderer {
   private npcGrassMasks: Map<string, Graphics> = new Map();
   private activeNpcGrassMaskList: Graphics[] = [];
   private grassParticles: GrassParticle[] = [];
+  private particlePool: GraphicParticlePool = new GraphicParticlePool(24);
   private exclamationContainer: Container | null = null;
   private ambientOverlay!: Graphics;
   private fadeOverlay!: Graphics;
@@ -57,9 +105,24 @@ export class OverworldRenderer {
   private krisFrames!: CharacterFrames;
   private playerFrames!: CharacterFrames;
   private npcFrames: Map<NpcSpriteType, CharacterFrames> = new Map();
+  private loadingNpcPromises: Map<NpcSpriteType, Promise<void>> = new Map();
   private fruitTreeTexture: Texture | null = null;
+  private lastCullCamX: number = Number.NaN;
+  private lastCullCamY: number = Number.NaN;
+  private lastCullScreenW: number = 0;
+  private lastCullScreenH: number = 0;
+  private lastAmbientStateKey: string = '';
 
-  public async init(containerElement: HTMLElement): Promise<void> {
+  public async init(
+    containerElement: HTMLElement,
+    queueOptions?: ManifestQueueOptions
+  ): Promise<void> {
+    // Prevent PixiJS v8 from spawning a blob: Web Worker where relative ./assets/... URLs fail to resolve
+    if (loadTextures?.config) {
+      loadTextures.config.preferWorkers = false;
+      loadTextures.config.preferCreateImageBitmap = false;
+    }
+
     this.app = new Application();
     await this.app.init({
       resizeTo: containerElement,
@@ -72,15 +135,21 @@ export class OverworldRenderer {
     containerElement.appendChild(this.app.canvas);
 
     this.stageContainer = new Container();
+    this.stageContainer.eventMode = 'none';
     this.mapContainer = new Container();
+    this.mapContainer.eventMode = 'none';
     this.itemBallContainer = new Container();
+    this.itemBallContainer.eventMode = 'none';
     this.entityContainer = new Container();
+    this.entityContainer.eventMode = 'none';
     this.foregroundContainer = new Container();
+    this.foregroundContainer.eventMode = 'none';
     this.ambientOverlay = new Graphics();
     this.ambientOverlay.visible = false;
     this.ambientOverlay.eventMode = 'none';
     this.fadeOverlay = new Graphics();
     this.fadeOverlay.visible = false;
+    this.fadeOverlay.eventMode = 'none';
 
     this.stageContainer.addChild(this.mapContainer);
     this.stageContainer.addChild(this.itemBallContainer);
@@ -90,534 +159,131 @@ export class OverworldRenderer {
     this.app.stage.addChild(this.ambientOverlay);
     this.app.stage.addChild(this.fadeOverlay);
 
-    await this.loadAssets();
+    await this.loadAssets(queueOptions);
     this.createPlayerSprite();
   }
 
-  private async loadAssets(): Promise<void> {
-    // 1. Load tiles
-    const tileNames = [
+  /**
+   * Lazily loads an NPC sprite sheet on demand if not yet cached.
+   */
+  public ensureNpcSpriteLoaded(spriteType: NpcSpriteType): Promise<void> {
+    if (this.npcFrames.has(spriteType)) {
+      return Promise.resolve();
+    }
+    const existing = this.loadingNpcPromises.get(spriteType);
+    if (existing) {
+      return existing;
+    }
+    const sheetPath = NPC_SHEET_PATHS[spriteType] || NPC_SHEET_PATHS.boy;
+    const promise = (async () => {
+      try {
+        const tex = await Assets.load<Texture>(sheetPath);
+        if (tex) {
+          tex.source.scaleMode = 'nearest';
+          const extracted = this.extractCharacterFrames(tex);
+          this.npcFrames.set(spriteType, extracted);
+          if (spriteType === 'kris') {
+            this.krisFrames = extracted;
+          }
+        }
+      } catch (err) {
+        console.warn(`Could not load NPC sprite ${spriteType}:`, err);
+      } finally {
+        this.loadingNpcPromises.delete(spriteType);
+      }
+    })();
+    this.loadingNpcPromises.set(spriteType, promise);
+    return promise;
+  }
+
+  private async loadAssets(queueOptions?: ManifestQueueOptions): Promise<void> {
+    // 1. Load only essential baseline fallback tiles at startup; all map-specific tiles load on-demand via ensureMapTilesLoaded
+    const baselineTileNames = [
       'grass',
       'tall_grass',
       'tree_tall_0',
-      'tree_tall_1',
       'tree_short_0',
       'path',
-      'path_gravel',
       'water',
       'water_edge',
-      'water_shore_n',
-      'water_shore_w',
-      'water_shore_nw',
       'flower_0',
-      'flower_1',
       'flower_red',
       'flower_yellow',
       'roof',
       'wall',
       'door',
-      'sign',
-      'sign_town',
-      'sign_lab',
-      'mailbox',
       'fence_horizontal',
-      'house_roof_tl',
-      'house_roof_top',
-      'house_roof_tr',
-      'house_roof_front_l',
-      'house_roof_front_m',
-      'house_roof_front_r',
-      'house_wall',
-      'house_window',
-      'house_door',
-      'lab_roof_tl',
-      'lab_roof_top',
-      'lab_roof_tr',
-      'lab_roof_front_l',
-      'lab_roof_front_m',
-      'lab_roof_front_r',
-      'lab_wall',
-      'lab_window',
-      'lab_door',
-      // 184 Authentic pret/pokecrystal 64x64 Overworld (jt_*) & Indoor (in_*) quadrant tiles
-      'in_house_00_00_00_00',
-      'in_house_00_00_06_07',
-      'in_house_00_00_0c_0d',
-      'in_house_01_01_01_01',
-      'in_house_02_03_12_13',
-      'in_house_04_04_14_14',
-      'in_house_05_2f_3c_3a',
-      'in_house_0a_0b_08_09',
-      'in_house_0e_0f_1e_1f',
-      'in_house_0e_0f_3c_3b',
-      'in_house_16_17_1e_1f',
-      'in_house_1a_1b_18_19',
-      'in_house_1c_1d_1e_1f',
-      'in_house_24_4a_34_2c',
-      'in_house_26_27_36_2f',
-      'in_house_27_29_2f_39',
-      'in_house_2d_2e_3d_3e',
-      'in_house_2f_15_3a_3b',
-      'in_house_32_33_0e_0f',
-      'in_house_32_33_30_31',
-      'in_lab_01_01_11_11',
-      'in_lab_02_02_12_12',
-      'in_lab_03_04_13_14',
-      'in_lab_05_06_15_16',
-      'in_lab_05_07_03_04',
-      'in_lab_06_06_16_16',
-      'in_lab_06_07_16_17',
-      'in_lab_0a_0b_1a_1b',
-      'in_lab_0c_0d_1c_1d',
-      'in_lab_0e_0f_1e_1f',
-      'in_lab_10_10_10_10',
-      'in_lab_10_10_81_82',
-      'in_lab_20_21_30_31',
-      'in_lab_22_23_32_33',
-      'in_lab_25_26_10_10',
-      'in_lab_26_26_10_10',
-      'in_lab_26_27_10_10',
-      'in_lab_42_43_52_53',
-      'in_lab_44_45_54_55',
-      'in_lab_46_47_56_57',
-      'in_lab_47_49_58_59',
-      'in_lab_85_86_83_84',
-      'in_lab_91_92_a1_a2',
-      'in_lab_93_94_a3_a4',
-      'in_mart_0b_0b_1b_1b',
-      'in_mart_0c_0d_50_51',
-      'in_mart_0c_0d_56_57',
-      'in_mart_11_11_2a_2b',
-      'in_mart_1e_2f_1a_19',
-      'in_mart_20_21_30_31',
-      'in_mart_26_27_36_37',
-      'in_mart_28_29_38_39',
-      'in_mart_3e_3f_3e_3f',
-      'in_mart_40_41_50_51',
-      'in_mart_42_2b_52_45',
-      'in_mart_43_44_53_54',
-      'in_mart_48_48_48_48',
-      'in_mart_50_51_5e_5f',
-      'in_mart_58_59_5a_5b',
-      'in_mart_5c_5d_1f_55',
-      'in_players_house_01_01_01_01',
-      'in_players_house_02_03_12_13',
-      'in_players_house_04_04_14_14',
-      'in_players_house_05_05_05_05',
-      'in_players_house_06_07_16_17',
-      'in_players_house_08_09_3a_3b',
-      'in_players_house_0e_0f_1e_1f',
-      'in_players_house_0e_0f_2e_2f',
-      'in_players_house_0e_0f_3a_3b',
-      'in_players_house_11_11_06_07',
-      'in_players_house_11_11_0a_0b',
-      'in_players_house_11_11_11_11',
-      'in_players_house_11_11_20_21',
-      'in_players_house_15_35_32_34',
-      'in_players_house_16_17_08_09',
-      'in_players_house_1a_1b_2a_2b',
-      'in_players_house_1c_1d_01_01',
-      'in_players_house_1c_40_01_01',
-      'in_players_house_22_24_15_35',
-      'in_players_house_23_22_25_15',
-      'in_cave_14_14_14_14',
-      'in_cave_0a_26_17_14',
-      'in_cave_26_26_14_14',
-      'in_cave_26_0b_14_15',
-      'in_cave_17_14_17_14',
-      'in_cave_14_15_14_15',
-      'in_cave_14_25_14_14',
-      'in_cave_27_14_14_14',
-      'in_players_house_25_15_33_32',
-      'in_players_house_25_35_25_35',
-      'in_players_house_25_35_33_34',
-      'in_players_house_26_27_36_37',
-      'in_players_house_28_29_38_39',
-      'in_players_house_2c_2d_11_11',
-      'in_players_house_2e_2f_18_19',
-      'in_players_house_30_31_0c_0d',
-      'in_players_house_32_34_11_11',
-      'in_players_house_33_32_11_11',
-      'in_players_house_40_1d_01_01',
-      'in_players_house_43_45_18_19',
-      'in_players_house_44_44_44_44',
-      'in_players_house_48_49_58_59',
-      'in_players_house_4a_4b_5a_5b',
-      'in_players_house_4c_4d_5c_5d',
-      'in_players_house_50_51_52_53',
-      'in_players_house_aa_ab_ba_00',
-      'in_pokecenter_01_01_11_11',
-      'in_pokecenter_01_0f_03_25',
-      'in_pokecenter_02_02_02_02',
-      'in_pokecenter_02_02_02_0f',
-      'in_pokecenter_02_02_20_21',
-      'in_pokecenter_04_05_14_15',
-      'in_pokecenter_0a_0b_1a_1b',
-      'in_pokecenter_0c_0c_24_24',
-      'in_pokecenter_11_11_11_11',
-      'in_pokecenter_13_35_46_47',
-      'in_pokecenter_1c_1d_2c_2d',
-      'in_pokecenter_1e_1f_2e_2f',
-      'in_pokecenter_30_31_40_41',
-      'in_pokecenter_34_0c_24_24',
-      'in_pokecenter_34_34_24_24',
-      'in_pokecenter_3c_3d_4c_4d',
-      'in_pokecenter_3d_3f_4e_4f',
-      'in_pokecenter_44_45_54_55',
-      'in_pokecenter_48_49_58_59',
-      'in_pokecenter_51_51_50_50',
-      'jt_03_05_05_05',
-      'jt_04_04_04_04',
-      'jt_05_05_05_03',
-      'jt_05_05_05_05',
-      'jt_05_05_4c_4c',
-      'jt_05_3d_05_3d',
-      'jt_05_3d_4c_4d',
-      'jt_06_06_06_06',
-      'jt_07_07_02_02',
-      'jt_07_07_07_07',
-      'jt_07_07_07_26',
-      'jt_07_1c_02_16',
-      'jt_07_1c_07_1c',
-      'jt_07_1c_26_1c',
-      'jt_08_09_17_17',
-      'jt_0d_0e_0a_0b_cg',
-      'jt_0d_0e_0a_0b_nb',
-      'jt_0e_0e_0b_0b_cg',
-      'jt_0e_0e_0b_0b_nb',
-      'jt_0e_0f_0b_0c_cg',
-      'jt_0e_0f_0b_0c_nb',
-      'jt_10_11_0a_0b_cg',
-      'jt_10_11_0a_0b_nb',
-      'jt_10_11_0d_0e_cg',
-      'jt_10_11_0d_0e_nb',
-      'jt_11_11_0b_0b_cg',
-      'jt_11_11_0b_0b_nb',
-      'jt_11_11_0e_0e_cg',
-      'jt_11_11_0e_0e_nb',
-      'jt_11_12_0b_0c_cg',
-      'jt_11_12_0b_0c_nb',
-      'jt_11_12_0e_0f_cg',
-      'jt_11_12_0e_0f_nb',
-      'jt_13_15_45_1d',
-      'jt_14_14_14_14',
-      'jt_14_3b_14_3b',
-      'jt_14_4b_14_14',
-      'jt_18_19_17_17',
-      'jt_1a_07_01_02',
-      'jt_1a_07_1a_07',
-      'jt_1a_1b_01_02',
-      'jt_1a_1b_1a_1b',
-      'jt_1a_1b_1a_26',
-      'jt_1b_1b_02_02',
-      'jt_1b_1b_1b_1b',
-      'jt_1b_1b_1b_26',
-      'jt_1b_1b_26_1b',
-      'jt_1b_1c_02_16',
-      'jt_1b_1c_26_1c',
       'jt_1e_1f_2e_2f',
-      'jt_1e_1f_3e_3f',
-      'jt_2b_2c_3b_3c',
-      'jt_2c_2d_3c_3d',
       'jt_2e_2f_3e_3f',
-      'jt_37_38_39_3a',
-      'jt_3b_05_3b_05',
-      'jt_3b_05_4b_4c',
-      'jt_3b_3c_4b_4c',
-      'jt_3c_3c_3c_3c',
-      'jt_3c_3d_4c_4d',
-      'jt_3d_14_3d_14',
-      'jt_4c_4c_14_14',
-      'jt_4d_14_14_14',
-      'jt_4e_4f_5e_5f',
-      'jt_58_58_58_58',
-      'jt_5c_4c_3d_14',
-      // Route 30 & Route 31 additional authentic quadrant tiles
-      'jt_06_06_4c_4c',
-      'jt_06_3d_06_3d',
-      'jt_07_07_26_07',
-      'jt_1a_07_1a_26',
-      'jt_31_36_41_48',
-      'jt_36_34_48_44',
-      'jt_36_36_48_48',
-      'jt_3b_3b_3b_3b',
-      'jt_3b_4b_4b_4c',
-      'jt_3d_3d_3d_3d',
-      'jt_40_40_40_40',
-      'jt_41_48_51_52',
-      'jt_46_47_56_57',
-      'jt_48_44_52_54',
-      'jt_48_48_52_52',
-      'jt_4c_4c_4c_4c',
-      'jt_4c_5d_14_3b',
-      'jt_4d_3d_4c_4d',
-      // Phase 5 Violet City, Route 31 Gate, Sprout Tower, Violet Gym, Academy & Houses tiles
-      'in_elite_four_room_00_00_00_00',
-      'in_elite_four_room_01_01_01_01',
-      'in_elite_four_room_04_04_14_14',
-      'in_elite_four_room_10_10_10_10',
-      'in_elite_four_room_11_11_01_01',
-      'in_elite_four_room_13_13_12_12',
-      'in_elite_four_room_20_21_30_31',
-      'in_elite_four_room_22_23_32_33',
-      'in_elite_four_room_55_56_57_58',
-      'in_gate_01_01_01_01',
-      'in_gate_07_07_24_25',
-      'in_gate_08_09_18_19',
-      'in_gate_0e_0f_20_21',
-      'in_gate_11_01_11_01',
-      'in_gate_11_11_01_01',
-      'in_gate_11_11_11_01',
-      'in_gate_18_19_18_19',
-      'in_gate_18_19_24_25',
-      'in_gate_28_29_28_29',
-      'in_gate_38_39_15_16',
-      'in_gate_5c_5d_08_09',
-      'in_gate_5c_5d_10_10',
-      'in_house_00_00_40_41',
-      'in_house_01_4f_01_01',
-      'in_house_20_21_42_43',
-      'in_house_37_28_38_3f',
-      'in_house_37_28_38_4e',
-      'in_house_44_45_00_00',
-      'in_house_49_4b_5a_5b',
-      'in_house_50_51_50_51',
-      'in_house_56_57_3c_3a',
-      'in_lab_03_04_35_36',
-      'in_lab_05_07_13_14',
-      'in_lab_24_24_24_24',
-      'in_lab_2a_2b_3a_3b',
-      'in_lab_2b_2c_3b_3c',
-      'in_lab_2e_2e_3e_3e',
-      'in_lab_2f_34_3f_34',
-      'in_lab_34_2d_34_3d',
-      'in_lab_34_34_24_24',
-      'in_lab_34_34_34_34',
-      'in_lab_40_41_50_51',
-      'in_tower_01_01_01_01',
-      'in_tower_01_2c_4e_4f',
-      'in_tower_02_02_02_02',
-      'in_tower_07_08_17_18',
-      'in_tower_08_09_18_19',
-      'in_tower_0a_0b_1a_1b',
-      'in_tower_0b_0b_1b_1b',
-      'in_tower_0c_0d_1c_1d',
-      'in_tower_0e_0f_1e_1f',
-      'in_tower_11_11_21_21',
-      'in_tower_11_11_40_20',
-      'in_tower_11_48_21_58',
-      'in_tower_1a_1b_1a_1b',
-      'in_tower_1b_1b_1b_1b',
-      'in_tower_2d_2e_3d_3e',
-      'in_tower_2e_2f_3e_3f',
-      'in_tower_3c_3e_4d_4e',
-      'in_tower_41_31_41_31',
-      'in_tower_42_43_5a_5b',
-      'in_tower_49_11_59_21',
-      'in_tower_4a_4b_5a_5b',
-      'in_tower_4c_5c_36_37',
-      'in_tower_4d_4e_5d_5e',
-      'in_tower_4e_4f_5e_5f',
-      'jt_06_06_9a_9a',
-      'jt_06_3d_4c_4d',
-      'jt_0d_0e_0a_0b_vc',
-      'jt_0e_0e_0b_0b_vc',
-      'jt_0e_0f_0b_0c_vc',
-      'jt_10_11_0a_0b_vc',
-      'jt_10_11_0d_0e_vc',
-      'jt_11_11_0b_0b_vc',
-      'jt_11_11_0e_0e_vc',
-      'jt_11_12_0b_0c_vc',
-      'jt_11_12_0e_0f_vc',
-      'jt_1a_94_97_98',
-      'jt_1a_95_97_98',
-      'jt_1c_3d_99_3d',
-      'jt_22_41_50_51',
-      'jt_23_24_1b_1b',
-      'jt_27_28_29_2a',
-      'jt_2c_2c_3c_3c',
-      'jt_2d_3c_3d_2d',
-      'jt_31_53_41_53',
-      'jt_3b_06_4b_4c',
-      'jt_3b_1a_3b_97',
-      'jt_41_53_51_52',
-      'jt_44_25_54_55',
-      'jt_53_34_53_44',
-      'jt_53_44_52_54',
-      'jt_53_53_52_52',
-      'jt_53_53_53_53',
-      'jt_94_95_52_52',
-      'jt_94_95_98_98',
-      'jt_95_95_98_98',
-      'jt_95_96_52_52',
-      'jt_95_96_98_98',
-      'jt_96_1c_98_99',
-      // Authentic johto_modern tiles for Azalea Town, Slowpoke Well entrance & Route 33
-      'jt_m_1e_1f_13_15',
-      'jt_m_13_15_3e_3f',
-      'jt_m_1e_1f_3e_3f',
-      'jt_m_05_05_05_05',
-      'jt_m_2b_2c_3b_3c',
-      'jt_m_2c_2d_3c_3d',
-      'jt_m_3b_3c_4b_4c',
-      'jt_m_3c_3d_4c_4d',
-      'jt_m_3b_3b_3b_3b',
-      'jt_m_3c_3c_3c_3c',
-      'jt_m_10_11_0d_0e_az',
-      'jt_m_11_11_0e_0e_az',
-      'jt_m_0d_0e_0a_0b_az',
-      'jt_m_0e_0e_0b_0b_az',
-      'jt_m_11_12_0e_0f_az',
-      'jt_m_0e_0f_0b_0c_az',
-      'jt_m_3b_4b_4b_4c',
-      'jt_m_4c_4c_4c_4c',
-      'jt_m_10_11_0a_0b_az',
-      'jt_m_11_11_0b_0b_az',
-      'jt_m_1a_1b_01_02',
-      'jt_m_37_38_39_3a',
-      'jt_m_11_12_0b_0c_az',
-      'jt_m_1b_1b_02_02',
-      'jt_m_1b_1c_02_16',
-      'jt_m_1a_07_1a_07_az',
-      'jt_m_07_07_07_07_az',
-      'jt_m_1a_07_01_02_az',
-      'jt_m_07_1c_07_1c_az',
-      'jt_m_18_19_17_17',
-      'jt_m_07_1c_02_16_az',
-      'jt_m_05_05_4c_4c',
-      'jt_m_06_06_06_06',
-      'jt_m_06_06_4c_4c',
-      'jt_m_06_06_5b_5b',
-      'jt_m_4e_4f_5e_5f',
-      'jt_m_29_2a_4b_48',
-      'jt_m_55_57_35_35',
-      'jt_m_29_2a_47_48',
-      'jt_m_32_32_46_46',
-      'jt_m_32_34_46_44',
-      'jt_m_46_46_52_52',
-      'jt_m_46_44_52_54',
-      'jt_m_5a_5a_59_59',
-      'jt_m_06_4a_06_4a',
-      'jt_m_08_09_17_17',
-      'jt_m_3b_4c_4b_4c',
-      'jt_m_5b_5b_5b_5b',
-      'jt_m_4c_3d_4c_4d',
-      'jt_m_1b_1b_1b_26',
-      'jt_m_1b_1c_26_1c',
-      'jt_m_40_40_40_40',
-      'jt_m_00_00_00_00',
-      'jt_m_06_00_00_00',
-      'jt_m_05_05_5b_5b',
-      'jt_m_1a_1b_1a_26',
-      'jt_m_1b_1b_26_1b',
-      'jt_m_23_24_1b_1b',
-      'jt_m_1b_1b_1b_1b',
-      'jt_m_3d_3d_3d_3d',
-      'jt_m_4c_4c_4c_3b',
-      'jt_m_45_22_27_28',
-      'jt_m_4d_3d_4c_4d',
-      'jt_m_3b_05_3b_05',
-      'jt_m_05_2b_2b_3b',
-      'jt_m_2c_2c_3c_3c',
-      'jt_m_2d_05_3d_2d',
-      'jt_m_3b_05_4b_4c',
-      'jt_m_04_04_04_04',
     ];
 
-    await Promise.all(
-      tileNames.map(async (name) => {
-        try {
+    const manifest = new AssetManifestQueue();
+
+    for (const name of baselineTileNames) {
+      manifest.enqueue({
+        id: `baseline_tile:${name}`,
+        label: `Loading tile ${name}.png`,
+        category: 'TILE_TEXTURE',
+        execute: async () => {
           const tex = await Assets.load<Texture>(`./assets/tiles/${name}.png`);
-          tex.source.scaleMode = 'nearest';
-          this.tileTextures.set(name, tex);
-        } catch (err) {
-          console.warn(`Could not load tile ${name}:`, err);
-        }
-      })
-    );
-
-    // Load 4-step authentic water animation frames (0 -> 1 -> 2 -> 1) from pret/pokecrystal water.png
-    for (const wName of ANIMATED_WATER_TILES) {
-      const f0 = this.tileTextures.get(wName);
-      if (!f0) continue;
-      try {
-        const f1 = await Assets.load<Texture>(`./assets/tiles/${wName}__w1.png`);
-        const f2 = await Assets.load<Texture>(`./assets/tiles/${wName}__w2.png`);
-        f1.source.scaleMode = 'nearest';
-        f2.source.scaleMode = 'nearest';
-        this.waterAnimFrames.set(wName, [f0, f1, f2, f1]);
-      } catch (err) {
-        console.warn(`Could not load water animation frames for ${wName}:`, err);
-      }
+          if (tex) {
+            tex.source.scaleMode = 'nearest';
+            this.tileTextures.set(name, tex);
+          }
+          if (ANIMATED_WATER_TILES.includes(name) && tex) {
+            const f1 = await Assets.load<Texture>(`./assets/tiles/${name}__w1.png`);
+            const f2 = await Assets.load<Texture>(`./assets/tiles/${name}__w2.png`);
+            f1.source.scaleMode = 'nearest';
+            f2.source.scaleMode = 'nearest';
+            this.waterAnimFrames.set(name, [tex, f1, f2, f1]);
+          }
+        },
+      });
     }
 
-    // 2. Load character sheets (144x32 -> 9 frames of 16x32)
-    const goldWalkTex = await Assets.load<Texture>('./assets/sprites/characters/gold_walk.png');
-    goldWalkTex.source.scaleMode = 'nearest';
-    this.goldFrames = this.extractCharacterFrames(goldWalkTex);
-    this.playerFrames = this.goldFrames;
+    // 2. Enqueue player character sheets and default boy NPC fallback sheet at boot; other NPCs load on-demand
+    manifest.enqueue({
+      id: 'sprite:gold_walk',
+      label: 'Loading sprite gold_walk.png',
+      category: 'CHARACTER_SPRITE',
+      execute: async () => {
+        const goldWalkTex = await Assets.load<Texture>('./assets/sprites/characters/gold_walk.png');
+        goldWalkTex.source.scaleMode = 'nearest';
+        this.goldFrames = this.extractCharacterFrames(goldWalkTex);
+        this.playerFrames = this.goldFrames;
+      },
+    });
 
-    const npcSheetPaths: Record<NpcSpriteType, string> = {
-      boy: './assets/sprites/characters/npc_boy.png',
-      girl: './assets/sprites/characters/npc_girl.png',
-      fat_man: './assets/sprites/characters/npc_fat_man.png',
-      sudowoodo: './assets/sprites/characters/sudowoodo.png',
-      kris: './assets/sprites/characters/kris_walk.png',
-      silver: './assets/sprites/characters/silver.png',
-      fisherman: './assets/sprites/characters/fisherman.png',
-      bug_catcher: './assets/sprites/characters/bug_catcher.png',
-      teacher: './assets/sprites/characters/teacher.png',
-      mom: './assets/sprites/characters/mom.png',
-      prof_elm: './assets/sprites/characters/prof_elm.png',
-      sage: './assets/sprites/characters/sage.png',
-      elder: './assets/sprites/characters/elder.png',
-      elder_li: './assets/sprites/characters/elder_li.png',
-      falkner: './assets/sprites/characters/falkner.png',
-      bird_keeper: './assets/sprites/characters/bird_keeper.png',
-      earl: './assets/sprites/characters/earl.png',
-      oak: './assets/sprites/characters/oak.png',
-      lapras: './assets/sprites/characters/lapras.png',
-      whitney: './assets/sprites/characters/whitney.png',
-      bike_shop_owner: './assets/sprites/characters/bike_shop_owner.png',
-      clerk: './assets/sprites/characters/clerk.png',
-      receptionist: './assets/sprites/characters/receptionist.png',
-      gentleman: './assets/sprites/characters/gentleman.png',
-      lass: './assets/sprites/characters/lass.png',
-      beauty: './assets/sprites/characters/beauty.png',
-      rocket_grunt_m: './assets/sprites/characters/rocket_grunt_m.png',
-      rocket_grunt_f: './assets/sprites/characters/rocket_grunt_f.png',
-      officer: './assets/sprites/characters/officer.png',
-      camper: './assets/sprites/characters/camper.png',
-      picnicker: './assets/sprites/characters/picnicker.png',
-      psychic: './assets/sprites/characters/psychic.png',
-      schoolboy: './assets/sprites/characters/schoolboy.png',
-      juggler: './assets/sprites/characters/juggler.png',
-      firebreather: './assets/sprites/characters/firebreather.png',
-      pokefan_m: './assets/sprites/characters/pokefan_m.png',
-      pokefan_f: './assets/sprites/characters/pokefan_f.png',
-      super_nerd: './assets/sprites/characters/super_nerd.png',
-      youngster: './assets/sprites/characters/youngster.png',
-    };
+    manifest.enqueue({
+      id: 'sprite:kris_walk',
+      label: 'Loading sprite kris_walk.png',
+      category: 'CHARACTER_SPRITE',
+      execute: async () => {
+        await this.ensureNpcSpriteLoaded('kris');
+      },
+    });
 
-    await Promise.all(
-      (Object.entries(npcSheetPaths) as Array<[NpcSpriteType, string]>).map(async ([spriteType, sheetPath]) => {
-        const tex = await Assets.load<Texture>(sheetPath);
-        tex.source.scaleMode = 'nearest';
-        const extracted = this.extractCharacterFrames(tex);
-        this.npcFrames.set(spriteType, extracted);
-        if (spriteType === 'kris') {
-          this.krisFrames = extracted;
-        }
-      })
-    );
+    manifest.enqueue({
+      id: 'sprite:npc_boy',
+      label: 'Loading sprite npc_boy.png',
+      category: 'CHARACTER_SPRITE',
+      execute: async () => {
+        await this.ensureNpcSpriteLoaded('boy');
+      },
+    });
 
-    try {
-      const treeTex = await Assets.load<Texture>('./assets/sprites/fruit_tree_64.png');
-      treeTex.source.scaleMode = 'nearest';
-      this.fruitTreeTexture = treeTex;
-    } catch (err) {
-      console.warn('Could not load fruit tree sprite:', err);
-    }
+    manifest.enqueue({
+      id: 'sprite:fruit_tree_64',
+      label: 'Loading sprite fruit_tree_64.png',
+      category: 'CHARACTER_SPRITE',
+      execute: async () => {
+        const treeTex = await Assets.load<Texture>('./assets/sprites/fruit_tree_64.png');
+        treeTex.source.scaleMode = 'nearest';
+        this.fruitTreeTexture = treeTex;
+      },
+    });
+
+    await manifest.run(queueOptions);
   }
 
   /**
@@ -707,13 +373,15 @@ export class OverworldRenderer {
 
   /**
    * Spawns 4 fluttering grass leaf particles when an entity steps onto a tall_grass tile
+   * using the pre-allocated GraphicParticlePool (zero GC churn).
    */
   public spawnGrassRustle(tileX: number, tileY: number): void {
+    if (!this.foregroundContainer) return;
     const centerX = (tileX + 0.5) * this.tileSize;
     const centerY = (tileY + 0.65) * this.tileSize;
     const angles = [-2.4, -1.9, -1.2, -0.7];
     for (let i = 0; i < 4; i++) {
-      const leaf = new Graphics();
+      const leaf = this.particlePool.acquire();
       leaf.rect(-4, -3, 8, 6).fill({ color: i % 2 === 0 ? 0x65c458 : 0x2a7a32 });
       leaf.rect(-2, -1, 4, 2).fill({ color: 0xb4f09c });
       leaf.position.set(centerX + (i - 1.5) * 8, centerY);
@@ -730,6 +398,7 @@ export class OverworldRenderer {
 
   /**
    * Plays a crisp diagonal blade slash and foliage burst when HM01 Cut chops a tree in the field
+   * using the pre-allocated GraphicParticlePool.
    */
   public playCutSlashEffect(tileX: number, tileY: number): void {
     if (!this.foregroundContainer) return;
@@ -737,7 +406,7 @@ export class OverworldRenderer {
     const centerY = (tileY + 0.5) * this.tileSize;
 
     // 1. Diagonal silver-white blade arc
-    const slash = new Graphics();
+    const slash = this.particlePool.acquire();
     slash
       .moveTo(-26, -26)
       .lineTo(26, 26)
@@ -759,7 +428,7 @@ export class OverworldRenderer {
     // 2. Scatter 6 cut leaf particles
     const angles = [-2.6, -2.0, -1.5, -1.0, -0.5, 0.2];
     for (let i = 0; i < angles.length; i++) {
-      const leaf = new Graphics();
+      const leaf = this.particlePool.acquire();
       leaf.rect(-5, -4, 10, 8).fill({ color: i % 2 === 0 ? 0x4ade80 : 0x16a34a });
       leaf.position.set(centerX + (i - 2.5) * 6, centerY);
       this.foregroundContainer.addChild(leaf);
@@ -771,6 +440,14 @@ export class OverworldRenderer {
         maxLife: 0.35,
       });
     }
+  }
+
+  public getParticlePoolStats(): { active: number; available: number; total: number } {
+    return {
+      active: this.particlePool.getActiveCount(),
+      available: this.particlePool.getAvailableCount(),
+      total: this.particlePool.getTotalAllocated(),
+    };
   }
 
   /**
@@ -1017,7 +694,8 @@ export class OverworldRenderer {
    */
   public async ensureMapTilesLoaded(
     map: MapData,
-    lookupMap?: (mapId: string) => MapData | undefined
+    lookupMap?: (mapId: string) => MapData | undefined,
+    queueOptions?: ManifestQueueOptions
   ): Promise<void> {
     if (!map.tileMap) return;
     const missingTileNames: string[] = [];
@@ -1051,11 +729,28 @@ export class OverworldRenderer {
       }
     }
 
-    if (missingTileNames.length === 0) return;
+    if (missingTileNames.length === 0) {
+      if (queueOptions?.onProgress) {
+        const endPct = Math.max(0, Math.min(100, queueOptions.endPercent ?? 100));
+        queueOptions.onProgress({
+          completed: 0,
+          total: 0,
+          percent: Math.round(endPct),
+          currentLabel: `Map tiles ready (${map.name || map.id})`,
+          category: 'TILE_TEXTURE',
+          itemId: `map_tile:${map.id}:ready`,
+        });
+      }
+      return;
+    }
 
-    await Promise.all(
-      missingTileNames.map(async (name) => {
-        try {
+    const manifest = new AssetManifestQueue();
+    for (const name of missingTileNames) {
+      manifest.enqueue({
+        id: `map_tile:${map.id}:${name}`,
+        label: `Loading map tile ${name}.png`,
+        category: ANIMATED_WATER_TILES.includes(name) ? 'WATER_ANIM' : 'TILE_TEXTURE',
+        execute: async () => {
           const tex = await Assets.load<Texture>(`./assets/tiles/${name}.png`);
           if (tex) {
             tex.source.scaleMode = 'nearest';
@@ -1068,21 +763,27 @@ export class OverworldRenderer {
             f2.source.scaleMode = 'nearest';
             this.waterAnimFrames.set(name, [tex, f1, f2, f1]);
           }
-        } catch (err) {
-          console.warn(`Could not load tile ${name}:`, err);
-        }
-      })
-    );
+        },
+      });
+    }
+
+    await manifest.run(queueOptions);
   }
 
   /**
    * Builds the textured overworld tilemap, including seamlessly connected neighbor maps (W/E/N/S) and outdoor border blocks
    */
   public renderMap(map: MapData, lookupMap?: (mapId: string) => MapData | undefined): void {
-    this.mapContainer.removeChildren();
+    // Cleanly destroy detached tile Sprite wrappers while keeping shared GPU textures cached
+    const oldChildren = this.mapContainer.removeChildren();
+    for (let i = 0; i < oldChildren.length; i++) {
+      oldChildren[i].destroy({ children: true, texture: false });
+    }
     this.animatedWaterSprites.length = 0;
     this.currentRenderedMap = map;
     this.tileSize = map.tileSize;
+    this.lastCullCamX = Number.NaN;
+    this.lastCullCamY = Number.NaN;
 
     if (map.tileMap) {
       const hasMissing = map.tileMap.some((name) => name && !this.tileTextures.has(name));
@@ -1335,7 +1036,7 @@ export class OverworldRenderer {
   public update(player: GridEntity, npcs: GridEntity[] = [], dtWorld: number = 0): void {
     const scale = 3;
 
-    // 0. Update Ambient Water Tile Animations at 1.0x World Time (~0.26s per Gen 2 tick)
+    // 0. Update Ambient Water Tile Animations at 1.0x World Time (~0.26s per Gen 2 tick) for visible tiles only
     if (dtWorld > 0 && this.animatedWaterSprites.length > 0) {
       this.waterAnimTimer += dtWorld;
       if (this.waterAnimTimer >= 0.26) {
@@ -1343,18 +1044,20 @@ export class OverworldRenderer {
         this.waterAnimStep = (this.waterAnimStep + 1) & 3;
         for (let i = 0; i < this.animatedWaterSprites.length; i++) {
           const entry = this.animatedWaterSprites[i];
-          entry.sprite.texture = entry.frames[this.waterAnimStep];
+          if (entry.sprite.visible) {
+            entry.sprite.texture = entry.frames[this.waterAnimStep];
+          }
         }
       }
     }
 
-    // 0b. Update active Grass Rustle Leaf Particles
+    // 0b. Update active Grass Rustle & Cut Leaf Particles (recycling expired graphics back to pool)
     if (dtWorld > 0 && this.grassParticles.length > 0) {
       for (let i = this.grassParticles.length - 1; i >= 0; i--) {
         const p = this.grassParticles[i];
         p.life += dtWorld;
         if (p.life >= p.maxLife) {
-          p.graphic.destroy();
+          this.particlePool.release(p.graphic);
           this.grassParticles.splice(i, 1);
           continue;
         }
@@ -1409,6 +1112,47 @@ export class OverworldRenderer {
 
     this.stageContainer.position.set(cameraTargetX, cameraTargetY);
 
+    // 2b. Viewport Tile & Item Frustum Culling (skips GPU draw calls for offscreen tiles)
+    if (
+      Number.isNaN(this.lastCullCamX) ||
+      Math.abs(cameraTargetX - this.lastCullCamX) >= 16 ||
+      Math.abs(cameraTargetY - this.lastCullCamY) >= 16 ||
+      screenWidth !== this.lastCullScreenW ||
+      screenHeight !== this.lastCullScreenH
+    ) {
+      this.lastCullCamX = cameraTargetX;
+      this.lastCullCamY = cameraTargetY;
+      this.lastCullScreenW = screenWidth;
+      this.lastCullScreenH = screenHeight;
+
+      const invScale = 1 / stageScale;
+      const padWorld = this.tileSize * 2;
+      const minWorldX = -cameraTargetX * invScale - padWorld;
+      const maxWorldX = (screenWidth - cameraTargetX) * invScale + padWorld;
+      const minWorldY = -cameraTargetY * invScale - padWorld;
+      const maxWorldY = (screenHeight - cameraTargetY) * invScale + padWorld;
+
+      const mapChildren = this.mapContainer.children;
+      for (let i = 0; i < mapChildren.length; i++) {
+        const tileChild = mapChildren[i];
+        tileChild.visible =
+          tileChild.x >= minWorldX &&
+          tileChild.x <= maxWorldX &&
+          tileChild.y >= minWorldY &&
+          tileChild.y <= maxWorldY;
+      }
+
+      const itemChildren = this.itemBallContainer.children;
+      for (let i = 0; i < itemChildren.length; i++) {
+        const itemChild = itemChildren[i];
+        itemChild.visible =
+          itemChild.x >= minWorldX &&
+          itemChild.x <= maxWorldX &&
+          itemChild.y >= minWorldY &&
+          itemChild.y <= maxWorldY;
+      }
+    }
+
     // 3. Update NPCs across active & connected maps with playing-window viewport culling (Zero-allocation pass)
     for (let i = 0; i < this.activeNpcSpriteList.length; i++) {
       this.activeNpcSpriteList[i].visible = false;
@@ -1436,8 +1180,13 @@ export class OverworldRenderer {
 
       if (!isInPlayingWindow) continue;
 
+      const desiredSpriteType = npc.spriteType || 'boy';
+      if (!this.npcFrames.has(desiredSpriteType)) {
+        void this.ensureNpcSpriteLoaded(desiredSpriteType);
+      }
+
       const frames =
-        this.npcFrames.get(npc.spriteType || 'boy') || this.npcFrames.get('boy') || this.playerFrames;
+        this.npcFrames.get(desiredSpriteType) || this.npcFrames.get('boy') || this.playerFrames;
 
       let sprite = this.npcSprites.get(npc.id);
       if (!sprite) {
@@ -1483,11 +1232,17 @@ export class OverworldRenderer {
 
     if (!isOutdoor) {
       this.ambientOverlay.visible = false;
+      this.lastAmbientStateKey = 'INDOOR';
       return;
     }
 
     const screenW = this.app.screen?.width || 800;
     const screenH = this.app.screen?.height || 600;
+    const stateKey = `${timeOfDay}_${screenW}_${screenH}`;
+    if (this.lastAmbientStateKey === stateKey) {
+      return;
+    }
+    this.lastAmbientStateKey = stateKey;
 
     let color = 0x000000;
     let alpha = 0.0;

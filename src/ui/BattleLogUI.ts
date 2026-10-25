@@ -22,7 +22,26 @@ export class BattleLogUI {
     this.createUI();
   }
 
+  private injectStyles(): void {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById?.('crystal-battle-log-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'crystal-battle-log-styles';
+    style.textContent = `
+      .hidden { display: none !important; }
+      .battle-log-panel {
+        display: none;
+      }
+      .battle-log-panel:not(.hidden) {
+        display: flex;
+      }
+    `;
+    (document.head || document.body)?.appendChild(style);
+  }
+
   private createUI(): void {
+    this.injectStyles();
+
     // 1. Root wrapper inside battle HUD container
     this.rootElement = document.createElement('div');
     this.rootElement.className = 'battle-log-root absolute top-2 right-2 z-30 flex flex-col items-end pointer-events-auto';
@@ -47,15 +66,18 @@ export class BattleLogUI {
     this.toggleButton.appendChild(this.countBadge);
     this.toggleButton.addEventListener('click', () => this.toggle());
 
-    // 3. Log panel container (hidden by default)
+    // 3. Log panel container (strictly hidden by default)
     this.logPanel = document.createElement('div');
     this.logPanel.className =
       'battle-log-panel hidden mt-2 w-72 md:w-80 max-h-56 bg-slate-950/92 border border-sky-500/30 rounded-xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden text-xs text-slate-200 transition-all duration-200';
+    this.logPanel.style.display = 'none';
+    this.logPanel.style.maxWidth = 'min(320px, 90vw)';
+    this.logPanel.style.maxHeight = 'min(220px, 45vh)';
 
     // 4. Panel Header
     const panelHeader = document.createElement('div');
     panelHeader.className =
-      'px-3 py-2 bg-slate-900/90 border-b border-sky-500/20 flex items-center justify-between font-bold text-sky-300 text-xs tracking-wider uppercase';
+      'px-3 py-2 bg-slate-900/90 border-b border-sky-500/20 flex items-center justify-between font-bold text-sky-300 text-xs tracking-wider uppercase flex-shrink-0';
     panelHeader.innerHTML = `
       <div class="flex items-center gap-1.5">
         <span>📜</span>
@@ -68,7 +90,7 @@ export class BattleLogUI {
     // 5. Scrollable Log List
     this.logList = document.createElement('div');
     this.logList.className =
-      'battle-log-list p-2.5 space-y-1.5 overflow-y-auto max-h-48 font-mono text-[11px] leading-relaxed scrollbar-thin scrollbar-thumb-sky-600/50 scrollbar-track-transparent';
+      'battle-log-list p-2.5 space-y-1.5 overflow-y-auto max-h-48 font-mono text-[11px] leading-relaxed scrollbar-thin scrollbar-thumb-sky-600/50 scrollbar-track-transparent flex-1';
 
     this.logPanel.appendChild(panelHeader);
     this.logPanel.appendChild(this.logList);
@@ -90,6 +112,7 @@ export class BattleLogUI {
   public open(): void {
     this.isOpen = true;
     this.logPanel.classList.remove('hidden');
+    this.logPanel.style.display = 'flex';
     this.toggleButton.classList.add('bg-sky-900/90', 'border-sky-400');
     this.scrollToBottom();
   }
@@ -97,6 +120,7 @@ export class BattleLogUI {
   public close(): void {
     this.isOpen = false;
     this.logPanel.classList.add('hidden');
+    this.logPanel.style.display = 'none';
     this.toggleButton.classList.remove('bg-sky-900/90', 'border-sky-400');
   }
 
@@ -105,11 +129,17 @@ export class BattleLogUI {
   }
 
   public hideRoot(): void {
-    if (this.rootElement) this.rootElement.classList.add('hidden');
+    if (this.rootElement) {
+      this.rootElement.classList?.add('hidden');
+      this.rootElement.style.display = 'none';
+    }
   }
 
   public showRoot(): void {
-    if (this.rootElement) this.rootElement.classList.remove('hidden');
+    if (this.rootElement) {
+      this.rootElement.classList?.remove('hidden');
+      this.rootElement.style.display = 'flex';
+    }
   }
 
   public clear(): void {

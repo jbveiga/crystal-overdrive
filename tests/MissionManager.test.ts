@@ -106,4 +106,27 @@ describe('MissionManager & Canonical Quest Progression (Ticket Sprint 11)', () =
     expect(manager2.getMission('S01')?.status).toBe('COMPLETED');
     expect(manager2.getMission('M02')?.status).toBe('ACTIVE');
   });
+
+  it('registers Mission 3 Step 1 (m03_step_1) when entering azalea_town and completes S03 & S04', () => {
+    const manager = new MissionManager();
+    const flags = new Set<string>(['starter_chosen', 'falkner_defeated']);
+    manager.checkStoryFlags(flags);
+
+    const m03 = manager.getMission('M03');
+    expect(m03?.status).toBe('ACTIVE');
+    expect(m03?.steps[0].completed).toBe(false);
+
+    manager.registerMapEntry('azalea_town', flags);
+    expect(flags.has('entered_azalea_town')).toBe(true);
+    expect(m03?.steps[0].completed).toBe(true);
+    expect(m03?.currentStepIndex).toBe(1);
+
+    // Side Mission S03 (Kyle's Onix trade) & Side Mission S04 (Earl's Academy)
+    flags.add('traded_onix_rocky');
+    flags.add('earls_academy_graduated');
+    manager.checkStoryFlags(flags);
+    expect(manager.getMission('S03')?.status).toBe('COMPLETED');
+    expect(manager.getMission('S04')?.status).toBe('COMPLETED');
+  });
 });
+

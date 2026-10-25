@@ -450,6 +450,7 @@ describe('StartMenuUI — Neo-Kanto Google Stitch Modernization', () => {
         getMapName: () => 'New Bark Town',
         getCrtScanlines: () => crtEnabled,
         getGbcPalette: () => palette,
+        getAutoHm: () => autoHmEnabled,
       },
       {
         onOpenParty: vi.fn(),
@@ -461,14 +462,19 @@ describe('StartMenuUI — Neo-Kanto Google Stitch Modernization', () => {
           crtEnabled = !crtEnabled;
           return crtEnabled;
         },
-        onSetGbcPalette: (next) => {
-          palette = next;
-          return palette;
+        onToggleAutoHm: (enabled) => {
+          autoHmEnabled = enabled;
+          return autoHmEnabled;
         },
       }
     );
 
+    let autoHmEnabled = true;
+
     ui.open();
+    // Verify CONTESTS was removed from Start Menu
+    expect(doc.getElementById('start-opt-contests')).toBeNull();
+
     ui.openPokedex();
 
     const dexModal = doc.getElementById('pokedex-modal');
@@ -509,23 +515,25 @@ describe('StartMenuUI — Neo-Kanto Google Stitch Modernization', () => {
     expect(matchingRows.some((r) => r.getAttribute('data-dex-id') === 'cyndaquil')).toBe(false);
     expect(matchingRows.some((r) => r.getAttribute('data-dex-id') === 'pidgey')).toBe(true);
 
-    // Open Settings and verify CRT Scanlines & GBC Palette controls
+    // Open Settings and verify CRT Scanlines, single Auto-HM toggle button, & removed GBC Palette controls
     ui.openSettings();
     const settingsModal = doc.getElementById('settings-modal');
     expect(settingsModal?.style.display).toBe('flex');
 
     const crtBtn = settingsModal?.querySelector('#settings-crt-btn');
+    const autoHmBtn = settingsModal?.querySelector('#settings-autohm-btn');
     const palBtn = settingsModal?.querySelector('#settings-palette-btn');
-    const dmgBtn = settingsModal?.querySelector('#settings-pal-dmg-btn');
+    const autoHmOnBtn = settingsModal?.querySelector('#settings-autohm-on-btn');
     expect(crtBtn).toBeDefined();
-    expect(palBtn).toBeDefined();
-    expect(dmgBtn).toBeDefined();
+    expect(autoHmBtn).toBeDefined();
+    expect(palBtn).toBeNull();
+    expect(autoHmOnBtn).toBeNull();
 
     crtBtn?.click();
     expect(crtEnabled).toBe(true);
 
-    dmgBtn?.click();
-    expect(palette).toBe('DMG');
+    autoHmBtn?.click();
+    expect(autoHmEnabled).toBe(false);
   });
 });
 

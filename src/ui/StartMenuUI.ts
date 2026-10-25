@@ -438,15 +438,6 @@ export class StartMenuUI {
         },
       },
       {
-        id: 'start-opt-contests',
-        label: 'CONTESTS',
-        icon: '🏆',
-        shortcut: 'C',
-        action: () => {
-          this.openBugContestLeaderboard();
-        },
-      },
-      {
         id: 'start-opt-trainer',
         label: this.stateProvider.getTrainerName() || 'TRAINER',
         icon: '🪪',
@@ -715,7 +706,6 @@ export class StartMenuUI {
       KeyB: 'start-opt-bag',
       KeyG: 'start-opt-pokegear',
       KeyM: 'start-opt-missions',
-      KeyC: 'start-opt-contests',
       KeyT: 'start-opt-trainer',
       KeyO: 'start-opt-settings',
     };
@@ -886,15 +876,22 @@ export class StartMenuUI {
       transform: translate(-50%, -50%);
       width: 440px;
       max-width: 94vw;
+      max-height: 86vh;
+      max-height: 86dvh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
       background: rgba(15, 23, 42, 0.98);
       backdrop-filter: blur(16px);
       border: 3px solid #38bdf8;
       box-shadow: 0 12px 36px rgba(0, 0, 0, 0.88), inset 0 0 0 2px rgba(56, 189, 248, 0.3);
       border-radius: 14px;
-      padding: 22px;
+      padding: 18px 20px;
       display: none;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       z-index: 65;
       pointer-events: auto;
       color: #f8fafc;
@@ -2020,15 +2017,15 @@ export class StartMenuUI {
     const titleLabelStyle = 'font-size:13px;font-weight:800;color:#fff;';
 
     this.settingsModal.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(56, 189, 248, 0.35); padding-bottom: 10px;">
+      <div style="position: sticky; top: 0; background: rgba(15, 23, 42, 0.98); z-index: 3; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(56, 189, 248, 0.35); padding-bottom: 10px; flex-shrink: 0;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 20px;">⚙️</span>
           <h2 style="margin: 0; font-size: 19px; font-weight: 900; color: #38bdf8; letter-spacing: 0.5px;">SETTINGS</h2>
         </div>
-        <button id="close-settings-x-btn" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 4px;">✕</button>
+        <button id="close-settings-x-btn" aria-label="Close Settings" style="background: rgba(51, 65, 85, 0.6); border: 1px solid rgba(148, 163, 184, 0.35); border-radius: 6px; color: #f8fafc; font-size: 16px; font-weight: 900; cursor: pointer; padding: 4px 10px;">✕</button>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div id="settings-scroll-body" style="display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding-right: 2px;">
         <!-- Sound Toggle -->
         <div style="${rowStyle}">
           <div>
@@ -2122,73 +2119,6 @@ export class StartMenuUI {
             cursor: pointer;
             min-width: 130px;
           ">${isCrtScanlines ? '📺 CRT: ON' : '📺 CRT: OFF'}</button>
-        </div>
-
-        <!-- GBC Hardware Color Palette Selector -->
-        <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-            <div>
-              <div style="${titleLabelStyle}">GBC COLOR PALETTE</div>
-              <div style="${subLabelStyle}">Handheld LCD hardware color profile</div>
-            </div>
-            <button id="settings-palette-btn" style="
-              background: #0284c7;
-              color: #ffffff;
-              border: 1px solid #38bdf8;
-              border-radius: 6px;
-              padding: 7px 12px;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-              min-width: 130px;
-            ">${GBC_PALETTE_SPECS[gbcPalette]?.label || '🎨 VIBRANT GBC'}</button>
-          </div>
-          <div id="settings-palette-segmented-group" style="display:flex;gap:6px;width:100%;">
-            <button id="settings-pal-vibrant-btn" style="
-              flex: 1;
-              background: ${gbcPalette === 'VIBRANT' ? '#0284c7' : '#0f172a'};
-              color: ${gbcPalette === 'VIBRANT' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${gbcPalette === 'VIBRANT' ? '#38bdf8' : 'rgba(255,255,255,0.12)'};
-              border-radius: 6px;
-              padding: 6px 4px;
-              font-size: 10px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ VIBRANT ]</button>
-            <button id="settings-pal-pocket-btn" style="
-              flex: 1;
-              background: ${gbcPalette === 'POCKET' ? '#059669' : '#0f172a'};
-              color: ${gbcPalette === 'POCKET' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${gbcPalette === 'POCKET' ? '#34d399' : 'rgba(255,255,255,0.12)'};
-              border-radius: 6px;
-              padding: 6px 4px;
-              font-size: 10px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ POCKET ]</button>
-            <button id="settings-pal-dmg-btn" style="
-              flex: 1;
-              background: ${gbcPalette === 'DMG' ? '#65a30d' : '#0f172a'};
-              color: ${gbcPalette === 'DMG' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${gbcPalette === 'DMG' ? '#a3e635' : 'rgba(255,255,255,0.12)'};
-              border-radius: 6px;
-              padding: 6px 4px;
-              font-size: 10px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ DMG-01 ]</button>
-            <button id="settings-pal-night-btn" style="
-              flex: 1;
-              background: ${gbcPalette === 'NIGHT' ? '#4f46e5' : '#0f172a'};
-              color: ${gbcPalette === 'NIGHT' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${gbcPalette === 'NIGHT' ? '#818cf8' : 'rgba(255,255,255,0.12)'};
-              border-radius: 6px;
-              padding: 6px 4px;
-              font-size: 10px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ NIGHT ]</button>
-          </div>
         </div>
 
         <!-- Unbound-Style Exp. Share Mode Toggle (OFF | ALL | CAPPED) -->
@@ -2303,62 +2233,40 @@ export class StartMenuUI {
           </div>
         </div>
 
-        <!-- Auto-HM Mode Toggle (UNBOUND STYLE) -->
-        <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-            <div>
-              <div style="${titleLabelStyle}">AUTO-HM MODE (UNBOUND)</div>
-              <div style="${subLabelStyle}">Use Surf, Cut & Strength without move slots or prompts</div>
-            </div>
-            <button id="settings-autohm-btn" style="
-              background: ${isAutoHm ? '#059669' : '#334155'};
-              color: #ffffff;
-              border: 1px solid ${isAutoHm ? '#34d399' : '#64748b'};
-              border-radius: 6px;
-              padding: 7px 12px;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-              min-width: 130px;
-            ">${isAutoHm ? '🌊 AUTO-HM: ON' : '💬 AUTO-HM: OFF'}</button>
+        <!-- Auto-HM Mode Single Toggle -->
+        <div style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">AUTO-HM MODE</div>
+            <div style="${subLabelStyle}">Use Surf, Cut & Strength automatically</div>
           </div>
-          <div id="settings-autohm-segmented-group" style="display:flex;gap:6px;width:100%;">
-            <button id="settings-autohm-on-btn" style="
-              flex: 1;
-              background: ${isAutoHm ? '#059669' : '#0f172a'};
-              color: ${isAutoHm ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${isAutoHm ? '#34d399' : 'rgba(255,255,255,0.12)'};
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ ON: AUTO SURF & OBSTACLES ]</button>
-            <button id="settings-autohm-off-btn" style="
-              flex: 1;
-              background: ${!isAutoHm ? '#334155' : '#0f172a'};
-              color: ${!isAutoHm ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${!isAutoHm ? '#94a3b8' : 'rgba(255,255,255,0.12)'};
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ OFF: CLASSIC PROMPTS ]</button>
-          </div>
+          <button id="settings-autohm-btn" style="
+            background: ${isAutoHm ? '#059669' : '#334155'};
+            color: #ffffff;
+            border: 1px solid ${isAutoHm ? '#34d399' : '#64748b'};
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 130px;
+          ">${isAutoHm ? '🌊 AUTO-HM: ON' : '💬 AUTO-HM: OFF'}</button>
         </div>
       </div>
 
       <button id="close-settings-btn" style="
+        position: sticky;
+        bottom: 0;
+        flex-shrink: 0;
         background: #334155;
         color: #ffffff;
-        border: none;
+        border: 1px solid rgba(56, 189, 248, 0.4);
         border-radius: 8px;
         padding: 10px;
         font-size: 13px;
         font-weight: 800;
         cursor: pointer;
         margin-top: 4px;
+        z-index: 3;
       ">← BACK TO MENU</button>
     `;
 
@@ -2367,11 +2275,6 @@ export class StartMenuUI {
     const gamepadBtn = this.settingsModal.querySelector('#settings-gamepad-btn') as HTMLButtonElement;
     const controlStyleBtn = this.settingsModal.querySelector('#settings-control-style-btn') as HTMLButtonElement;
     const crtBtn = this.settingsModal.querySelector('#settings-crt-btn') as HTMLButtonElement;
-    const paletteBtn = this.settingsModal.querySelector('#settings-palette-btn') as HTMLButtonElement;
-    const palVibrantBtn = this.settingsModal.querySelector('#settings-pal-vibrant-btn') as HTMLButtonElement;
-    const palPocketBtn = this.settingsModal.querySelector('#settings-pal-pocket-btn') as HTMLButtonElement;
-    const palDmgBtn = this.settingsModal.querySelector('#settings-pal-dmg-btn') as HTMLButtonElement;
-    const palNightBtn = this.settingsModal.querySelector('#settings-pal-night-btn') as HTMLButtonElement;
     const expShareBtn = this.settingsModal.querySelector('#settings-exp-share-btn') as HTMLButtonElement;
     const expOffBtn = this.settingsModal.querySelector('#settings-exp-off-btn') as HTMLButtonElement;
     const expAllBtn = this.settingsModal.querySelector('#settings-exp-all-btn') as HTMLButtonElement;
@@ -2381,8 +2284,6 @@ export class StartMenuUI {
     const encNormalBtn = this.settingsModal.querySelector('#settings-enc-normal-btn') as HTMLButtonElement;
     const encClassicBtn = this.settingsModal.querySelector('#settings-enc-classic-btn') as HTMLButtonElement;
     const autoHmBtn = this.settingsModal.querySelector('#settings-autohm-btn') as HTMLButtonElement;
-    const autoHmOnBtn = this.settingsModal.querySelector('#settings-autohm-on-btn') as HTMLButtonElement;
-    const autoHmOffBtn = this.settingsModal.querySelector('#settings-autohm-off-btn') as HTMLButtonElement;
     const closeBtn = this.settingsModal.querySelector('#close-settings-btn') as HTMLButtonElement;
     const closeXBtn = this.settingsModal.querySelector('#close-settings-x-btn') as HTMLButtonElement;
 
@@ -2397,50 +2298,6 @@ export class StartMenuUI {
         this.callbacks.onToggleCrtScanlines?.(activeCrt);
       });
     }
-
-    let activePalette: GbcPaletteMode = gbcPalette;
-    const syncPaletteButtons = (mode: GbcPaletteMode) => {
-      activePalette = mode;
-      if (paletteBtn) {
-        paletteBtn.innerText = GBC_PALETTE_SPECS[mode]?.label || '🎨 VIBRANT GBC';
-      }
-      if (palVibrantBtn) {
-        palVibrantBtn.style.background = mode === 'VIBRANT' ? '#0284c7' : '#0f172a';
-        palVibrantBtn.style.color = mode === 'VIBRANT' ? '#ffffff' : '#94a3b8';
-        palVibrantBtn.style.borderColor = mode === 'VIBRANT' ? '#38bdf8' : 'rgba(255,255,255,0.12)';
-      }
-      if (palPocketBtn) {
-        palPocketBtn.style.background = mode === 'POCKET' ? '#059669' : '#0f172a';
-        palPocketBtn.style.color = mode === 'POCKET' ? '#ffffff' : '#94a3b8';
-        palPocketBtn.style.borderColor = mode === 'POCKET' ? '#34d399' : 'rgba(255,255,255,0.12)';
-      }
-      if (palDmgBtn) {
-        palDmgBtn.style.background = mode === 'DMG' ? '#65a30d' : '#0f172a';
-        palDmgBtn.style.color = mode === 'DMG' ? '#ffffff' : '#94a3b8';
-        palDmgBtn.style.borderColor = mode === 'DMG' ? '#a3e635' : 'rgba(255,255,255,0.12)';
-      }
-      if (palNightBtn) {
-        palNightBtn.style.background = mode === 'NIGHT' ? '#4f46e5' : '#0f172a';
-        palNightBtn.style.color = mode === 'NIGHT' ? '#ffffff' : '#94a3b8';
-        palNightBtn.style.borderColor = mode === 'NIGHT' ? '#818cf8' : 'rgba(255,255,255,0.12)';
-      }
-    };
-
-    const applyPalette = (nextMode: GbcPaletteMode) => {
-      BattleAudio.playMenuSound('CONFIRM');
-      this.callbacks.onSetGbcPalette?.(nextMode);
-      syncPaletteButtons(nextMode);
-    };
-
-    paletteBtn?.addEventListener('click', () => {
-      const order: GbcPaletteMode[] = ['VIBRANT', 'POCKET', 'DMG', 'NIGHT'];
-      const next = order[(order.indexOf(activePalette) + 1) % order.length];
-      applyPalette(next);
-    });
-    palVibrantBtn?.addEventListener('click', () => applyPalette('VIBRANT'));
-    palPocketBtn?.addEventListener('click', () => applyPalette('POCKET'));
-    palDmgBtn?.addEventListener('click', () => applyPalette('DMG'));
-    palNightBtn?.addEventListener('click', () => applyPalette('NIGHT'));
 
     let activeExpMode: ExpShareMode = expShareMode;
     const syncExpShareButtons = (mode: ExpShareMode) => {
@@ -2521,32 +2378,20 @@ export class StartMenuUI {
     encClassicBtn.addEventListener('click', () => applyEncMode('CLASSIC'));
 
     let activeAutoHm = isAutoHm;
-    const syncAutoHmButtons = (enabled: boolean) => {
-      activeAutoHm = enabled;
-      autoHmBtn.innerText = enabled ? '🌊 AUTO-HM: ON' : '💬 AUTO-HM: OFF';
-      autoHmBtn.style.background = enabled ? '#059669' : '#334155';
-      autoHmBtn.style.borderColor = enabled ? '#34d399' : '#64748b';
-
-      autoHmOnBtn.style.background = enabled ? '#059669' : '#0f172a';
-      autoHmOnBtn.style.color = enabled ? '#ffffff' : '#94a3b8';
-      autoHmOnBtn.style.borderColor = enabled ? '#34d399' : 'rgba(255,255,255,0.12)';
-
-      autoHmOffBtn.style.background = !enabled ? '#334155' : '#0f172a';
-      autoHmOffBtn.style.color = !enabled ? '#ffffff' : '#94a3b8';
-      autoHmOffBtn.style.borderColor = !enabled ? '#94a3b8' : 'rgba(255,255,255,0.12)';
-    };
-
     const applyAutoHm = (enabled: boolean) => {
+      activeAutoHm = enabled;
       BattleAudio.playMenuSound('CONFIRM');
-      syncAutoHmButtons(enabled);
+      if (autoHmBtn) {
+        autoHmBtn.innerText = enabled ? '🌊 AUTO-HM: ON' : '💬 AUTO-HM: OFF';
+        autoHmBtn.style.background = enabled ? '#059669' : '#334155';
+        autoHmBtn.style.borderColor = enabled ? '#34d399' : '#64748b';
+      }
       if (this.callbacks.onToggleAutoHm) {
         this.callbacks.onToggleAutoHm(enabled);
       }
     };
 
-    autoHmBtn.addEventListener('click', () => applyAutoHm(!activeAutoHm));
-    autoHmOnBtn.addEventListener('click', () => applyAutoHm(true));
-    autoHmOffBtn.addEventListener('click', () => applyAutoHm(false));
+    autoHmBtn?.addEventListener('click', () => applyAutoHm(!activeAutoHm));
 
     soundBtn.addEventListener('click', () => {
       if (this.callbacks.onToggleMute) {

@@ -37,6 +37,27 @@ export class MapManager {
     this.maps.set(map.id, map);
   }
 
+  /**
+   * Lazily retrieves a map from cache or fetches it on-demand from ./assets/data/maps/${mapId}.json.
+   */
+  async ensureMapLoaded(mapId: string): Promise<MapData | undefined> {
+    if (!mapId) return undefined;
+    const existing = this.maps.get(mapId);
+    if (existing) return existing;
+
+    try {
+      const res = await fetch(`./assets/data/maps/${mapId}.json`);
+      if (res.ok) {
+        const data: MapData = await res.json();
+        this.registerMap(data);
+        return data;
+      }
+    } catch (err) {
+      console.warn(`Could not lazy load map "${mapId}":`, err);
+    }
+    return undefined;
+  }
+
   setCurrentMap(mapId: string): MapData {
     const map = this.maps.get(mapId);
     if (!map) {

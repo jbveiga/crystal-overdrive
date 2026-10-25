@@ -114,7 +114,16 @@ export interface GridEntity {
     | 'QUICK_CLAW_EVENT'
     | 'BUG_CONTEST_OFFICER_EVENT'
     | 'RIVAL_BURNED_TOWER_BATTLE'
-    | 'BEASTS_AWAKENING';
+    | 'BEASTS_AWAKENING'
+    | 'RED_GYARADOS_EVENT'
+    | 'LANCE_LAKE_EVENT'
+    | 'MAHOGANY_GYM_BLOCKER'
+    | 'LANCE_MART_EVENT'
+    | 'LANCE_BASE_HEAL'
+    | 'ROCKET_GENERATOR_ELECTRODE'
+    | 'AZALEA_RIVAL_EVENT'
+    | 'CHARCOAL_KILN_APPRENTICE_EVENT'
+    | 'SWEET_SCENT_TEACHER_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

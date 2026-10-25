@@ -441,20 +441,32 @@ export class TownMapUI {
         min-height: 0;
         overflow: hidden;
       ">
-        <!-- Blueprint Vector Map Canvas -->
+        <!-- Authentic Game Boy Color Johto Regional Map Canvas -->
         <div id="town-map-canvas-container" style="
           ${isMobile ? 'flex: 1 1 54vh; width: 100%; min-height: 50vh; border-bottom: 2px solid #22324F;' : 'flex: 1.8; border-right: 2px solid #22324F;'}
           position: relative;
-          background: #080E1D;
+          background: #2878c8;
           overflow: hidden;
-          background-image: 
-            radial-gradient(#141E33 1.5px, transparent 1.5px),
-            linear-gradient(to right, rgba(20, 30, 51, 0.3) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(20, 30, 51, 0.3) 1px, transparent 1px);
-          background-size: 32px 32px, 32px 32px, 32px 32px;
         ">
-          <!-- SVG Connections Layer -->
-          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;">
+          <!-- Authentic GBC Johto Terrain & Route Highways Layer -->
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;">
+            <!-- Ocean waves pattern -->
+            <rect x="0" y="0" width="100" height="100" fill="#2878c8" />
+            <!-- Cianwood Western Peninsula -->
+            <polygon points="0,42 15,44 17,76 0,82" fill="#58b848" stroke="#e8d088" stroke-width="1.2" />
+            <!-- Whirl Islands -->
+            <circle cx="16" cy="64" r="2.2" fill="#e8d088" stroke="#409838" stroke-width="0.6" />
+            <circle cx="20" cy="67" r="1.8" fill="#e8d088" stroke="#409838" stroke-width="0.6" />
+            <!-- Main Johto & Western Kanto Continent Landmass -->
+            <polygon points="16,12 96,12 98,84 82,84 68,78 58,88 32,90 28,68 23,54 16,46" fill="#58b848" stroke="#e8d088" stroke-width="1.4" />
+            <!-- Mountain Ranges (Mt. Mortar, Dark Cave, Ice Path, Mt. Silver) -->
+            <polygon points="48,14 94,14 95,46 74,48 62,36 48,34" fill="#987848" opacity="0.85" />
+            <!-- Ilex Forest & National Park Woodland Canopy -->
+            <ellipse cx="42" cy="76" rx="9" ry="7" fill="#308028" />
+            <ellipse cx="38" cy="44" rx="7" ry="6" fill="#308028" />
+            <!-- Lake of Rage -->
+            <ellipse cx="64" cy="18" rx="6.5" ry="4.2" fill="#2878c8" stroke="#e8d088" stroke-width="0.8" />
+            <!-- Classic GBC Golden-Tan Route Roads -->
             ${JOHTO_CONNECTIONS.map((conn) => {
               const fromLm = JOHTO_LANDMARKS[conn.from];
               const toLm = JOHTO_LANDMARKS[conn.to];
@@ -463,13 +475,22 @@ export class TownMapUI {
               const p2 = getPercentCoord(toLm.gridX, toLm.gridY);
               return `
                 <line
-                  x1="${p1.leftPct}%"
-                  y1="${p1.topPct}%"
-                  x2="${p2.leftPct}%"
-                  y2="${p2.topPct}%"
-                  stroke="#334155"
-                  stroke-width="3"
-                  stroke-dasharray="5,5"
+                  x1="${p1.leftPct}"
+                  y1="${p1.topPct}"
+                  x2="${p2.leftPct}"
+                  y2="${p2.topPct}"
+                  stroke="#684818"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                />
+                <line
+                  x1="${p1.leftPct}"
+                  y1="${p1.topPct}"
+                  x2="${p2.leftPct}"
+                  y2="${p2.topPct}"
+                  stroke="#f8d878"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
                 />
               `;
             }).join('')}
@@ -487,14 +508,10 @@ export class TownMapUI {
               const baseSize = isCityOrTown ? 18 : lm.type === 'route' ? 10 : 14;
               const size = isMobile ? Math.max(24, baseSize) : baseSize;
               const bg = isCityOrTown
-                ? lm.gymLeader
-                  ? '#FFD028'
-                  : isVisitedLm
-                  ? '#2A75D3'
-                  : '#475569'
+                ? '#e83828'
                 : lm.type === 'route'
-                ? '#38BDF8'
-                : '#A855F7';
+                ? '#f8d878'
+                : '#9858d8';
               const radius = isCityOrTown ? '3px' : '50%';
 
               // Roamers at this node
@@ -517,8 +534,8 @@ export class TownMapUI {
                     min-height: ${isMobile ? '24px' : 'auto'};
                     background: ${bg};
                     border-radius: ${radius};
-                    border: 2px solid #0D1322;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+                    border: 2px solid ${isVisitedLm || isCityOrTown ? '#ffffff' : '#1e293b'};
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.75);
                   "
                   title="${lm.name}"
                 >
@@ -528,6 +545,28 @@ export class TownMapUI {
                       : ''
                   }
                 </div>
+
+                ${
+                  isCityOrTown
+                    ? `<div style="
+                        position: absolute;
+                        left: ${leftPct}%;
+                        top: calc(${topPct}% + ${Math.round(size / 2) + 3}px);
+                        transform: translateX(-50%);
+                        font-size: 9px;
+                        font-weight: 900;
+                        font-family: 'Space Mono', monospace;
+                        color: #ffffff;
+                        background: rgba(15, 23, 42, 0.82);
+                        padding: 1px 4px;
+                        border-radius: 3px;
+                        white-space: nowrap;
+                        pointer-events: none;
+                        z-index: 22;
+                        text-shadow: 0 1px 2px #000;
+                      ">${lm.name.replace(/ City| Town/g, '')}</div>`
+                    : ''
+                }
 
                 ${
                   isPlayerHere

@@ -268,6 +268,21 @@ export class PokemonFactory {
   }
 
   /**
+   * Instantiates the canonical Shiny Red Gyarados at Lake of Rage (Level 30).
+   * Fixed shiny, Gen 2 moveset: Dragon Rage, Twister, Leer, Bite.
+   */
+  public static createShinyRedGyarados(level: number = 30): PokemonInstance {
+    const gyarados = this.create('gyarados', level, ['dragonrage', 'twister', 'leer', 'bite']);
+    return {
+      ...gyarados,
+      nickname: 'GYARADOS',
+      isShiny: true,
+      heldItem: 'red-scale',
+      catchRate: 45,
+    };
+  }
+
+  /**
    * Instantiates an unhatched Pokémon Egg (Ticket 5.4)
    */
   public static createEgg(speciesId: string, hatchSteps: number = 256): PokemonInstance {

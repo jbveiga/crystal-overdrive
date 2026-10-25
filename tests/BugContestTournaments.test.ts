@@ -239,9 +239,8 @@ describe('Bug Catching Contest Tournaments & Leaderboards', () => {
     );
 
     ui.open();
-    const contestsMenuBtn = doc.getElementById('start-opt-contests');
-    expect(contestsMenuBtn).toBeDefined();
-    contestsMenuBtn?.click();
+    expect(doc.getElementById('start-opt-contests')).toBeNull();
+    ui.openBugContestLeaderboard();
 
     const modal = doc.getElementById('bug-contest-leaderboard-modal');
     expect(modal).toBeDefined();

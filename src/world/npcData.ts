@@ -205,6 +205,136 @@ export function calculateTourLegCoordinates(
   return results;
 }
 
+/**
+ * Enforces single-presence rules so moving NPCs (e.g., Guide Gent, Kurt) are never
+ * present in two locations simultaneously.
+ */
+export function isNpcActiveForStoryFlags(
+  npcId: string,
+  storyFlags: ReadonlySet<string>
+): boolean {
+  const hasMapCard =
+    storyFlags.has('has_map_card') ||
+    storyFlags.has('HAS_MAP_CARD') ||
+    storyFlags.has('EVENT_GUIDE_GENT_IN_HIS_HOUSE');
+
+  // Guide Gent (Mission S02): Outside in Cherrygrove City BEFORE Map Card; inside his house AFTER Map Card
+  if (npcId === 'cg_guide_gent') {
+    return !hasMapCard;
+  }
+  if (npcId === 'house_guide_gent') {
+    return hasMapCard;
+  }
+
+  // New Bark Town Rival peeking into Elm's Lab window: only before receiving Mystery Egg
+  if (npcId === 'nbt_rival') {
+    return (
+      !storyFlags.has('HAS_MYSTERY_EGG') &&
+      !storyFlags.has('mystery_egg_received') &&
+      !storyFlags.has('rival_1_defeated') &&
+      !storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') &&
+      !storyFlags.has('EVENT_RIVAL_NAMED')
+    );
+  }
+
+  // Mr. Pokémon's House: Prof. Oak departs after granting the Pokédex
+  if (npcId === 'prof_oak_npc') {
+    return !storyFlags.has('HAS_MYSTERY_EGG') && !storyFlags.has('HAS_POKEDEX');
+  }
+
+  // Prof. Elm's Lab Police Officer: Strictly present ONLY after Cherrygrove Rival battle and BEFORE naming Rival
+  if (npcId === 'lab_police_officer') {
+    return (
+      storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') &&
+      !storyFlags.has('EVENT_RIVAL_NAMED')
+    );
+  }
+
+  // Kurt (Mission M03): Strictly in one place at one time:
+  // 1) Before EVENT_KURT_LEFT_FOR_WELL -> inside Kurt's House (kurt_house_kurt)
+  // 2) After EVENT_KURT_LEFT_FOR_WELL & before slowpoke_well_cleared -> inside Slowpoke Well B1F (well_kurt)
+  // 3) After slowpoke_well_cleared -> back inside Kurt's House (kurt_house_kurt)
+  const isWellCleared =
+    storyFlags.has('slowpoke_well_cleared') ||
+    storyFlags.has('cleared_slowpoke_well') ||
+    storyFlags.has('EVENT_CLEARED_SLOWPOKE_WELL');
+  const kurtInWell = storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') && !isWellCleared;
+
+  if (npcId === 'azalea_kurt') {
+    return false;
+  }
+  if (npcId === 'kurt_house_kurt') {
+    return !kurtInWell;
+  }
+  if (npcId === 'well_kurt') {
+    return kurtInWell;
+  }
+
+  // Azalea Town & Slowpoke Well Rocket Siege lifecycle
+  if (npcId === 'azalea_well_grunt') {
+    return !storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') && !isWellCleared;
+  }
+  if (npcId === 'azalea_gym_grunt') {
+    return !isWellCleared;
+  }
+  if (
+    npcId === 'rocket_grunt_1' ||
+    npcId === 'rocket_grunt_2' ||
+    npcId === 'rocket_grunt_3' ||
+    npcId === 'executive_proton'
+  ) {
+    return !isWellCleared;
+  }
+  if (npcId === 'azalea_slowpoke' || npcId === 'azalea_slowpoke_2') {
+    return isWellCleared;
+  }
+
+  // Charcoal Kiln & Ilex Forest Farfetch'd lifecycle
+  const isFarfetchdReturned =
+    storyFlags.has('has_hm01_cut') || storyFlags.has('EVENT_GOT_HM01_CUT');
+  if (npcId === 'kiln_apprentice' || npcId === 'kiln_farfetchd') {
+    return (
+      isFarfetchdReturned ||
+      storyFlags.has('EVENT_HERDED_FARFETCHD') ||
+      storyFlags.has('forest_farfetchd_herded')
+    );
+  }
+  if (npcId === 'forest_farfetchd') {
+    return !isFarfetchdReturned;
+  }
+
+  // Route 36 Sudowoodo
+  if (npcId === 'sudowoodo') {
+    return !storyFlags.has('sudowoodo_cleared') && !storyFlags.has('EVENT_FOUGHT_SUDOWOODO');
+  }
+
+  // Phase 11: Lake of Rage, Mahogany Town, and Team Rocket Base
+  if (npcId === 'lake_of_rage_red_gyarados') {
+    return !storyFlags.has('red_gyarados_subdued');
+  }
+  if (npcId === 'lake_of_rage_lance') {
+    return storyFlags.has('red_gyarados_subdued') && !storyFlags.has('lance_lake_talked');
+  }
+  if (npcId === 'mahogany_gym_blocker') {
+    return !storyFlags.has('rocket_base_generator_cleared');
+  }
+  if (npcId === 'mahogany_mart_lance') {
+    return storyFlags.has('lance_lake_talked') && !storyFlags.has('rocket_base_generator_cleared');
+  }
+  if (npcId === 'team_rocket_base_b2f_lance') {
+    return !storyFlags.has('rocket_base_generator_cleared');
+  }
+  if (npcId.startsWith('b3f_electrode_')) {
+    if (storyFlags.has('rocket_base_generator_cleared')) return false;
+    return !storyFlags.has(npcId + '_cleared');
+  }
+  if (npcId === 'route_43_gate_rocket_1' || npcId === 'route_43_gate_rocket_2') {
+    return !storyFlags.has('rocket_base_generator_cleared');
+  }
+
+  return true;
+}
+
 export interface DaySiblingInfo {
   id: string;
   name: string;
@@ -748,7 +878,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         4,
         4,
         'DOWN',
-        'fat_man',
+        'officer',
         '👮 POLICE OFFICER',
         [
           'OFFICER: I heard a POKéMON was stolen here…',
@@ -1773,23 +1903,11 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
     azalea_town: [
       makeNpc(
-        'azalea_kurt',
-        9,
-        6,
-        'DOWN',
-        'elder',
-        '👴 KURT',
-        [
-          'KURT: Those dastardly TEAM ROCKET villains are chopping off SLOWPOKE tails in the well!',
-          "I'm going in there to drive them off myself! Stay back, kid!",
-        ]
-      ),
-      makeNpc(
         'azalea_well_grunt',
         31,
         9,
         'DOWN',
-        'silver',
+        'rocket_grunt_m',
         '⚡ ROCKET GRUNT',
         [
           "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
@@ -1800,7 +1918,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         10,
         16,
         'DOWN',
-        'silver',
+        'rocket_grunt_m',
         '⚡ ROCKET GRUNT',
         [
           "ROCKET GRUNT: No one gets in the GYM! Buzz off, brat!",
@@ -1835,18 +1953,29 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         17,
         10,
         'UP',
-        'boy',
+        'youngster',
         '👦 APPRENTICE',
         ['The master charcoal-maker uses wood from ILEX FOREST to fire the kiln.'],
         { wanders: true }
       ),
       makeNpc(
-        'azalea_gramps',
-        8,
-        11,
+        'azalea_kurt',
+        9,
+        6,
         'DOWN',
         'elder',
-        '👴 AZALEA ELDER',
+        '🔨 BALL SMITH KURT',
+        [
+          'KURT: Those TEAM ROCKET thugs are cutting off SLOWPOKE TAILS at the well! I am going to put a stop to them!',
+        ]
+      ),
+      makeNpc(
+        'azalea_gramps',
+        21,
+        8,
+        'DOWN',
+        'gentleman',
+        '🎩 AZALEA GENTLEMAN',
         ["KURT creates handmade custom POKé BALLS from APRICORNS gathered from trees. No factory can match his touch!"]
       ),
     ],
@@ -2066,7 +2195,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         2,
         3,
         'DOWN',
-        'elder',
+        'fat_man',
         '🧔 KILN BOSS',
         ['The kiln burns day and night to cure authentic AZALEA CHARCOAL. It boosts the power of FIRE-type moves!']
       ),
@@ -2075,9 +2204,19 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         5,
         3,
         'LEFT',
-        'boy',
+        'youngster',
         '👦 APPRENTICE',
-        ["Our FARFETCH'D ran off into ILEX FOREST! We need it back so we can continue collecting firewood!"]
+        ["Thank you so much for chasing down FARFETCH'D in ILEX FOREST! Please take this CHARCOAL that we made in the kiln!"],
+        { action: 'CHARCOAL_KILN_APPRENTICE_EVENT' }
+      ),
+      makeNpc(
+        'kiln_farfetchd',
+        6,
+        3,
+        'LEFT',
+        'bird_keeper',
+        '🦆 FARFETCH’D',
+        ["FARFETCH'D: Kwaa! It looks happy to be back home at the kiln!"]
       ),
     ],
     slowpoke_well_b1f: [
@@ -2086,14 +2225,14 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         15,
         7,
         'DOWN',
-        'silver',
+        'rocket_grunt_m',
         '⚡ ROCKET GRUNT',
         ["Sure, we've been hacking the tails off SLOWPOKE and selling them. Everything we do is for profit. That's right! We're TEAM ROCKET, and we'll do anything for money!"],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'rocket_grunt_1',
           trainerName: 'Rocket Grunt',
-          visionRange: 3,
+          visionRange: 4,
           challengePages: ["ROCKET GRUNT: Darn! I was standing guard up top when some old coot yelled at me. He startled me so much that I fell down here. I think I'll vent my anger by taking it out on you!"],
           trainerPokemon: { speciesId: 'rattata', level: 9, moves: ['tackle', 'quickattack'] },
           trainerTeam: [
@@ -2107,7 +2246,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         5,
         6,
         'RIGHT',
-        'silver',
+        'rocket_grunt_m',
         '⚡ ROCKET GRUNT',
         ["We need the money, but selling SLOWPOKETAILS? It's tough being a ROCKET GRUNT!"],
         {
@@ -2127,15 +2266,15 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'rocket_grunt_3',
         10,
         4,
-        'LEFT',
-        'girl',
+        'RIGHT',
+        'rocket_grunt_f',
         '⚡ ROCKET GRUNT',
         ["SLOWPOKETAILS grow back fast! What's wrong with selling them?"],
         {
           action: 'TRAINER_BATTLE',
           trainerId: 'rocket_grunt_3',
           trainerName: 'Rocket Grunt',
-          visionRange: 3,
+          visionRange: 4,
           challengePages: ["ROCKET GRUNT: Stop taking TAILS? Yeah, just try to defeat all of us!"],
           trainerPokemon: { speciesId: 'rattata', level: 7, moves: ['tackle', 'quickattack'] },
           trainerTeam: [
@@ -2150,7 +2289,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         5,
         2,
         'DOWN',
-        'silver',
+        'rocket_grunt_m',
         '⚡ EXECUTIVE PROTON',
         ["PROTON: What do you want? If you interrupt our work, don't expect any mercy! We're TEAM ROCKET, and we'll do anything for money!"],
         {
@@ -2316,9 +2455,19 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'teacher',
         '👩‍🏫 TEACHER',
         [
-          'Leaving the deep woods? Here, take TM12 SWEET SCENT! It lures wild POKéMON right to you!',
-          'Use it in tall grass to instantly trigger wild encounters without walking!',
-        ]
+          "Oh, honey. You're making a POKéDEX? Here, take TM12 SWEET SCENT! It lures wild POKéMON right to you!",
+          'Use it in tall grass to attract wild POKéMON anytime!',
+        ],
+        { action: 'SWEET_SCENT_TEACHER_EVENT' }
+      ),
+      makeNpc(
+        'gate_butterfree',
+        4,
+        3,
+        'LEFT',
+        'lass',
+        '🦋 BUTTERFREE',
+        ['BUTTERFREE: Freeh! It spreads a sweet, soothing floral scent around the gatehouse.']
       ),
     ],
     route_34: [
@@ -2327,7 +2476,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         13,
         7,
         'LEFT',
-        'boy',
+        'camper',
         '⛺ CAMPER TODD',
         ["I'm confident in my ability to raise POKéMON. Want to see?"],
         {
@@ -2347,7 +2496,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         15,
         32,
         'DOWN',
-        'boy',
+        'youngster',
         '🧢 YOUNGSTER SAMUEL',
         ['This is where I do my training!'],
         {
@@ -2370,7 +2519,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         11,
         20,
         'DOWN',
-        'boy',
+        'youngster',
         '🧢 YOUNGSTER IAN',
         ["I'm the best in my class at POKéMON."],
         {
@@ -2391,7 +2540,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         10,
         26,
         'RIGHT',
-        'girl',
+        'picnicker',
         '👧 PICNICKER GINA',
         ["Are you a trainer? Let's have a practice battle."],
         {
@@ -2413,7 +2562,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         9,
         11,
         'DOWN',
-        'fat_man',
+        'officer',
         '👮 OFFICER KEITH',
         ["I'm on patrol for suspicious individuals.", "It's safe now, but trouble stirs after dark."],
         {
@@ -4526,6 +4675,30 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
 
     lake_of_rage: [
       makeNpc(
+        'lake_of_rage_red_gyarados',
+        21,
+        15,
+        'DOWN',
+        'lapras',
+        '🐉 GYARADOS',
+        [
+          "GYARADOS: Gyashaa! The lake's waters churn violently as the crimson Gyarados thrashes with fury!",
+        ],
+        { action: 'RED_GYARADOS_EVENT' }
+      ),
+      makeNpc(
+        'lake_of_rage_lance',
+        21,
+        30,
+        'UP',
+        'gentleman',
+        '🏆 CHAMPION LANCE',
+        [
+          "LANCE: ...So you're the one who quelled that Gyarados. Impressive!",
+        ],
+        { action: 'LANCE_LAKE_EVENT' }
+      ),
+      makeNpc(
         'wesley_of_wednesday',
         8,
         18,
@@ -4537,6 +4710,117 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           "Here's a BLACK BELT! It boosts the power of FIGHTING-type moves!",
         ],
         { action: 'DAY_SIBLING_EVENT' }
+      ),
+    ],
+
+    mahogany_town: [
+      makeNpc(
+        'mahogany_gym_blocker',
+        6,
+        14,
+        'DOWN',
+        'fat_man',
+        'TOWN RESIDENT',
+        [
+          "Gym Leader Pryce went up to the Lake of Rage to investigate the strange Pokémon disturbance.",
+          "The Gym is closed until the emergency at the lake and the souvenir shop is resolved!",
+        ],
+        { action: 'MAHOGANY_GYM_BLOCKER' }
+      ),
+    ],
+
+    mahogany_mart: [
+      makeNpc(
+        'mahogany_mart_lance',
+        4,
+        4,
+        'UP',
+        'gentleman',
+        '🏆 CHAMPION LANCE',
+        [
+          "LANCE: You made it! The transmitter signal is emanating right from beneath this floor.",
+          "Lance moves the heavy cabinet to reveal a secret stairway descending underground!",
+          "LANCE: Follow me down! We need to shut down the generator Electrodes powering their broadcast!",
+        ],
+        { action: 'LANCE_MART_EVENT' }
+      ),
+    ],
+
+    team_rocket_base_b2f: [
+      makeNpc(
+        'team_rocket_base_b2f_lance',
+        18,
+        10,
+        'DOWN',
+        'gentleman',
+        '🏆 CHAMPION LANCE',
+        [
+          "LANCE: Are your Pokémon holding up? Here, let me restore your team to full fighting strength!",
+        ],
+        { action: 'LANCE_BASE_HEAL' }
+      ),
+    ],
+
+    team_rocket_base_b3f: [
+      makeNpc(
+        'b3f_electrode_1',
+        20,
+        5,
+        'DOWN',
+        'pokefan_m',
+        '⚡ ELECTRODE',
+        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
+        { action: 'ROCKET_GENERATOR_ELECTRODE' }
+      ),
+      makeNpc(
+        'b3f_electrode_2',
+        20,
+        7,
+        'DOWN',
+        'pokefan_m',
+        '⚡ ELECTRODE',
+        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
+        { action: 'ROCKET_GENERATOR_ELECTRODE' }
+      ),
+      makeNpc(
+        'b3f_electrode_3',
+        20,
+        9,
+        'DOWN',
+        'pokefan_m',
+        '⚡ ELECTRODE',
+        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
+        { action: 'ROCKET_GENERATOR_ELECTRODE' }
+      ),
+      makeNpc(
+        'b3f_electrode_4',
+        25,
+        5,
+        'DOWN',
+        'pokefan_m',
+        '⚡ ELECTRODE',
+        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
+        { action: 'ROCKET_GENERATOR_ELECTRODE' }
+      ),
+      makeNpc(
+        'b3f_electrode_5',
+        25,
+        7,
+        'DOWN',
+        'pokefan_m',
+        '⚡ ELECTRODE',
+        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
+        { action: 'ROCKET_GENERATOR_ELECTRODE' }
+      ),
+      makeNpc(
+        'b3f_electrode_6',
+        25,
+        9,
+        'DOWN',
+        'pokefan_m',
+        '⚡ ELECTRODE',
+        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
+        { action: 'ROCKET_GENERATOR_ELECTRODE' }
       ),
     ],
 
@@ -4607,6 +4891,7 @@ export const npcsByMap: Record<string, GridEntity[]> = createNpcsByMap();
  * Returns the active NPCs for a given map filtered by dynamic story flags:
  * - `mr_pokemons_house`: `prof_oak_npc` departs after `HAS_MYSTERY_EGG` / `HAS_POKEDEX` is set.
  * - `route_36`: `sudowoodo` is cleared after `sudowoodo_cleared` is set.
+ * - Phase 11 story maps: `lake_of_rage`, `mahogany_town`, `mahogany_mart`, `team_rocket_base_b2f`, `team_rocket_base_b3f`, `route_43_gate`.
  */
 export function getNpcsForMap(
   mapId: string,
@@ -4614,11 +4899,10 @@ export function getNpcsForMap(
   registry: Record<string, GridEntity[]> = npcsByMap
 ): GridEntity[] {
   const list = registry[mapId] || [];
-  if (mapId === 'mr_pokemons_house' && (storyFlags.has('HAS_MYSTERY_EGG') || storyFlags.has('HAS_POKEDEX'))) {
-    return list.filter((n) => n.id !== 'prof_oak_npc');
-  }
-  if (mapId === 'route_36' && (storyFlags.has('sudowoodo_cleared') || storyFlags.has('EVENT_FOUGHT_SUDOWOODO'))) {
-    return list.filter((n) => n.id !== 'sudowoodo');
-  }
-  return list;
+  return list.filter((n) => {
+    if (mapId === 'route_43_gate' && storyFlags.has('rocket_base_generator_cleared') && n.id.includes('rocket')) {
+      return false;
+    }
+    return isNpcActiveForStoryFlags(n.id, storyFlags);
+  });
 }

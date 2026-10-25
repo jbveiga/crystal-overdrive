@@ -106,6 +106,7 @@ describe('BattleLogUI Component', () => {
     expect(toggleBtn).not.toBeNull();
     const panel = container.querySelector('.battle-log-panel');
     expect(panel?.classList.contains('hidden')).toBe(true);
+    expect(panel?.style.display).toBe('none');
   });
 
   it('2. toggles open and closed when open(), close(), or toggle() is called', () => {
@@ -113,13 +114,16 @@ describe('BattleLogUI Component', () => {
     expect(battleLog.isExpanded()).toBe(true);
     const panel = container.querySelector('.battle-log-panel');
     expect(panel?.classList.contains('hidden')).toBe(false);
+    expect(panel?.style.display).toBe('flex');
 
     battleLog.close();
     expect(battleLog.isExpanded()).toBe(false);
     expect(panel?.classList.contains('hidden')).toBe(true);
+    expect(panel?.style.display).toBe('none');
 
     battleLog.toggle();
     expect(battleLog.isExpanded()).toBe(true);
+    expect(panel?.style.display).toBe('flex');
   });
 
   it('3. appends turn markers and logs move, damage, and status entries', () => {

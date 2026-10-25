@@ -56,10 +56,22 @@ export class BattleRenderer {
     }
   }
 
+  private clearDisplayContainers(): void {
+    gsap.killTweensOf(this.arenaContainer.children);
+    gsap.killTweensOf(this.fxContainer.children);
+    const oldArena = this.arenaContainer.removeChildren();
+    for (let i = 0; i < oldArena.length; i++) {
+      oldArena[i].destroy({ children: true, texture: false });
+    }
+    const oldFx = this.fxContainer.removeChildren();
+    for (let i = 0; i < oldFx.length; i++) {
+      oldFx[i].destroy({ children: true, texture: false });
+    }
+  }
+
   public async startBattle(playerPokemon: PokemonInstance, enemyPokemon: PokemonInstance): Promise<void> {
     this.container.visible = true;
-    this.arenaContainer.removeChildren();
-    this.fxContainer.removeChildren();
+    this.clearDisplayContainers();
 
     const width = this.app.screen.width;
     const height = this.app.screen.height;
@@ -817,10 +829,15 @@ export class BattleRenderer {
   }
 
   public endBattle(): void {
-    if (this.playerIdleTween) this.playerIdleTween.kill();
-    if (this.enemyIdleTween) this.enemyIdleTween.kill();
+    if (this.playerIdleTween) {
+      this.playerIdleTween.kill();
+      this.playerIdleTween = null;
+    }
+    if (this.enemyIdleTween) {
+      this.enemyIdleTween.kill();
+      this.enemyIdleTween = null;
+    }
     this.container.visible = false;
-    this.arenaContainer.removeChildren();
-    this.fxContainer.removeChildren();
+    this.clearDisplayContainers();
   }
 }

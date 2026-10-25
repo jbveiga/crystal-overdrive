@@ -101,6 +101,26 @@ export class MissionManager {
   }
 
   /**
+   * Registers story flags for entering a map (e.g., entered_azalea_town, entered_ecruteak, etc.)
+   * and evaluates mission progression.
+   */
+  public registerMapEntry(
+    mapId: string,
+    storyFlags: Set<string>
+  ): { newlyUnlocked: Mission[]; newlyCompleted: Mission[]; advanced: Mission[] } {
+    if (mapId) {
+      storyFlags.add(`entered_${mapId}`);
+      if (mapId === 'ecruteak_city') storyFlags.add('entered_ecruteak');
+      if (mapId === 'cianwood_city') storyFlags.add('entered_cianwood');
+      if (mapId === 'mahogany_town') storyFlags.add('entered_mahogany');
+      if (mapId === 'kurts_house' || mapId === 'slowpoke_well_b1f' || mapId === 'azalea_poke_center' || mapId === 'azalea_mart' || mapId === 'azalea_gym') {
+        storyFlags.add('entered_azalea_town');
+      }
+    }
+    return this.checkStoryFlags(storyFlags);
+  }
+
+  /**
    * Evaluates story flags to automatically unlock missions, advance steps, and complete quests.
    */
   public checkStoryFlags(
@@ -125,7 +145,14 @@ export class MissionManager {
       let stepChanged = false;
       let latestAdvancedStep: MissionStep | null = null;
       for (const step of mission.steps) {
-        if (!step.completed && step.storyFlag && flagSet.has(step.storyFlag)) {
+        const hasDirectFlag = Boolean(step.storyFlag && flagSet.has(step.storyFlag));
+        const hasEnteredTargetFlag = Boolean(
+          step.storyFlag &&
+            step.storyFlag.startsWith('entered_') &&
+            step.targetMapId &&
+            flagSet.has(`entered_${step.targetMapId}`)
+        );
+        if (!step.completed && (hasDirectFlag || hasEnteredTargetFlag)) {
           step.completed = true;
           stepChanged = true;
           latestAdvancedStep = step;
