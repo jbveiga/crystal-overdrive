@@ -75,28 +75,30 @@ export class BattleLogUI {
     // 3. Log panel container (strictly hidden by default)
     this.logPanel = document.createElement('div');
     this.logPanel.className =
-      'battle-log-panel hidden mt-2 w-72 md:w-80 max-h-56 bg-slate-950/92 border border-sky-500/30 rounded-xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden text-xs text-slate-200 transition-all duration-200';
+      'battle-log-panel hidden mt-2 bg-slate-950/95 border border-sky-400/50 rounded-xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden text-slate-100 transition-all duration-200';
+    this.logPanel.style.cssText =
+      'display: none; position: absolute; right: 0; top: 100%; margin-top: 6px; z-index: 60; width: min(340px, calc(100vw - 28px)); max-width: calc(100vw - 28px); max-height: min(320px, 55vh); background: rgba(15, 23, 42, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.55); border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85); overflow: hidden;';
     this.logPanel.style.display = 'none';
-    this.logPanel.style.maxWidth = 'min(320px, 90vw)';
-    this.logPanel.style.maxHeight = 'min(220px, 45vh)';
 
     // 4. Panel Header
     const panelHeader = document.createElement('div');
     panelHeader.className =
-      'px-3 py-2 bg-slate-900/90 border-b border-sky-500/20 flex items-center justify-between font-bold text-sky-300 text-xs tracking-wider uppercase flex-shrink-0';
+      'px-3.5 py-2.5 bg-slate-900 border-b border-sky-500/30 flex items-center justify-between font-bold text-sky-300 text-xs tracking-wider uppercase flex-shrink-0';
     panelHeader.innerHTML = `
-      <div class="flex items-center gap-1.5">
-        <span>📜</span>
-        <span>BATTLE LOG</span>
+      <div class="flex items-center gap-2">
+        <span class="text-sm">📜</span>
+        <span class="font-bold text-sky-200">BATTLE LOG</span>
       </div>
-      <button type="button" class="battle-log-close-btn text-slate-400 hover:text-white px-1 font-bold text-sm">✕</button>
+      <button type="button" class="battle-log-close-btn text-slate-300 hover:text-white px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 font-bold text-sm cursor-pointer" aria-label="Close log">✕</button>
     `;
     panelHeader.querySelector('.battle-log-close-btn')?.addEventListener('click', () => this.close());
 
     // 5. Scrollable Log List
     this.logList = document.createElement('div');
     this.logList.className =
-      'battle-log-list p-2.5 space-y-1.5 overflow-y-auto max-h-48 font-mono text-[11px] leading-relaxed scrollbar-thin scrollbar-thumb-sky-600/50 scrollbar-track-transparent flex-1';
+      'battle-log-list p-3 space-y-2 overflow-y-auto font-mono text-xs leading-relaxed flex-1';
+    this.logList.style.cssText =
+      'overflow-y: auto; max-height: calc(min(320px, 55vh) - 44px); -webkit-overflow-scrolling: touch; font-size: 12px; line-height: 1.6; color: #f1f5f9; padding: 10px 12px;';
 
     this.logPanel.appendChild(panelHeader);
     this.logPanel.appendChild(this.logList);

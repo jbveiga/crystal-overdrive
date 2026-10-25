@@ -70,6 +70,8 @@ const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   pokefan_f: './assets/sprites/characters/pokefan_f.png',
   super_nerd: './assets/sprites/characters/super_nerd.png',
   youngster: './assets/sprites/characters/youngster.png',
+  slowpoke: './assets/sprites/characters/slowpoke.png',
+  farfetchd: './assets/sprites/characters/farfetchd.png',
 };
 
 export class OverworldRenderer {

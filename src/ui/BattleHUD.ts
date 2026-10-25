@@ -341,7 +341,7 @@ export class BattleHUD {
           border-bottom: 4px solid #334155;
           border-radius: 10px 10px 18px 10px;
           padding: 12px 20px;
-          min-width: 300px;
+          min-width: min(280px, calc(100vw - 120px));
           box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
         ">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
@@ -422,7 +422,7 @@ export class BattleHUD {
           border-bottom: 4px solid #334155;
           border-radius: 18px 10px 10px 10px;
           padding: 12px 20px 10px 20px;
-          min-width: 320px;
+          min-width: min(290px, calc(100vw - 60px));
           box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
         ">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">

@@ -39,7 +39,9 @@ export type NpcSpriteType =
   | 'pokefan_m'
   | 'pokefan_f'
   | 'super_nerd'
-  | 'youngster';
+  | 'youngster'
+  | 'slowpoke'
+  | 'farfetchd';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
@@ -52,6 +54,9 @@ export interface GridEntity {
   id: string;
   x: number;
   y: number;
+  originX?: number;
+  originY?: number;
+  originDirection?: Direction;
   gridX?: number;
   gridY?: number;
   targetX: number;

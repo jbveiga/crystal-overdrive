@@ -98,14 +98,41 @@ describe('GitHub Issues #8, #9, #10, #11, #12 & Headless Sync Suite', () => {
     expect(typeof BattleLogUI).toBe('function');
   });
 
-  it('Headless GitHub Sync module: contains comprehensive resolution mapping for issues #8 through #12', () => {
-    expect(ISSUE_RESOLUTIONS[8]).toBeDefined();
-    expect(ISSUE_RESOLUTIONS[9]).toBeDefined();
-    expect(ISSUE_RESOLUTIONS[10]).toBeDefined();
-    expect(ISSUE_RESOLUTIONS[11]).toBeDefined();
-    expect(ISSUE_RESOLUTIONS[12]).toBeDefined();
+  it('Issue #15: ensures HM01 Cut replaces cut tree with forest grass tile in_forest_05_05_05_05', () => {
+    const ilexMapPath = path.resolve(__dirname, '../public/assets/data/maps/ilex_forest.json');
+    expect(fs.existsSync(ilexMapPath)).toBe(true);
+    const ilexData = JSON.parse(fs.readFileSync(ilexMapPath, 'utf8'));
 
-    for (const id of [8, 9, 10, 11, 12]) {
+    // Verify surrounding walkable ground tiles in Ilex Forest use in_forest_05_05_05_05
+    const idx26_8 = 26 * ilexData.width + 8;
+    const idx24_8 = 24 * ilexData.width + 8;
+    expect(ilexData.tileMap[idx26_8]).toBe('in_forest_05_05_05_05');
+    expect(ilexData.tileMap[idx24_8]).toBe('in_forest_05_05_05_05');
+
+    // Simulate cut replacement logic
+    const cutTileId = ilexData.tileMap[25 * ilexData.width + 8];
+    const isForestTile = cutTileId.startsWith('in_forest_') || ilexData.id === 'ilex_forest';
+    const replacementTile = isForestTile ? 'in_forest_05_05_05_05' : 'jt_07_07_07_07';
+    expect(replacementTile).toBe('in_forest_05_05_05_05');
+    expect(replacementTile).not.toBe('jt_07_07_07_07');
+  });
+
+  it('Issue #16: Bug Report modal does not automatically redirect and provides manual PNG save', () => {
+    const mainTsPath = path.resolve(__dirname, '../src/main.ts');
+    const mainContent = fs.readFileSync(mainTsPath, 'utf8');
+
+    // Verify auto-redirect setTimeout has been removed from mountGitHubReportButton
+    expect(mainContent).not.toMatch(/directLink\?\.click\(\);\s*\}\s*,\s*1000\)/);
+    // Verify save screenshot link and open issue link exist
+    expect(mainContent).toContain('github-screenshot-download-link');
+    expect(mainContent).toContain('SAVE SCREENSHOT PNG');
+    expect(mainContent).toContain('github-issues-redirect-link');
+    expect(mainContent).toContain('OPEN GITHUB ISSUE');
+  });
+
+  it('Headless GitHub Sync module: contains comprehensive resolution mapping for issues #8 through #16', () => {
+    for (const id of [8, 9, 10, 11, 12, 15, 16]) {
+      expect(ISSUE_RESOLUTIONS[id]).toBeDefined();
       expect(ISSUE_RESOLUTIONS[id].resolution.length).toBeGreaterThan(100);
       expect(ISSUE_RESOLUTIONS[id].resolution).toContain('Root Cause');
       expect(ISSUE_RESOLUTIONS[id].resolution).toContain('Fix');

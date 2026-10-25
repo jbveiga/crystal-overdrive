@@ -77,11 +77,13 @@ export {
   GUIDE_GENT_TOUR_LEGS,
   isNpcActiveForStoryFlags,
 } from './world/npcData';
+import { syncGitHubIssues } from './sync/githubSync';
 
 declare global {
   interface Window {
     updateLoaderProgress?: (pct: number, label: string) => void;
     dismissLoader?: () => void;
+    syncGitHubIssues?: typeof syncGitHubIssues;
   }
 }
 
@@ -1071,6 +1073,10 @@ async function bootstrap() {
     if (map.id === 'ilex_forest' && storyFlags.has('ilex_tree_cut')) {
       map.collisionGrid[25 * map.width + 8] = 0;
       map.collisionGrid[22 * map.width + 8] = 0;
+      if (map.tileMap) {
+        map.tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05';
+        map.tileMap[22 * map.width + 8] = 'in_forest_05_05_05_05';
+      }
     }
     const itemBalls = [...overworldItemManager.getActiveItemBalls(map.id)];
     if (map.id === 'elms_lab') {
@@ -1380,6 +1386,33 @@ async function bootstrap() {
   const npcObstaclesScratch: GridEntity[] = [];
   const worldNpcsScratch: GridEntity[] = [];
 
+  const resetMapNpcsToOrigin = (mapId: string) => {
+    const list = npcsByMap[mapId];
+    if (!list) return;
+    for (const npc of list) {
+      if (npc.originX !== undefined && npc.originY !== undefined) {
+        if (npc.id === 'forest_farfetchd' && !storyFlags.has('forest_farfetchd_herded')) {
+          continue;
+        }
+        npc.x = npc.originX;
+        npc.y = npc.originY;
+        npc.gridX = npc.originX;
+        npc.gridY = npc.originY;
+        npc.targetX = npc.originX;
+        npc.targetY = npc.originY;
+        npc.renderX = npc.originX;
+        npc.renderY = npc.originY;
+        if (npc.originDirection) {
+          npc.direction = npc.originDirection;
+        }
+        npc.isMoving = false;
+        npc.progress = 0;
+      }
+    }
+  };
+
+  resetMapNpcsToOrigin(initialMap.id);
+
   const getActiveMapNpcs = (mapId: string): GridEntity[] =>
     activeNpcCache.getActiveNpcs(
       mapId,
@@ -1539,6 +1572,7 @@ async function bootstrap() {
     if (nextMapId) {
       visitedMaps.add(nextMapId);
       missionManager.registerMapEntry(nextMapId, storyFlags);
+      resetMapNpcsToOrigin(nextMapId);
       entity.x = targetX;
       entity.targetX = targetX;
       entity.renderX = targetX;
@@ -2102,6 +2136,10 @@ async function bootstrap() {
               const evoScene = new EvolutionSceneUI('modal-container');
               const evoResult = await evoScene.play(member, evoCandidate.targetSpeciesId);
               if (evoResult.evolved) {
+                const targetSpecies = evoResult.newSpeciesId || evoResult.targetSpecies || evoCandidate.targetSpeciesId;
+                if (member.speciesId.toLowerCase() !== targetSpecies.toLowerCase()) {
+                  EvolutionManager.executeEvolution(member, targetSpecies);
+                }
                 seenSpecies.add(member.speciesId);
                 const evoMoves = await PokemonFactory.getLearnableMovesAtLevel(
                   member.speciesId,
@@ -2437,6 +2475,27 @@ async function bootstrap() {
         overworldHUD.showToast('✨ Received SOFT SAND from Cooltrainer Kate!');
         saveCurrentGame();
       }
+    }
+
+    // Reset line-of-sight trainer back to origin coordinates upon defeat so paths/corridors stay unblocked
+    if (
+      trainer.originX !== undefined &&
+      trainer.originY !== undefined &&
+      (trainer.x !== trainer.originX || trainer.y !== trainer.originY)
+    ) {
+      trainer.x = trainer.originX;
+      trainer.y = trainer.originY;
+      trainer.gridX = trainer.originX;
+      trainer.gridY = trainer.originY;
+      trainer.targetX = trainer.originX;
+      trainer.targetY = trainer.originY;
+      trainer.renderX = trainer.originX;
+      trainer.renderY = trainer.originY;
+      if (trainer.originDirection) {
+        trainer.direction = trainer.originDirection;
+      }
+      trainer.isMoving = false;
+      trainer.progress = 0;
     }
   };
 
@@ -2786,6 +2845,7 @@ async function bootstrap() {
         const targetMap = mapManager.setCurrentMap(transitionConfig.targetMapId);
         visitedMaps.add(targetMap.id);
         missionManager.registerMapEntry(targetMap.id, storyFlags);
+        resetMapNpcsToOrigin(targetMap.id);
         if (targetMap.id.endsWith('_poke_center')) {
           lastVisitedPokecenter = {
             mapId: targetMap.id,
@@ -6250,6 +6310,39 @@ async function bootstrap() {
       return;
     }
 
+    // Helper to resolve the correct walkable ground tile beneath a cut tree
+    const resolveCutReplacementTile = (map: MapData, tileX: number, tileY: number, currentTile?: string): string => {
+      if (map.id === 'ilex_forest' || (currentTile && currentTile.startsWith('in_forest_'))) {
+        return 'in_forest_05_05_05_05';
+      }
+      if (map.tileMap) {
+        const neighbors = [
+          { x: tileX, y: tileY + 1 },
+          { x: tileX, y: tileY - 1 },
+          { x: tileX - 1, y: tileY },
+          { x: tileX + 1, y: tileY },
+        ];
+        for (const n of neighbors) {
+          if (n.x >= 0 && n.x < map.width && n.y >= 0 && n.y < map.height) {
+            const idx = n.y * map.width + n.x;
+            if (map.collisionGrid[idx] === 0 && map.tileMap[idx]) {
+              const t = map.tileMap[idx];
+              if (!t.includes('tree') && !t.includes('cut')) {
+                return t;
+              }
+            }
+          }
+        }
+      }
+      if (map.id.startsWith('route_') || map.id.startsWith('kt_')) {
+        return 'kt_0b_0b_0b_0b';
+      }
+      if (map.id.includes('azalea') || map.id.startsWith('jt_m_')) {
+        return 'jt_m_07_07_07_07_az';
+      }
+      return 'jt_07_07_07_07';
+    };
+
     // 3. Check Cuttable Trees (HM01 Cut interaction - Task 2)
     if (
       facingX >= 0 &&
@@ -6295,14 +6388,19 @@ async function bootstrap() {
             '🌳 CUTTABLE TREE',
             () => {
               currentMap.collisionGrid[tileIdx] = 0;
+              const replacementTile = resolveCutReplacementTile(currentMap, facingX, facingY, facingTileName);
+              currentMap.tileMap![tileIdx] = replacementTile;
               if (currentMap.id === 'ilex_forest') {
                 currentMap.collisionGrid[25 * currentMap.width + 8] = 0;
                 currentMap.collisionGrid[22 * currentMap.width + 8] = 0;
+                if (currentMap.tileMap) {
+                  currentMap.tileMap[25 * currentMap.width + 8] = 'in_forest_05_05_05_05';
+                  currentMap.tileMap[22 * currentMap.width + 8] = 'in_forest_05_05_05_05';
+                }
                 storyFlags.add('ilex_tree_cut');
                 storyFlags.add('cut_used_in_ilex');
                 missionManager.checkStoryFlags(storyFlags);
               }
-              currentMap.tileMap![tileIdx] = 'jt_07_07_07_07';
               overworldRenderer.renderMap(currentMap, lookupMap);
               syncMapOverworldItems(currentMap);
               saveCurrentGame();
@@ -7336,63 +7434,59 @@ async function bootstrap() {
             ? `<img src="${screenshotDataUrl}" alt="Current Screen Capture" style="width: 100%; height: 110px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.4);" />`
             : ''
         }
-        <div style="font-size: 11px; color: #cbd5e1; line-height: 1.4;">
+        <div style="font-size: 11.5px; color: #e2e8f0; line-height: 1.5; display: flex; flex-direction: column; gap: 4px;">
+          <div><strong>1. Save screenshot:</strong> Tap below to download the PNG image.</div>
+          <div><strong>2. Open issue:</strong> Tap the link to open GitHub, fill in details, and attach the image.</div>
           ${
             copiedToClipboard
-              ? '✅ Screenshot copied to clipboard! Opening GitHub Issues in 1 second (Ctrl+V / Cmd+V to paste)...'
-              : '💾 Opening GitHub Issues in 1 second — download the screenshot below and drag it into the issue page.'
+              ? '<div style="color: #38bdf8; font-size: 10.5px;"><em>(Desktop: Also copied to your clipboard)</em></div>'
+              : ''
           }
         </div>
-        <div style="display: flex; gap: 8px;">
-          <a id="github-issues-redirect-link" href="${githubIssueUrl}" target="_blank" rel="noopener noreferrer" style="
-            flex: 1.4;
-            text-align: center;
-            text-decoration: none;
-            background: #0284c7;
-            color: #ffffff;
-            border: 1px solid #38bdf8;
-            border-radius: 8px;
-            padding: 8px 10px;
-            font-size: 12px;
-            font-weight: 800;
-          ">OPEN GITHUB ISSUE ↗</a>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
           ${
             screenshotDataUrl
               ? `<a id="github-screenshot-download-link" href="${screenshotDataUrl}" download="crystal-overdrive-${activeMapId}.png" style="
-                  flex: 1;
+                  display: block;
                   text-align: center;
                   text-decoration: none;
-                  background: #334155;
-                  color: #f8fafc;
-                  border: 1px solid rgba(148, 163, 184, 0.4);
+                  background: #2563eb;
+                  color: #ffffff;
+                  border: 1.5px solid #60a5fa;
                   border-radius: 8px;
-                  padding: 8px 8px;
-                  font-size: 11px;
+                  padding: 9px 12px;
+                  font-size: 12px;
                   font-weight: 800;
-                ">⬇ SAVE PNG</a>`
+                  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+                ">💾 SAVE SCREENSHOT PNG</a>`
               : ''
           }
+          <a id="github-issues-redirect-link" href="${githubIssueUrl}" target="_blank" rel="noopener noreferrer" style="
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            background: #0f172a;
+            color: #38bdf8;
+            border: 1.5px solid #38bdf8;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 12px;
+            font-weight: 800;
+          ">🚀 OPEN GITHUB ISSUE ↗</a>
         </div>
       `;
       uiOverlay.appendChild(modalCard);
 
-      let redirectCancelled = false;
       modalCard.querySelector('#close-report-card-btn')?.addEventListener('click', () => {
-        redirectCancelled = true;
         modalCard.remove();
       });
-
-      const directLink = modalCard.querySelector('#github-issues-redirect-link') as HTMLAnchorElement | null;
-      setTimeout(() => {
-        if (!redirectCancelled && document.body.contains(modalCard)) {
-          directLink?.click();
-        }
-      }, 1000);
     });
 
     uiOverlay.appendChild(reportBtn);
   };
   mountGitHubReportButton();
+
+  window.syncGitHubIssues = syncGitHubIssues;
 
   console.log('⚡ Crystal Overdrive Vertical Slice 100% playable & booted!');
 }

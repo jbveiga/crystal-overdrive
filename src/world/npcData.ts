@@ -25,6 +25,9 @@ export const makeNpc = (
   id,
   x,
   y,
+  originX: x,
+  originY: y,
+  originDirection: direction,
   gridX: x,
   gridY: y,
   targetX: x,
@@ -1929,7 +1932,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         21,
         10,
         'DOWN',
-        'fat_man',
+        'slowpoke',
         '🦛 SLOWPOKE',
         [
           'SLOWPOKE: ... ... ...',
@@ -1941,7 +1944,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         15,
         13,
         'RIGHT',
-        'fat_man',
+        'slowpoke',
         '🦛 SLOWPOKE',
         [
           'SLOWPOKE: ... ... ...',
@@ -2215,7 +2218,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         6,
         3,
         'LEFT',
-        'bird_keeper',
+        'farfetchd',
         '🦆 FARFETCH’D',
         ["FARFETCH'D: Kwaa! It looks happy to be back home at the kiln!"]
       ),
@@ -2324,7 +2327,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         6,
         2,
         'DOWN',
-        'fat_man',
+        'slowpoke',
         '🦛 RESCUED SLOWPOKE',
         [
           'SLOWPOKE: ... ... ...',
@@ -2336,7 +2339,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         7,
         4,
         'DOWN',
-        'fat_man',
+        'slowpoke',
         '🦛 RESCUED SLOWPOKE',
         [
           'SLOWPOKE: ... ... ...',
@@ -2378,7 +2381,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         15,
         23,
         'DOWN',
-        'bird_keeper',
+        'farfetchd',
         '🦆 FARFETCH’D',
         [
           "FARFETCH'D: Quaaack! It clutches its fresh green onion stalk proudly!",

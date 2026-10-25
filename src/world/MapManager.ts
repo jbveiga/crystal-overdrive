@@ -24,6 +24,34 @@ export class MapManager {
   private repelStepsRemaining: number = 0;
   private encounterRateMode: EncounterRateMode = 'NORMAL';
   private surfEnabled: boolean = false;
+  private spatialWarpCache: Map<string, Map<string, WarpEvent>> = new Map();
+  private spatialBgEventCache: Map<string, Map<string, BgEvent>> = new Map();
+
+  private getSpatialWarps(map: MapData): Map<string, WarpEvent> {
+    let index = this.spatialWarpCache.get(map.id);
+    if (!index) {
+      index = new Map();
+      for (const w of map.warps) {
+        index.set(`${w.x},${w.y}`, w);
+      }
+      this.spatialWarpCache.set(map.id, index);
+    }
+    return index;
+  }
+
+  private getSpatialBgEvents(map: MapData): Map<string, BgEvent> {
+    let index = this.spatialBgEventCache.get(map.id);
+    if (!index) {
+      index = new Map();
+      if (map.bgEvents) {
+        for (const bg of map.bgEvents) {
+          index.set(`${bg.x},${bg.y}`, bg);
+        }
+      }
+      this.spatialBgEventCache.set(map.id, index);
+    }
+    return index;
+  }
 
   public setSurfEnabled(enabled: boolean): void {
     this.surfEnabled = enabled;
@@ -31,6 +59,16 @@ export class MapManager {
 
   public isSurfEnabled(): boolean {
     return this.surfEnabled;
+  }
+
+  public invalidateSpatialCache(mapId?: string): void {
+    if (mapId) {
+      this.spatialWarpCache.delete(mapId);
+      this.spatialBgEventCache.delete(mapId);
+    } else {
+      this.spatialWarpCache.clear();
+      this.spatialBgEventCache.clear();
+    }
   }
 
   registerMap(map: MapData): void {
@@ -151,11 +189,11 @@ export class MapManager {
   };
 
   /**
-   * Checks if coordinate lands on a warp point
+   * Checks if coordinate lands on a warp point (O(1) spatial lookup)
    */
   checkWarp(coord: TileCoord): WarpEvent | undefined {
     if (!this.currentMap) return undefined;
-    return this.currentMap.warps.find((w) => w.x === coord.x && w.y === coord.y);
+    return this.getSpatialWarps(this.currentMap).get(`${coord.x},${coord.y}`);
   }
 
   /**
@@ -166,37 +204,36 @@ export class MapManager {
     if (x < 0 && this.currentMap.connections.WEST) {
       const conn = this.currentMap.connections.WEST;
       const westMap = this.maps.get(conn.mapId);
-      if (westMap?.bgEvents) {
-        return westMap.bgEvents.find((bg) => bg.x === x + westMap.width && bg.y === y - conn.offset);
+      if (westMap) {
+        return this.getSpatialBgEvents(westMap).get(`${x + westMap.width},${y - conn.offset}`);
       }
       return undefined;
     }
     if (x >= this.currentMap.width && this.currentMap.connections.EAST) {
       const conn = this.currentMap.connections.EAST;
       const eastMap = this.maps.get(conn.mapId);
-      if (eastMap?.bgEvents) {
-        return eastMap.bgEvents.find((bg) => bg.x === x - this.currentMap!.width && bg.y === y - conn.offset);
+      if (eastMap) {
+        return this.getSpatialBgEvents(eastMap).get(`${x - this.currentMap.width},${y - conn.offset}`);
       }
       return undefined;
     }
     if (y < 0 && this.currentMap.connections.NORTH) {
       const conn = this.currentMap.connections.NORTH;
       const northMap = this.maps.get(conn.mapId);
-      if (northMap?.bgEvents) {
-        return northMap.bgEvents.find((bg) => bg.x === x - conn.offset && bg.y === y + northMap.height);
+      if (northMap) {
+        return this.getSpatialBgEvents(northMap).get(`${x - conn.offset},${y + northMap.height}`);
       }
       return undefined;
     }
     if (y >= this.currentMap.height && this.currentMap.connections.SOUTH) {
       const conn = this.currentMap.connections.SOUTH;
       const southMap = this.maps.get(conn.mapId);
-      if (southMap?.bgEvents) {
-        return southMap.bgEvents.find((bg) => bg.x === x - conn.offset && bg.y === y - this.currentMap!.height);
+      if (southMap) {
+        return this.getSpatialBgEvents(southMap).get(`${x - conn.offset},${y - this.currentMap.height}`);
       }
       return undefined;
     }
-    if (!this.currentMap.bgEvents) return undefined;
-    return this.currentMap.bgEvents.find((bg) => bg.x === x && bg.y === y);
+    return this.getSpatialBgEvents(this.currentMap).get(`${x},${y}`);
   }
 
   /**

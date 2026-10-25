@@ -81,6 +81,26 @@ export const ISSUE_RESOLUTIONS: Record<number, { titleMatch: string; resolution:
   2. Increased text size to 12px with high contrast (\`#f1f5f9\`), clear turn dividers, and tactile close button.
   3. Updated \`enemy-card\` and \`player-card\` min-widths in \`src/ui/BattleHUD.ts\` to prevent mobile flex squishing.`,
   },
+  15: {
+    titleMatch: 'ilex_forest (8, 26)',
+    resolution: `### Resolution Details for Issue #15
+- **Root Cause**: When using HM01 Cut on the tree blocking the path at Ilex Forest (8, 25), the replacement tile in \`src/main.ts\` was hardcoded to \`'jt_07_07_07_07'\` (a Johto town cobblestone/brick tile), causing an out-of-place brick tile to appear in the forest grass.
+- **Fix**:
+  1. Implemented \`resolveCutReplacementTile(map, x, y, currentTile)\` helper in \`src/main.ts\` which dynamically checks the current map and adjacent walkable ground tiles.
+  2. For \`ilex_forest\` or any tile starting with \`in_forest_\`, returns \`'in_forest_05_05_05_05'\` (authentic walkable forest grass ground).
+  3. Ensured both cut interaction and persistent state reload in \`syncMapOverworldItems\` restore \`'in_forest_05_05_05_05'\` at (8, 25) and (8, 22).`,
+  },
+  16: {
+    titleMatch: 'ilex_forest (8, 26)',
+    resolution: `### Resolution Details for Issue #16
+- **Root Cause**: Tapping the in-game bug report button automatically fired a \`setTimeout\` redirect to GitHub after 1000ms. On mobile browsers (viewport 443x864), web clipboard image paste into GitHub issue forms is not supported, and the automatic redirect prevented users from downloading the captured PNG screenshot first.
+- **Fix**:
+  1. Removed the automatic \`setTimeout\` / \`directLink?.click()\` redirect in \`mountGitHubReportButton\` in \`src/main.ts\`.
+  2. The dialog now stays open, giving players clear step-by-step actions:
+     - **💾 SAVE SCREENSHOT PNG**: Downloads the captured screen canvas to device storage.
+     - **🚀 OPEN GITHUB ISSUE ↗**: Opens the pre-filled issue form in a new tab when the player is ready to attach the downloaded screenshot.
+  3. Updated the issue description template to instruct players to attach their saved screenshot file.`,
+  },
 };
 
 export async function fetchOpenIssues(

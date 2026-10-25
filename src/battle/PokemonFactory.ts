@@ -22,6 +22,7 @@ export interface PartyExpAward {
 
 export class PokemonFactory {
   private static learnsetCache = new Map<string, Record<string, string[]>>();
+  private static moveDataCache = new Map<string, MoveData>();
 
   public static createDefaultStatStages(): StatStages {
     return { atk: 0, def: 0, spa: 0, spd: 0, spe: 0, acc: 0, eva: 0 };
@@ -49,6 +50,9 @@ export class PokemonFactory {
    * Looks up MoveData from Showdown Dex
    */
   public static getMoveData(moveId: string): MoveData {
+    const cached = PokemonFactory.moveDataCache.get(moveId);
+    if (cached) return cached;
+
     const dexMove = Dex.moves.get(moveId);
     if (!dexMove.exists) {
       throw new Error(`Move "${moveId}" does not exist in Dex.`);
@@ -106,7 +110,7 @@ export class PokemonFactory {
       statChanges = { target: 'self', stat: 'spa', stages: 1 };
     }
 
-    return {
+    const moveObj: MoveData = {
       id: dexMove.id,
       name: dexMove.name,
       type,
@@ -121,6 +125,8 @@ export class PokemonFactory {
       secondaryStatus,
       statChanges,
     };
+    PokemonFactory.moveDataCache.set(moveId, moveObj);
+    return moveObj;
   }
 
   /**

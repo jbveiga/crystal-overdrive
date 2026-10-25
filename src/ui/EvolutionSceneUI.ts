@@ -204,7 +204,7 @@ export class EvolutionSceneUI {
     this.options = {
       autoAdvance: true,
       pulseDurationMs: 5500,
-      mutatePokemon: false,
+      mutatePokemon: true,
       ...options,
     };
 
@@ -384,6 +384,13 @@ export class EvolutionSceneUI {
    */
   public completeEvolution(): void {
     if (!this.active) return;
+    if (
+      this.options.mutatePokemon !== false &&
+      this.pokemon &&
+      this.pokemon.speciesId.toLowerCase() !== this.targetSpeciesId.toLowerCase()
+    ) {
+      EvolutionManager.executeEvolution(this.pokemon, this.targetSpeciesId);
+    }
     const result: EvolutionSceneResult = {
       evolved: true,
       targetSpecies: this.targetSpeciesId,
@@ -559,6 +566,7 @@ export class EvolutionSceneUI {
               id="evo-base-sprite"
               class="nk-evo-sprite nk-evo-sprite-base phase-${this.phase.toLowerCase()}"
               src="${preSpriteUrl}"
+              onerror="if(this.src && !this.src.includes('./assets/')){this.src='./assets/sprites/pokemon/${EvolutionManager.normalizeId(this.preEvoSpeciesId)}_front.png';}"
               alt="${this.preEvoName}"
             />
 
@@ -567,6 +575,7 @@ export class EvolutionSceneUI {
               id="evo-target-sprite"
               class="nk-evo-sprite nk-evo-sprite-target phase-${this.phase.toLowerCase()}"
               src="${targetSpriteUrl}"
+              onerror="if(this.src && !this.src.includes('./assets/')){this.src='./assets/sprites/pokemon/${EvolutionManager.normalizeId(this.targetSpeciesId)}_front.png';}"
               alt="${this.targetSpeciesName}"
             />
 
