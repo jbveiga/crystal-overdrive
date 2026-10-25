@@ -43,6 +43,8 @@ import { BugContestSpecimenSwapModal } from './ui/BugContestSpecimenSwapModal';
 import { KurtCraftingManager } from './world/KurtCraftingManager';
 import { KurtCraftingModalUI } from './ui/KurtCraftingModalUI';
 import { ModernHMHandler } from './world/ModernHMHandler';
+import { EvolutionManager } from './world/EvolutionManager';
+import { EvolutionSceneUI } from './ui/EvolutionSceneUI';
 import { isEcruteakGymSafeTile, ECRUTEAK_GYM_RESPAWN } from './world/ecruteakGymMaze';
 import { DisplayThemeManager } from './ui/DisplayThemeManager';
 import type {
@@ -61,6 +63,7 @@ import type {
 } from './types/game';
 import type { Graphics } from 'pixi.js';
 import {
+  makeNpc,
   createNpcsByMap,
   DAY_SIBLINGS,
   GUIDE_GENT_TOUR_LEGS,
@@ -1328,6 +1331,29 @@ async function bootstrap() {
       storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
     }
   }
+  // Recover existing saves where Leader Falkner or Leader Bugsy was defeated via line-of-sight
+  if (defeatedTrainers.has('falkner') && !storyFlags.has('falkner_defeated')) {
+    storyFlags.add('falkner_defeated');
+    storyFlags.add('CAN_USE_FLASH');
+    if (!inventory.badges.includes('zephyr')) inventory.badges.push('zephyr');
+    if (!inventory.tms.includes('TM31')) inventory.tms.push('TM31');
+  }
+  if (defeatedTrainers.has('bugsy') && !storyFlags.has('bugsy_defeated')) {
+    storyFlags.add('bugsy_defeated');
+    storyFlags.add('CAN_USE_CUT');
+    if (!inventory.badges.includes('hive')) inventory.badges.push('hive');
+    if (!inventory.tms.includes('TM49')) inventory.tms.push('TM49');
+  }
+  // Recover existing saves where Farfetch'd was herded before HM01 Cut was awarded
+  if (
+    (storyFlags.has('EVENT_HERDED_FARFETCHD') || storyFlags.has('forest_farfetchd_herded')) &&
+    !storyFlags.has('has_hm01_cut')
+  ) {
+    storyFlags.add('has_hm01_cut');
+    storyFlags.add('EVENT_GOT_HM01_CUT');
+    if (!inventory.tms.includes('HM01')) inventory.tms.push('HM01');
+    if (!inventory.tms.includes('HM01_CUT')) inventory.tms.push('HM01_CUT');
+  }
   if ((storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') || storyFlags.has('slowpoke_well_cleared')) && npcsByMap.azalea_town) {
     npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_well_grunt');
   }
@@ -2062,6 +2088,42 @@ async function bootstrap() {
         audioManager.restoreOverworldBgm(0.6);
         overworldHUD.show();
         itemfinderHUD.resume();
+
+        // Check and run post-battle Level-Up Evolution sequences for any eligible party Pokémon
+        if (result.winner === 'PLAYER') {
+          for (const member of playerParty) {
+            if (member.isEgg || member.currentHp <= 0) continue;
+            const evoCandidate = EvolutionManager.canEvolve(member, {
+              trigger: 'LEVEL_UP',
+              level: member.level,
+              timeOfDay: gameClock.getTimeOfDay(),
+            });
+            if (evoCandidate) {
+              const evoScene = new EvolutionSceneUI('modal-container');
+              const evoResult = await evoScene.play(member, evoCandidate.targetSpeciesId);
+              if (evoResult.evolved) {
+                seenSpecies.add(member.speciesId);
+                const evoMoves = await PokemonFactory.getLearnableMovesAtLevel(
+                  member.speciesId,
+                  member.level
+                );
+                for (const moveId of evoMoves) {
+                  if (member.moves.some((m) => m.moveId === moveId)) continue;
+                  const moveData = PokemonFactory.getMoveData(moveId);
+                  if (member.moves.length < 4) {
+                    member.moves.push({
+                      moveId: moveData.id,
+                      currentPp: moveData.pp,
+                      maxPp: moveData.pp,
+                    });
+                    overworldHUD.showToast(`✨ ${member.nickname} learned ${moveData.name}!`);
+                  }
+                }
+              }
+            }
+          }
+        }
+
         saveCurrentGame();
 
         if (options.onBattleEnd) {
@@ -2328,6 +2390,34 @@ async function bootstrap() {
       trainer.action === 'PROTON_EVENT'
     ) {
       completeSlowpokeWellProtonVictory();
+      return;
+    }
+    if (
+      trainer.id === 'bugsy' ||
+      trainer.trainerId === 'bugsy' ||
+      trainer.action === 'BUGSY_EVENT'
+    ) {
+      defeatedTrainers.add('bugsy');
+      storyFlags.add('bugsy_defeated');
+      storyFlags.add('CAN_USE_CUT');
+      if (!inventory.badges.includes('hive')) inventory.badges.push('hive');
+      if (!inventory.tms.includes('TM49')) inventory.tms.push('TM49');
+      missionManager.checkStoryFlags(storyFlags);
+      missionManager.completeMission('M03');
+      audioManager.playSfx('sfx_badge_get');
+      BattleAudio.playOverworldSound('KEY_ITEM');
+      overworldHUD.openDialogue(
+        [
+          "BUGSY: Whoa, amazing! You're an expert on POKéMON! My research isn't complete yet… OK, you win. Take this BADGE.",
+          `${playerName} received the HIVEBADGE from BUGSY!`,
+          "BUGSY: If you have the HIVEBADGE, POKéMON up to Lv. 30 will obey you without question! POKéMON that know CUT can also chop down small trees outside of battle! Here, take TM49 FURY CUTTER too!",
+        ],
+        trainer.speaker || '🐞 LEADER BUGSY',
+        () => {
+          saveCurrentGame();
+          overworldHUD.showToast('🐞 Received HIVE BADGE & TM49 FURY CUTTER from Leader Bugsy!');
+        }
+      );
       return;
     }
     if (trainer.trainerId === 'camper_todd') {
@@ -5354,12 +5444,65 @@ async function bootstrap() {
           return;
         }
 
-        // Ilex Forest: Farfetch'd Herding Puzzle (TICKET-WORLD-ILEX-FOREST-01)
-        if (targetNpc.action === 'FARFETCHD_HERD_EVENT' || targetNpc.id === 'forest_farfetchd') {
-          if (storyFlags.has('EVENT_HERDED_FARFETCHD')) {
+        // Ilex Forest: Charcoal Apprentice Interaction & HM01 Cut Fail-Safe
+        if (targetNpc.id === 'forest_apprentice') {
+          if (
+            (storyFlags.has('EVENT_HERDED_FARFETCHD') || storyFlags.has('forest_farfetchd_herded')) &&
+            !storyFlags.has('has_hm01_cut')
+          ) {
+            storyFlags.add('has_hm01_cut');
+            storyFlags.add('EVENT_GOT_HM01_CUT');
+            if (!inventory.tms) inventory.tms = [];
+            if (!inventory.tms.includes('HM01')) inventory.tms.push('HM01');
+            if (!inventory.tms.includes('HM01_CUT')) inventory.tms.push('HM01_CUT');
+            BattleAudio.playOverworldSound('KEY_ITEM');
             overworldHUD.openDialogue(
               [
-                "FARFETCH'D: Quaaack! It is resting happily beside the apprentice.",
+                "APPRENTICE: Thank you so much for bringing FARFETCH'D back!",
+                'Here is HM01 CUT from my boss as your reward!',
+                `${playerName} received HM01 CUT!`,
+              ],
+              targetNpc.speaker,
+              () => {
+                saveCurrentGame();
+                overworldHUD.showToast('🪓 Received HM01 CUT!');
+              }
+            );
+            return;
+          }
+          if (storyFlags.has('has_hm01_cut') || storyFlags.has('EVENT_GOT_HM01_CUT')) {
+            overworldHUD.openDialogue(
+              [
+                "APPRENTICE: Thanks to you, FARFETCH'D is safe and we have HM01 CUT ready to clear the forest path!",
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+        }
+
+        // Ilex Forest: Farfetch'd Herding Puzzle (TICKET-WORLD-ILEX-FOREST-01)
+        if (targetNpc.action === 'FARFETCHD_HERD_EVENT' || targetNpc.id === 'forest_farfetchd') {
+          const grantCutReward = () => {
+            storyFlags.add('EVENT_HERDED_FARFETCHD');
+            storyFlags.add('forest_farfetchd_herded');
+            storyFlags.add('has_hm01_cut');
+            storyFlags.add('EVENT_GOT_HM01_CUT');
+            if (!inventory.tms) inventory.tms = [];
+            if (!inventory.tms.includes('HM01')) inventory.tms.push('HM01');
+            if (!inventory.tms.includes('HM01_CUT')) inventory.tms.push('HM01_CUT');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            saveCurrentGame();
+            overworldHUD.showToast("🦆 FARFETCH'D returned! 🪓 Received HM01 CUT from the Charcoal Master!");
+          };
+
+          if (storyFlags.has('EVENT_HERDED_FARFETCHD')) {
+            if (!storyFlags.has('has_hm01_cut')) {
+              grantCutReward();
+            }
+            overworldHUD.openDialogue(
+              [
+                "FARFETCH'D: Quaaack! It is resting happily beside the apprentice and Charcoal Master.",
               ],
               targetNpc.speaker
             );
@@ -5368,12 +5511,9 @@ async function bootstrap() {
 
           const FARFETCHD_WAYPOINTS = [
             { x: 15, y: 23 },
-            { x: 15, y: 25 },
             { x: 20, y: 24 },
             { x: 22, y: 31 },
             { x: 15, y: 29 },
-            { x: 10, y: 35 },
-            { x: 13, y: 30 },
           ];
 
           let currentWpIdx = FARFETCHD_WAYPOINTS.findIndex(
@@ -5383,19 +5523,17 @@ async function bootstrap() {
           const nextWpIdx = currentWpIdx + 1;
 
           if (nextWpIdx >= FARFETCHD_WAYPOINTS.length) {
-            storyFlags.add('EVENT_HERDED_FARFETCHD');
-            storyFlags.add('forest_farfetchd_herded');
             BattleAudio.playCry('farfetchd');
             overworldHUD.openDialogue(
               [
                 "FARFETCH'D: Quaaack!",
                 "FARFETCH'D ran safely back to the Charcoal Apprentice!",
-                "APPRENTICE: You did it! You brought FARFETCH'D back! Look, the CHARCOAL MASTER is here too!",
+                "CHARCOAL MASTER: Ah! You rounded up my naughty FARFETCH'D! Take this HM01 CUT as my sincere thanks!",
+                `${playerName} received HM01 CUT!`,
               ],
               targetNpc.speaker,
               () => {
-                saveCurrentGame();
-                overworldHUD.showToast("🦆 FARFETCH'D was safely returned to the Charcoal Apprentice!");
+                grantCutReward();
               }
             );
             return;
@@ -5412,25 +5550,24 @@ async function bootstrap() {
           BattleAudio.playCry('farfetchd');
 
           if (nextWpIdx === FARFETCHD_WAYPOINTS.length - 1) {
-            storyFlags.add('EVENT_HERDED_FARFETCHD');
-            storyFlags.add('forest_farfetchd_herded');
             overworldHUD.openDialogue(
               [
                 "FARFETCH'D: Quaaack!",
-                "FARFETCH'D was steered all the way back to the Charcoal Apprentice!",
-                "APPRENTICE: Wow, thank you! The CHARCOAL MASTER has arrived to reward you!",
+                "FARFETCH'D was steered all the way back to the Charcoal Apprentice and Charcoal Master!",
+                "CHARCOAL MASTER: Ah! You're the young trainer who rounded up my FARFETCH'D! Without it, our business was in big trouble.",
+                'Here, take HM01 CUT as my sincere thanks! With the HIVE BADGE, you can chop down small prickly trees blocking your path!',
+                `${playerName} received HM01 CUT!`,
               ],
               targetNpc.speaker,
               () => {
-                saveCurrentGame();
-                overworldHUD.showToast("🦆 FARFETCH'D was safely returned to the Charcoal Apprentice!");
+                grantCutReward();
               }
             );
           } else {
             overworldHUD.openDialogue(
               [
                 "FARFETCH'D: Quaaack!",
-                "FARFETCH'D fluttered deeper along the path towards the apprentice!",
+                "FARFETCH'D fluttered along the eastern forest path towards the apprentice!",
               ],
               targetNpc.speaker
             );
@@ -6141,8 +6278,12 @@ async function bootstrap() {
       if (isCutTree) {
         const cutCheck = ModernHMHandler.checkCut(inventory, storyFlags, playerParty);
 
-        if (cutCheck.canUse) {
-          const cutter = cutCheck.userPokemon || playerParty.find((p) => !p.isEgg) || playerParty[0];
+        if (cutCheck.canUse || (cutCheck.hasBadge && cutCheck.hasHM && cutCheck.compatiblePokemon)) {
+          const cutter =
+            cutCheck.userPokemon ||
+            cutCheck.compatiblePokemon ||
+            playerParty.find((p) => !p.isEgg) ||
+            playerParty[0];
           const cutterName = cutter ? cutter.nickname : playerName;
           BattleAudio.playOverworldSound('RUSTLE');
           overworldRenderer.playCutSlashEffect(facingX, facingY);
@@ -6399,6 +6540,22 @@ async function bootstrap() {
     player.progress = 0;
     player.direction = 'LEFT';
 
+    // Spawn Rival Silver sprite facing player at the west gate
+    const rivalX = Math.max(1, player.x - 1);
+    const rivalY = player.y;
+    const silverNpc = makeNpc(
+      'azalea_rival_cutscene',
+      rivalX,
+      rivalY,
+      'RIGHT',
+      'silver',
+      `❓ RIVAL ${rivalName || 'SILVER'}`,
+      []
+    );
+    if (!npcsByMap.azalea_town) npcsByMap.azalea_town = [];
+    npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_rival_cutscene');
+    npcsByMap.azalea_town.push(silverNpc);
+
     let starterSpeciesId: 'croconaw' | 'bayleef' | 'quilava' = 'croconaw';
     let starterMoves = ['scratch', 'leer', 'rage', 'watergun'];
 
@@ -6452,6 +6609,11 @@ async function bootstrap() {
               ],
               `❓ RIVAL ${rivalName || 'SILVER'}`,
               () => {
+                if (npcsByMap.azalea_town) {
+                  npcsByMap.azalea_town = npcsByMap.azalea_town.filter(
+                    (n) => n.id !== 'azalea_rival_cutscene'
+                  );
+                }
                 isCutsceneLocked = false;
                 saveCurrentGame();
                 overworldHUD.showToast(`⚔️ Defeated Rival ${rivalName || 'Silver'}! The way to Ilex Forest is open!`);
@@ -6460,6 +6622,11 @@ async function bootstrap() {
           },
           onBattleEnd: (res) => {
             if (res.winner !== 'PLAYER') {
+              if (npcsByMap.azalea_town) {
+                npcsByMap.azalea_town = npcsByMap.azalea_town.filter(
+                  (n) => n.id !== 'azalea_rival_cutscene'
+                );
+              }
               isCutsceneLocked = false;
             }
           },
@@ -6474,6 +6641,21 @@ async function bootstrap() {
     player.isMoving = false;
     player.progress = 0;
     player.direction = 'RIGHT';
+
+    const rivalNpc = makeNpc(
+      'cherrygrove_rival_cutscene',
+      player.x + 1,
+      player.y,
+      'LEFT',
+      'silver',
+      '❓ PASSERBY BOY',
+      []
+    );
+    if (!npcsByMap.cherrygrove_city) npcsByMap.cherrygrove_city = [];
+    npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter(
+      (n) => n.id !== 'cherrygrove_rival_cutscene'
+    );
+    npcsByMap.cherrygrove_city.push(rivalNpc);
 
     let rivalSpeciesId: 'totodile' | 'chikorita' | 'cyndaquil' = 'totodile';
     let rivalMoves = ['scratch', 'leer'];
@@ -6518,6 +6700,11 @@ async function bootstrap() {
               ],
               '❓ PASSERBY BOY',
               () => {
+                if (npcsByMap.cherrygrove_city) {
+                  npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter(
+                    (n) => n.id !== 'cherrygrove_rival_cutscene'
+                  );
+                }
                 BattleAudio.playOverworldSound('BUMP');
                 BattleAudio.playOverworldSound('KEY_ITEM');
                 storyFlags.add('EVENT_RIVAL_CHERRYGROVE_DEFEATED');
@@ -6534,6 +6721,16 @@ async function bootstrap() {
                 overworldHUD.showToast('Dropped TRAINER CARD acquired! Suspect: SILVER');
               }
             );
+          },
+          onBattleEnd: (res) => {
+            if (res.winner !== 'PLAYER') {
+              if (npcsByMap.cherrygrove_city) {
+                npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter(
+                  (n) => n.id !== 'cherrygrove_rival_cutscene'
+                );
+              }
+              isCutsceneLocked = false;
+            }
           },
         });
       }
@@ -7016,7 +7213,7 @@ async function bootstrap() {
     reportBtn.title = 'Capture Screenshot to Clipboard & Report Issue on GitHub';
     reportBtn.style.cssText = `
       position: fixed;
-      top: max(54px, calc(env(safe-area-inset-top, 12px) + 42px));
+      top: max(96px, calc(env(safe-area-inset-top, 12px) + 84px));
       right: max(12px, env(safe-area-inset-right, 12px));
       z-index: 98;
       pointer-events: auto;
@@ -7046,18 +7243,36 @@ async function bootstrap() {
       let copiedToClipboard = false;
 
       try {
-        if (overworldRenderer.app?.renderer && overworldRenderer.app?.stage) {
-          overworldRenderer.app.renderer.render(overworldRenderer.app.stage);
-        }
-        const canvas = overworldRenderer.app?.canvas as HTMLCanvasElement | undefined;
-        if (canvas) {
-          screenshotDataUrl = canvas.toDataURL('image/png');
-          const blob = await new Promise<Blob | null>((resolve) =>
-            canvas.toBlob((b) => resolve(b), 'image/png')
-          );
-          if (blob && navigator.clipboard && typeof ClipboardItem !== 'undefined') {
-            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-            copiedToClipboard = true;
+        // Wait for the next animation frame and explicitly render the PixiJS stage so the WebGL buffer is never black
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => {
+            if (overworldRenderer.app?.renderer && overworldRenderer.app?.stage) {
+              overworldRenderer.app.renderer.render(overworldRenderer.app.stage);
+            }
+            resolve();
+          })
+        );
+
+        const glCanvas = overworldRenderer.app?.canvas as HTMLCanvasElement | undefined;
+        if (glCanvas) {
+          const outCanvas = document.createElement('canvas');
+          outCanvas.width = glCanvas.width || window.innerWidth;
+          outCanvas.height = glCanvas.height || window.innerHeight;
+          const ctx = outCanvas.getContext('2d');
+          if (ctx) {
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+            ctx.drawImage(glCanvas, 0, 0, outCanvas.width, outCanvas.height);
+            screenshotDataUrl = outCanvas.toDataURL('image/png');
+            const blob = await new Promise<Blob | null>((resolve) =>
+              outCanvas.toBlob((b) => resolve(b), 'image/png')
+            );
+            if (blob && navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+              await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+              copiedToClipboard = true;
+            }
+          } else {
+            screenshotDataUrl = glCanvas.toDataURL('image/png');
           }
         }
       } catch (err) {
@@ -7095,7 +7310,7 @@ async function bootstrap() {
       modalCard.id = 'github-report-modal-card';
       modalCard.style.cssText = `
         position: fixed;
-        top: max(94px, calc(env(safe-area-inset-top, 12px) + 82px));
+        top: max(136px, calc(env(safe-area-inset-top, 12px) + 124px));
         right: max(12px, env(safe-area-inset-right, 12px));
         width: 310px;
         max-width: 90vw;

@@ -1,6 +1,8 @@
 import type { PokemonInstance, SpeedMultiplier } from '../types/game';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { BattleAudio } from '../audio/BattleAudio';
+import { EvolutionManager } from '../world/EvolutionManager';
+import { EvolutionSceneUI } from './EvolutionSceneUI';
 
 const TYPE_COLORS: Record<string, { bg: string; text: string }> = {
   Normal: { bg: '#8A9BA8', text: '#0D1322' },
@@ -326,6 +328,13 @@ export class PartyManagementUI {
         ? `<span style="background: #48C774; color: #0D1322; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; box-shadow: 0 1px 0 0 #070B14;">★ LEAD</span>`
         : '';
 
+      const evoCandidate = !pkmn.isEgg
+        ? EvolutionManager.canEvolve(pkmn, { trigger: 'LEVEL_UP', level: pkmn.level })
+        : null;
+      const evoBadgeHtml = evoCandidate
+        ? `<span style="background: #A855F7; color: #F6F8F3; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; box-shadow: 0 1px 0 0 #070B14;">✨ EVOLVE READY</span>`
+        : '';
+
       const isEgg = Boolean(pkmn.isEgg);
       const avatarHtml = isEgg
         ? `<span style="font-size: 28px;" role="img" aria-label="EGG">🥚</span>`
@@ -353,6 +362,7 @@ export class PartyManagementUI {
                 <span style="font-family: 'Space Mono', monospace; font-weight: 900; font-size: 14px; color: #F6F8F3;">${isEgg ? 'EGG' : pkmn.nickname.toUpperCase()}</span>
                 ${leadHtml}
                 ${statusHtml}
+                ${evoBadgeHtml}
               </div>
               <span style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #FFD028;">${isEgg ? 'EGG' : `Lv.${pkmn.level}`}</span>
             </div>
@@ -457,6 +467,36 @@ export class PartyManagementUI {
         });
 
         actionRow.appendChild(summaryBtn);
+        if (evoCandidate) {
+          const evolveBtn = document.createElement('button');
+          evolveBtn.className = 'party-action-evolve-btn party-tactile-btn';
+          evolveBtn.style.cssText = `
+            flex: 1;
+            background: #A855F7;
+            color: #F6F8F3;
+            border: 1.5px solid #C084FC;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 2px 0 0 #581C87;
+          `;
+          evolveBtn.innerText = '✨ EVOLVE';
+          evolveBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            BattleAudio.playMenuSound('CONFIRM');
+            this.hide();
+            const evoScene = new EvolutionSceneUI(this.container.id || 'modal-container');
+            const res = await evoScene.play(pkmn, evoCandidate.targetSpeciesId);
+            if (res.evolved) {
+              this.onPartyChanged?.();
+            }
+            this.open();
+          });
+          actionRow.appendChild(evolveBtn);
+        }
         actionRow.appendChild(switchBtn);
         actionRow.appendChild(cancelBtn);
         card.appendChild(actionRow);
