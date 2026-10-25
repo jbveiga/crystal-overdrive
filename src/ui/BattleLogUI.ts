@@ -44,13 +44,17 @@ export class BattleLogUI {
 
     // 1. Root wrapper inside battle HUD container
     this.rootElement = document.createElement('div');
-    this.rootElement.className = 'battle-log-root absolute top-2 right-2 z-30 flex flex-col items-end pointer-events-auto';
+    this.rootElement.className = 'battle-log-root z-30 flex flex-col items-end pointer-events-auto';
+    this.rootElement.style.cssText =
+      'position: relative; display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto; margin-top: 4px; z-index: 30;';
 
     // 2. Toggle button & badge
     this.toggleButton = document.createElement('button');
     this.toggleButton.type = 'button';
     this.toggleButton.className =
       'battle-log-toggle-btn px-3 py-1.5 bg-slate-900/85 hover:bg-slate-800 text-sky-300 hover:text-white border border-sky-500/40 hover:border-sky-400 rounded-lg text-xs font-semibold tracking-wide shadow-md transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md';
+    this.toggleButton.style.cssText =
+      'padding: 6px 12px; background: rgba(15, 23, 42, 0.92); color: #7dd3fc; border: 1.5px solid rgba(56, 189, 248, 0.45); border-radius: 999px; font-size: 12px; font-weight: 800; letter-spacing: 0.4px; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);';
 
     const iconSpan = document.createElement('span');
     iconSpan.textContent = '📜';
@@ -59,6 +63,8 @@ export class BattleLogUI {
 
     this.countBadge = document.createElement('span');
     this.countBadge.className = 'battle-log-count text-[10px] bg-sky-950 px-1.5 py-0.5 rounded text-sky-400 font-mono';
+    this.countBadge.style.cssText =
+      'font-size: 10px; background: #082f49; padding: 1px 6px; border-radius: 999px; color: #38bdf8; font-family: monospace;';
     this.countBadge.textContent = '0';
 
     this.toggleButton.appendChild(iconSpan);

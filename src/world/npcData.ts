@@ -2197,7 +2197,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'DOWN',
         'fat_man',
         '🧔 KILN BOSS',
-        ['The kiln burns day and night to cure authentic AZALEA CHARCOAL. It boosts the power of FIRE-type moves!']
+        ['The kiln burns day and night to cure authentic AZALEA CHARCOAL. It boosts the power of FIRE-type moves!'],
+        { action: 'CHARCOAL_MASTER_EVENT' }
       ),
       makeNpc(
         'kiln_apprentice',
@@ -2386,8 +2387,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       ),
       makeNpc(
         'cut_master',
-        8,
-        23,
+        16,
+        28,
         'DOWN',
         'elder',
         '🧔 CHARCOAL MASTER',
