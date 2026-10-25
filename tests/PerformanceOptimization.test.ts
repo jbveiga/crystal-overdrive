@@ -1,8 +1,33 @@
-import { describe, it, expect, vi } from 'vitest';
-import { Container } from 'pixi.js';
-import { GraphicParticlePool } from '../src/render/GraphicParticlePool';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { TrackedStoryFlagSet, ActiveNpcCache } from '../src/world/ActiveNpcCache';
 import type { GridEntity } from '../src/world/GridPhysics';
+
+// Polyfill minimal browser globals for PixiJS in Node 20 environments
+if (typeof globalThis.navigator === 'undefined') {
+  Object.defineProperty(globalThis, 'navigator', {
+    value: { userAgent: 'node' },
+    configurable: true,
+    writable: true,
+  });
+}
+(globalThis as any).window = globalThis;
+if (!(globalThis as any).document) {
+  (globalThis as any).document = {
+    createElement: () => ({
+      getContext: () => null,
+    }),
+  };
+}
+
+let Container: typeof import('pixi.js').Container;
+let GraphicParticlePool: typeof import('../src/render/GraphicParticlePool').GraphicParticlePool;
+
+beforeAll(async () => {
+  const pixi = await import('pixi.js');
+  Container = pixi.Container;
+  const poolMod = await import('../src/render/GraphicParticlePool');
+  GraphicParticlePool = poolMod.GraphicParticlePool;
+});
 
 describe('Full-Stack Performance & Efficiency Optimizations', () => {
   describe('1. GraphicParticlePool (Zero-Allocation Overworld Particle Recycling)', () => {
