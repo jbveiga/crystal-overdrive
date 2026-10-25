@@ -316,6 +316,8 @@ export interface StartMenuStateProvider {
   getAutoHm?: () => boolean;
   getCrtScanlines?: () => boolean;
   getGbcPalette?: () => GbcPaletteMode;
+  getLowHpBeep?: () => boolean;
+  getChiptuneMode?: () => boolean;
   getLevelCap?: () => number;
   getGymAceLevel?: () => number;
   getBugContestLeaderboard?: () => BugContestLeaderboardEntry[];
@@ -341,6 +343,8 @@ export interface StartMenuCallbacks {
   onToggleAutoHm?: (enabled: boolean) => boolean | void;
   onToggleCrtScanlines?: (enabled: boolean) => boolean | void;
   onSetGbcPalette?: (palette: GbcPaletteMode) => GbcPaletteMode | void;
+  onToggleLowHpBeep?: (enabled: boolean) => boolean | void;
+  onToggleChiptuneMode?: (enabled: boolean) => boolean | void;
 }
 
 const JOHTO_BADGES = [
@@ -1982,6 +1986,12 @@ export class StartMenuUI {
     const isCrtScanlines: boolean = this.stateProvider.getCrtScanlines
       ? this.stateProvider.getCrtScanlines()
       : false;
+    const isLowHpBeep: boolean = this.stateProvider.getLowHpBeep
+      ? this.stateProvider.getLowHpBeep()
+      : BattleAudio.lowHpBeepEnabled;
+    const isChiptuneMode: boolean = this.stateProvider.getChiptuneMode
+      ? this.stateProvider.getChiptuneMode()
+      : false;
     const gbcPalette: GbcPaletteMode = this.stateProvider.getGbcPalette
       ? this.stateProvider.getGbcPalette()
       : 'VIBRANT';
@@ -2043,6 +2053,44 @@ export class StartMenuUI {
             cursor: pointer;
             min-width: 130px;
           ">${isMuted ? '🔇 SOUND: OFF' : '🔊 SOUND: ON'}</button>
+        </div>
+
+        <!-- 8-Bit Chiptune APU Mode Toggle -->
+        <div style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">BGM SYNTHESIS MODE</div>
+            <div style="${subLabelStyle}">4-channel Game Boy APU vs Studio BGM</div>
+          </div>
+          <button id="settings-chiptune-btn" style="
+            background: ${isChiptuneMode ? '#7c3aed' : '#0284c7'};
+            color: #ffffff;
+            border: 1px solid ${isChiptuneMode ? '#c084fc' : '#38bdf8'};
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 130px;
+          ">${isChiptuneMode ? '🎵 8-BIT APU: ON' : '🎼 STUDIO BGM'}</button>
+        </div>
+
+        <!-- Low-HP Warning Alarm Beep Toggle -->
+        <div style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">LOW-HP WARNING BEEP</div>
+            <div style="${subLabelStyle}">Two-tone battle alarm when HP ≤ 20%</div>
+          </div>
+          <button id="settings-lowhp-beep-btn" style="
+            background: ${isLowHpBeep ? '#059669' : '#334155'};
+            color: #ffffff;
+            border: 1px solid ${isLowHpBeep ? '#34d399' : '#64748b'};
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            min-width: 130px;
+          ">${isLowHpBeep ? '🚨 LOW-HP BEEP: ON' : '🔕 LOW-HP BEEP: OFF'}</button>
         </div>
 
         <!-- Speed Multiplier Cycle -->
@@ -2271,6 +2319,8 @@ export class StartMenuUI {
     `;
 
     const soundBtn = this.settingsModal.querySelector('#settings-sound-btn') as HTMLButtonElement;
+    const chiptuneBtn = this.settingsModal.querySelector('#settings-chiptune-btn') as HTMLButtonElement;
+    const lowHpBeepBtn = this.settingsModal.querySelector('#settings-lowhp-beep-btn') as HTMLButtonElement;
     const speedBtn = this.settingsModal.querySelector('#settings-speed-btn') as HTMLButtonElement;
     const gamepadBtn = this.settingsModal.querySelector('#settings-gamepad-btn') as HTMLButtonElement;
     const controlStyleBtn = this.settingsModal.querySelector('#settings-control-style-btn') as HTMLButtonElement;
@@ -2286,6 +2336,31 @@ export class StartMenuUI {
     const autoHmBtn = this.settingsModal.querySelector('#settings-autohm-btn') as HTMLButtonElement;
     const closeBtn = this.settingsModal.querySelector('#close-settings-btn') as HTMLButtonElement;
     const closeXBtn = this.settingsModal.querySelector('#close-settings-x-btn') as HTMLButtonElement;
+
+    let activeChiptune = isChiptuneMode;
+    if (chiptuneBtn) {
+      chiptuneBtn.addEventListener('click', () => {
+        activeChiptune = !activeChiptune;
+        BattleAudio.playMenuSound('CONFIRM');
+        chiptuneBtn.innerText = activeChiptune ? '🎵 8-BIT APU: ON' : '🎼 STUDIO BGM';
+        chiptuneBtn.style.background = activeChiptune ? '#7c3aed' : '#0284c7';
+        chiptuneBtn.style.borderColor = activeChiptune ? '#c084fc' : '#38bdf8';
+        this.callbacks.onToggleChiptuneMode?.(activeChiptune);
+      });
+    }
+
+    let activeLowHpBeep = isLowHpBeep;
+    if (lowHpBeepBtn) {
+      lowHpBeepBtn.addEventListener('click', () => {
+        activeLowHpBeep = !activeLowHpBeep;
+        BattleAudio.setLowHpBeepEnabled(activeLowHpBeep);
+        BattleAudio.playMenuSound('CONFIRM');
+        lowHpBeepBtn.innerText = activeLowHpBeep ? '🚨 LOW-HP BEEP: ON' : '🔕 LOW-HP BEEP: OFF';
+        lowHpBeepBtn.style.background = activeLowHpBeep ? '#059669' : '#334155';
+        lowHpBeepBtn.style.borderColor = activeLowHpBeep ? '#34d399' : '#64748b';
+        this.callbacks.onToggleLowHpBeep?.(activeLowHpBeep);
+      });
+    }
 
     let activeCrt = isCrtScanlines;
     if (crtBtn) {

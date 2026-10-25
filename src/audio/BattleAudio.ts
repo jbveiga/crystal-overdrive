@@ -8,6 +8,9 @@ export type { WarpSoundCue };
 export class BattleAudio {
   private static ctx: AudioContext | null = null;
   public static muted: boolean = false;
+  public static lowHpBeepEnabled: boolean = true;
+  private static lowHpAlarmTimer: ReturnType<typeof setInterval> | null = null;
+  private static lowHpAlarmActive: boolean = false;
 
   private static getContext(): AudioContext | null {
     if (this.muted || typeof window === 'undefined') return null;
@@ -729,5 +732,250 @@ export class BattleAudio {
       osc.start(now);
       osc.stop(now + 0.08);
     }
+  }
+
+  /**
+   * Returns whether the continuous Gen II low-HP warning alarm loop is currently active.
+   */
+  public static isLowHpAlarmActive(): boolean {
+    return this.lowHpAlarmActive;
+  }
+
+  /**
+   * Enables or disables the low-HP warning alarm. If disabled while active, stops the alarm immediately.
+   */
+  public static setLowHpBeepEnabled(enabled: boolean): void {
+    this.lowHpBeepEnabled = enabled;
+    if (!enabled) {
+      this.stopLowHpAlarm();
+    }
+  }
+
+  /**
+   * Plays a single two-tone Gen II Crystal low-HP warning beep (B5 -> F#5 on Pulse 1).
+   */
+  public static playLowHpBeepOnce(): void {
+    if (this.muted || !this.lowHpBeepEnabled) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const tones: Array<{ freq: number; offset: number; dur: number }> = [
+      { freq: 987.77, offset: 0.0, dur: 0.1 },   // B5
+      { freq: 739.99, offset: 0.11, dur: 0.12 }, // F#5
+    ];
+
+    for (const t of tones) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(t.freq, now + t.offset);
+      gain.gain.setValueAtTime(0.055, now + t.offset);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + t.offset + t.dur);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now + t.offset);
+      osc.stop(now + t.offset + t.dur);
+    }
+  }
+
+  /**
+   * Starts the rhythmic Gen II low-HP two-tone alarm loop when the player's active Pokémon is in the red zone (<= 20% HP).
+   */
+  public static startLowHpAlarm(): void {
+    if (!this.lowHpBeepEnabled) {
+      this.stopLowHpAlarm();
+      return;
+    }
+    if (this.lowHpAlarmActive) return;
+
+    this.lowHpAlarmActive = true;
+    this.playLowHpBeepOnce();
+    this.lowHpAlarmTimer = setInterval(() => {
+      if (!this.lowHpAlarmActive || !this.lowHpBeepEnabled) {
+        this.stopLowHpAlarm();
+        return;
+      }
+      this.playLowHpBeepOnce();
+    }, 650);
+  }
+
+  /**
+   * Stops the continuous low-HP warning alarm loop cleanly.
+   */
+  public static stopLowHpAlarm(): void {
+    if (this.lowHpAlarmTimer !== null) {
+      clearInterval(this.lowHpAlarmTimer);
+      this.lowHpAlarmTimer = null;
+    }
+    this.lowHpAlarmActive = false;
+  }
+
+  /**
+   * Evaluates a player's active Pokémon HP and starts or stops the low-HP warning alarm accordingly.
+   * Triggers when `0 < currentHp <= 0.20 * maxHp`. Stops on heal (> 20%) or faint (<= 0).
+   */
+  public static updateLowHpState(currentHp: number, maxHp: number): void {
+    if (maxHp <= 0 || currentHp <= 0) {
+      this.stopLowHpAlarm();
+      return;
+    }
+    const ratio = currentHp / maxHp;
+    if (ratio <= 0.20 && this.lowHpBeepEnabled) {
+      this.startLowHpAlarm();
+    } else {
+      this.stopLowHpAlarm();
+    }
+  }
+
+  /**
+   * Synthesizes authentic 8-bit status infliction sound cues (PAR, BRN, FRZ, PSN, TOX, SLP).
+   */
+  public static playStatusSound(status: 'PAR' | 'BRN' | 'FRZ' | 'PSN' | 'TOX' | 'SLP'): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    if (status === 'PAR') {
+      // Rapid electric static pulse
+      [0, 0.06, 0.12, 0.18].forEach((offset, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(i % 2 === 0 ? 920 : 480, now + offset);
+        gain.gain.setValueAtTime(0.06, now + offset);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.05);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + offset);
+        osc.stop(now + offset + 0.05);
+      });
+    } else if (status === 'BRN') {
+      // Searing flame burst sweep
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      this.bindAutoDisconnect(osc, gain);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(660, now + 0.12);
+      osc.frequency.exponentialRampToValueAtTime(160, now + 0.26);
+      gain.gain.setValueAtTime(0.07, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.26);
+    } else if (status === 'FRZ') {
+      // Crystalline high chime
+      [1046.5, 1318.5, 1568.0].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + i * 0.07);
+        gain.gain.setValueAtTime(0.065, now + i * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.11);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.07);
+        osc.stop(now + i * 0.07 + 0.11);
+      });
+    } else if (status === 'PSN' || status === 'TOX') {
+      // Bubbling toxic pitch drop
+      [340, 260, 310, 210].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, now + i * 0.065);
+        gain.gain.setValueAtTime(0.06, now + i * 0.065);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.065 + 0.06);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.065);
+        osc.stop(now + i * 0.065 + 0.06);
+      });
+    } else if (status === 'SLP') {
+      // Drowsy descending triangle wave
+      [523.25, 440, 349.23].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + i * 0.1);
+        gain.gain.setValueAtTime(0.07, now + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.1);
+        osc.stop(now + i * 0.1 + 0.12);
+      });
+    }
+  }
+
+  /**
+   * Synthesizes weather ambience & battle weather transition cues (RAIN, SANDSTORM, SUN, HAIL).
+   */
+  public static playWeatherSound(weather: 'RAIN' | 'SANDSTORM' | 'SUN' | 'HAIL'): void {
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    if (weather === 'SUN') {
+      [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        this.bindAutoDisconnect(osc, gain);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + i * 0.06);
+        gain.gain.setValueAtTime(0.065, now + i * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.14);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.06);
+        osc.stop(now + i * 0.06 + 0.14);
+      });
+      return;
+    }
+
+    // Filtered noise burst for RAIN, SANDSTORM, or HAIL
+    const duration = weather === 'SANDSTORM' ? 0.35 : 0.25;
+    const bufferSize = Math.max(64, Math.floor(ctx.sampleRate * duration));
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(
+      weather === 'RAIN' ? 1800 : weather === 'HAIL' ? 3200 : 750,
+      now
+    );
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.065, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.onended = () => {
+      try {
+        noise.disconnect();
+        filter.disconnect();
+        gain.disconnect();
+      } catch {
+        // Ignore
+      }
+    };
+    noise.start(now);
+    noise.stop(now + duration);
   }
 }

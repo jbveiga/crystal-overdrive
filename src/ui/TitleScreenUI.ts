@@ -545,15 +545,20 @@ export class TitleScreenUI {
     this.gateElement.id = 'title-unlock-gate';
     this.gateElement.style.cssText = `
       margin-top: 24px;
-      padding: 16px 32px;
+      max-width: 92vw;
+      width: fit-content;
+      box-sizing: border-box;
+      padding: 12px clamp(14px, 4vw, 28px);
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.78);
       border: 2px solid rgba(56, 189, 248, 0.65);
       box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
       color: #f8fafc;
-      font-size: 15px;
+      font-size: clamp(11px, 3.2vw, 15px);
       font-weight: 800;
-      letter-spacing: 1.8px;
+      letter-spacing: clamp(0.6px, 0.35vw, 1.8px);
+      line-height: 1.35;
+      white-space: normal;
       cursor: pointer;
       text-align: center;
       animation: crystalBlinkPrompt 1.4s infinite ease-in-out;
@@ -979,6 +984,36 @@ export class TitleScreenUI {
           ">${this.options.battleAnimations ? 'ON' : 'OFF'}</button>
         </div>
 
+        <!-- 8-Bit Chiptune APU Synthesis Mode -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; font-weight: 700;">🎵 8-BIT APU CHIPTUNE BGM</span>
+          <button id="opt-chiptune-btn" style="
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            background: ${this.options.chiptuneMode ? '#7c3aed' : '#334155'};
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+          ">${this.options.chiptuneMode ? 'ON' : 'OFF'}</button>
+        </div>
+
+        <!-- Low-HP Warning Alarm Beep -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 13px; font-weight: 700;">🚨 LOW-HP WARNING BEEP</span>
+          <button id="opt-lowhp-beep-btn" style="
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            background: ${(this.options.lowHpBeepEnabled ?? true) ? '#16a34a' : '#334155'};
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+          ">${(this.options.lowHpBeepEnabled ?? true) ? 'ON' : 'OFF'}</button>
+        </div>
+
         <!-- Default Overdrive Movement Speed -->
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <span style="font-size: 13px; font-weight: 700;">⚡ DEFAULT OVERDRIVE SPEED</span>
@@ -1024,7 +1059,9 @@ export class TitleScreenUI {
       this.updateOptions({ soundVolume: val });
     });
 
-    const textSpeedBtns = this.optionsModalElement.querySelectorAll('[data-text-speed]');
+    const textSpeedBtns = this.optionsModalElement.querySelectorAll
+      ? this.optionsModalElement.querySelectorAll('[data-text-speed]')
+      : [];
     textSpeedBtns.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1041,7 +1078,25 @@ export class TitleScreenUI {
       this.updateOptions({ battleAnimations: !this.options.battleAnimations });
     });
 
-    const speedBtns = this.optionsModalElement.querySelectorAll('[data-default-speed]');
+    const chiptuneBtn = this.optionsModalElement.querySelector('#opt-chiptune-btn');
+    chiptuneBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      BattleAudio.playMenuSound('CURSOR');
+      this.updateOptions({ chiptuneMode: !(this.options.chiptuneMode ?? false) });
+    });
+
+    const lowHpBeepBtn = this.optionsModalElement.querySelector('#opt-lowhp-beep-btn');
+    lowHpBeepBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const next = !(this.options.lowHpBeepEnabled ?? true);
+      BattleAudio.setLowHpBeepEnabled(next);
+      BattleAudio.playMenuSound('CURSOR');
+      this.updateOptions({ lowHpBeepEnabled: next });
+    });
+
+    const speedBtns = this.optionsModalElement.querySelectorAll
+      ? this.optionsModalElement.querySelectorAll('[data-default-speed]')
+      : [];
     speedBtns.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();

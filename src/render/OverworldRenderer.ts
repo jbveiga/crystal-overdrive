@@ -130,6 +130,7 @@ export class OverworldRenderer {
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
       antialias: false, // Crisp pixel art
+      preserveDrawingBuffer: true,
     });
 
     containerElement.appendChild(this.app.canvas);

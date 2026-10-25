@@ -203,6 +203,8 @@ async function bootstrap() {
     gameOptions.crtScanlines ?? false,
     gameOptions.gbcPalette ?? 'VIBRANT'
   );
+  BattleAudio.setLowHpBeepEnabled(gameOptions.lowHpBeepEnabled ?? true);
+  audioManager.setChiptuneMode(gameOptions.chiptuneMode ?? false);
 
   // 3. Fetch and Register Outdoor & Indoor Maps (New Bark -> Cherrygrove -> Route 30/31 -> Violet City)
   const mapIds = [
@@ -817,6 +819,8 @@ async function bootstrap() {
       getAutoHm: () => gameOptions.autoHm ?? true,
       getCrtScanlines: () => displayThemeManager.isCrtEnabled(),
       getGbcPalette: () => displayThemeManager.getPalette(),
+      getLowHpBeep: () => gameOptions.lowHpBeepEnabled ?? true,
+      getChiptuneMode: () => audioManager.isChiptuneMode(),
       getBugContestLeaderboard: () => bugContestManager.getTopLeaderboard(5),
       getBugContestPersonalBest: () => bugContestManager.getPersonalBestRecord(),
     },
@@ -921,6 +925,18 @@ async function bootstrap() {
         gameOptions.gbcPalette = next;
         saveCurrentGame();
         return next;
+      },
+      onToggleLowHpBeep: (enabled: boolean) => {
+        gameOptions.lowHpBeepEnabled = enabled;
+        BattleAudio.setLowHpBeepEnabled(enabled);
+        saveCurrentGame();
+        return enabled;
+      },
+      onToggleChiptuneMode: (enabled: boolean) => {
+        gameOptions.chiptuneMode = enabled;
+        audioManager.setChiptuneMode(enabled);
+        saveCurrentGame();
+        return enabled;
       },
     }
   );
@@ -1208,6 +1224,12 @@ async function bootstrap() {
       if (updatedOptions.gbcPalette) {
         displayThemeManager.setPalette(updatedOptions.gbcPalette);
       }
+      if (updatedOptions.lowHpBeepEnabled !== undefined) {
+        BattleAudio.setLowHpBeepEnabled(updatedOptions.lowHpBeepEnabled);
+      }
+      if (updatedOptions.chiptuneMode !== undefined) {
+        audioManager.setChiptuneMode(updatedOptions.chiptuneMode);
+      }
       overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
       bagUI.setSpeedMultiplier(gameClock.playerSpeed);
       partyUI.setSpeedMultiplier(gameClock.playerSpeed);
@@ -1295,6 +1317,16 @@ async function bootstrap() {
   }
   if ((!storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') || storyFlags.has('EVENT_RIVAL_NAMED')) && npcsByMap.elms_lab) {
     npcsByMap.elms_lab = npcsByMap.elms_lab.filter((n) => n.id !== 'lab_police_officer');
+  }
+  // Recover existing saves where Executive Proton was defeated via line-of-sight before story flags were set
+  if (defeatedTrainers.has('executive_proton') && !storyFlags.has('slowpoke_well_cleared')) {
+    storyFlags.add('proton_defeated');
+    storyFlags.add('slowpoke_well_cleared');
+    if (!storyFlags.has('EVENT_KURT_GAVE_YOU_LURE_BALL')) {
+      inventory.balls['lure-ball'] = (inventory.balls['lure-ball'] || 0) + 1;
+      storyFlags.add('EVENT_KURT_GAVE_YOU_LURE_BALL');
+      storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
+    }
   }
   if ((storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') || storyFlags.has('slowpoke_well_cleared')) && npcsByMap.azalea_town) {
     npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_well_grunt');
@@ -2227,7 +2259,77 @@ async function bootstrap() {
     });
   };
 
+  const completeSlowpokeWellProtonVictory = () => {
+    defeatedTrainers.add('executive_proton');
+    storyFlags.add('proton_defeated');
+    storyFlags.add('slowpoke_well_cleared');
+    if (npcsByMap.slowpoke_well_b1f) {
+      npcsByMap.slowpoke_well_b1f = npcsByMap.slowpoke_well_b1f.filter(
+        (n) => !n.id.startsWith('rocket_grunt') && n.id !== 'executive_proton'
+      );
+    }
+    if (npcsByMap.azalea_town) {
+      npcsByMap.azalea_town = npcsByMap.azalea_town.filter(
+        (n) => n.id !== 'azalea_well_grunt' && n.id !== 'azalea_gym_grunt'
+      );
+    }
+    missionManager.checkStoryFlags(storyFlags);
+    overworldHUD.openDialogue(
+      [
+        "PROTON: You did OK today, but don't think you've stopped us!",
+        'TEAM ROCKET will never give up! Retreat!',
+        'The Rocket Grunts and Executive Proton scrambled out of the cavern!',
+        "KURT: Way to go! Team Rocket has taken off! Let's get out of here.",
+      ],
+      '⚡ EXECUTIVE PROTON',
+      () => {
+        overworldHUD.playFieldRestAnimation(() => {
+          healPlayerParty(false);
+          const kurtMap = mapManager.setCurrentMap('kurts_house');
+          player.x = 3;
+          player.y = 4;
+          player.targetX = 3;
+          player.targetY = 4;
+          player.renderX = 3;
+          player.renderY = 4;
+          player.direction = 'UP';
+          overworldRenderer.renderMap(kurtMap, lookupMap);
+          syncMapOverworldItems(kurtMap);
+          overworldHUD.updateRouteName(kurtMap.name);
+          audioManager.playMapBgm(kurtMap.id, 0.8);
+
+          inventory.balls['lure-ball'] = (inventory.balls['lure-ball'] || 0) + 1;
+          storyFlags.add('EVENT_KURT_GAVE_YOU_LURE_BALL');
+          storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
+          missionManager.checkStoryFlags(storyFlags);
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          overworldHUD.openDialogue(
+            [
+              "KURT: You drove off TEAM ROCKET from SLOWPOKE WELL? You're a wonderful trainer!",
+              'Take this LURE BALL as a token of my gratitude!',
+              `${playerName} received a LURE BALL from KURT!`,
+              "KURT: Bring me any APRICORNS you find on trees, and I'll gladly craft custom POKé BALLS for you free of charge!",
+            ],
+            '👴 KURT',
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('⚡ Rescued the Slowpoke & received LURE BALL from Kurt!');
+            }
+          );
+        });
+      }
+    );
+  };
+
   const handleTrainerDefeatRewards = (trainer: GridEntity) => {
+    if (
+      trainer.id === 'executive_proton' ||
+      trainer.trainerId === 'executive_proton' ||
+      trainer.action === 'PROTON_EVENT'
+    ) {
+      completeSlowpokeWellProtonVictory();
+      return;
+    }
     if (trainer.trainerId === 'camper_todd') {
       storyFlags.add('TODD_REGISTERED');
       overworldHUD.showToast("📱 Registered Todd's number in Pokégear!");
@@ -5186,8 +5288,18 @@ async function bootstrap() {
           return;
         }
 
+        // Slowpoke Well: Kurt inside B1F if Proton was already defeated
+        if (targetNpc.id === 'well_kurt' && defeatedTrainers.has('executive_proton') && !storyFlags.has('slowpoke_well_cleared')) {
+          completeSlowpokeWellProtonVictory();
+          return;
+        }
+
         // Slowpoke Well: Executive Proton Boss Battle (Ticket SPRINT-13-RIVAL-AND-AZALEA)
         if (targetNpc.action === 'PROTON_EVENT' || targetNpc.id === 'executive_proton') {
+          if (defeatedTrainers.has('executive_proton') && !storyFlags.has('slowpoke_well_cleared')) {
+            completeSlowpokeWellProtonVictory();
+            return;
+          }
           if (!storyFlags.has('proton_defeated')) {
             const introPages = [
               "PROTON: What do you want? If you interrupt our work, don't expect any mercy! We're TEAM ROCKET, and we'll do anything for money!",
@@ -5200,64 +5312,7 @@ async function bootstrap() {
                 trainerName: 'Executive Proton',
                 trainerTeam: team,
                 onVictory: () => {
-                  defeatedTrainers.add('executive_proton');
-                  storyFlags.add('proton_defeated');
-                  storyFlags.add('slowpoke_well_cleared');
-                  if (npcsByMap.slowpoke_well_b1f) {
-                    npcsByMap.slowpoke_well_b1f = npcsByMap.slowpoke_well_b1f.filter(
-                      (n) => !n.id.startsWith('rocket_grunt') && n.id !== 'executive_proton'
-                    );
-                  }
-                  if (npcsByMap.azalea_town) {
-                    npcsByMap.azalea_town = npcsByMap.azalea_town.filter(
-                      (n) => n.id !== 'azalea_well_grunt' && n.id !== 'azalea_gym_grunt'
-                    );
-                  }
-                  overworldHUD.openDialogue(
-                    [
-                      "PROTON: You did OK today, but don't think you've stopped us!",
-                      "TEAM ROCKET will never give up! Retreat!",
-                      "The Rocket Grunts and Executive Proton scrambled out of the cavern!",
-                      "KURT: Way to go! Team Rocket has taken off! Let's get out of here.",
-                    ],
-                    '⚡ EXECUTIVE PROTON',
-                    () => {
-                      overworldHUD.playFieldRestAnimation(() => {
-                        healPlayerParty(false);
-                        const kurtMap = mapManager.setCurrentMap('kurts_house');
-                        player.x = 3;
-                        player.y = 4;
-                        player.targetX = 3;
-                        player.targetY = 4;
-                        player.renderX = 3;
-                        player.renderY = 4;
-                        player.direction = 'UP';
-                        overworldRenderer.renderMap(kurtMap, lookupMap);
-                        syncMapOverworldItems(kurtMap);
-                        overworldHUD.updateRouteName(kurtMap.name);
-                        audioManager.playMapBgm(kurtMap.id, 0.8);
-
-                        inventory.balls['lure-ball'] = (inventory.balls['lure-ball'] || 0) + 1;
-                        storyFlags.add('EVENT_KURT_GAVE_YOU_LURE_BALL');
-                        storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
-                        missionManager.checkStoryFlags(storyFlags);
-                        BattleAudio.playOverworldSound('KEY_ITEM');
-                        overworldHUD.openDialogue(
-                          [
-                            "KURT: You drove off TEAM ROCKET from SLOWPOKE WELL? You're a wonderful trainer!",
-                            "Take this LURE BALL as a token of my gratitude!",
-                            `${playerName} received a LURE BALL from KURT!`,
-                            "KURT: Bring me any APRICORNS you find on trees, and I'll gladly craft custom POKé BALLS for you free of charge!",
-                          ],
-                          '👴 KURT',
-                          () => {
-                            saveCurrentGame();
-                            overworldHUD.showToast('⚡ Rescued the Slowpoke & received LURE BALL from Kurt!');
-                          }
-                        );
-                      });
-                    }
-                  );
+                  completeSlowpokeWellProtonVictory();
                 },
               });
             });
@@ -6991,6 +7046,9 @@ async function bootstrap() {
       let copiedToClipboard = false;
 
       try {
+        if (overworldRenderer.app?.renderer && overworldRenderer.app?.stage) {
+          overworldRenderer.app.renderer.render(overworldRenderer.app.stage);
+        }
         const canvas = overworldRenderer.app?.canvas as HTMLCanvasElement | undefined;
         if (canvas) {
           screenshotDataUrl = canvas.toDataURL('image/png');
@@ -7066,8 +7124,8 @@ async function bootstrap() {
         <div style="font-size: 11px; color: #cbd5e1; line-height: 1.4;">
           ${
             copiedToClipboard
-              ? '✅ Screenshot copied to clipboard! Paste it (Ctrl+V / Cmd+V) directly into the GitHub issue.'
-              : '💾 Download the screenshot below and drag it into the GitHub issue page.'
+              ? '✅ Screenshot copied to clipboard! Opening GitHub Issues in 1 second (Ctrl+V / Cmd+V to paste)...'
+              : '💾 Opening GitHub Issues in 1 second — download the screenshot below and drag it into the issue page.'
           }
         </div>
         <div style="display: flex; gap: 8px;">
@@ -7103,12 +7161,18 @@ async function bootstrap() {
       `;
       uiOverlay.appendChild(modalCard);
 
+      let redirectCancelled = false;
       modalCard.querySelector('#close-report-card-btn')?.addEventListener('click', () => {
+        redirectCancelled = true;
         modalCard.remove();
       });
 
       const directLink = modalCard.querySelector('#github-issues-redirect-link') as HTMLAnchorElement | null;
-      directLink?.click();
+      setTimeout(() => {
+        if (!redirectCancelled && document.body.contains(modalCard)) {
+          directLink?.click();
+        }
+      }, 1000);
     });
 
     uiOverlay.appendChild(reportBtn);

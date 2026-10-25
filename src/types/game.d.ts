@@ -47,6 +47,8 @@ export interface GameOptions {
   autoHm?: boolean;         // (default: true [Unbound-style Auto-HM])
   crtScanlines?: boolean;   // (default: false)
   gbcPalette?: GbcPaletteMode; // (default: 'VIBRANT')
+  lowHpBeepEnabled?: boolean; // (default: true)
+  chiptuneMode?: boolean;   // (default: false)
 }
 
 export interface RadarPing {

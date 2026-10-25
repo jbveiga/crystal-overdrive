@@ -1156,6 +1156,10 @@ export class BattleHUD {
       }
     }
 
+    if (isPlayer) {
+      BattleAudio.updateLowHpState(currentHp, maxHp);
+    }
+
     this.updateStatusBadges();
   }
 
@@ -2062,6 +2066,7 @@ export class BattleHUD {
   }
 
   public hide(): void {
+    BattleAudio.stopLowHpAlarm();
     this.rootElement.style.display = 'none';
     if (this.battleLogUI) {
       this.battleLogUI.clear();
