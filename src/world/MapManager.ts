@@ -15,9 +15,12 @@ export class MapManager {
   public static readonly CAVE_CAP_RELAXED = 0.025;   // 2.50% (1 in 40 steps)
   public static readonly CAVE_CAP_CLASSIC = 0.0625;  // 6.25% (1 in 16 steps)
 
+  public static readonly MAX_RESIDENT_MAPS = 16;
+
   private currentMap: MapData | null = null;
   private neighborScratchMap: MapData | null = null;
   private maps: Map<string, MapData> = new Map();
+  private inFlightLoads: Map<string, Promise<MapData | undefined>> = new Map();
   private graceStepsRemaining: number = 0;
   private stepsSinceGraceEnd: number = 4;
   private pacingEnabled: boolean = false;
@@ -85,10 +88,10 @@ export class MapManager {
   }
 
   /**
-   * Evicts distant maps when loaded maps exceed maxResident (default 24).
+   * Evicts distant maps when loaded maps exceed maxResident (default 16).
    * Never evicts activeMapId, currentMap, 1-hop connected neighbors, or direct warp targets.
    */
-  evictDistantMaps(activeMapId: string, maxResident: number = 24): number {
+  evictDistantMaps(activeMapId: string, maxResident: number = MapManager.MAX_RESIDENT_MAPS): number {
     if (this.maps.size <= maxResident) return 0;
 
     const protectedMapIds = new Set<string>();
@@ -131,6 +134,7 @@ export class MapManager {
 
   /**
    * Lazily retrieves a map from cache or fetches it on-demand from ./assets/data/maps/${mapId}.json.
+   * Deduplicates concurrent in-flight requests for the same mapId.
    */
   async ensureMapLoaded(mapId: string): Promise<MapData | undefined> {
     if (!mapId) return undefined;
@@ -140,17 +144,66 @@ export class MapManager {
       return existing;
     }
 
-    try {
-      const res = await fetch(`./assets/data/maps/${mapId}.json`);
-      if (res.ok) {
-        const data: MapData = await res.json();
-        this.registerMap(data);
-        return data;
-      }
-    } catch (err) {
-      console.warn(`Could not lazy load map "${mapId}":`, err);
+    const inFlight = this.inFlightLoads.get(mapId);
+    if (inFlight) {
+      return inFlight;
     }
-    return undefined;
+
+    const loadPromise = (async () => {
+      try {
+        const res = await fetch(`./assets/data/maps/${mapId}.json`);
+        if (res.ok) {
+          const data: MapData = await res.json();
+          this.registerMap(data);
+          return data;
+        }
+      } catch (err) {
+        console.warn(`Could not lazy load map "${mapId}":`, err);
+      }
+      return undefined;
+    })().finally(() => {
+      this.inFlightLoads.delete(mapId);
+    });
+
+    this.inFlightLoads.set(mapId, loadPromise);
+    return loadPromise;
+  }
+
+  /**
+   * Loads the requested map and preloads its immediate 1-hop connections:
+   * 1. Awaits the target active map and its cardinal border neighbors (NORTH, SOUTH, EAST, WEST).
+   * 2. Kicks off non-blocking preloading for all unique local door/cave/stair warp target maps.
+   */
+  async ensureZoneAndConnectionsLoaded(mapId: string): Promise<MapData | undefined> {
+    const activeMap = await this.ensureMapLoaded(mapId);
+    if (!activeMap) return undefined;
+
+    // 1-hop cardinal neighbor preloading (blocking for smooth border scrolling)
+    const cardinalIds: string[] = [];
+    if (activeMap.connections) {
+      if (activeMap.connections.NORTH?.mapId) cardinalIds.push(activeMap.connections.NORTH.mapId);
+      if (activeMap.connections.SOUTH?.mapId) cardinalIds.push(activeMap.connections.SOUTH.mapId);
+      if (activeMap.connections.WEST?.mapId) cardinalIds.push(activeMap.connections.WEST.mapId);
+      if (activeMap.connections.EAST?.mapId) cardinalIds.push(activeMap.connections.EAST.mapId);
+    }
+    if (cardinalIds.length > 0) {
+      await Promise.all(cardinalIds.map(id => this.ensureMapLoaded(id)));
+    }
+
+    // 1-hop door & warp targets (non-blocking prefetch for fast door transitions)
+    if (activeMap.warps && activeMap.warps.length > 0) {
+      const warpTargets = new Set<string>();
+      for (const w of activeMap.warps) {
+        if (w.targetMapId && !this.maps.has(w.targetMapId)) {
+          warpTargets.add(w.targetMapId);
+        }
+      }
+      for (const targetId of warpTargets) {
+        void this.ensureMapLoaded(targetId);
+      }
+    }
+
+    return activeMap;
   }
 
   setCurrentMap(mapId: string): MapData {

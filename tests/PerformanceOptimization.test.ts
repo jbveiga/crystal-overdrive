@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { TrackedStoryFlagSet, ActiveNpcCache } from '../src/world/ActiveNpcCache';
 import type { GridEntity } from '../src/world/GridPhysics';
+import { MapManager } from '../src/world/MapManager';
+import type { MapData } from '../src/types/game';
 
 // Polyfill minimal browser globals for PixiJS in Node 20 environments
 if (typeof globalThis.navigator === 'undefined') {
@@ -167,4 +169,133 @@ describe('Full-Stack Performance & Efficiency Optimizations', () => {
       expect(cache.getStats().misses).toBe(2);
     });
   });
+
+  describe('3. MapManager Zone-Based Lazy-Loading & Deduplication (LRU=16)', () => {
+    const createMockMap = (id: string, options: Partial<MapData> = {}): MapData => ({
+      id,
+      name: id.toUpperCase(),
+      width: 10,
+      height: 10,
+      tileSize: 64,
+      collisionGrid: new Array(100).fill(0),
+      warps: [],
+      connections: {},
+      ...options,
+    });
+
+    it('deduplicates concurrent in-flight requests for the same mapId to a single fetch call', async () => {
+      const mapManager = new MapManager();
+      const mockRouteMap = createMockMap('route_29');
+
+      let fetchCallCount = 0;
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = vi.fn().mockImplementation(async () => {
+        fetchCallCount++;
+        // Small artificial delay to ensure concurrent calls overlap
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        return {
+          ok: true,
+          json: async () => mockRouteMap,
+        };
+      }) as any;
+
+      try {
+        const [res1, res2, res3] = await Promise.all([
+          mapManager.ensureMapLoaded('route_29'),
+          mapManager.ensureMapLoaded('route_29'),
+          mapManager.ensureMapLoaded('route_29'),
+        ]);
+
+        expect(fetchCallCount).toBe(1);
+        expect(res1).toBe(res2);
+        expect(res2).toBe(res3);
+        expect(res1?.id).toBe('route_29');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('preloads 1-hop cardinal connections and background-prefetches local door warps', async () => {
+      const mapManager = new MapManager();
+      const activeMap = createMockMap('cherrygrove_city', {
+        connections: {
+          EAST: { mapId: 'route_29', offset: 0 },
+          NORTH: { mapId: 'route_30', offset: 0 },
+        },
+        warps: [
+          { x: 5, y: 5, targetMapId: 'cherrygrove_poke_center', targetX: 3, targetY: 5 },
+          { x: 10, y: 5, targetMapId: 'cherrygrove_mart', targetX: 3, targetY: 5 },
+        ],
+      });
+
+      const fetchedMaps: string[] = [];
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = vi.fn().mockImplementation(async (url: string) => {
+        const match = url.match(/maps\/(.+)\.json$/);
+        const id = match ? match[1] : 'unknown';
+        fetchedMaps.push(id);
+        const map = id === 'cherrygrove_city' ? activeMap : createMockMap(id);
+        return {
+          ok: true,
+          json: async () => map,
+        };
+      }) as any;
+
+      try {
+        const result = await mapManager.ensureZoneAndConnectionsLoaded('cherrygrove_city');
+        expect(result?.id).toBe('cherrygrove_city');
+
+        // Cardinal neighbors must be loaded
+        expect(mapManager.getMap('route_29')).toBeDefined();
+        expect(mapManager.getMap('route_30')).toBeDefined();
+
+        // Allow microtask queue to settle background warp prefetches
+        await new Promise((resolve) => setTimeout(resolve, 25));
+
+        expect(mapManager.getMap('cherrygrove_poke_center')).toBeDefined();
+        expect(mapManager.getMap('cherrygrove_mart')).toBeDefined();
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('enforces LRU cap of 16 resident maps while strictly protecting active, neighbor, and warp maps', () => {
+      const mapManager = new MapManager();
+      expect(MapManager.MAX_RESIDENT_MAPS).toBe(16);
+
+      const activeMap = createMockMap('violet_city', {
+        connections: {
+          SOUTH: { mapId: 'route_32', offset: 0 },
+        },
+        warps: [
+          { x: 3, y: 3, targetMapId: 'violet_gym', targetX: 5, targetY: 10 },
+        ],
+      });
+
+      mapManager.registerMap(activeMap);
+      mapManager.registerMap(createMockMap('route_32'));
+      mapManager.registerMap(createMockMap('violet_gym'));
+
+      // Register 20 other distant maps
+      for (let i = 1; i <= 20; i++) {
+        mapManager.registerMap(createMockMap(`distant_map_${i}`));
+      }
+
+      // Total loaded before eviction: 23 maps
+      // Default evictDistantMaps caps to MAX_RESIDENT_MAPS (16)
+      const evicted = mapManager.evictDistantMaps('violet_city');
+      expect(evicted).toBe(7); // 23 - 16 = 7
+
+      // Active map, south route, and gym warp must NEVER be evicted
+      expect(mapManager.getMap('violet_city')).toBeDefined();
+      expect(mapManager.getMap('route_32')).toBeDefined();
+      expect(mapManager.getMap('violet_gym')).toBeDefined();
+
+      // Older distant maps should be evicted first
+      expect(mapManager.getMap('distant_map_1')).toBeUndefined();
+      expect(mapManager.getMap('distant_map_7')).toBeUndefined();
+      expect(mapManager.getMap('distant_map_20')).toBeDefined();
+    });
+  });
 });
+
