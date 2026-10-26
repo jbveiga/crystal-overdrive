@@ -89,29 +89,29 @@ describe('Overworld Items & Authentic Pret Extraction', () => {
     const data: OverworldItemsData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
     // Category Totals
-    expect(data.summary.totalItemBalls).toBe(136);
+    expect(data.summary.totalItemBalls).toBe(137);
     expect(data.summary.totalHiddenItems).toBe(80);
     expect(data.summary.totalFruitTrees).toBe(30);
-    expect(data.summary.total).toBe(246);
+    expect(data.summary.total).toBe(247);
     expect(data.summary.totalMapsWithItems).toBe(93);
 
     // Array Lengths Match Summary
-    expect(data.itemBalls.length).toBe(136);
+    expect(data.itemBalls.length).toBe(137);
     expect(data.hiddenItems.length).toBe(80);
     expect(data.fruitTrees.length).toBe(30);
 
     // Regional Distribution
-    expect(data.summary.johto.itemBalls).toBe(103);
+    expect(data.summary.johto.itemBalls).toBe(104);
     expect(data.summary.johto.hiddenItems).toBe(48);
     expect(data.summary.johto.fruitTrees).toBe(22);
-    expect(data.summary.johto.total).toBe(173);
+    expect(data.summary.johto.total).toBe(174);
 
     expect(data.summary.kanto.itemBalls).toBe(33);
     expect(data.summary.kanto.hiddenItems).toBe(32);
     expect(data.summary.kanto.fruitTrees).toBe(8);
     expect(data.summary.kanto.total).toBe(73);
 
-    expect(data.summary.johto.total + data.summary.kanto.total).toBe(246);
+    expect(data.summary.johto.total + data.summary.kanto.total).toBe(247);
   });
 
   it('verifies authentic pret/pokecrystal Johto items', () => {

@@ -3890,6 +3890,28 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         ],
         { action: 'DAY_SIBLING_EVENT' }
       ),
+      makeNpc(
+        'psychic_greg',
+        6,
+        12,
+        'UP',
+        'youngster',
+        '🔮 PSYCHIC GREG',
+        ['POKéMON can’t do a thing if they are asleep!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'psychic_greg',
+          trainerName: 'Psychic Greg',
+          visionRange: 3,
+          challengePages: [
+            "PSYCHIC GREG: POKéMON can't do a thing if they are asleep! I'll show you how scary that is!",
+          ],
+          trainerPokemon: { speciesId: 'drowzee', level: 17, moves: ['hypnosis', 'disable', 'confusion'] },
+          trainerTeam: [
+            { speciesId: 'drowzee', level: 17, moves: ['hypnosis', 'disable', 'confusion'] },
+          ],
+        }
+      ),
     ],
     ecruteak_city: [
       makeNpc(
@@ -4224,7 +4246,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         '🔍 ITEM COLLECTOR',
         [
           "There are countless items hidden in the grass, rocks, and ruins of Johto that aren't obvious to the naked eye.",
-          'This upgraded dowsing machine projects a real-time radar beam pointing straight toward buried treasures within 8 paces!',
+          'Aha! I see you already have the upgraded Neo-Kanto Dowsing Machine equipped! It projects a real-time radar beam pointing straight toward buried treasures within 8 paces!',
         ]
       ),
     ],

@@ -14,6 +14,7 @@ import {
 } from './battle/BattleStateMachine';
 import { StadiumArenaManager } from './battle/StadiumArenaManager';
 import { PokemonFactory, type PartyExpAward } from './battle/PokemonFactory';
+import { MoveReplacementModalUI } from './ui/MoveReplacementModalUI';
 import { BattleAudio } from './audio/BattleAudio';
 import { AudioManager } from './audio/AudioManager';
 import { RoamingManager } from './world/RoamingManager';
@@ -313,11 +314,81 @@ async function bootstrap() {
     console.log('💾 Game state successfully saved to IndexedDB.');
   };
 
+  const TM_MOVE_CODE_MAP: Record<string, string> = {
+    tm_dynamicpunch: 'TM01',
+    tm_headbutt: 'TM02',
+    tm_curse: 'TM03',
+    tm_rollout: 'TM04',
+    tm_roar: 'TM05',
+    tm_toxic: 'TM06',
+    tm_zap_cannon: 'TM07',
+    tm_zapcannon: 'TM07',
+    tm_rock_smash: 'TM08',
+    tm_rocksmash: 'TM08',
+    tm_psych_up: 'TM09',
+    tm_hidden_power: 'TM10',
+    tm_sunny_day: 'TM11',
+    tm_sweet_scent: 'TM12',
+    tm_snore: 'TM13',
+    tm_blizzard: 'TM14',
+    tm_hyper_beam: 'TM15',
+    tm_icy_wind: 'TM16',
+    tm_protect: 'TM17',
+    tm_rain_dance: 'TM18',
+    tm_giga_drain: 'TM19',
+    tm_endure: 'TM20',
+    tm_frustration: 'TM21',
+    tm_solarbeam: 'TM22',
+    tm_iron_tail: 'TM23',
+    tm_dragonbreath: 'TM24',
+    tm_thunder: 'TM25',
+    tm_earthquake: 'TM26',
+    tm_return: 'TM27',
+    tm_dig: 'TM28',
+    tm_psychic: 'TM29',
+    tm_shadow_ball: 'TM30',
+    tm_shadowball: 'TM30',
+    tm_mud_slap: 'TM31',
+    tm_mudslap: 'TM31',
+    tm_double_team: 'TM32',
+    tm_ice_punch: 'TM33',
+    tm_swagger: 'TM34',
+    tm_sleep_talk: 'TM35',
+    tm_sludge_bomb: 'TM36',
+    tm_sandstorm: 'TM37',
+    tm_fire_blast: 'TM38',
+    tm_swift: 'TM39',
+    tm_defense_curl: 'TM40',
+    tm_thunderpunch: 'TM41',
+    tm_dream_eater: 'TM42',
+    tm_detect: 'TM43',
+    tm_rest: 'TM44',
+    tm_attract: 'TM45',
+    tm_thief: 'TM46',
+    tm_steel_wing: 'TM47',
+    tm_fire_punch: 'TM48',
+    tm_fury_cutter: 'TM49',
+    tm_nightmare: 'TM50',
+    tm_false_swipe: 'TM54',
+    tm_thunder_wave: 'TM73',
+    hm_cut: 'HM01',
+    hm_fly: 'HM02',
+    hm_surf: 'HM03',
+    hm_strength: 'HM04',
+    hm_flash: 'HM05',
+    hm_whirlpool: 'HM06',
+    hm_waterfall: 'HM07',
+  };
+
   const addOverworldItemToInventory = (rawItemId: string) => {
     const norm = rawItemId.toLowerCase().replace(/_/g, '-');
     const pocket = OverworldItemManager.resolveItemPocket(rawItemId);
     if (pocket === 'TMS') {
-      const code = rawItemId.toUpperCase().split('_')[0];
+      const lower = rawItemId.toLowerCase();
+      const code =
+        TM_MOVE_CODE_MAP[lower] ||
+        rawItemId.toUpperCase().match(/^(TM\d+|HM\d+)/)?.[1] ||
+        rawItemId.toUpperCase().split('_')[0];
       if (!inventory.tms.includes(code)) {
         inventory.tms.push(code);
       }
@@ -1931,6 +2002,29 @@ async function bootstrap() {
                       maxPp: moveData.pp,
                     });
                     overworldHUD.showToast(`✨ ${member.nickname} learned ${moveData.name}!`);
+                  } else {
+                    const modal = new MoveReplacementModalUI('modal-container');
+                    const chosenSlot = await modal.open(member, moveData);
+                    if (chosenSlot !== null && chosenSlot >= 0 && chosenSlot < 4) {
+                      const replacedMove = member.moves[chosenSlot];
+                      let replacedName = replacedMove.moveId.toUpperCase();
+                      try {
+                        const replacedData = PokemonFactory.getMoveData(replacedMove.moveId);
+                        replacedName = replacedData.name;
+                      } catch {}
+                      member.moves[chosenSlot] = {
+                        moveId: moveData.id,
+                        currentPp: moveData.pp,
+                        maxPp: moveData.pp,
+                      };
+                      overworldHUD.showToast(
+                        `✨ ${member.nickname} forgot ${replacedName} and learned ${moveData.name}!`
+                      );
+                    } else {
+                      overworldHUD.showToast(
+                        `${member.nickname} did not learn ${moveData.name}.`
+                      );
+                    }
                   }
                 }
               }
@@ -3028,6 +3122,61 @@ async function bootstrap() {
             });
             return;
           }
+        }
+
+        // Ecruteak Dance Theater Gentleman: HM03 Surf Event
+        if (targetNpc.id === 'surf_gentleman') {
+          const kimonoIds = ['kimono_naoko', 'kimono_sayo', 'kimono_zuki', 'kimono_kuni', 'kimono_miki'];
+          const allKimonoDefeated =
+            storyFlags.has('DEFEATED_ALL_KIMONO_GIRLS') ||
+            kimonoIds.every((id) => defeatedTrainers.has(id));
+
+          if (!allKimonoDefeated) {
+            const remaining = kimonoIds.filter((id) => !defeatedTrainers.has(id)).length;
+            overworldHUD.openDialogue(
+              [
+                'ADMIRER: The KIMONO GIRLS are so graceful, yet so strong in battle!',
+                `If you can defeat all five KIMONO GIRLS on stage (${5 - remaining}/5 defeated), I will give you a marvelous gift!`,
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          storyFlags.add('DEFEATED_ALL_KIMONO_GIRLS');
+          if (!storyFlags.has('has_hm03_surf')) {
+            storyFlags.add('has_hm03_surf');
+            storyFlags.add('EVENT_GOT_HM03_SURF');
+            if (!inventory.tms.includes('HM03')) inventory.tms.push('HM03');
+            missionManager.checkStoryFlags(storyFlags);
+            audioManager.playSfx('sfx_badge_get');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                'ADMIRER: Bravo! Magnificent! The way you battled all five KIMONO GIRLS, it was like watching a dance!',
+                'I want you to have this... Take HM03 SURF!',
+                'With the FOGBADGE from Ecruteak Gym, your POKéMON can carry you across oceans and lakes!',
+              ],
+              targetNpc.speaker,
+              () => {
+                const surfCheck = ModernHMHandler.checkSurf(inventory, storyFlags, playerParty);
+                if (gameOptions.autoHm && surfCheck.canUse) {
+                  mapManager.setSurfEnabled(true);
+                }
+                saveCurrentGame();
+                overworldHUD.showToast('🌊 Received HM03 SURF from the Dance Theater Admirer!');
+              }
+            );
+            return;
+          }
+
+          overworldHUD.openDialogue(
+            [
+              'ADMIRER: That HM03 is SURF! With the FOGBADGE, your POKéMON can glide across any body of water!',
+            ],
+            targetNpc.speaker
+          );
+          return;
         }
 
         // Chuck's Wife: HM02 Fly Event

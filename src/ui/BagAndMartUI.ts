@@ -2,6 +2,8 @@ import type { PokemonInstance, PokeballId, MedicineId, RepelId, SpeedMultiplier,
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { BattleAudio } from '../audio/BattleAudio';
 import { OverworldItemManager } from '../world/OverworldItemManager';
+import { EvolutionManager } from '../world/EvolutionManager';
+import { EvolutionSceneUI } from './EvolutionSceneUI';
 import { MoveReplacementModalUI } from './MoveReplacementModalUI';
 
 export interface BagInventory {
@@ -286,7 +288,49 @@ export const INFINITE_TMS: Record<string, TMDefinition> = {
     type: 'Normal',
     desc: '50 Power Normal attack. Cuts down small overworld trees (Hive Badge; no move slot needed).',
   },
+  HM03: {
+    id: 'HM03',
+    moveId: 'surf',
+    name: 'Surf',
+    type: 'Water',
+    desc: '95 Power Water attack. Carries the player across water (Fog Badge; no move slot needed).',
+  },
+  TM20: {
+    id: 'TM20',
+    moveId: 'endure',
+    name: 'Endure',
+    type: 'Normal',
+    desc: 'Always leaves the user with at least 1 HP when struck by a fatal hit this turn.',
+  },
+  TM30: {
+    id: 'TM30',
+    moveId: 'shadowball',
+    name: 'Shadow Ball',
+    type: 'Ghost',
+    desc: '80 Power Ghost attack that may lower the target Special Defense.',
+  },
 };
+
+export interface EvolutionStoneItemDef {
+  id: string;
+  altId: string;
+  name: string;
+  price: number;
+  badgeLabel: string;
+  desc: string;
+  icon: string;
+  isLinkStone?: boolean;
+}
+
+export const EVOLUTION_STONE_CATALOG: EvolutionStoneItemDef[] = [
+  { id: 'fire-stone', altId: 'fire_stone', name: 'Fire Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Fire-type Pokémon evolve (e.g. Eevee, Growlithe, Vulpix).', icon: '🔥' },
+  { id: 'water-stone', altId: 'water_stone', name: 'Water Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Water-type Pokémon evolve (e.g. Eevee, Poliwhirl, Shellder, Staryu).', icon: '💧' },
+  { id: 'thunder-stone', altId: 'thunder_stone', name: 'Thunder Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Electric-type Pokémon evolve (e.g. Eevee, Pikachu).', icon: '⚡' },
+  { id: 'leaf-stone', altId: 'leaf_stone', name: 'Leaf Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Grass-type Pokémon evolve (e.g. Gloom, Weepinbell, Exeggcute).', icon: '🍃' },
+  { id: 'moon-stone', altId: 'moon_stone', name: 'Moon Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Pokémon evolve (e.g. Clefairy, Jigglypuff, Nidorino, Nidorina).', icon: '🌙' },
+  { id: 'sun-stone', altId: 'sun_stone', name: 'Sun Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Pokémon evolve (e.g. Gloom into Bellossom, Sunkern into Sunflora).', icon: '☀️' },
+  { id: 'link-stone', altId: 'link_stone', name: 'Link Stone', price: 3000, badgeLabel: 'TRADE EVOLVE', desc: 'Unbound-style Link Cable stone that triggers trade evolutions (e.g. Haunter, Kadabra, Machoke, Graveler).', icon: '🔗', isLinkStone: true },
+];
 
 export type BagTabId = 'ITEMS' | 'TMS' | 'BALLS' | 'MART';
 
@@ -616,6 +660,8 @@ export class BagAndMartUI {
     const pillsRow = document.createElement('div');
     pillsRow.style.cssText = 'display: flex; gap: 8px; flex-wrap: wrap;';
 
+    const ownedStones = EVOLUTION_STONE_CATALOG.filter((s) => this.getOwnedStoneCount(s) > 0);
+
     this.party.forEach((pkmn, idx) => {
       const isSelected = idx === this.selectedPartyIndex;
       const pct = Math.max(0, Math.min(100, (pkmn.currentHp / pkmn.stats.hp) * 100));
@@ -643,10 +689,26 @@ export class BagAndMartUI {
           ? `<span style="background: #EE4238; color: #FFFFFF; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; font-family: 'Space Mono', monospace;">${pkmn.status}</span>`
           : '';
 
+      const canAnyOwnedStoneEvolve =
+        ownedStones.length > 0 && !pkmn.isEgg
+          ? ownedStones.some((s) =>
+              EvolutionManager.canEvolve(pkmn, {
+                trigger: 'ITEM',
+                itemId: s.altId,
+              })
+            )
+          : false;
+
+      const stoneBadge =
+        ownedStones.length > 0 && !pkmn.isEgg
+          ? `<span class="party-stone-compat-badge" style="background: ${canAnyOwnedStoneEvolve ? '#059669' : '#334155'}; color: ${canAnyOwnedStoneEvolve ? '#FFFFFF' : '#94A3B8'}; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; font-family: 'Space Mono', monospace;">${canAnyOwnedStoneEvolve ? 'ABLE' : 'UNABLE'}</span>`
+          : '';
+
       pill.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; font-weight: 800;">
           <span>${pkmn.nickname}</span>
           ${statusBadge}
+          ${stoneBadge}
           <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #FFD028;">Lv.${pkmn.level}</span>
         </div>
         <div style="width: 100%; height: 5px; background: #080E1D; border-radius: 3px; overflow: hidden; border: 1px solid #22324F;">
@@ -668,6 +730,123 @@ export class BagAndMartUI {
     container.appendChild(bar);
   }
 
+  public getOwnedStoneCount(stone: EvolutionStoneItemDef): number {
+    if (!this.inventory.items) return 0;
+    let count = (this.inventory.items[stone.id] ?? 0) + (this.inventory.items[stone.altId] ?? 0);
+    if (stone.isLinkStone) {
+      count += (this.inventory.items['linking_cord'] ?? 0) + (this.inventory.items['linking-cord'] ?? 0);
+    }
+    return count;
+  }
+
+  private consumeOwnedStone(stone: EvolutionStoneItemDef): string {
+    if (!this.inventory.items) return stone.id;
+    if ((this.inventory.items[stone.id] ?? 0) > 0) {
+      this.inventory.items[stone.id]!--;
+      return stone.id;
+    }
+    if ((this.inventory.items[stone.altId] ?? 0) > 0) {
+      this.inventory.items[stone.altId]!--;
+      return stone.altId;
+    }
+    if (stone.isLinkStone) {
+      if ((this.inventory.items['linking_cord'] ?? 0) > 0) {
+        this.inventory.items['linking_cord']!--;
+        return 'linking_cord';
+      }
+      if ((this.inventory.items['linking-cord'] ?? 0) > 0) {
+        this.inventory.items['linking-cord']!--;
+        return 'linking-cord';
+      }
+    }
+    return stone.id;
+  }
+
+  private refundOwnedStone(key: string): void {
+    if (!this.inventory.items) this.inventory.items = {};
+    this.inventory.items[key] = (this.inventory.items[key] ?? 0) + 1;
+  }
+
+  public async useEvolutionStoneOnTarget(
+    stone: EvolutionStoneItemDef,
+    target: PokemonInstance | undefined
+  ): Promise<boolean> {
+    if (!target) {
+      BattleAudio.playMenuSound('CANCEL');
+      this.showFeedback('Select a party Pokémon first!', true);
+      return false;
+    }
+
+    if (target.isEgg) {
+      BattleAudio.playMenuSound('CANCEL');
+      this.showFeedback("An EGG won't evolve from a stone!", true);
+      return false;
+    }
+
+    const evoCandidate = EvolutionManager.canEvolve(target, {
+      trigger: 'ITEM',
+      itemId: stone.altId,
+    });
+
+    if (!evoCandidate) {
+      BattleAudio.playMenuSound('CANCEL');
+      this.showFeedback(`It won't have any effect on ${target.nickname}!`, true);
+      return false;
+    }
+
+    const currentCount = this.getOwnedStoneCount(stone);
+    if (currentCount <= 0) {
+      BattleAudio.playMenuSound('CANCEL');
+      this.showFeedback(`You don't have any ${stone.name} left!`, true);
+      return false;
+    }
+
+    const consumedKey = this.consumeOwnedStone(stone);
+    this.hide();
+
+    const evoScene = new EvolutionSceneUI('modal-container');
+    const res = await evoScene.play(target, evoCandidate.targetSpeciesId, { mutatePokemon: true });
+
+    if (res.evolved) {
+      const targetSpecies = res.newSpeciesId || res.targetSpecies || evoCandidate.targetSpeciesId;
+      if (target.speciesId.toLowerCase() !== targetSpecies.toLowerCase()) {
+        EvolutionManager.executeEvolution(target, targetSpecies);
+      }
+
+      // Check and teach learnset moves at current level
+      const evoMoves = await PokemonFactory.getLearnableMovesAtLevel(target.speciesId, target.level);
+      for (const moveId of evoMoves) {
+        if (target.moves.some((m) => m.moveId === moveId)) continue;
+        const moveData = PokemonFactory.getMoveData(moveId);
+        if (target.moves.length < 4) {
+          target.moves.push({
+            moveId: moveData.id,
+            currentPp: moveData.pp,
+            maxPp: moveData.pp,
+          });
+        } else {
+          const modal = new MoveReplacementModalUI('modal-container');
+          const chosenSlot = await modal.open(target, moveData);
+          if (chosenSlot !== null && chosenSlot >= 0 && chosenSlot < 4) {
+            target.moves[chosenSlot] = {
+              moveId: moveData.id,
+              currentPp: moveData.pp,
+              maxPp: moveData.pp,
+            };
+          }
+        }
+      }
+
+      this.onInventoryChanged?.();
+      return true;
+    } else {
+      // Cancelled via B-button: refund the stone
+      this.refundOwnedStone(consumedKey);
+      this.onInventoryChanged?.();
+      return false;
+    }
+  }
+
   private renderItemsTab(): void {
     const container = this.bagModal.querySelector('#bag-content') as HTMLDivElement;
     container.innerHTML = '';
@@ -680,8 +859,15 @@ export class BagAndMartUI {
 
     const ownedItems = MART_MEDICINE_CATALOG.filter((m) => (this.inventory.items?.[m.id] ?? 0) > 0);
     const ownedRepels = MART_REPEL_CATALOG.filter((r) => (this.inventory.items?.[r.id] ?? 0) > 0);
+    const ownedStones = EVOLUTION_STONE_CATALOG.filter((s) => this.getOwnedStoneCount(s) > 0);
     const hasBerries = Object.values(this.inventory.berries || {}).some((c) => (c ?? 0) > 0);
-    if (ownedItems.length === 0 && ownedRepels.length === 0 && !this.onUseItemfinder && !hasBerries) {
+    if (
+      ownedItems.length === 0 &&
+      ownedRepels.length === 0 &&
+      ownedStones.length === 0 &&
+      !this.onUseItemfinder &&
+      !hasBerries
+    ) {
       container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; background: #141E33; border: 1px dashed #22324F; border-radius: 10px; box-shadow: 0 3px 0 0 #070B14;">No medicine items in bag. Visit a Poké Mart to stock up!</div>`;
       return;
     }
@@ -719,6 +905,56 @@ export class BagAndMartUI {
       useRepelBtn.addEventListener('click', () => {
         this.useRepelItem(repel);
       });
+      container.appendChild(card);
+    }
+
+    for (const stone of ownedStones) {
+      const count = this.getOwnedStoneCount(stone);
+      const evoCandidate =
+        targetPkmn && !targetPkmn.isEgg
+          ? EvolutionManager.canEvolve(targetPkmn, {
+              trigger: 'ITEM',
+              itemId: stone.altId,
+            })
+          : null;
+
+      const card = document.createElement('div');
+      card.style.cssText = CARD_STYLE;
+
+      const compatHtml = evoCandidate
+        ? `<span class="stone-compat-badge" data-compat="ABLE" style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">ABLE → ${evoCandidate.targetSpeciesName.toUpperCase()}</span>`
+        : `<span class="stone-compat-badge" data-compat="UNABLE" style="font-family: 'Space Mono', monospace; font-size: 10px; background: #475569; color: #94A3B8; padding: 2px 6px; border-radius: 4px; font-weight: 800;">UNABLE</span>`;
+
+      card.innerHTML = `
+        <div style="flex: 1;">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${stone.icon} ${stone.name}</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: ${stone.isLinkStone ? '#7C3AED' : '#D97706'}; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${stone.badgeLabel}</span>
+            ${compatHtml}
+            <span style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #FFD028;">x${count}</span>
+          </div>
+          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${stone.desc}</div>
+        </div>
+        <button class="use-stone-btn" style="
+          background: ${evoCandidate ? '#059669' : '#334155'};
+          color: white;
+          border: 1.5px solid ${evoCandidate ? '#34D399' : '#64748B'};
+          border-radius: 6px;
+          padding: 8px 14px;
+          font-family: 'Space Mono', monospace;
+          font-weight: 800;
+          font-size: 11px;
+          cursor: pointer;
+          white-space: nowrap;
+          box-shadow: 0 3px 0 0 #070B14;
+        ">USE ON ${targetPkmn ? targetPkmn.nickname.toUpperCase() : 'PARTY'}</button>
+      `;
+
+      const useBtn = card.querySelector('.use-stone-btn') as HTMLButtonElement;
+      useBtn.addEventListener('click', async () => {
+        await this.useEvolutionStoneOnTarget(stone, targetPkmn);
+      });
+
       container.appendChild(card);
     }
 

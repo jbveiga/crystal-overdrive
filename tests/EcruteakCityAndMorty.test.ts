@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
 import { isEcruteakGymSafeTile, ECRUTEAK_GYM_RESPAWN, ECRUTEAK_GYM_SAFE_SET } from '../src/world/ecruteakGymMaze';
 import { createNpcsByMap } from '../src/world/npcData';
 import { RoamingManager } from '../src/world/RoamingManager';
@@ -135,6 +137,127 @@ describe('Phase 9: Ecruteak City, Burned Tower & Gym Leader Morty Suite', () => 
       expect(raikou?.currentMapId).not.toBe('burned_tower');
       expect(entei?.currentMapId).not.toBe('burned_tower');
       expect(suicune?.currentMapId).not.toBe('burned_tower');
+    });
+  });
+
+  describe('4. Route 37 Completion & Psychic Greg Trainer Verification', () => {
+    const npcs = createNpcsByMap();
+
+    it('populates Route 37 with all 4 canonical trainers including Psychic Greg', () => {
+      const r37Npcs = npcs.route_37;
+      expect(r37Npcs).toBeDefined();
+
+      const greg = r37Npcs.find((n) => n.id === 'psychic_greg');
+      expect(greg).toBeDefined();
+      expect(greg?.trainerName).toBe('Psychic Greg');
+      expect(greg?.spriteType).toBe('youngster');
+      expect(greg?.x).toBe(6);
+      expect(greg?.y).toBe(12);
+      expect(greg?.action).toBe('TRAINER_BATTLE');
+      expect(greg?.trainerTeam).toHaveLength(1);
+      expect(greg?.trainerTeam?.[0].speciesId).toBe('drowzee');
+      expect(greg?.trainerTeam?.[0].level).toBe(17);
+
+      // Verify canonical twins and day sibling on Route 37 exist
+      expect(r37Npcs.some((n) => n.id === 'twins_ann_anne')).toBe(true);
+      expect(r37Npcs.some((n) => n.id === 'sunny_of_sunday')).toBe(true);
+    });
+
+    it('asserts Psychic Greg stands on a strictly walkable tile on Route 37', () => {
+      const r37Data = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, '../public/assets/data/maps/route_37.json'), 'utf8')
+      );
+      const gregIndex = 12 * r37Data.width + 6;
+      expect(r37Data.collisionGrid[gregIndex]).toBe(0);
+    });
+  });
+
+  describe('5. Dance Theater Surf Gentleman & Kimono Girls Verification', () => {
+    const npcs = createNpcsByMap();
+
+    it('populates Dance Theater with all 5 Kimono Girls and the Surf Gentleman', () => {
+      const theaterNpcs = npcs.dance_theater;
+      expect(theaterNpcs).toBeDefined();
+
+      const kimonoIds = [
+        'kimono_naoko',
+        'kimono_sayo',
+        'kimono_zuki',
+        'kimono_kuni',
+        'kimono_miki',
+      ];
+      for (const id of kimonoIds) {
+        const girl = theaterNpcs.find((n) => n.id === id);
+        expect(girl).toBeDefined();
+        expect(girl?.action).toBe('TRAINER_BATTLE');
+      }
+
+      const surfGentleman = theaterNpcs.find((n) => n.id === 'surf_gentleman');
+      expect(surfGentleman).toBeDefined();
+      expect(surfGentleman?.x).toBe(9);
+      expect(surfGentleman?.y).toBe(10);
+    });
+
+    it('asserts Surf Gentleman stands on a strictly walkable tile', () => {
+      const theaterData = JSON.parse(
+        fs.readFileSync(
+          path.resolve(__dirname, '../public/assets/data/maps/dance_theater.json'),
+          'utf8'
+        )
+      );
+      const index = 10 * theaterData.width + 9;
+      expect(theaterData.collisionGrid[index]).toBe(0);
+    });
+  });
+
+  describe('6. Burned Tower B1F Ground Items & Walkability', () => {
+    it('contains TM Endure and Ultra Ball on strictly walkable tiles', () => {
+      const itemsData = JSON.parse(
+        fs.readFileSync(
+          path.resolve(__dirname, '../public/assets/data/overworld_items.json'),
+          'utf8'
+        )
+      );
+      const btMap = itemsData.byMap?.burned_tower_b1f;
+      expect(btMap).toBeDefined();
+
+      const endureBall = btMap.itemBalls.find((b: any) => b.id === 'burned_tower_b1f_16_4_tm_endure');
+      expect(endureBall).toBeDefined();
+      expect(endureBall.itemId).toBe('tm_endure');
+      expect(endureBall.x).toBe(16);
+      expect(endureBall.y).toBe(4);
+
+      const ultraBall = btMap.itemBalls.find((b: any) => b.id === 'burned_tower_b1f_15_12_ultra_ball');
+      expect(ultraBall).toBeDefined();
+      expect(ultraBall.itemId).toBe('ultra_ball');
+      expect(ultraBall.x).toBe(15);
+      expect(ultraBall.y).toBe(12);
+
+      const btb1fData = JSON.parse(
+        fs.readFileSync(
+          path.resolve(__dirname, '../public/assets/data/maps/burned_tower_b1f.json'),
+          'utf8'
+        )
+      );
+      // Verify walkability of both item ball tiles
+      expect(btb1fData.collisionGrid[4 * btb1fData.width + 16]).toBe(0);
+      expect(btb1fData.collisionGrid[12 * btb1fData.width + 15]).toBe(0);
+    });
+  });
+
+  describe('7. Ecruteak Itemfinder House Dialogue Verification', () => {
+    const npcs = createNpcsByMap();
+
+    it('contains item_man referencing the upgraded Dowsing Machine radar', () => {
+      const houseNpcs = npcs.ecruteak_itemfinder_house;
+      expect(houseNpcs).toBeDefined();
+
+      const itemMan = houseNpcs.find((n) => n.id === 'item_man');
+      expect(itemMan).toBeDefined();
+      expect(itemMan?.pages).toBeDefined();
+      const dialogueText = itemMan!.pages!.join(' ');
+      expect(dialogueText).toContain('Dowsing Machine');
+      expect(dialogueText).toContain('radar');
     });
   });
 });
