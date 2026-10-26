@@ -29,6 +29,19 @@ const getAllNpcDataSrc = () => {
   return src;
 };
 
+const getAllStartMenuSrc = () => {
+  const startMenuPath = path.resolve(__dirname, '../src/ui/StartMenuUI.ts');
+  const startMenuDir = path.resolve(__dirname, '../src/ui/start-menu');
+  let src = fs.readFileSync(startMenuPath, 'utf8');
+  if (fs.existsSync(startMenuDir)) {
+    const files = fs.readdirSync(startMenuDir).filter((f) => f.endsWith('.ts'));
+    for (const f of files) {
+      src += '\n' + fs.readFileSync(path.join(startMenuDir, f), 'utf8');
+    }
+  }
+  return src;
+};
+
 describe('MapData & Authentic Tile Integrity', () => {
   it('validates new_bark_town.json structure, tileMap dimensions, and asset presence', () => {
     const mapPath = path.resolve(__dirname, '../public/assets/data/maps/new_bark_town.json');
@@ -591,7 +604,7 @@ describe('MapData & Authentic Tile Integrity', () => {
       getAllNpcDataSrc() +
       '\n' +
       getAllInteractionSrc();
-    const startMenuSrc = fs.readFileSync(path.resolve(__dirname, '../src/ui/StartMenuUI.ts'), 'utf8');
+    const startMenuSrc = getAllStartMenuSrc();
 
     expect(mainSrc).toContain("'gym_guide'");
     expect(mainSrc).toContain("trainerId: 'bird_keeper_abe'");

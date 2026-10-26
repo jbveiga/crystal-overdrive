@@ -6,6 +6,57 @@
 
 ---
 
+## 0. Agent Semantic Routing Index (1-Hop File Lookup Table)
+
+To eliminate exploratory agent searches (`grep`, `find`, directory walking) and maximize token ergonomics across the multi-agent development pipeline, every subsystem, domain contract, regional data module, and modal renderer is mapped below. Every module strictly adheres to the **Single-Window File Ceiling (< 800 lines)**.
+
+| Subsystem / Domain | Target Capability / Feature / NPC / Mechanic | Owning File Path | Line Ceiling (<800) |
+| :--- | :--- | :--- | :---: |
+| **Global Type Contracts** | Cross-module runtime context, game options, audio & battle interfaces | `src/types/gameContext.d.ts` | < 150 lines |
+| **Engine & Data Types** | Core definitions: Pokemon, Move, Trainer, Map, Item, Quest | `src/types/game.ts` | < 600 lines |
+| **Pure Battle Engine** | Turn order, priority, status effects, damage calculations, stat stages | `src/battle/BattleStateMachine.ts` | < 650 lines |
+| **Battle Session Controller** | Wild battles, trainer duels, 2v2 double battles, pacing, learnsets | `src/battle/BattleSessionController.ts` | < 550 lines |
+| **Damage Calculator** | Gen 4+ Physical/Special split, STAB, type effectiveness, crits | `src/battle/DamageCalculator.ts` | < 350 lines |
+| **Pokemon Factory & Dex** | Level caps, EXP formulas, IV/DV generation, starter hydration | `src/battle/PokemonFactory.ts` | < 700 lines |
+| **Stadium Cup Manager** | 2v2 Double Battle Cup tournaments, Item Clause, Challenger AI | `src/battle/StadiumArenaManager.ts` | < 500 lines |
+| **Grid Physics & Motion** | 1x/2x/3x speed, tile collisions, ledges, trainer vision, zero-alloc loop | `src/world/GridPhysics.ts` | < 550 lines |
+| **Map Engine & Streaming** | Binary `.blk` maps, time-of-day encounters, reciprocal warps | `src/world/MapManager.ts` | < 750 lines |
+| **Roaming Beast Engine** | Markov beast adjacency graph, Entei/Raikou/Suicune roamer hops | `src/world/RoamingManager.ts` | < 300 lines |
+| **Overworld World State** | Day-Care breeding, Kurt Apricorn crafting, Bug-Catching Contests | `src/world/WorldState.ts` | < 450 lines |
+| **$O(1)$ NPC Field Router** | Universal NPC facing talk actions, dialogue trees, shopkeepers | `src/world/interactions/npcRouter.ts` | < 500 lines |
+| **$O(1)$ Gym Leader Router** | Johto Gym Leader battles, badge awards, TM rewards | `src/world/interactions/gymLeaderRouter.ts` | < 450 lines |
+| **$O(1)$ Day-Care Router** | Route 34 Day-Care breeding dialogues, compatibility, egg retrieval | `src/world/interactions/dayCareRouter.ts` | < 350 lines |
+| **$O(1)$ Story Script Router**| Elm's Lab starter choice, Togepi Egg delivery, narrative gates | `src/world/interactions/storyScriptRouter.ts` | < 400 lines |
+| **$O(1)$ Warp Transition Router** | Doorways, cave holes, ladders, reciprocal threshold alignments | `src/world/interactions/warpTransitionRouter.ts` | < 350 lines |
+| **$O(1)$ Field Obstacle Router** | Cut trees, Rock Smash boulders, Headbutt trees, fruit trees | `src/world/interactions/fieldObstacleRouter.ts` | < 400 lines |
+| **NPC Shared Helpers** | NPC builders, Guide Gent tour legs, Day-of-Week siblings logic | `src/world/npcs/npcShared.ts` | < 450 lines |
+| **New Bark to Sprout Tower NPCs** | New Bark, Route 29, Cherrygrove, Routes 30/31, Sprout Tower | `src/world/npcs/newBarkToSproutTowerNpcs.ts` | < 650 lines |
+| **Violet to Union Cave NPCs** | Violet City, Violet Gym, Route 32, Ruins of Alph, Union Cave, Route 33 | `src/world/npcs/violetToUnionCaveNpcs.ts` | < 700 lines |
+| **Azalea to Ilex Forest NPCs**| Azalea Town, Azalea Gym, Slowpoke Well, Ilex Forest | `src/world/npcs/azaleaToIlexNpcs.ts` | < 600 lines |
+| **Goldenrod Overworld NPCs** | Route 34, Goldenrod City streets, Goldenrod Underground | `src/world/npcs/goldenrodCityNpcs.ts` | < 650 lines |
+| **Goldenrod Buildings & Park**| Dept Store 1F-6F, Radio Tower, Gym, National Park, Routes 35/36 | `src/world/npcs/goldenrodBuildingsAndParkNpcs.ts` | < 750 lines |
+| **Ecruteak to Route 39 NPCs**| Route 37, Ecruteak City, Gym, Burned/Tin Towers, Routes 38/39 | `src/world/npcs/ecruteakToRoute39Npcs.ts` | < 700 lines |
+| **Olivine to Indigo NPCs** | Olivine, Lighthouse, Cianwood, Mahogany, Blackthorn, League | `src/world/npcs/olivineToIndigoNpcs.ts` | < 750 lines |
+| **NPC Data Aggregator Facade**| Backward-compatible barrel exports, `createNpcsByMap()`, `npcsByMap` | `src/world/npcData.ts` | < 250 lines |
+| **Start Menu Drawer Facade** | Keyboard shortcuts, tactile menu drawer shell, sub-modal facade | `src/ui/StartMenuUI.ts` | < 700 lines |
+| **Pokédex Species Data** | 251 Johto/Kanto species telemetry, BST, mass, types, base stats | `src/ui/start-menu/pokedexData.ts` | < 350 lines |
+| **Pokédex Modal Renderer** | 3-pane Neo-Kanto Pokédex workstation, habitat tracker, search/filter | `src/ui/start-menu/PokedexModalRenderer.ts` | < 650 lines |
+| **Trainer Card & Save Renderer**| Holographic Johto ID card, 8-badge dock, save progress modal | `src/ui/start-menu/TrainerCardAndSaveRenderer.ts` | < 450 lines |
+| **Settings Modal Renderer** | Neo-Kanto System Config tabs (Audio, Gameplay, Graphics, Controls) | `src/ui/start-menu/SettingsModalRenderer.ts` | < 600 lines |
+| **Settings Controls Binding** | Event listeners for speed toggles, CRT, 8-bit APU, Exp Share, palettes | `src/ui/start-menu/SettingsControlsBinding.ts` | < 450 lines |
+| **Party Management UI** | 6-slot party roster, summary card, item hold/take, move reordering | `src/ui/PartyManagementUI.ts` | < 700 lines |
+| **Bag & Mart UI** | Multi-pocket Bag (Items, Balls, Key Items, TMs), Poké Mart shop | `src/ui/BagAndMartUI.ts` | < 750 lines |
+| **Box Management UI** | Unbound-style 14-box PC storage grid, 1-click pick/swap inspector | `src/ui/BoxManagementUI.ts` | < 650 lines |
+| **Mission Log UI** | Quests (Main & Side), rewards, dossier inspection, objective checklist | `src/ui/MissionLogUI.ts` | < 600 lines |
+| **Town Map & Roamer Radar** | Interactive Johto/Kanto map, fly landmarks, Legendary Beast radar | `src/ui/TownMapUI.ts` | < 750 lines |
+| **Overworld HUD** | D-Pad / Analog Joystick overlay, A/B buttons, header telemetry | `src/ui/OverworldHUD.ts` | < 700 lines |
+| **Battle HUD** | Neo-Kanto battle dialogue, move cards, HP/EXP bars, type badges | `src/ui/BattleHUD.ts` | < 750 lines |
+| **PixiJS Overworld Render** | 64x64 Metatiles, view frustum culling, daylight tint shaders | `src/render/OverworldRenderer.ts` | < 750 lines |
+| **PixiJS Battle Render** | 2.5D layered arena, GSAP battle animations, particle VFX | `src/render/BattleRenderer.ts` | < 700 lines |
+| **Audio Engine** | 8-bit APU chiptune emulation, Web Audio API, authentic cry synthesis | `src/audio/BattleAudio.ts` | < 650 lines |
+
+---
+
 ## 1. Executive Overview & Core Architectural Pillars
 
 **Crystal Overdrive** is a high-performance, browser-based recreation of *Pokémon Crystal* designed with an authentic Johto world, modernized Gen 4+ battle mechanics, and zero-allocation game loops.
@@ -372,7 +423,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `BattleSessionController.ts` / `FieldObstacleDispatcher.ts` / `gameContext.d.ts` / `main.ts` | `tests/AgentModularArchitectureSlice1.test.ts` | 4 | ✅ Covered | Agent-Optimized Modularization Slice 1: Extraction of BattleSessionController (~554 lines) and FieldObstacleDispatcher (~558 lines), reduction of `src/main.ts` to < 6,000 lines (5,996 lines, >= 950 lines reduction), strict layer boundary purity (zero DOM/PixiJS in battle/world), canonical ground tile replacement for HM01 Cut, and empty obstacle fallback interaction guarantees (TICKET-REFACTOR-AGENT-OPT-SLICE-01). |
 | `NpcInteractionRouter.ts` / `GymLeaderInteractions.ts` / `EarlyJohtoQuestInteractions.ts` / `IlexForestInteractions.ts` / `MidToLateJohtoQuestInteractions.ts` / `GoldenrodAndRoute34Interactions.ts` / `JohtoTownServiceInteractions.ts` / `main.ts` | `tests/AgentModularArchitectureSlice2.test.ts` | 10 | ✅ Covered | Agent-Optimized Modularization Slice 2: Extraction of O(1) Map-backed `NpcInteractionRouter` and 6 domain-focused NPC interaction modules under `src/world/interactions/` (< 800 lines each), reducing `src/main.ts` from 5,996 lines down to ~2,800 lines (> 3,190 lines removed), strict layer purity (zero DOM/PixiJS), O(1) ID/action dispatch, and standard TRAINER_BATTLE & dialogue fallback (TICKET-REFACTOR-AGENT-OPT-SLICE-02). |
 | `npcData.ts` / `npcShared.ts` / `newBarkToSproutTowerNpcs.ts` / `violetToUnionCaveNpcs.ts` / `azaleaToIlexNpcs.ts` / `goldenrodCityNpcs.ts` / `goldenrodBuildingsAndParkNpcs.ts` / `ecruteakToRoute39Npcs.ts` / `olivineToIndigoNpcs.ts` | `tests/AgentModularArchitectureSlice3.test.ts` | 7 | ✅ Covered | Agent-Optimized Modularization Slice 3: Regional Partitioning of 5,468-line `src/world/npcData.ts` into 8 regional modules under `src/world/npcs/` (< 800 lines each) behind a 100% backward-compatible barrel export in `src/world/npcData.ts` (~230 lines), zero layer boundary violations, 100% walkability compliance, and complete state/export equivalence (TICKET-REFACTOR-AGENT-OPT-SLICE-03). |
-| **Current Baseline** | **62 Suites** | **598 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `StartMenuUI.ts` / `pokedexData.ts` / `PokedexModalRenderer.ts` / `TrainerCardAndSaveRenderer.ts` / `SettingsModalRenderer.ts` / `SettingsControlsBinding.ts` | `tests/AgentModularArchitectureSlice4.test.ts` | 7 | ✅ Covered | Agent-Optimized Modularization Slice 4: Partitioning of 2,943-line `StartMenuUI.ts` into 5 domain sub-modal renderers under `src/ui/start-menu/` (< 800 lines each) behind a clean ~680-line `StartMenuUI.ts` facade, publication of Section 0 Semantic Agent Routing Index in `ARCHITECTURE.md`, 100% backward-compatible exports and DOM ID contracts, zero broken assets (TICKET-REFACTOR-AGENT-OPT-SLICE-04). |
+| **Current Baseline** | **63 Suites** | **605 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.1.1 1-Hop Semantic Agent Routing Index (Overworld NPC & Interaction Modules)
 To enable instantaneous 1-hop navigation without exploratory grep searches, overworld mechanics and NPCs route directly to their owning modules:
