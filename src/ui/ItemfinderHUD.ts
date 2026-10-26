@@ -33,33 +33,36 @@ export class ItemfinderHUD {
       position: fixed;
       top: calc(56px + env(safe-area-inset-top, 0px));
       right: max(14px, env(safe-area-inset-right, 14px));
-      min-width: 152px;
-      height: 44px;
-      background: rgba(15, 23, 42, 0.92);
+      min-width: 156px;
+      height: 46px;
+      background: #0D1322;
       backdrop-filter: blur(10px);
-      border: 1.5px solid #38bdf8;
-      border-radius: 9999px;
+      border: 2px solid #38bdf8;
+      border-radius: 10px;
       padding: 4px 14px 4px 8px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 4px 0 0 #070B14, 0 8px 20px rgba(0, 0, 0, 0.75);
       align-items: center;
       gap: 10px;
       z-index: 40;
       pointer-events: none;
+      font-family: 'Space Mono', monospace;
       transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      box-sizing: border-box;
     `;
 
     this.capsuleElement.innerHTML = `
       <div id="itemfinder-compass-dial" style="
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: rgba(30, 41, 59, 0.95);
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #080E1D;
         border: 1.5px solid #38bdf8;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
         flex-shrink: 0;
+        box-shadow: inset 0 0 6px rgba(56, 189, 248, 0.25);
       ">
         <div id="itemfinder-compass-needle" style="
           font-size: 15px;
@@ -73,15 +76,17 @@ export class ItemfinderHUD {
       <div style="display: flex; flex-direction: column; justify-content: center; line-height: 1.15;">
         <div id="itemfinder-radar-header" style="
           font-size: 9px;
-          font-weight: 900;
+          font-weight: 700;
           letter-spacing: 0.8px;
           color: #94a3b8;
+          font-family: 'Space Mono', monospace;
         ">📡 DOWSING RADAR</div>
         <div id="itemfinder-distance-label" style="
           font-size: 12px;
-          font-weight: 800;
+          font-weight: 700;
           color: #f8fafc;
           white-space: nowrap;
+          font-family: 'Space Mono', monospace;
         ">NO RESPONSE</div>
       </div>
     `;
@@ -143,10 +148,10 @@ export class ItemfinderHUD {
     if (!this.active || this.suspended) return;
 
     if (!ping.hasItemInRange || ping.distance === null) {
-      this.capsuleElement.style.borderColor = '#64748b';
-      this.capsuleElement.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.65)';
-      this.dialElement.style.borderColor = '#64748b';
-      this.needleElement.style.color = '#64748b';
+      this.capsuleElement.style.borderColor = '#475569';
+      this.capsuleElement.style.boxShadow = '0 4px 0 0 #070B14, 0 8px 20px rgba(0, 0, 0, 0.75)';
+      this.dialElement.style.borderColor = '#475569';
+      this.needleElement.style.color = '#475569';
       this.needleElement.style.transform = 'rotate(0deg)';
       this.subLabelElement.innerText = '📡 DOWSING RADAR';
       this.subLabelElement.style.color = '#94a3b8';
@@ -160,18 +165,18 @@ export class ItemfinderHUD {
 
     if (ping.isFacingDirectly || ping.proximityBand === 'FACING' || ping.distance <= 1) {
       // Gold lock-on state when right on or facing the buried item
-      this.capsuleElement.style.borderColor = '#facc15';
-      this.capsuleElement.style.boxShadow = '0 6px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(250, 204, 21, 0.55)';
-      this.dialElement.style.borderColor = '#facc15';
-      this.needleElement.style.color = '#facc15';
+      this.capsuleElement.style.borderColor = '#FFD028';
+      this.capsuleElement.style.boxShadow = '0 4px 0 0 #070B14, 0 0 16px rgba(255, 208, 40, 0.55)';
+      this.dialElement.style.borderColor = '#FFD028';
+      this.needleElement.style.color = '#FFD028';
       this.subLabelElement.innerText = ping.isFacingDirectly ? '✨ LOCKED ON [A]' : '✨ TARGET NEARBY';
-      this.subLabelElement.style.color = '#facc15';
+      this.subLabelElement.style.color = '#FFD028';
       this.statusLabelElement.innerText = 'RIGHT HERE!';
-      this.statusLabelElement.style.color = '#fef08a';
+      this.statusLabelElement.style.color = '#FFD028';
     } else {
       // Active vector lock (2..8 tiles)
       this.capsuleElement.style.borderColor = '#38bdf8';
-      this.capsuleElement.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.65), 0 0 12px rgba(56, 189, 248, 0.35)';
+      this.capsuleElement.style.boxShadow = '0 4px 0 0 #070B14, 0 0 12px rgba(56, 189, 248, 0.35)';
       this.dialElement.style.borderColor = '#38bdf8';
       this.needleElement.style.color = '#38bdf8';
       this.subLabelElement.innerText = `📡 BEARING ${ping.bearing}`;

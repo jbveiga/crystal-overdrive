@@ -31,20 +31,24 @@ export class MissionLogUI {
     const style = document.createElement('style');
     style.id = 'crystal-mission-log-styles';
     style.textContent = `
+      #mission-log-card * {
+        box-sizing: border-box;
+      }
       @media (max-width: 720px), (orientation: portrait) {
         #mission-log-card {
           width: 96vw !important;
-          max-height: 90dvh !important;
+          max-height: 92dvh !important;
           padding: 12px !important;
         }
         #mission-split-body {
           flex-direction: column !important;
+          max-height: 72dvh !important;
         }
         #mission-list-pane {
           width: 100% !important;
           max-height: 28dvh !important;
           border-right: none !important;
-          border-bottom: 1px solid rgba(56, 189, 248, 0.25) !important;
+          border-bottom: 1.5px solid #22324F !important;
           padding-right: 0 !important;
           padding-bottom: 8px !important;
         }
@@ -68,52 +72,59 @@ export class MissionLogUI {
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(9, 13, 22, 0.82);
+      background: rgba(8, 14, 29, 0.88);
       backdrop-filter: blur(12px);
       z-index: 62;
       align-items: center;
       justify-content: center;
       pointer-events: auto;
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     `;
     this.modalElement.style.pointerEvents = 'auto';
 
     this.modalElement.innerHTML = `
       <div id="mission-log-card" class="interactive" style="
-        width: 820px;
+        width: 840px;
         max-width: 95vw;
-        max-height: 86dvh;
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(9, 13, 22, 0.99) 100%);
-        border: 2px solid rgba(56, 189, 248, 0.45);
-        border-radius: 14px;
+        max-height: 88dvh;
+        background: #0D1322;
+        border: 2px solid #22324F;
+        border-radius: 12px;
         padding: 18px 20px;
         color: #f8fafc;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(56, 189, 248, 0.15);
+        box-shadow: 0 6px 0 0 #070B14, 0 20px 60px rgba(0, 0, 0, 0.9);
         display: flex;
         flex-direction: column;
         gap: 12px;
         box-sizing: border-box;
         pointer-events: auto;
+        position: relative;
+        overflow: hidden;
       ">
+        <!-- Top Cyber Gradient Strip -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #38BDF8, #818CF8, #FFD028);"></div>
+
         <!-- Header Row -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(56, 189, 248, 0.25); padding-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #22324F; padding-bottom: 10px; margin-top: 4px;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <span style="font-size: 20px;">📜</span>
             <div>
-              <h2 id="mission-log-title" style="margin: 0; font-size: 18px; font-weight: 900; color: #38bdf8; letter-spacing: 0.6px;">MISSION LOG</h2>
-              <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">JOHTO & KANTO QUEST ARCHIVE</div>
+              <h2 id="mission-log-title" style="margin: 0; font-family: 'Space Mono', monospace; font-size: 17px; font-weight: 700; color: #38bdf8; letter-spacing: 0.8px;">MISSION LOG // PROTOCOL ARCHIVE</h2>
+              <div style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94a3b8; font-weight: 600;">JOHTO & KANTO DISPATCH TELEMETRY</div>
             </div>
           </div>
           <button id="close-mission-log-btn" class="interactive" style="
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #141E33;
+            border: 1.5px solid #22324F;
             border-radius: 8px;
             color: #e2e8f0;
+            font-family: 'Space Mono', monospace;
             font-size: 12px;
-            font-weight: 800;
-            padding: 6px 12px;
+            font-weight: 700;
+            padding: 6px 14px;
             cursor: pointer;
             pointer-events: auto;
+            box-shadow: 0 3px 0 0 #070B14;
           ">✕ CLOSE <span class="keyboard-hint">[ESC]</span></button>
         </div>
 
@@ -130,7 +141,7 @@ export class MissionLogUI {
             flex-direction: column;
             gap: 8px;
             padding-right: 10px;
-            border-right: 1px solid rgba(56, 189, 248, 0.22);
+            border-right: 1.5px solid #22324F;
           "></div>
 
           <!-- Right Mission Dossier -->
@@ -281,13 +292,15 @@ export class MissionLogUI {
         min-width: 110px;
         padding: 8px 12px;
         border-radius: 8px;
-        border: 1.5px solid ${isSelected ? '#38bdf8' : 'rgba(148, 163, 184, 0.25)'};
-        background: ${isSelected ? 'rgba(2, 132, 199, 0.35)' : '#1e293b'};
+        border: 1.5px solid ${isSelected ? '#38bdf8' : '#22324F'};
+        background: ${isSelected ? '#1E3A8A' : '#141E33'};
         color: ${isSelected ? '#f8fafc' : '#94a3b8'};
+        font-family: 'Space Mono', monospace;
         font-size: 12px;
-        font-weight: 800;
+        font-weight: 700;
         cursor: pointer;
         pointer-events: auto;
+        box-shadow: 0 4px 0 0 #070B14;
         transition: all 0.12s ease;
       `;
       btn.innerText = `[ ${tab} (${counts[tab]}) ]`;
@@ -302,12 +315,12 @@ export class MissionLogUI {
 
   private getStatusBadgeHtml(mission: Mission): string {
     if (mission.status === 'COMPLETED') {
-      return `<span style="font-size: 10px; font-weight: 800; color: #4ade80; background: rgba(34, 197, 94, 0.16); border: 1px solid rgba(74, 222, 128, 0.4); padding: 2px 6px; border-radius: 999px;">✓ COMPLETED</span>`;
+      return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #4ade80; background: rgba(34, 197, 94, 0.16); border: 1.5px solid #4ade80; padding: 2px 7px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">✓ COMPLETED</span>`;
     }
     if (mission.status === 'ACTIVE') {
-      return `<span style="font-size: 10px; font-weight: 800; color: #38bdf8; background: rgba(56, 189, 248, 0.16); border: 1px solid rgba(56, 189, 248, 0.45); padding: 2px 6px; border-radius: 999px;">● ACTIVE</span>`;
+      return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.16); border: 1.5px solid #38bdf8; padding: 2px 7px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">● ACTIVE</span>`;
     }
-    return `<span style="font-size: 10px; font-weight: 800; color: #94a3b8; background: rgba(51, 65, 85, 0.55); border: 1px solid rgba(148, 163, 184, 0.25); padding: 2px 6px; border-radius: 999px;">🔒 LOCKED</span>`;
+    return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #94a3b8; background: #080E1D; border: 1.5px solid #22324F; padding: 2px 7px; border-radius: 6px;">🔒 LOCKED</span>`;
   }
 
   private renderMissionList(): void {
@@ -316,7 +329,7 @@ export class MissionLogUI {
 
     if (missions.length === 0) {
       this.listPane.innerHTML = `
-        <div style="padding: 24px 12px; text-align: center; color: #64748b; font-size: 13px; font-weight: 600;">
+        <div style="padding: 24px 12px; text-align: center; color: #64748b; font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 600;">
           No missions in this category yet.
         </div>
       `;
@@ -334,9 +347,10 @@ export class MissionLogUI {
       card.style.cssText = `
         width: 100%;
         text-align: left;
-        background: ${isSelected ? 'rgba(30, 58, 138, 0.55)' : 'rgba(30, 41, 59, 0.78)'};
-        border: 1.5px solid ${isSelected ? '#38bdf8' : 'rgba(255, 255, 255, 0.1)'};
-        border-radius: 10px;
+        background: ${isSelected ? '#1E3A8A' : '#141E33'};
+        border: 1.5px solid ${isSelected ? '#38bdf8' : '#22324F'};
+        box-shadow: 0 4px 0 0 #070B14;
+        border-radius: 8px;
         padding: 10px 12px;
         color: #f8fafc;
         cursor: pointer;
@@ -346,14 +360,15 @@ export class MissionLogUI {
         gap: 5px;
         opacity: ${m.status === 'LOCKED' ? '0.68' : '1'};
         transition: all 0.12s ease;
+        box-sizing: border-box;
       `;
 
       card.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
-          <span style="font-size: 10px; font-weight: 800; color: ${catColor}; letter-spacing: 0.4px;">[${catLabel}]</span>
+          <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: ${catColor}; letter-spacing: 0.4px;">[${catLabel}]</span>
           ${this.getStatusBadgeHtml(m)}
         </div>
-        <div style="font-size: 14px; font-weight: 800; color: ${isSelected ? '#ffffff' : '#e2e8f0'};">
+        <div style="font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 13.5px; font-weight: 700; color: ${isSelected ? '#ffffff' : '#e2e8f0'};">
           ${m.id}: ${m.title}
         </div>
       `;
@@ -372,7 +387,7 @@ export class MissionLogUI {
     const mission = this.selectedMissionId ? this.missionManager.getMission(this.selectedMissionId) : undefined;
     if (!mission) {
       this.detailPane.innerHTML = `
-        <div style="padding: 36px; text-align: center; color: #64748b; font-size: 14px; font-weight: 600;">
+        <div style="padding: 36px; text-align: center; color: #64748b; font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 600;">
           Select a mission from the left panel to view its dossier and objectives.
         </div>
       `;
@@ -380,7 +395,8 @@ export class MissionLogUI {
     }
 
     const catTag = mission.category === 'MAIN' ? `ACT ${mission.act} • MAIN STORY` : `ACT ${mission.act} • SIDE QUEST`;
-    const catBg = mission.category === 'MAIN' ? 'rgba(250, 204, 21, 0.18)' : 'rgba(56, 189, 248, 0.18)';
+    const catBg = mission.category === 'MAIN' ? 'rgba(250, 204, 21, 0.16)' : 'rgba(56, 189, 248, 0.16)';
+    const catBorder = mission.category === 'MAIN' ? 'rgba(250, 204, 21, 0.4)' : 'rgba(56, 189, 248, 0.4)';
     const catColor = mission.category === 'MAIN' ? '#facc15' : '#38bdf8';
 
     const stepsHtml = mission.steps
@@ -389,21 +405,22 @@ export class MissionLogUI {
         const badge = step.completed ? '[✓]' : isCurrent ? '[▶]' : '[ ]';
         const textColor = step.completed ? '#94a3b8' : isCurrent ? '#38bdf8' : '#64748b';
         const textDeco = step.completed ? 'line-through' : 'none';
-        const fontWeight = isCurrent ? '800' : '600';
+        const fontWeight = isCurrent ? '700' : '600';
         return `
           <div style="
             display: flex;
             align-items: flex-start;
             gap: 8px;
-            padding: 7px 10px;
+            padding: 8px 10px;
             border-radius: 8px;
-            background: ${isCurrent ? 'rgba(56, 189, 248, 0.12)' : 'rgba(15, 23, 42, 0.55)'};
-            border: 1px solid ${isCurrent ? 'rgba(56, 189, 248, 0.4)' : 'rgba(255, 255, 255, 0.06)'};
+            background: ${isCurrent ? '#080E1D' : '#141E33'};
+            border: 1.5px solid ${isCurrent ? '#38bdf8' : '#22324F'};
+            box-shadow: 0 2px 0 0 #070B14;
             color: ${textColor};
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: ${fontWeight};
           ">
-            <span style="font-family: monospace; font-weight: 900; min-width: 26px;">${badge}</span>
+            <span style="font-family: 'Space Mono', monospace; font-weight: 700; min-width: 26px;">${badge}</span>
             <span style="text-decoration: ${textDeco}; line-height: 1.4;">${idx + 1}. ${step.description}</span>
           </div>
         `;
@@ -414,13 +431,15 @@ export class MissionLogUI {
       .map(
         (r) => `
           <span style="
-            background: rgba(30, 41, 59, 0.92);
-            border: 1px solid rgba(250, 204, 21, 0.4);
+            background: #141E33;
+            border: 1.5px solid #FFD028;
             color: #fef08a;
-            font-size: 12px;
-            font-weight: 800;
-            padding: 5px 10px;
-            border-radius: 999px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 0 0 #070B14;
           ">${r.label}</span>
         `
       )
@@ -432,30 +451,33 @@ export class MissionLogUI {
           <span style="
             display: inline-block;
             background: ${catBg};
+            border: 1px solid ${catBorder};
             color: ${catColor};
-            font-size: 11px;
-            font-weight: 800;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
             padding: 3px 8px;
             border-radius: 6px;
             margin-bottom: 6px;
           ">${catTag}</span>
-          <h3 id="mission-dossier-title" style="margin: 0; font-size: 19px; font-weight: 900; color: #f8fafc;">
-            ${mission.id}: ${mission.title}
-          </h3>
+          <h3 id="mission-dossier-title" style="margin: 0; font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: #f8fafc;">${mission.id}: ${mission.title}</h3>
         </div>
         ${this.getStatusBadgeHtml(mission)}
       </div>
 
-      <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: #cbd5e1; font-weight: 700; background: rgba(30, 41, 59, 0.65); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
-        <span>📍 <strong>Location:</strong> ${mission.location}</span>
-        <span>👤 <strong>Giver:</strong> ${mission.giver}</span>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; font-family: 'Space Mono', monospace; font-size: 11.5px; color: #cbd5e1; font-weight: 600; background: #080E1D; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #22324F; box-shadow: 0 2px 0 0 #070B14;">
+        <span>📍 <strong style="color: #38bdf8;">LOCATION:</strong> ${mission.location}</span>
+        <span>👤 <strong style="color: #38bdf8;">GIVER:</strong> ${mission.giver}</span>
       </div>
 
       <div id="mission-dossier-summary" style="
-        background: rgba(15, 23, 42, 0.75);
+        background: #080E1D;
         border-left: 3px solid #38bdf8;
+        border-top: 1.5px solid #22324F;
+        border-right: 1.5px solid #22324F;
+        border-bottom: 1.5px solid #22324F;
         padding: 10px 14px;
-        border-radius: 6px;
+        border-radius: 8px;
         font-size: 13px;
         line-height: 1.5;
         color: #e2e8f0;
@@ -464,7 +486,7 @@ export class MissionLogUI {
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 6px;">
-        <div style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.6px;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.6px;">
           Objectives Checklist (${mission.steps.filter((s) => s.completed).length}/${mission.steps.length})
         </div>
         <div id="mission-dossier-steps" style="display: flex; flex-direction: column; gap: 6px;">
@@ -473,7 +495,7 @@ export class MissionLogUI {
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 6px; margin-top: auto; padding-top: 6px;">
-        <div style="font-size: 11px; font-weight: 800; color: #facc15; text-transform: uppercase; letter-spacing: 0.6px;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #facc15; text-transform: uppercase; letter-spacing: 0.6px;">
           🎁 Mission Rewards
         </div>
         <div id="mission-dossier-rewards" style="display: flex; flex-wrap: wrap; gap: 8px;">

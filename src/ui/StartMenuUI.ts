@@ -371,6 +371,7 @@ export class StartMenuUI {
   private cursorIndex: number = 0;
   private speedMultiplier: SpeedMultiplier = 1;
   private menuItems: Array<{ id: string; label: string; icon: string; shortcut: string; action: () => void }> = [];
+  private activeSettingsTab: 'ALL' | 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS' = 'ALL';
 
   // Pokedex interactive workstation state
   private selectedDexSpeciesId: string = 'cyndaquil';
@@ -573,6 +574,24 @@ export class StartMenuUI {
         animation: neoKantoPulse 1.8s ease-in-out infinite;
       }
       @media (max-width: 768px) {
+        #start-menu-panel {
+          top: calc(52px + env(safe-area-inset-top, 0px)) !important;
+          right: max(10px, env(safe-area-inset-right, 10px)) !important;
+          width: min(220px, calc(100vw - 20px)) !important;
+        }
+        #save-confirm-modal {
+          width: 94vw !important;
+          padding: 14px !important;
+        }
+        #settings-modal {
+          width: 95vw !important;
+          max-height: 92dvh !important;
+          padding: 12px !important;
+        }
+        #settings-category-tabs {
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
         #pokedex-modal {
           width: 95vw !important;
           height: 92dvh !important;
@@ -600,6 +619,15 @@ export class StartMenuUI {
         #trainer-card-bento {
           grid-template-columns: 1fr !important;
           gap: 12px !important;
+        }
+        #bug-contest-leaderboard-modal {
+          width: 95vw !important;
+          max-height: 92dvh !important;
+          padding: 12px !important;
+        }
+        [data-contest-rank] {
+          grid-template-columns: 50px 1fr 1fr !important;
+          gap: 6px !important;
         }
       }
     `;
@@ -737,19 +765,18 @@ export class StartMenuUI {
   }
 
   private createUI(): void {
-    // 1. Classic Right-Hand Vertical Start Menu Panel
+    // 1. Classic Right-Hand Vertical Start Menu Panel (Neo-Kanto Protocol Drawer)
     const panel = document.createElement('div');
     panel.id = 'start-menu-panel';
     panel.style.cssText = `
       position: absolute;
       top: 64px;
       right: 18px;
-      width: 220px;
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 29, 0.99) 100%);
-      border: 3px solid #f8fafc;
-      outline: 3px solid #1e293b;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), inset 0 0 0 2px #38bdf8;
-      border-radius: 10px;
+      width: 236px;
+      background: #0D1322;
+      border: 2px solid #22324F;
+      box-shadow: 0 6px 0 0 #070B14, 0 16px 36px rgba(0, 0, 0, 0.85);
+      border-radius: 12px;
       padding: 12px;
       display: none;
       flex-direction: column;
@@ -757,6 +784,8 @@ export class StartMenuUI {
       z-index: 60;
       pointer-events: auto;
       color: #f8fafc;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     `;
     this.container.appendChild(panel);
     this.menuPanel = panel;
@@ -845,7 +874,7 @@ export class StartMenuUI {
     this.container.appendChild(contestModal);
     this.contestLeaderboardModal = contestModal;
 
-    // 3. Save Confirmation Modal
+    // 3. Save Confirmation Modal (Neo-Kanto Memory Card Console)
     const saveModal = document.createElement('div');
     saveModal.id = 'save-confirm-modal';
     saveModal.style.cssText = `
@@ -853,11 +882,10 @@ export class StartMenuUI {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 400px;
-      max-width: 92vw;
-      background: rgba(15, 23, 42, 0.98);
-      border: 3px solid #f8fafc;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85), inset 0 0 0 2px #38bdf8;
+      width: min(440px, 94vw);
+      background: #0D1322;
+      border: 2px solid #22324F;
+      box-shadow: 0 6px 0 0 #070B14, 0 16px 48px rgba(0, 0, 0, 0.9);
       border-radius: 12px;
       padding: 20px;
       display: none;
@@ -866,11 +894,13 @@ export class StartMenuUI {
       z-index: 65;
       pointer-events: auto;
       color: #f8fafc;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     `;
     this.container.appendChild(saveModal);
     this.saveConfirmModal = saveModal;
 
-    // 4. Game Settings Modal
+    // 4. Game Settings Modal (Neo-Kanto System Config Workstation)
     const setModal = document.createElement('div');
     setModal.id = 'settings-modal';
     setModal.style.cssText = `
@@ -878,19 +908,17 @@ export class StartMenuUI {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 440px;
-      max-width: 94vw;
-      max-height: 86vh;
-      max-height: 86dvh;
+      width: min(560px, 95vw);
+      max-height: 88vh;
+      max-height: 88dvh;
       overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
       touch-action: pan-y;
-      background: rgba(15, 23, 42, 0.98);
-      backdrop-filter: blur(16px);
-      border: 3px solid #38bdf8;
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.88), inset 0 0 0 2px rgba(56, 189, 248, 0.3);
+      background: #0D1322;
+      border: 2px solid #22324F;
+      box-shadow: 0 6px 0 0 #070B14, 0 16px 48px rgba(0, 0, 0, 0.9);
       border-radius: 14px;
       padding: 18px 20px;
       display: none;
@@ -899,6 +927,8 @@ export class StartMenuUI {
       z-index: 65;
       pointer-events: auto;
       color: #f8fafc;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     `;
     this.container.appendChild(setModal);
     this.settingsModal = setModal;
@@ -909,17 +939,25 @@ export class StartMenuUI {
 
     const header = document.createElement('div');
     header.style.cssText = `
+      font-family: 'Space Mono', monospace;
       font-size: 11px;
       font-weight: 800;
       color: #38bdf8;
       letter-spacing: 0.8px;
-      padding: 2px 6px 6px 6px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-      margin-bottom: 2px;
+      padding: 2px 4px 8px 4px;
+      border-bottom: 1.5px solid #22324F;
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     `;
-    header.innerHTML = `<span>START MENU</span><span class="keyboard-hint" style="color: #94a3b8;">ESC</span>`;
+    header.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span class="neo-kanto-pulse-dot" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+        <span>START MENU // SYS.NAV</span>
+      </div>
+      <span class="keyboard-hint" style="color: #94a3b8; font-size: 10px; background: #080E1D; border: 1px solid #22324F; padding: 1px 5px; border-radius: 4px;">ESC</span>
+    `;
     this.menuPanel.appendChild(header);
 
     this.menuItems.forEach((item, idx) => {
@@ -929,13 +967,15 @@ export class StartMenuUI {
       const isSelected = idx === this.cursorIndex;
       const btn = document.createElement('button');
       btn.id = item.id;
+      btn.className = 'neo-kanto-tactile-btn';
       btn.style.cssText = `
-        background: ${isSelected ? '#1e3a8a' : 'transparent'};
+        background: ${isSelected ? '#1E3A8A' : '#141E33'};
         color: ${isSelected ? '#ffffff' : '#e2e8f0'};
-        border: 1px solid ${isSelected ? '#38bdf8' : 'transparent'};
-        border-radius: 6px;
+        border: 1.5px solid ${isSelected ? '#38BDF8' : '#22324F'};
+        box-shadow: 0 4px 0 0 #070B14;
+        border-radius: 8px;
         padding: 9px 10px;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 800;
         cursor: pointer;
         display: flex;
@@ -943,14 +983,15 @@ export class StartMenuUI {
         justify-content: space-between;
         gap: 8px;
         text-align: left;
+        box-sizing: border-box;
       `;
       btn.innerHTML = `
         <span style="display: flex; align-items: center; gap: 8px;">
-          <span style="color: ${isSelected ? '#facc15' : 'transparent'}; font-size: 12px;">▶</span>
-          <span>${item.icon}</span>
-          <span>${item.label}</span>
+          <span style="color: ${isSelected ? '#FFD028' : 'transparent'}; font-size: 11px; width: 10px;">▶</span>
+          <span style="font-size: 14px;">${item.icon}</span>
+          <span style="letter-spacing: 0.3px;">${item.label}</span>
         </span>
-        <span class="keyboard-hint" style="font-size: 10px; font-weight: 800; color: #94a3b8; background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(148, 163, 184, 0.28); padding: 1px 5px; border-radius: 4px;">[${item.shortcut}]</span>
+        <span class="keyboard-hint" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #94a3b8; background: #080E1D; border: 1px solid #22324F; padding: 1px 5px; border-radius: 4px;">[${item.shortcut}]</span>
       `;
 
       btn.addEventListener('mouseenter', () => {
@@ -1892,39 +1933,54 @@ export class StartMenuUI {
     const name = this.stateProvider.getTrainerName();
     const mapName = this.stateProvider.getMapName();
     const badgesCount = this.stateProvider.getBadges().length;
+    const pokedexCount = this.stateProvider.getCaughtCount ? this.stateProvider.getCaughtCount() : 0;
     const playTime = this.formatPlayTime(this.stateProvider.getPlayTimeSeconds());
 
     this.saveConfirmModal.innerHTML = `
-      <div style="font-size: 13px; font-weight: 800; color: #38bdf8; letter-spacing: 0.6px;">💾 SAVE PROGRESS</div>
-      <div style="background: #1e293b; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 5px; font-size: 13px;">
-        <div style="display: flex; justify-content: space-between;"><span style="color: #94a3b8;">PLAYER:</span><strong>${name}</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span style="color: #94a3b8;">LOCATION:</span><strong>${mapName}</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span style="color: #94a3b8;">BADGES:</span><strong>${badgesCount}</strong></div>
-        <div style="display: flex; justify-content: space-between;"><span style="color: #94a3b8;">TIME:</span><strong>${playTime}</strong></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #22324F; padding-bottom: 10px;">
+        <div style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38bdf8; letter-spacing: 0.6px; display: flex; align-items: center; gap: 6px;">
+          <span class="neo-kanto-pulse-dot" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+          <span>💾 MEMORY CARD // SAVE CONSOLE</span>
+        </div>
+        <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #4ADE80; background: #080E1D; border: 1px solid #22324F; padding: 2px 6px; border-radius: 4px;">SLOT 1</span>
       </div>
-      <div id="save-confirm-status" style="font-size: 15px; font-weight: 700; color: #f8fafc;">
+
+      <div class="nk-save-slot-card" style="background: #080E1D; border: 1.5px solid #22324F; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 7px; font-family: 'Space Mono', monospace; font-size: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">PLAYER</span><strong style="color: #38BDF8;">${name}</strong></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">LOCATION</span><strong style="color: #F8FAFC;">${mapName}</strong></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">BADGES</span><strong style="color: #FFD028;">${badgesCount}</strong></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">POKéDEX</span><strong style="color: #4ADE80;">${pokedexCount}</strong></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">TIME</span><strong style="color: #E2E8F0;">${playTime}</strong></div>
+      </div>
+
+      <div id="save-confirm-status" style="font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: #f8fafc; text-align: center; padding: 4px 0;">
         Would you like to save the game?
       </div>
+
       <div id="save-confirm-buttons" style="display: flex; gap: 10px;">
-        <button id="confirm-save-yes-btn" style="
+        <button id="confirm-save-yes-btn" class="neo-kanto-tactile-btn" style="
           flex: 1;
-          background: #16a34a;
+          background: #059669;
           color: white;
-          border: none;
+          border: 1.5px solid #34D399;
+          box-shadow: 0 4px 0 0 #070B14;
           border-radius: 8px;
           padding: 10px;
-          font-size: 14px;
+          font-family: 'Space Mono', monospace;
+          font-size: 13px;
           font-weight: 800;
           cursor: pointer;
         ">YES, SAVE</button>
-        <button id="confirm-save-no-btn" style="
+        <button id="confirm-save-no-btn" class="neo-kanto-tactile-btn" style="
           flex: 1;
-          background: #475569;
+          background: #1E293B;
           color: white;
-          border: none;
+          border: 1.5px solid #475569;
+          box-shadow: 0 4px 0 0 #070B14;
           border-radius: 8px;
           padding: 10px;
-          font-size: 14px;
+          font-family: 'Space Mono', monospace;
+          font-size: 13px;
           font-weight: 800;
           cursor: pointer;
         ">NO</button>
@@ -1959,6 +2015,7 @@ export class StartMenuUI {
 
   public openSettings(): void {
     BattleAudio.playMenuSound('CONFIRM');
+    this.activeSettingsTab = 'ALL';
     this.menuPanel.style.display = 'none';
     this.settingsModal.style.display = 'flex';
     this.renderSettingsContent();
@@ -2022,33 +2079,45 @@ export class StartMenuUI {
       return '⚖️ NORMAL (6.25% Cap)';
     };
 
-    const rowStyle = 'background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;';
-    const subLabelStyle = 'font-size:11px;color:#94a3b8;';
-    const titleLabelStyle = 'font-size:13px;font-weight:800;color:#fff;';
+    const rowStyle = 'background: #141E33; border: 1.5px solid #22324F; box-shadow: 0 4px 0 0 #070B14; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px;';
+    const groupCardStyle = 'background: #141E33; border: 1.5px solid #22324F; box-shadow: 0 4px 0 0 #070B14; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;';
+    const subLabelStyle = 'font-size: 11px; color: #94A3B8; font-family: "Plus Jakarta Sans", system-ui, sans-serif;';
+    const titleLabelStyle = 'font-size: 13px; font-weight: 800; color: #F8FAFC; font-family: "Space Mono", monospace; letter-spacing: 0.3px;';
 
     this.settingsModal.innerHTML = `
-      <div style="position: sticky; top: 0; background: rgba(15, 23, 42, 0.98); z-index: 3; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(56, 189, 248, 0.35); padding-bottom: 10px; flex-shrink: 0;">
+      <div style="position: sticky; top: 0; background: #0D1322; z-index: 3; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 10px; flex-shrink: 0;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 20px;">⚙️</span>
-          <h2 style="margin: 0; font-size: 19px; font-weight: 900; color: #38bdf8; letter-spacing: 0.5px;">SETTINGS</h2>
+          <span class="neo-kanto-pulse-dot" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+          <h2 style="margin: 0; font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 900; color: #38bdf8; letter-spacing: 0.5px;">⚙️ SETTINGS // SYS.CONFIG</h2>
         </div>
-        <button id="close-settings-x-btn" aria-label="Close Settings" style="background: rgba(51, 65, 85, 0.6); border: 1px solid rgba(148, 163, 184, 0.35); border-radius: 6px; color: #f8fafc; font-size: 16px; font-weight: 900; cursor: pointer; padding: 4px 10px;">✕</button>
+        <button id="close-settings-x-btn" aria-label="Close Settings" class="neo-kanto-tactile-btn" style="background: #141E33; border: 1.5px solid #22324F; box-shadow: 0 2px 0 0 #070B14; border-radius: 6px; color: #f8fafc; font-size: 14px; font-weight: 900; cursor: pointer; padding: 4px 10px;">✕</button>
+      </div>
+
+      <!-- Segmented Category Tabs -->
+      <div id="settings-category-tabs" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; flex-shrink: 0;">
+        <button id="settings-tab-all" data-settings-tab="ALL" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 60px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${this.activeSettingsTab === 'ALL' ? '#1E3A8A' : '#141E33'}; color: ${this.activeSettingsTab === 'ALL' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${this.activeSettingsTab === 'ALL' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ ALL ]</button>
+        <button id="settings-tab-audio" data-settings-tab="AUDIO" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 60px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${this.activeSettingsTab === 'AUDIO' ? '#1E3A8A' : '#141E33'}; color: ${this.activeSettingsTab === 'AUDIO' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${this.activeSettingsTab === 'AUDIO' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ AUDIO ]</button>
+        <button id="settings-tab-gameplay" data-settings-tab="GAMEPLAY" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 70px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${this.activeSettingsTab === 'GAMEPLAY' ? '#1E3A8A' : '#141E33'}; color: ${this.activeSettingsTab === 'GAMEPLAY' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${this.activeSettingsTab === 'GAMEPLAY' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ GAMEPLAY ]</button>
+        <button id="settings-tab-graphics" data-settings-tab="GRAPHICS" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 70px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${this.activeSettingsTab === 'GRAPHICS' ? '#1E3A8A' : '#141E33'}; color: ${this.activeSettingsTab === 'GRAPHICS' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${this.activeSettingsTab === 'GRAPHICS' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ GRAPHICS ]</button>
+        <button id="settings-tab-controls" data-settings-tab="CONTROLS" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 70px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${this.activeSettingsTab === 'CONTROLS' ? '#1E3A8A' : '#141E33'}; color: ${this.activeSettingsTab === 'CONTROLS' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${this.activeSettingsTab === 'CONTROLS' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ CONTROLS ]</button>
       </div>
 
       <div id="settings-scroll-body" style="display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding-right: 2px;">
         <!-- Sound Toggle -->
-        <div style="${rowStyle}">
+        <div data-settings-category="AUDIO" style="${rowStyle}">
           <div>
             <div style="${titleLabelStyle}">AUDIO & SOUND</div>
             <div style="${subLabelStyle}">Background music & battle SFX</div>
           </div>
-          <button id="settings-sound-btn" style="
+          <button id="settings-sound-btn" class="neo-kanto-tactile-btn" style="
             background: ${isMuted ? '#7f1d1d' : '#0284c7'};
             color: #ffffff;
-            border: 1px solid ${isMuted ? '#ef4444' : '#38bdf8'};
+            border: 1.5px solid ${isMuted ? '#ef4444' : '#38bdf8'};
+            box-shadow: 0 3px 0 0 #070B14;
             border-radius: 6px;
             padding: 8px 14px;
-            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
             font-weight: 800;
             cursor: pointer;
             min-width: 130px;
@@ -2056,18 +2125,20 @@ export class StartMenuUI {
         </div>
 
         <!-- 8-Bit Chiptune APU Mode Toggle -->
-        <div style="${rowStyle}">
+        <div data-settings-category="AUDIO" style="${rowStyle}">
           <div>
             <div style="${titleLabelStyle}">BGM SYNTHESIS MODE</div>
             <div style="${subLabelStyle}">4-channel Game Boy APU vs Studio BGM</div>
           </div>
-          <button id="settings-chiptune-btn" style="
+          <button id="settings-chiptune-btn" class="neo-kanto-tactile-btn" style="
             background: ${isChiptuneMode ? '#7c3aed' : '#0284c7'};
             color: #ffffff;
-            border: 1px solid ${isChiptuneMode ? '#c084fc' : '#38bdf8'};
+            border: 1.5px solid ${isChiptuneMode ? '#c084fc' : '#38bdf8'};
+            box-shadow: 0 3px 0 0 #070B14;
             border-radius: 6px;
             padding: 8px 14px;
-            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
             font-weight: 800;
             cursor: pointer;
             min-width: 130px;
@@ -2075,18 +2146,20 @@ export class StartMenuUI {
         </div>
 
         <!-- Low-HP Warning Alarm Beep Toggle -->
-        <div style="${rowStyle}">
+        <div data-settings-category="AUDIO" style="${rowStyle}">
           <div>
             <div style="${titleLabelStyle}">LOW-HP WARNING BEEP</div>
             <div style="${subLabelStyle}">Two-tone battle alarm when HP ≤ 20%</div>
           </div>
-          <button id="settings-lowhp-beep-btn" style="
+          <button id="settings-lowhp-beep-btn" class="neo-kanto-tactile-btn" style="
             background: ${isLowHpBeep ? '#059669' : '#334155'};
             color: #ffffff;
-            border: 1px solid ${isLowHpBeep ? '#34d399' : '#64748b'};
+            border: 1.5px solid ${isLowHpBeep ? '#34d399' : '#64748b'};
+            box-shadow: 0 3px 0 0 #070B14;
             border-radius: 6px;
             padding: 8px 14px;
-            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
             font-weight: 800;
             cursor: pointer;
             min-width: 130px;
@@ -2094,18 +2167,20 @@ export class StartMenuUI {
         </div>
 
         <!-- Speed Multiplier Cycle -->
-        <div style="${rowStyle}">
+        <div data-settings-category="GAMEPLAY" style="${rowStyle}">
           <div>
             <div style="${titleLabelStyle}">GAME SPEED</div>
             <div style="${subLabelStyle}">Overworld traversal & dialogue</div>
           </div>
-          <button id="settings-speed-btn" style="
+          <button id="settings-speed-btn" class="neo-kanto-tactile-btn" style="
             background: #2563eb;
             color: #ffffff;
-            border: 1px solid #60a5fa;
+            border: 1.5px solid #60a5fa;
+            box-shadow: 0 3px 0 0 #070B14;
             border-radius: 6px;
             padding: 8px 14px;
-            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
             font-weight: 800;
             cursor: pointer;
             min-width: 130px;
@@ -2113,18 +2188,20 @@ export class StartMenuUI {
         </div>
 
         <!-- Touch Controls Toggle -->
-        <div style="${rowStyle}">
+        <div data-settings-category="CONTROLS" style="${rowStyle}">
           <div>
             <div style="${titleLabelStyle}">TOUCH CONTROLS</div>
             <div style="${subLabelStyle}">On-screen virtual D-Pad & A/B</div>
           </div>
-          <button id="settings-gamepad-btn" style="
+          <button id="settings-gamepad-btn" class="neo-kanto-tactile-btn" style="
             background: ${isGamepad ? '#059669' : '#334155'};
             color: #ffffff;
-            border: 1px solid ${isGamepad ? '#34d399' : '#64748b'};
+            border: 1.5px solid ${isGamepad ? '#34d399' : '#64748b'};
+            box-shadow: 0 3px 0 0 #070B14;
             border-radius: 6px;
             padding: 8px 14px;
-            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
             font-weight: 800;
             cursor: pointer;
             min-width: 130px;
@@ -2132,18 +2209,20 @@ export class StartMenuUI {
         </div>
 
         <!-- Touch Control Style Toggle (D-Pad vs Analog Joystick) -->
-        <div style="${rowStyle}">
+        <div data-settings-category="CONTROLS" style="${rowStyle}">
           <div>
             <div style="${titleLabelStyle}">CONTROL STYLE</div>
             <div style="${subLabelStyle}">D-Pad buttons or analog joystick</div>
           </div>
-          <button id="settings-control-style-btn" style="
+          <button id="settings-control-style-btn" class="neo-kanto-tactile-btn" style="
             background: ${isJoystick ? '#7c3aed' : '#0284c7'};
             color: #ffffff;
-            border: 1px solid ${isJoystick ? '#c084fc' : '#38bdf8'};
+            border: 1.5px solid ${isJoystick ? '#c084fc' : '#38bdf8'};
+            box-shadow: 0 3px 0 0 #070B14;
             border-radius: 6px;
             padding: 8px 14px;
-            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
             font-weight: 800;
             cursor: pointer;
             min-width: 130px;
@@ -2151,18 +2230,20 @@ export class StartMenuUI {
         </div>
 
         <!-- CRT Scanlines Toggle -->
-        <div style="${rowStyle}">
+        <div data-settings-category="GRAPHICS" style="${rowStyle}">
           <div>
             <div style="${titleLabelStyle}">CRT SCANLINE OVERLAY</div>
             <div style="${subLabelStyle}">Retro CRT horizontal scanlines & bezel vignette</div>
           </div>
-          <button id="settings-crt-btn" style="
+          <button id="settings-crt-btn" class="neo-kanto-tactile-btn" style="
             background: ${isCrtScanlines ? '#059669' : '#334155'};
             color: #ffffff;
-            border: 1px solid ${isCrtScanlines ? '#34d399' : '#64748b'};
+            border: 1.5px solid ${isCrtScanlines ? '#34d399' : '#64748b'};
+            box-shadow: 0 3px 0 0 #070B14;
             border-radius: 6px;
             padding: 8px 14px;
-            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
             font-weight: 800;
             cursor: pointer;
             min-width: 130px;
@@ -2170,18 +2251,20 @@ export class StartMenuUI {
         </div>
 
         <!-- Unbound-Style Exp. Share Mode Toggle (OFF | ALL | CAPPED) -->
-        <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+        <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
             <div>
               <div style="${titleLabelStyle}">EXP. SHARE MODE</div>
               <div style="${subLabelStyle}">Party EXP distribution & level caps</div>
             </div>
-            <button id="settings-exp-share-btn" style="
+            <button id="settings-exp-share-btn" class="neo-kanto-tactile-btn" style="
               background: ${getExpShareButtonBg(expShareMode)};
               color: #ffffff;
-              border: 1px solid ${getExpShareButtonBorder(expShareMode)};
+              border: 1.5px solid ${getExpShareButtonBorder(expShareMode)};
+              box-shadow: 0 3px 0 0 #070B14;
               border-radius: 6px;
               padding: 7px 12px;
+              font-family: 'Space Mono', monospace;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
@@ -2189,35 +2272,41 @@ export class StartMenuUI {
             ">${getExpShareButtonLabel(expShareMode)}</button>
           </div>
           <div id="settings-exp-segmented-group" style="display:flex;gap:6px;width:100%;">
-            <button id="settings-exp-off-btn" style="
+            <button id="settings-exp-off-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
-              background: ${expShareMode === 'OFF' ? '#475569' : '#0f172a'};
+              background: ${expShareMode === 'OFF' ? '#475569' : '#080E1D'};
               color: ${expShareMode === 'OFF' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${expShareMode === 'OFF' ? '#cbd5e1' : 'rgba(255,255,255,0.12)'};
+              border: 1.5px solid ${expShareMode === 'OFF' ? '#cbd5e1' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
               border-radius: 6px;
               padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
             ">[ OFF ]</button>
-            <button id="settings-exp-all-btn" style="
+            <button id="settings-exp-all-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
-              background: ${expShareMode === 'ALL' ? '#059669' : '#0f172a'};
+              background: ${expShareMode === 'ALL' ? '#059669' : '#080E1D'};
               color: ${expShareMode === 'ALL' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${expShareMode === 'ALL' ? '#34d399' : 'rgba(255,255,255,0.12)'};
+              border: 1.5px solid ${expShareMode === 'ALL' ? '#34d399' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
               border-radius: 6px;
               padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
             ">[ ALL ]</button>
-            <button id="settings-exp-capped-btn" style="
+            <button id="settings-exp-capped-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
-              background: ${expShareMode === 'CAPPED' ? '#7c3aed' : '#0f172a'};
+              background: ${expShareMode === 'CAPPED' ? '#7c3aed' : '#080E1D'};
               color: ${expShareMode === 'CAPPED' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${expShareMode === 'CAPPED' ? '#c084fc' : 'rgba(255,255,255,0.12)'};
+              border: 1.5px solid ${expShareMode === 'CAPPED' ? '#c084fc' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
               border-radius: 6px;
               padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
@@ -2226,18 +2315,20 @@ export class StartMenuUI {
         </div>
 
         <!-- Wild Encounter Rate Cap Toggle (RELAXED 4.0% | NORMAL 6.25% | CLASSIC 10.0%) -->
-        <div style="background:rgba(30,41,59,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+        <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
             <div>
               <div style="${titleLabelStyle}">WILD ENCOUNTER RATE</div>
               <div style="${subLabelStyle}">4-step grace buffer + step probability cap</div>
             </div>
-            <button id="settings-encounter-rate-btn" style="
+            <button id="settings-encounter-rate-btn" class="neo-kanto-tactile-btn" style="
               background: #0284c7;
               color: #ffffff;
-              border: 1px solid #38bdf8;
+              border: 1.5px solid #38bdf8;
+              box-shadow: 0 3px 0 0 #070B14;
               border-radius: 6px;
               padding: 7px 12px;
+              font-family: 'Space Mono', monospace;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
@@ -2245,35 +2336,41 @@ export class StartMenuUI {
             ">${getEncounterRateLabel(encounterRateMode)}</button>
           </div>
           <div id="settings-encounter-segmented-group" style="display:flex;gap:6px;width:100%;">
-            <button id="settings-enc-relaxed-btn" style="
+            <button id="settings-enc-relaxed-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
-              background: ${encounterRateMode === 'RELAXED' ? '#059669' : '#0f172a'};
+              background: ${encounterRateMode === 'RELAXED' ? '#059669' : '#080E1D'};
               color: ${encounterRateMode === 'RELAXED' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${encounterRateMode === 'RELAXED' ? '#34d399' : 'rgba(255,255,255,0.12)'};
+              border: 1.5px solid ${encounterRateMode === 'RELAXED' ? '#34d399' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
               border-radius: 6px;
               padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
             ">[ RELAXED 4% ]</button>
-            <button id="settings-enc-normal-btn" style="
+            <button id="settings-enc-normal-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
-              background: ${encounterRateMode === 'NORMAL' ? '#0284c7' : '#0f172a'};
+              background: ${encounterRateMode === 'NORMAL' ? '#0284c7' : '#080E1D'};
               color: ${encounterRateMode === 'NORMAL' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${encounterRateMode === 'NORMAL' ? '#38bdf8' : 'rgba(255,255,255,0.12)'};
+              border: 1.5px solid ${encounterRateMode === 'NORMAL' ? '#38bdf8' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
               border-radius: 6px;
               padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
             ">[ NORMAL 6.25% ]</button>
-            <button id="settings-enc-classic-btn" style="
+            <button id="settings-enc-classic-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
-              background: ${encounterRateMode === 'CLASSIC' ? '#d97706' : '#0f172a'};
+              background: ${encounterRateMode === 'CLASSIC' ? '#d97706' : '#080E1D'};
               color: ${encounterRateMode === 'CLASSIC' ? '#ffffff' : '#94a3b8'};
-              border: 1px solid ${encounterRateMode === 'CLASSIC' ? '#fbbf24' : 'rgba(255,255,255,0.12)'};
+              border: 1.5px solid ${encounterRateMode === 'CLASSIC' ? '#fbbf24' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
               border-radius: 6px;
               padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
               font-size: 11px;
               font-weight: 800;
               cursor: pointer;
@@ -2282,18 +2379,20 @@ export class StartMenuUI {
         </div>
 
         <!-- Auto-HM Mode Single Toggle -->
-        <div style="${rowStyle}">
+        <div data-settings-category="GAMEPLAY" style="${rowStyle}">
           <div>
             <div style="${titleLabelStyle}">AUTO-HM MODE</div>
             <div style="${subLabelStyle}">Use Surf, Cut & Strength automatically</div>
           </div>
-          <button id="settings-autohm-btn" style="
+          <button id="settings-autohm-btn" class="neo-kanto-tactile-btn" style="
             background: ${isAutoHm ? '#059669' : '#334155'};
             color: #ffffff;
-            border: 1px solid ${isAutoHm ? '#34d399' : '#64748b'};
+            border: 1.5px solid ${isAutoHm ? '#34d399' : '#64748b'};
+            box-shadow: 0 3px 0 0 #070B14;
             border-radius: 6px;
             padding: 8px 14px;
-            font-size: 12px;
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
             font-weight: 800;
             cursor: pointer;
             min-width: 130px;
@@ -2301,22 +2400,60 @@ export class StartMenuUI {
         </div>
       </div>
 
-      <button id="close-settings-btn" style="
+      <button id="close-settings-btn" class="neo-kanto-tactile-btn" style="
         position: sticky;
         bottom: 0;
         flex-shrink: 0;
-        background: #334155;
+        background: #1E293B;
         color: #ffffff;
-        border: 1px solid rgba(56, 189, 248, 0.4);
+        border: 1.5px solid #475569;
+        box-shadow: 0 4px 0 0 #070B14;
         border-radius: 8px;
         padding: 10px;
-        font-size: 13px;
+        font-family: 'Space Mono', monospace;
+        font-size: 12px;
         font-weight: 800;
         cursor: pointer;
         margin-top: 4px;
         z-index: 3;
       ">← BACK TO MENU</button>
     `;
+
+    // Hook up category tab filtering
+    const filterCategory = (tab: 'ALL' | 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS') => {
+      this.activeSettingsTab = tab;
+      const tabBtns = this.settingsModal.querySelectorAll('[data-settings-tab]');
+      for (let i = 0; i < tabBtns.length; i++) {
+        const b = tabBtns[i] as HTMLElement;
+        const bTab = b.getAttribute('data-settings-tab');
+        const isSel = bTab === tab;
+        b.style.background = isSel ? '#1E3A8A' : '#141E33';
+        b.style.color = isSel ? '#FFFFFF' : '#94A3B8';
+        b.style.borderColor = isSel ? '#38BDF8' : '#22324F';
+      }
+
+      const rows = this.settingsModal.querySelectorAll('[data-settings-category]');
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i] as HTMLElement;
+        const cat = r.getAttribute('data-settings-category');
+        if (tab === 'ALL' || cat === tab) {
+          r.style.display = 'flex';
+        } else {
+          r.style.display = 'none';
+        }
+      }
+    };
+
+    const tabAll = this.settingsModal.querySelector('#settings-tab-all');
+    tabAll?.addEventListener('click', () => { BattleAudio.playMenuSound('CURSOR'); filterCategory('ALL'); });
+    const tabAudio = this.settingsModal.querySelector('#settings-tab-audio');
+    tabAudio?.addEventListener('click', () => { BattleAudio.playMenuSound('CURSOR'); filterCategory('AUDIO'); });
+    const tabGameplay = this.settingsModal.querySelector('#settings-tab-gameplay');
+    tabGameplay?.addEventListener('click', () => { BattleAudio.playMenuSound('CURSOR'); filterCategory('GAMEPLAY'); });
+    const tabGraphics = this.settingsModal.querySelector('#settings-tab-graphics');
+    tabGraphics?.addEventListener('click', () => { BattleAudio.playMenuSound('CURSOR'); filterCategory('GRAPHICS'); });
+    const tabControls = this.settingsModal.querySelector('#settings-tab-controls');
+    tabControls?.addEventListener('click', () => { BattleAudio.playMenuSound('CURSOR'); filterCategory('CONTROLS'); });
 
     const soundBtn = this.settingsModal.querySelector('#settings-sound-btn') as HTMLButtonElement;
     const chiptuneBtn = this.settingsModal.querySelector('#settings-chiptune-btn') as HTMLButtonElement;
