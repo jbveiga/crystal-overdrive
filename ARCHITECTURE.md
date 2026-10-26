@@ -14,7 +14,8 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | :--- | :--- | :--- | :---: |
 | **Global Type Contracts** | Cross-module runtime context, game options, audio & battle interfaces | `src/types/gameContext.d.ts` | < 150 lines |
 | **Engine & Data Types** | Core definitions: Pokemon, Move, Trainer, Map, Item, Quest | `src/types/game.ts` | < 600 lines |
-| **Pure Battle Engine** | Turn order, priority, status effects, damage calculations, stat stages | `src/battle/BattleStateMachine.ts` | < 650 lines |
+| **Pure Battle Engine Facade** | Turn order, priority, status effects, damage calculations, stat stages | `src/battle/BattleStateMachine.ts` | < 750 lines |
+| **Battle Move & Item Executor** | Spread moves, residuals, weather multipliers, move execution, item effects | `src/battle/state/BattleMoveAndItemExecutor.ts` | < 600 lines |
 | **Battle Session Controller** | Wild battles, trainer duels, 2v2 double battles, pacing, learnsets | `src/battle/BattleSessionController.ts` | < 550 lines |
 | **Damage Calculator** | Gen 4+ Physical/Special split, STAB, type effectiveness, crits | `src/battle/DamageCalculator.ts` | < 350 lines |
 | **Pokemon Factory & Dex** | Level caps, EXP formulas, IV/DV generation, starter hydration | `src/battle/PokemonFactory.ts` | < 700 lines |
@@ -67,6 +68,8 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Title Screen Modals & Styles** | Title particle animation, Overwrite Confirmation & Options modals | `src/ui/title/TitleScreenModalsAndStyles.ts` | < 600 lines |
 | **Intro Sequence UI Facade** | Prof. Oak introduction 6-stage machine, boy/girl selection, character creation | `src/ui/IntroSequenceUI.ts` | < 750 lines |
 | **Intro Stage Renderers & Styles** | Spotlight dais, gender cards, QWERTY keyboard, RTC clock & shrink ray | `src/ui/intro/IntroStageRenderersAndStyles.ts` | < 600 lines |
+| **Evolution Scene UI Facade** | Fullscreen metamorphosis, oscillation engine, B-button cancel guardrail | `src/ui/EvolutionSceneUI.ts` | < 750 lines |
+| **Evolution Scene DOM & Styles** | Dais arena, celebration card, stat deltas, responsive Neo-Kanto styles | `src/ui/evolution/EvolutionDomAndStyles.ts` | < 750 lines |
 | **Overworld HUD Facade** | D-Pad / Analog Joystick overlay, A/B buttons, header telemetry | `src/ui/OverworldHUD.ts` | < 700 lines |
 | **Overworld Touch & Key Controller** | Touch D-Pad / Joystick event routing, keyboard listeners, direction state | `src/ui/hud/OverworldTouchAndKeyController.ts` | < 400 lines |
 | **Overworld Cutscene & Pokegear Modals** | Starter choice modal, Pokémon Center healing tray, field rest, roamer radar | `src/ui/hud/OverworldCutsceneAndPokegearModals.ts` | < 450 lines |
@@ -83,7 +86,8 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Overworld Ticker & Itemfinder** | Zero-alloc ticker hot paths, player bump, neighbor NPC wander, radar sonar | `src/world/OverworldTickerCoordinator.ts` | < 600 lines |
 | **Overworld Modal Registry** | Lazy modal instantiations, sub-modal lifecycle, shortcut handling | `src/ui/OverworldModalRegistry.ts` | < 550 lines |
 | **Main Application Bootstrapper** | Core engine initialization, state coordination, input dispatch | `src/main.ts` | < 750 lines |
-| **Audio Engine** | 8-bit APU chiptune emulation, Web Audio API, authentic cry synthesis | `src/audio/BattleAudio.ts` | < 650 lines |
+| **Audio Engine Facade** | 8-bit APU chiptune emulation, Web Audio API, authentic cry synthesis | `src/audio/BattleAudio.ts` | < 650 lines |
+| **Overworld & Environmental Audio** | Warp sounds, footsteps, itemfinder sonar, status sounds, weather | `src/audio/battle/OverworldAndEnvironmentalAudio.ts` | < 650 lines |
 
 ---
 
@@ -460,7 +464,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `OverworldRenderer.ts` / `OverworldNpcAndItemSprites.ts` / `OverworldParticleAndVfxPool.ts` / `OverworldHUD.ts` / `OverworldTouchAndKeyController.ts` / `OverworldCutsceneAndPokegearModals.ts` | `tests/AgentModularArchitectureSlice8.test.ts` | 9 | ✅ Covered | Agent-Optimized Modularization Slice 8: Decomposed 1,731-line `OverworldRenderer.ts` down to 745 lines (< 750L ceiling) and 1,567-line `OverworldHUD.ts` down to 696 lines (< 700L ceiling) into discrete sub-modules under `src/render/` and `src/ui/hud/` (< 800L each), preserving 100% of public methods, zero-allocation ticker update loop, and DOM clickability contracts (TICKET-REFACTOR-AGENT-OPT-SLICE-08). |
 | `TownMapUI.ts` / `TownMapStylesAndInspectorRenderer.ts` / `BoxManagementUI.ts` / `BoxStylesAndReleaseModal.ts` / `TitleScreenUI.ts` / `TitleScreenModalsAndStyles.ts` | `tests/AgentModularArchitectureSlice9.test.ts` | 12 | ✅ Covered | Agent-Optimized Modularization Slice 9: Decomposed 1,323-line `TownMapUI.ts` (553L), 1,214-line `BoxManagementUI.ts` (683L), and 1,175-line `TitleScreenUI.ts` (656L) down to < 750 lines into discrete sub-modules (< 800L each) across `src/ui/town-map/`, `src/ui/box/`, and `src/ui/title/`, preserving 100% of public methods, DOM IDs, and responsive viewport contracts (TICKET-REFACTOR-AGENT-OPT-SLICE-09). |
 | `missionData.ts` / `earlyJohtoMissions.ts` / `midToLateJohtoMissions.ts` / `IntroSequenceUI.ts` / `IntroStageRenderersAndStyles.ts` / `MapManager.ts` / `MapClassificationAndWarpRules.ts` | `tests/AgentModularArchitectureSlice10.test.ts` | 13 | ✅ Covered | Agent-Optimized Modularization Slice 10: Decomposed 1,283-line `missionData.ts` (19L), 1,037-line `IntroSequenceUI.ts` (612L), and 904-line `MapManager.ts` (692L) down to < 750 lines into discrete sub-modules (< 800L each) across `src/world/missions/`, `src/ui/intro/`, and `src/world/map/`, preserving 100% of public methods, static methods, DOM IDs, and pure layer purity (TICKET-REFACTOR-AGENT-OPT-SLICE-10). |
-| **Current Baseline** | **69 Suites** | **656 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `BattleStateMachine.ts` / `BattleMoveAndItemExecutor.ts` / `EvolutionSceneUI.ts` / `EvolutionDomAndStyles.ts` / `BattleAudio.ts` / `OverworldAndEnvironmentalAudio.ts` | `tests/AgentModularArchitectureSlice11.test.ts` | 12 | ✅ Covered | Agent-Optimized Modularization Slice 11: Decomposed 1,118-line `BattleStateMachine.ts` (694L), 1,076-line `EvolutionSceneUI.ts` (501L), and 982-line `BattleAudio.ts` (548L) down to < 750 lines into discrete sub-modules (< 800L each) across `src/battle/state/`, `src/ui/evolution/`, and `src/audio/battle/`, preserving 100% of public methods, static methods, DOM IDs, and pure layer purity (TICKET-REFACTOR-AGENT-OPT-SLICE-11). |
+| **Current Baseline** | **70 Suites** | **668 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.1.1 1-Hop Semantic Agent Routing Index (Overworld NPC & Interaction Modules)
 To enable instantaneous 1-hop navigation without exploratory grep searches, overworld mechanics and NPCs route directly to their owning modules:

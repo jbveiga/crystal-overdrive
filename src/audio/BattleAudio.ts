@@ -1,5 +1,15 @@
 import type { PokemonType, MoveCategory, WarpSoundCue } from '../types/game';
-export type { WarpSoundCue };
+import {
+  playWarpSound,
+  playOverworldSound,
+  playItemfinderPing,
+  playItemfinderSonar,
+  playStatusSound,
+  playWeatherSound,
+} from './battle/OverworldAndEnvironmentalAudio';
+import type { OverworldSoundCue } from './battle/OverworldAndEnvironmentalAudio';
+
+export type { WarpSoundCue, OverworldSoundCue };
 
 /**
  * Pure WebAudio retro sound synthesizer for authentic Game Boy / GBA Pokémon battle cries,
@@ -368,371 +378,42 @@ export class BattleAudio {
    * Plays dedicated building, cave, and staircase warp sound effects (DOOR_ENTER, DOOR_EXIT, STAIRS_STEP, CAVE_WARP)
    */
   public static playWarpSound(cue: WarpSoundCue): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    const now = ctx.currentTime;
-
-    if (cue === 'DOOR_ENTER') {
-      // Classic Gen 2 door opening rising chime (E4 -> C5)
-      const notes = [
-        { f: 329.63, t: 0, d: 0.06 },
-        { f: 523.25, t: 0.055, d: 0.11 },
-      ];
-      for (const n of notes) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(n.f, now + n.t);
-        gain.gain.setValueAtTime(0.06, now + n.t);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + n.t);
-        osc.stop(now + n.t + n.d);
-      }
-    } else if (cue === 'DOOR_EXIT') {
-      // Gentle door closing latch & thud
-      const clicks = [
-        { f: 480, t: 0, d: 0.035, type: 'square' as OscillatorType, vol: 0.05 },
-        { f: 220, t: 0.03, d: 0.075, type: 'triangle' as OscillatorType, vol: 0.07 },
-      ];
-      for (const c of clicks) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = c.type;
-        osc.frequency.setValueAtTime(c.f, now + c.t);
-        gain.gain.setValueAtTime(c.vol, now + c.t);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + c.t + c.d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + c.t);
-        osc.stop(now + c.t + c.d);
-      }
-    } else if (cue === 'STAIRS_STEP') {
-      // Rapid staircase footstep shuffle
-      const steps = [
-        { f: 440, t: 0, d: 0.035 },
-        { f: 370, t: 0.045, d: 0.035 },
-        { f: 494, t: 0.09, d: 0.05 },
-      ];
-      for (const s of steps) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(s.f, now + s.t);
-        gain.gain.setValueAtTime(0.05, now + s.t);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + s.t + s.d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + s.t);
-        osc.stop(now + s.t + s.d);
-      }
-    } else if (cue === 'CAVE_WARP') {
-      // Deep cave reverberation and resonant descent
-      const osc1 = ctx.createOscillator();
-      const gain1 = ctx.createGain();
-      this.bindAutoDisconnect(osc1, gain1);
-      osc1.type = 'triangle';
-      osc1.frequency.setValueAtTime(160, now);
-      osc1.frequency.exponentialRampToValueAtTime(65, now + 0.22);
-      gain1.gain.setValueAtTime(0.08, now);
-      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
-      osc1.connect(gain1);
-      gain1.connect(ctx.destination);
-      osc1.start(now);
-      osc1.stop(now + 0.24);
-
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      this.bindAutoDisconnect(osc2, gain2);
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(90, now);
-      osc2.frequency.exponentialRampToValueAtTime(45, now + 0.26);
-      gain2.gain.setValueAtTime(0.05, now);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
-      osc2.connect(gain2);
-      gain2.connect(ctx.destination);
-      osc2.start(now);
-      osc2.stop(now + 0.26);
-    }
+    playWarpSound(cue, {
+      getContext: () => this.getContext(),
+      bindAutoDisconnect: this.bindAutoDisconnect,
+    });
   }
 
   /**
    * Plays authentic Game Boy Color overworld sound effects (Tall grass rustle, Ledge hop, Trainer '!' alert, Doorway, Key Item, Pokégear ring)
    */
-  public static playOverworldSound(
-    type:
-      | 'RUSTLE'
-      | 'HOP'
-      | 'EXCLAMATION'
-      | 'DOOR'
-      | 'DOOR_ENTER'
-      | 'DOOR_EXIT'
-      | 'STAIRS_STEP'
-      | 'CAVE_WARP'
-      | 'KEY_ITEM'
-      | 'PHONE_RING'
-      | 'BUMP'
-      | 'HEAL_JINGLE'
-      | 'FANFARE'
-  ): void {
-    if (type === 'DOOR' || type === 'DOOR_ENTER') {
-      this.playWarpSound('DOOR_ENTER');
-      return;
-    }
-    if (type === 'DOOR_EXIT') {
-      this.playWarpSound('DOOR_EXIT');
-      return;
-    }
-    if (type === 'STAIRS_STEP') {
-      this.playWarpSound('STAIRS_STEP');
-      return;
-    }
-    if (type === 'CAVE_WARP') {
-      this.playWarpSound('CAVE_WARP');
-      return;
-    }
-
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    const now = ctx.currentTime;
-
-    if (type === 'RUSTLE') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      this.bindAutoDisconnect(osc, gain);
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(680, now);
-      osc.frequency.exponentialRampToValueAtTime(1120, now + 0.065);
-      gain.gain.setValueAtTime(0.035, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.075);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.075);
-    } else if (type === 'HOP') {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      this.bindAutoDisconnect(osc, gain);
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(320, now);
-      osc.frequency.exponentialRampToValueAtTime(640, now + 0.11);
-      osc.frequency.exponentialRampToValueAtTime(240, now + 0.22);
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.23);
-    } else if (type === 'EXCLAMATION') {
-      // Classic 2-tone Trainer Spotted '!' chime (B5 -> E6)
-      const notes = [
-        { f: 987.77, t: 0, d: 0.07 },
-        { f: 1318.51, t: 0.075, d: 0.22 },
-      ];
-      for (const n of notes) {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(n.f, now + n.t);
-        gain.gain.setValueAtTime(0.08, now + n.t);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + n.t);
-        osc.stop(now + n.t + n.d);
-      }
-    } else if (type === 'KEY_ITEM') {
-      const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
-      notes.forEach((f, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(f, now + i * 0.08);
-        gain.gain.setValueAtTime(0.07, now + i * 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + (i + 1) * 0.09);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + i * 0.08);
-        osc.stop(now + (i + 1) * 0.09);
-      });
-    } else if (type === 'PHONE_RING') {
-      const notes = [880, 1174.66, 880, 1174.66, 880, 1174.66];
-      notes.forEach((f, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(f, now + i * 0.055);
-        gain.gain.setValueAtTime(0.06, now + i * 0.055);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + (i + 1) * 0.055);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + i * 0.055);
-        osc.stop(now + (i + 1) * 0.055);
-      });
-    } else if (type === 'BUMP') {
-      // Authentic retro Game Boy wall bump thud (120Hz -> 65Hz)
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      this.bindAutoDisconnect(osc, gain);
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(120, now);
-      osc.frequency.exponentialRampToValueAtTime(65, now + 0.06);
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.065);
-    } else if (type === 'HEAL_JINGLE') {
-      // Classic Nurse Joy 6-note recovery melody (E5, G5, C6, E6, C6, E6)
-      const notes = [
-        { f: 659.25, d: 0.11, t: 0 },
-        { f: 783.99, d: 0.11, t: 0.11 },
-        { f: 1046.5, d: 0.11, t: 0.22 },
-        { f: 1318.51, d: 0.13, t: 0.33 },
-        { f: 1046.5, d: 0.13, t: 0.46 },
-        { f: 1318.51, d: 0.32, t: 0.59 },
-      ];
-      notes.forEach((n) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(n.f, now + n.t);
-        gain.gain.setValueAtTime(0.075, now + n.t);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + n.t);
-        osc.stop(now + n.t + n.d);
-      });
-    } else if (type === 'FANFARE') {
-      // 4-note upbeat triumph item fanfare
-      const notes = [
-        { f: 523.25, d: 0.09, t: 0 },
-        { f: 659.25, d: 0.09, t: 0.09 },
-        { f: 783.99, d: 0.09, t: 0.18 },
-        { f: 1046.5, d: 0.28, t: 0.27 },
-      ];
-      notes.forEach((n) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(n.f, now + n.t);
-        gain.gain.setValueAtTime(0.07, now + n.t);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + n.t);
-        osc.stop(now + n.t + n.d);
-      });
-    }
+  public static playOverworldSound(type: OverworldSoundCue): void {
+    playOverworldSound(type, {
+      getContext: () => this.getContext(),
+      bindAutoDisconnect: this.bindAutoDisconnect,
+    });
   }
 
   /**
-   * Plays authentic Itemfinder radar sonar ping (double high-pitch beep if found, low dull tone if not found)
+   * Synthesizes Itemfinder tactical audio feedback.
    */
   public static playItemfinderPing(found: boolean): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    const now = ctx.currentTime;
-    if (found) {
-      [0, 0.14].forEach((offset) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(1174.66, now + offset);
-        osc.frequency.setValueAtTime(1567.98, now + offset + 0.04);
-        gain.gain.setValueAtTime(0.07, now + offset);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.11);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + offset);
-        osc.stop(now + offset + 0.11);
-      });
-    } else {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      this.bindAutoDisconnect(osc, gain);
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(220, now);
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.14);
-    }
+    playItemfinderPing(found, {
+      getContext: () => this.getContext(),
+      bindAutoDisconnect: this.bindAutoDisconnect,
+    });
   }
 
   /**
-   * Plays dynamic proximity sonar ping for Unbound-style Live Itemfinder Radar:
-   * f(d) = 880 + (8 - d) * 120 Hz with 80ms exponential decay, or double lock-on chime when facing/on target.
+   * Synthesizes Itemfinder distance-modulated pitch & cadence sonar beeps.
    */
   public static playItemfinderSonar(distance: number | null, isFacing: boolean = false): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    const now = ctx.currentTime;
-    if (distance === null || distance > 8) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      this.bindAutoDisconnect(osc, gain);
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(220, now);
-      gain.gain.setValueAtTime(0.05, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.12);
-      return;
-    }
-
-    const clamped = Math.max(0, Math.min(8, distance));
-    const baseFreq = Math.round(880 + (8 - clamped) * 120);
-
-    if (isFacing || clamped <= 1) {
-      [0, 0.11].forEach((offset, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(baseFreq + idx * 240, now + offset);
-        gain.gain.setValueAtTime(0.07, now + offset);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.08);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + offset);
-        osc.stop(now + offset + 0.08);
-      });
-    } else {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      this.bindAutoDisconnect(osc, gain);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(baseFreq, now);
-      osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.12, now + 0.08);
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.08);
-    }
+    playItemfinderSonar(distance, isFacing, {
+      getContext: () => this.getContext(),
+      bindAutoDisconnect: this.bindAutoDisconnect,
+    });
   }
+
 
   /**
    * Returns whether the continuous Gen II low-HP warning alarm loop is currently active.
@@ -833,149 +514,19 @@ export class BattleAudio {
    * Synthesizes authentic 8-bit status infliction sound cues (PAR, BRN, FRZ, PSN, TOX, SLP).
    */
   public static playStatusSound(status: 'PAR' | 'BRN' | 'FRZ' | 'PSN' | 'TOX' | 'SLP'): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    const now = ctx.currentTime;
-    if (status === 'PAR') {
-      // Rapid electric static pulse
-      [0, 0.06, 0.12, 0.18].forEach((offset, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(i % 2 === 0 ? 920 : 480, now + offset);
-        gain.gain.setValueAtTime(0.06, now + offset);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.05);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + offset);
-        osc.stop(now + offset + 0.05);
-      });
-    } else if (status === 'BRN') {
-      // Searing flame burst sweep
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      this.bindAutoDisconnect(osc, gain);
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.exponentialRampToValueAtTime(660, now + 0.12);
-      osc.frequency.exponentialRampToValueAtTime(160, now + 0.26);
-      gain.gain.setValueAtTime(0.07, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.26);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.26);
-    } else if (status === 'FRZ') {
-      // Crystalline high chime
-      [1046.5, 1318.5, 1568.0].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now + i * 0.07);
-        gain.gain.setValueAtTime(0.065, now + i * 0.07);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.11);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + i * 0.07);
-        osc.stop(now + i * 0.07 + 0.11);
-      });
-    } else if (status === 'PSN' || status === 'TOX') {
-      // Bubbling toxic pitch drop
-      [340, 260, 310, 210].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(freq, now + i * 0.065);
-        gain.gain.setValueAtTime(0.06, now + i * 0.065);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.065 + 0.06);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + i * 0.065);
-        osc.stop(now + i * 0.065 + 0.06);
-      });
-    } else if (status === 'SLP') {
-      // Drowsy descending triangle wave
-      [523.25, 440, 349.23].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now + i * 0.1);
-        gain.gain.setValueAtTime(0.07, now + i * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.12);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + i * 0.1);
-        osc.stop(now + i * 0.1 + 0.12);
-      });
-    }
+    playStatusSound(status, {
+      getContext: () => this.getContext(),
+      bindAutoDisconnect: this.bindAutoDisconnect,
+    });
   }
 
   /**
    * Synthesizes weather ambience & battle weather transition cues (RAIN, SANDSTORM, SUN, HAIL).
    */
   public static playWeatherSound(weather: 'RAIN' | 'SANDSTORM' | 'SUN' | 'HAIL'): void {
-    const ctx = this.getContext();
-    if (!ctx) return;
-
-    const now = ctx.currentTime;
-    if (weather === 'SUN') {
-      [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        this.bindAutoDisconnect(osc, gain);
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now + i * 0.06);
-        gain.gain.setValueAtTime(0.065, now + i * 0.06);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.14);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now + i * 0.06);
-        osc.stop(now + i * 0.06 + 0.14);
-      });
-      return;
-    }
-
-    // Filtered noise burst for RAIN, SANDSTORM, or HAIL
-    const duration = weather === 'SANDSTORM' ? 0.35 : 0.25;
-    const bufferSize = Math.max(64, Math.floor(ctx.sampleRate * duration));
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-    }
-
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(
-      weather === 'RAIN' ? 1800 : weather === 'HAIL' ? 3200 : 750,
-      now
-    );
-
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.065, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-    noise.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-    noise.onended = () => {
-      try {
-        noise.disconnect();
-        filter.disconnect();
-        gain.disconnect();
-      } catch {
-        // Ignore
-      }
-    };
-    noise.start(now);
-    noise.stop(now + duration);
+    playWeatherSound(weather, {
+      getContext: () => this.getContext(),
+      bindAutoDisconnect: this.bindAutoDisconnect,
+    });
   }
 }
