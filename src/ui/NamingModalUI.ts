@@ -119,7 +119,7 @@ export class NamingModalUI {
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      font-family: 'Courier New', Courier, monospace;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       padding: 16px;
       box-sizing: border-box;
     `;
@@ -132,10 +132,10 @@ export class NamingModalUI {
       width: min(560px, 94vw);
       max-height: calc(100dvh - 32px);
       overflow-y: auto;
-      background: rgba(15, 23, 42, 0.94);
-      border: 2px solid rgba(239, 68, 68, 0.6);
-      border-radius: 16px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 24px rgba(239, 68, 68, 0.3);
+      background: #0D1322;
+      border: 2px solid #EF4444;
+      border-radius: 12px;
+      box-shadow: 0 8px 0 0 #070B14;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -143,6 +143,7 @@ export class NamingModalUI {
       padding: 18px 20px 20px;
       box-sizing: border-box;
       color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     `;
 
     const slots = Array.from({ length: NamingModalUI.MAX_NAME_LENGTH }, (_, idx) => {
@@ -152,11 +153,16 @@ export class NamingModalUI {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: clamp(15px, 4.2vw, 22px);
-        height: 30px;
-        border-bottom: 3px solid ${isFilled ? '#ef4444' : '#475569'};
-        font-size: clamp(14px, 3.8vw, 18px);
-        font-weight: 900;
+        width: clamp(16px, 4.4vw, 24px);
+        height: 32px;
+        background: #141E33;
+        border: 1.5px solid #22324F;
+        border-bottom: 3px solid ${isFilled ? '#ef4444' : '#22324F'};
+        border-radius: 6px;
+        box-shadow: inset 0 2px 0 0 #070B14;
+        font-family: 'Space Mono', monospace;
+        font-size: clamp(13px, 3.6vw, 16px);
+        font-weight: 700;
         color: ${isFilled ? '#fef08a' : '#64748b'};
       ">${ch}</span>`;
     }).join('');
@@ -178,10 +184,11 @@ export class NamingModalUI {
           border-radius: 999px;
           padding: 3px 12px;
           text-transform: uppercase;
+          font-family: 'Space Mono', monospace;
         ">
           🚨 POLICE INVESTIGATION
         </div>
-        <div style="font-size: 11px; color: #cbd5e1; line-height: 1.3; max-width: 440px;">
+        <div style="font-size: 12px; color: #cbd5e1; line-height: 1.4; max-width: 440px;">
           "What was the name of the red-haired boy who stole the POKéMON?"
         </div>
       </div>
@@ -198,7 +205,7 @@ export class NamingModalUI {
           filter: drop-shadow(0 6px 14px rgba(239, 68, 68, 0.45));
         "></div>
         <div style="display: flex; flex-direction: column; gap: 6px; align-items: center; max-width: 100%;">
-          <span style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 1px;">RIVAL'S NAME (1–15 CHARS)</span>
+          <span style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 1px; font-family: 'Space Mono', monospace;">RIVAL'S NAME (1–15 CHARS)</span>
           <div id="rival-slots-container" style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 100%;">${slots}</div>
         </div>
       </div>
@@ -210,13 +217,15 @@ export class NamingModalUI {
           <button class="rival-preset-btn interactive" data-name="${preset}" style="
             pointer-events: auto !important;
             padding: 6px 12px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 800;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
             cursor: pointer;
-            background: ${preset === this.currentName ? '#ef4444' : '#1e293b'};
+            background: ${preset === this.currentName ? '#ef4444' : '#141E33'};
             color: #ffffff;
-            border: 1px solid ${preset === this.currentName ? '#fca5a5' : '#475569'};
+            border: 1.5px solid ${preset === this.currentName ? '#fca5a5' : '#22324F'};
+            box-shadow: 0 3px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
             transition: all 0.12s ease;
           ">★ ${preset}</button>
         `
@@ -238,9 +247,11 @@ export class NamingModalUI {
               border-radius: 6px;
               font-size: clamp(12px, 3.2vw, 15px);
               font-weight: 800;
-              background: #1e293b;
+              background: #141E33;
               color: #f8fafc;
-              border: 1px solid #334155;
+              border: 1.5px solid #22324F;
+              box-shadow: 0 3px 0 0 #070B14;
+              font-family: 'Space Mono', monospace;
               cursor: pointer;
               touch-action: manipulation;
             ">${letter}</button>
@@ -262,9 +273,11 @@ export class NamingModalUI {
               border-radius: 6px;
               font-size: clamp(12px, 3.2vw, 15px);
               font-weight: 800;
-              background: #1e293b;
+              background: #141E33;
               color: #f8fafc;
-              border: 1px solid #334155;
+              border: 1.5px solid #22324F;
+              box-shadow: 0 3px 0 0 #070B14;
+              font-family: 'Space Mono', monospace;
               cursor: pointer;
               touch-action: manipulation;
             ">${letter}</button>
@@ -285,7 +298,9 @@ export class NamingModalUI {
             font-weight: 800;
             background: #dc2626;
             color: #ffffff;
-            border: 1px solid #fca5a5;
+            border: 1.5px solid #fca5a5;
+            box-shadow: 0 4px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
             cursor: pointer;
             touch-action: manipulation;
           ">⌫ DEL</button>
@@ -300,9 +315,11 @@ export class NamingModalUI {
               border-radius: 6px;
               font-size: clamp(12px, 3.2vw, 15px);
               font-weight: 800;
-              background: #1e293b;
+              background: #141E33;
               color: #f8fafc;
-              border: 1px solid #334155;
+              border: 1.5px solid #22324F;
+              box-shadow: 0 3px 0 0 #070B14;
+              font-family: 'Space Mono', monospace;
               cursor: pointer;
               touch-action: manipulation;
             ">${letter}</button>
@@ -319,7 +336,9 @@ export class NamingModalUI {
             font-weight: 900;
             background: #ef4444;
             color: #ffffff;
-            border: 1px solid #fca5a5;
+            border: 1.5px solid #fca5a5;
+            box-shadow: 0 4px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
             cursor: pointer;
             touch-action: manipulation;
           ">✓ OK</button>
@@ -426,7 +445,7 @@ export class NamingModalUI {
       const ch = this.currentName[idx] || '_';
       const isFilled = idx < this.currentName.length;
       (el as HTMLElement).textContent = ch;
-      (el as HTMLElement).style.borderBottomColor = isFilled ? '#ef4444' : '#475569';
+      (el as HTMLElement).style.borderBottomColor = isFilled ? '#ef4444' : '#22324F';
       (el as HTMLElement).style.color = isFilled ? '#fef08a' : '#64748b';
     });
   }
@@ -437,9 +456,9 @@ export class NamingModalUI {
     btns.forEach((btn) => {
       const name = (btn as HTMLElement).getAttribute('data-name');
       const isSelected = name === this.currentName;
-      (btn as HTMLElement).style.background = isSelected ? '#ef4444' : '#1e293b';
+      (btn as HTMLElement).style.background = isSelected ? '#ef4444' : '#141E33';
       (btn as HTMLElement).style.color = isSelected ? '#ffffff' : '#e2e8f0';
-      (btn as HTMLElement).style.borderColor = isSelected ? '#fca5a5' : '#475569';
+      (btn as HTMLElement).style.borderColor = isSelected ? '#fca5a5' : '#22324F';
     });
   }
 }

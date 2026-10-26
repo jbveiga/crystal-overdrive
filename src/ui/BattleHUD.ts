@@ -155,6 +155,15 @@ export class BattleHUD {
     const styleEl = document.createElement('style');
     styleEl.id = 'crystal-battle-hud-styles';
     styleEl.textContent = `
+      #battle-hud-root {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      #enemy-level, #enemy-hp-text, #enemy-partner-level, #enemy-partner-hp-text,
+      #player-level, #player-hp-text, #player-partner-level, #player-partner-hp-text,
+      #battle-stadium-badge, #battle-speed-btn, .keyboard-hint, .move-pwr-acc,
+      .status-condition-badge, .stat-stage-badge {
+        font-family: 'Space Mono', monospace !important;
+      }
       @keyframes crystalUltraPulse {
         0%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(236, 72, 153, 0.75); }
         50% { transform: scale(1.06); box-shadow: 0 0 14px rgba(236, 72, 153, 1); }
@@ -164,10 +173,25 @@ export class BattleHUD {
         50% { opacity: 0.72; filter: brightness(1.35); }
       }
       .crystal-ultra-pill {
+        background: rgba(13, 19, 34, 0.95);
+        border: 2px solid #22324F;
+        box-shadow: 0 4px 0 0 #070B14;
         animation: crystalUltraPulse 1.1s infinite ease-in-out;
       }
       .crystal-low-hp {
         animation: crystalLowHpPulse 0.85s infinite ease-in-out;
+      }
+      #battle-action-menu button {
+        box-shadow: 0 4px 0 0 #070B14;
+        transition: transform 0.08s ease, box-shadow 0.08s ease;
+      }
+      #battle-action-menu button:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 0 #070B14 !important;
+      }
+      .battle-move-btn:active {
+        transform: translateY(2px);
+        box-shadow: 0 1px 0 0 #070B14 !important;
       }
       @media (hover: none) and (pointer: coarse), (max-width: 768px) {
         .keyboard-hint {
@@ -335,14 +359,13 @@ export class BattleHUD {
       <!-- Top Area: Asymmetric Enemy HUD Card (Top-Left) & Speed Toggle Pill (Top-Right) -->
       <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
         <div id="enemy-card" style="
-          background: rgba(15, 23, 42, 0.92);
+          background: rgba(13, 19, 34, 0.95);
           backdrop-filter: blur(8px);
-          border: 2px solid rgba(226, 232, 240, 0.25);
-          border-bottom: 4px solid #334155;
-          border-radius: 10px 10px 18px 10px;
+          border: 2px solid #22324F;
+          border-radius: 10px;
           padding: 12px 20px;
           min-width: min(280px, calc(100vw - 120px));
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+          box-shadow: 0 4px 0 0 #070B14;
         ">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
@@ -351,14 +374,14 @@ export class BattleHUD {
               <span id="enemy-gender"></span>
               <span id="enemy-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap;"></span>
             </div>
-            <span id="enemy-level" style="background: rgba(250, 204, 21, 0.16); border: 1px solid rgba(250, 204, 21, 0.45); color: #facc15; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 999px;">Lv. 3</span>
+            <span id="enemy-level" style="background: rgba(250, 204, 21, 0.16); border: 1.5px solid #FFD028; color: #FFD028; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">Lv. 3</span>
           </div>
           <div style="margin-top: 8px;">
             <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 700;">
               <span style="color: #facc15; letter-spacing: 0.5px;">HP</span>
-              <span id="enemy-hp-text">16 / 16 HP</span>
+              <span id="enemy-hp-text" style="font-family: 'Space Mono', monospace;">16 / 16 HP</span>
             </div>
-            <div style="width: 100%; height: 9px; background: #1e293b; border: 1px solid #475569; border-radius: 5px; overflow: hidden;">
+            <div style="width: 100%; height: 9px; background: #070B14; border: 1.5px solid #22324F; border-radius: 99px; overflow: hidden;">
               <div id="enemy-hp-bar" style="width: 100%; height: 100%; background: #22c55e; transition: width 0.3s ease;"></div>
             </div>
           </div>
@@ -370,14 +393,14 @@ export class BattleHUD {
                 <span id="enemy-partner-name">Partner</span>
                 <span id="enemy-partner-status-badges" style="display: flex; gap: 4px;"></span>
               </div>
-              <span id="enemy-partner-level" style="color: #facc15; font-size: 11px; font-weight: 800;">Lv. 30</span>
+              <span id="enemy-partner-level" style="color: #facc15; font-size: 11px; font-weight: 800; font-family: 'Space Mono', monospace;">Lv. 30</span>
             </div>
             <div style="margin-top: 4px;">
               <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px; color: #94a3b8; font-weight: 700;">
                 <span style="color: #facc15;">HP</span>
-                <span id="enemy-partner-hp-text">50 / 50 HP</span>
+                <span id="enemy-partner-hp-text" style="font-family: 'Space Mono', monospace;">50 / 50 HP</span>
               </div>
-              <div style="width: 100%; height: 7px; background: #1e293b; border: 1px solid #475569; border-radius: 4px; overflow: hidden;">
+              <div style="width: 100%; height: 7px; background: #070B14; border: 1.5px solid #22324F; border-radius: 99px; overflow: hidden;">
                 <div id="enemy-partner-hp-bar" style="width: 100%; height: 100%; background: #22c55e; transition: width 0.3s ease;"></div>
               </div>
             </div>
@@ -387,26 +410,29 @@ export class BattleHUD {
         <div id="battle-top-right-controls" style="pointer-events: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; position: relative;">
           <div id="battle-stadium-badge" style="
             display: none;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1.5px solid #facc15;
-            color: #facc15;
+            background: #0D1322;
+            border: 1.5px solid #FFD028;
+            color: #FFD028;
             border-radius: 8px;
             padding: 5px 12px;
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
             letter-spacing: 0.4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 3px 0 0 #070B14;
           "></div>
           <button id="battle-speed-btn" style="
-            background: #2563eb;
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            border-radius: 999px;
-            padding: 8px 16px;
-            font-size: 13px;
-            font-weight: 800;
+            background: #141E33;
+            color: #38BDF8;
+            border: 2px solid #38BDF8;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Space Mono', monospace;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 3px 0 0 #070B14;
+            pointer-events: auto;
           ">
             <span>⚡ SPEED: 1x</span> <span class="keyboard-hint">(Shift)</span>
           </button>
@@ -416,14 +442,13 @@ export class BattleHUD {
       <!-- Mid-Right Area: Asymmetric Player HUD Card with Numeric HP, Cyan EXP Bar & 6-Dot Party Dock -->
       <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;">
         <div id="player-card" style="
-          background: rgba(15, 23, 42, 0.92);
+          background: rgba(13, 19, 34, 0.95);
           backdrop-filter: blur(8px);
-          border: 2px solid rgba(226, 232, 240, 0.25);
-          border-bottom: 4px solid #334155;
-          border-radius: 18px 10px 10px 10px;
+          border: 2px solid #22324F;
+          border-radius: 10px;
           padding: 12px 20px 10px 20px;
           min-width: min(290px, calc(100vw - 60px));
-          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+          box-shadow: 0 4px 0 0 #070B14;
         ">
           <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
@@ -431,14 +456,14 @@ export class BattleHUD {
               <span id="player-gender"></span>
               <span id="player-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap;"></span>
             </div>
-            <span id="player-level" style="background: rgba(250, 204, 21, 0.16); border: 1px solid rgba(250, 204, 21, 0.45); color: #facc15; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 999px;">Lv. 5</span>
+            <span id="player-level" style="background: rgba(250, 204, 21, 0.16); border: 1.5px solid #FFD028; color: #FFD028; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">Lv. 5</span>
           </div>
           <div style="margin-top: 8px;">
             <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 700;">
               <span style="color: #facc15; letter-spacing: 0.5px;">HP</span>
-              <span id="player-hp-text" style="color: #f8fafc; font-weight: 800;">20 / 20 HP</span>
+              <span id="player-hp-text" style="color: #f8fafc; font-weight: 800; font-family: 'Space Mono', monospace;">20 / 20 HP</span>
             </div>
-            <div style="width: 100%; height: 9px; background: #1e293b; border: 1px solid #475569; border-radius: 5px; overflow: hidden;">
+            <div style="width: 100%; height: 9px; background: #070B14; border: 1.5px solid #22324F; border-radius: 99px; overflow: hidden;">
               <div id="player-hp-bar" style="width: 100%; height: 100%; background: #22c55e; transition: width 0.3s ease;"></div>
             </div>
           </div>
@@ -450,14 +475,14 @@ export class BattleHUD {
                 <span id="player-partner-name">Partner</span>
                 <span id="player-partner-status-badges" style="display: flex; gap: 4px;"></span>
               </div>
-              <span id="player-partner-level" style="color: #facc15; font-size: 11px; font-weight: 800;">Lv. 30</span>
+              <span id="player-partner-level" style="color: #facc15; font-size: 11px; font-weight: 800; font-family: 'Space Mono', monospace;">Lv. 30</span>
             </div>
             <div style="margin-top: 4px;">
               <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 3px; color: #94a3b8; font-weight: 700;">
                 <span style="color: #facc15;">HP</span>
-                <span id="player-partner-hp-text" style="color: #f8fafc; font-weight: 800;">50 / 50 HP</span>
+                <span id="player-partner-hp-text" style="color: #f8fafc; font-weight: 800; font-family: 'Space Mono', monospace;">50 / 50 HP</span>
               </div>
-              <div style="width: 100%; height: 7px; background: #1e293b; border: 1px solid #475569; border-radius: 4px; overflow: hidden;">
+              <div style="width: 100%; height: 7px; background: #070B14; border: 1.5px solid #22324F; border-radius: 99px; overflow: hidden;">
                 <div id="player-partner-hp-bar" style="width: 100%; height: 100%; background: #22c55e; transition: width 0.3s ease;"></div>
               </div>
             </div>
@@ -465,8 +490,8 @@ export class BattleHUD {
           <!-- Cyan EXP Bar + 6-Dot Miniature Party Dock -->
           <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
             <div style="flex: 1; display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 9px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">EXP</span>
-              <div style="flex: 1; height: 5px; background: #0f172a; border: 1px solid #334155; border-radius: 3px; overflow: hidden;">
+              <span style="font-size: 9px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; font-family: 'Space Mono', monospace;">EXP</span>
+              <div style="flex: 1; height: 5px; background: #070B14; border: 1px solid #22324F; border-radius: 3px; overflow: hidden;">
                 <div id="player-exp-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.35s ease;"></div>
               </div>
             </div>
@@ -477,12 +502,12 @@ export class BattleHUD {
 
       <!-- Bottom Control & Classic Double-Framed Dialogue Panel -->
       <div id="battle-bottom-panel" style="
-        background: rgba(15, 23, 42, 0.95);
+        background: rgba(13, 19, 34, 0.96);
         backdrop-filter: blur(12px);
-        border: 2px solid rgba(255, 255, 255, 0.24);
+        border: 2px solid #22324F;
         border-radius: 12px;
         padding: 16px;
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
+        box-shadow: 0 6px 0 0 #070B14;
         pointer-events: auto;
         min-height: 132px;
         display: flex;
@@ -492,12 +517,17 @@ export class BattleHUD {
         <!-- Dialogue Text -->
         <div id="battle-message-box" style="
           flex: 1;
-          font-size: 18px;
+          background: #141E33;
+          border: 1.5px solid #22324F;
+          border-radius: 8px;
+          padding: 12px 16px;
+          font-size: 16px;
           font-weight: 600;
           color: #f8fafc;
           line-height: 1.5;
           display: flex;
           align-items: center;
+          font-family: 'Plus Jakarta Sans', sans-serif;
         ">
           What will Cyndaquil do?
         </div>
@@ -512,63 +542,71 @@ export class BattleHUD {
           <button id="btn-fight" style="
             background: #dc2626;
             color: white;
-            border: 2px solid #f87171;
+            border: 2px solid #ef4444;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
+            letter-spacing: 0.8px;
             padding: 10px 12px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+            box-shadow: 0 4px 0 0 #070B14;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 6px;
-          "><span>FIGHT</span><span class="keyboard-hint" style="font-size: 10px; opacity: 0.85; background: rgba(0,0,0,0.25); padding: 1px 5px; border-radius: 4px;">[F]</span></button>
+            font-family: 'Plus Jakarta Sans', sans-serif;
+          "><span>FIGHT</span><span class="keyboard-hint" style="font-size: 10px; opacity: 0.85; background: rgba(0,0,0,0.25); padding: 1px 5px; border-radius: 4px; font-family: 'Space Mono', monospace;">[F]</span></button>
           <button id="btn-bag" style="
             background: #d97706;
             color: white;
-            border: 2px solid #fbbf24;
+            border: 2px solid #f59e0b;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
+            letter-spacing: 0.8px;
             padding: 10px 12px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
+            box-shadow: 0 4px 0 0 #070B14;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 6px;
-          "><span>BAG</span><span class="keyboard-hint" style="font-size: 10px; opacity: 0.85; background: rgba(0,0,0,0.25); padding: 1px 5px; border-radius: 4px;">[B]</span></button>
+            font-family: 'Plus Jakarta Sans', sans-serif;
+          "><span>BAG</span><span class="keyboard-hint" style="font-size: 10px; opacity: 0.85; background: rgba(0,0,0,0.25); padding: 1px 5px; border-radius: 4px; font-family: 'Space Mono', monospace;">[B]</span></button>
           <button id="btn-pokemon" style="
-            background: #16a34a;
+            background: #059669;
             color: white;
-            border: 2px solid #4ade80;
+            border: 2px solid #10b981;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
+            letter-spacing: 0.8px;
             padding: 10px 12px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
+            box-shadow: 0 4px 0 0 #070B14;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 6px;
-          "><span>POKÉMON</span><span class="keyboard-hint" style="font-size: 10px; opacity: 0.85; background: rgba(0,0,0,0.25); padding: 1px 5px; border-radius: 4px;">[P]</span></button>
+            font-family: 'Plus Jakarta Sans', sans-serif;
+          "><span>POKÉMON</span><span class="keyboard-hint" style="font-size: 10px; opacity: 0.85; background: rgba(0,0,0,0.25); padding: 1px 5px; border-radius: 4px; font-family: 'Space Mono', monospace;">[P]</span></button>
           <button id="btn-run" style="
             background: #2563eb;
             color: white;
-            border: 2px solid #60a5fa;
+            border: 2px solid #3b82f6;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
+            letter-spacing: 0.8px;
             padding: 10px 12px;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 4px 0 0 #070B14;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 6px;
-          "><span>RUN</span><span class="keyboard-hint" style="font-size: 10px; opacity: 0.85; background: rgba(0,0,0,0.25); padding: 1px 5px; border-radius: 4px;">[R]</span></button>
+            font-family: 'Plus Jakarta Sans', sans-serif;
+          "><span>RUN</span><span class="keyboard-hint" style="font-size: 10px; opacity: 0.85; background: rgba(0,0,0,0.25); padding: 1px 5px; border-radius: 4px; font-family: 'Space Mono', monospace;">[R]</span></button>
         </div>
 
         <!-- Fight Submenu (Unbound 2x2 Move Matrix + Tooltip) -->
@@ -1258,9 +1296,9 @@ export class BattleHUD {
     tooltipBar.id = 'battle-move-tooltip';
     tooltipBar.style.cssText = `
       grid-column: span 2;
-      background: rgba(15, 23, 42, 0.95);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      border-radius: 6px;
+      background: rgba(13, 19, 34, 0.95);
+      border: 1.5px solid #22324F;
+      border-radius: 8px;
       padding: 6px 10px;
       font-size: 11px;
       color: #cbd5e1;
@@ -1269,6 +1307,8 @@ export class BattleHUD {
       align-items: center;
       gap: 8px;
       min-height: 28px;
+      box-shadow: 0 3px 0 0 #070B14;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     `;
 
     const renderTooltipForMove = (moveData: MoveData, currentPp: number, maxPp: number) => {
@@ -1303,9 +1343,9 @@ export class BattleHUD {
       btn.id = `move-btn-${idx}`;
       btn.className = 'battle-move-btn';
       btn.style.cssText = `
-        background: #1e293b;
+        background: #141E33;
         color: white;
-        border: 1.5px solid rgba(255, 255, 255, 0.16);
+        border: 1.5px solid #22324F;
         border-radius: 8px;
         padding: 9px 12px;
         cursor: pointer;
@@ -1313,7 +1353,9 @@ export class BattleHUD {
         flex-direction: column;
         justify-content: space-between;
         text-align: left;
-        transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+        min-width: 0 !important;
+        box-shadow: 0 3px 0 0 #070B14;
+        transition: transform 0.08s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.08s ease;
       `;
 
       const typeColor = TYPE_COLORS[moveData.type] || '#64748b';
@@ -1369,15 +1411,17 @@ export class BattleHUD {
 
     const backBtn = document.createElement('button');
     backBtn.style.cssText = `
-      background: #334155;
+      background: #141E33;
       color: #cbd5e1;
-      border: none;
-      border-radius: 6px;
+      border: 1.5px solid #22324F;
+      border-radius: 8px;
       font-size: 12px;
       font-weight: 700;
       padding: 6px;
       cursor: pointer;
       grid-column: span 2;
+      box-shadow: 0 3px 0 0 #070B14;
+      font-family: 'Space Mono', monospace;
     `;
     backBtn.innerHTML = '<span>← BACK</span> <span class="keyboard-hint">(Esc / X)</span>';
     backBtn.addEventListener('click', () => this.showActionMenu());
@@ -1421,9 +1465,9 @@ export class BattleHUD {
 
       const btn = document.createElement('button');
       btn.style.cssText = `
-        background: ${isActive ? '#0f172a' : '#1e293b'};
+        background: ${isActive ? '#0D1322' : '#141E33'};
         color: ${isFainted || isEgg ? '#64748b' : 'white'};
-        border: 1px solid ${isActive ? '#38bdf8' : 'rgba(255, 255, 255, 0.14)'};
+        border: 1.5px solid ${isActive ? '#38BDF8' : '#22324F'};
         border-radius: 8px;
         padding: 8px 12px;
         cursor: ${isActive || isFainted || isEgg ? 'default' : 'pointer'};
@@ -1431,6 +1475,8 @@ export class BattleHUD {
         flex-direction: column;
         justify-content: space-between;
         text-align: left;
+        box-shadow: 0 3px 0 0 #070B14;
+        font-family: 'Plus Jakarta Sans', sans-serif;
       `;
 
       btn.innerHTML = `
@@ -1482,15 +1528,17 @@ export class BattleHUD {
     if (!this.isForcedPartySwitch) {
       const backBtn = document.createElement('button');
       backBtn.style.cssText = `
-        background: #334155;
+        background: #141E33;
         color: white;
-        border: none;
+        border: 1.5px solid #22324F;
         border-radius: 8px;
         font-size: 13px;
         font-weight: 700;
         padding: 8px;
         cursor: pointer;
         grid-column: span 2;
+        box-shadow: 0 3px 0 0 #070B14;
+        font-family: 'Space Mono', monospace;
       `;
       backBtn.innerHTML = '<span>← BACK</span> <span class="keyboard-hint">(Esc / X)</span>';
       backBtn.addEventListener('click', () => this.showActionMenu());
@@ -1526,10 +1574,11 @@ export class BattleHUD {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(13, 19, 34, 0.95);
+      border: 1.5px solid #22324F;
       border-radius: 8px;
       padding: 6px 10px;
+      box-shadow: 0 3px 0 0 #070B14;
     `;
 
     const tabRow = document.createElement('div');
@@ -1548,14 +1597,16 @@ export class BattleHUD {
       tBtn.type = 'button';
       tBtn.className = `battle-bag-tab-${t.id.toLowerCase()}`;
       tBtn.style.cssText = `
-        background: ${isAct ? '#0284c7' : '#1e293b'};
+        background: ${isAct ? '#0284c7' : '#141E33'};
         color: ${isAct ? '#ffffff' : '#94a3b8'};
-        border: 1px solid ${isAct ? '#38bdf8' : '#334155'};
+        border: 1.5px solid ${isAct ? '#38bdf8' : '#22324F'};
         border-radius: 6px;
         padding: 3px 10px;
         font-size: 11px;
         font-weight: 800;
         cursor: pointer;
+        box-shadow: 0 2px 0 0 #070B14;
+        font-family: 'Space Mono', monospace;
       `;
       tBtn.innerText = t.label;
       tBtn.addEventListener('click', () => this.showBagMenu(t.id));
@@ -1568,7 +1619,7 @@ export class BattleHUD {
       const targetWrap = document.createElement('div');
       targetWrap.style.cssText = 'display: flex; align-items: center; gap: 4px; flex-wrap: wrap;';
       const lbl = document.createElement('span');
-      lbl.style.cssText = 'font-size: 10px; font-weight: 800; color: #94a3b8; margin-right: 2px;';
+      lbl.style.cssText = 'font-size: 10px; font-weight: 800; color: #94a3b8; margin-right: 2px; font-family: \'Space Mono\', monospace;';
       lbl.innerText = 'TARGET:';
       targetWrap.appendChild(lbl);
 
@@ -1579,14 +1630,16 @@ export class BattleHUD {
         pBtn.type = 'button';
         pBtn.className = 'battle-bag-target-btn';
         pBtn.style.cssText = `
-          background: ${isSel ? '#065f46' : '#0f172a'};
+          background: ${isSel ? '#065f46' : '#141E33'};
           color: ${isSel ? '#a7f3d0' : '#cbd5e1'};
-          border: 1px solid ${isSel ? '#10b981' : '#334155'};
+          border: 1px solid ${isSel ? '#10b981' : '#22324F'};
           border-radius: 5px;
           padding: 2px 7px;
           font-size: 10px;
           font-weight: 700;
           cursor: pointer;
+          box-shadow: 0 2px 0 0 #070B14;
+          font-family: 'Plus Jakarta Sans', sans-serif;
         `;
         const statusSuffix = pkmn.status !== 'NONE' ? ` [${pkmn.status}]` : '';
         pBtn.innerText = `${pkmn.nickname} (${pkmn.currentHp}/${pkmn.stats.hp})${statusSuffix}`;
@@ -1616,9 +1669,9 @@ export class BattleHUD {
         btn.className = 'battle-bag-item-btn';
         btn.setAttribute('data-item-id', item.id);
         btn.style.cssText = `
-          background: #1e293b;
+          background: #141E33;
           color: white;
-          border: 1px solid rgba(16, 185, 129, 0.35);
+          border: 1.5px solid #22324F;
           border-radius: 8px;
           padding: 8px 12px;
           cursor: pointer;
@@ -1626,6 +1679,8 @@ export class BattleHUD {
           flex-direction: column;
           justify-content: space-between;
           text-align: left;
+          box-shadow: 0 3px 0 0 #070B14;
+          font-family: 'Plus Jakarta Sans', sans-serif;
           transition: transform 0.1s ease;
         `;
 
@@ -1634,9 +1689,9 @@ export class BattleHUD {
             <span style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; color: ${item.color};">
               <span>${item.icon}</span>
               <span>${item.name}</span>
-              <span style="font-size: 9px; background: rgba(15, 23, 42, 0.85); color: #a7f3d0; padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.4);">${item.badge}</span>
+              <span style="font-size: 9px; background: rgba(15, 23, 42, 0.85); color: #a7f3d0; padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.4); font-family: 'Space Mono', monospace;">${item.badge}</span>
             </span>
-            <span style="font-size: 12px; font-weight: 700; color: #facc15;">x${count}</span>
+            <span style="font-size: 12px; font-weight: 700; color: #facc15; font-family: 'Space Mono', monospace;">x${count}</span>
           </div>
           <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">
             ${item.desc}
@@ -1721,9 +1776,9 @@ export class BattleHUD {
         btn.className = 'battle-bag-ball-btn';
         btn.setAttribute('data-ball-id', ball.id);
         btn.style.cssText = `
-          background: #1e293b;
+          background: #141E33;
           color: white;
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          border: 1.5px solid #22324F;
           border-radius: 8px;
           padding: 8px 12px;
           cursor: pointer;
@@ -1731,6 +1786,8 @@ export class BattleHUD {
           flex-direction: column;
           justify-content: space-between;
           text-align: left;
+          box-shadow: 0 3px 0 0 #070B14;
+          font-family: 'Plus Jakarta Sans', sans-serif;
           transition: transform 0.1s ease;
         `;
 
@@ -1740,7 +1797,7 @@ export class BattleHUD {
               <img src="${palette.spritePath}" alt="${ball.name}" onerror="this.style.display='none'" style="width: 18px; height: 18px; image-rendering: pixelated;" />
               <span>${ball.name}</span>
             </span>
-            <span style="font-size: 12px; font-weight: 700; color: #38bdf8;">x${count}</span>
+            <span style="font-size: 12px; font-weight: 700; color: #38bdf8; font-family: 'Space Mono', monospace;">x${count}</span>
           </div>
           <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">
             ${ball.desc}
@@ -1767,9 +1824,11 @@ export class BattleHUD {
         color: #94a3b8;
         padding: 12px;
         font-size: 12px;
-        background: rgba(15, 23, 42, 0.6);
-        border: 1px dashed #334155;
+        background: #0D1322;
+        border: 1.5px dashed #22324F;
         border-radius: 8px;
+        box-shadow: 0 2px 0 0 #070B14;
+        font-family: 'Space Mono', monospace;
       `;
       emptyBox.innerText = 'No usable items in this category.';
       this.bagMenu.appendChild(emptyBox);
@@ -1777,15 +1836,17 @@ export class BattleHUD {
 
     const backBtn = document.createElement('button');
     backBtn.style.cssText = `
-      background: #334155;
+      background: #141E33;
       color: white;
-      border: none;
+      border: 1.5px solid #22324F;
       border-radius: 8px;
       font-size: 13px;
       font-weight: 700;
       padding: 8px;
       cursor: pointer;
       grid-column: span 2;
+      box-shadow: 0 3px 0 0 #070B14;
+      font-family: 'Space Mono', monospace;
     `;
     backBtn.innerHTML = '<span>← BACK</span> <span class="keyboard-hint">(Esc / X)</span>';
     backBtn.addEventListener('click', () => this.showActionMenu());
@@ -1880,18 +1941,18 @@ export class BattleHUD {
         max-width: 92vw;
         max-height: 85dvh;
         overflow-y: auto;
-        background: rgba(15, 23, 42, 0.96);
-        backdrop-filter: blur(14px);
-        border: 2px solid #38bdf8;
+        background: #0D1322;
+        border: 2px solid #38BDF8;
         border-radius: 12px;
         padding: 18px;
-        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.9);
+        box-shadow: 0 8px 0 0 #070B14;
         display: flex;
         flex-direction: column;
         gap: 12px;
         z-index: 100;
         pointer-events: auto;
         color: #f8fafc;
+        font-family: 'Plus Jakarta Sans', sans-serif;
       `;
       modal.style.pointerEvents = 'auto';
 
@@ -1900,35 +1961,37 @@ export class BattleHUD {
       const newAcc = newMove.accuracy > 0 ? `${newMove.accuracy}%` : '—';
 
       modal.innerHTML = `
-        <div style="font-weight: 800; font-size: 16px; color: #38bdf8;">
+        <div style="font-weight: 800; font-size: 16px; color: #38bdf8; font-family: 'Space Mono', monospace;">
           ✨ LEARN A NEW MOVE?
         </div>
         <div style="font-size: 13px; color: #cbd5e1; line-height: 1.4;">
           <strong>${pokemon.nickname}</strong> wants to learn <strong>${newMove.name}</strong>, but already knows 4 moves! Select an existing move to replace, or cancel to keep current moves.
         </div>
-        <div style="background: rgba(30, 41, 59, 0.9); border: 1.5px solid ${newTypeColor}; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="background: #141E33; border: 1.5px solid ${newTypeColor}; border-radius: 8px; box-shadow: 0 3px 0 0 #070B14; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
           <div>
             <span style="font-size: 10px; font-weight: 800; background: ${newTypeColor}; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">${newMove.type.toUpperCase()}</span>
             <strong style="font-size: 14px; color: #f8fafc;">${newMove.name}</strong>
             <span style="font-size: 11px; color: #94a3b8; margin-left: 6px;">[${newMove.category.toUpperCase()}]</span>
           </div>
-          <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">
+          <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; font-family: 'Space Mono', monospace;">
             PWR: ${newPwr} | ACC: ${newAcc} | PP: ${newMove.pp}
           </div>
         </div>
-        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Existing Moves:</div>
+        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; font-family: 'Space Mono', monospace;">Existing Moves:</div>
         <div id="forget-slots-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
         <button id="cancel-learn-btn" style="
           margin-top: 6px;
-          background: #334155;
+          background: #141E33;
           color: #f8fafc;
-          border: none;
+          border: 1.5px solid #22324F;
           border-radius: 8px;
           padding: 10px;
           font-size: 13px;
           font-weight: 700;
           cursor: pointer;
           pointer-events: auto;
+          box-shadow: 0 3px 0 0 #070B14;
+          font-family: 'Space Mono', monospace;
         ">✕ Keep Existing Moves (Don't Learn)</button>
       `;
 
@@ -1968,9 +2031,9 @@ export class BattleHUD {
         const slotBtn = document.createElement('button');
         slotBtn.id = `forget-slot-btn-${idx}`;
         slotBtn.style.cssText = `
-          background: #1e293b;
+          background: #141E33;
           color: white;
-          border: 1px solid rgba(255, 255, 255, 0.16);
+          border: 1.5px solid #22324F;
           border-radius: 8px;
           padding: 9px 12px;
           cursor: pointer;
@@ -1979,26 +2042,28 @@ export class BattleHUD {
           justify-content: space-between;
           align-items: center;
           text-align: left;
-          transition: background 0.15s ease, border-color 0.15s ease;
+          box-shadow: 0 3px 0 0 #070B14;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
         `;
         slotBtn.innerHTML = `
           <div>
-            <span class="keyboard-hint" style="font-size: 10px; font-weight: 800; color: #94a3b8; margin-right: 4px;">[${idx + 1}]</span>
+            <span class="keyboard-hint" style="font-size: 10px; font-weight: 800; color: #94a3b8; margin-right: 4px; font-family: 'Space Mono', monospace;">[${idx + 1}]</span>
             <span style="font-size: 10px; font-weight: 800; background: ${slotTypeColor}; color: white; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">${slotData.type.toUpperCase()}</span>
             <strong style="font-size: 13px;">Forget ${slotData.name}</strong>
           </div>
-          <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">
+          <div style="font-size: 11px; color: #94a3b8; font-weight: 600; font-family: 'Space Mono', monospace;">
             PWR: ${slotPwr} | ACC: ${slotAcc} | PP: ${slot.currentPp}/${slot.maxPp}
           </div>
         `;
         slotBtn.addEventListener('mouseenter', () => {
           cursorIndex = idx;
           slotBtn.style.borderColor = '#ef4444';
-          slotBtn.style.background = 'rgba(239, 68, 68, 0.15)';
+          slotBtn.style.background = 'rgba(239, 68, 68, 0.2)';
         });
         slotBtn.addEventListener('mouseleave', () => {
-          slotBtn.style.borderColor = 'rgba(255, 255, 255, 0.16)';
-          slotBtn.style.background = '#1e293b';
+          slotBtn.style.borderColor = '#22324F';
+          slotBtn.style.background = '#141E33';
         });
         slotBtn.addEventListener('click', (e) => {
           e.stopPropagation();

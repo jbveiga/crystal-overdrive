@@ -26,31 +26,32 @@ export function mountGitHubReportButton(ctx: BugReportContext): void {
     position: fixed;
     top: max(88px, calc(env(safe-area-inset-top, 12px) + 76px));
     right: max(12px, env(safe-area-inset-right, 12px));
-    background: rgba(15, 23, 42, 0.9);
-    color: #38bdf8;
-    border: 1.5px solid rgba(56, 189, 248, 0.5);
-    border-radius: 999px;
-    padding: 6px 10px;
+    background: rgba(13, 19, 34, 0.92);
+    color: #F8FAFC;
+    border: 2px solid #22324F;
+    border-radius: 8px;
+    padding: 6px 12px;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 3px 0 0 #070B14;
     z-index: 50;
     pointer-events: auto;
     display: flex;
     align-items: center;
-    gap: 5px;
-    transition: transform 0.15s ease, background-color 0.15s ease;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    transition: transform 0.1s ease, border-color 0.15s ease;
   `;
   reportBtn.innerHTML = `<span>📸</span><span>BUG</span>`;
 
   reportBtn.addEventListener('mouseenter', () => {
-    reportBtn.style.transform = 'scale(1.05)';
-    reportBtn.style.backgroundColor = 'rgba(15, 23, 42, 1)';
+    reportBtn.style.transform = 'translateY(-1px)';
+    reportBtn.style.borderColor = '#38BDF8';
   });
   reportBtn.addEventListener('mouseleave', () => {
-    reportBtn.style.transform = 'scale(1)';
-    reportBtn.style.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+    reportBtn.style.transform = 'translateY(0px)';
+    reportBtn.style.borderColor = '#22324F';
   });
 
   reportBtn.addEventListener('click', async () => {
@@ -116,34 +117,35 @@ export function mountGitHubReportButton(ctx: BugReportContext): void {
       right: max(12px, env(safe-area-inset-right, 12px));
       width: 310px;
       max-width: 90vw;
-      background: rgba(15, 23, 42, 0.98);
-      border: 2px solid #38bdf8;
+      background: #0D1322;
+      border: 2px solid #38BDF8;
       border-radius: 12px;
       padding: 14px;
       z-index: 99;
       pointer-events: auto;
-      color: #f8fafc;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+      color: #F8FAFC;
+      box-shadow: 0 6px 0 0 #070B14;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       display: flex;
       flex-direction: column;
       gap: 10px;
     `;
     modalCard.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 13px; font-weight: 900; color: #38bdf8;">📸 SCREENSHOT CAPTURED</span>
-        <button id="close-report-card-btn" aria-label="Close Report Dialog" style="background: none; border: none; color: #94a3b8; font-size: 15px; cursor: pointer;">✕</button>
+        <span style="font-size: 12px; font-weight: 800; color: #38BDF8; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">📸 SCREENSHOT CAPTURED</span>
+        <button id="close-report-card-btn" aria-label="Close Report Dialog" style="background: none; border: none; color: #94A3B8; font-size: 14px; cursor: pointer; font-family: 'Space Mono', monospace; font-weight: 800;">✕</button>
       </div>
       ${
         screenshotDataUrl
-          ? `<img src="${screenshotDataUrl}" alt="Current Screen Capture" style="width: 100%; height: 110px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.4);" />`
+          ? `<div style="background: #141E33; border: 1.5px solid #22324F; border-radius: 6px; overflow: hidden; display: flex;"><img src="${screenshotDataUrl}" alt="Current Screen Capture" style="width: 100%; height: 110px; object-fit: cover;" /></div>`
           : ''
       }
-      <div style="font-size: 11.5px; color: #e2e8f0; line-height: 1.5; display: flex; flex-direction: column; gap: 4px;">
+      <div style="font-size: 11.5px; color: #CBD5E1; line-height: 1.5; display: flex; flex-direction: column; gap: 4px;">
         <div><strong>1. Save screenshot:</strong> Tap below to download the PNG image.</div>
         <div><strong>2. Open issue:</strong> Tap the link to open GitHub, fill in details, and attach the image.</div>
         ${
           copiedToClipboard
-            ? '<div style="color: #38bdf8; font-size: 10.5px;"><em>(Desktop: Also copied to your clipboard)</em></div>'
+            ? '<div style="color: #38BDF8; font-size: 10.5px; font-family: \'Space Mono\', monospace;"><em>(Desktop: Also copied to clipboard)</em></div>'
             : ''
         }
       </div>
@@ -154,14 +156,15 @@ export function mountGitHubReportButton(ctx: BugReportContext): void {
                 display: block;
                 text-align: center;
                 text-decoration: none;
-                background: #2563eb;
-                color: #ffffff;
-                border: 1.5px solid #60a5fa;
+                background: #2563EB;
+                color: #FFFFFF;
+                border: 1.5px solid #60A5FA;
                 border-radius: 8px;
                 padding: 9px 12px;
                 font-size: 12px;
                 font-weight: 800;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+                box-shadow: 0 3px 0 0 #070B14;
+                font-family: 'Space Mono', monospace;
               ">💾 SAVE SCREENSHOT PNG</a>`
             : ''
         }
@@ -169,13 +172,15 @@ export function mountGitHubReportButton(ctx: BugReportContext): void {
           display: block;
           text-align: center;
           text-decoration: none;
-          background: #0f172a;
-          color: #38bdf8;
-          border: 1.5px solid #38bdf8;
+          background: #141E33;
+          color: #38BDF8;
+          border: 1.5px solid #38BDF8;
           border-radius: 8px;
           padding: 9px 12px;
           font-size: 12px;
           font-weight: 800;
+          box-shadow: 0 3px 0 0 #070B14;
+          font-family: 'Space Mono', monospace;
         ">🚀 OPEN GITHUB ISSUE ↗</a>
       </div>
     `;

@@ -440,6 +440,7 @@ export class TitleScreenUI {
       overflow: hidden;
       z-index: 100;
       user-select: none;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     `;
 
     // Upward drifting crystal particles layer
@@ -484,10 +485,11 @@ export class TitleScreenUI {
       justify-content: space-between;
       align-items: center;
       z-index: 2;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       color: #94a3b8;
       letter-spacing: 1px;
+      font-family: 'Space Mono', monospace;
     `;
     topBar.innerHTML = `
       <span>💎 JOHTO GEN II REIMAGINED</span>
@@ -549,18 +551,19 @@ export class TitleScreenUI {
       width: fit-content;
       box-sizing: border-box;
       padding: 12px clamp(14px, 4vw, 28px);
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.78);
-      border: 2px solid rgba(56, 189, 248, 0.65);
-      box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
+      border-radius: 8px;
+      background: #0D1322;
+      border: 2px solid #38BDF8;
+      box-shadow: 0 4px 0 0 #070B14;
       color: #f8fafc;
-      font-size: clamp(11px, 3.2vw, 15px);
+      font-size: clamp(11px, 3.2vw, 14px);
       font-weight: 800;
-      letter-spacing: clamp(0.6px, 0.35vw, 1.8px);
+      letter-spacing: clamp(0.6px, 0.35vw, 1.5px);
       line-height: 1.35;
       white-space: normal;
       cursor: pointer;
       text-align: center;
+      font-family: 'Space Mono', monospace;
       animation: crystalBlinkPrompt 1.4s infinite ease-in-out;
     `;
     this.gateElement.textContent = '⚡ PRESS ANY KEY OR CLICK TO START ⚡';
@@ -677,25 +680,26 @@ export class TitleScreenUI {
       flex-direction: column;
       gap: 8px;
       padding: 14px 18px;
-      border-radius: 12px;
+      border-radius: 10px;
       background: ${
         !hasSaveData
-          ? 'rgba(15, 23, 42, 0.42)'
+          ? 'rgba(13, 19, 34, 0.42)'
           : continueFocused
-          ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))'
-          : 'rgba(15, 23, 42, 0.82)'
+          ? '#141E33'
+          : '#0D1322'
       };
       border: 2px solid ${
         !hasSaveData
-          ? 'rgba(148, 163, 184, 0.18)'
+          ? '#22324F'
           : continueFocused
-          ? '#38bdf8'
-          : 'rgba(148, 163, 184, 0.3)'
+          ? '#38BDF8'
+          : '#22324F'
       };
-      box-shadow: ${continueFocused && hasSaveData ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'};
+      box-shadow: 0 4px 0 0 #070B14;
       opacity: ${hasSaveData ? '1' : '0.48'};
       cursor: ${hasSaveData ? 'pointer' : 'not-allowed'};
-      transition: all 0.15s ease;
+      transition: all 0.12s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     `;
 
     if (hasSaveData && preview) {
@@ -709,28 +713,31 @@ export class TitleScreenUI {
 
       continueBtn.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div style="font-size: 16px; font-weight: 900; color: #f8fafc; letter-spacing: 1px;">
+          <div style="font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.8px;">
             ${continueFocused ? '▶ ' : ''}CONTINUE JOURNEY
           </div>
           <span style="
-            background: rgba(56, 189, 248, 0.2);
-            border: 1px solid rgba(56, 189, 248, 0.5);
+            background: rgba(56, 189, 248, 0.15);
+            border: 1.5px solid #38bdf8;
             color: #7dd3fc;
             padding: 2px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 800;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 2px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
           ">📍 ${preview.currentLocationName}</span>
         </div>
         <div style="
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
           gap: 8px;
-          padding-top: 6px;
-          border-top: 1px solid rgba(255, 255, 255, 0.12);
-          font-size: 12px;
+          padding-top: 8px;
+          border-top: 1.5px solid #22324F;
+          font-size: 11.5px;
           color: #cbd5e1;
           font-weight: 700;
+          font-family: 'Space Mono', monospace;
         ">
           <div>👤 ${preview.playerName} ${genderBadge}</div>
           <div>🏅 BADGES: <span style="color: #facc15;">${preview.badgeCount} / 8</span></div>
@@ -743,7 +750,7 @@ export class TitleScreenUI {
       continueBtn.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span style="font-size: 15px; font-weight: 800; color: #94a3b8;">CONTINUE</span>
-          <span style="font-size: 12px; color: #64748b; font-weight: 700;">NO SAVE DATA FOUND</span>
+          <span style="font-size: 11px; color: #64748b; font-weight: 700; font-family: 'Space Mono', monospace;">NO SAVE DATA FOUND</span>
         </div>
       `;
     }
@@ -768,22 +775,19 @@ export class TitleScreenUI {
       justify-content: space-between;
       align-items: center;
       padding: 14px 18px;
-      border-radius: 12px;
-      background: ${
-        newGameFocused
-          ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))'
-          : 'rgba(15, 23, 42, 0.82)'
-      };
-      border: 2px solid ${newGameFocused ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)'};
-      box-shadow: ${newGameFocused ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'};
+      border-radius: 10px;
+      background: ${newGameFocused ? '#141E33' : '#0D1322'};
+      border: 2px solid ${newGameFocused ? '#38BDF8' : '#22324F'};
+      box-shadow: 0 4px 0 0 #070B14;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.12s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     `;
     newGameBtn.innerHTML = `
-      <span style="font-size: 16px; font-weight: 900; color: #f8fafc; letter-spacing: 1px;">
+      <span style="font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.8px;">
         ${newGameFocused ? '▶ ' : ''}NEW GAME
       </span>
-      <span style="font-size: 12px; font-weight: 700; color: #94a3b8;">Start Fresh in New Bark Town</span>
+      <span style="font-size: 11px; font-weight: 700; color: #94a3b8; font-family: 'Space Mono', monospace;">Start Fresh in New Bark Town</span>
     `;
     newGameBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -801,22 +805,19 @@ export class TitleScreenUI {
       justify-content: space-between;
       align-items: center;
       padding: 14px 18px;
-      border-radius: 12px;
-      background: ${
-        optionsFocused
-          ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))'
-          : 'rgba(15, 23, 42, 0.82)'
-      };
-      border: 2px solid ${optionsFocused ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)'};
-      box-shadow: ${optionsFocused ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'};
+      border-radius: 10px;
+      background: ${optionsFocused ? '#141E33' : '#0D1322'};
+      border: 2px solid ${optionsFocused ? '#38BDF8' : '#22324F'};
+      box-shadow: 0 4px 0 0 #070B14;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.12s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     `;
     optionsBtn.innerHTML = `
-      <span style="font-size: 16px; font-weight: 900; color: #f8fafc; letter-spacing: 1px;">
+      <span style="font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.8px;">
         ${optionsFocused ? '▶ ' : ''}OPTIONS
       </span>
-      <span style="font-size: 12px; font-weight: 700; color: #94a3b8;">Audio, Text Speed & Overdrive Settings</span>
+      <span style="font-size: 11px; font-weight: 700; color: #94a3b8; font-family: 'Space Mono', monospace;">Audio, Text Speed & Overdrive</span>
     `;
     optionsBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -836,43 +837,48 @@ export class TitleScreenUI {
 
     this.overwriteModalElement.innerHTML = `
       <div style="
-        background: #0f172a;
-        border: 2px solid #f43f5e;
-        border-radius: 14px;
+        background: #0D1322;
+        border: 2px solid #EF4444;
+        border-radius: 12px;
         padding: 24px;
         width: min(440px, 92vw);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+        box-shadow: 0 8px 0 0 #070B14;
         display: flex;
         flex-direction: column;
         gap: 16px;
         color: #f8fafc;
+        font-family: 'Plus Jakarta Sans', sans-serif;
       ">
-        <div style="font-size: 18px; font-weight: 900; color: #fb7185;">
+        <div style="font-size: 17px; font-weight: 800; color: #fb7185; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">
           ⚠️ OVERWRITE EXISTING SAVE?
         </div>
-        <div style="font-size: 14px; line-height: 1.5; color: #cbd5e1;">
+        <div style="font-size: 13.5px; line-height: 1.5; color: #cbd5e1;">
           An active adventure for <strong>${this.savePreview?.playerName ?? 'GOLD'}</strong> (${this.savePreview?.playTimeFormatted ?? '00:00'}) already exists. Saving in the new adventure will replace the previous save.
         </div>
         <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 6px;">
           <button id="overwrite-confirm-yes" style="
             padding: 10px 16px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 800;
             cursor: pointer;
-            background: ${yesFocused ? '#e11d48' : '#1e293b'};
+            background: ${yesFocused ? '#DC2626' : '#141E33'};
             color: #ffffff;
-            border: 2px solid ${yesFocused ? '#fda4af' : '#475569'};
+            border: 1.5px solid ${yesFocused ? '#FCA5A5' : '#22324F'};
+            box-shadow: 0 3px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
           ">${yesFocused ? '▶ ' : ''}START NEW GAME</button>
           <button id="overwrite-confirm-no" style="
             padding: 10px 16px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 800;
             cursor: pointer;
-            background: ${noFocused ? '#0284c7' : '#1e293b'};
+            background: ${noFocused ? '#0284C7' : '#141E33'};
             color: #ffffff;
-            border: 2px solid ${noFocused ? '#7dd3fc' : '#475569'};
+            border: 1.5px solid ${noFocused ? '#7DD3FC' : '#22324F'};
+            box-shadow: 0 3px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
           ">${noFocused ? '▶ ' : ''}CANCEL</button>
         </div>
       </div>
@@ -903,28 +909,31 @@ export class TitleScreenUI {
 
     this.optionsModalElement.innerHTML = `
       <div style="
-        background: #0f172a;
-        border: 2px solid #38bdf8;
-        border-radius: 14px;
+        background: #0D1322;
+        border: 2px solid #38BDF8;
+        border-radius: 12px;
         padding: 24px;
         width: min(480px, 94vw);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+        box-shadow: 0 8px 0 0 #070B14;
         display: flex;
         flex-direction: column;
         gap: 16px;
         color: #f8fafc;
+        font-family: 'Plus Jakarta Sans', sans-serif;
       ">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: #38bdf8;">⚙️ SYSTEM OPTIONS</h3>
+          <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #38bdf8; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">⚙️ SYSTEM OPTIONS</h3>
           <button id="options-close-btn" style="
-            background: #1e293b;
+            background: #141E33;
             color: #cbd5e1;
-            border: 1px solid #475569;
+            border: 1.5px solid #22324F;
             border-radius: 6px;
             padding: 4px 10px;
-            font-size: 12px;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 700;
             cursor: pointer;
+            box-shadow: 0 2px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
           ">✕ CLOSE</button>
         </div>
 
@@ -932,7 +941,7 @@ export class TitleScreenUI {
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700;">
             <span>🎵 BGM VOLUME</span>
-            <span style="color: #38bdf8;">${Math.round(this.options.bgmVolume * 100)}%</span>
+            <span style="color: #38bdf8; font-family: 'Space Mono', monospace;">${Math.round(this.options.bgmVolume * 100)}%</span>
           </div>
           <input id="opt-bgm-slider" type="range" min="0" max="100" value="${Math.round(this.options.bgmVolume * 100)}" style="width: 100%; cursor: pointer;" />
         </div>
@@ -941,7 +950,7 @@ export class TitleScreenUI {
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700;">
             <span>🔊 SFX VOLUME</span>
-            <span style="color: #38bdf8;">${Math.round(this.options.soundVolume * 100)}%</span>
+            <span style="color: #38bdf8; font-family: 'Space Mono', monospace;">${Math.round(this.options.soundVolume * 100)}%</span>
           </div>
           <input id="opt-sfx-slider" type="range" min="0" max="100" value="${Math.round(this.options.soundVolume * 100)}" style="width: 100%; cursor: pointer;" />
         </div>
@@ -956,12 +965,14 @@ export class TitleScreenUI {
               <button data-text-speed="${ts}" style="
                 padding: 8px 6px;
                 border-radius: 6px;
-                font-size: 12px;
-                font-weight: 800;
+                font-size: 11px;
+                font-weight: 700;
                 cursor: pointer;
-                background: ${this.options.textSpeed === ts ? '#0284c7' : '#1e293b'};
+                background: ${this.options.textSpeed === ts ? '#0284c7' : '#141E33'};
                 color: #ffffff;
-                border: 1px solid ${this.options.textSpeed === ts ? '#7dd3fc' : '#475569'};
+                border: 1.5px solid ${this.options.textSpeed === ts ? '#38bdf8' : '#22324F'};
+                box-shadow: 0 2px 0 0 #070B14;
+                font-family: 'Space Mono', monospace;
               ">${ts}</button>
             `
               )
@@ -975,12 +986,14 @@ export class TitleScreenUI {
           <button id="opt-battle-anim-btn" style="
             padding: 8px 16px;
             border-radius: 6px;
-            font-size: 12px;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 700;
             cursor: pointer;
-            background: ${this.options.battleAnimations ? '#16a34a' : '#334155'};
+            background: ${this.options.battleAnimations ? '#059669' : '#141E33'};
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1.5px solid ${this.options.battleAnimations ? '#10b981' : '#22324F'};
+            box-shadow: 0 2px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
           ">${this.options.battleAnimations ? 'ON' : 'OFF'}</button>
         </div>
 
@@ -990,12 +1003,14 @@ export class TitleScreenUI {
           <button id="opt-chiptune-btn" style="
             padding: 8px 16px;
             border-radius: 6px;
-            font-size: 12px;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 700;
             cursor: pointer;
-            background: ${this.options.chiptuneMode ? '#7c3aed' : '#334155'};
+            background: ${this.options.chiptuneMode ? '#7c3aed' : '#141E33'};
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1.5px solid ${this.options.chiptuneMode ? '#a855f7' : '#22324F'};
+            box-shadow: 0 2px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
           ">${this.options.chiptuneMode ? 'ON' : 'OFF'}</button>
         </div>
 
@@ -1005,12 +1020,14 @@ export class TitleScreenUI {
           <button id="opt-lowhp-beep-btn" style="
             padding: 8px 16px;
             border-radius: 6px;
-            font-size: 12px;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 700;
             cursor: pointer;
-            background: ${(this.options.lowHpBeepEnabled ?? true) ? '#16a34a' : '#334155'};
+            background: ${(this.options.lowHpBeepEnabled ?? true) ? '#059669' : '#141E33'};
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1.5px solid ${(this.options.lowHpBeepEnabled ?? true) ? '#10b981' : '#22324F'};
+            box-shadow: 0 2px 0 0 #070B14;
+            font-family: 'Space Mono', monospace;
           ">${(this.options.lowHpBeepEnabled ?? true) ? 'ON' : 'OFF'}</button>
         </div>
 
@@ -1024,12 +1041,14 @@ export class TitleScreenUI {
               <button data-default-speed="${spd}" style="
                 padding: 8px 6px;
                 border-radius: 6px;
-                font-size: 12px;
-                font-weight: 800;
+                font-size: 11px;
+                font-weight: 700;
                 cursor: pointer;
-                background: ${this.options.playerSpeedDefault === spd ? '#7c3aed' : '#1e293b'};
+                background: ${this.options.playerSpeedDefault === spd ? '#7c3aed' : '#141E33'};
                 color: #ffffff;
-                border: 1px solid ${this.options.playerSpeedDefault === spd ? '#c4b5fd' : '#475569'};
+                border: 1.5px solid ${this.options.playerSpeedDefault === spd ? '#a855f7' : '#22324F'};
+                box-shadow: 0 2px 0 0 #070B14;
+                font-family: 'Space Mono', monospace;
               ">${spd}x</button>
             `
               )

@@ -44,17 +44,16 @@ export class BattleLogUI {
 
     // 1. Root wrapper inside battle HUD container
     this.rootElement = document.createElement('div');
-    this.rootElement.className = 'battle-log-root z-30 flex flex-col items-end pointer-events-auto';
+    this.rootElement.className = 'battle-log-root';
     this.rootElement.style.cssText =
       'position: relative; display: flex; flex-direction: column; align-items: flex-end; pointer-events: auto; margin-top: 4px; z-index: 30;';
 
     // 2. Toggle button & badge
     this.toggleButton = document.createElement('button');
     this.toggleButton.type = 'button';
-    this.toggleButton.className =
-      'battle-log-toggle-btn px-3 py-1.5 bg-slate-900/85 hover:bg-slate-800 text-sky-300 hover:text-white border border-sky-500/40 hover:border-sky-400 rounded-lg text-xs font-semibold tracking-wide shadow-md transition-all flex items-center gap-1.5 cursor-pointer backdrop-blur-md';
+    this.toggleButton.className = 'battle-log-toggle-btn';
     this.toggleButton.style.cssText =
-      'padding: 6px 12px; background: rgba(15, 23, 42, 0.92); color: #7dd3fc; border: 1.5px solid rgba(56, 189, 248, 0.45); border-radius: 999px; font-size: 12px; font-weight: 800; letter-spacing: 0.4px; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);';
+      'padding: 6px 12px; background: #0D1322; color: #F8FAFC; border: 2px solid #38BDF8; border-radius: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 3px 0 0 #070B14; font-family: \'Space Mono\', monospace; pointer-events: auto;';
 
     const iconSpan = document.createElement('span');
     iconSpan.textContent = '📜';
@@ -62,9 +61,9 @@ export class BattleLogUI {
     labelSpan.textContent = 'LOG';
 
     this.countBadge = document.createElement('span');
-    this.countBadge.className = 'battle-log-count text-[10px] bg-sky-950 px-1.5 py-0.5 rounded text-sky-400 font-mono';
+    this.countBadge.className = 'battle-log-count';
     this.countBadge.style.cssText =
-      'font-size: 10px; background: #082f49; padding: 1px 6px; border-radius: 999px; color: #38bdf8; font-family: monospace;';
+      'font-size: 10px; background: rgba(56, 189, 248, 0.18); border: 1px solid #38BDF8; padding: 1px 6px; border-radius: 4px; color: #38BDF8; font-family: \'Space Mono\', monospace; font-weight: 700;';
     this.countBadge.textContent = '0';
 
     this.toggleButton.appendChild(iconSpan);
@@ -74,31 +73,29 @@ export class BattleLogUI {
 
     // 3. Log panel container (strictly hidden by default)
     this.logPanel = document.createElement('div');
-    this.logPanel.className =
-      'battle-log-panel hidden mt-2 bg-slate-950/95 border border-sky-400/50 rounded-xl shadow-2xl backdrop-blur-md flex flex-col overflow-hidden text-slate-100 transition-all duration-200';
+    this.logPanel.className = 'battle-log-panel hidden';
     this.logPanel.style.cssText =
-      'display: none; position: absolute; right: 0; top: 100%; margin-top: 6px; z-index: 60; width: min(340px, calc(100vw - 28px)); max-width: calc(100vw - 28px); max-height: min(320px, 55vh); background: rgba(15, 23, 42, 0.98); border: 1.5px solid rgba(56, 189, 248, 0.55); border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.85); overflow: hidden;';
+      'display: none; position: absolute; right: 0; top: 100%; margin-top: 6px; z-index: 60; width: min(340px, calc(100vw - 28px)); max-width: calc(100vw - 28px); max-height: min(320px, 55vh); background: rgba(13, 19, 34, 0.96); border: 2px solid #38BDF8; border-radius: 10px; box-shadow: 0 6px 0 0 #070B14; font-family: \'Plus Jakarta Sans\', sans-serif; color: #F8FAFC; overflow: hidden; pointer-events: auto;';
     this.logPanel.style.display = 'none';
 
     // 4. Panel Header
     const panelHeader = document.createElement('div');
-    panelHeader.className =
-      'px-3.5 py-2.5 bg-slate-900 border-b border-sky-500/30 flex items-center justify-between font-bold text-sky-300 text-xs tracking-wider uppercase flex-shrink-0';
+    panelHeader.style.cssText =
+      'padding: 10px 14px; background: #0D1322; border-bottom: 1.5px solid #22324F; display: flex; align-items: center; justify-content: space-between; font-weight: 800; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; font-family: \'Space Mono\', monospace;';
     panelHeader.innerHTML = `
-      <div class="flex items-center gap-2">
-        <span class="text-sm">📜</span>
-        <span class="font-bold text-sky-200">BATTLE LOG</span>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 14px;">📜</span>
+        <span style="font-weight: 800; color: #38BDF8;">BATTLE LOG</span>
       </div>
-      <button type="button" class="battle-log-close-btn text-slate-300 hover:text-white px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 font-bold text-sm cursor-pointer" aria-label="Close log">✕</button>
+      <button type="button" class="battle-log-close-btn" style="background: #141E33; border: 1.5px solid #22324F; border-radius: 6px; color: #CBD5E1; padding: 2px 8px; font-weight: 800; font-size: 12px; cursor: pointer; box-shadow: 0 2px 0 0 #070B14; font-family: 'Space Mono', monospace;" aria-label="Close log">✕</button>
     `;
     panelHeader.querySelector('.battle-log-close-btn')?.addEventListener('click', () => this.close());
 
     // 5. Scrollable Log List
     this.logList = document.createElement('div');
-    this.logList.className =
-      'battle-log-list p-3 space-y-2 overflow-y-auto font-mono text-xs leading-relaxed flex-1';
+    this.logList.className = 'battle-log-list';
     this.logList.style.cssText =
-      'overflow-y: auto; max-height: calc(min(320px, 55vh) - 44px); -webkit-overflow-scrolling: touch; font-size: 12px; line-height: 1.6; color: #f1f5f9; padding: 10px 12px;';
+      'overflow-y: auto; max-height: calc(min(320px, 55vh) - 44px); -webkit-overflow-scrolling: touch; font-size: 12px; line-height: 1.6; color: #f1f5f9; padding: 10px 12px; font-family: \'Plus Jakarta Sans\', sans-serif;';
 
     this.logPanel.appendChild(panelHeader);
     this.logPanel.appendChild(this.logList);
@@ -183,61 +180,61 @@ export class BattleLogUI {
 
   private renderEntry(entry: BattleLogEntry): void {
     const item = document.createElement('div');
-    item.className = 'battle-log-item transition-all';
+    item.className = 'battle-log-item';
 
-    let colorClass = 'text-slate-300';
+    if (entry.type === 'turn') {
+      item.style.cssText =
+        'border-top: 1px solid rgba(56, 189, 248, 0.25); padding-top: 6px; margin-top: 4px; text-align: center; font-family: \'Space Mono\', monospace; font-size: 10px; font-weight: 700; color: #38BDF8; letter-spacing: 1.5px;';
+      item.innerHTML = `<span>⚔️ TURN ${entry.turn || ''}</span>`;
+      this.logList.appendChild(item);
+      return;
+    }
+
+    let color = '#CBD5E1';
     let icon = '•';
 
     switch (entry.type) {
-      case 'turn':
-        colorClass = 'text-sky-400 font-bold border-t border-sky-500/20 pt-1.5 mt-1 text-center text-[10px] tracking-widest';
-        icon = '⚔️';
-        item.innerHTML = `<span class="${colorClass}">${icon} TURN ${entry.turn || ''}</span>`;
-        this.logList.appendChild(item);
-        return;
-
       case 'move':
-        colorClass = 'text-sky-300 font-semibold';
+        color = '#38BDF8';
         icon = '💥';
         break;
 
       case 'damage':
         if (entry.text.includes('super effective') || entry.text.includes('CRITICAL')) {
-          colorClass = 'text-amber-400 font-semibold';
+          color = '#FBBF24';
           icon = '⚡';
         } else {
-          colorClass = 'text-rose-400';
+          color = '#F87171';
           icon = '🩸';
         }
         break;
 
       case 'status':
-        colorClass = 'text-purple-400 font-semibold';
+        color = '#C084FC';
         icon = '✨';
         break;
 
       case 'stat':
-        colorClass = 'text-emerald-400';
+        color = '#34D399';
         icon = '📊';
         break;
 
       case 'faint':
-        colorClass = 'text-slate-400 italic';
+        color = '#94A3B8';
         icon = '💀';
         break;
 
       case 'info':
       default:
-        colorClass = 'text-slate-300';
+        color = '#CBD5E1';
         icon = 'ℹ️';
         break;
     }
 
+    item.style.cssText = `display: flex; align-items: flex-start; gap: 6px; color: ${color}; font-size: 11.5px; line-height: 1.5; font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 4px;`;
     item.innerHTML = `
-      <div class="flex items-start gap-1.5 ${colorClass}">
-        <span class="text-[10px] opacity-70 shrink-0 select-none">${icon}</span>
-        <span class="break-words flex-1">${this.escapeHtml(entry.text)}</span>
-      </div>
+      <span style="font-size: 10px; opacity: 0.8; flex-shrink: 0; user-select: none;">${icon}</span>
+      <span style="word-break: break-word; flex: 1;">${this.escapeHtml(entry.text)}</span>
     `;
 
     this.logList.appendChild(item);
