@@ -32,7 +32,12 @@ describe('Warp Transition & Texture Hydration Synchronization (BUGFIX-ASYNC-TILE
     (fs.existsSync(transitionControllerPath)
       ? '\n' + fs.readFileSync(transitionControllerPath, 'utf8')
       : '');
-  const rendererSrc = fs.readFileSync(rendererTsPath, 'utf8');
+  const rendererSrc =
+    fs.readFileSync(rendererTsPath, 'utf8') +
+    '\n' +
+    fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldParticleAndVfxPool.ts'), 'utf8') +
+    '\n' +
+    fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldNpcAndItemSprites.ts'), 'utf8');
   const worldMaps: any[] = JSON.parse(fs.readFileSync(worldMapsPath, 'utf8'));
 
   describe('1. Lifecycle Order Invariant (Warp Transitions & Black Veil Lock)', () => {

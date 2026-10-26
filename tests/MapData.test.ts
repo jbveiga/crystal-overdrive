@@ -1692,7 +1692,10 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(sudowoodo.spriteType).toBe('sudowoodo');
     const assetPath = path.resolve(__dirname, '../public/assets/sprites/characters/sudowoodo.png');
     expect(fs.existsSync(assetPath)).toBe(true);
-    const rendererSrc = fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldRenderer.ts'), 'utf8');
+    const rendererSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldRenderer.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldNpcAndItemSprites.ts'), 'utf8');
     expect(rendererSrc).toContain("sudowoodo: './assets/sprites/characters/sudowoodo.png'");
   });
 

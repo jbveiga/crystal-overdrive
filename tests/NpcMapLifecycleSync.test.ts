@@ -231,10 +231,10 @@ describe('TICKET-ARCH-NPC-SPAWN-MAP-LIFECYCLE-SYNC-01: NPC & Map Lifecycle Synch
     });
 
     it('verifies OverworldRenderer.ensureMapTilesLoaded preloads character sprite sheets into manifest', () => {
-      const rendererSrc = fs.readFileSync(
-        path.resolve(__dirname, '../src/render/OverworldRenderer.ts'),
-        'utf8'
-      );
+      const rendererSrc =
+        fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldRenderer.ts'), 'utf8') +
+        '\n' +
+        fs.readFileSync(path.resolve(__dirname, '../src/render/OverworldNpcAndItemSprites.ts'), 'utf8');
 
       // Verify ensureMapTilesLoaded collects NPC character sheets and queues them into manifest
       expect(rendererSrc).toContain('missingSpriteTypes');
