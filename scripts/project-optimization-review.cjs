@@ -144,6 +144,47 @@ try {
   totalIssues++;
 }
 
+// 6. Agent-Optimized Architecture & File Ceiling (< 800 Lines) Audit
+console.log('6️⃣  Auditing Agent-Optimized Architecture & Single-Window File Ceiling (< 800 Lines)...');
+function getTsFilesRecursively(dir) {
+  let results = [];
+  if (!fs.existsSync(dir)) return results;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results = results.concat(getTsFilesRecursively(full));
+    } else if (entry.name.endsWith('.ts')) {
+      results.push(full);
+    }
+  }
+  return results;
+}
+
+const srcTsFiles = getTsFilesRecursively(path.resolve(__dirname, '../src'));
+let fileCeilingViolations = 0;
+let repoMaxLines = 0;
+let repoMaxFile = '';
+
+for (const filePath of srcTsFiles) {
+  const lineCount = fs.readFileSync(filePath, 'utf8').split('\n').length;
+  if (lineCount > repoMaxLines) {
+    repoMaxLines = lineCount;
+    repoMaxFile = path.relative(path.resolve(__dirname, '..'), filePath);
+  }
+  if (lineCount > 800) {
+    const relPath = path.relative(path.resolve(__dirname, '..'), filePath);
+    console.error(`  ❌ File exceeds 800-line single-window threshold: ${relPath} (${lineCount} lines)`);
+    fileCeilingViolations++;
+    totalIssues++;
+  }
+}
+
+if (fileCeilingViolations === 0) {
+  console.log(`  ✅ 100% of TypeScript files in src/ strictly adhere to < 800-line single-window ceiling (${srcTsFiles.length} files audited, max: ${repoMaxLines} lines in ${repoMaxFile}).\n`);
+} else {
+  console.log(`  ⚠️  Found ${fileCeilingViolations} files exceeding the 800-line ceiling.\n`);
+}
+
 console.log('===========================================================');
 if (totalIssues === 0) {
   console.log('🎉 REVIEW COMPLETE: ALL PROJECT HEALTH & OPTIMIZATION CHECKS PASSED (0 issues)');

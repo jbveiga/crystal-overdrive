@@ -415,7 +415,11 @@ describe('TICKET-UX-BATTLE-3X-SPEED-AND-PACING-01: Battle 3x Speed Ceiling & Pac
   describe('4. BattleRenderer Snappy Intro & Idle Animation Scaling', () => {
     it('verifies BattleRenderer has tuned flashDur, slideDur, cry bounce, and scaled idle breathing', () => {
       const rendererFile = path.resolve(__dirname, '../src/render/BattleRenderer.ts');
-      const content = fs.readFileSync(rendererFile, 'utf-8');
+      const animsFile = path.resolve(__dirname, '../src/render/BattlePokeballAndSwitchAnimations.ts');
+      const content =
+        fs.readFileSync(rendererFile, 'utf-8') +
+        '\n' +
+        (fs.existsSync(animsFile) ? fs.readFileSync(animsFile, 'utf-8') : '');
 
       expect(content).toContain('const flashDur = 0.05 / this.speedMultiplier;');
       expect(content).toContain('const slideDur = 0.30 / this.speedMultiplier;');

@@ -80,7 +80,8 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **PixiJS Overworld Render Facade** | 64x64 Metatiles, view frustum culling, daylight tint shaders | `src/render/OverworldRenderer.ts` | < 750 lines |
 | **Overworld NPC & Item Sprites** | NPC sprite texture cache, character frames, overworld item balls & fruit trees | `src/render/OverworldNpcAndItemSprites.ts` | < 700 lines |
 | **Overworld Particle & VFX Pool** | Zero-GC graphic particle pool, grass rustle, cut slash, doorway fade veil | `src/render/OverworldParticleAndVfxPool.ts` | < 400 lines |
-| **PixiJS Battle Render** | 2.5D layered arena, GSAP battle animations, particle VFX | `src/render/BattleRenderer.ts` | < 700 lines |
+| **PixiJS Battle Render Facade** | 2.5D layered arena, GSAP battle animations, particle VFX | `src/render/BattleRenderer.ts` | < 600 lines |
+| **Battle Pokeball & Switch VFX** | Parabolic Pokeball toss, switch recall, faint collapse, capture shake | `src/render/BattlePokeballAndSwitchAnimations.ts` | < 450 lines |
 | **Overworld Warp & Map Transition** | Async tile texture hydration, reciprocal warps, story mutations, black veil sync | `src/world/OverworldWarpAndMapTransitionController.ts` | < 650 lines |
 | **Trainer Sight & Walking Tour** | Line-of-sight trigger, rewards, stadium duels, Guide Gent tour | `src/world/OverworldTrainerSightAndTourController.ts` | < 550 lines |
 | **Overworld Ticker & Itemfinder** | Zero-alloc ticker hot paths, player bump, neighbor NPC wander, radar sonar | `src/world/OverworldTickerCoordinator.ts` | < 600 lines |
@@ -88,6 +89,8 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Main Application Bootstrapper** | Core engine initialization, state coordination, input dispatch | `src/main.ts` | < 750 lines |
 | **Audio Engine Facade** | 8-bit APU chiptune emulation, Web Audio API, authentic cry synthesis | `src/audio/BattleAudio.ts` | < 650 lines |
 | **Overworld & Environmental Audio** | Warp sounds, footsteps, itemfinder sonar, status sounds, weather | `src/audio/battle/OverworldAndEnvironmentalAudio.ts` | < 650 lines |
+| **Seamless BGM Audio Manager** | WebM/MP3 loop streaming, map crossfades, battle ducking, chiptune mode | `src/audio/AudioManager.ts` | < 500 lines |
+| **Johto & Kanto Map BGM Table** | Universal mapping of Johto/Kanto locations & battle types to BGM tracks | `src/audio/mapBgmTable.ts` | < 400 lines |
 
 ---
 
@@ -465,7 +468,8 @@ Every code addition and pull request must strictly honor these five non-negotiab
 | `TownMapUI.ts` / `TownMapStylesAndInspectorRenderer.ts` / `BoxManagementUI.ts` / `BoxStylesAndReleaseModal.ts` / `TitleScreenUI.ts` / `TitleScreenModalsAndStyles.ts` | `tests/AgentModularArchitectureSlice9.test.ts` | 12 | ✅ Covered | Agent-Optimized Modularization Slice 9: Decomposed 1,323-line `TownMapUI.ts` (553L), 1,214-line `BoxManagementUI.ts` (683L), and 1,175-line `TitleScreenUI.ts` (656L) down to < 750 lines into discrete sub-modules (< 800L each) across `src/ui/town-map/`, `src/ui/box/`, and `src/ui/title/`, preserving 100% of public methods, DOM IDs, and responsive viewport contracts (TICKET-REFACTOR-AGENT-OPT-SLICE-09). |
 | `missionData.ts` / `earlyJohtoMissions.ts` / `midToLateJohtoMissions.ts` / `IntroSequenceUI.ts` / `IntroStageRenderersAndStyles.ts` / `MapManager.ts` / `MapClassificationAndWarpRules.ts` | `tests/AgentModularArchitectureSlice10.test.ts` | 13 | ✅ Covered | Agent-Optimized Modularization Slice 10: Decomposed 1,283-line `missionData.ts` (19L), 1,037-line `IntroSequenceUI.ts` (612L), and 904-line `MapManager.ts` (692L) down to < 750 lines into discrete sub-modules (< 800L each) across `src/world/missions/`, `src/ui/intro/`, and `src/world/map/`, preserving 100% of public methods, static methods, DOM IDs, and pure layer purity (TICKET-REFACTOR-AGENT-OPT-SLICE-10). |
 | `BattleStateMachine.ts` / `BattleMoveAndItemExecutor.ts` / `EvolutionSceneUI.ts` / `EvolutionDomAndStyles.ts` / `BattleAudio.ts` / `OverworldAndEnvironmentalAudio.ts` | `tests/AgentModularArchitectureSlice11.test.ts` | 12 | ✅ Covered | Agent-Optimized Modularization Slice 11: Decomposed 1,118-line `BattleStateMachine.ts` (694L), 1,076-line `EvolutionSceneUI.ts` (501L), and 982-line `BattleAudio.ts` (548L) down to < 750 lines into discrete sub-modules (< 800L each) across `src/battle/state/`, `src/ui/evolution/`, and `src/audio/battle/`, preserving 100% of public methods, static methods, DOM IDs, and pure layer purity (TICKET-REFACTOR-AGENT-OPT-SLICE-11). |
-| **Current Baseline** | **70 Suites** | **668 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
+| `AudioManager.ts` / `mapBgmTable.ts` / `BattleRenderer.ts` / `BattlePokeballAndSwitchAnimations.ts` / `project-optimization-review.cjs` | `tests/AgentModularArchitectureSlice12.test.ts` | 12 | ✅ Covered | Agent-Optimized Modularization Slice 12: Finalized 100% repo-wide compliance with the < 800-line single-window ceiling across all 120 TypeScript files in `src/`! Decomposed 852-line `AudioManager.ts` down to 473 lines (< 500L) via `mapBgmTable.ts` (384L), and decomposed 845-line `BattleRenderer.ts` down to 539 lines (< 600L) via `BattlePokeballAndSwitchAnimations.ts` (376L). Implemented an automated single-window file ceiling hard gate in `scripts/project-optimization-review.cjs` (TICKET-REFACTOR-AGENT-OPT-SLICE-12). |
+| **Current Baseline** | **71 Suites** | **680 Tests** | **100% Pass** | **All Active Tests Passing (`npm test`)** |
 
 ### 6.1.1 1-Hop Semantic Agent Routing Index (Overworld NPC & Interaction Modules)
 To enable instantaneous 1-hop navigation without exploratory grep searches, overworld mechanics and NPCs route directly to their owning modules:
