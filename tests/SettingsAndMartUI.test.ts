@@ -833,9 +833,9 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
       expect(messageBox.style.display).toBe('flex');
     });
 
-    it('keeps typewriter timing independent of battle speed (~12ms/char + 500ms post-delay)', async () => {
-      expect(BattleHUD.DIALOGUE_CHAR_DELAY_MS).toBe(12);
-      expect(BattleHUD.DIALOGUE_POST_DELAY_MS).toBe(500);
+    it('scales typewriter and post-delay timing with battle speed multiplier (TICKET-BATTLE-SPEED-EXP-SHARE-POLISH-01)', async () => {
+      expect(BattleHUD.DIALOGUE_CHAR_DELAY_MS).toBe(10);
+      expect(BattleHUD.DIALOGUE_POST_DELAY_MS).toBe(380);
 
       vi.useFakeTimers();
       try {
@@ -847,7 +847,7 @@ describe('Settings, Mart, and Mobile UI Enhancements', () => {
           const p = hud.showMessage(text).then(() => {
             done = true;
           });
-          const total = 12 * text.length + 500;
+          const total = hud.getEffectiveCharDelayMs() * text.length + hud.getEffectivePostDelayMs();
           await vi.advanceTimersByTimeAsync(total - 5);
           expect(done).toBe(false);
           await vi.advanceTimersByTimeAsync(10);

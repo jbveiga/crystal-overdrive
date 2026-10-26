@@ -273,6 +273,15 @@ export class TitleScreenUI {
     if (patch.playerSpeedDefault !== undefined) {
       this.options.playerSpeedDefault = patch.playerSpeedDefault;
     }
+    if (patch.battleSpeedMultiplier !== undefined) {
+      this.options.battleSpeedMultiplier = patch.battleSpeedMultiplier;
+    }
+    if (patch.chiptuneMode !== undefined) {
+      this.options.chiptuneMode = patch.chiptuneMode;
+    }
+    if (patch.lowHpBeepEnabled !== undefined) {
+      this.options.lowHpBeepEnabled = patch.lowHpBeepEnabled;
+    }
 
     if (this.callbacks.onOptionsChanged) {
       this.callbacks.onOptionsChanged({ ...this.options });
@@ -905,6 +914,7 @@ export class TitleScreenUI {
     if (!this.optionsModalOpen) return;
 
     const textSpeeds: Array<GameOptions['textSpeed']> = ['SLOW', 'MID', 'FAST', 'INSTANT'];
+    const battleSpeeds: SpeedMultiplier[] = [1, 2, 3];
     const speeds: SpeedMultiplier[] = [1, 2, 3, 4];
 
     this.optionsModalElement.innerHTML = `
@@ -1031,6 +1041,31 @@ export class TitleScreenUI {
           ">${(this.options.lowHpBeepEnabled ?? true) ? 'ON' : 'OFF'}</button>
         </div>
 
+        <!-- Battle Speed Multiplier -->
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <span style="font-size: 13px; font-weight: 700;">⚔️ BATTLE SPEED</span>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+            ${battleSpeeds
+              .map(
+                (spd) => `
+              <button data-battle-speed="${spd}" style="
+                padding: 8px 6px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: 700;
+                cursor: pointer;
+                background: ${(this.options.battleSpeedMultiplier ?? 1) === spd ? '#2563eb' : '#141E33'};
+                color: #ffffff;
+                border: 1.5px solid ${(this.options.battleSpeedMultiplier ?? 1) === spd ? '#60a5fa' : '#22324F'};
+                box-shadow: 0 2px 0 0 #070B14;
+                font-family: 'Space Mono', monospace;
+              ">${spd === 1 ? '1x NORMAL' : spd === 2 ? '2x FAST' : '3x TURBO'}</button>
+            `
+              )
+              .join('')}
+          </div>
+        </div>
+
         <!-- Default Overdrive Movement Speed -->
         <div style="display: flex; flex-direction: column; gap: 6px;">
           <span style="font-size: 13px; font-weight: 700;">⚡ DEFAULT OVERDRIVE SPEED</span>
@@ -1111,6 +1146,18 @@ export class TitleScreenUI {
       BattleAudio.setLowHpBeepEnabled(next);
       BattleAudio.playMenuSound('CURSOR');
       this.updateOptions({ lowHpBeepEnabled: next });
+    });
+
+    const battleSpeedBtns = this.optionsModalElement.querySelectorAll
+      ? this.optionsModalElement.querySelectorAll('[data-battle-speed]')
+      : [];
+    battleSpeedBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const spd = Number((btn as HTMLElement).getAttribute('data-battle-speed')) as SpeedMultiplier;
+        BattleAudio.playMenuSound('CURSOR');
+        this.updateOptions({ battleSpeedMultiplier: spd });
+      });
     });
 
     const speedBtns = this.optionsModalElement.querySelectorAll

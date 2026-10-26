@@ -13,7 +13,7 @@ import {
   type DoubleBattleConfig,
 } from './battle/BattleStateMachine';
 import { StadiumArenaManager } from './battle/StadiumArenaManager';
-import { PokemonFactory } from './battle/PokemonFactory';
+import { PokemonFactory, type PartyExpAward } from './battle/PokemonFactory';
 import { BattleAudio } from './audio/BattleAudio';
 import { AudioManager } from './audio/AudioManager';
 import { RoamingManager } from './world/RoamingManager';
@@ -509,6 +509,37 @@ async function bootstrap() {
     new Set([...playerParty.map((p) => p.speciesId), ...boxManager.flatten().map((p) => p.speciesId)]);
 
   let overworldHUD: OverworldHUD;
+  let battleRenderer: BattleRenderer;
+  let battleHUD: BattleHUD;
+
+  const setBattleSpeed = (speed: SpeedMultiplier): SpeedMultiplier => {
+    gameClock.battleSpeed = speed;
+    gameOptions.battleSpeedMultiplier = speed;
+    if (battleRenderer) battleRenderer.setSpeedMultiplier(speed);
+    if (battleHUD) battleHUD.setSpeedMultiplier(speed);
+    void saveCurrentGame();
+    return speed;
+  };
+
+  const cycleBattleSpeed = (): SpeedMultiplier => {
+    const nextSpeed: SpeedMultiplier = gameClock.battleSpeed === 1 ? 2 : gameClock.battleSpeed === 2 ? 3 : 1;
+    return setBattleSpeed(nextSpeed);
+  };
+
+  const setTextSpeed = (speed: GameOptions['textSpeed']): GameOptions['textSpeed'] => {
+    gameOptions.textSpeed = speed;
+    if (overworldHUD) overworldHUD.setTextSpeed(speed);
+    if (battleHUD) battleHUD.setTextSpeed(speed);
+    void saveCurrentGame();
+    return speed;
+  };
+
+  const cycleTextSpeed = (): GameOptions['textSpeed'] => {
+    const speeds: Array<GameOptions['textSpeed']> = ['SLOW', 'MID', 'FAST', 'INSTANT'];
+    const current = gameOptions.textSpeed ?? 'MID';
+    const nextIdx = (speeds.indexOf(current) + 1) % speeds.length;
+    return setTextSpeed(speeds[nextIdx]);
+  };
 
   const cyclePlayerSpeed = (): SpeedMultiplier => {
     const newSpeed = gameClock.cyclePlayerSpeed();
@@ -549,6 +580,8 @@ async function bootstrap() {
       getMapName: () => mapManager.getCurrentMap()?.name || 'New Bark Town',
       isMuted: () => audioManager.isMuted(),
       getSpeedMultiplier: () => gameClock.playerSpeed,
+      getBattleSpeedMultiplier: () => gameClock.battleSpeed,
+      getTextSpeed: () => gameOptions.textSpeed ?? 'MID',
       isGamepadActive: () => overworldHUD?.isGamepadActive() ?? false,
       getTouchControlStyle: () => overworldHUD?.getTouchControlStyle() ?? gameOptions.touchControlStyle ?? 'DPAD',
       getExpShareMode: () => gameOptions.expShare ?? 'CAPPED',
@@ -612,6 +645,18 @@ async function bootstrap() {
       },
       onCycleSpeed: () => {
         return cyclePlayerSpeed();
+      },
+      onCycleBattleSpeed: () => {
+        return cycleBattleSpeed();
+      },
+      onSetBattleSpeed: (spd: SpeedMultiplier) => {
+        return setBattleSpeed(spd);
+      },
+      onCycleTextSpeed: () => {
+        return cycleTextSpeed();
+      },
+      onSetTextSpeed: (spd: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
+        return setTextSpeed(spd);
       },
       onToggleGamepad: () => {
         return overworldHUD.toggleGamepad();
@@ -758,6 +803,7 @@ async function bootstrap() {
   });
   overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
   overworldHUD.setTouchControlStyle(gameOptions.touchControlStyle || 'DPAD');
+  overworldHUD.setTextSpeed(gameOptions.textSpeed ?? 'MID');
   overworldHUD.updateMuteDisplay(audioManager.isMuted());
   overworldHUD.updateRouteName(initialMap.name);
   overworldHUD.updatePokegear(roamingManager.getAllRoamers());
@@ -870,10 +916,11 @@ async function bootstrap() {
   syncMapOverworldItems(initialMap);
 
   window.updateLoaderProgress?.(97, 'Initializing battle engine...');
-  const battleRenderer = new BattleRenderer(overworldRenderer.app);
+  battleRenderer = new BattleRenderer(overworldRenderer.app);
   battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
-  const battleHUD = new BattleHUD('battle-hud-container');
+  battleHUD = new BattleHUD('battle-hud-container');
   battleHUD.setSpeedMultiplier(gameClock.battleSpeed);
+  battleHUD.setTextSpeed(gameOptions.textSpeed ?? 'MID');
   window.updateLoaderProgress?.(100, 'Ready!');
   window.dismissLoader?.();
 
@@ -989,9 +1036,10 @@ async function bootstrap() {
       audioManager.setSfxVolume(updatedOptions.soundVolume);
       gameClock.playerSpeed = updatedOptions.playerSpeedDefault;
       if (updatedOptions.battleSpeedMultiplier) {
-        gameClock.battleSpeed = updatedOptions.battleSpeedMultiplier;
-        battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
-        battleHUD.setSpeedMultiplier(gameClock.battleSpeed);
+        setBattleSpeed(updatedOptions.battleSpeedMultiplier);
+      }
+      if (updatedOptions.textSpeed) {
+        setTextSpeed(updatedOptions.textSpeed);
       }
       if (updatedOptions.touchControlStyle) {
         overworldHUD.setTouchControlStyle(updatedOptions.touchControlStyle);
@@ -1505,10 +1553,7 @@ async function bootstrap() {
             }
           },
           onSpeedToggle: () => {
-            const nextSpeed = gameClock.cycleBattleSpeed();
-            gameOptions.battleSpeedMultiplier = nextSpeed;
-            battleRenderer.setSpeedMultiplier(nextSpeed);
-            return nextSpeed;
+            return cycleBattleSpeed();
           },
         },
         inventory.balls,
@@ -1663,82 +1708,87 @@ async function bootstrap() {
             inventory.badges.length
           );
 
-          for (const award of expAwards) {
+          const processLevelUpAndMoves = async (award: PartyExpAward) => {
+            if (!award.leveledUp) return;
             const member = award.pokemon;
-            if (award.isActiveBattler) {
-              if (award.isCapped) {
+            BattleAudio.playBallEvent('LEVEL_UP');
+            await battleHUD.showMessage(
+              `🎉 ${member.nickname} grew to Lv. ${award.newLevel}!`
+            );
+
+            // Level-Up Learnset Move Learning (Ticket 6.4)
+            const learnableMoveIds = await PokemonFactory.getLearnableMovesAtLevel(
+              member.speciesId,
+              award.newLevel
+            );
+
+            for (const newMoveId of learnableMoveIds) {
+              const alreadyKnown = member.moves.some((m) => m.moveId === newMoveId);
+              if (alreadyKnown) continue;
+
+              const newMoveData = PokemonFactory.getMoveData(newMoveId);
+
+              if (member.moves.length < 4) {
+                // Auto-learn if fewer than 4 moves
+                member.moves.push({
+                  moveId: newMoveData.id,
+                  currentPp: newMoveData.pp,
+                  maxPp: newMoveData.pp,
+                });
+                BattleAudio.playBallEvent('LEVEL_UP');
                 await battleHUD.showMessage(
-                  `🧢 ${member.nickname} is at the level cap (Lv. ${award.levelCap})! Received 1 EXP.`
+                  `✨ ${member.nickname} learned ${newMoveData.name}!`
                 );
               } else {
-                await battleHUD.showMessage(`${member.nickname} gained ${award.expAwarded} EXP. Points!`);
-              }
-              battleHUD.updateExp(activePlayerPokemon);
-              battleHUD.updateHp(true, activePlayerPokemon.currentHp, activePlayerPokemon.stats.hp);
-            } else {
-              if (award.isCapped) {
-                await battleHUD.showMessage(
-                  `🧢 ${member.nickname} is at the level cap (Lv. ${award.levelCap})! Received 1 EXP.`
-                );
-              } else {
-                await battleHUD.showMessage(
-                  `✨ ${member.nickname} gained ${award.expAwarded} EXP. Points via Exp. Share!`
-                );
-              }
-            }
-
-            if (award.leveledUp) {
-              BattleAudio.playBallEvent('LEVEL_UP');
-              await battleHUD.showMessage(
-                `🎉 ${member.nickname} grew to Lv. ${award.newLevel}!`
-              );
-
-              // Level-Up Learnset Move Learning (Ticket 6.4)
-              const learnableMoveIds = await PokemonFactory.getLearnableMovesAtLevel(
-                member.speciesId,
-                award.newLevel
-              );
-
-              for (const newMoveId of learnableMoveIds) {
-                const alreadyKnown = member.moves.some((m) => m.moveId === newMoveId);
-                if (alreadyKnown) continue;
-
-                const newMoveData = PokemonFactory.getMoveData(newMoveId);
-
-                if (member.moves.length < 4) {
-                  // Auto-learn if fewer than 4 moves
-                  member.moves.push({
+                // Prompt to forget an existing move or decline
+                const chosenIdx = await battleHUD.promptMoveForget(member, newMoveData);
+                if (chosenIdx !== null && chosenIdx >= 0 && chosenIdx < 4) {
+                  const forgottenMove = member.moves[chosenIdx];
+                  const forgottenData = PokemonFactory.getMoveData(forgottenMove.moveId);
+                  member.moves[chosenIdx] = {
                     moveId: newMoveData.id,
                     currentPp: newMoveData.pp,
                     maxPp: newMoveData.pp,
-                  });
+                  };
                   BattleAudio.playBallEvent('LEVEL_UP');
                   await battleHUD.showMessage(
-                    `✨ ${member.nickname} learned ${newMoveData.name}!`
+                    `1, 2, and... Poof! ${member.nickname} forgot ${forgottenData.name} and learned ${newMoveData.name}!`
                   );
                 } else {
-                  // Prompt to forget an existing move or decline
-                  const chosenIdx = await battleHUD.promptMoveForget(member, newMoveData);
-                  if (chosenIdx !== null && chosenIdx >= 0 && chosenIdx < 4) {
-                    const forgottenMove = member.moves[chosenIdx];
-                    const forgottenData = PokemonFactory.getMoveData(forgottenMove.moveId);
-                    member.moves[chosenIdx] = {
-                      moveId: newMoveData.id,
-                      currentPp: newMoveData.pp,
-                      maxPp: newMoveData.pp,
-                    };
-                    BattleAudio.playBallEvent('LEVEL_UP');
-                    await battleHUD.showMessage(
-                      `1, 2, and... Poof! ${member.nickname} forgot ${forgottenData.name} and learned ${newMoveData.name}!`
-                    );
-                  } else {
-                    await battleHUD.showMessage(
-                      `${member.nickname} did not learn ${newMoveData.name}.`
-                    );
-                  }
+                  await battleHUD.showMessage(
+                    `${member.nickname} did not learn ${newMoveData.name}.`
+                  );
                 }
               }
             }
+          };
+
+          // 1. Process active battler first
+          for (const award of expAwards) {
+            if (!award.isActiveBattler) continue;
+            const member = award.pokemon;
+            if (award.isCapped) {
+              await battleHUD.showMessage(
+                `🧢 ${member.nickname} is at the level cap (Lv. ${award.levelCap})! Received 1 EXP.`
+              );
+            } else {
+              await battleHUD.showMessage(`${member.nickname} gained ${award.expAwarded} EXP. Points!`);
+            }
+            battleHUD.updateExp(activePlayerPokemon);
+            battleHUD.updateHp(true, activePlayerPokemon.currentHp, activePlayerPokemon.stats.hp);
+            await processLevelUpAndMoves(award);
+          }
+
+          // 2. Process benched party members via consolidated summary (Pokémon Unbound style)
+          const benchSummary = PokemonFactory.formatBenchExpShareSummary(expAwards);
+          if (benchSummary) {
+            await battleHUD.showMessage(benchSummary);
+          }
+
+          // 3. Process benched members' level-ups and move learns
+          for (const award of expAwards) {
+            if (award.isActiveBattler || !award.leveledUp) continue;
+            await processLevelUpAndMoves(award);
           }
 
           // Multi-Pokémon Trainer Team continuation (Ticket 5.5)
@@ -1841,7 +1891,6 @@ async function bootstrap() {
         if (options.isRoamer) {
           eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
         }
-        await battleHUD.showMessage('Battle concluded! Returning to overworld...');
         mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
         battleRenderer.endBattle();
         battleHUD.hide();

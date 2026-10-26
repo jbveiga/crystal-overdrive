@@ -18,6 +18,37 @@ export interface OverworldHUDOptions {
 export class OverworldHUD {
   public static readonly DIALOGUE_CHAR_DELAY_MS = 12;
 
+  private textSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT' = 'MID';
+
+  public setTextSpeed(speed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT'): void {
+    this.textSpeed = speed;
+  }
+
+  public getTextSpeed(): 'SLOW' | 'MID' | 'FAST' | 'INSTANT' {
+    return this.textSpeed;
+  }
+
+  /**
+   * Returns effective typewriter character delay in ms for overworld dialogues:
+   * - SLOW: 24ms
+   * - MID (Normal): 12ms (OverworldHUD.DIALOGUE_CHAR_DELAY_MS)
+   * - FAST: 5ms
+   * - INSTANT: 0ms (renders full page text immediately in a single tick)
+   */
+  public getEffectiveCharDelayMs(): number {
+    switch (this.textSpeed) {
+      case 'SLOW':
+        return 24;
+      case 'FAST':
+        return 5;
+      case 'INSTANT':
+        return 0;
+      case 'MID':
+      default:
+        return OverworldHUD.DIALOGUE_CHAR_DELAY_MS;
+    }
+  }
+
   private container: HTMLElement;
   private speedButton: HTMLButtonElement | null = null;
   private muteButton: HTMLButtonElement | null = null;
@@ -1155,6 +1186,15 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
       this.dialoguePages.length > 1 ? `(${this.dialoguePageIndex + 1}/${this.dialoguePages.length}) ` : '';
     this.dialoguePrompt.style.opacity = '0.4';
 
+    const charDelay = this.getEffectiveCharDelayMs();
+    if (charDelay <= 0) {
+      this.dialogueCharIndex = fullText.length;
+      this.dialogueText.innerText = fullText;
+      this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
+      this.dialoguePrompt.style.opacity = '1';
+      return;
+    }
+
     this.dialogueTypeTimer = setInterval(() => {
       this.dialogueCharIndex++;
       this.dialogueText.innerText = fullText.slice(0, this.dialogueCharIndex);
@@ -1164,7 +1204,7 @@ box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
         this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
         this.dialoguePrompt.style.opacity = '1';
       }
-    }, OverworldHUD.DIALOGUE_CHAR_DELAY_MS);
+    }, charDelay);
   }
 
   public advanceDialogue(): void {

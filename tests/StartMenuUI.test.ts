@@ -793,5 +793,99 @@ describe('StartMenuUI — Neo-Kanto Google Stitch Modernization', () => {
     expect(doc.getElementById('itemfinder-radar-header')?.innerText).toBe('✨ LOCKED ON [A]');
     expect(doc.getElementById('itemfinder-distance-label')?.innerText).toBe('RIGHT HERE!');
   });
+
+  it('integrates Battle Speed and Text Speed controls into StartMenuUI Settings (TICKET-BATTLE-SPEED-EXP-SHARE-POLISH-01)', () => {
+    let currentBattleSpeed: SpeedMultiplier = 1;
+    let currentTextSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT' = 'MID';
+
+    const onSetBattleSpeed = vi.fn((spd: SpeedMultiplier) => {
+      currentBattleSpeed = spd;
+    });
+    const onCycleBattleSpeed = vi.fn(() => {
+      currentBattleSpeed = currentBattleSpeed === 1 ? 2 : currentBattleSpeed === 2 ? 3 : 1;
+      return currentBattleSpeed;
+    });
+    const onSetTextSpeed = vi.fn((ts: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
+      currentTextSpeed = ts;
+    });
+    const onCycleTextSpeed = vi.fn(() => {
+      const order: Array<'SLOW' | 'MID' | 'FAST' | 'INSTANT'> = ['SLOW', 'MID', 'FAST', 'INSTANT'];
+      currentTextSpeed = order[(order.indexOf(currentTextSpeed) + 1) % order.length];
+      return currentTextSpeed;
+    });
+
+    const ui = new StartMenuUI(
+      'modal-container',
+      {
+        getTrainerName: () => 'GOLD',
+        getMoney: () => 14500,
+        getBadges: () => ['zephyr'],
+        getPartyCount: () => 1,
+        getCaughtCount: () => 1,
+        getPlayTimeSeconds: () => 100,
+        getMapName: () => 'New Bark Town',
+        getBattleSpeedMultiplier: () => currentBattleSpeed,
+        getTextSpeed: () => currentTextSpeed,
+      },
+      {
+        onOpenParty: vi.fn(),
+        onOpenBag: vi.fn(),
+        onOpenPokegear: vi.fn(),
+        onSaveGame: vi.fn(),
+        onSetBattleSpeed,
+        onCycleBattleSpeed,
+        onSetTextSpeed,
+        onCycleTextSpeed,
+      }
+    );
+
+    ui.openSettings();
+    const settingsModal = doc.getElementById('settings-modal');
+    expect(settingsModal).not.toBeNull();
+
+    // Verify Battle Speed controls
+    const battleSpeedHeaderBtn = settingsModal?.querySelector('#settings-battle-speed-btn');
+    const battleSpeed1xBtn = settingsModal?.querySelector('#settings-battle-speed-1x-btn');
+    const battleSpeed2xBtn = settingsModal?.querySelector('#settings-battle-speed-2x-btn');
+    const battleSpeed3xBtn = settingsModal?.querySelector('#settings-battle-speed-3x-btn');
+
+    expect(battleSpeedHeaderBtn).toBeDefined();
+    expect(battleSpeed1xBtn).toBeDefined();
+    expect(battleSpeed2xBtn).toBeDefined();
+    expect(battleSpeed3xBtn).toBeDefined();
+
+    expect(battleSpeedHeaderBtn?.innerText).toContain('1x');
+
+    // Click 2x segmented button
+    battleSpeed2xBtn?.click();
+    expect(onSetBattleSpeed).toHaveBeenCalledWith(2);
+
+    // Click header cycle button
+    battleSpeedHeaderBtn?.click();
+    expect(onCycleBattleSpeed).toHaveBeenCalled();
+
+    // Verify Text Speed controls
+    const textSpeedHeaderBtn = settingsModal?.querySelector('#settings-text-speed-btn');
+    const textSlowBtn = settingsModal?.querySelector('#settings-text-slow-btn');
+    const textMidBtn = settingsModal?.querySelector('#settings-text-mid-btn');
+    const textFastBtn = settingsModal?.querySelector('#settings-text-fast-btn');
+    const textInstantBtn = settingsModal?.querySelector('#settings-text-instant-btn');
+
+    expect(textSpeedHeaderBtn).toBeDefined();
+    expect(textSlowBtn).toBeDefined();
+    expect(textMidBtn).toBeDefined();
+    expect(textFastBtn).toBeDefined();
+    expect(textInstantBtn).toBeDefined();
+
+    expect(textSpeedHeaderBtn?.innerText).toContain('NORMAL');
+
+    // Click INSTANT segmented button
+    textInstantBtn?.click();
+    expect(onSetTextSpeed).toHaveBeenCalledWith('INSTANT');
+
+    // Click header cycle button
+    textSpeedHeaderBtn?.click();
+    expect(onCycleTextSpeed).toHaveBeenCalled();
+  });
 });
 

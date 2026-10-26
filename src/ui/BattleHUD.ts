@@ -127,11 +127,43 @@ export class BattleHUD {
   private activeBagTab: BattleBagTab = 'ALL';
   private selectedBagTargetIndex: number = 0;
   private callbacks!: BattleHUDCallbacks;
-  public static readonly DIALOGUE_CHAR_DELAY_MS = 12;
-  public static readonly DIALOGUE_POST_DELAY_MS = 500;
+  public static readonly DIALOGUE_CHAR_DELAY_MS = 10;
+  public static readonly DIALOGUE_POST_DELAY_MS = 380;
 
+  private textSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT' = 'MID';
   private speedMultiplier: SpeedMultiplier = 1;
   private isForcedPartySwitch: boolean = false;
+
+  public setTextSpeed(speed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT'): void {
+    this.textSpeed = speed;
+  }
+
+  public getTextSpeed(): 'SLOW' | 'MID' | 'FAST' | 'INSTANT' {
+    return this.textSpeed;
+  }
+
+  /**
+   * Returns effective per-character delay scaled by both textSpeed and speedMultiplier.
+   * - INSTANT: 0ms
+   * - SLOW: base 18ms / speedMultiplier (min 2ms)
+   * - MID: base 10ms / speedMultiplier (min 2ms)
+   * - FAST: base 5ms / speedMultiplier (min 2ms)
+   */
+  public getEffectiveCharDelayMs(): number {
+    if (this.textSpeed === 'INSTANT') return 0;
+    const baseMs =
+      this.textSpeed === 'SLOW'
+        ? 18
+        : this.textSpeed === 'FAST'
+          ? 5
+          : BattleHUD.DIALOGUE_CHAR_DELAY_MS;
+    return Math.max(2, Math.round(baseMs / this.speedMultiplier));
+  }
+
+  /** Returns effective post-message hold duration scaled inversely by speedMultiplier (min 80ms). */
+  public getEffectivePostDelayMs(): number {
+    return Math.max(80, Math.round(BattleHUD.DIALOGUE_POST_DELAY_MS / this.speedMultiplier));
+  }
 
   constructor(containerId: string = 'battle-hud-container') {
     const el = document.getElementById(containerId);
@@ -888,6 +920,8 @@ export class BattleHUD {
     const text = this.rootElement.querySelector(textId) as HTMLElement | null;
     if (!bar || !text) return;
     const pct = Math.max(0, Math.min(100, (currentHp / Math.max(1, maxHp)) * 100));
+    const drainSec = (0.3 / this.speedMultiplier).toFixed(2);
+    bar.style.transition = `width ${drainSec}s ease`;
     bar.style.width = `${pct}%`;
     text.innerText = `${currentHp} / ${maxHp} HP`;
     bar.style.background = pct > 50 ? '#22c55e' : pct > 20 ? '#eab308' : '#ef4444';
@@ -1890,13 +1924,20 @@ export class BattleHUD {
       }
     }
 
-    this.messageBox.innerText = '';
-    for (let i = 1; i <= text.length; i++) {
-      this.messageBox.innerText = text.slice(0, i);
-      await new Promise((r) => setTimeout(r, BattleHUD.DIALOGUE_CHAR_DELAY_MS));
+    const charDelay = this.getEffectiveCharDelayMs();
+    const postDelay = this.getEffectivePostDelayMs();
+
+    if (charDelay <= 0) {
+      this.messageBox.innerText = text;
+    } else {
+      this.messageBox.innerText = '';
+      for (let i = 1; i <= text.length; i++) {
+        this.messageBox.innerText = text.slice(0, i);
+        await new Promise((r) => setTimeout(r, charDelay));
+      }
     }
 
-    return new Promise((resolve) => setTimeout(resolve, BattleHUD.DIALOGUE_POST_DELAY_MS));
+    return new Promise((resolve) => setTimeout(resolve, postDelay));
   }
 
   private isMobileViewport(): boolean {

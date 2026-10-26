@@ -531,6 +531,22 @@ export class PokemonFactory {
   }
 
   /**
+   * Formats a single consolidated Pokémon Unbound-style Exp. Share summary line for all
+   * benched party recipients (`!award.isActiveBattler`). Returns `null` if no bench Pokémon gained EXP.
+   */
+  public static formatBenchExpShareSummary(awards: PartyExpAward[]): string | null {
+    const benchAwards = awards.filter((a) => !a.isActiveBattler && a.expAwarded > 0);
+    if (benchAwards.length === 0) return null;
+
+    const uncappedBench = benchAwards.find((a) => !a.isCapped);
+    if (!uncappedBench) {
+      const cap = benchAwards[0].levelCap;
+      return `🧢 The rest of your party is at the level cap (Lv. ${cap}) and received 1 EXP. Point via Exp. Share!`;
+    }
+    return `✨ The rest of your party received ${uncappedBench.expAwarded} EXP. Points via Exp. Share!`;
+  }
+
+  /**
    * Awards EXP to a Pokémon and recalculates stats if it levels up
    */
   public static gainExp(pokemon: PokemonInstance, amount: number): { leveledUp: boolean; newLevel: number } {

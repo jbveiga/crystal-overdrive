@@ -148,8 +148,14 @@ class MockElement {
       if (selector.startsWith('#')) return el.id === selector.slice(1);
       if (selector.startsWith('.')) return el.classList.contains(selector.slice(1));
       if (selector.startsWith('[')) {
-        const attr = selector.slice(1, -1);
-        return Boolean(el.attributes[attr]);
+        const inner = selector.slice(1, -1);
+        const eqIdx = inner.indexOf('=');
+        if (eqIdx !== -1) {
+          const k = inner.slice(0, eqIdx).trim();
+          const v = inner.slice(eqIdx + 1).replace(/^["']|["']$/g, '').trim();
+          return el.attributes[k] === v;
+        }
+        return Boolean(el.attributes[inner]);
       }
       return el.tagName.toLowerCase() === selector.toLowerCase();
     });
@@ -176,8 +182,15 @@ class MockElement {
       if (selector.startsWith('#')) matches = child.id === selector.slice(1);
       else if (selector.startsWith('.')) matches = child.classList.contains(selector.slice(1));
       else if (selector.startsWith('[')) {
-        const attr = selector.slice(1, -1);
-        matches = Boolean(child.attributes[attr]);
+        const inner = selector.slice(1, -1);
+        const eqIdx = inner.indexOf('=');
+        if (eqIdx !== -1) {
+          const k = inner.slice(0, eqIdx).trim();
+          const v = inner.slice(eqIdx + 1).replace(/^["']|["']$/g, '').trim();
+          matches = child.attributes[k] === v;
+        } else {
+          matches = Boolean(child.attributes[inner]);
+        }
       } else matches = child.tagName.toLowerCase() === selector.toLowerCase();
 
       if (matches) results.push(child);
@@ -433,5 +446,13 @@ describe('Neo-Kanto Google Stitch Overhaul — Sprint 16 Slice 2 UI Modules', ()
     expect(innerCard?.style.border).toBe('2px solid #38BDF8');
     expect(innerCard?.style.boxShadow).toBe('0 8px 0 0 #070B14');
     expect(innerCard?.style.fontFamily).toContain('Plus Jakarta Sans');
+
+    // Verify Battle Speed options in TitleScreenUI
+    const battleSpeedBtns = optionsModal?.querySelectorAll('[data-battle-speed]');
+    expect(battleSpeedBtns?.length).toBe(3);
+    const spd2Btn = optionsModal?.querySelector('[data-battle-speed="2"]');
+    expect(spd2Btn).toBeDefined();
+    spd2Btn?.click();
+    expect(titleScreen.getOptions().battleSpeedMultiplier).toBe(2);
   });
 });

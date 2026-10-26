@@ -309,6 +309,8 @@ export interface StartMenuStateProvider {
   getMapName: () => string;
   isMuted?: () => boolean;
   getSpeedMultiplier?: () => SpeedMultiplier;
+  getBattleSpeedMultiplier?: () => SpeedMultiplier;
+  getTextSpeed?: () => 'SLOW' | 'MID' | 'FAST' | 'INSTANT';
   isGamepadActive?: () => boolean;
   getTouchControlStyle?: () => TouchControlStyle;
   getExpShareMode?: () => ExpShareMode;
@@ -335,6 +337,10 @@ export interface StartMenuCallbacks {
   onSaveGame: () => Promise<void>;
   onToggleMute?: () => boolean;
   onCycleSpeed?: () => SpeedMultiplier;
+  onCycleBattleSpeed?: () => SpeedMultiplier;
+  onSetBattleSpeed?: (speed: SpeedMultiplier) => SpeedMultiplier | void;
+  onCycleTextSpeed?: () => 'SLOW' | 'MID' | 'FAST' | 'INSTANT';
+  onSetTextSpeed?: (speed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => ('SLOW' | 'MID' | 'FAST' | 'INSTANT') | void;
   onToggleGamepad?: () => boolean;
   onToggleTouchControlStyle?: () => TouchControlStyle;
   onCycleExpShareMode?: () => ExpShareMode;
@@ -2055,6 +2061,40 @@ export class StartMenuUI {
     const currentBadges = this.stateProvider.getBadges ? this.stateProvider.getBadges().length : 0;
     const currentLevelCap = PokemonFactory.getLevelCapForBadges(currentBadges);
 
+    const battleSpeed: SpeedMultiplier = this.stateProvider.getBattleSpeedMultiplier
+      ? this.stateProvider.getBattleSpeedMultiplier()
+      : 1;
+    const textSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT' = this.stateProvider.getTextSpeed
+      ? this.stateProvider.getTextSpeed()
+      : 'MID';
+
+    const getBattleSpeedBg = (spd: SpeedMultiplier) => {
+      if (spd === 1) return '#2563eb';
+      if (spd === 2) return '#d97706';
+      return '#dc2626';
+    };
+    const getBattleSpeedBorder = (spd: SpeedMultiplier) => {
+      if (spd === 1) return '#60a5fa';
+      if (spd === 2) return '#f59e0b';
+      return '#ef4444';
+    };
+
+    const getTextSpeedBg = (spd: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
+      if (spd === 'SLOW') return '#475569';
+      if (spd === 'MID') return '#0284c7';
+      if (spd === 'FAST') return '#059669';
+      return '#7c3aed';
+    };
+    const getTextSpeedBorder = (spd: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
+      if (spd === 'SLOW') return '#94a3b8';
+      if (spd === 'MID') return '#38bdf8';
+      if (spd === 'FAST') return '#34d399';
+      return '#c084fc';
+    };
+    const getTextSpeedLabel = (spd: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
+      return spd === 'MID' ? 'NORMAL' : spd;
+    };
+
     const getExpShareButtonLabel = (mode: ExpShareMode) => {
       if (mode === 'OFF') return 'EXP: OFF (Single Battler)';
       if (mode === 'ALL') return 'EXP: ALL (Full Team 50%)';
@@ -2185,6 +2225,147 @@ export class StartMenuUI {
             cursor: pointer;
             min-width: 130px;
           ">⚡ SPEED: ${currentSpeed}x</button>
+        </div>
+
+        <!-- Battle Speed Group Card -->
+        <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="${titleLabelStyle}">BATTLE SPEED</div>
+              <div style="${subLabelStyle}">Combat animations, HP/EXP bars & battle text pacing</div>
+            </div>
+            <button id="settings-battle-speed-btn" class="neo-kanto-tactile-btn" style="
+              background: ${getBattleSpeedBg(battleSpeed)};
+              color: #ffffff;
+              border: 1.5px solid ${getBattleSpeedBorder(battleSpeed)};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 7px 12px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+              min-width: 130px;
+            ">⚔️ BATTLE: ${battleSpeed}x</button>
+          </div>
+          <div id="settings-battle-speed-segmented-group" style="display:flex;gap:6px;width:100%;">
+            <button id="settings-battle-speed-1x-btn" data-battle-speed-choice="1" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${battleSpeed === 1 ? '#2563eb' : '#080E1D'};
+              color: ${battleSpeed === 1 ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${battleSpeed === 1 ? '#60a5fa' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ 1x NORMAL ]</button>
+            <button id="settings-battle-speed-2x-btn" data-battle-speed-choice="2" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${battleSpeed === 2 ? '#d97706' : '#080E1D'};
+              color: ${battleSpeed === 2 ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${battleSpeed === 2 ? '#f59e0b' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ 2x FAST ]</button>
+            <button id="settings-battle-speed-3x-btn" data-battle-speed-choice="3" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${battleSpeed === 3 ? '#dc2626' : '#080E1D'};
+              color: ${battleSpeed === 3 ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${battleSpeed === 3 ? '#ef4444' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 6px 8px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ 3x TURBO ]</button>
+          </div>
+        </div>
+
+        <!-- Text Speed Group Card -->
+        <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <div style="${titleLabelStyle}">TEXT SPEED</div>
+              <div style="${subLabelStyle}">Overworld & battle dialogue typewriter cadence</div>
+            </div>
+            <button id="settings-text-speed-btn" class="neo-kanto-tactile-btn" style="
+              background: ${getTextSpeedBg(textSpeed)};
+              color: #ffffff;
+              border: 1.5px solid ${getTextSpeedBorder(textSpeed)};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 7px 12px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+              min-width: 130px;
+            ">💬 TEXT: ${getTextSpeedLabel(textSpeed)}</button>
+          </div>
+          <div id="settings-text-speed-segmented-group" style="display:flex;gap:6px;width:100%;">
+            <button id="settings-text-slow-btn" data-text-speed-choice="SLOW" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${textSpeed === 'SLOW' ? '#475569' : '#080E1D'};
+              color: ${textSpeed === 'SLOW' ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${textSpeed === 'SLOW' ? '#94a3b8' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 6px 6px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ SLOW ]</button>
+            <button id="settings-text-mid-btn" data-text-speed-choice="MID" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${textSpeed === 'MID' ? '#0284c7' : '#080E1D'};
+              color: ${textSpeed === 'MID' ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${textSpeed === 'MID' ? '#38bdf8' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 6px 6px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ NORMAL ]</button>
+            <button id="settings-text-fast-btn" data-text-speed-choice="FAST" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${textSpeed === 'FAST' ? '#059669' : '#080E1D'};
+              color: ${textSpeed === 'FAST' ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${textSpeed === 'FAST' ? '#34d399' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 6px 6px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ FAST ]</button>
+            <button id="settings-text-instant-btn" data-text-speed-choice="INSTANT" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${textSpeed === 'INSTANT' ? '#7c3aed' : '#080E1D'};
+              color: ${textSpeed === 'INSTANT' ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${textSpeed === 'INSTANT' ? '#c084fc' : '#22324F'};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 6px 6px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+            ">[ INSTANT ]</button>
+          </div>
         </div>
 
         <!-- Touch Controls Toggle -->
@@ -2623,6 +2804,110 @@ export class StartMenuUI {
         speedBtn.innerText = `⚡ SPEED: ${nextSpeed}x`;
       }
     });
+
+    const battleSpeedBtn = this.settingsModal.querySelector('#settings-battle-speed-btn') as HTMLButtonElement | null;
+    const battleSpeed1xBtn = this.settingsModal.querySelector('#settings-battle-speed-1x-btn') as HTMLButtonElement | null;
+    const battleSpeed2xBtn = this.settingsModal.querySelector('#settings-battle-speed-2x-btn') as HTMLButtonElement | null;
+    const battleSpeed3xBtn = this.settingsModal.querySelector('#settings-battle-speed-3x-btn') as HTMLButtonElement | null;
+
+    let activeBattleSpeed: SpeedMultiplier = battleSpeed;
+    const syncBattleSpeedButtons = (spd: SpeedMultiplier) => {
+      activeBattleSpeed = spd;
+      if (battleSpeedBtn) {
+        battleSpeedBtn.innerText = `⚔️ BATTLE: ${spd}x`;
+        battleSpeedBtn.style.background = getBattleSpeedBg(spd);
+        battleSpeedBtn.style.borderColor = getBattleSpeedBorder(spd);
+      }
+      const choices: Array<{ el: HTMLButtonElement | null; val: SpeedMultiplier }> = [
+        { el: battleSpeed1xBtn, val: 1 },
+        { el: battleSpeed2xBtn, val: 2 },
+        { el: battleSpeed3xBtn, val: 3 },
+      ];
+      for (const { el, val } of choices) {
+        if (!el) continue;
+        const isSel = spd === val;
+        el.style.background = isSel ? getBattleSpeedBg(val) : '#080E1D';
+        el.style.color = isSel ? '#ffffff' : '#94a3b8';
+        el.style.borderColor = isSel ? getBattleSpeedBorder(val) : '#22324F';
+      }
+    };
+
+    const applyBattleSpeed = (spd: SpeedMultiplier) => {
+      BattleAudio.playMenuSound('CONFIRM');
+      if (this.callbacks.onSetBattleSpeed) {
+        this.callbacks.onSetBattleSpeed(spd);
+      }
+      syncBattleSpeedButtons(spd);
+    };
+
+    battleSpeedBtn?.addEventListener('click', () => {
+      if (this.callbacks.onCycleBattleSpeed) {
+        const nextSpeed = this.callbacks.onCycleBattleSpeed();
+        BattleAudio.playMenuSound('CONFIRM');
+        syncBattleSpeedButtons(nextSpeed);
+      } else {
+        const nextSpeed: SpeedMultiplier = activeBattleSpeed === 1 ? 2 : activeBattleSpeed === 2 ? 3 : 1;
+        applyBattleSpeed(nextSpeed);
+      }
+    });
+
+    battleSpeed1xBtn?.addEventListener('click', () => applyBattleSpeed(1));
+    battleSpeed2xBtn?.addEventListener('click', () => applyBattleSpeed(2));
+    battleSpeed3xBtn?.addEventListener('click', () => applyBattleSpeed(3));
+
+    const textSpeedBtn = this.settingsModal.querySelector('#settings-text-speed-btn') as HTMLButtonElement | null;
+    const textSlowBtn = this.settingsModal.querySelector('#settings-text-slow-btn') as HTMLButtonElement | null;
+    const textMidBtn = this.settingsModal.querySelector('#settings-text-mid-btn') as HTMLButtonElement | null;
+    const textFastBtn = this.settingsModal.querySelector('#settings-text-fast-btn') as HTMLButtonElement | null;
+    const textInstantBtn = this.settingsModal.querySelector('#settings-text-instant-btn') as HTMLButtonElement | null;
+
+    let activeTextSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT' = textSpeed;
+    const syncTextSpeedButtons = (ts: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
+      activeTextSpeed = ts;
+      if (textSpeedBtn) {
+        textSpeedBtn.innerText = `💬 TEXT: ${getTextSpeedLabel(ts)}`;
+        textSpeedBtn.style.background = getTextSpeedBg(ts);
+        textSpeedBtn.style.borderColor = getTextSpeedBorder(ts);
+      }
+      const choices: Array<{ el: HTMLButtonElement | null; val: 'SLOW' | 'MID' | 'FAST' | 'INSTANT' }> = [
+        { el: textSlowBtn, val: 'SLOW' },
+        { el: textMidBtn, val: 'MID' },
+        { el: textFastBtn, val: 'FAST' },
+        { el: textInstantBtn, val: 'INSTANT' },
+      ];
+      for (const { el, val } of choices) {
+        if (!el) continue;
+        const isSel = ts === val;
+        el.style.background = isSel ? getTextSpeedBg(val) : '#080E1D';
+        el.style.color = isSel ? '#ffffff' : '#94a3b8';
+        el.style.borderColor = isSel ? getTextSpeedBorder(val) : '#22324F';
+      }
+    };
+
+    const applyTextSpeed = (ts: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
+      BattleAudio.playMenuSound('CONFIRM');
+      if (this.callbacks.onSetTextSpeed) {
+        this.callbacks.onSetTextSpeed(ts);
+      }
+      syncTextSpeedButtons(ts);
+    };
+
+    textSpeedBtn?.addEventListener('click', () => {
+      if (this.callbacks.onCycleTextSpeed) {
+        const nextTs = this.callbacks.onCycleTextSpeed();
+        BattleAudio.playMenuSound('CONFIRM');
+        syncTextSpeedButtons(nextTs);
+      } else {
+        const speeds: Array<'SLOW' | 'MID' | 'FAST' | 'INSTANT'> = ['SLOW', 'MID', 'FAST', 'INSTANT'];
+        const nextTs = speeds[(speeds.indexOf(activeTextSpeed) + 1) % speeds.length];
+        applyTextSpeed(nextTs);
+      }
+    });
+
+    textSlowBtn?.addEventListener('click', () => applyTextSpeed('SLOW'));
+    textMidBtn?.addEventListener('click', () => applyTextSpeed('MID'));
+    textFastBtn?.addEventListener('click', () => applyTextSpeed('FAST'));
+    textInstantBtn?.addEventListener('click', () => applyTextSpeed('INSTANT'));
 
     gamepadBtn.addEventListener('click', () => {
       if (this.callbacks.onToggleGamepad) {

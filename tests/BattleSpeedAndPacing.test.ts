@@ -4,6 +4,7 @@ import * as path from 'path';
 import { GameClock } from '../src/core/GameClock';
 import { BattleHUD } from '../src/ui/BattleHUD';
 import { OverworldHUD } from '../src/ui/OverworldHUD';
+import { PokemonFactory, type PartyExpAward } from '../src/battle/PokemonFactory';
 import type { SpeedMultiplier } from '../src/types/game';
 
 // Lightweight in-memory DOM mock for node environment UI test
@@ -302,17 +303,17 @@ describe('TICKET-UX-BATTLE-3X-SPEED-AND-PACING-01: Battle 3x Speed Ceiling & Pac
     });
   });
 
-  describe('3. Dialogue Pacing Decoupling & Accelerated Constants', () => {
-    it('defines DIALOGUE_CHAR_DELAY_MS = 12 and DIALOGUE_POST_DELAY_MS = 500 in BattleHUD', () => {
-      expect(BattleHUD.DIALOGUE_CHAR_DELAY_MS).toBe(12);
-      expect(BattleHUD.DIALOGUE_POST_DELAY_MS).toBe(500);
+  describe('3. BattleHUD & OverworldHUD Pacing & Cadence Sync', () => {
+    it('defines DIALOGUE_CHAR_DELAY_MS = 10 and DIALOGUE_POST_DELAY_MS = 380 in BattleHUD', () => {
+      expect(BattleHUD.DIALOGUE_CHAR_DELAY_MS).toBe(10);
+      expect(BattleHUD.DIALOGUE_POST_DELAY_MS).toBe(380);
     });
 
     it('defines DIALOGUE_CHAR_DELAY_MS = 12 in OverworldHUD', () => {
       expect(OverworldHUD.DIALOGUE_CHAR_DELAY_MS).toBe(12);
     });
 
-    it('guarantees battle dialogue typewriter runs at 12ms/char + 500ms post-delay across all speeds', async () => {
+    it('computes effective character and post delay scaled by speedMultiplier and textSpeed in BattleHUD', () => {
       const container = doc.createElement('div');
       container.id = 'battle-hud-container';
       doc.body.appendChild(container);
@@ -320,55 +321,195 @@ describe('TICKET-UX-BATTLE-3X-SPEED-AND-PACING-01: Battle 3x Speed Ceiling & Pac
 
       const hud = new BattleHUD('battle-hud-container');
 
+      // MID text speed
+      hud.setTextSpeed('MID');
+      hud.setSpeedMultiplier(1);
+      expect(hud.getEffectiveCharDelayMs()).toBe(10);
+      expect(hud.getEffectivePostDelayMs()).toBe(380);
+
+      hud.setSpeedMultiplier(2);
+      expect(hud.getEffectiveCharDelayMs()).toBe(5);
+      expect(hud.getEffectivePostDelayMs()).toBe(190);
+
+      hud.setSpeedMultiplier(3);
+      expect(hud.getEffectiveCharDelayMs()).toBe(3);
+      expect(hud.getEffectivePostDelayMs()).toBe(127);
+
+      // SLOW text speed
+      hud.setTextSpeed('SLOW');
+      hud.setSpeedMultiplier(1);
+      expect(hud.getEffectiveCharDelayMs()).toBe(18);
+
+      // FAST text speed
+      hud.setTextSpeed('FAST');
+      hud.setSpeedMultiplier(1);
+      expect(hud.getEffectiveCharDelayMs()).toBe(5);
+
+      // INSTANT text speed
+      hud.setTextSpeed('INSTANT');
+      hud.setSpeedMultiplier(1);
+      expect(hud.getEffectiveCharDelayMs()).toBe(0);
+      hud.setSpeedMultiplier(3);
+      expect(hud.getEffectiveCharDelayMs()).toBe(0);
+    });
+
+    it('renders battle text instantly when textSpeed is INSTANT', async () => {
+      const container = doc.createElement('div');
+      container.id = 'battle-hud-container';
+      doc.body.appendChild(container);
+      doc.register(container);
+
+      const hud = new BattleHUD('battle-hud-container');
+      hud.setTextSpeed('INSTANT');
+      hud.setSpeedMultiplier(3);
+
       vi.useFakeTimers();
       try {
-        for (const speed of [1, 2, 3] as const) {
-          hud.setSpeedMultiplier(speed);
-          let finished = false;
-          const msg = 'PIKACHU used THUNDERBOLT!';
-          const expectedTotalMs = 12 * msg.length + 500;
+        let finished = false;
+        const msg = 'PIKACHU used THUNDERBOLT!';
+        const promise = hud.showMessage(msg).then(() => {
+          finished = true;
+        });
 
-          const promise = hud.showMessage(msg).then(() => {
-            finished = true;
-          });
+        const postDelay = hud.getEffectivePostDelayMs();
+        // Advance slightly before post delay finishes
+        await vi.advanceTimersByTimeAsync(postDelay - 5);
+        expect(finished).toBe(false);
 
-          await vi.advanceTimersByTimeAsync(expectedTotalMs - 10);
-          expect(finished).toBe(false);
-
-          await vi.advanceTimersByTimeAsync(15);
-          await promise;
-          expect(finished).toBe(true);
-        }
+        await vi.advanceTimersByTimeAsync(10);
+        await promise;
+        expect(finished).toBe(true);
       } finally {
         vi.useRealTimers();
       }
     });
 
-    it('executes overworld dialogue typewriter ticker with 12ms character pacing', () => {
+    it('computes effective typewriter char delay in OverworldHUD and renders instantly when INSTANT', () => {
       const container = doc.createElement('div');
       container.id = 'overworld-hud-container';
       doc.body.appendChild(container);
       doc.register(container);
 
       const overworldHud = new OverworldHUD('overworld-hud-container');
-      const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
+      overworldHud.setTextSpeed('SLOW');
+      expect(overworldHud.getEffectiveCharDelayMs()).toBe(24);
 
+      overworldHud.setTextSpeed('MID');
+      expect(overworldHud.getEffectiveCharDelayMs()).toBe(12);
+
+      overworldHud.setTextSpeed('FAST');
+      expect(overworldHud.getEffectiveCharDelayMs()).toBe(5);
+
+      overworldHud.setTextSpeed('INSTANT');
+      expect(overworldHud.getEffectiveCharDelayMs()).toBe(0);
+
+      // Test ticker spy with MID
+      overworldHud.setTextSpeed('MID');
+      const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
       overworldHud.openDialogue(['Welcome to the world of Pokémon!'], 'PROF. ELM');
       expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 12);
-
       setIntervalSpy.mockRestore();
     });
   });
 
-  describe('4. BattleRenderer Snappy Intro Animation Invariants', () => {
-    it('verifies BattleRenderer has tuned flashDur (0.05), slideDur (0.30), and cry bounce (0.065 / repeat 2)', () => {
+  describe('4. BattleRenderer Snappy Intro & Idle Animation Scaling', () => {
+    it('verifies BattleRenderer has tuned flashDur, slideDur, cry bounce, and scaled idle breathing', () => {
       const rendererFile = path.resolve(__dirname, '../src/render/BattleRenderer.ts');
       const content = fs.readFileSync(rendererFile, 'utf-8');
 
       expect(content).toContain('const flashDur = 0.05 / this.speedMultiplier;');
       expect(content).toContain('const slideDur = 0.30 / this.speedMultiplier;');
       expect(content).toContain('duration: 0.065 / this.speedMultiplier,');
-      expect(content).toContain('repeat: 2,');
+      expect(content).toContain('duration: 0.75 / this.speedMultiplier,');
+      expect(content).toContain('this.playerIdleTween?.timeScale(speed);');
+      expect(content).toContain('this.enemyIdleTween?.timeScale(speed);');
+    });
+  });
+
+  describe('5. PokemonFactory Unbound-Style Exp. Share Summary', () => {
+    it('returns null when no bench Pokémon gained EXP', () => {
+      const awards: PartyExpAward[] = [
+        {
+          pokemon: { nickname: 'Cyndaquil' } as any,
+          expAwarded: 50,
+          isCapped: false,
+          isActiveBattler: true,
+          leveledUp: false,
+          newLevel: 5,
+          levelCap: 15,
+        },
+      ];
+      expect(PokemonFactory.formatBenchExpShareSummary(awards)).toBeNull();
+    });
+
+    it('returns consolidated summary prompt when benched party members receive EXP', () => {
+      const awards: PartyExpAward[] = [
+        {
+          pokemon: { nickname: 'Cyndaquil' } as any,
+          expAwarded: 100,
+          isCapped: false,
+          isActiveBattler: true,
+          leveledUp: false,
+          newLevel: 10,
+          levelCap: 15,
+        },
+        {
+          pokemon: { nickname: 'Pidgey' } as any,
+          expAwarded: 50,
+          isCapped: false,
+          isActiveBattler: false,
+          leveledUp: false,
+          newLevel: 8,
+          levelCap: 15,
+        },
+        {
+          pokemon: { nickname: 'Sentret' } as any,
+          expAwarded: 50,
+          isCapped: false,
+          isActiveBattler: false,
+          leveledUp: false,
+          newLevel: 7,
+          levelCap: 15,
+        },
+      ];
+      expect(PokemonFactory.formatBenchExpShareSummary(awards)).toBe(
+        '✨ The rest of your party received 50 EXP. Points via Exp. Share!'
+      );
+    });
+
+    it('returns level-cap summary prompt when all benched recipients are capped', () => {
+      const awards: PartyExpAward[] = [
+        {
+          pokemon: { nickname: 'Cyndaquil' } as any,
+          expAwarded: 100,
+          isCapped: false,
+          isActiveBattler: true,
+          leveledUp: false,
+          newLevel: 12,
+          levelCap: 15,
+        },
+        {
+          pokemon: { nickname: 'Pidgey' } as any,
+          expAwarded: 1,
+          isCapped: true,
+          isActiveBattler: false,
+          leveledUp: false,
+          newLevel: 15,
+          levelCap: 15,
+        },
+      ];
+      expect(PokemonFactory.formatBenchExpShareSummary(awards)).toBe(
+        '🧢 The rest of your party is at the level cap (Lv. 15) and received 1 EXP. Point via Exp. Share!'
+      );
+    });
+  });
+
+  describe('6. Canonical Battle Conclusions', () => {
+    it('asserts that main.ts does not contain synthetic "Battle concluded! Returning to overworld..." message', () => {
+      const mainFile = path.resolve(__dirname, '../src/main.ts');
+      const content = fs.readFileSync(mainFile, 'utf-8');
+
+      expect(content).not.toContain('Battle concluded! Returning to overworld...');
     });
   });
 });

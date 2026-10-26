@@ -31,6 +31,8 @@ export class BattleRenderer {
 
   public setSpeedMultiplier(speed: SpeedMultiplier): void {
     this.speedMultiplier = speed;
+    this.playerIdleTween?.timeScale(speed);
+    this.enemyIdleTween?.timeScale(speed);
   }
 
   private startIdleBreathing(sprite: Sprite, baseScale: number, isPlayer: boolean): void {
@@ -43,7 +45,7 @@ export class BattleRenderer {
     const tween = gsap.to(sprite.scale, {
       x: baseScale * 1.03,
       y: baseScale * 0.96,
-      duration: 0.75,
+      duration: 0.75 / this.speedMultiplier,
       yoyo: true,
       repeat: -1,
       ease: 'sine.inOut',
