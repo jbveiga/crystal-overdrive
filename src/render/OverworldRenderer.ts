@@ -112,6 +112,7 @@ export class OverworldRenderer {
   private npcFrames: Map<NpcSpriteType, CharacterFrames> = new Map();
   private loadingNpcPromises: Map<NpcSpriteType, Promise<void>> = new Map();
   private fruitTreeTexture: Texture | null = null;
+  private lookupMapNpcs?: (mapId: string) => GridEntity[];
   private lastCullCamX: number = Number.NaN;
   private lastCullCamY: number = Number.NaN;
   private lastCullScreenW: number = 0;
@@ -200,6 +201,54 @@ export class OverworldRenderer {
     })();
     this.loadingNpcPromises.set(spriteType, promise);
     return promise;
+  }
+
+  public setNpcLookup(lookupMapNpcs: (mapId: string) => GridEntity[]): void {
+    this.lookupMapNpcs = lookupMapNpcs;
+  }
+
+  /**
+   * Preloads character sprite sheets for an explicit list of NPCs via AssetManifestQueue.
+   */
+  public async ensureMapNpcSpritesLoaded(
+    npcs: GridEntity[],
+    queueOptions?: ManifestQueueOptions
+  ): Promise<void> {
+    const missingSpriteTypes: NpcSpriteType[] = [];
+    for (let i = 0; i < npcs.length; i++) {
+      const spriteType = npcs[i].spriteType || 'boy';
+      if (!this.npcFrames.has(spriteType) && !missingSpriteTypes.includes(spriteType)) {
+        missingSpriteTypes.push(spriteType);
+      }
+    }
+
+    if (missingSpriteTypes.length === 0) return;
+
+    const manifest = new AssetManifestQueue();
+    for (const spriteType of missingSpriteTypes) {
+      manifest.enqueue({
+        id: `npc_sprite:${spriteType}`,
+        label: `Loading NPC sprite ${spriteType}`,
+        category: 'CHARACTER_SPRITE',
+        execute: async () => {
+          await this.ensureNpcSpriteLoaded(spriteType);
+        },
+      });
+    }
+
+    await manifest.run(queueOptions);
+  }
+
+  public hasNpcSpriteLoaded(spriteType: NpcSpriteType): boolean {
+    return this.npcFrames.has(spriteType);
+  }
+
+  public hasSpawnedNpcSprite(npcId: string): boolean {
+    return this.npcSprites.has(npcId);
+  }
+
+  public getSpawnedNpcSpriteCount(): number {
+    return this.npcSprites.size;
   }
 
   private async loadAssets(queueOptions?: ManifestQueueOptions): Promise<void> {
@@ -697,13 +746,14 @@ export class OverworldRenderer {
    * Ensures all tiles referenced by a map (base tileMap, overlayMap, and adjacent neighbor chunks) are loaded into tileTextures.
    * Loads textures on-demand from ./assets/tiles/${name}.png so maps (such as Route 32 cave rocks,
    * Union Cave, and shoreline water) never fallback to grassTex.
+   * Also preloads all character sprite sheets for NPCs on map and 1-hop connected neighbors while veil is opaque.
    */
   public async ensureMapTilesLoaded(
     map: MapData,
     lookupMap?: (mapId: string) => MapData | undefined,
-    queueOptions?: ManifestQueueOptions
+    queueOptions?: ManifestQueueOptions,
+    explicitNpcs?: GridEntity[]
   ): Promise<void> {
-    if (!map.tileMap) return;
     const missingTileNames: string[] = [];
 
     const collectMissing = (m: MapData) => {
@@ -723,7 +773,9 @@ export class OverworldRenderer {
       }
     };
 
-    collectMissing(map);
+    if (map.tileMap || map.overlayMap) {
+      collectMissing(map);
+    }
 
     if (lookupMap && map.connections) {
       for (const dir of ['WEST', 'EAST', 'NORTH', 'SOUTH'] as const) {
@@ -735,14 +787,40 @@ export class OverworldRenderer {
       }
     }
 
-    if (missingTileNames.length === 0) {
+    // Collect missing NPC character sprite sheets across map + 1-hop connected neighbors
+    const missingSpriteTypes: NpcSpriteType[] = [];
+    const collectNpcSprites = (npcList: GridEntity[] | undefined) => {
+      if (!npcList) return;
+      for (let i = 0; i < npcList.length; i++) {
+        const spriteType = npcList[i].spriteType || 'boy';
+        if (!this.npcFrames.has(spriteType) && !missingSpriteTypes.includes(spriteType)) {
+          missingSpriteTypes.push(spriteType);
+        }
+      }
+    };
+
+    if (explicitNpcs) {
+      collectNpcSprites(explicitNpcs);
+    } else if (this.lookupMapNpcs) {
+      collectNpcSprites(this.lookupMapNpcs(map.id));
+      if (lookupMap && map.connections) {
+        for (const dir of ['WEST', 'EAST', 'NORTH', 'SOUTH'] as const) {
+          const conn = map.connections[dir];
+          if (conn && conn.mapId) {
+            collectNpcSprites(this.lookupMapNpcs(conn.mapId));
+          }
+        }
+      }
+    }
+
+    if (missingTileNames.length === 0 && missingSpriteTypes.length === 0) {
       if (queueOptions?.onProgress) {
         const endPct = Math.max(0, Math.min(100, queueOptions.endPercent ?? 100));
         queueOptions.onProgress({
           completed: 0,
           total: 0,
           percent: Math.round(endPct),
-          currentLabel: `Map tiles ready (${map.name || map.id})`,
+          currentLabel: `Map assets ready (${map.name || map.id})`,
           category: 'TILE_TEXTURE',
           itemId: `map_tile:${map.id}:ready`,
         });
@@ -773,18 +851,32 @@ export class OverworldRenderer {
       });
     }
 
+    for (const spriteType of missingSpriteTypes) {
+      manifest.enqueue({
+        id: `npc_sprite:${spriteType}`,
+        label: `Loading NPC sprite ${spriteType}`,
+        category: 'CHARACTER_SPRITE',
+        execute: async () => {
+          await this.ensureNpcSpriteLoaded(spriteType);
+        },
+      });
+    }
+
     await manifest.run(queueOptions);
   }
 
   /**
    * Bounded LRU texture eviction: when tileTextures exceeds maxTextureCap, evicts textures
    * belonging to maps more than 1 hop away from activeMap and its neighbors.
+   * Also evicts distant NPC sprites outside the 1-hop zone.
    */
   public evictDistantTileTextures(
     activeMap: MapData,
     lookupMap?: (mapId: string) => MapData | undefined,
     maxTextureCap: number = 300
   ): void {
+    this.evictDistantNpcSprites();
+
     if (this.tileTextures.size <= maxTextureCap) return;
 
     const pinnedTiles = new Set<string>([
@@ -841,6 +933,175 @@ export class OverworldRenderer {
   }
 
   /**
+   * Synchronously instantiates/updates Sprite and tall-grass Graphics instances for all active NPCs
+   * on map and its 1-hop connected neighbors, setting initial frame textures and world coordinates (npcPxX, npcPxY)
+   * before the transition veil lifts. Eliminates lazy ticker allocations.
+   */
+  public spawnMapNpcs(npcs?: GridEntity[], lookupMap?: (mapId: string) => MapData | undefined): void {
+    const list: Array<{ npc: GridEntity; offsetX: number; offsetY: number }> = [];
+
+    if (npcs) {
+      for (let i = 0; i < npcs.length; i++) {
+        const n = npcs[i];
+        list.push({ npc: n, offsetX: n.worldOffsetX || 0, offsetY: n.worldOffsetY || 0 });
+      }
+    } else if (this.currentRenderedMap && this.lookupMapNpcs) {
+      const activeMap = this.currentRenderedMap;
+      const mainNpcs = this.lookupMapNpcs(activeMap.id);
+      for (let i = 0; i < mainNpcs.length; i++) {
+        list.push({ npc: mainNpcs[i], offsetX: 0, offsetY: 0 });
+      }
+
+      if (lookupMap && activeMap.connections) {
+        if (activeMap.connections.WEST) {
+          const conn = activeMap.connections.WEST;
+          const westMap = lookupMap(conn.mapId);
+          if (westMap) {
+            const westNpcs = this.lookupMapNpcs(westMap.id);
+            for (let i = 0; i < westNpcs.length; i++) {
+              list.push({ npc: westNpcs[i], offsetX: -westMap.width, offsetY: conn.offset });
+            }
+          }
+        }
+        if (activeMap.connections.EAST) {
+          const conn = activeMap.connections.EAST;
+          const eastMap = lookupMap(conn.mapId);
+          if (eastMap) {
+            const eastNpcs = this.lookupMapNpcs(eastMap.id);
+            for (let i = 0; i < eastNpcs.length; i++) {
+              list.push({ npc: eastNpcs[i], offsetX: activeMap.width, offsetY: conn.offset });
+            }
+          }
+        }
+        if (activeMap.connections.NORTH) {
+          const conn = activeMap.connections.NORTH;
+          const northMap = lookupMap(conn.mapId);
+          if (northMap) {
+            const northNpcs = this.lookupMapNpcs(northMap.id);
+            for (let i = 0; i < northNpcs.length; i++) {
+              list.push({ npc: northNpcs[i], offsetX: conn.offset, offsetY: -northMap.height });
+            }
+          }
+        }
+        if (activeMap.connections.SOUTH) {
+          const conn = activeMap.connections.SOUTH;
+          const southMap = lookupMap(conn.mapId);
+          if (southMap) {
+            const southNpcs = this.lookupMapNpcs(southMap.id);
+            for (let i = 0; i < southNpcs.length; i++) {
+              list.push({ npc: southNpcs[i], offsetX: conn.offset, offsetY: activeMap.height });
+            }
+          }
+        }
+      }
+    }
+
+    const scale = this.tileSize / 16;
+    const activeZoneNpcs: GridEntity[] = [];
+
+    for (let i = 0; i < list.length; i++) {
+      const { npc, offsetX, offsetY } = list[i];
+      activeZoneNpcs.push(npc);
+
+      const desiredSpriteType = npc.spriteType || 'boy';
+      const frames =
+        this.npcFrames.get(desiredSpriteType) || this.npcFrames.get('boy') || this.playerFrames;
+
+      const npcPxX = (npc.renderX + offsetX + 0.5) * this.tileSize;
+      const npcPxY = (npc.renderY + offsetY + 0.85) * this.tileSize;
+
+      let sprite = this.npcSprites.get(npc.id);
+      if (!sprite) {
+        sprite = new Sprite(frames ? frames.downStand : Texture.WHITE);
+        sprite.anchor.set(0.5, 0.85);
+        sprite.scale.set(scale, scale);
+        if (this.entityContainer) {
+          this.entityContainer.addChild(sprite);
+        }
+        this.npcSprites.set(npc.id, sprite);
+        this.activeNpcSpriteList.push(sprite);
+      }
+      sprite.position.set(npcPxX, npcPxY);
+
+      if (frames) {
+        const npcTex = this.getFrameForEntity(frames, npc.direction, npc.isMoving, npc.progress);
+        sprite.texture = npcTex;
+      }
+
+      if (npc.direction === 'RIGHT') {
+        sprite.scale.set(-scale, scale);
+      } else {
+        sprite.scale.set(scale, scale);
+      }
+
+      if (offsetX === 0 && offsetY === 0 && this.isEntityOnTallGrass(npc)) {
+        let mask = this.npcGrassMasks.get(npc.id);
+        if (!mask) {
+          mask = this.createGrassWadingGraphic();
+          if (this.foregroundContainer) {
+            this.foregroundContainer.addChild(mask);
+          }
+          this.npcGrassMasks.set(npc.id, mask);
+          this.activeNpcGrassMaskList.push(mask);
+        }
+        mask.position.set(npcPxX, npcPxY);
+      }
+    }
+
+    if (activeZoneNpcs.length > 0) {
+      this.evictDistantNpcSprites(activeZoneNpcs);
+    }
+  }
+
+  /**
+   * Destroys and removes Sprite and grass mask Graphics entries from npcSprites,
+   * activeNpcSpriteList, npcGrassMasks, and activeNpcGrassMaskList for any NPC ID not in active 1-hop zone.
+   */
+  public evictDistantNpcSprites(activeWorldNpcs?: GridEntity[]): number {
+    const activeIds = new Set<string>();
+    if (activeWorldNpcs) {
+      for (let i = 0; i < activeWorldNpcs.length; i++) {
+        activeIds.add(activeWorldNpcs[i].id);
+      }
+    } else if (this.currentRenderedMap && this.lookupMapNpcs) {
+      const activeMap = this.currentRenderedMap;
+      const mainNpcs = this.lookupMapNpcs(activeMap.id);
+      for (let i = 0; i < mainNpcs.length; i++) {
+        activeIds.add(mainNpcs[i].id);
+      }
+      if (activeMap.connections) {
+        for (const dir of ['WEST', 'EAST', 'NORTH', 'SOUTH'] as const) {
+          const conn = activeMap.connections[dir];
+          if (conn && conn.mapId) {
+            const neighborNpcs = this.lookupMapNpcs(conn.mapId);
+            for (let i = 0; i < neighborNpcs.length; i++) {
+              activeIds.add(neighborNpcs[i].id);
+            }
+          }
+        }
+      }
+    }
+
+    let evictedCount = 0;
+    for (const [id, sprite] of Array.from(this.npcSprites.entries())) {
+      if (!activeIds.has(id)) {
+        sprite.destroy({ children: true, texture: false });
+        this.npcSprites.delete(id);
+        this.activeNpcSpriteList = this.activeNpcSpriteList.filter((s) => s !== sprite);
+
+        const mask = this.npcGrassMasks.get(id);
+        if (mask) {
+          mask.destroy({ children: true });
+          this.npcGrassMasks.delete(id);
+          this.activeNpcGrassMaskList = this.activeNpcGrassMaskList.filter((m) => m !== mask);
+        }
+        evictedCount++;
+      }
+    }
+    return evictedCount;
+  }
+
+  /**
    * Builds the textured overworld tilemap, including seamlessly connected neighbor maps (W/E/N/S) and outdoor border blocks
    */
   public renderMap(map: MapData, lookupMap?: (mapId: string) => MapData | undefined): void {
@@ -854,6 +1115,9 @@ export class OverworldRenderer {
     this.tileSize = map.tileSize;
     this.lastCullCamX = Number.NaN;
     this.lastCullCamY = Number.NaN;
+
+    // Synchronously spawn NPC Sprite & grass mask instances for active map + 1-hop connections
+    this.spawnMapNpcs(undefined, lookupMap);
 
     if (map.tileMap) {
       const hasMissing = map.tileMap.some((name) => name && !this.tileTextures.has(name));

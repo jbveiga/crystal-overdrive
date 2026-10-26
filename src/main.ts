@@ -68,6 +68,7 @@ import {
   DAY_SIBLINGS,
   GUIDE_GENT_TOUR_LEGS,
   isNpcActiveForStoryFlags,
+  applyMapNpcStoryMutations,
 } from './world/npcData';
 import { TrackedStoryFlagSet, ActiveNpcCache } from './world/ActiveNpcCache';
 export {
@@ -76,6 +77,7 @@ export {
   DAY_SIBLINGS,
   GUIDE_GENT_TOUR_LEGS,
   isNpcActiveForStoryFlags,
+  applyMapNpcStoryMutations,
 } from './world/npcData';
 import { syncGitHubIssues } from './sync/githubSync';
 import { mountGitHubReportButton } from './ui/BugReportModal';
@@ -786,6 +788,39 @@ async function bootstrap() {
   overworldRenderer.setPlayerGender(playerGender);
   const lookupMap = (id: string) => mapManager.getMap(id);
 
+  const getActiveMapNpcs = (mapId: string): GridEntity[] =>
+    activeNpcCache.getActiveNpcs(
+      mapId,
+      npcsByMap[mapId],
+      storyFlags,
+      isNpcActiveForStoryFlags
+    );
+
+  const resetMapNpcsToOrigin = (mapId: string) => {
+    if (npcsByMap[mapId]) {
+      npcsByMap[mapId] = applyMapNpcStoryMutations(
+        mapId,
+        npcsByMap[mapId],
+        storyFlags,
+        defeatedTrainers
+      );
+    }
+    activeNpcCache.invalidate(mapId);
+  };
+
+  mapManager.setNpcLifecycleCallbacks({
+    onMapLoaded: (map) => {
+      resetMapNpcsToOrigin(map.id);
+      getActiveMapNpcs(map.id);
+    },
+    onMapEvicted: (mapId) => {
+      activeNpcCache.invalidate(mapId);
+    },
+  });
+
+  overworldRenderer.setNpcLookup((id) => getActiveMapNpcs(id));
+  resetMapNpcsToOrigin(initialMap.id);
+
   const detectChosenStarterSpecies = (): 'cyndaquil' | 'totodile' | 'chikorita' | undefined => {
     if (storyFlags.has('starter_cyndaquil')) return 'cyndaquil';
     if (storyFlags.has('starter_totodile')) return 'totodile';
@@ -1093,66 +1128,10 @@ async function bootstrap() {
     if (!inventory.tms.includes('HM01')) inventory.tms.push('HM01');
     if (!inventory.tms.includes('HM01_CUT')) inventory.tms.push('HM01_CUT');
   }
-  if ((storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') || storyFlags.has('slowpoke_well_cleared')) && npcsByMap.azalea_town) {
-    npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_well_grunt');
-  }
-  if (storyFlags.has('slowpoke_well_cleared')) {
-    if (npcsByMap.azalea_town) {
-      npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_gym_grunt');
-    }
-    if (npcsByMap.slowpoke_well_b1f) {
-      npcsByMap.slowpoke_well_b1f = npcsByMap.slowpoke_well_b1f.filter(
-        (n) => !n.id.startsWith('rocket_grunt') && n.id !== 'executive_proton'
-      );
-    }
-  }
-
-  const isFriday = new Date().getDay() === 5 || storyFlags.has('FORCE_FRIDAY');
-  if (
-    (!isFriday || storyFlags.has('defeated_lapras_union_cave') || storyFlags.has('caught_lapras')) &&
-    npcsByMap.union_cave_b2f
-  ) {
-    npcsByMap.union_cave_b2f = npcsByMap.union_cave_b2f.filter((n) => n.id !== 'union_cave_lapras');
-  }
 
   const emptyNpcs: GridEntity[] = [];
   const npcObstaclesScratch: GridEntity[] = [];
   const worldNpcsScratch: GridEntity[] = [];
-
-  const resetMapNpcsToOrigin = (mapId: string) => {
-    const list = npcsByMap[mapId];
-    if (!list) return;
-    for (const npc of list) {
-      if (npc.originX !== undefined && npc.originY !== undefined) {
-        if (npc.id === 'forest_farfetchd' && !storyFlags.has('forest_farfetchd_herded')) {
-          continue;
-        }
-        npc.x = npc.originX;
-        npc.y = npc.originY;
-        npc.gridX = npc.originX;
-        npc.gridY = npc.originY;
-        npc.targetX = npc.originX;
-        npc.targetY = npc.originY;
-        npc.renderX = npc.originX;
-        npc.renderY = npc.originY;
-        if (npc.originDirection) {
-          npc.direction = npc.originDirection;
-        }
-        npc.isMoving = false;
-        npc.progress = 0;
-      }
-    }
-  };
-
-  resetMapNpcsToOrigin(initialMap.id);
-
-  const getActiveMapNpcs = (mapId: string): GridEntity[] =>
-    activeNpcCache.getActiveNpcs(
-      mapId,
-      npcsByMap[mapId],
-      storyFlags,
-      isNpcActiveForStoryFlags
-    );
 
   const populateWorldNpcs = (map: MapData | null): GridEntity[] => {
     worldNpcsScratch.length = 0;
@@ -1337,6 +1316,7 @@ async function bootstrap() {
       void ensureMapAndNeighborsLoaded(nextMapId).then((loadedMap) => {
         if (loadedMap) {
           mapManager.evictDistantMaps(nextMapId, 16);
+          activeNpcCache.evictMapsNotIn(mapManager.getProtectedMapIds(nextMapId));
           overworldRenderer.evictDistantTileTextures(loadedMap, lookupMap);
         }
       });
@@ -2410,6 +2390,7 @@ async function bootstrap() {
         overworldRenderer.renderMap(targetMap, lookupMap);
         overworldRenderer.evictDistantTileTextures(targetMap, lookupMap);
         mapManager.evictDistantMaps(targetMap.id, 16);
+        activeNpcCache.evictMapsNotIn(mapManager.getProtectedMapIds(targetMap.id));
         syncMapOverworldItems(targetMap);
         overworldHUD.updateRouteName(targetMap.name);
         audioManager.playMapBgm(targetMap.id, 0.8);

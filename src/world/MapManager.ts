@@ -6,6 +6,11 @@ export interface WildEncounterResult {
   isRoamer?: boolean;
 }
 
+export interface MapNpcLifecycleCallbacks {
+  onMapLoaded?: (map: MapData) => void | Promise<void>;
+  onMapEvicted?: (mapId: string) => void;
+}
+
 export class MapManager {
   public static readonly GRACE_STEPS_DEFAULT = 4;
   public static readonly GRASS_CAP_NORMAL = 0.0625;  // 6.25% (1 in 16 steps)
@@ -75,10 +80,22 @@ export class MapManager {
   }
 
   private mapAccessTimestamps: Map<string, number> = new Map();
+  private npcLifecycleCallbacks?: MapNpcLifecycleCallbacks;
+
+  public setNpcLifecycleCallbacks(callbacks: MapNpcLifecycleCallbacks): void {
+    this.npcLifecycleCallbacks = callbacks;
+  }
 
   registerMap(map: MapData): void {
     this.maps.set(map.id, map);
     this.mapAccessTimestamps.set(map.id, Date.now());
+    if (this.npcLifecycleCallbacks?.onMapLoaded) {
+      try {
+        void this.npcLifecycleCallbacks.onMapLoaded(map);
+      } catch (err) {
+        console.warn(`Error in onMapLoaded callback for map "${map.id}":`, err);
+      }
+    }
   }
 
   touchMap(mapId: string): void {
@@ -88,30 +105,41 @@ export class MapManager {
   }
 
   /**
+   * Returns the exact 1-hop protected zone set:
+   * activeMapId, currentMap.id, cardinal NORTH/SOUTH/EAST/WEST neighbors, and direct warps.targetMapId.
+   */
+  public getProtectedMapIds(activeMapId: string): Set<string> {
+    const protectedMapIds = new Set<string>();
+    if (activeMapId) protectedMapIds.add(activeMapId);
+    if (this.currentMap) protectedMapIds.add(this.currentMap.id);
+
+    const active = this.maps.get(activeMapId) || this.currentMap;
+    if (active) {
+      if (active.connections) {
+        if (active.connections.NORTH?.mapId) protectedMapIds.add(active.connections.NORTH.mapId);
+        if (active.connections.SOUTH?.mapId) protectedMapIds.add(active.connections.SOUTH.mapId);
+        if (active.connections.WEST?.mapId) protectedMapIds.add(active.connections.WEST.mapId);
+        if (active.connections.EAST?.mapId) protectedMapIds.add(active.connections.EAST.mapId);
+      }
+      if (active.warps) {
+        for (const w of active.warps) {
+          if (w.targetMapId) {
+            protectedMapIds.add(w.targetMapId);
+          }
+        }
+      }
+    }
+    return protectedMapIds;
+  }
+
+  /**
    * Evicts distant maps when loaded maps exceed maxResident (default 16).
    * Never evicts activeMapId, currentMap, 1-hop connected neighbors, or direct warp targets.
    */
   evictDistantMaps(activeMapId: string, maxResident: number = MapManager.MAX_RESIDENT_MAPS): number {
     if (this.maps.size <= maxResident) return 0;
 
-    const protectedMapIds = new Set<string>();
-    protectedMapIds.add(activeMapId);
-    if (this.currentMap) protectedMapIds.add(this.currentMap.id);
-
-    const active = this.maps.get(activeMapId) || this.currentMap;
-    if (active) {
-      if (active.connections) {
-        if (active.connections.NORTH) protectedMapIds.add(active.connections.NORTH.mapId);
-        if (active.connections.SOUTH) protectedMapIds.add(active.connections.SOUTH.mapId);
-        if (active.connections.WEST) protectedMapIds.add(active.connections.WEST.mapId);
-        if (active.connections.EAST) protectedMapIds.add(active.connections.EAST.mapId);
-      }
-      if (active.warps) {
-        for (const w of active.warps) {
-          protectedMapIds.add(w.targetMapId);
-        }
-      }
-    }
+    const protectedMapIds = this.getProtectedMapIds(activeMapId);
 
     const candidateEntries: Array<{ mapId: string; time: number }> = [];
     for (const [id] of this.maps) {
@@ -127,6 +155,13 @@ export class MapManager {
       this.maps.delete(candidate.mapId);
       this.mapAccessTimestamps.delete(candidate.mapId);
       this.invalidateSpatialCache(candidate.mapId);
+      if (this.npcLifecycleCallbacks?.onMapEvicted) {
+        try {
+          this.npcLifecycleCallbacks.onMapEvicted(candidate.mapId);
+        } catch (err) {
+          console.warn(`Error in onMapEvicted callback for map "${candidate.mapId}":`, err);
+        }
+      }
       evictedCount++;
     }
     return evictedCount;
@@ -213,6 +248,13 @@ export class MapManager {
     }
     this.currentMap = map;
     this.touchMap(mapId);
+    if (this.npcLifecycleCallbacks?.onMapLoaded) {
+      try {
+        void this.npcLifecycleCallbacks.onMapLoaded(map);
+      } catch (err) {
+        console.warn(`Error in onMapLoaded callback for map "${map.id}":`, err);
+      }
+    }
     this.evictDistantMaps(mapId);
     return map;
   }

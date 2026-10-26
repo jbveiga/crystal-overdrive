@@ -114,6 +114,21 @@ export class ActiveNpcCache {
     }
   }
 
+  public hasMap(mapId: string): boolean {
+    return this.cache.has(mapId);
+  }
+
+  public evictMapsNotIn(protectedMapIds: Set<string>): number {
+    let evicted = 0;
+    for (const id of Array.from(this.cache.keys())) {
+      if (!protectedMapIds.has(id)) {
+        this.cache.delete(id);
+        evicted++;
+      }
+    }
+    return evicted;
+  }
+
   public getStats(): { hits: number; misses: number; cachedMaps: number } {
     return {
       hits: this.hits,
