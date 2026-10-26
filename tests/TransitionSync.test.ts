@@ -19,18 +19,28 @@ if (!(globalThis as any).document) {
 
 describe('Warp Transition & Texture Hydration Synchronization (BUGFIX-ASYNC-TILE-TEXTURE-FADE-SYNC-01)', () => {
   const mainTsPath = path.resolve(__dirname, '../src/main.ts');
+  const transitionControllerPath = path.resolve(
+    __dirname,
+    '../src/world/OverworldWarpAndMapTransitionController.ts'
+  );
   const rendererTsPath = path.resolve(__dirname, '../src/render/OverworldRenderer.ts');
   const worldMapsPath = path.resolve(__dirname, '../public/assets/data/world_maps.json');
   const tilesDir = path.resolve(__dirname, '../public/assets/tiles');
 
-  const mainSrc = fs.readFileSync(mainTsPath, 'utf8');
+  const mainSrc =
+    fs.readFileSync(mainTsPath, 'utf8') +
+    (fs.existsSync(transitionControllerPath)
+      ? '\n' + fs.readFileSync(transitionControllerPath, 'utf8')
+      : '');
   const rendererSrc = fs.readFileSync(rendererTsPath, 'utf8');
   const worldMaps: any[] = JSON.parse(fs.readFileSync(worldMapsPath, 'utf8'));
 
   describe('1. Lifecycle Order Invariant (Warp Transitions & Black Veil Lock)', () => {
     it('asserts executeWarpTransition strictly awaits ensureMapTilesLoaded before invoking renderMap', () => {
-      // Find executeWarpTransition body in src/main.ts
-      const warpFuncMatch = mainSrc.match(/const executeWarpTransition =[\s\S]*?playDoorwayFade\([\s\S]*?\}\);/);
+      // Find executeWarpTransition body across main.ts and OverworldWarpAndMapTransitionController.ts
+      const warpFuncMatch = mainSrc.match(
+        /(?:const|public static async)\s+executeWarpTransition\s*=?[\s\S]*?playDoorwayFade\([\s\S]*?\}\);/
+      );
       expect(warpFuncMatch).not.toBeNull();
       const warpCode = warpFuncMatch![0];
 

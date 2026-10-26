@@ -9,11 +9,24 @@ import { MissionManager } from '../src/world/MissionManager';
 
 const getAllInteractionSrc = () => {
   const interactionsDir = path.resolve(__dirname, '../src/world/interactions');
-  return fs
+  const worldDir = path.resolve(__dirname, '../src/world');
+  let src = fs
     .readdirSync(interactionsDir)
     .filter((f) => f.endsWith('.ts'))
     .map((f) => fs.readFileSync(path.join(interactionsDir, f), 'utf8'))
     .join('\n');
+  const overworldFiles = [
+    'OverworldWarpAndMapTransitionController.ts',
+    'OverworldTrainerSightAndTourController.ts',
+    'OverworldTickerCoordinator.ts',
+  ];
+  for (const ofile of overworldFiles) {
+    const p = path.join(worldDir, ofile);
+    if (fs.existsSync(p)) {
+      src += '\n' + fs.readFileSync(p, 'utf8');
+    }
+  }
+  return src;
 };
 
 const getAllNpcDataSrc = () => {
@@ -669,6 +682,11 @@ describe('MapData & Authentic Tile Integrity', () => {
       '\n' +
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      ) +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/OverworldWarpAndMapTransitionController.ts'),
         'utf8'
       );
 
@@ -1549,6 +1567,11 @@ describe('MapData & Authentic Tile Integrity', () => {
       '\n' +
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      ) +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/OverworldWarpAndMapTransitionController.ts'),
         'utf8'
       );
     expect(mainSrc).toContain('./assets/data/world_maps.json');

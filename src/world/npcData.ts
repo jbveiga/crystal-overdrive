@@ -242,3 +242,83 @@ export function applyMapNpcStoryMutations(
 
   return filtered;
 }
+
+export function applyStoryRecoveryFlags(
+  storyFlags: Set<string>,
+  defeatedTrainers: Set<string>,
+  inventory: { balls: Record<string, number>; badges: string[]; tms: string[] }
+): void {
+  if (defeatedTrainers.has('executive_proton') && !storyFlags.has('slowpoke_well_cleared')) {
+    storyFlags.add('proton_defeated');
+    storyFlags.add('slowpoke_well_cleared');
+    if (!storyFlags.has('EVENT_KURT_GAVE_YOU_LURE_BALL')) {
+      inventory.balls['lure-ball'] = (inventory.balls['lure-ball'] || 0) + 1;
+      storyFlags.add('EVENT_KURT_GAVE_YOU_LURE_BALL');
+      storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
+    }
+  }
+  if (defeatedTrainers.has('falkner') && !storyFlags.has('falkner_defeated')) {
+    storyFlags.add('falkner_defeated');
+    storyFlags.add('CAN_USE_FLASH');
+    if (!inventory.badges.includes('zephyr')) inventory.badges.push('zephyr');
+    if (!inventory.tms.includes('TM31')) inventory.tms.push('TM31');
+  }
+  if (defeatedTrainers.has('bugsy') && !storyFlags.has('bugsy_defeated')) {
+    storyFlags.add('bugsy_defeated');
+    storyFlags.add('CAN_USE_CUT');
+    if (!inventory.badges.includes('hive')) inventory.badges.push('hive');
+    if (!inventory.tms.includes('TM49')) inventory.tms.push('TM49');
+  }
+  if (
+    (storyFlags.has('EVENT_HERDED_FARFETCHD') || storyFlags.has('forest_farfetchd_herded')) &&
+    !storyFlags.has('has_hm01_cut')
+  ) {
+    storyFlags.add('has_hm01_cut');
+    storyFlags.add('EVENT_GOT_HM01_CUT');
+    if (!inventory.tms.includes('HM01')) inventory.tms.push('HM01');
+    if (!inventory.tms.includes('HM01_CUT')) inventory.tms.push('HM01_CUT');
+  }
+}
+
+export function filterInitialMapNpcs(npcsByMap: Record<string, GridEntity[]>, storyFlags: Set<string>): void {
+  if (storyFlags.has('sudowoodo_cleared') && npcsByMap.route_36) {
+    npcsByMap.route_36 = npcsByMap.route_36.filter((n) => n.id !== 'sudowoodo');
+  }
+  if (
+    (storyFlags.has('HAS_MYSTERY_EGG') ||
+      storyFlags.has('mystery_egg_received') ||
+      storyFlags.has('rival_1_defeated') ||
+      storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') ||
+      storyFlags.has('EVENT_RIVAL_NAMED')) &&
+    npcsByMap.new_bark_town
+  ) {
+    npcsByMap.new_bark_town = npcsByMap.new_bark_town.filter((n) => n.id !== 'nbt_rival');
+  }
+  if (storyFlags.has('has_map_card') && npcsByMap.cherrygrove_city) {
+    npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter((n) => n.id !== 'cg_guide_gent');
+  }
+  if ((storyFlags.has('HAS_MYSTERY_EGG') || storyFlags.has('HAS_POKEDEX')) && npcsByMap.mr_pokemons_house) {
+    npcsByMap.mr_pokemons_house = npcsByMap.mr_pokemons_house.filter((n) => n.id !== 'prof_oak_npc');
+  }
+  if ((!storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') || storyFlags.has('EVENT_RIVAL_NAMED')) && npcsByMap.elms_lab) {
+    npcsByMap.elms_lab = npcsByMap.elms_lab.filter((n) => n.id !== 'lab_police_officer');
+  }
+}
+
+export function resetStoryNpcSpawns(npcsByMap: Record<string, GridEntity[]>): void {
+  const freshNpcs = createNpcsByMap();
+  const resetKeys = [
+    'mr_pokemons_house',
+    'new_bark_town',
+    'cherrygrove_city',
+    'route_36',
+    'elms_lab',
+    'azalea_town',
+    'slowpoke_well_b1f',
+    'union_cave_b2f',
+  ];
+  for (const k of resetKeys) {
+    if (freshNpcs[k]) npcsByMap[k] = freshNpcs[k];
+  }
+}
+

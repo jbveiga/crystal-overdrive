@@ -193,9 +193,12 @@ describe('GitHub Issues #8, #9, #10, #11, #12 & Headless Sync Suite', () => {
 
   it('Issue #20: applyMapStoryMutations updates cut tree tile before renderMap', () => {
     const mainTsPath = path.resolve(__dirname, '../src/main.ts');
-    const mainContent = fs.readFileSync(mainTsPath, 'utf8');
+    const controllerPath = path.resolve(__dirname, '../src/world/OverworldWarpAndMapTransitionController.ts');
+    const mainContent =
+      fs.readFileSync(mainTsPath, 'utf8') +
+      (fs.existsSync(controllerPath) ? '\n' + fs.readFileSync(controllerPath, 'utf8') : '');
 
-    expect(mainContent).toContain('applyMapStoryMutations(targetMap)');
+    expect(mainContent).toMatch(/(this\.)?applyMapStoryMutations\((ctx,\s*)?targetMap\)/);
     expect(mainContent).toContain("tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05'");
     // Verify shrine roof at (8, 22) is not made walkable
     expect(mainContent).not.toMatch(/collisionGrid\[22 \* map\.width \+ 8\] = 0/);

@@ -143,6 +143,65 @@ export class SaveManager {
   }
 
   /**
+   * Returns a fresh, pristine SaveData structure for a new game adventure (Ticket 4.3).
+   */
+  public static createFreshSaveData(name: string, gender: PlayerGender): SaveData {
+    return {
+      version: 1,
+      timestamp: Date.now(),
+      playTimeSeconds: 0,
+      player: {
+        name,
+        gender,
+        mapId: 'players_house_2f',
+        x: 7,
+        y: 1,
+        direction: 'DOWN',
+        speedMultiplier: 3,
+        battleSpeedMultiplier: 1,
+        badges: [],
+        money: 3000,
+        rivalName: 'SILVER',
+      },
+      rivalName: 'SILVER',
+      party: [],
+      box: [],
+      storage: StorageManager.createDefaultStorage(),
+      inventory: {
+        balls: {
+          'quick-ball': 5,
+          'fast-ball': 5,
+          'net-ball': 5,
+          'ultra-ball': 10,
+          'great-ball': 15,
+          'poke-ball': 30,
+          'master-ball': 1,
+        },
+        items: {
+          potion: 5,
+          'super-potion': 2,
+          antidote: 3,
+          'parlyz-heal': 2,
+          awakening: 2,
+          revive: 1,
+        },
+        berries: {},
+        tms: ['TM54', 'TM73', 'TM99'],
+        keyItems: [],
+      },
+      roamers: [],
+      defeatedTrainers: [],
+      storyFlags: [],
+      collectedItems: [],
+      collectedItemFlags: [],
+      harvestedFruitTrees: [],
+      fruitTreePicks: {},
+      seenSpecies: [],
+      options: SaveManager.getDefaultOptions(),
+    };
+  }
+
+  /**
    * Formats total elapsed seconds into canonical `"HH:MM:ss"` (e.g. `0` -> `"00:00:00"`, `65` -> `"00:01:05"`, `3665` -> `"01:01:05"`).
    */
   public static formatPlayTime(seconds: number): string {
@@ -358,5 +417,202 @@ export class SaveManager {
       console.error('Failed to import save file:', err);
       return false;
     }
+  }
+
+  public static hydrateGameState(
+    existingSave: SaveData,
+    state: {
+      playTimeSeconds: { val: number };
+      playerName: { val: string };
+      playerGender: { val: PlayerGender };
+      rivalName: { val: string };
+      playerParty: PokemonInstance[];
+      playerBox: PokemonInstance[];
+      gameOptions: GameOptions;
+      inventory: {
+        balls: Partial<Record<PokeballId, number>>;
+        items?: Partial<Record<MedicineId, number>>;
+        berries?: Partial<Record<string, number>>;
+        keyItems?: string[];
+        tms: string[];
+        money: number;
+        badges: string[];
+      };
+      defeatedTrainers: Set<string>;
+      storyFlags: Set<string>;
+      seenSpecies: Set<string>;
+      overworldItemManager: any;
+      missionManager: any;
+      gameClock: any;
+      roamingManager: any;
+    }
+  ): {
+    mapId: string;
+    x: number;
+    y: number;
+    direction: Direction;
+    lastVisitedPokecenter: { mapId: string; x: number; y: number };
+  } {
+    state.playTimeSeconds.val = existingSave.playTimeSeconds || 0;
+    state.playerName.val = existingSave.player.name || 'GOLD';
+    state.playerGender.val = existingSave.player.gender || 'BOY';
+    state.rivalName.val = existingSave.player.rivalName || existingSave.rivalName || 'SILVER';
+    state.playerParty.splice(0, state.playerParty.length, ...(existingSave.party || []));
+    state.playerBox.splice(0, state.playerBox.length, ...(existingSave.box || []));
+    Object.assign(state.gameOptions, existingSave.options || {});
+    state.inventory.balls = existingSave.inventory.balls || {};
+    state.inventory.items = existingSave.inventory.items || {};
+    state.inventory.berries = existingSave.inventory.berries || {};
+    if (existingSave.inventory.keyItems) state.inventory.keyItems = existingSave.inventory.keyItems;
+    state.inventory.tms = existingSave.inventory.tms || [];
+    state.inventory.money = existingSave.player.money ?? 3000;
+    state.inventory.badges = existingSave.player.badges || [];
+    existingSave.defeatedTrainers?.forEach((t) => state.defeatedTrainers.add(t));
+    existingSave.storyFlags?.forEach((f) => state.storyFlags.add(f));
+    existingSave.seenSpecies?.forEach((s) => state.seenSpecies.add(s));
+    state.playerParty.forEach((p) => state.seenSpecies.add(p.speciesId));
+    state.playerBox.forEach((p) => state.seenSpecies.add(p.speciesId));
+
+    state.overworldItemManager.setCollectedFlags([
+      ...(existingSave.collectedItems || []),
+      ...(existingSave.collectedItemFlags || []),
+      ...Array.from(state.storyFlags),
+    ]);
+    state.overworldItemManager.setFruitTreePicks(
+      existingSave.fruitTreePicks || existingSave.harvestedFruitTrees || {}
+    );
+    state.missionManager.deserialize(existingSave.missions);
+    state.missionManager.reconcileStarterState(state.playerParty, state.storyFlags);
+
+    const initialMapId = existingSave.player.mapId || 'new_bark_town';
+    const initialPlayerX = existingSave.player.x ?? 7;
+    const initialPlayerY = existingSave.player.y ?? 1;
+    const initialPlayerDir = existingSave.player.direction || 'DOWN';
+    let lastVisitedPokecenter = { mapId: 'new_bark_town', x: 13, y: 6 };
+    if (initialMapId.endsWith('_poke_center')) {
+      lastVisitedPokecenter = { mapId: initialMapId, x: 3, y: 3 };
+    }
+
+    state.gameClock.playerSpeed =
+      existingSave.player.speedMultiplier || existingSave.options?.playerSpeedDefault || 3;
+    state.gameClock.battleSpeed =
+      existingSave.player.battleSpeedMultiplier || existingSave.options?.battleSpeedMultiplier || 1;
+    state.gameOptions.playerSpeedDefault = state.gameClock.playerSpeed;
+    state.gameOptions.battleSpeedMultiplier = state.gameClock.battleSpeed;
+
+    if (
+      existingSave.storyFlags?.includes('beasts_awakened') ||
+      state.storyFlags.has('beasts_awakened') ||
+      state.inventory.badges.length >= 4
+    ) {
+      state.roamingManager.awakenBeasts();
+    } else {
+      state.roamingManager.sleepBeasts();
+    }
+
+    return {
+      mapId: initialMapId,
+      x: initialPlayerX,
+      y: initialPlayerY,
+      direction: initialPlayerDir,
+      lastVisitedPokecenter,
+    };
+  }
+
+  public static createSaveSnapshot(params: {
+    playTimeSeconds: number;
+    playerName: string;
+    playerGender: PlayerGender;
+    rivalName: string;
+    player: { x: number; y: number; direction: Direction };
+    mapId: string;
+    gameClock: { playerSpeed: SpeedMultiplier; battleSpeed: SpeedMultiplier };
+    inventory: {
+      balls: Partial<Record<PokeballId, number>>;
+      items?: Partial<Record<MedicineId, number>>;
+      berries?: Partial<Record<string, number>>;
+      keyItems?: string[];
+      tms: string[];
+      money: number;
+      badges: string[];
+    };
+    playerParty: PokemonInstance[];
+    boxManager: any;
+    roamingManager: any;
+    defeatedTrainers: Set<string>;
+    storyFlags: Set<string>;
+    seenSpecies: Set<string>;
+    overworldItemManager: any;
+    gameOptions: GameOptions;
+    missionManager: any;
+    dayCareManager: any;
+    kurtCraftingManager: any;
+    bugContestManager: any;
+  }): SaveData {
+    const {
+      playTimeSeconds,
+      playerName,
+      playerGender,
+      rivalName,
+      player,
+      mapId,
+      gameClock,
+      inventory,
+      playerParty,
+      boxManager,
+      roamingManager,
+      defeatedTrainers,
+      storyFlags,
+      seenSpecies,
+      overworldItemManager,
+      gameOptions,
+      missionManager,
+      dayCareManager,
+      kurtCraftingManager,
+      bugContestManager,
+    } = params;
+
+    return {
+      version: 1,
+      timestamp: Date.now(),
+      playTimeSeconds: Math.floor(playTimeSeconds),
+      player: {
+        name: playerName,
+        gender: playerGender,
+        mapId,
+        x: player.x,
+        y: player.y,
+        direction: player.direction,
+        speedMultiplier: gameClock.playerSpeed,
+        battleSpeedMultiplier: gameClock.battleSpeed,
+        badges: inventory.badges,
+        money: inventory.money,
+        rivalName,
+      },
+      rivalName,
+      party: playerParty,
+      box: boxManager.flatten(),
+      storage: boxManager.getState(),
+      inventory: {
+        balls: inventory.balls,
+        items: inventory.items,
+        berries: inventory.berries,
+        tms: inventory.tms,
+        keyItems: inventory.keyItems,
+      },
+      roamers: roamingManager.getAllRoamers(),
+      defeatedTrainers: Array.from(defeatedTrainers),
+      storyFlags: Array.from(storyFlags),
+      collectedItems: overworldItemManager.getCollectedFlags(),
+      collectedItemFlags: overworldItemManager.getCollectedFlags(),
+      harvestedFruitTrees: overworldItemManager.getHarvestedTreeIds(),
+      fruitTreePicks: overworldItemManager.getFruitTreePicksRecord(),
+      seenSpecies: Array.from(seenSpecies),
+      options: gameOptions,
+      missions: missionManager.serialize(),
+      dayCare: dayCareManager.getState(),
+      kurtCraftingOrder: kurtCraftingManager.activeOrder,
+      bugContestRecords: bugContestManager.serializeRecords(),
+    };
   }
 }

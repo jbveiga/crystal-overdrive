@@ -371,19 +371,24 @@ describe('TICKET-WORLD-ROUTE34-DAYCARE-01: Route 34 & Day-Care Center 10-Point P
     });
 
     it('verifies Officer Keith conditional night-only challenge logic in main.ts', () => {
+      const tickerPath = path.resolve(__dirname, '../src/world/OverworldTickerCoordinator.ts');
       const mainSrc =
         fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
         '\n' +
         fs.readFileSync(
           path.resolve(__dirname, '../src/world/interactions/GoldenrodAndRoute34Interactions.ts'),
           'utf8'
-        );
+        ) +
+        (fs.existsSync(tickerPath) ? '\n' + fs.readFileSync(tickerPath, 'utf8') : '');
       expect(mainSrc).toMatch(/(targetNpc\.id === 'officer_keith'|'officer_keith').*getTimeOfDay\(\) !== 'NIGHT'/s);
       expect(mainSrc).toContain("spottedTrainer.id === 'officer_keith' && gameClock.getTimeOfDay() !== 'NIGHT'");
     });
 
     it('verifies Camper Todd, Picnicker Gina, and Cooltrainer Kate defeat reward handlers in main.ts', () => {
-      const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+      const tourPath = path.resolve(__dirname, '../src/world/OverworldTrainerSightAndTourController.ts');
+      const mainSrc =
+        fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+        (fs.existsSync(tourPath) ? '\n' + fs.readFileSync(tourPath, 'utf8') : '');
       expect(mainSrc).toContain("storyFlags.add('TODD_REGISTERED')");
       expect(mainSrc).toContain("storyFlags.add('GINA_REGISTERED')");
       expect(mainSrc).toContain("storyFlags.add('KATE_DEFEATED_REWARD')");

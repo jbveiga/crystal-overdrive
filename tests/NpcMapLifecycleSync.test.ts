@@ -249,7 +249,15 @@ describe('TICKET-ARCH-NPC-SPAWN-MAP-LIFECYCLE-SYNC-01: NPC & Map Lifecycle Synch
     });
 
     it('verifies src/main.ts wires MapManager lifecycle callbacks and OverworldRenderer NPC lookup', () => {
-      const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+      const transitionControllerPath = path.resolve(
+        __dirname,
+        '../src/world/OverworldWarpAndMapTransitionController.ts'
+      );
+      const mainSrc =
+        fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+        (fs.existsSync(transitionControllerPath)
+          ? '\n' + fs.readFileSync(transitionControllerPath, 'utf8')
+          : '');
 
       // Assert setNpcLifecycleCallbacks is registered
       expect(mainSrc).toContain('mapManager.setNpcLifecycleCallbacks');

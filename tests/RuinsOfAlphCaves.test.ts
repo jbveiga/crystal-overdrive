@@ -106,13 +106,15 @@ describe('Ruins of Alph Cave Interiors & Chambers (TICKET-WORLD-RUINS-OF-ALPH-CA
 
   it('verifies both chamber map IDs are registered in main.ts & FieldObstacleDispatcher', () => {
     const mainTsPath = path.resolve(__dirname, '../src/main.ts');
+    const tickerCoordPath = path.resolve(__dirname, '../src/world/OverworldTickerCoordinator.ts');
     const mainTsContent =
       fs.readFileSync(mainTsPath, 'utf8') +
       '\n' +
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
         'utf8'
-      );
+      ) +
+      (fs.existsSync(tickerCoordPath) ? '\n' + fs.readFileSync(tickerCoordPath, 'utf8') : '');
 
     expect(mainTsContent).toContain("'ruins_of_alph_kabuto_chamber'");
     expect(mainTsContent).toContain("'ruins_of_alph_inner_chamber'");

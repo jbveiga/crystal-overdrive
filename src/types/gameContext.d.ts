@@ -136,6 +136,134 @@ export interface FieldObstacleContext {
   isItemfinderActive: () => boolean;
 }
 
+import type { StadiumArenaManager } from '../battle/StadiumArenaManager';
+import type { OverworldHUD } from '../ui/OverworldHUD';
+import type { ItemfinderHUD } from '../ui/ItemfinderHUD';
+
+export interface OverworldTransitionContext {
+  mapManager: MapManager;
+  storyFlags: Set<string>;
+  visitedMaps: Set<string>;
+  inventory: BagInventory;
+  playerParty: PokemonInstance[];
+  player: GridEntity;
+  playerName: string;
+  isCutsceneLocked: () => boolean;
+  setCutsceneLocked: (locked: boolean) => void;
+  audioManager: {
+    playMapBgm: (mapId: string, volume?: number) => void;
+  };
+  overworldRenderer: {
+    renderMap: (map: MapData, lookupMap: (id: string) => MapData | undefined) => void;
+    playDoorwayFade: (onBlackout: () => Promise<void>, durationMs?: number) => Promise<void>;
+    ensureMapTilesLoaded: (map: MapData, lookupMap: (id: string) => MapData | undefined, options?: any) => Promise<void>;
+    evictDistantTileTextures: (map: MapData, lookupMap: (id: string) => MapData | undefined) => void;
+    renderOverworldItems?: (itemBalls: any[], fruitTrees: any[], harvestedTreeIds: Set<string>) => void;
+  };
+  overworldHUD: {
+    openDialogue: (pages: string[], speaker?: string, onComplete?: () => void) => void;
+    updateRouteName: (name: string) => void;
+    showRoamerAlert: (speciesId: string, routeId: string) => void;
+    hideRoamerAlert: () => void;
+    playFieldRestAnimation?: (onComplete?: () => void) => void;
+    showToast?: (msg: string) => void;
+    show?: () => void;
+    playHealingAnimation?: (count: number, cb?: () => void) => void;
+  };
+  missionManager: MissionManager;
+  activeNpcCache: {
+    invalidate: (mapId: string) => void;
+    evictMapsNotIn: (protectedMapIds: Set<string>) => void;
+  };
+  npcsByMap: Record<string, GridEntity[]>;
+  getActiveMapNpcs: (mapId: string) => GridEntity[];
+  defeatedTrainers: Set<string>;
+  lookupMap: (id: string) => MapData | undefined;
+  saveCurrentGame: () => void;
+  roamingManager: RoamingManager;
+  eventBus: {
+    emit: (event: string, payload: any) => void;
+  };
+  getLastVisitedPokecenter: () => { mapId: string; x: number; y: number };
+  setLastVisitedPokecenter: (loc: { mapId: string; x: number; y: number }) => void;
+  triggerAzaleaRivalAmbush: () => void;
+  triggerCanvasEarthquake?: () => void;
+  overworldItemManager: OverworldItemManager;
+  detectChosenStarterSpecies: () => 'cyndaquil' | 'totodile' | 'chikorita' | undefined;
+}
+
+export interface OverworldTrainerSightContext {
+  player: GridEntity;
+  playerName: string;
+  rivalName: string;
+  playerParty: PokemonInstance[];
+  inventory: BagInventory;
+  storyFlags: Set<string>;
+  defeatedTrainers: Set<string>;
+  npcsByMap: Record<string, GridEntity[]>;
+  gameState: () => 'TITLE' | 'OVERWORLD' | 'BATTLE';
+  isCutsceneLocked: () => boolean;
+  setCutsceneLocked: (locked: boolean) => void;
+  audioManager: {
+    playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader') => void;
+    restoreOverworldBgm: (volume?: number) => void;
+    playMapBgm: (mapId: string, volume?: number) => void;
+    playSfx?: (name: string) => void;
+  };
+  overworldRenderer: {
+    renderMap: (map: MapData, lookupMap: (id: string) => MapData | undefined) => void;
+  };
+  overworldHUD: {
+    openDialogue: (pages: string[], speaker?: string, onComplete?: () => void) => void;
+    showToast: (msg: string) => void;
+    playFieldRestAnimation: (onComplete?: () => void) => void;
+    updateRouteName: (name: string) => void;
+  };
+  mapManager: MapManager;
+  missionManager: MissionManager;
+  roamingManager: RoamingManager;
+  gameClock: GameClock;
+  stadiumArenaManager: StadiumArenaManager;
+  triggerBattle: (pokemon: PokemonInstance, options?: TriggerBattleOptions) => Promise<void>;
+  healPlayerParty: (playAnim?: boolean) => void;
+  saveCurrentGame: () => void;
+  lookupMap: (id: string) => MapData | undefined;
+  syncMapOverworldItems: (map: MapData | null) => void;
+}
+
+export interface OverworldTickerContext {
+  getGameState: () => 'TITLE' | 'OVERWORLD' | 'BATTLE';
+  isCutsceneLocked: () => boolean;
+  isDialogueOpen: () => boolean;
+  isMenuOpen: () => boolean;
+  isAnyModalOpen: () => boolean;
+  player: GridEntity;
+  mapManager: MapManager;
+  overworldItemManager: OverworldItemManager;
+  gameClock: GameClock;
+  storyFlags: Set<string>;
+  visitedMaps: Set<string>;
+  roamingManager: RoamingManager;
+  missionManager: MissionManager;
+  itemfinderHUD: ItemfinderHUD;
+  overworldHUD: OverworldHUD;
+  audioManager: any;
+  overworldRenderer: any;
+  getActiveMapNpcs: (mapId: string) => GridEntity[];
+  populateWorldNpcs: (map: MapData | null) => GridEntity[];
+  handleMapTransition: (entity: GridEntity) => void;
+  executeWarpTransition: (warp: any) => Promise<void>;
+  runTrainerSightSequence: (trainer: GridEntity) => Promise<void>;
+  triggerSlowpokeWellGruntIntercept: (grunt: GridEntity) => Promise<void>;
+  triggerBeastsAwakeningCutscene: () => void;
+  triggerBurnedTowerRivalBattle: () => void;
+  triggerCherrygroveRivalAmbush: () => void;
+  saveCurrentGame: () => void | Promise<void>;
+  triggerWildEncounter: (encounter: any, options?: any) => Promise<void>;
+  addPlayTimeDelta: (dtSec: number) => void;
+  isSurfEnabled: () => boolean;
+}
+
 export type NpcInteractionHandler = (
   targetNpc: GridEntity,
   currentMap: MapData,
