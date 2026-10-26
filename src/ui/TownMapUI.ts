@@ -18,12 +18,20 @@ export interface TownMapResponsiveMetrics {
   inspectorFlexBasis: string;
 }
 
+export type TownMapFilter = 'ALL' | 'GYMS' | 'DUNGEONS' | 'ROUTES';
+
 export interface TownMapUIOptions {
   containerId?: string;
   onClose?: () => void;
   onFly?: (landmark: TownMapLandmark) => void;
 }
 
+/**
+ * Neo-Kanto Tactical Radar & Johto Regional PokéGear Map.
+ * Conforms to Google Stitch Neo-Kanto Protocol:
+ * - Desktop Screen: 3014eb857fec479fb5f0e19d9af61caa (Side Command Menu & Regional Radar Map)
+ * - Mobile Screen:  d8b601897b044546af55628a5ed19332 (Mobile PokéGear // Johto Comms Hub)
+ */
 export class TownMapUI {
   private container: HTMLElement;
   private rootElement: HTMLDivElement | null = null;
@@ -33,6 +41,7 @@ export class TownMapUI {
   private selectedLandmark: TownMapLandmark | null = null;
   private visitedLandmarkIds: Set<string> = new Set();
   private activeRoamers: RoamerState[] = [];
+  private activeFilter: TownMapFilter = 'ALL';
   private options: TownMapUIOptions;
   private boundKeyHandler: ((e: KeyboardEvent) => void) | null = null;
 
@@ -59,6 +68,17 @@ export class TownMapUI {
     return this.playerLandmark;
   }
 
+  public getActiveFilter(): TownMapFilter {
+    return this.activeFilter;
+  }
+
+  public setActiveFilter(filter: TownMapFilter): void {
+    if (this.activeFilter === filter) return;
+    this.activeFilter = filter;
+    BattleAudio.playMenuSound('CURSOR');
+    this.render();
+  }
+
   public open(
     currentMapId: string = 'new_bark_town',
     visitedLandmarks: Iterable<string> = [],
@@ -69,7 +89,7 @@ export class TownMapUI {
     this.visitedLandmarkIds = new Set(visitedLandmarks);
     this.activeRoamers = activeRoamers;
 
-    // Resolve current player landmark
+    // Resolve current player landmark with comprehensive interior map resolution
     this.playerLandmark = resolveCurrentLandmark(currentMapId) || JOHTO_LANDMARKS.new_bark_town;
     this.visitedLandmarkIds.add(this.playerLandmark.id);
     this.selectedLandmark =
@@ -113,6 +133,24 @@ export class TownMapUI {
     if (e.key === 'Escape') {
       e.preventDefault();
       this.close();
+      return true;
+    }
+
+    // Hotkey Category Switching: 1=ALL, 2=GYMS, 3=DUNGEONS, 4=ROUTES
+    if (e.key === '1') {
+      this.setActiveFilter('ALL');
+      return true;
+    }
+    if (e.key === '2') {
+      this.setActiveFilter('GYMS');
+      return true;
+    }
+    if (e.key === '3') {
+      this.setActiveFilter('DUNGEONS');
+      return true;
+    }
+    if (e.key === '4') {
+      this.setActiveFilter('ROUTES');
       return true;
     }
 
@@ -209,9 +247,30 @@ export class TownMapUI {
         pointer-events: auto !important;
       }
 
-      @keyframes radarPing {
-        0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0.9; }
-        100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
+      /* Pure concentric radar ping animation (Zero compound translation offset) */
+      @keyframes neoRadarPing {
+        0% {
+          transform: scale(0.75);
+          opacity: 0.95;
+        }
+        70% {
+          opacity: 0.35;
+        }
+        100% {
+          transform: scale(2.6);
+          opacity: 0;
+        }
+      }
+
+      @keyframes neoRadarPulse {
+        0%, 100% {
+          transform: scale(1);
+          opacity: 0.65;
+        }
+        50% {
+          transform: scale(1.35);
+          opacity: 0.2;
+        }
       }
 
       @keyframes roamerPulse {
@@ -219,32 +278,104 @@ export class TownMapUI {
         50% { transform: translate(-50%, -50%) scale(1.25); filter: drop-shadow(0 0 8px #FFD028); }
       }
 
-      .town-map-player-blip {
-        width: 14px;
-        height: 14px;
-        background: #FFD028;
-        border: 2px solid #0D1322;
-        border-radius: 50%;
+      @keyframes radarSweep {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      /* Centered Player Radar Beacon Structure */
+      .town-map-player-beacon {
         position: absolute;
         transform: translate(-50%, -50%);
-        z-index: 30;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 35;
+      }
+
+      .beacon-ping-ring {
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid #FFD028;
+        background: rgba(255, 208, 40, 0.15);
+        animation: neoRadarPing 1.6s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        transform-origin: center center;
         pointer-events: none;
       }
 
-      .town-map-player-blip::after {
+      .beacon-pulse-halo {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: rgba(255, 208, 40, 0.38);
+        animation: neoRadarPulse 1.4s ease-in-out infinite;
+        transform-origin: center center;
+        pointer-events: none;
+      }
+
+      .town-map-player-blip {
+        width: 12px;
+        height: 12px;
+        background: #FFD028;
+        border: 2px solid #080E1D;
+        border-radius: 50%;
+        box-shadow: 0 0 10px #FFD028;
+        position: relative;
+        z-index: 3;
+        pointer-events: none;
+      }
+
+      /* Floating Tactical YOU Sector Badge */
+      .beacon-you-badge {
+        position: absolute;
+        bottom: calc(100% + 5px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: #FFD028;
+        color: #080E1D;
+        font-family: 'Space Mono', monospace;
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        padding: 1px 5px;
+        border-radius: 3px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 208, 40, 0.6);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        z-index: 38;
+        pointer-events: none;
+      }
+      .beacon-you-badge::after {
         content: '';
         position: absolute;
-        inset: -6px;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 3px 3px 0 3px;
+        border-style: solid;
+        border-color: #FFD028 transparent transparent transparent;
+      }
+      .beacon-you-dot {
+        width: 4px;
+        height: 4px;
         border-radius: 50%;
-        border: 2px solid #FFD028;
-        animation: radarPing 1.6s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        background: #F43F5E;
+        display: inline-block;
       }
 
       .town-map-node {
         position: absolute;
         transform: translate(-50%, -50%);
         cursor: pointer;
-        transition: transform 0.1s ease, filter 0.1s ease;
+        transition: transform 0.12s ease, filter 0.15s ease, opacity 0.15s ease;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -252,14 +383,18 @@ export class TownMapUI {
         user-select: none;
       }
       .town-map-node:hover {
-        transform: translate(-50%, -50%) scale(1.3);
-        z-index: 25;
+        transform: translate(-50%, -50%) scale(1.28);
+        z-index: 28;
       }
       .town-map-node.selected {
         outline: 2px solid #FFD028;
         outline-offset: 3px;
-        z-index: 26;
-        box-shadow: 0 0 12px rgba(255, 208, 40, 0.8);
+        z-index: 29;
+        box-shadow: 0 0 14px rgba(255, 208, 40, 0.9);
+      }
+      .town-map-node.dimmed {
+        opacity: 0.22 !important;
+        filter: grayscale(0.8) !important;
       }
 
       /* Responsive Mobile Viewport Adaptations (< 768px Full-Width Architecture) */
@@ -293,6 +428,13 @@ export class TownMapUI {
           padding: 12px 16px !important;
           box-sizing: border-box !important;
           border-top: none !important;
+        }
+        #town-map-radar-toolbar {
+          padding: 0 8px !important;
+        }
+        .town-map-filter-btn {
+          font-size: 8px !important;
+          padding: 2px 5px !important;
         }
         .town-map-node {
           min-width: 24px;
@@ -328,7 +470,8 @@ export class TownMapUI {
       this.rootElement.remove();
     }
 
-    const isMobile = typeof window !== 'undefined' && window.innerWidth > 0 && window.innerWidth < 768;
+    const isMobile =
+      typeof window !== 'undefined' && window.innerWidth > 0 && window.innerWidth < 768;
 
     const modal = document.createElement('div');
     modal.id = 'town-map-modal';
@@ -336,7 +479,7 @@ export class TownMapUI {
     modal.style.cssText = `
       position: fixed;
       inset: 0;
-      background: rgba(13, 19, 34, 0.94);
+      background: rgba(8, 14, 29, 0.95);
       backdrop-filter: blur(14px);
       display: flex;
       align-items: center;
@@ -355,10 +498,10 @@ export class TownMapUI {
       background: #0D1322;
       border: ${isMobile ? 'none' : '2px solid #22324F'};
       border-radius: ${isMobile ? '0' : '8px'};
-      box-shadow: ${isMobile ? 'none' : '0 16px 48px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 208, 40, 0.15)'};
-      width: ${isMobile ? '100vw' : 'min(980px, 96vw)'};
+      box-shadow: ${isMobile ? 'none' : '0 20px 54px rgba(0, 0, 0, 0.92), 0 0 0 1px rgba(56, 189, 248, 0.15)'};
+      width: ${isMobile ? '100vw' : 'min(1040px, 96vw)'};
       max-width: ${isMobile ? '100vw' : 'none'};
-      height: ${isMobile ? '100dvh' : 'min(650px, 92vh)'};
+      height: ${isMobile ? '100dvh' : 'min(660px, 92vh)'};
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -378,10 +521,10 @@ export class TownMapUI {
     });
 
     // Tactical Blueprint SVG Grid Coordinates (16 x 14 grid matrix)
-    // 0..15 mapped to 4% .. 96% width; 0..13 mapped to 6% .. 94% height
+    // 0..15 mapped to 4% .. 96% width; 0..13 mapped to 8% .. 92% height (accounting for top radar toolbar)
     const getPercentCoord = (gridX: number, gridY: number) => {
       const leftPct = 4 + (gridX / 15) * 92;
-      const topPct = 6 + (gridY / 13) * 88;
+      const topPct = 9 + (gridY / 13) * 85;
       return { leftPct, topPct };
     };
 
@@ -441,53 +584,126 @@ export class TownMapUI {
         min-height: 0;
         overflow: hidden;
       ">
-        <!-- Authentic Game Boy Color Johto Regional Map Canvas -->
+        <!-- Neo-Kanto Tactical Blueprint Radar Map Canvas -->
         <div id="town-map-canvas-container" style="
-          ${isMobile ? 'flex: 1 1 54vh; width: 100%; min-height: 50vh; border-bottom: 2px solid #22324F;' : 'flex: 1.8; border-right: 2px solid #22324F;'}
+          ${isMobile ? 'flex: 1 1 54vh; width: 100%; min-height: 50vh; border-bottom: 2px solid #22324F;' : 'flex: 1.85; border-right: 2px solid #22324F;'}
           position: relative;
-          background: #2878c8;
+          background: #080E1C;
           overflow: hidden;
         ">
-          <!-- Authentic GBC Johto Terrain & Orthogonal Route Highways Layer -->
+          <!-- Tactical HUD Deck Header & Filter Control (Google Stitch Screen 3014eb857fec479fb5f0e19d9af61caa) -->
+          <div id="town-map-radar-toolbar" style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 38px;
+            background: rgba(13, 19, 34, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #22324F;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            z-index: 28;
+          ">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+              <span style="color: #38BDF8; font-size: 12px; flex-shrink: 0;">📡</span>
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #F6F8F3; letter-spacing: 0.5px; white-space: nowrap;">
+                RADAR MATRIX // SECTOR-02
+              </span>
+              <span style="
+                background: #060B16;
+                border: 1px solid #22324F;
+                color: #FFD028;
+                font-family: 'Space Mono', monospace;
+                font-size: 9px;
+                font-weight: 700;
+                padding: 1px 6px;
+                border-radius: 3px;
+                white-space: nowrap;
+              ">
+                GRID: E-${String(sel.gridX).padStart(2, '0')}/N-${String(sel.gridY).padStart(2, '0')}
+              </span>
+            </div>
+
+            <!-- Segmented Category Filters -->
+            <div style="display: flex; gap: 4px; background: #060B16; padding: 2px; border-radius: 6px; border: 1px solid #22324F; flex-shrink: 0;">
+              ${(['ALL', 'GYMS', 'DUNGEONS', 'ROUTES'] as const)
+                .map(
+                  (f) => `
+                <button
+                  type="button"
+                  class="town-map-filter-btn"
+                  data-filter="${f}"
+                  style="
+                    background: ${this.activeFilter === f ? '#FFD028' : 'transparent'};
+                    color: ${this.activeFilter === f ? '#080E1D' : '#8A9BA8'};
+                    font-family: 'Space Mono', monospace;
+                    font-size: 9px;
+                    font-weight: ${this.activeFilter === f ? '900' : '700'};
+                    padding: 3px 8px;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    transition: all 0.15s ease;
+                  "
+                >
+                  ${f === 'ALL' ? 'ALL NODES' : f === 'GYMS' ? 'GYMS (8)' : f}
+                </button>
+              `
+                )
+                .join('')}
+            </div>
+          </div>
+
+          <!-- Multi-Layer SVG Vector Radar Stage -->
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;">
             <defs>
-              <!-- Authentic GBC Scanline Wave Pattern -->
-              <pattern id="gbc-sea-waves" width="10" height="4" patternUnits="userSpaceOnUse">
-                <rect x="0" y="0" width="10" height="2" fill="#2868b8" />
-                <rect x="0" y="2" width="10" height="2" fill="#3878c8" />
-                <line x1="2" y1="1" x2="8" y2="1" stroke="#4888d8" stroke-width="0.6" opacity="0.5" />
+              <!-- Stitch Blueprint Tactical Grid (48x48 style) -->
+              <pattern id="tacticalGrid" width="6.25" height="7.14" patternUnits="userSpaceOnUse">
+                <path d="M 6.25 0 L 0 0 0 7.14" fill="none" stroke="#162238" stroke-width="0.35" />
+                <circle cx="0" cy="0" r="0.4" fill="#FFD028" opacity="0.3" />
               </pattern>
             </defs>
 
-            <!-- Ocean waves background -->
-            <rect x="0" y="0" width="100" height="100" fill="url(#gbc-sea-waves)" />
+            <!-- Background Deep Void & Tactical Grid -->
+            <rect x="0" y="0" width="100" height="100" fill="#080E1C" />
+            <rect x="0" y="0" width="100" height="100" fill="url(#tacticalGrid)" opacity="0.85" />
 
-            <!-- Authentic GBC Landmass (Western Cianwood Peninsula & Whirl Islands) -->
-            <polygon points="0,52 14,54 18,78 0,84" fill="#68a850" stroke="#183810" stroke-width="1.2" />
-            <circle cx="16" cy="62" r="2.4" fill="#e8d088" stroke="#183810" stroke-width="0.8" />
-            <circle cx="21" cy="65" r="2.0" fill="#e8d088" stroke="#183810" stroke-width="0.8" />
+            <!-- Concentric Topographic Radar Rings -->
+            <circle cx="48" cy="52" r="28" fill="none" stroke="rgba(56, 189, 248, 0.08)" stroke-width="0.3" stroke-dasharray="1.5, 1.5" />
+            <circle cx="48" cy="52" r="44" fill="none" stroke="rgba(56, 189, 248, 0.05)" stroke-width="0.3" stroke-dasharray="2, 2" />
 
-            <!-- Main Johto Landmass -->
-            <polygon points="18,10 98,10 98,82 84,82 70,76 60,86 34,88 28,66 24,52 18,44" fill="#68a850" stroke="#183810" stroke-width="1.4" />
+            <!-- Western Cianwood Peninsula & Whirl Islands -->
+            <polygon points="0,52 14,54 18,78 0,84" fill="#0F1B2E" stroke="#233B5E" stroke-width="0.7" />
+            <circle cx="16" cy="62" r="2.2" fill="#14243D" stroke="#38BDF8" stroke-width="0.5" stroke-dasharray="1,1" />
+            <circle cx="21" cy="65" r="1.8" fill="#14243D" stroke="#38BDF8" stroke-width="0.5" stroke-dasharray="1,1" />
 
-            <!-- Mountain Ranges (Mt. Mortar, Dark Cave, Ice Path, Mt. Silver) -->
-            <polygon points="46,12 96,12 97,48 76,50 64,36 46,34" fill="#987040" stroke="#483018" stroke-width="1.0" opacity="0.9" />
+            <!-- Main Johto Continental Landmass Polygon -->
+            <polygon points="18,10 98,10 98,82 84,82 70,76 60,86 34,88 28,66 24,52 18,44" fill="#0F1B2E" stroke="#2A466F" stroke-width="0.9" />
 
-            <!-- Forest Canopies (Ilex Forest & National Park) -->
-            <rect x="30" y="70" width="12" height="10" rx="3" fill="#286820" stroke="#183810" stroke-width="0.8" />
-            <rect x="31" y="38" width="10" height="9" rx="3" fill="#286820" stroke="#183810" stroke-width="0.8" />
+            <!-- Topographic Mountain Elevation Contours (Mt. Mortar, Dark Cave, Ice Path, Mt. Silver) -->
+            <polygon points="46,12 96,12 97,48 76,50 64,36 46,34" fill="#162238" stroke="#334155" stroke-width="0.5" stroke-dasharray="1,1" />
 
-            <!-- Lake of Rage -->
-            <ellipse cx="71" cy="14" rx="7" ry="4.5" fill="#2868b8" stroke="#183810" stroke-width="0.8" />
+            <!-- Woodland Bio-Canopies (Ilex Forest & National Park) -->
+            <rect x="30" y="70" width="12" height="10" rx="2" fill="rgba(16, 185, 129, 0.12)" stroke="rgba(72, 199, 116, 0.35)" stroke-width="0.5" />
+            <rect x="31" y="38" width="10" height="9" rx="2" fill="rgba(16, 185, 129, 0.12)" stroke="rgba(72, 199, 116, 0.35)" stroke-width="0.5" />
 
-            <!-- Authentic GBC "JOHTO" Corner Plaque -->
-            <g id="johto-banner" transform="translate(4, 4)">
-              <rect x="0" y="0" width="22" height="9" rx="1" fill="#f8f8f0" stroke="#181818" stroke-width="1.0" />
-              <rect x="1" y="1" width="20" height="7" fill="none" stroke="#d04820" stroke-width="0.6" />
-              <text x="11" y="6.5" font-family="'Space Mono', monospace" font-size="5" font-weight="900" fill="#181818" text-anchor="middle" letter-spacing="1">JOHTO</text>
+            <!-- Lake of Rage Hydro-Basin -->
+            <ellipse cx="71" cy="14" rx="7" ry="4.5" fill="#0A192F" stroke="#F43F5E" stroke-width="0.6" stroke-dasharray="1.5,1" />
+
+            <!-- Saffron-Goldenrod High-Speed Magnet Train Line (Google Stitch Mobile Screen d8b601897b044546af55628a5ed19332) -->
+            <line x1="0" y1="53.5" x2="34.6" y2="53.5" stroke="#A9C7FF" stroke-width="1.8" stroke-linecap="round" opacity="0.75" />
+            <line x1="0" y1="53.5" x2="34.6" y2="53.5" stroke="#FFD028" stroke-width="1.0" stroke-dasharray="3, 2" />
+
+            <!-- Tactical Corner Regional Label -->
+            <g id="johto-banner" transform="translate(4, 44)">
+              <rect x="0" y="0" width="18" height="6.5" rx="2" fill="#060B16" stroke="#22324F" stroke-width="0.6" />
+              <text x="9" y="4.6" font-family="'Space Mono', monospace" font-size="3.2" font-weight="900" fill="#38BDF8" text-anchor="middle" letter-spacing="0.5">JOHTO</text>
             </g>
 
-            <!-- Authentic Orthogonal 90-Degree GBC Route Highways -->
+            <!-- Orthogonal 90° Tactical Route Network (Active vs Dormant Corridors) -->
             ${JOHTO_CONNECTIONS.map((conn) => {
               const fromLm = JOHTO_LANDMARKS[conn.from];
               const toLm = JOHTO_LANDMARKS[conn.to];
@@ -499,8 +715,6 @@ export class TownMapUI {
               if (p1.leftPct === p2.leftPct || p1.topPct === p2.topPct) {
                 pathD = `M ${p1.leftPct} ${p1.topPct} L ${p2.leftPct} ${p2.topPct}`;
               } else {
-                // Orthogonal 90° elbow connection matching GBC route alignment
-                // Prioritize horizontal-then-vertical unless vertical movement matches route corridor
                 if (Math.abs(fromLm.gridX - toLm.gridX) > Math.abs(fromLm.gridY - toLm.gridY)) {
                   pathD = `M ${p1.leftPct} ${p1.topPct} L ${p2.leftPct} ${p1.topPct} L ${p2.leftPct} ${p2.topPct}`;
                 } else {
@@ -508,34 +722,70 @@ export class TownMapUI {
                 }
               }
 
-              return `
-                <path
-                  d="${pathD}"
-                  stroke="#181818"
-                  stroke-width="3.6"
-                  stroke-linecap="square"
-                  stroke-linejoin="miter"
-                  fill="none"
-                />
-                <path
-                  d="${pathD}"
-                  stroke="#f8e090"
-                  stroke-width="2.2"
-                  stroke-linecap="square"
-                  stroke-linejoin="miter"
-                  fill="none"
-                />
-              `;
+              const isVisitedRoute =
+                this.visitedLandmarkIds.has(conn.from) || this.visitedLandmarkIds.has(conn.to);
+
+              if (isVisitedRoute) {
+                return `
+                  <path
+                    d="${pathD}"
+                    stroke="#060B16"
+                    stroke-width="3.2"
+                    stroke-linecap="square"
+                    stroke-linejoin="miter"
+                    fill="none"
+                  />
+                  <path
+                    d="${pathD}"
+                    stroke="#FFD028"
+                    stroke-width="1.8"
+                    stroke-linecap="square"
+                    stroke-linejoin="miter"
+                    fill="none"
+                    opacity="0.9"
+                  />
+                `;
+              } else {
+                return `
+                  <path
+                    d="${pathD}"
+                    stroke="#060B16"
+                    stroke-width="2.6"
+                    stroke-linecap="square"
+                    stroke-linejoin="miter"
+                    fill="none"
+                  />
+                  <path
+                    d="${pathD}"
+                    stroke="#4E4633"
+                    stroke-width="1.4"
+                    stroke-dasharray="1.8, 1.4"
+                    stroke-linecap="square"
+                    stroke-linejoin="miter"
+                    fill="none"
+                  />
+                `;
+              }
             }).join('')}
           </svg>
 
-          <!-- Nodes Layer -->
+          <!-- Interactive Tactical Nodes Layer -->
           ${Object.values(JOHTO_LANDMARKS)
             .map((lm) => {
               const { leftPct, topPct } = getPercentCoord(lm.gridX, lm.gridY);
               const isSelected = sel.id === lm.id;
               const isPlayerHere = this.playerLandmark?.id === lm.id;
               const isVisitedLm = this.visitedLandmarkIds.has(lm.id);
+
+              // Category Filter Match
+              const matchesFilter =
+                this.activeFilter === 'ALL' ||
+                (this.activeFilter === 'GYMS' && Boolean(lm.gymLeader)) ||
+                (this.activeFilter === 'DUNGEONS' &&
+                  (lm.type === 'dungeon' || lm.type === 'landmark')) ||
+                (this.activeFilter === 'ROUTES' && lm.type === 'route');
+
+              const isDimmed = !matchesFilter && !isPlayerHere && !isSelected;
 
               const isCityOrTown = lm.type === 'city' || lm.type === 'town';
               const isLandmarkOrDungeon = lm.type === 'landmark' || lm.type === 'dungeon';
@@ -553,7 +803,12 @@ export class TownMapUI {
               let badgeHtml = '';
 
               if (isCityOrTown) {
-                // Authentic GBC Orange Square City Node with Inner Dark Square ▣
+                // Neo-Kanto Tactical City Node
+                const borderColor = lm.gymLeader
+                  ? '#FFD028'
+                  : isVisitedLm
+                  ? '#38BDF8'
+                  : '#22324F';
                 nodeStyle = `
                   left: ${leftPct}%;
                   top: ${topPct}%;
@@ -561,19 +816,21 @@ export class TownMapUI {
                   height: ${size}px;
                   min-width: ${isMobile ? '24px' : 'auto'};
                   min-height: ${isMobile ? '24px' : 'auto'};
-                  background: #f85800;
-                  border: 2px solid #000000;
-                  border-radius: 0px;
-                  box-shadow: inset 0 0 0 2px #f85800, inset 0 0 0 3px #000000, 0 2px 6px rgba(0,0,0,0.75);
+                  background: #141E33;
+                  border: 2px solid ${borderColor};
+                  border-radius: 4px;
+                  box-shadow: 0 0 8px ${lm.gymLeader ? 'rgba(255, 208, 40, 0.4)' : 'rgba(56, 189, 248, 0.3)'};
                   display: flex;
                   align-items: center;
                   justify-content: center;
                 `;
                 if (lm.gymLeader) {
-                  badgeHtml = `<span style="font-size: 8px; line-height: 1; pointer-events: none;">${lm.badgeIcon || '⚡'}</span>`;
+                  badgeHtml = `<span style="font-size: 9px; line-height: 1; pointer-events: none;">${lm.badgeIcon || '⚡'}</span>`;
                 }
               } else if (isLandmarkOrDungeon) {
-                // Authentic GBC Red Diamond Landmark Marker ◆
+                // Neo-Kanto Diamond Hazard / Dungeon Node
+                const isLake = lm.id === 'lake_of_rage';
+                const borderColor = isLake ? '#F43F5E' : '#A855F7';
                 nodeStyle = `
                   left: ${leftPct}%;
                   top: ${topPct}%;
@@ -581,11 +838,11 @@ export class TownMapUI {
                   height: ${size}px;
                   min-width: ${isMobile ? '24px' : 'auto'};
                   min-height: ${isMobile ? '24px' : 'auto'};
-                  background: #f81800;
-                  border: 2px solid #000000;
+                  background: ${isLake ? 'rgba(244, 63, 94, 0.25)' : 'rgba(168, 85, 247, 0.25)'};
+                  border: 2px solid ${borderColor};
                   transform: translate(-50%, -50%) rotate(45deg);
-                  border-radius: 0px;
-                  box-shadow: 0 2px 6px rgba(0,0,0,0.75);
+                  border-radius: 2px;
+                  box-shadow: 0 0 8px ${isLake ? 'rgba(244, 63, 94, 0.4)' : 'rgba(168, 85, 247, 0.4)'};
                 `;
               } else {
                 // Route Waypoint
@@ -596,16 +853,36 @@ export class TownMapUI {
                   height: ${size}px;
                   min-width: ${isMobile ? '24px' : 'auto'};
                   min-height: ${isMobile ? '24px' : 'auto'};
-                  background: #f8e090;
-                  border: 1.5px solid #181818;
-                  border-radius: 0px;
-                  box-shadow: 0 1px 4px rgba(0,0,0,0.6);
+                  background: #1E293B;
+                  border: 1.5px solid ${isVisitedLm ? '#FFD028' : '#475569'};
+                  border-radius: 2px;
+                  box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+                `;
+              }
+
+              // Anti-Collision Label Position
+              let labelPosStyle = `
+                left: ${leftPct}%;
+                top: calc(${topPct}% + ${Math.round(size / 2) + 3}px);
+                transform: translateX(-50%);
+              `;
+              if (lm.id === 'goldenrod_city' || lm.id === 'olivine_city') {
+                labelPosStyle = `
+                  left: calc(${leftPct}% - ${Math.round(size / 2) + 4}px);
+                  top: ${topPct}%;
+                  transform: translate(-100%, -50%);
+                `;
+              } else if (lm.id === 'violet_city' || lm.id === 'blackthorn_city') {
+                labelPosStyle = `
+                  left: calc(${leftPct}% + ${Math.round(size / 2) + 4}px);
+                  top: ${topPct}%;
+                  transform: translateY(-50%);
                 `;
               }
 
               return `
                 <div
-                  class="town-map-node ${isSelected ? 'selected' : ''}"
+                  class="town-map-node ${isSelected ? 'selected' : ''} ${isDimmed ? 'dimmed' : ''}"
                   data-landmark-id="${lm.id}"
                   style="${nodeStyle}"
                   title="${lm.name}"
@@ -614,37 +891,46 @@ export class TownMapUI {
                 </div>
 
                 ${
-                  isCityOrTown
+                  isCityOrTown || isSelected || (matchesFilter && lm.type !== 'route')
                     ? `<div style="
                         position: absolute;
-                        left: ${leftPct}%;
-                        top: calc(${topPct}% + ${Math.round(size / 2) + 3}px);
-                        transform: translateX(-50%);
+                        ${labelPosStyle}
                         font-size: 9px;
-                        font-weight: 900;
+                        font-weight: 800;
                         font-family: 'Space Mono', monospace;
-                        color: #ffffff;
-                        background: rgba(15, 23, 42, 0.88);
-                        padding: 1px 4px;
-                        border: 1px solid rgba(255, 255, 255, 0.2);
-                        border-radius: 2px;
+                        color: #F6F8F3;
+                        background: rgba(13, 19, 34, 0.92);
+                        padding: 1px 5px;
+                        border: 1px solid rgba(56, 189, 248, 0.3);
+                        border-radius: 3px;
                         white-space: nowrap;
                         pointer-events: none;
                         z-index: 22;
                         text-shadow: 0 1px 2px #000;
+                        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+                        opacity: ${isDimmed ? '0.22' : '1'};
+                        transition: opacity 0.15s ease;
                       ">${lm.name.replace(/ City| Town/g, '')}</div>`
                     : ''
                 }
 
                 ${
                   isPlayerHere
-                    ? `<div class="town-map-player-blip" style="left: ${leftPct}%; top: ${topPct}%;"></div>`
+                    ? `
+                      <div class="town-map-player-beacon" style="left: ${leftPct}%; top: ${topPct}%;">
+                        <div class="beacon-you-badge"><span class="beacon-you-dot"></span>YOU</div>
+                        <div class="beacon-ping-ring"></div>
+                        <div class="beacon-pulse-halo"></div>
+                        <div class="town-map-player-blip"></div>
+                      </div>
+                    `
                     : ''
                 }
 
                 ${roamersHere
                   .map((r) => {
-                    const icon = r.speciesId === 'raikou' ? '⚡' : r.speciesId === 'entei' ? '🔥' : '💧';
+                    const icon =
+                      r.speciesId === 'raikou' ? '⚡' : r.speciesId === 'entei' ? '🔥' : '💧';
                     return `
                     <div style="
                       position: absolute;
@@ -661,6 +947,50 @@ export class TownMapUI {
               `;
             })
             .join('')}
+
+          <!-- Compass Telemetry Reticle -->
+          <div style="
+            position: absolute;
+            bottom: 8px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(13, 19, 34, 0.88);
+            border: 1px solid #22324F;
+            backdrop-filter: blur(6px);
+            padding: 3px 8px;
+            border-radius: 4px;
+            z-index: 25;
+            pointer-events: none;
+          ">
+            <span style="font-size: 11px;">🧭</span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: #8A9BA8;">
+              MAGNETIC N 014° // <strong style="color: #F6F8F3;">SILPH-RADAR 5000</strong>
+            </span>
+          </div>
+
+          <!-- Live Scan Status -->
+          <div style="
+            position: absolute;
+            bottom: 8px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(13, 19, 34, 0.88);
+            border: 1px solid #22324F;
+            backdrop-filter: blur(6px);
+            padding: 3px 8px;
+            border-radius: 4px;
+            z-index: 25;
+            pointer-events: none;
+          ">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #48C774; box-shadow: 0 0 6px #48C774;"></span>
+            <span style="font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; color: #48C774; letter-spacing: 0.5px;">
+              SCAN CYCLE ACTIVE
+            </span>
+          </div>
         </div>
 
         <!-- Telemetry Inspector Card (Right / Bottom Sheet) -->
@@ -683,8 +1013,12 @@ export class TownMapUI {
               letter-spacing: 1px;
               text-transform: uppercase;
               margin-bottom: 4px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
             ">
-              // ${sel.type} TELEMETRY
+              <span>// ${sel.type} TELEMETRY</span>
+              <span style="color: #8A9BA8; font-size: 10px;">GRID: E-${String(sel.gridX).padStart(2, '0')}/N-${String(sel.gridY).padStart(2, '0')}</span>
             </div>
             <div style="font-size: 20px; font-weight: 800; color: #F6F8F3;">
               ${sel.name}
@@ -694,8 +1028,8 @@ export class TownMapUI {
             </div>
           </div>
 
-          <!-- Status Pill -->
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <!-- Status & Fast Travel Row -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
             <span style="
               font-family: 'Space Mono', monospace;
               font-size: 10px;
@@ -712,18 +1046,29 @@ export class TownMapUI {
             ${
               sel.flyable && isVisited
                 ? `
-              <span style="
-                font-family: 'Space Mono', monospace;
-                font-size: 10px;
-                font-weight: 700;
-                padding: 4px 10px;
-                border-radius: 4px;
-                background: rgba(42, 117, 211, 0.2);
-                color: #38BDF8;
-                border: 1px solid #38BDF8;
-              ">
-                ✈️ FLY DESTINATION
-              </span>
+              <button
+                id="town-map-fly-btn"
+                type="button"
+                style="
+                  font-family: 'Space Mono', monospace;
+                  font-size: 10px;
+                  font-weight: 800;
+                  padding: 4px 12px;
+                  border-radius: 4px;
+                  background: #FFD028;
+                  color: #080E1D;
+                  border: 1px solid #FFD028;
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  gap: 4px;
+                  box-shadow: 0 0 10px rgba(255, 208, 40, 0.4);
+                  transition: transform 0.1s ease;
+                "
+              >
+                <span>✈️</span>
+                <span>FAST TRAVEL [HM-02]</span>
+              </button>
             `
                 : ''
             }
@@ -766,7 +1111,8 @@ export class TownMapUI {
               ${roamersAtSel
                 .map((r) => {
                   const name = r.speciesId.toUpperCase();
-                  const icon = r.speciesId === 'raikou' ? '⚡' : r.speciesId === 'entei' ? '🔥' : '💧';
+                  const icon =
+                    r.speciesId === 'raikou' ? '⚡' : r.speciesId === 'entei' ? '🔥' : '💧';
                   return `
                     <div style="font-size: 12px; color: #F6F8F3; margin-top: 4px;">
                       ${icon} <strong>${name}</strong> is currently prowling here!
@@ -830,7 +1176,8 @@ export class TownMapUI {
               <div style="display: flex; flex-direction: column; gap: 6px;">
                 ${this.activeRoamers
                   .map((r) => {
-                    const rLm = resolveCurrentLandmark(r.currentMapId) || JOHTO_LANDMARKS.burned_tower;
+                    const rLm =
+                      resolveCurrentLandmark(r.currentMapId) || JOHTO_LANDMARKS.burned_tower;
                     const hops = computeLandmarkDistance(
                       this.playerLandmark?.id || 'new_bark_town',
                       rLm.id
@@ -914,6 +1261,7 @@ export class TownMapUI {
             line-height: 1.6;
           ">
             <div>• Use <strong>Arrow Keys</strong> or <strong>Click</strong> to inspect landmarks</div>
+            <div>• Press <strong>1-4</strong> to switch category filters</div>
             <div>• Press <strong>Escape</strong> to return to overworld</div>
           </div>
         </div>
@@ -926,6 +1274,24 @@ export class TownMapUI {
 
     // Attach Event Handlers
     card.querySelector('#town-map-close-btn')?.addEventListener('click', () => this.close());
+
+    // Category Filter Buttons
+    const filterBtns = card.querySelectorAll('.town-map-filter-btn');
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.getAttribute('data-filter') as TownMapFilter;
+        if (filter) {
+          this.setActiveFilter(filter);
+        }
+      });
+    });
+
+    // Fly / Fast Travel Button
+    card.querySelector('#town-map-fly-btn')?.addEventListener('click', () => {
+      if (sel.flyable && isVisited) {
+        this.options.onFly?.(sel);
+      }
+    });
 
     const nodes = card.querySelectorAll('.town-map-node');
     nodes.forEach((el) => {

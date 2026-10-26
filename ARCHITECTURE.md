@@ -486,3 +486,21 @@ Every new map or regional zone delivered to the engine must be a **100% complete
 10. **Zone BGM & Environmental Ambience**:
     - Canonical BGM track assigned to every zone, plus ambient environmental audio (cave drips, coastal waves, Route 33 rain).
 
+---
+
+## 8. Active Backlog & Upcoming Roadmap
+
+### 8.1 Story-Gated Legendary Beast Radar (Next Priority)
+- **Ticket / Scope**: `TICKET-FEATURE-ROAMER-RADAR-STORY-GATE-01`
+- **Context**: Currently, the Legendary Beast Radar in `TownMapUI` tracks Raikou, Entei, and Suicune as long as their state has `isAwakened: true`.
+- **Requirements & Planned Specifications**:
+  1. **Story Gate Precondition**: The Legendary Beast Radar section in `TownMapUI` (and regional HUD telemetry) must remain concealed / dormant until the player triggers the canonical Burned Tower B1F storyline awakening event (`BURNED_TOWER_BEASTS_AWAKENED` or `saveData.storyFlags.burnedTowerBeastsAwakened`).
+  2. **Pre-Awakening Presentation**:
+     - The "LEGENDARY BEAST RADAR" card section in the Town Map right-hand inspector must either be cleanly hidden or display a neutral dormant scanning readout:
+       `BEAST RADAR FREQUENCY // DORMANT [NO BIO-SIGNALS DETECTED IN JOHTO]`.
+     - No roamer icons or BFS hop telemetry should be rendered on the overworld radar map prior to story progression.
+  3. **Awakening Trigger & Cutscene**:
+     - In Burned Tower B1F, stepping into the beast chamber triggers the 3-beast scatter cutscene (Raikou, Entei, Suicune).
+     - Event sets `saveData.storyFlags.burnedTowerBeastsAwakened = true`, awakens the roamers in `RoamingManager`, and plays the signature beast cry sequence.
+     - Unlocks the live radar matrix in `TownMapUI`, displaying real-time BFS hop proximity, route presence, and species icons.
+

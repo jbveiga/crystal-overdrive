@@ -48,12 +48,14 @@ class MockElement {
       const idMatch = attrs.match(/id=["']([^"']+)["']/i);
       const classMatch = attrs.match(/class=["']([^"']+)["']/i);
       const dataLmMatch = attrs.match(/data-landmark-id=["']([^"']+)["']/i);
+      const dataFilterMatch = attrs.match(/data-filter=["']([^"']+)["']/i);
       const styleMatch = attrs.match(/style=["']([^"']+)["']/i);
 
       const child = new MockElement(tag);
       if (idMatch) child.id = idMatch[1];
       if (classMatch) child.className = classMatch[1];
       if (dataLmMatch) child.setAttribute('data-landmark-id', dataLmMatch[1]);
+      if (dataFilterMatch) child.setAttribute('data-filter', dataFilterMatch[1]);
       if (styleMatch) child.style.cssText = styleMatch[1];
       this.appendChild(child);
     }
@@ -202,6 +204,21 @@ describe('Johto Town Map Engine & UI (TICKET-FEATURE-TOWN-MAP-ENGINE-01)', () =>
       expect(resolveCurrentLandmark('slowpoke_well_b1f')?.id).toBe('slowpoke_well');
       expect(resolveCurrentLandmark('route_29')?.id).toBe('route_29');
       expect(resolveCurrentLandmark('violet_city')?.id).toBe('violet_city');
+
+      // Comprehensive building & dungeon sub-map resolution
+      expect(resolveCurrentLandmark('guide_gents_house')?.id).toBe('cherrygrove_city');
+      expect(resolveCurrentLandmark('earls_pokemon_academy')?.id).toBe('violet_city');
+      expect(resolveCurrentLandmark('charcoal_kiln')?.id).toBe('azalea_town');
+      expect(resolveCurrentLandmark('radio_tower_5f')?.id).toBe('goldenrod_city');
+      expect(resolveCurrentLandmark('dance_theater')?.id).toBe('ecruteak_city');
+      expect(resolveCurrentLandmark('team_rocket_base_b2f')?.id).toBe('mahogany_town');
+      expect(resolveCurrentLandmark('whirl_island_lugia_chamber')?.id).toBe('route_41');
+      expect(resolveCurrentLandmark('mount_mortar_b1f')?.id).toBe('route_42');
+      expect(resolveCurrentLandmark('dragon_shrine')?.id).toBe('dragons_den');
+      expect(resolveCurrentLandmark('victory_road')?.id).toBe('indigo_plateau');
+      expect(resolveCurrentLandmark('indigo_plateau_pokecenter')?.id).toBe('indigo_plateau');
+      expect(resolveCurrentLandmark('battle_tower_elevator')?.id).toBe('route_40');
+      expect(resolveCurrentLandmark('lake_of_rage_hidden_power_house')?.id).toBe('lake_of_rage');
     });
   });
 
@@ -336,6 +353,98 @@ describe('Johto Town Map Engine & UI (TICKET-FEATURE-TOWN-MAP-ENGINE-01)', () =>
       expect(raikouCard).toBeDefined();
       raikouCard?.click();
       expect(ui.getSelectedLandmark()?.id).toBe('route_29');
+
+      ui.close();
+    });
+
+    it('renders centered gold player beacon with concentric ping & pulse rings and YOU badge without compound offset', () => {
+      const ui = new TownMapUI({ containerId: 'modal-container' });
+      // Open with player in Cherrygrove City
+      ui.open('cherrygrove_city');
+      expect(ui.getCurrentPlayerLandmark()?.id).toBe('cherrygrove_city');
+
+      const card = mockDoc.getElementById('town-map-card');
+      expect(card).not.toBeNull();
+
+      // Check player beacon element structure
+      const beacon = card?.querySelector('.town-map-player-beacon');
+      expect(beacon).not.toBeNull();
+
+      const pingRing = card?.querySelector('.beacon-ping-ring');
+      expect(pingRing).not.toBeNull();
+
+      const pulseHalo = card?.querySelector('.beacon-pulse-halo');
+      expect(pulseHalo).not.toBeNull();
+
+      const blip = card?.querySelector('.town-map-player-blip');
+      expect(blip).not.toBeNull();
+
+      const youBadge = card?.querySelector('.beacon-you-badge');
+      expect(youBadge).not.toBeNull();
+      expect(card?.innerHTML).toContain('YOU');
+
+      // Verify styles use concentric neoRadarPing keyframes without compound translate
+      const styleEl = mockDoc.getElementById('neo-kanto-town-map-styles');
+      const css = (styleEl as any)?.textContent || '';
+      expect(css).toContain('neoRadarPing');
+      expect(css).toContain('neoRadarPulse');
+      expect(css).not.toContain('transform: translate(-50%, -50%) scale(1.0)');
+
+      ui.close();
+    });
+
+    it('supports Stitch tactical HUD category filter tabs (ALL, GYMS, DUNGEONS, ROUTES)', () => {
+      const ui = new TownMapUI({ containerId: 'modal-container' });
+      ui.open('new_bark_town');
+      expect(ui.getActiveFilter()).toBe('ALL');
+
+      const card = mockDoc.getElementById('town-map-card');
+      expect(card).not.toBeNull();
+
+      // Toolbar and grid telemetry
+      expect(card?.innerHTML).toContain('RADAR MATRIX // SECTOR-02');
+      expect(card?.innerHTML).toContain('GRID: E-');
+
+      // Filter buttons exist
+      const filterBtns = card?.querySelectorAll('.town-map-filter-btn') || [];
+      expect(filterBtns.length).toBe(4);
+
+      // Switch to GYMS
+      const gymsBtn = filterBtns.find((b) => b.getAttribute('data-filter') === 'GYMS');
+      expect(gymsBtn).toBeDefined();
+      gymsBtn?.click();
+      expect(ui.getActiveFilter()).toBe('GYMS');
+
+      // Switch to DUNGEONS via hotkey '3'
+      ui.handleKeyDown({ key: '3', preventDefault: vi.fn() } as any);
+      expect(ui.getActiveFilter()).toBe('DUNGEONS');
+
+      // Switch to ROUTES via setActiveFilter
+      ui.setActiveFilter('ROUTES');
+      expect(ui.getActiveFilter()).toBe('ROUTES');
+
+      // Switch back to ALL via hotkey '1'
+      ui.handleKeyDown({ key: '1', preventDefault: vi.fn() } as any);
+      expect(ui.getActiveFilter()).toBe('ALL');
+
+      ui.close();
+    });
+
+    it('supports fast travel / fly transit action button callback', () => {
+      const onFly = vi.fn();
+      const ui = new TownMapUI({ containerId: 'modal-container', onFly });
+      // Open at New Bark Town with Violet City already visited
+      ui.open('new_bark_town', ['new_bark_town', 'violet_city']);
+
+      // Inspect Violet City (flyable: true)
+      ui.selectLandmark('violet_city');
+
+      const flyBtn = mockDoc.getElementById('town-map-fly-btn');
+      expect(flyBtn).not.toBeNull();
+      flyBtn?.click();
+
+      expect(onFly).toHaveBeenCalledTimes(1);
+      expect(onFly).toHaveBeenCalledWith(expect.objectContaining({ id: 'violet_city' }));
 
       ui.close();
     });
