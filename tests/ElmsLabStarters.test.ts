@@ -25,8 +25,14 @@ describe('TICKET-NARRATIVE-ELMS-TABLE-POKEBALLS-01', () => {
     });
   });
 
-  describe('Table inspection dialogue wiring (main.ts)', () => {
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+  describe('Table inspection dialogue wiring (main.ts & FieldObstacleDispatcher.ts)', () => {
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
 
     it('uses context-aware dialogues instead of the generic empty-ball text', () => {
       expect(mainSrc).not.toContain("It's an empty POKé BALL.");

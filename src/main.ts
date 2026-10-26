@@ -14,6 +14,9 @@ import {
 } from './battle/BattleStateMachine';
 import { StadiumArenaManager } from './battle/StadiumArenaManager';
 import { PokemonFactory, type PartyExpAward } from './battle/PokemonFactory';
+import { BattleSessionController } from './battle/BattleSessionController';
+import { FieldObstacleDispatcher } from './world/interactions/FieldObstacleDispatcher';
+import type { BattleSessionContext, FieldObstacleContext, TriggerBattleOptions } from './types/gameContext';
 import { MoveReplacementModalUI } from './ui/MoveReplacementModalUI';
 import { BattleAudio } from './audio/BattleAudio';
 import { AudioManager } from './audio/AudioManager';
@@ -1449,603 +1452,86 @@ async function bootstrap() {
     }
   };
 
+  const getBattleSessionContext = (): BattleSessionContext => ({
+    setGameState: (state: 'TITLE' | 'OVERWORLD' | 'BATTLE') => { gameState = state; },
+    overworldHUD: { hide: () => overworldHUD.hide(), show: () => overworldHUD.show(), showToast: (msg: string) => overworldHUD.showToast(msg), hideRoamerAlert: () => overworldHUD.hideRoamerAlert() },
+    itemfinderHUD: { suspend: () => itemfinderHUD.suspend(), resume: () => itemfinderHUD.resume() },
+    player,
+    audioManager,
+    seenSpecies,
+    playerParty,
+    playerBox,
+    setPlayerBox: (box: PokemonInstance[]) => { playerBox = box; },
+    healPlayerParty: (playAnim?: boolean) => healPlayerParty(playAnim),
+    battleHUD,
+    battleRenderer,
+    inventory,
+    gameClock,
+    gameOptions,
+    eventBus,
+    mapManager,
+    boxManager,
+    storyFlags,
+    bugContestManager,
+    roamingManager,
+    missionManager,
+    playerName,
+    cycleBattleSpeed: () => cycleBattleSpeed(),
+    saveCurrentGame: () => saveCurrentGame(),
+    respawnAtLastPokecenter: async () => {
+      const respawnMapId = mapManager.getMap(lastVisitedPokecenter.mapId) ? lastVisitedPokecenter.mapId : 'new_bark_town';
+      const respawnMap = mapManager.setCurrentMap(respawnMapId);
+      player.x = player.targetX = player.renderX = lastVisitedPokecenter.x;
+      player.y = player.targetY = player.renderY = lastVisitedPokecenter.y;
+      player.direction = 'DOWN';
+      player.isMoving = false;
+      player.progress = 0;
+      await overworldRenderer.ensureMapTilesLoaded(respawnMap, lookupMap);
+      overworldRenderer.renderMap(respawnMap, lookupMap);
+      syncMapOverworldItems(respawnMap);
+      overworldHUD.updateRouteName(respawnMap.name);
+      audioManager.playMapBgm(respawnMap.id, 0.8);
+      overworldHUD.show();
+      itemfinderHUD.resume();
+      healPlayerParty(false);
+      saveCurrentGame();
+      if (respawnMap.id.endsWith('_poke_center')) {
+        overworldHUD.playHealingAnimation(playerParty.length, () => overworldHUD.showToast('💖 Your party was restored to full HP & PP at the Pokémon Center!'));
+      } else {
+        overworldHUD.playFieldRestAnimation(() => overworldHUD.showToast('💖 Your party was restored to full HP & PP at home!'));
+      }
+    },
+    promptBugContestSpecimenSwap: async (newCatch: PokemonInstance) => {
+      const catchResult = bugContestManager.recordCatch(newCatch);
+      if (catchResult.promptSwap && bugContestManager.state.bestCaughtPokemon) {
+        new BugContestSpecimenSwapModal('modal-container', {
+          currentSpecimen: bugContestManager.state.bestCaughtPokemon,
+          newCatch,
+          ballsRemaining: bugContestManager.state.ballsRemaining,
+          timeRemainingSec: bugContestManager.state.timeRemainingSec,
+          onDecision: (choice) => {
+            if (choice === 'replace') bugContestManager.swapSpecimen(newCatch); else bugContestManager.keepCurrentSpecimen();
+            bugContestHUD.update(bugContestManager.state.ballsRemaining, bugContestManager.state.timeRemainingSec, bugContestManager.state.bestCaughtPokemon);
+          },
+        });
+      } else {
+        bugContestHUD.update(bugContestManager.state.ballsRemaining, bugContestManager.state.timeRemainingSec, bugContestManager.state.bestCaughtPokemon);
+      }
+    },
+    playEvolutionScene: (pokemon, targetSpeciesId) => new EvolutionSceneUI('modal-container').play(pokemon, targetSpeciesId),
+    openMoveReplacementModal: (pokemon, moveData) => new MoveReplacementModalUI('modal-container').open(pokemon, moveData),
+  });
+
   // 7. Start Battle (Wild, Trainer, or 2v2 Stadium Double Battle)
   const triggerBattle = async (
     initialOpponentPokemon: PokemonInstance,
-    options: {
-      isRoamer?: boolean;
-      isTrainer?: boolean;
-      isGymLeader?: boolean;
-      trainerName?: string;
-      trainerTeam?: PokemonInstance[];
-      doubleConfig?: DoubleBattleConfig;
-      stadiumBadgeLabel?: string;
-      onVictory?: () => Promise<void> | void;
-      onBattleEnd?: (result: BattleTurnResult) => Promise<void> | void;
-    } = {}
-  ) => {
-    let opponentPokemon = initialOpponentPokemon;
-    const remainingTrainerParty: PokemonInstance[] =
-      options.doubleConfig?.isDoubleBattle
-        ? []
-        : options.trainerTeam && options.trainerTeam.length > 1
-        ? options.trainerTeam.slice(1)
-        : [];
-
-    gameState = 'BATTLE';
-    overworldHUD.hide();
-    itemfinderHUD.suspend();
-    player.isMoving = false;
-    player.progress = 0;
-    audioManager.playBattleBgm(
-      options.isGymLeader ? 'gym_leader' : options.isTrainer ? 'trainer' : 'wild'
+    options: TriggerBattleOptions = {}
+  ): Promise<void> => {
+    await BattleSessionController.runBattleSession(
+      getBattleSessionContext(),
+      initialOpponentPokemon,
+      options
     );
-
-    // Record species as SEEN in Pokédex
-    seenSpecies.add(opponentPokemon.speciesId);
-    if (options.doubleConfig?.enemyPartner) {
-      seenSpecies.add(options.doubleConfig.enemyPartner.speciesId);
-    }
-
-    // Reset temporary trapping flag at the start of a new encounter while keeping persistent HP/Status
-    if (playerParty.length === 0) return;
-    opponentPokemon.isTrapped = false;
-
-    let activePlayerPokemon =
-      playerParty.find((p) => !p.isEgg && p.currentHp > 0) ||
-      playerParty.find((p) => !p.isEgg) ||
-      playerParty[0];
-    if (activePlayerPokemon.currentHp <= 0) {
-      healPlayerParty();
-      activePlayerPokemon = playerParty.find((p) => !p.isEgg) || playerParty[0];
-    }
-    let battleSM = new BattleStateMachine(
-      activePlayerPokemon,
-      opponentPokemon,
-      options.isRoamer,
-      options.doubleConfig
-    );
-
-    battleRenderer.setSpeedMultiplier(gameClock.battleSpeed);
-    battleHUD.updateSpeedDisplay(gameClock.battleSpeed);
-
-    const caughtSpeciesIds = new Set<string>([
-      ...playerParty.map((p) => p.speciesId),
-      ...playerBox.map((p) => p.speciesId),
-    ]);
-
-    await battleRenderer.startBattle(activePlayerPokemon, opponentPokemon);
-
-    if (options.doubleConfig?.isDoubleBattle) {
-      const foePartner = options.doubleConfig.enemyPartner;
-      const allyPartner = options.doubleConfig.playerPartner;
-      await battleHUD.showMessage(
-        `🏟️ ${options.trainerName || 'Stadium Duo'} challenged you to a 2v2 Double Battle!`
-      );
-      await battleHUD.showMessage(
-        `${options.trainerName || 'Foe'} sent out ${opponentPokemon.nickname}${foePartner ? ` and ${foePartner.nickname}` : ''}!`
-      );
-      if (allyPartner) {
-        await battleHUD.showMessage(
-          `Go! ${activePlayerPokemon.nickname} and ${allyPartner.nickname}!`
-        );
-      }
-    } else if (options.isTrainer) {
-      await battleHUD.showMessage(`${options.trainerName} would like to battle!`);
-      await battleHUD.showMessage(`${options.trainerName} sent out ${opponentPokemon.nickname}!`);
-    } else if (options.isRoamer) {
-      await battleHUD.showMessage(`⚡ Legendary Beast ${opponentPokemon.nickname} appeared!`);
-    } else {
-      await battleHUD.showMessage(`Wild ${opponentPokemon.nickname} appeared!`);
-    }
-
-    const bindBattleHudForActiveFoe = () => {
-      battleHUD.initBattle(
-        activePlayerPokemon,
-        opponentPokemon,
-        {
-          onMoveSelected: async (moveId: string) => {
-            const result = battleSM.executeRound({ type: 'FIGHT', moveId });
-            await playTurnEventsAndFinishCheck(result);
-          },
-          onDoubleMovesSelected: async (
-            slot1MoveId: string,
-            slot2MoveId?: string,
-            slot1Target?: 0 | 1,
-            slot2Target?: 0 | 1
-          ) => {
-            const result = battleSM.executeDoubleRound(
-              { type: 'FIGHT', moveId: slot1MoveId, targetSlot: slot1Target ?? 0 },
-              slot2MoveId
-                ? { type: 'FIGHT', moveId: slot2MoveId, targetSlot: slot2Target ?? 1 }
-                : undefined
-            );
-            await playTurnEventsAndFinishCheck(result);
-          },
-          onPokemonSelected: async (targetPokemon: PokemonInstance) => {
-            const result = battleSM.executeRound({ type: 'SWITCH', switchPokemon: targetPokemon });
-            await playTurnEventsAndFinishCheck(result);
-          },
-          onBagSelected: async (ballId: PokeballId) => {
-            if (options.isTrainer) {
-              await battleHUD.showMessage("The trainer blocked the ball! Don't be a thief!");
-              battleHUD.showActionMenu();
-              return;
-            }
-
-            if (inventory.balls[ballId] && inventory.balls[ballId]! > 0) {
-              inventory.balls[ballId]!--;
-            }
-
-            const result = battleSM.executeRound({ type: 'BAG', ballId });
-            await playTurnEventsAndFinishCheck(result);
-          },
-          onItemUsed: async (itemId: string, targetPokemon: PokemonInstance) => {
-            const underscoreId = itemId.replace(/-/g, '_');
-            if ((inventory.items[itemId] ?? 0) > 0) {
-              inventory.items[itemId]!--;
-            } else if ((inventory.items[underscoreId] ?? 0) > 0) {
-              inventory.items[underscoreId]!--;
-            } else if (
-              inventory.berries &&
-              (inventory.berries[itemId as keyof typeof inventory.berries] ?? 0) > 0
-            ) {
-              inventory.berries[itemId as keyof typeof inventory.berries]!--;
-            } else if (
-              inventory.berries &&
-              (inventory.berries[underscoreId as keyof typeof inventory.berries] ?? 0) > 0
-            ) {
-              inventory.berries[underscoreId as keyof typeof inventory.berries]!--;
-            }
-
-            const result = battleSM.executeRound({ type: 'USE_ITEM', itemId, targetPokemon });
-            await playTurnEventsAndFinishCheck(result);
-          },
-          onRunSelected: async () => {
-            if (options.isTrainer) {
-              await battleHUD.showMessage("No! There's no running from a Trainer battle!");
-              battleHUD.showActionMenu();
-              return;
-            }
-            const runResult = battleSM.executeRound({ type: 'RUN' });
-            if (options.isRoamer) {
-              eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-            }
-            await battleHUD.showMessage('Got away safely!');
-            mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
-            battleRenderer.endBattle();
-            battleHUD.hide();
-            gameState = 'OVERWORLD';
-            audioManager.restoreOverworldBgm(0.6);
-            overworldHUD.show();
-            itemfinderHUD.resume();
-            if (options.onBattleEnd) {
-              await options.onBattleEnd(runResult);
-            }
-          },
-          onSpeedToggle: () => {
-            return cycleBattleSpeed();
-          },
-        },
-        inventory.balls,
-        playerParty,
-        caughtSpeciesIds,
-        inventory.items,
-        inventory.berries as Record<string, number | undefined>
-      );
-
-      if (options.doubleConfig?.isDoubleBattle || options.doubleConfig?.stadiumRules) {
-        battleHUD.setDoubleBattlePeers(
-          battleSM.playerPartner,
-          battleSM.enemyPartner,
-          options.doubleConfig?.stadiumRules
-        );
-      } else {
-        battleHUD.setDoubleBattlePeers(undefined, undefined, undefined);
-      }
-    };
-
-    const playTurnEventsAndFinishCheck = async (result: BattleTurnResult) => {
-      let ballGraphic: Graphics | null = null;
-
-      for (const ev of result.events) {
-        if (ev.type === 'MESSAGE') {
-          await battleHUD.showMessage(ev.text);
-        } else if (ev.type === 'SWITCH') {
-          activePlayerPokemon = ev.newPokemon;
-          await battleRenderer.animateSwitchPlayerPokemon(activePlayerPokemon);
-          battleHUD.setActivePlayerPokemon(activePlayerPokemon);
-          battleHUD.slideInHealthCard(true);
-        } else if (ev.type === 'THROW_BALL') {
-          ballGraphic = await battleRenderer.animateThrowBall(ev.ballId);
-        } else if (ev.type === 'SHAKE' && ballGraphic) {
-          await battleRenderer.animateShake(ballGraphic, ev.shakes, ev.caught);
-        } else if (ev.type === 'ATTACK') {
-          const isAllyAttacker =
-            ev.attackerId === activePlayerPokemon.uid ||
-            ev.attackerId === battleSM.playerPartner?.uid;
-          await battleRenderer.animateAttack(
-            isAllyAttacker,
-            ev.moveType,
-            ev.moveCategory
-          );
-        } else if (ev.type === 'DAMAGE') {
-          const isPlayerTarget =
-            ev.targetId === activePlayerPokemon.uid ||
-            ev.targetId === battleSM.playerPartner?.uid;
-          await battleRenderer.animateDamage(isPlayerTarget, ev.effectiveness, ev.isCritical);
-          battleHUD.updateHpByUid(ev.targetId, ev.remainingHp);
-        } else if (ev.type === 'HEAL') {
-          BattleAudio.playMenuSound('HEAL');
-          if (ev.targetId === activePlayerPokemon.uid) {
-            battleHUD.updateHp(true, ev.remainingHp, activePlayerPokemon.stats.hp);
-          } else {
-            battleHUD.updatePartyDock();
-          }
-          battleHUD.updateStatusBadges();
-        } else if (ev.type === 'RESIDUAL_DAMAGE') {
-          const isPlayerTarget =
-            ev.targetId === activePlayerPokemon.uid ||
-            ev.targetId === battleSM.playerPartner?.uid;
-          await battleRenderer.animateDamage(isPlayerTarget, 1, false);
-          battleHUD.updateHpByUid(ev.targetId, ev.remainingHp);
-        } else if (ev.type === 'STAT_CHANGE') {
-          const isPlayerTarget =
-            ev.targetId === activePlayerPokemon.uid ||
-            ev.targetId === battleSM.playerPartner?.uid;
-          await battleRenderer.animateStatChange(isPlayerTarget, ev.stages > 0);
-          battleHUD.updateStatusBadges();
-        } else if (ev.type === 'STATUS') {
-          battleHUD.updateStatusBadges();
-        } else if (ev.type === 'FAINT') {
-          const isPlayerTarget =
-            ev.targetId === activePlayerPokemon.uid ||
-            ev.targetId === battleSM.playerPartner?.uid;
-          BattleAudio.playCry(isPlayerTarget ? activePlayerPokemon.speciesId : opponentPokemon.speciesId, true);
-          if (ev.targetId === activePlayerPokemon.uid || ev.targetId === opponentPokemon.uid) {
-            await battleRenderer.animateFaint(ev.targetId === activePlayerPokemon.uid);
-          }
-        }
-      }
-
-      if (result.isBattleOver) {
-        if (result.caught) {
-          if (bugContestManager.state.isActive) {
-            const catchResult = bugContestManager.recordCatch(opponentPokemon);
-            if (catchResult.promptSwap && bugContestManager.state.bestCaughtPokemon) {
-              new BugContestSpecimenSwapModal('modal-container', {
-                currentSpecimen: bugContestManager.state.bestCaughtPokemon,
-                newCatch: opponentPokemon,
-                ballsRemaining: bugContestManager.state.ballsRemaining,
-                timeRemainingSec: bugContestManager.state.timeRemainingSec,
-                onDecision: (choice) => {
-                  if (choice === 'replace') {
-                    bugContestManager.swapSpecimen(opponentPokemon);
-                  } else {
-                    bugContestManager.keepCurrentSpecimen();
-                  }
-                  bugContestHUD.update(
-                    bugContestManager.state.ballsRemaining,
-                    bugContestManager.state.timeRemainingSec,
-                    bugContestManager.state.bestCaughtPokemon
-                  );
-                },
-              });
-            } else {
-              bugContestHUD.update(
-                bugContestManager.state.ballsRemaining,
-                bugContestManager.state.timeRemainingSec,
-                bugContestManager.state.bestCaughtPokemon
-              );
-            }
-          }
-          if (options.isRoamer) {
-            roamingManager.markCaught(opponentPokemon.speciesId);
-            overworldHUD.hideRoamerAlert();
-          }
-          if (playerParty.length < 6) {
-            playerParty.push(opponentPokemon);
-          } else {
-            const depositRes = boxManager.deposit(opponentPokemon);
-            playerBox = boxManager.flatten();
-            const targetBox = boxManager.getBox(depositRes.boxIndex);
-            const boxName = targetBox ? targetBox.name : `BOX ${depositRes.boxIndex + 1}`;
-            BattleAudio.playOverworldSound('FANFARE');
-            await battleHUD.showMessage("Bill's PC was accessed.");
-            await battleHUD.showMessage(
-              `${opponentPokemon.nickname || opponentPokemon.speciesId.toUpperCase()} was transferred to ${boxName}!`
-            );
-            if (depositRes.rolledOver) {
-              await battleHUD.showMessage(
-                `The previous box was full! Automatically stored in ${boxName}!`
-              );
-            }
-            saveCurrentGame();
-          }
-        } else if (result.winner === 'PLAYER') {
-          if (options.isRoamer) {
-            roamingManager.markDefeated(opponentPokemon.speciesId);
-            overworldHUD.hideRoamerAlert();
-          }
-
-          // Award EXP & Check Level-Up across party via Unbound-Style Exp. Share (OFF | ALL | CAPPED)
-          const expGained = PokemonFactory.calculateExpGain(opponentPokemon, Boolean(options.isTrainer));
-          const expShareMode: ExpShareMode = gameOptions.expShare || 'CAPPED';
-          const expAwards = PokemonFactory.distributePartyExp(
-            playerParty,
-            activePlayerPokemon,
-            expGained,
-            expShareMode,
-            inventory.badges.length
-          );
-
-          const processLevelUpAndMoves = async (award: PartyExpAward) => {
-            if (!award.leveledUp) return;
-            const member = award.pokemon;
-            BattleAudio.playBallEvent('LEVEL_UP');
-            await battleHUD.showMessage(
-              `🎉 ${member.nickname} grew to Lv. ${award.newLevel}!`
-            );
-
-            // Level-Up Learnset Move Learning (Ticket 6.4)
-            const learnableMoveIds = await PokemonFactory.getLearnableMovesAtLevel(
-              member.speciesId,
-              award.newLevel
-            );
-
-            for (const newMoveId of learnableMoveIds) {
-              const alreadyKnown = member.moves.some((m) => m.moveId === newMoveId);
-              if (alreadyKnown) continue;
-
-              const newMoveData = PokemonFactory.getMoveData(newMoveId);
-
-              if (member.moves.length < 4) {
-                // Auto-learn if fewer than 4 moves
-                member.moves.push({
-                  moveId: newMoveData.id,
-                  currentPp: newMoveData.pp,
-                  maxPp: newMoveData.pp,
-                });
-                BattleAudio.playBallEvent('LEVEL_UP');
-                await battleHUD.showMessage(
-                  `✨ ${member.nickname} learned ${newMoveData.name}!`
-                );
-              } else {
-                // Prompt to forget an existing move or decline
-                const chosenIdx = await battleHUD.promptMoveForget(member, newMoveData);
-                if (chosenIdx !== null && chosenIdx >= 0 && chosenIdx < 4) {
-                  const forgottenMove = member.moves[chosenIdx];
-                  const forgottenData = PokemonFactory.getMoveData(forgottenMove.moveId);
-                  member.moves[chosenIdx] = {
-                    moveId: newMoveData.id,
-                    currentPp: newMoveData.pp,
-                    maxPp: newMoveData.pp,
-                  };
-                  BattleAudio.playBallEvent('LEVEL_UP');
-                  await battleHUD.showMessage(
-                    `1, 2, and... Poof! ${member.nickname} forgot ${forgottenData.name} and learned ${newMoveData.name}!`
-                  );
-                } else {
-                  await battleHUD.showMessage(
-                    `${member.nickname} did not learn ${newMoveData.name}.`
-                  );
-                }
-              }
-            }
-          };
-
-          // 1. Process active battler first
-          for (const award of expAwards) {
-            if (!award.isActiveBattler) continue;
-            const member = award.pokemon;
-            if (award.isCapped) {
-              await battleHUD.showMessage(
-                `🧢 ${member.nickname} is at the level cap (Lv. ${award.levelCap})! Received 1 EXP.`
-              );
-            } else {
-              await battleHUD.showMessage(`${member.nickname} gained ${award.expAwarded} EXP. Points!`);
-            }
-            battleHUD.updateExp(activePlayerPokemon);
-            battleHUD.updateHp(true, activePlayerPokemon.currentHp, activePlayerPokemon.stats.hp);
-            await processLevelUpAndMoves(award);
-          }
-
-          // 2. Process benched party members via consolidated summary (Pokémon Unbound style)
-          const benchSummary = PokemonFactory.formatBenchExpShareSummary(expAwards);
-          if (benchSummary) {
-            await battleHUD.showMessage(benchSummary);
-          }
-
-          // 3. Process benched members' level-ups and move learns
-          for (const award of expAwards) {
-            if (award.isActiveBattler || !award.leveledUp) continue;
-            await processLevelUpAndMoves(award);
-          }
-
-          // Multi-Pokémon Trainer Team continuation (Ticket 5.5)
-          if (options.isTrainer && remainingTrainerParty.length > 0) {
-            opponentPokemon = remainingTrainerParty.shift()!;
-            opponentPokemon.isTrapped = false;
-            seenSpecies.add(opponentPokemon.speciesId);
-            battleSM = new BattleStateMachine(activePlayerPokemon, opponentPokemon, false);
-            await battleHUD.showMessage(`${options.trainerName} sent out ${opponentPokemon.nickname}!`);
-            await battleRenderer.animateSendOutNextPokemon(false, opponentPokemon);
-            bindBattleHudForActiveFoe();
-            battleHUD.slideInHealthCard(false);
-            return;
-          }
-
-          if (options.isTrainer) {
-            const fullTrainerTeam = options.trainerTeam || [opponentPokemon];
-            const prizeMoney = BattleStateMachine.calculateTrainerPayout(fullTrainerTeam);
-            inventory.money += prizeMoney;
-            await battleHUD.showMessage(`You defeated ${options.trainerName}!`);
-            await battleHUD.showMessage(`You got $${prizeMoney} for winning!`);
-          }
-        } else if (result.winner === 'ENEMY') {
-          const remainingConscious = playerParty.filter((p) => !p.isEgg && p.currentHp > 0);
-          if (remainingConscious.length > 0) {
-            await battleHUD.showMessage(
-              `${activePlayerPokemon.nickname} fainted! Choose another POKéMON to send in!`
-            );
-            battleHUD.showPartyMenu({
-              forcedSwitch: true,
-              onSelected: async (nextPokemon: PokemonInstance) => {
-                activePlayerPokemon = nextPokemon;
-                battleSM.playerPokemon = nextPokemon;
-                battleSM.playerPokemon.statStages = PokemonFactory.createDefaultStatStages();
-                battleSM.isBattleOver = false;
-                await battleHUD.showMessage(`Go! ${activePlayerPokemon.nickname}!`);
-                await battleRenderer.animateSendOutNextPokemon(true, activePlayerPokemon);
-                bindBattleHudForActiveFoe();
-                battleHUD.slideInHealthCard(true);
-              },
-            });
-            return;
-          }
-
-          // Whiteout / Blackout sequence (all party Pokémon fainted)
-          const fine = Math.min(inventory.money, Math.max(20, Math.floor(inventory.money * 0.1)));
-          inventory.money = Math.max(0, inventory.money - fine);
-          await battleHUD.showMessage(`${playerName} is out of usable POKéMON!`);
-          if (fine > 0) {
-            await battleHUD.showMessage(`${playerName} paid $${fine} as the prize money…`);
-          }
-          await battleHUD.showMessage(
-            `${playerName} blacked out and rushed to the POKéMON CENTER!`
-          );
-
-          if (options.isRoamer) {
-            eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-          }
-
-          mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
-          battleRenderer.endBattle();
-          battleHUD.hide();
-          gameState = 'OVERWORLD';
-
-          const respawnMapId = mapManager.getMap(lastVisitedPokecenter.mapId)
-            ? lastVisitedPokecenter.mapId
-            : 'new_bark_town';
-          const respawnMap = mapManager.setCurrentMap(respawnMapId);
-          player.x = lastVisitedPokecenter.x;
-          player.y = lastVisitedPokecenter.y;
-          player.targetX = lastVisitedPokecenter.x;
-          player.targetY = lastVisitedPokecenter.y;
-          player.renderX = lastVisitedPokecenter.x;
-          player.renderY = lastVisitedPokecenter.y;
-          player.direction = 'DOWN';
-          player.isMoving = false;
-          player.progress = 0;
-
-          await overworldRenderer.ensureMapTilesLoaded(respawnMap, lookupMap);
-          overworldRenderer.renderMap(respawnMap, lookupMap);
-          syncMapOverworldItems(respawnMap);
-          overworldHUD.updateRouteName(respawnMap.name);
-          audioManager.playMapBgm(respawnMap.id, 0.8);
-          overworldHUD.show();
-          itemfinderHUD.resume();
-
-          healPlayerParty(false);
-          saveCurrentGame();
-          if (respawnMap.id.endsWith('_poke_center')) {
-            overworldHUD.playHealingAnimation(playerParty.length, () => {
-              overworldHUD.showToast('💖 Your party was restored to full HP & PP at the Pokémon Center!');
-            });
-          } else {
-            overworldHUD.playFieldRestAnimation(() => {
-              overworldHUD.showToast('💖 Your party was restored to full HP & PP at home!');
-            });
-          }
-          return;
-        }
-        if (options.isRoamer) {
-          eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-        }
-        mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
-        battleRenderer.endBattle();
-        battleHUD.hide();
-        gameState = 'OVERWORLD';
-        audioManager.restoreOverworldBgm(0.6);
-        overworldHUD.show();
-        itemfinderHUD.resume();
-
-        // Check and run post-battle Level-Up Evolution sequences for any eligible party Pokémon
-        if (result.winner === 'PLAYER') {
-          for (const member of playerParty) {
-            if (member.isEgg || member.currentHp <= 0) continue;
-            const evoCandidate = EvolutionManager.canEvolve(member, {
-              trigger: 'LEVEL_UP',
-              level: member.level,
-              timeOfDay: gameClock.getTimeOfDay(),
-            });
-            if (evoCandidate) {
-              const evoScene = new EvolutionSceneUI('modal-container');
-              const evoResult = await evoScene.play(member, evoCandidate.targetSpeciesId);
-              if (evoResult.evolved) {
-                const targetSpecies = evoResult.newSpeciesId || evoResult.targetSpecies || evoCandidate.targetSpeciesId;
-                if (member.speciesId.toLowerCase() !== targetSpecies.toLowerCase()) {
-                  EvolutionManager.executeEvolution(member, targetSpecies);
-                }
-                seenSpecies.add(member.speciesId);
-                const evoMoves = await PokemonFactory.getLearnableMovesAtLevel(
-                  member.speciesId,
-                  member.level
-                );
-                for (const moveId of evoMoves) {
-                  if (member.moves.some((m) => m.moveId === moveId)) continue;
-                  const moveData = PokemonFactory.getMoveData(moveId);
-                  if (member.moves.length < 4) {
-                    member.moves.push({
-                      moveId: moveData.id,
-                      currentPp: moveData.pp,
-                      maxPp: moveData.pp,
-                    });
-                    overworldHUD.showToast(`✨ ${member.nickname} learned ${moveData.name}!`);
-                  } else {
-                    const modal = new MoveReplacementModalUI('modal-container');
-                    const chosenSlot = await modal.open(member, moveData);
-                    if (chosenSlot !== null && chosenSlot >= 0 && chosenSlot < 4) {
-                      const replacedMove = member.moves[chosenSlot];
-                      let replacedName = replacedMove.moveId.toUpperCase();
-                      try {
-                        const replacedData = PokemonFactory.getMoveData(replacedMove.moveId);
-                        replacedName = replacedData.name;
-                      } catch {}
-                      member.moves[chosenSlot] = {
-                        moveId: moveData.id,
-                        currentPp: moveData.pp,
-                        maxPp: moveData.pp,
-                      };
-                      overworldHUD.showToast(
-                        `✨ ${member.nickname} forgot ${replacedName} and learned ${moveData.name}!`
-                      );
-                    } else {
-                      overworldHUD.showToast(
-                        `${member.nickname} did not learn ${moveData.name}.`
-                      );
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        saveCurrentGame();
-
-        if (options.onBattleEnd) {
-          await options.onBattleEnd(result);
-        }
-        if (result.winner === 'PLAYER' && options.onVictory) {
-          await options.onVictory();
-        }
-      } else {
-        battleHUD.showActionMenu();
-      }
-    };
-
-    bindBattleHudForActiveFoe();
   };
 
   const launchStadiumChallenge = (challengerId: string, cupId: string) => {
@@ -2601,6 +2087,60 @@ async function bootstrap() {
       }
     );
   };
+
+  const refreshItemfinderRadar = (playSonar: boolean = true) => {
+    if (!itemfinderHUD.isActive()) return;
+    const currentMap = mapManager.getCurrentMap();
+    if (!currentMap) return;
+    const hiddenItems = overworldItemManager.getHiddenItemsForMap(currentMap.id, storyFlags);
+    const ping = ItemfinderRadar.scan(
+      player.x,
+      player.y,
+      player.direction,
+      hiddenItems,
+      storyFlags
+    );
+    itemfinderHUD.update(ping);
+    if (playSonar && ping.hasItemInRange) {
+      BattleAudio.playItemfinderSonar(ping.distance, ping.isFacingDirectly);
+    }
+  };
+
+  const getFieldObstacleContext = (): FieldObstacleContext => ({
+    playerName,
+    playerParty,
+    inventory,
+    storyFlags,
+    player,
+    mapManager,
+    overworldItemManager,
+    missionManager,
+    visitedMaps,
+    roamingManager,
+    detectChosenStarterSpecies,
+    openStarterChoiceModal: (speciesId, name, type, onConfirm, onCancel) => overworldHUD.openStarterChoiceModal(speciesId, name, type, onConfirm, onCancel),
+    openDialogue: (pages, speaker, onComplete) => overworldHUD.openDialogue(pages, speaker, onComplete),
+    showToast: (msg) => overworldHUD.showToast(msg),
+    openPcStorage: () => boxManagementUI.open(playerParty, boxManager.getState(), { onSave: () => saveCurrentGame(), onClose: () => saveCurrentGame() }),
+    openTownMap: (mapId, visited, roamers) => townMapUI.open(mapId, visited, roamers),
+    openRuinsPuzzleModal: (callbacks) => ruinsPuzzleModalUI.open(callbacks),
+    handleRuinsPuzzleSolve,
+    openMart: () => bagUI.openMart(),
+    healPlayerParty: (playAnim) => healPlayerParty(playAnim),
+    playHealingAnimation: (partyCount) => overworldHUD.playHealingAnimation(partyCount),
+    playFieldRestAnimation: () => overworldHUD.playFieldRestAnimation(),
+    playFlashEffect: () => overworldRenderer.playFlashEffect(),
+    playCutSlashEffect: (x, y) => overworldRenderer.playCutSlashEffect(x, y),
+    addOverworldItemToInventory,
+    removeItemBall: (eventFlag) => overworldRenderer.removeItemBall(eventFlag),
+    syncMapOverworldItems,
+    refreshItemfinderRadar: (playSonar) => refreshItemfinderRadar(playSonar),
+    saveCurrentGame,
+    renderMap: (map) => overworldRenderer.renderMap(map, lookupMap),
+    setSurfEnabled: (enabled) => mapManager.setSurfEnabled(enabled),
+    triggerBattle,
+    isItemfinderActive: () => itemfinderHUD.isActive(),
+  });
 
   handleInteract = () => {
     if (gameState !== 'OVERWORLD' || isCutsceneLocked || player.isMoving || overworldHUD.isDialogueOpen()) return;
@@ -5980,543 +5520,8 @@ async function bootstrap() {
       }
     }
 
-    // 2. Check Street Signs & Interactive Background Objects (bgEvents)
-    const bgEvent = mapManager.checkBgEvent(facingX, facingY);
-    if (bgEvent && bgEvent.pages.length > 0) {
-      // Starter Pokéball Selection in Elm's Lab (Ticket 6.1)
-      if (
-        bgEvent.action === 'STARTER_CYNDAQUIL' ||
-        bgEvent.action === 'STARTER_TOTODILE' ||
-        bgEvent.action === 'STARTER_CHIKORITA'
-      ) {
-        if (storyFlags.has('starter_chosen') || playerParty.length > 0) {
-          const tableSpecies: 'cyndaquil' | 'totodile' | 'chikorita' =
-            bgEvent.action === 'STARTER_CYNDAQUIL'
-              ? 'cyndaquil'
-              : bgEvent.action === 'STARTER_TOTODILE'
-              ? 'totodile'
-              : 'chikorita';
-          const tableName = tableSpecies.toUpperCase();
-          const chosenSpecies = detectChosenStarterSpecies();
-
-          // A. The spot of the ball the player took
-          if (chosenSpecies === tableSpecies) {
-            overworldHUD.openDialogue(
-              [`It's an empty spot. You already chose ${tableName}!`],
-              bgEvent.speaker
-            );
-            return;
-          }
-
-          // B. The spot of the ball the Rival stole after Elm's emergency call
-          const counterPickMap: Record<string, string> = {
-            cyndaquil: 'totodile',
-            totodile: 'chikorita',
-            chikorita: 'cyndaquil',
-          };
-          const rivalStolen = chosenSpecies ? counterPickMap[chosenSpecies] : null;
-          if (storyFlags.has('ELM_CALLED_ABOUT_THEFT') && rivalStolen === tableSpecies) {
-            overworldHUD.openDialogue(['The POKé BALL was stolen from the table!'], bgEvent.speaker);
-            return;
-          }
-
-          // C. A ball still sitting on the table
-          const tableType =
-            tableSpecies === 'cyndaquil' ? 'FIRE' : tableSpecies === 'totodile' ? 'WATER' : 'GRASS';
-          overworldHUD.openDialogue(
-            [`It's ${tableName}, a ${tableType} POKéMON!`, 'PROF. ELM: You already chose your partner!'],
-            bgEvent.speaker
-          );
-          return;
-        }
-
-        const starterConfig: Record<
-          string,
-          { speciesId: 'cyndaquil' | 'totodile' | 'chikorita'; name: string; type: string }
-        > = {
-          STARTER_CYNDAQUIL: {
-            speciesId: 'cyndaquil',
-            name: 'CYNDAQUIL',
-            type: 'FIRE',
-          },
-          STARTER_TOTODILE: {
-            speciesId: 'totodile',
-            name: 'TOTODILE',
-            type: 'WATER',
-          },
-          STARTER_CHIKORITA: {
-            speciesId: 'chikorita',
-            name: 'CHIKORITA',
-            type: 'GRASS',
-          },
-        };
-
-        const chosen = starterConfig[bgEvent.action];
-        if (chosen) {
-          BattleAudio.playCry(chosen.speciesId);
-          overworldHUD.openStarterChoiceModal(
-            chosen.speciesId,
-            chosen.name,
-            chosen.type,
-            () => {
-              const starterPokemon = PokemonFactory.create(chosen.speciesId, 5);
-              playerParty.push(starterPokemon);
-              seenSpecies.add(chosen.speciesId);
-              storyFlags.add('starter_chosen');
-              storyFlags.add(`starter_${chosen.speciesId}`);
-              missionManager.reconcileStarterState(playerParty, storyFlags);
-              overworldRenderer.removeItemBall(`${chosen.speciesId}_ball`);
-              syncMapOverworldItems(currentMap);
-              BattleAudio.playOverworldSound('KEY_ITEM');
-              overworldHUD.openDialogue(
-                [
-                  `${playerName} received ${chosen.name} from PROF. ELM!`,
-                  "PROF. ELM: Excellent choice! That POKéMON is really energetic! Now, please visit MR. POKéMON's house on ROUTE 30 to retrieve the MYSTERY EGG!",
-                ],
-                '🔬 PROF. ELM',
-                () => {
-                  saveCurrentGame();
-                  overworldHUD.showToast(`✨ Received ${chosen.name} (Lv. 5)!`);
-                }
-              );
-            },
-            () => {
-              BattleAudio.playMenuSound('CANCEL');
-            }
-          );
-          return;
-        }
-      }
-
-      // Bill's PC Storage Terminal Interaction
-      if (
-        bgEvent.action === 'OPEN_PC' ||
-        bgEvent.speaker?.includes('PC') ||
-        bgEvent.pages.some((p) => p.includes('PC'))
-      ) {
-        overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
-          boxManagementUI.open(playerParty, boxManager.getState(), {
-            onSave: () => saveCurrentGame(),
-            onClose: () => saveCurrentGame(),
-          });
-        });
-        return;
-      }
-
-      // Town Map Wall Poster Interaction
-      if (
-        bgEvent.action === 'POKECENTER_MAP' ||
-        bgEvent.action === 'OPEN_MAP' ||
-        bgEvent.pages.some((p) => p.toUpperCase().includes('TOWN MAP')) ||
-        bgEvent.speaker?.toUpperCase().includes('TOWN MAP')
-      ) {
-        overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
-          townMapUI.open(currentMap.id, visitedMaps, roamingManager.getActiveRoamers());
-        });
-        return;
-      }
-
-      // Gym Statues Dynamic Winning Trainers Inspection
-      if (
-        bgEvent.speaker?.includes('STATUE') ||
-        (bgEvent.pages && bgEvent.pages.some((p) => p.includes('GYM STATUE') || p.includes('POKéMON GYM')))
-      ) {
-        if (currentMap.id === 'violet_gym') {
-          const statuePages = [
-            'VIOLET CITY POKéMON GYM',
-            'LEADER: FALKNER',
-            storyFlags.has('falkner_defeated')
-              ? `WINNING TRAINERS: SILVER, ${playerName}`
-              : 'WINNING TRAINERS: SILVER',
-          ];
-          overworldHUD.openDialogue(statuePages, bgEvent.speaker);
-          return;
-        }
-        if (currentMap.id === 'azalea_gym') {
-          const statuePages = [
-            'AZALEA TOWN POKéMON GYM',
-            'LEADER: BUGSY',
-            storyFlags.has('bugsy_defeated')
-              ? `WINNING TRAINERS: SILVER, ${playerName}`
-              : 'WINNING TRAINERS: SILVER',
-          ];
-          overworldHUD.openDialogue(statuePages, bgEvent.speaker);
-          return;
-        }
-      }
-
-      // Dark Cave Entrance on Route 31 (HM05 Flash Field Technique)
-      if (currentMap.id === 'route_31' && facingX === 34 && facingY === 5) {
-        const flashCheck = ModernHMHandler.checkFlash(inventory, storyFlags, playerParty);
-        if (flashCheck.canUse) {
-          const userPkmn = flashCheck.userPokemon;
-          const userName = userPkmn ? userPkmn.nickname : playerName;
-          overworldRenderer.playFlashEffect();
-          BattleAudio.playOverworldSound('KEY_ITEM');
-          const firstClear = !storyFlags.has('dark_cave_cleared');
-          storyFlags.add('dark_cave_cleared');
-          missionManager.checkStoryFlags(storyFlags);
-          missionManager.completeMission('S06');
-          const pages = [
-            `Pitch-black darkness ahead… ${userName} used FLASH to illuminate DARK CAVE!`,
-            firstClear
-              ? 'Deep inside the illuminated cavern, you discovered TM13 SNORE and startled a rare DUNSPARCE!'
-              : 'A wild DUNSPARCE emerged from the illuminated cavern depths!',
-          ];
-          if (firstClear && !inventory.tms.includes('TM13')) {
-            inventory.tms.push('TM13');
-          }
-          overworldHUD.openDialogue(pages, '⛰️ DARK CAVE (FLASH)', () => {
-            saveCurrentGame();
-            if (firstClear) {
-              overworldHUD.showToast('✨ Illuminated Dark Cave & found TM13 SNORE!');
-            }
-            const wildDunsparce = PokemonFactory.create('dunsparce', 6);
-            triggerBattle(wildDunsparce, { isTrainer: false });
-          });
-        } else {
-          overworldHUD.openDialogue(
-            [
-              'DARK CAVE — Pitch-black cavern ahead.',
-              flashCheck.missingReason || 'A blinding FLASH of light is required to navigate safely.',
-            ],
-            '⛰️ DARK CAVE'
-          );
-        }
-        return;
-      }
-
-      // Ruins of Alph Kabuto Chamber Altar & Inscription Interaction
-      if (currentMap.id === 'ruins_of_alph_kabuto_chamber') {
-        if (facingX === 3 && facingY === 2) {
-          if (storyFlags.has('unown_awakened_kabuto')) {
-            overworldHUD.openDialogue(['A completed stone panel of KABUTO.'], '🧩 KABUTO PUZZLE');
-          } else {
-            overworldHUD.openDialogue(
-              [
-                "It's an ancient stone puzzle depicting a prehistoric POKéMON.",
-                'Attempt to assemble the sliding panels?',
-              ],
-              '🧩 KABUTO PUZZLE',
-              () => {
-                ruinsPuzzleModalUI.open({
-                  onSolve: (puzzleId) => {
-                    handleRuinsPuzzleSolve(puzzleId);
-                  },
-                  onClose: () => {},
-                });
-              }
-            );
-          }
-          return;
-        }
-
-        if (facingX === 4 && facingY === 2) {
-          overworldHUD.openDialogue(
-            [
-              'A POKéMON that hid on the sea floor.',
-              'Eyes on its back scanned the area.',
-            ],
-            '📜 ANCIENT INSCRIPTION'
-          );
-          return;
-        }
-      }
-
-      overworldHUD.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
-        if (
-          currentMap.id === 'earls_pokemon_academy' &&
-          bgEvent.speaker.includes('BLACKBOARD') &&
-          !storyFlags.has('earls_academy_graduated')
-        ) {
-          storyFlags.add('earls_academy_graduated');
-          inventory.items['parlyz-heal'] = (inventory.items['parlyz-heal'] || 0) + 1;
-          inventory.items['antidote'] = (inventory.items['antidote'] || 0) + 1;
-          inventory.items['awakening'] = (inventory.items['awakening'] || 0) + 1;
-          missionManager.checkStoryFlags(storyFlags);
-          BattleAudio.playOverworldSound('FANFARE');
-          overworldHUD.showToast('🎓 Blackboard studied! Received Status Cure Kit!');
-          saveCurrentGame();
-        } else if (bgEvent.action === 'HEAL_AND_SAVE') {
-          healPlayerParty(false);
-          saveCurrentGame();
-          if (currentMap.id.endsWith('_poke_center')) {
-            overworldHUD.playHealingAnimation(playerParty.length);
-          } else {
-            overworldHUD.playFieldRestAnimation();
-          }
-        } else if (bgEvent.action === 'OPEN_MART') {
-          bagUI.openMart();
-        }
-      });
+    if (FieldObstacleDispatcher.handleFieldAndBgInteraction(getFieldObstacleContext(), currentMap, facingX, facingY)) {
       return;
-    }
-
-    // 2a-fallback. Universal Pokémon Center & Bedroom PC Terminal Fallback
-    if (
-      (currentMap.id.endsWith('_poke_center') && facingX === 9 && facingY === 1) ||
-      (currentMap.id === 'players_house_2f' && facingX === 0 && facingY === 1)
-    ) {
-      overworldHUD.openDialogue(
-        ["Accessed BILL'S PC!", 'POKéMON Storage System is online and synced.'],
-        "💻 BILL'S PC",
-        () => {
-          boxManagementUI.open(playerParty, boxManager.getState(), {
-            onSave: () => saveCurrentGame(),
-            onClose: () => saveCurrentGame(),
-          });
-        }
-      );
-      return;
-    }
-
-    // 2b. Check Overworld Visible Item Balls (Sprint 12 — Facing Adjacent Interaction)
-    const itemBall = overworldItemManager.checkItemBall(currentMap.id, facingX, facingY, storyFlags);
-    if (itemBall) {
-      addOverworldItemToInventory(itemBall.itemId);
-      overworldItemManager.collectItem(itemBall.eventFlag);
-      storyFlags.add(itemBall.eventFlag);
-      overworldRenderer.removeItemBall(itemBall.eventFlag);
-      BattleAudio.playOverworldSound('KEY_ITEM');
-      const itemName = OverworldItemManager.formatItemName(itemBall.itemId);
-      const pocket = OverworldItemManager.resolveItemPocket(itemBall.itemId);
-      overworldHUD.openDialogue(
-        [
-          `${playerName} found ${itemName}!`,
-          `${playerName} put the ${itemName} in the ${pocket} POCKET.`,
-        ],
-        '🔴 ITEM BALL',
-        () => {
-          saveCurrentGame();
-          overworldHUD.showToast(`🔴 Found ${itemName}!`);
-        }
-      );
-      return;
-    }
-
-    // 2c. Check Overworld Hidden Items (Sprint 12)
-    const hiddenItem = overworldItemManager.checkHiddenItemInteraction(
-      currentMap.id,
-      facingX,
-      facingY,
-      player.x,
-      player.y
-    );
-    if (hiddenItem) {
-      addOverworldItemToInventory(hiddenItem.itemId);
-      overworldItemManager.collectItem(hiddenItem.eventFlag);
-      storyFlags.add(hiddenItem.eventFlag);
-      if (hiddenItem.itemId === 'machine_part') {
-        storyFlags.add('machine_part_found');
-      }
-      if (itemfinderHUD.isActive()) {
-        const remainingHidden = overworldItemManager.getHiddenItemsForMap(currentMap.id, storyFlags);
-        const nextPing = ItemfinderRadar.scan(
-          player.x,
-          player.y,
-          player.direction,
-          remainingHidden,
-          storyFlags
-        );
-        itemfinderHUD.update(nextPing);
-      }
-      BattleAudio.playOverworldSound('KEY_ITEM');
-      const itemName = OverworldItemManager.formatItemName(hiddenItem.itemId);
-      const pocket = OverworldItemManager.resolveItemPocket(hiddenItem.itemId);
-      overworldHUD.openDialogue(
-        [
-          `${playerName} found ${itemName}!`,
-          `${playerName} put the ${itemName} in the ${pocket} POCKET.`,
-        ],
-        '✨ HIDDEN ITEM',
-        () => {
-          saveCurrentGame();
-          overworldHUD.showToast(`✨ Found hidden ${itemName}!`);
-        }
-      );
-      return;
-    }
-
-    // 2d. Check Overworld Fruit Trees (Sprint 12 — Facing Adjacent Interaction)
-    const fruitTree = overworldItemManager.checkFruitTree(currentMap.id, facingX, facingY);
-    if (fruitTree) {
-      if (overworldItemManager.isFruitTreePickedToday(fruitTree.treeId)) {
-        overworldHUD.openDialogue(
-          ["It's a fruit-bearing tree, but there are no berries left today."],
-          '🌳 FRUIT TREE'
-        );
-      } else {
-        addOverworldItemToInventory(fruitTree.berryId);
-        overworldItemManager.pickFruitTree(fruitTree.treeId);
-        syncMapOverworldItems(currentMap);
-        BattleAudio.playOverworldSound('KEY_ITEM');
-        const berryName = OverworldItemManager.formatItemName(fruitTree.berryId);
-        overworldHUD.openDialogue(
-          [
-            `Hey! It's a fruit-bearing tree! It has ${berryName}!`,
-            `${playerName} picked the ${berryName}!`,
-          ],
-          '🌳 FRUIT TREE',
-          () => {
-            saveCurrentGame();
-            overworldHUD.showToast(`🍒 Picked ${berryName}!`);
-          }
-        );
-      }
-      return;
-    }
-
-    // Helper to resolve the correct walkable ground tile beneath a cut tree
-    const resolveCutReplacementTile = (map: MapData, tileX: number, tileY: number, currentTile?: string): string => {
-      if (map.id === 'ilex_forest' || (currentTile && currentTile.startsWith('in_forest_'))) {
-        return 'in_forest_05_05_05_05';
-      }
-      if (map.tileMap) {
-        const neighbors = [
-          { x: tileX, y: tileY + 1 },
-          { x: tileX, y: tileY - 1 },
-          { x: tileX - 1, y: tileY },
-          { x: tileX + 1, y: tileY },
-        ];
-        for (const n of neighbors) {
-          if (n.x >= 0 && n.x < map.width && n.y >= 0 && n.y < map.height) {
-            const idx = n.y * map.width + n.x;
-            if (map.collisionGrid[idx] === 0 && map.tileMap[idx]) {
-              const t = map.tileMap[idx];
-              if (!t.includes('tree') && !t.includes('cut')) {
-                return t;
-              }
-            }
-          }
-        }
-      }
-      if (map.id.startsWith('route_') || map.id.startsWith('kt_')) {
-        return 'kt_0b_0b_0b_0b';
-      }
-      if (map.id.includes('azalea') || map.id.startsWith('jt_m_')) {
-        return 'jt_m_07_07_07_07_az';
-      }
-      return 'jt_07_07_07_07';
-    };
-
-    // 3. Check Cuttable Trees (HM01 Cut interaction - Task 2)
-    if (
-      facingX >= 0 &&
-      facingX < currentMap.width &&
-      facingY >= 0 &&
-      facingY < currentMap.height &&
-      currentMap.tileMap
-    ) {
-      const tileIdx = facingY * currentMap.width + facingX;
-      const facingTileName = currentMap.tileMap[tileIdx] || '';
-      const isIlexCutTree =
-        currentMap.id === 'ilex_forest' && facingX === 8 && facingY === 25;
-      const isCutTree =
-        isIlexCutTree ||
-        (currentMap.collisionGrid[tileIdx] === 1 &&
-          (facingTileName === 'tree_short_0' ||
-            facingTileName.includes('13_15_45_1d') ||
-            facingTileName.includes('2d_2e_3d_3e') ||
-            facingTileName.includes('28_39_38_3a') ||
-            facingTileName.includes('cut_tree') ||
-            facingTileName.includes('cuttable')));
-
-      if (isCutTree) {
-        const cutCheck = ModernHMHandler.checkCut(inventory, storyFlags, playerParty);
-
-        if (cutCheck.canUse || (cutCheck.hasBadge && cutCheck.hasHM && cutCheck.compatiblePokemon)) {
-          const cutter =
-            cutCheck.userPokemon ||
-            cutCheck.compatiblePokemon ||
-            playerParty.find((p) => !p.isEgg) ||
-            playerParty[0];
-          const cutterName = cutter ? cutter.nickname : playerName;
-          BattleAudio.playOverworldSound('RUSTLE');
-          overworldRenderer.playCutSlashEffect(facingX, facingY);
-          overworldHUD.openDialogue(
-            [
-              'This tree looks like it can be CUT down!',
-              `${cutterName} hacked away with CUT!`,
-            ],
-            '🌳 CUTTABLE TREE',
-            () => {
-              currentMap.collisionGrid[tileIdx] = 0;
-              const replacementTile = resolveCutReplacementTile(currentMap, facingX, facingY, facingTileName);
-              currentMap.tileMap![tileIdx] = replacementTile;
-              if (currentMap.id === 'ilex_forest') {
-                currentMap.collisionGrid[25 * currentMap.width + 8] = 0;
-                if (currentMap.tileMap) {
-                  currentMap.tileMap[25 * currentMap.width + 8] = 'in_forest_05_05_05_05';
-                }
-                storyFlags.add('ilex_tree_cut');
-                storyFlags.add('cut_used_in_ilex');
-                missionManager.checkStoryFlags(storyFlags);
-              }
-              overworldRenderer.renderMap(currentMap, lookupMap);
-              syncMapOverworldItems(currentMap);
-              saveCurrentGame();
-              overworldHUD.showToast('🌳 The tree was cut down!');
-            }
-          );
-        } else {
-          overworldHUD.openDialogue(
-            [
-              'This tree looks like it can be CUT down!',
-              cutCheck.missingReason || 'Obtain HM01 CUT and the HIVE BADGE to clear this obstacle.',
-            ],
-            '🌳 CUTTABLE TREE'
-          );
-        }
-        return;
-      }
-
-      // 4. Check Water Tile Surfing Interaction (Classic Mode or Manual Prompt)
-      if (currentMap.collisionGrid[tileIdx] === 3) {
-        const surfCheck = ModernHMHandler.checkSurf(inventory, storyFlags, playerParty);
-        if (surfCheck.canUse) {
-          const surfer = surfCheck.userPokemon || playerParty.find((p) => !p.isEgg) || playerParty[0];
-          const surferName = surfer ? surfer.nickname : playerName;
-          overworldHUD.openDialogue(
-            [
-              'The water is dyed a deep blue...',
-              `${surferName} used SURF!`,
-            ],
-            '🌊 WATER',
-            () => {
-              mapManager.setSurfEnabled(true);
-              saveCurrentGame();
-              overworldHUD.showToast(`🌊 Surfing on the water with ${surferName}!`);
-            }
-          );
-        } else {
-          overworldHUD.openDialogue(
-            [
-              'The water is dyed a deep blue...',
-              surfCheck.missingReason || 'You need HM03 SURF and the FOG BADGE to surf on water!',
-            ],
-            '🌊 WATER'
-          );
-        }
-        return;
-      }
-    }
-  };
-
-  const refreshItemfinderRadar = (playSonar: boolean = true) => {
-    if (!itemfinderHUD.isActive()) return;
-    const currentMap = mapManager.getCurrentMap();
-    if (!currentMap) return;
-    const hiddenItems = overworldItemManager.getHiddenItemsForMap(currentMap.id, storyFlags);
-    const ping = ItemfinderRadar.scan(
-      player.x,
-      player.y,
-      player.direction,
-      hiddenItems,
-      storyFlags
-    );
-    itemfinderHUD.update(ping);
-    if (playSonar && ping.hasItemInRange) {
-      BattleAudio.playItemfinderSonar(ping.distance, ping.isFacingDirectly);
     }
   };
 

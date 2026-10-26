@@ -623,7 +623,13 @@ describe('MapData & Authentic Tile Integrity', () => {
   it("validates Ticket 6.1 Elm's Lab starter Poké Ball bgEvents, Route 29 roadblock, and starter choice modal", () => {
     const labPath = path.resolve(__dirname, '../public/assets/data/maps/elms_lab.json');
     const labData: MapData = JSON.parse(fs.readFileSync(labPath, 'utf8'));
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
 
     const cyndaquilBall = labData.bgEvents?.find((e) => e.x === 6 && e.y === 3);
     const totodileBall = labData.bgEvents?.find((e) => e.x === 7 && e.y === 3);
@@ -776,7 +782,13 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(bugsyNpc?.trainerPokemon?.speciesId).toBe('scyther');
     expect(bugsyNpc?.trainerTeam?.length).toBe(3);
 
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
     expect(mainSrc).toContain("action === 'BUGSY_EVENT'");
     expect(mainSrc).toContain("inventory.badges.includes('hive')");
     expect(mainSrc).toContain("inventory.tms.includes('TM49')");
@@ -891,7 +903,13 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(whitneyNpc?.trainerPokemon?.speciesId).toBe('miltank');
     expect(whitneyNpc?.trainerTeam?.length).toBe(2);
 
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
     expect(mainSrc).toContain("action === 'WHITNEY_EVENT'");
     expect(mainSrc).toContain("inventory.badges.includes('plain')");
     expect(mainSrc).toContain("inventory.tms.includes('TM45')");
@@ -974,7 +992,13 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(mortyNpc?.trainerPokemon?.speciesId).toBe('gengar');
     expect(mortyNpc?.trainerTeam?.length).toBe(4);
 
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
     expect(mainSrc).toContain("action === 'MORTY_EVENT'");
     expect(mainSrc).toContain("inventory.badges.includes('fog')");
     expect(mainSrc).toContain("inventory.tms.includes('TM30')");
@@ -1121,7 +1145,13 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(pharmacistNpc).toBeDefined();
     expect(pharmacistNpc?.action).toBe('PHARMACY_SECRET_POTION_EVENT');
 
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
     expect(mainSrc).toContain("action === 'JASMINE_EVENT'");
     expect(mainSrc).toContain("action === 'CHUCK_EVENT'");
     expect(mainSrc).toContain("action === 'AMPHY_EVENT'");
@@ -1175,7 +1205,13 @@ describe('MapData & Authentic Tile Integrity', () => {
     const clair = npcsByMap.blackthorn_gym_2f.find((n) => n.action === 'CLAIR_EVENT') ?? npcsByMap.blackthorn_gym_1f.find((n) => n.action === 'CLAIR_EVENT');
     expect(clair?.trainerTeam?.length).toBe(4);
 
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
     expect(mainSrc).toContain("action === 'PRYCE_EVENT'");
     expect(mainSrc).toContain("action === 'CLAIR_EVENT'");
     expect(mainSrc).toContain("inventory.badges.includes('glacier')");
@@ -1274,7 +1310,13 @@ describe('MapData & Authentic Tile Integrity', () => {
     expect(blue).toBeDefined();
     expect(blue?.trainerId).toBe('blue');
 
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
     expect(mainSrc).toContain('BROCK_EVENT:');
     expect(mainSrc).toContain('MISTY_EVENT:');
     expect(mainSrc).toContain('BLUE_EVENT:');
@@ -1445,7 +1487,13 @@ describe('MapData & Authentic Tile Integrity', () => {
     const bundledMaps: MapData[] = JSON.parse(fs.readFileSync(worldMapsPath, 'utf8'));
     expect(bundledMaps.length).toBeGreaterThanOrEqual(315);
 
-    const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+    const mainSrc =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
+        'utf8'
+      );
     expect(mainSrc).toContain('./assets/data/world_maps.json');
     expect(mainSrc).toContain('window.updateLoaderProgress?.(');
     expect(mainSrc).toContain('window.dismissLoader?.()');
