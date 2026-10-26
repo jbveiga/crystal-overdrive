@@ -16,6 +16,19 @@ const getAllInteractionSrc = () => {
     .join('\n');
 };
 
+const getAllNpcDataSrc = () => {
+  const npcDataPath = path.resolve(__dirname, '../src/world/npcData.ts');
+  const npcsDir = path.resolve(__dirname, '../src/world/npcs');
+  let src = fs.readFileSync(npcDataPath, 'utf8');
+  if (fs.existsSync(npcsDir)) {
+    const files = fs.readdirSync(npcsDir).filter((f) => f.endsWith('.ts'));
+    for (const f of files) {
+      src += '\n' + fs.readFileSync(path.join(npcsDir, f), 'utf8');
+    }
+  }
+  return src;
+};
+
 describe('MapData & Authentic Tile Integrity', () => {
   it('validates new_bark_town.json structure, tileMap dimensions, and asset presence', () => {
     const mapPath = path.resolve(__dirname, '../public/assets/data/maps/new_bark_town.json');
@@ -546,7 +559,7 @@ describe('MapData & Authentic Tile Integrity', () => {
     const mainSrc =
       fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
       '\n' +
-      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8') +
+      getAllNpcDataSrc() +
       '\n' +
       getAllInteractionSrc();
 
@@ -575,7 +588,7 @@ describe('MapData & Authentic Tile Integrity', () => {
     const mainSrc =
       fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
       '\n' +
-      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8') +
+      getAllNpcDataSrc() +
       '\n' +
       getAllInteractionSrc();
     const startMenuSrc = fs.readFileSync(path.resolve(__dirname, '../src/ui/StartMenuUI.ts'), 'utf8');
@@ -601,7 +614,7 @@ describe('MapData & Authentic Tile Integrity', () => {
     const mainSrc =
       fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
       '\n' +
-      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8') +
+      getAllNpcDataSrc() +
       '\n' +
       getAllInteractionSrc();
 

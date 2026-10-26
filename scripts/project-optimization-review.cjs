@@ -10,7 +10,7 @@ let totalIssues = 0;
 
 // 1. Architecture Boundary Scan (Zero DOM/Pixi in core, world, battle)
 console.log('1️⃣  Auditing Layer Boundaries (src/core, src/world, src/battle)...');
-const pureDirs = ['src/core', 'src/world', 'src/battle'];
+const pureDirs = ['src/core', 'src/world', 'src/world/npcs', 'src/world/interactions', 'src/battle'];
 const forbiddenPatterns = [
   /from ['"]pixi\.js['"]/,
   /from ['"]@pixi\//,
@@ -46,7 +46,15 @@ if (boundaryViolations === 0) {
 
 // 2. NPC Walkability & Map Collision Grid Audit
 console.log('2️⃣  Auditing NPC Coordinates & Map Walkability...');
-const npcDataSrc = fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8');
+const npcDataPath = path.resolve(__dirname, '../src/world/npcData.ts');
+const npcsDirPath = path.resolve(__dirname, '../src/world/npcs');
+let npcDataSrc = fs.readFileSync(npcDataPath, 'utf8');
+if (fs.existsSync(npcsDirPath)) {
+  const npcFiles = fs.readdirSync(npcsDirPath).filter((f) => f.endsWith('.ts'));
+  for (const f of npcFiles) {
+    npcDataSrc += '\n' + fs.readFileSync(path.join(npcsDirPath, f), 'utf8');
+  }
+}
 const mapsDir = path.resolve(__dirname, '../public/assets/data/maps');
 let npcWalkabilityFailures = 0;
 
