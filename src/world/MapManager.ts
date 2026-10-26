@@ -495,6 +495,7 @@ export class MapManager {
       'ruins_of_alph_outside',
       'route_33',
       'azalea_town',
+      'ilex_forest',
       'route_34',
       'goldenrod_city',
       'goldenrod_dept_store_roof',
@@ -584,17 +585,46 @@ export class MapManager {
   }
 
   /**
+   * Determines the required player direction to trigger a boundary or doorway warp in an indoor map.
+   * - North doorway (warp.y <= 1): requires 'UP'
+   * - South doorway (warp.y >= currentMap.height - 2): requires 'DOWN'
+   * - West doorway (warp.x <= 1): requires 'LEFT'
+   * - East doorway (warp.x >= currentMap.width - 2): requires 'RIGHT'
+   * - Interior warps (stairs/holes): null (triggered from any direction)
+   */
+  public static getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): Direction | null {
+    if (MapManager.isOutdoorMap(currentMap.id)) return null;
+    if (warp.direction) return warp.direction;
+
+    // Check cardinal boundary edge thresholds on indoor/gate maps
+    if (warp.y <= 1) {
+      return 'UP';
+    }
+    if (warp.y >= currentMap.height - 2) {
+      return 'DOWN';
+    }
+    if (warp.x <= 1) {
+      return 'LEFT';
+    }
+    if (warp.x >= currentMap.width - 2) {
+      return 'RIGHT';
+    }
+    return null;
+  }
+
+  /**
    * Identifies whether a warp tile acts as an authentic GBC exit carpet (COLL_WARP_CARPET_DOWN).
-   * In indoor maps, entrance/exit carpets are situated at the doorway threshold (leading outdoor or at the bottom row).
+   * In indoor maps, entrance/exit carpets are situated at the bottom doorway threshold.
    */
   public static isCarpetWarp(warp: WarpEvent, currentMap: MapData): boolean {
     if (MapManager.isOutdoorMap(currentMap.id)) return false;
-    return MapManager.isOutdoorMap(warp.targetMapId) || warp.y >= currentMap.height - 2;
+    return warp.y >= currentMap.height - 2;
   }
 
   /**
    * Resolves canonical building/cave/stair transition configuration adhering to pret/pokecrystal:
-   * - Exiting to overworld spawns 1 tile in front of the door (targetX, targetY + 1) facing DOWN
+   * - Exiting to overworld spawns 1 tile in front of the door (targetX, targetY + 1) facing DOWN,
+   *   or on the north apron (targetX, targetY - 1) facing UP for North gate exits
    * - Entering indoor spawns at door facing UP
    * - Selects authentic sound cues (DOOR_ENTER, DOOR_EXIT, STAIRS_STEP, CAVE_WARP)
    * - Enforces 160ms/160ms transition pacing
@@ -631,25 +661,45 @@ export class MapManager {
     } else if (isCave) {
       landingFacing = 'DOWN';
     } else if (isExitingToOverworld) {
-      landingFacing = 'DOWN';
+      // Cardinal Doorstep Landings for Gatehouses & Buildings:
+      if (warp.y <= 1) {
+        landingFacing = 'UP';
+        const isDoorTile = targetMap
+          ? targetMap.warps?.some((w) => w.x === warp.targetX && w.y === warp.targetY) ?? true
+          : true;
+        if (isDoorTile) {
+          landingY = Math.max(0, warp.targetY - 1);
+        }
+      } else if (warp.x <= 1) {
+        landingFacing = 'LEFT';
+        const isDoorTile = targetMap
+          ? targetMap.warps?.some((w) => w.x === warp.targetX && w.y === warp.targetY) ?? true
+          : true;
+        if (isDoorTile) {
+          landingX = Math.max(0, warp.targetX - 1);
+        }
+      } else if (warp.x >= currentMap.width - 2) {
+        landingFacing = 'RIGHT';
+        const isDoorTile = targetMap
+          ? targetMap.warps?.some((w) => w.x === warp.targetX && w.y === warp.targetY) ?? true
+          : true;
+        if (isDoorTile) {
+          landingX = warp.targetX + 1;
+        }
+      } else {
+        // Standard South doorway exit
+        landingFacing = 'DOWN';
+        const isDoorTile = targetMap
+          ? targetMap.warps?.some((w) => w.x === warp.targetX && w.y === warp.targetY) ?? true
+          : true;
+        if (isDoorTile) {
+          landingY = warp.targetY + 1;
+        }
+      }
     } else if (isEnteringIndoor) {
       landingFacing = 'UP';
     } else if (isStairs) {
       landingFacing = warp.targetY <= 1 ? 'DOWN' : 'UP';
-    }
-
-    if (isExitingToOverworld) {
-      landingFacing = 'DOWN';
-      // Canonical Outdoor Doorstep Landing:
-      // If targetMap has an entrance warp at (targetX, targetY), or if targetMap is undefined,
-      // (targetX, targetY) is the door tile and the player spawns 1 tile in front of the door (targetY + 1).
-      // If targetMap already has targetY on the safe apron, preserve targetY.
-      const isDoorTile = targetMap
-        ? targetMap.warps?.some((w) => w.x === warp.targetX && w.y === warp.targetY) ?? true
-        : true;
-      if (isDoorTile) {
-        landingY = warp.targetY + 1;
-      }
     }
 
     return {

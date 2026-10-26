@@ -327,7 +327,7 @@ function buildQuadrantBuffer(ts, quad8x8, roofGroup, waterFrameIdx = 0) {
 function renderQuadrant64(ts, quad8x8, roofGroup) {
   const prefix = ts.tsName === 'kanto' ? 'kt' : ts.isOutdoor ? 'jt' : `in_${ts.tsName}`;
   const hasRoof = ts.isOutdoor && (quad8x8.some((tid) => ts.pal0[tid] === 'ROOF') || (ts.tsName !== 'kanto' && quad8x8.some((tid) => tid >= 0x0a && tid <= 0x12)));
-  const hasWater = (ts.isOutdoor || ts.tsName === 'cave') && ts.tsName !== 'kanto' && quad8x8.includes(0x14);
+  const hasWater = (ts.isOutdoor || ts.tsName === 'cave' || ts.tsName === 'forest') && ts.tsName !== 'kanto' && quad8x8.includes(0x14);
   const suffix = hasRoof ? `_${roofGroup}` : '';
   const tileName = `${prefix}_${quad8x8.map((x) => x.toString(16).padStart(2, '0')).join('_')}${suffix}`;
 

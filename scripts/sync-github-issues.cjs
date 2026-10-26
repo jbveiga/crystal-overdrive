@@ -79,6 +79,22 @@ const { ISSUE_RESOLUTIONS } = (() => {
 - **Fix**:
   1. Removed coordinate \`(8, 22)\` completely from cut tree mutation logic in \`src/main.ts\` and \`applyMapStoryMutations\`.
   2. The cut path is strictly confined to \`(8, 25)\`, preserving the intact 3x2 shrine structure at \`y=22-23\` with solid collision.`,
+      22: `### Resolution Details for Issue #22
+- **Root Cause**:
+  1. \`MapManager.isCarpetWarp\` evaluated all outdoor-facing indoor exits as carpet warps regardless of edge position, causing North-facing door warps at \`y=0\` to require \`player.direction === 'DOWN'\`, which blocked players walking North or pressing \`UP\`.
+  2. Idle carpet check only tested for \`heldDir === 'DOWN'\`, preventing players parked on \`(4, 0)\` from triggering the exit upon pressing \`UP\`.
+  3. Outdoor doorstep landing assumed South exits (\`targetY + 1\`), whereas North gate exits must spawn on the northern apron (\`targetY - 1\` facing \`UP\`).
+- **Fix**:
+  1. Implemented \`MapManager.getRequiredWarpDirection(warp, currentMap)\` which accurately determines required cardinal direction (\`UP\` for North \`y<=1\`, \`DOWN\` for South, \`LEFT\` for West, \`RIGHT\` for East).
+  2. Updated \`MapManager.isCarpetWarp\` to strictly check bottom doorway threshold.
+  3. Updated \`resolveWarpTransition\` to spawn North gate exits at \`(targetX, targetY - 1)\` facing \`UP\`.
+  4. Updated \`src/main.ts\` idle held-direction check to trigger egress when pressing toward any boundary threshold warp tile.`,
+      23: `### Resolution Details for Issue #23
+- **Root Cause**: \`scripts/generate-authentic-tiles.cjs\` only generated 4-step shimmer animation frames (\`__w1.png\`, \`__w2.png\`) for outdoor (\`jt_*\`) and cave (\`in_cave_*\`) tilesets, excluding forest tiles (\`in_forest_*\`). Furthermore, \`ANIMATED_WATER_TILES\` in \`src/render/tileConstants.ts\` omitted Ilex Forest water tiles.
+- **Fix**:
+  1. Updated \`scripts/generate-authentic-tiles.cjs\` to include \`ts.tsName === 'forest'\` in water shimmer frame generation.
+  2. Generated all 12 authentic \`__w1.png\` and \`__w2.png\` shimmer frame PNGs for Ilex Forest pond tiles.
+  3. Registered \`in_forest_14_14_14_14\`, \`in_forest_09_2a_1b_14\`, \`in_forest_2a_2a_14_14\`, \`in_forest_2a_0b_14_19\`, \`in_forest_1b_14_1b_14\`, and \`in_forest_14_19_14_19\` in \`ANIMATED_WATER_TILES\` (\`src/render/tileConstants.ts\`).`,
     },
   };
 })();

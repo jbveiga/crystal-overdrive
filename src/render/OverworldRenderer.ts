@@ -777,6 +777,70 @@ export class OverworldRenderer {
   }
 
   /**
+   * Bounded LRU texture eviction: when tileTextures exceeds maxTextureCap, evicts textures
+   * belonging to maps more than 1 hop away from activeMap and its neighbors.
+   */
+  public evictDistantTileTextures(
+    activeMap: MapData,
+    lookupMap?: (mapId: string) => MapData | undefined,
+    maxTextureCap: number = 300
+  ): void {
+    if (this.tileTextures.size <= maxTextureCap) return;
+
+    const pinnedTiles = new Set<string>([
+      'grass',
+      'tall_grass',
+      'tree_tall_0',
+      'tree_short_0',
+      'path',
+      'water',
+      'water_edge',
+      'flower_0',
+      'flower_red',
+      'flower_yellow',
+      'roof',
+      'wall',
+      'door',
+      'fence_horizontal',
+      'jt_1e_1f_2e_2f',
+      'jt_2e_2f_3e_3f',
+    ]);
+
+    const pinMap = (m: MapData) => {
+      if (m.tileMap) {
+        for (const t of m.tileMap) if (t) pinnedTiles.add(t);
+      }
+      if (m.overlayMap) {
+        for (const t of m.overlayMap) if (t) pinnedTiles.add(t);
+      }
+    };
+
+    pinMap(activeMap);
+    if (lookupMap && activeMap.connections) {
+      for (const dir of ['WEST', 'EAST', 'NORTH', 'SOUTH'] as const) {
+        const conn = activeMap.connections[dir];
+        if (conn) {
+          const neighbor = lookupMap(conn.mapId);
+          if (neighbor) pinMap(neighbor);
+        }
+      }
+    }
+
+    for (const [name, tex] of this.tileTextures.entries()) {
+      if (!pinnedTiles.has(name)) {
+        tex.destroy(true);
+        this.tileTextures.delete(name);
+        this.waterAnimFrames.delete(name);
+        try {
+          Assets.unload(`./assets/tiles/${name}.png`);
+        } catch {
+          // Ignore if already evicted
+        }
+      }
+    }
+  }
+
+  /**
    * Builds the textured overworld tilemap, including seamlessly connected neighbor maps (W/E/N/S) and outdoor border blocks
    */
   public renderMap(map: MapData, lookupMap?: (mapId: string) => MapData | undefined): void {

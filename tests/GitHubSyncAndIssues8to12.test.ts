@@ -119,19 +119,23 @@ describe('GitHub Issues #8, #9, #10, #11, #12 & Headless Sync Suite', () => {
 
   it('Issue #16: Bug Report modal does not automatically redirect and provides manual PNG save', () => {
     const mainTsPath = path.resolve(__dirname, '../src/main.ts');
-    const mainContent = fs.readFileSync(mainTsPath, 'utf8');
+    const modalPath = path.resolve(__dirname, '../src/ui/BugReportModal.ts');
+    const combinedContent =
+      (fs.existsSync(mainTsPath) ? fs.readFileSync(mainTsPath, 'utf8') : '') +
+      '\n' +
+      (fs.existsSync(modalPath) ? fs.readFileSync(modalPath, 'utf8') : '');
 
     // Verify auto-redirect setTimeout has been removed from mountGitHubReportButton
-    expect(mainContent).not.toMatch(/directLink\?\.click\(\);\s*\}\s*,\s*1000\)/);
+    expect(combinedContent).not.toMatch(/directLink\?\.click\(\);\s*\}\s*,\s*1000\)/);
     // Verify save screenshot link and open issue link exist
-    expect(mainContent).toContain('github-screenshot-download-link');
-    expect(mainContent).toContain('SAVE SCREENSHOT PNG');
-    expect(mainContent).toContain('github-issues-redirect-link');
-    expect(mainContent).toContain('OPEN GITHUB ISSUE');
+    expect(combinedContent).toContain('github-screenshot-download-link');
+    expect(combinedContent).toContain('SAVE SCREENSHOT PNG');
+    expect(combinedContent).toContain('github-issues-redirect-link');
+    expect(combinedContent).toContain('OPEN GITHUB ISSUE');
   });
 
-  it('Headless GitHub Sync module: contains comprehensive resolution mapping for issues #8 through #20', () => {
-    for (const id of [8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20]) {
+  it('Headless GitHub Sync module: contains comprehensive resolution mapping for issues #8 through #23', () => {
+    for (const id of [8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22, 23]) {
       expect(ISSUE_RESOLUTIONS[id]).toBeDefined();
       expect(ISSUE_RESOLUTIONS[id].resolution.length).toBeGreaterThan(100);
       expect(ISSUE_RESOLUTIONS[id].resolution).toContain('Root Cause');

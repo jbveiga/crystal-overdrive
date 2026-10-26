@@ -39,6 +39,13 @@ export default defineConfig({
           ) {
             return 'world-data';
           }
+          if (
+            id.includes('cutsceneScripts') ||
+            id.includes('npcInteractionHandler') ||
+            id.includes('fallbackMaps')
+          ) {
+            return 'world-events';
+          }
         },
       },
     },

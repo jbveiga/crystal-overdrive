@@ -20,4 +20,11 @@ export const ANIMATED_WATER_TILES: readonly string[] = [
   'in_cave_14_15_14_15',
   'in_cave_14_25_14_14',
   'in_cave_27_14_14_14',
+  // Authentic Forest water animation tiles (Ilex Forest pond & shrine)
+  'in_forest_14_14_14_14',
+  'in_forest_09_2a_1b_14',
+  'in_forest_2a_2a_14_14',
+  'in_forest_2a_0b_14_19',
+  'in_forest_1b_14_1b_14',
+  'in_forest_14_19_14_19',
 ];
