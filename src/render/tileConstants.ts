@@ -11,6 +11,15 @@ export const ANIMATED_WATER_TILES: readonly string[] = [
   'jt_4d_14_14_14',
   'jt_4c_5d_14_3b',
   'jt_5c_4c_3d_14',
+  // Authentic Johto Modern outdoor water tiles (Route 34, Azalea Town, Route 33)
+  'jt_m_14_14_14_14',
+  'jt_m_14_3b_14_3b',
+  'jt_m_14_4b_14_14',
+  'jt_m_3d_14_3d_14',
+  'jt_m_4c_4c_14_14',
+  'jt_m_4c_5d_14_3b',
+  'jt_m_4d_14_14_14',
+  'jt_m_5c_4c_3d_14',
   // Authentic Cave water animation tiles (Union Cave, Slowpoke Well, Mt Mortar, Whirl Islands)
   'in_cave_14_14_14_14',
   'in_cave_0a_26_17_14',

@@ -95,6 +95,17 @@ const { ISSUE_RESOLUTIONS } = (() => {
   1. Updated \`scripts/generate-authentic-tiles.cjs\` to include \`ts.tsName === 'forest'\` in water shimmer frame generation.
   2. Generated all 12 authentic \`__w1.png\` and \`__w2.png\` shimmer frame PNGs for Ilex Forest pond tiles.
   3. Registered \`in_forest_14_14_14_14\`, \`in_forest_09_2a_1b_14\`, \`in_forest_2a_2a_14_14\`, \`in_forest_2a_0b_14_19\`, \`in_forest_1b_14_1b_14\`, and \`in_forest_14_19_14_19\` in \`ANIMATED_WATER_TILES\` (\`src/render/tileConstants.ts\`).`,
+      24: `### Resolution Details for Issue #24
+- **Root Cause**: \`scripts/generate-authentic-tiles.cjs\` omitted \`TILESETS.johto_modern\` and assigned \`tileset: 'johto'\` to \`route_34\` (as well as \`goldenrod_city\`, \`azalea_town\`, and \`route_33\`). In \`Route34.blk\`, metatile \`0x32\` represents walkable paved road in \`johto_modern\`, but under \`johto\` it decoded to water buoys (\`collision: 3\` / \`1\`) across \`y=22..35\`, trapping the player at \`(15, 36)\` just north of the Ilex Forest Gate.
+- **Fix**:
+  1. Registered \`johto_modern: loadTileset('johto_modern', true)\` in \`scripts/generate-authentic-tiles.cjs\` with \`jt_m\` tile prefixing.
+  2. Configured all 4 canonical \`TILESET_JOHTO_MODERN\` maps (\`route_34\`, \`goldenrod_city\`, \`azalea_town\`, and \`route_33\`) to build with \`tileset: 'johto_modern'\`.
+  3. Regenerated all 129 authentic \`jt_m_*.png\` 64x64 quadrant tiles, rebuilt \`route_34.json\` and \`world_maps.json\`, and verified seamless walkable road navigation (\`collision: 0\`) from \`(13, 37)\` / \`(15, 36)\` all the way north into Goldenrod City.`,
+      25: `### Resolution Details for Issue #25
+- **Root Cause**: In \`src/main.ts\`, step-based wild encounter checks evaluated \`isCaveOrRuins\` using only \`MapManager.isCaveMap(latestMap.id) || latestMap.id.includes('ruins_of_alph')\`. Because \`ilex_forest\` walkable paths use floor tiles (\`tileType === 0\`) rather than tall grass (\`tileType === 2\`), \`canEncounter\` always evaluated to \`false\` in \`src/main.ts\`, preventing \`mapManager.rollWildEncounter()\` from ever being called in Ilex Forest (as well as Sprout Tower, Burned Tower, Tin Tower, and Mt. Mortar).
+- **Fix**:
+  1. Added unified static helpers \`MapManager.isDungeonOrCaveMap(mapId)\` and \`MapManager.canTriggerWildEncounter(mapId, tileType)\` in \`src/world/MapManager.ts\`.
+  2. Updated both \`src/main.ts\` and \`MapManager.rollWildEncounter()\` to use \`MapManager.canTriggerWildEncounter(mapId, tileType)\`, enabling authentic Morning/Day/Night floor and pond wild encounters throughout \`ilex_forest\`.`,
     },
   };
 })();

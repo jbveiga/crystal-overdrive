@@ -6713,11 +6713,10 @@ async function bootstrap() {
             overworldHUD.showToast("🛡️ Repel's effect wore off!");
           }
 
-          // Wild Encounter Check in Tall Grass (tile type 2) or Cave / Ruins floors (tile type 0)
-          const isCaveOrRuins =
-            latestMap &&
-            (MapManager.isCaveMap(latestMap.id) || latestMap.id.includes('ruins_of_alph'));
-          const canEncounter = tileType === 2 || (isCaveOrRuins && tileType === 0);
+          // Wild Encounter Check in Tall Grass (2), Surfing Water (3), or Cave / Dungeon / Forest floors (0)
+          const canEncounter = latestMap
+            ? MapManager.canTriggerWildEncounter(latestMap.id, tileType)
+            : false;
 
           if (canEncounter && playerParty.length > 0) {
             // In ruins_of_alph_inner_chamber, encounters only occur once Unown are awakened

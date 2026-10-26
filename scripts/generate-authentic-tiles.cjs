@@ -249,6 +249,7 @@ function loadTileset(tsName, isOutdoor = false) {
 
 const TILESETS = {
   johto: loadTileset('johto', true),
+  johto_modern: loadTileset('johto_modern', true),
   lab: loadTileset('lab', false),
   players_house: loadTileset('players_house', false),
   house: loadTileset('house', false),
@@ -325,7 +326,14 @@ function buildQuadrantBuffer(ts, quad8x8, roofGroup, waterFrameIdx = 0) {
 }
 
 function renderQuadrant64(ts, quad8x8, roofGroup) {
-  const prefix = ts.tsName === 'kanto' ? 'kt' : ts.isOutdoor ? 'jt' : `in_${ts.tsName}`;
+  const prefix =
+    ts.tsName === 'kanto'
+      ? 'kt'
+      : ts.tsName === 'johto_modern'
+        ? 'jt_m'
+        : ts.isOutdoor
+          ? 'jt'
+          : `in_${ts.tsName}`;
   const hasRoof = ts.isOutdoor && (quad8x8.some((tid) => ts.pal0[tid] === 'ROOF') || (ts.tsName !== 'kanto' && quad8x8.some((tid) => tid >= 0x0a && tid <= 0x12)));
   const hasWater = (ts.isOutdoor || ts.tsName === 'cave' || ts.tsName === 'forest' || ts.tsName === 'port') && quad8x8.includes(0x14);
   const suffix = hasRoof ? `_${roofGroup}` : '';
@@ -365,7 +373,11 @@ function buildMapFromBlk({
     return;
   }
   if (!TILESETS[tileset]) {
-    const isOutdoor = tileset === 'johto' || tileset === 'kanto' || tileset === 'park';
+    const isOutdoor =
+      tileset === 'johto' ||
+      tileset === 'johto_modern' ||
+      tileset === 'kanto' ||
+      tileset === 'park';
     TILESETS[tileset] = loadTileset(tileset, isOutdoor);
   }
   const ts = TILESETS[tileset];
@@ -436,8 +448,32 @@ function buildMapFromBlk({
     collisionGrid[25 * width + 7] = 0;
   }
 
+  const existingMapPath = path.join(MAPS_DIR, `${id}.json`);
+  const existingMapData = fs.existsSync(existingMapPath)
+    ? JSON.parse(fs.readFileSync(existingMapPath, 'utf8'))
+    : null;
+
+  const finalConnections =
+    existingMapData && Object.keys(existingMapData.connections || {}).length > 0
+      ? existingMapData.connections
+      : connections;
+  const finalWarps =
+    existingMapData && Array.isArray(existingMapData.warps) && existingMapData.warps.length > 0
+      ? existingMapData.warps
+      : warps;
+  const finalBgEvents =
+    existingMapData && Array.isArray(existingMapData.bgEvents) && existingMapData.bgEvents.length > 0
+      ? existingMapData.bgEvents
+      : bgEvents;
+  const finalGrassEncounters =
+    existingMapData &&
+    Array.isArray(existingMapData.grassEncounters) &&
+    existingMapData.grassEncounters.length > 0
+      ? existingMapData.grassEncounters
+      : grassEncounters;
+
   // Ensure all warp door/carpet coordinates are walkable (0)
-  for (const w of warps) {
+  for (const w of finalWarps) {
     collisionGrid[w.y * width + w.x] = 0;
   }
 
@@ -451,13 +487,14 @@ function buildMapFromBlk({
     objectLayer: [],
     collisionGrid,
     tileMap,
-    connections,
-    warps,
-    bgEvents,
-    grassEncounters,
+    connections: finalConnections,
+    warps: finalWarps,
+    bgEvents: finalBgEvents,
+    grassEncounters: finalGrassEncounters,
+    ...(existingMapData?.waterEncounters ? { waterEncounters: existingMapData.waterEncounters } : {}),
   };
 
-  fs.writeFileSync(path.join(MAPS_DIR, `${id}.json`), JSON.stringify(mapData, null, 2) + '\n');
+  fs.writeFileSync(existingMapPath, JSON.stringify(mapData, null, 2) + '\n');
   console.log(`Built authentic ${id}.json (${width}x${height} step tiles)`);
 }
 
@@ -1724,7 +1761,7 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'route_33',
   name: 'Route 33',
-  tileset: 'johto',
+  tileset: 'johto_modern',
   blkFile: 'maps__Route33.blk',
   blocksW: 10,
   blocksH: 9,
@@ -1756,7 +1793,7 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'azalea_town',
   name: 'Azalea Town',
-  tileset: 'johto',
+  tileset: 'johto_modern',
   blkFile: 'maps__AzaleaTown.blk',
   blocksW: 20,
   blocksH: 9,
@@ -2005,7 +2042,7 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'route_34',
   name: 'Route 34',
-  tileset: 'johto',
+  tileset: 'johto_modern',
   blkFile: 'maps__Route34.blk',
   blocksW: 10,
   blocksH: 27,
@@ -2068,7 +2105,7 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'goldenrod_city',
   name: 'Goldenrod City',
-  tileset: 'johto',
+  tileset: 'johto_modern',
   blkFile: 'maps__GoldenrodCity.blk',
   blocksW: 20,
   blocksH: 18,

@@ -357,6 +357,44 @@ describe('Johto Town Map Engine & UI (TICKET-FEATURE-TOWN-MAP-ENGINE-01)', () =>
       ui.close();
     });
 
+    it('completely hides Legendary Beast Radar when beasts have not yet awakened in Burned Tower', () => {
+      const ui = new TownMapUI({ containerId: 'modal-container' });
+      const dormantRoamers: RoamerState[] = [
+        {
+          speciesId: 'raikou',
+          currentMapId: 'burned_tower_b1f',
+          pokemon: PokemonFactory.create('raikou', 40),
+          isAwakened: false,
+          isCaught: false,
+          isDefeated: false,
+        },
+        {
+          speciesId: 'entei',
+          currentMapId: 'burned_tower_b1f',
+          pokemon: PokemonFactory.create('entei', 40),
+          isAwakened: false,
+          isCaught: false,
+          isDefeated: false,
+        },
+        {
+          speciesId: 'suicune',
+          currentMapId: 'burned_tower_b1f',
+          pokemon: PokemonFactory.create('suicune', 40),
+          isAwakened: false,
+          isCaught: false,
+          isDefeated: false,
+        },
+      ];
+
+      ui.open('azalea_town', ['new_bark_town', 'azalea_town'], dormantRoamers);
+      const card = mockDoc.getElementById('town-map-card');
+      expect(card).not.toBeNull();
+      expect(card?.innerHTML).not.toContain('LEGENDARY BEAST RADAR');
+      expect(card?.querySelector('#town-map-roamer-radar')).toBeNull();
+
+      ui.close();
+    });
+
     it('renders centered gold player beacon with concentric ping & pulse rings and YOU badge without compound offset', () => {
       const ui = new TownMapUI({ containerId: 'modal-container' });
       // Open with player in Cherrygrove City

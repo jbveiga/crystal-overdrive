@@ -445,15 +445,8 @@ export class MapManager {
     }
 
     const isWaterTile = tileType === 3;
-    const isCaveOrRuins =
-      MapManager.isCaveMap(this.currentMap.id) ||
-      this.currentMap.id.includes('ruins_of_alph') ||
-      this.currentMap.id.includes('sprout_tower') ||
-      this.currentMap.id.includes('burned_tower') ||
-      this.currentMap.id.includes('tin_tower') ||
-      this.currentMap.id.includes('mount_mortar') ||
-      this.currentMap.id === 'ilex_forest';
-    if (tileType !== 2 && !isWaterTile && !(isCaveOrRuins && tileType === 0)) {
+    const isCaveOrRuins = MapManager.isDungeonOrCaveMap(this.currentMap.id);
+    if (!MapManager.canTriggerWildEncounter(this.currentMap.id, tileType)) {
       return null;
     }
 
@@ -694,6 +687,33 @@ export class MapManager {
     return /cave|well|tunnel|whirl_island|ice_path|dragons_den|rock_tunnel|digletts_cave|mount_moon|victory_road|silver_cave|tohjo_falls/i.test(
       mapId
     );
+  }
+
+  /**
+   * Checks whether a map ID represents a cave, dungeon, tower, ruins, or forest interior
+   * where wild encounters can trigger on standard walkable floor tiles (tileType === 0).
+   */
+  public static isDungeonOrCaveMap(mapId: string): boolean {
+    return (
+      MapManager.isCaveMap(mapId) ||
+      mapId.includes('ruins_of_alph') ||
+      mapId.includes('sprout_tower') ||
+      mapId.includes('burned_tower') ||
+      mapId.includes('tin_tower') ||
+      mapId.includes('mount_mortar') ||
+      mapId === 'ilex_forest'
+    );
+  }
+
+  /**
+   * Unified check for whether stepping on a tileType in a given map can roll a wild encounter.
+   * Supports tall grass (2), surfing water (3), and walkable dungeon/forest floors (0).
+   */
+  public static canTriggerWildEncounter(mapId: string, tileType: number): boolean {
+    const isWater = tileType === 3;
+    const isGrass = tileType === 2;
+    const isDungeonFloor = tileType === 0 && MapManager.isDungeonOrCaveMap(mapId);
+    return isGrass || isWater || isDungeonFloor;
   }
 
   /**

@@ -1156,9 +1156,9 @@ export class TownMapUI {
               : ''
           }
 
-          <!-- Legendary Beast Roamer Radar -->
+          <!-- Legendary Beast Roamer Radar (Story-Gated: Hidden until Burned Tower awakening) -->
           ${
-            this.activeRoamers.length > 0
+            this.activeRoamers.some((r) => r.isAwakened)
               ? `
             <div id="town-map-roamer-radar" style="
               background: #141E33;
