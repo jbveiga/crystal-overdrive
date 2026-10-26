@@ -1,341 +1,42 @@
-import type { PokemonInstance, PokeballId, MedicineId, RepelId, SpeedMultiplier, MoveData } from '../types/game';
-import { PokemonFactory } from '../battle/PokemonFactory';
+import type { PokemonInstance, SpeedMultiplier } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
-import { OverworldItemManager } from '../world/OverworldItemManager';
 import { EvolutionManager } from '../world/EvolutionManager';
-import { EvolutionSceneUI } from './EvolutionSceneUI';
-import { MoveReplacementModalUI } from './MoveReplacementModalUI';
+import {
+  CARD_STYLE,
+  MART_MEDICINE_CATALOG,
+  MART_REPEL_CATALOG,
+  MART_POKEBALL_CATALOG,
+  INFINITE_TMS,
+  EVOLUTION_STONE_CATALOG,
+  type BagInventory,
+  type TMDefinition,
+  type MartBallItem,
+  type MedicineItemDef,
+  type RepelItemDef,
+  type EvolutionStoneItemDef,
+  type BagTabId,
+} from './bag/BagItemCatalogs';
+import { BagPartyTargetRenderer } from './bag/BagPartyTargetRenderer';
+import { PokeMartRenderer } from './bag/PokeMartRenderer';
+import { BagTMTabRenderer } from './bag/BagTMTabRenderer';
 
-export interface BagInventory {
-  balls: Partial<Record<PokeballId, number>>;
-  items?: Partial<Record<string, number>>;
-  berries?: Partial<Record<string, number>>;
-  tms: string[];
-  money: number;
-  badges: string[];
-  keyItems?: string[];
-}
-
-export interface TMDefinition {
-  id: string; // e.g. 'TM54'
-  moveId: string; // 'falseswipe'
-  name: string;
-  type: string;
-  desc: string;
-}
-
-export interface MartBallItem {
-  id: PokeballId;
-  name: string;
-  price: number;
-  requiredBadges: number;
-  multiplierLabel: string;
-  desc: string;
-}
-
-export interface MedicineItemDef {
-  id: MedicineId;
-  name: string;
-  price: number;
-  badgeLabel: string;
-  desc: string;
-  icon: string;
-}
-
-export const MART_MEDICINE_CATALOG: MedicineItemDef[] = [
-  {
-    id: 'potion',
-    name: 'Potion',
-    price: 300,
-    badgeLabel: '+20 HP',
-    desc: 'A spray-type medicine for wounds. Restores the HP of one Pokémon by 20 points.',
-    icon: '🧪',
-  },
-  {
-    id: 'super-potion',
-    name: 'Super Potion',
-    price: 700,
-    badgeLabel: '+50 HP',
-    desc: 'A concentrated spray-type medicine. Restores the HP of one Pokémon by 50 points.',
-    icon: '⚗️',
-  },
-  {
-    id: 'antidote',
-    name: 'Antidote',
-    price: 100,
-    badgeLabel: 'CURES PSN',
-    desc: 'A spray-type medicine that lifts the effects of poison from one Pokémon.',
-    icon: '💛',
-  },
-  {
-    id: 'parlyz-heal',
-    name: 'Parlyz Heal',
-    price: 200,
-    badgeLabel: 'CURES PAR',
-    desc: 'A spray-type medicine that eliminates paralysis from a single Pokémon.',
-    icon: '⚡',
-  },
-  {
-    id: 'awakening',
-    name: 'Awakening',
-    price: 250,
-    badgeLabel: 'WAKES SLP',
-    desc: 'A spray-type medicine that awakens a sleeping Pokémon immediately.',
-    icon: '🔔',
-  },
-  {
-    id: 'revive',
-    name: 'Revive',
-    price: 1500,
-    badgeLabel: 'REVIVE 50%',
-    desc: 'A medicine that revives a fainted Pokémon and restores half its maximum HP.',
-    icon: '💎',
-  },
-];
-
-export interface RepelItemDef {
-  id: RepelId;
-  name: string;
-  price: number;
-  steps: number;
-  badgeLabel: string;
-  desc: string;
-  icon: string;
-}
-
-export const MART_REPEL_CATALOG: RepelItemDef[] = [
-  {
-    id: 'repel',
-    name: 'Repel',
-    price: 350,
-    steps: 100,
-    badgeLabel: '100 STEPS',
-    desc: 'An aerosol spray that keeps wild Pokémon away for 100 steps.',
-    icon: '🛡️',
-  },
-  {
-    id: 'super-repel',
-    name: 'Super Repel',
-    price: 500,
-    steps: 200,
-    badgeLabel: '200 STEPS',
-    desc: 'Keeps wild Pokémon away for 200 steps. Lasts twice as long as standard Repel.',
-    icon: '🛡️',
-  },
-  {
-    id: 'max-repel',
-    name: 'Max Repel',
-    price: 700,
-    steps: 250,
-    badgeLabel: '250 STEPS',
-    desc: 'Maximum-strength spray that keeps wild Pokémon away for 250 steps.',
-    icon: '🛡️',
-  },
-];
-
-export const MART_POKEBALL_CATALOG: MartBallItem[] = [
-  {
-    id: 'poke-ball',
-    name: 'Poké Ball',
-    price: 200,
-    requiredBadges: 0,
-    multiplierLabel: '1.0x',
-    desc: 'Standard device for catching wild Pokémon.',
-  },
-  {
-    id: 'great-ball',
-    name: 'Great Ball',
-    price: 600,
-    requiredBadges: 1,
-    multiplierLabel: '1.5x',
-    desc: 'High-performance Ball with a higher catch rate than a Poké Ball.',
-  },
-  {
-    id: 'net-ball',
-    name: 'Net Ball',
-    price: 1000,
-    requiredBadges: 1,
-    multiplierLabel: '3.5x Water/Bug',
-    desc: 'Works especially well on Water- and Bug-type Pokémon (ideal for Suicune!).',
-  },
-  {
-    id: 'nest-ball',
-    name: 'Nest Ball',
-    price: 1000,
-    requiredBadges: 1,
-    multiplierLabel: 'Up to 4.0x',
-    desc: 'Works better the lower the wild Pokémon level is.',
-  },
-  {
-    id: 'ultra-ball',
-    name: 'Ultra Ball',
-    price: 800,
-    requiredBadges: 3,
-    multiplierLabel: '2.0x',
-    desc: 'Ultra-high performance Ball with double the standard catch rate.',
-  },
-  {
-    id: 'quick-ball',
-    name: 'Quick Ball',
-    price: 1000,
-    requiredBadges: 3,
-    multiplierLabel: '5.0x Turn 1',
-    desc: 'Provides a 5.0x catch multiplier if thrown on the very first turn of battle!',
-  },
-  {
-    id: 'dusk-ball',
-    name: 'Dusk Ball',
-    price: 1000,
-    requiredBadges: 3,
-    multiplierLabel: '3.0x Night/Cave',
-    desc: 'Makes it easier to catch wild Pokémon at night or inside dark caves.',
-  },
-  {
-    id: 'timer-ball',
-    name: 'Timer Ball',
-    price: 1000,
-    requiredBadges: 5,
-    multiplierLabel: 'Up to 4.0x',
-    desc: 'Becomes progressively more effective the more turns are taken in battle.',
-  },
-  {
-    id: 'repeat-ball',
-    name: 'Repeat Ball',
-    price: 1000,
-    requiredBadges: 5,
-    multiplierLabel: '3.5x Registered',
-    desc: 'Works especially well on Pokémon species that have been caught before.',
-  },
-  {
-    id: 'fast-ball',
-    name: 'Fast Ball',
-    price: 1000,
-    requiredBadges: 5,
-    multiplierLabel: '4.0x Speed ≥ 100',
-    desc: '4.0x catch rate on Pokémon with Base Speed ≥ 100 (Raikou, Entei & Suicune!).',
-  },
-  {
-    id: 'dream-ball',
-    name: 'Dream Ball',
-    price: 1200,
-    requiredBadges: 8,
-    multiplierLabel: '4.0x Asleep',
-    desc: '4.0x catch multiplier when the target Pokémon is asleep (SLP).',
-  },
-];
-
-export const INFINITE_TMS: Record<string, TMDefinition> = {
-  TM54: {
-    id: 'TM54',
-    moveId: 'falseswipe',
-    name: 'False Swipe',
-    type: 'Normal',
-    desc: '40 Power Physical attack that never reduces the target HP below 1.',
-  },
-  TM73: {
-    id: 'TM73',
-    moveId: 'thunderwave',
-    name: 'Thunder Wave',
-    type: 'Electric',
-    desc: 'Paralyzes the target (1.5x catch rate, -50% Speed).',
-  },
-  TM99: {
-    id: 'TM99',
-    moveId: 'meanlook',
-    name: 'Mean Look',
-    type: 'Normal',
-    desc: 'Locks the target in battle, preventing roaming beasts from fleeing.',
-  },
-  HM05: {
-    id: 'HM05',
-    moveId: 'flash',
-    name: 'Flash',
-    type: 'Normal',
-    desc: "Illuminates dark caves in the field (Zephyr Badge; no move slot needed) and lowers target accuracy in battle.",
-  },
-  TM13: {
-    id: 'TM13',
-    moveId: 'snore',
-    name: 'Snore',
-    type: 'Normal',
-    desc: '40 Power Normal attack that can be used while asleep and may cause flinching.',
-  },
-  TM31: {
-    id: 'TM31',
-    moveId: 'mudslap',
-    name: 'Mud-Slap',
-    type: 'Ground',
-    desc: '20 Power Ground attack that inflicts damage and lowers target accuracy.',
-  },
-  TM49: {
-    id: 'TM49',
-    moveId: 'furycutter',
-    name: 'Fury Cutter',
-    type: 'Bug',
-    desc: '40 Power Bug attack that doubles in power with consecutive hits.',
-  },
-  HM01: {
-    id: 'HM01',
-    moveId: 'cut',
-    name: 'Cut',
-    type: 'Normal',
-    desc: '50 Power Normal attack. Cuts down small overworld trees (Hive Badge; no move slot needed).',
-  },
-  HM01_CUT: {
-    id: 'HM01',
-    moveId: 'cut',
-    name: 'Cut',
-    type: 'Normal',
-    desc: '50 Power Normal attack. Cuts down small overworld trees (Hive Badge; no move slot needed).',
-  },
-  HM03: {
-    id: 'HM03',
-    moveId: 'surf',
-    name: 'Surf',
-    type: 'Water',
-    desc: '95 Power Water attack. Carries the player across water (Fog Badge; no move slot needed).',
-  },
-  TM20: {
-    id: 'TM20',
-    moveId: 'endure',
-    name: 'Endure',
-    type: 'Normal',
-    desc: 'Always leaves the user with at least 1 HP when struck by a fatal hit this turn.',
-  },
-  TM30: {
-    id: 'TM30',
-    moveId: 'shadowball',
-    name: 'Shadow Ball',
-    type: 'Ghost',
-    desc: '80 Power Ghost attack that may lower the target Special Defense.',
-  },
+// Re-export catalogs and types for 100% backward compatibility
+export type {
+  BagInventory,
+  TMDefinition,
+  MartBallItem,
+  MedicineItemDef,
+  RepelItemDef,
+  EvolutionStoneItemDef,
+  BagTabId,
 };
-
-export interface EvolutionStoneItemDef {
-  id: string;
-  altId: string;
-  name: string;
-  price: number;
-  badgeLabel: string;
-  desc: string;
-  icon: string;
-  isLinkStone?: boolean;
-}
-
-export const EVOLUTION_STONE_CATALOG: EvolutionStoneItemDef[] = [
-  { id: 'fire-stone', altId: 'fire_stone', name: 'Fire Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Fire-type Pokémon evolve (e.g. Eevee, Growlithe, Vulpix).', icon: '🔥' },
-  { id: 'water-stone', altId: 'water_stone', name: 'Water Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Water-type Pokémon evolve (e.g. Eevee, Poliwhirl, Shellder, Staryu).', icon: '💧' },
-  { id: 'thunder-stone', altId: 'thunder_stone', name: 'Thunder Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Electric-type Pokémon evolve (e.g. Eevee, Pikachu).', icon: '⚡' },
-  { id: 'leaf-stone', altId: 'leaf_stone', name: 'Leaf Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Grass-type Pokémon evolve (e.g. Gloom, Weepinbell, Exeggcute).', icon: '🍃' },
-  { id: 'moon-stone', altId: 'moon_stone', name: 'Moon Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Pokémon evolve (e.g. Clefairy, Jigglypuff, Nidorino, Nidorina).', icon: '🌙' },
-  { id: 'sun-stone', altId: 'sun_stone', name: 'Sun Stone', price: 2100, badgeLabel: 'EVOLVE STONE', desc: 'A peculiar stone that makes certain Pokémon evolve (e.g. Gloom into Bellossom, Sunkern into Sunflora).', icon: '☀️' },
-  { id: 'link-stone', altId: 'link_stone', name: 'Link Stone', price: 3000, badgeLabel: 'TRADE EVOLVE', desc: 'Unbound-style Link Cable stone that triggers trade evolutions (e.g. Haunter, Kadabra, Machoke, Graveler).', icon: '🔗', isLinkStone: true },
-];
-
-export type BagTabId = 'ITEMS' | 'TMS' | 'BALLS' | 'MART';
-
-const CARD_STYLE =
-  'background:#141E33;border:1.5px solid #22324F;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 3px 0 0 #070B14;';
+export {
+  MART_MEDICINE_CATALOG,
+  MART_REPEL_CATALOG,
+  MART_POKEBALL_CATALOG,
+  INFINITE_TMS,
+  EVOLUTION_STONE_CATALOG,
+};
 
 export class BagAndMartUI {
   private container: HTMLElement;
@@ -635,216 +336,57 @@ export class BagAndMartUI {
     if (badgesEl) badgesEl.innerText = `🏅 ${this.inventory.badges.length} Badges`;
   }
 
-  /**
-   * Renders an inline Party Target Selector so the player can pick which party member receives a Usable Item or TM
-   */
   private renderPartyTargetSelector(container: HTMLElement, onSelect: () => void): void {
-    const bar = document.createElement('div');
-    bar.style.cssText = `
-      background: #080E1D;
-      border: 1.5px solid #22324F;
-      border-radius: 10px;
-      padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: 0 3px 0 0 #070B14;
-    `;
-
-    const title = document.createElement('div');
-    title.style.cssText =
-      "font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px;";
-    title.innerText = 'Target Party Member (Click to Select):';
-    bar.appendChild(title);
-
-    const pillsRow = document.createElement('div');
-    pillsRow.style.cssText = 'display: flex; gap: 8px; flex-wrap: wrap;';
-
-    const ownedStones = EVOLUTION_STONE_CATALOG.filter((s) => this.getOwnedStoneCount(s) > 0);
-
-    this.party.forEach((pkmn, idx) => {
-      const isSelected = idx === this.selectedPartyIndex;
-      const pct = Math.max(0, Math.min(100, (pkmn.currentHp / pkmn.stats.hp) * 100));
-      const hpColor = pct > 50 ? '#48C774' : pct > 20 ? '#FFD028' : '#EE4238';
-
-      const pill = document.createElement('button');
-      pill.style.cssText = `
-        background: ${isSelected ? '#141E33' : '#0D1322'};
-        border: 2px solid ${isSelected ? '#38BDF8' : '#22324F'};
-        box-shadow: ${isSelected ? '0 0 10px rgba(56, 189, 248, 0.3), 0 3px 0 0 #070B14' : '0 2px 0 0 #070B14'};
-        border-radius: 8px;
-        padding: 6px 10px;
-        color: #F6F8F3;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        min-width: 124px;
-        text-align: left;
-        transition: all 0.1s ease;
-      `;
-
-      const statusBadge =
-        pkmn.status !== 'NONE'
-          ? `<span style="background: #EE4238; color: #FFFFFF; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; font-family: 'Space Mono', monospace;">${pkmn.status}</span>`
-          : '';
-
-      const canAnyOwnedStoneEvolve =
-        ownedStones.length > 0 && !pkmn.isEgg
-          ? ownedStones.some((s) =>
-              EvolutionManager.canEvolve(pkmn, {
-                trigger: 'ITEM',
-                itemId: s.altId,
-              })
-            )
-          : false;
-
-      const stoneBadge =
-        ownedStones.length > 0 && !pkmn.isEgg
-          ? `<span class="party-stone-compat-badge" style="background: ${canAnyOwnedStoneEvolve ? '#059669' : '#334155'}; color: ${canAnyOwnedStoneEvolve ? '#FFFFFF' : '#94A3B8'}; font-size: 9px; font-weight: 800; padding: 1px 4px; border-radius: 3px; font-family: 'Space Mono', monospace;">${canAnyOwnedStoneEvolve ? 'ABLE' : 'UNABLE'}</span>`
-          : '';
-
-      pill.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 12px; font-weight: 800;">
-          <span>${pkmn.nickname}</span>
-          ${statusBadge}
-          ${stoneBadge}
-          <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #FFD028;">Lv.${pkmn.level}</span>
-        </div>
-        <div style="width: 100%; height: 5px; background: #080E1D; border-radius: 3px; overflow: hidden; border: 1px solid #22324F;">
-          <div style="width: ${pct}%; height: 100%; background: ${hpColor};"></div>
-        </div>
-        <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;">HP ${pkmn.currentHp}/${pkmn.stats.hp}</div>
-      `;
-
-      pill.addEventListener('click', () => {
-        BattleAudio.playMenuSound('CURSOR');
+    BagPartyTargetRenderer.renderPartyTargetSelector({
+      container,
+      party: this.party,
+      selectedPartyIndex: this.selectedPartyIndex,
+      inventory: this.inventory,
+      onSelect: (idx) => {
         this.selectedPartyIndex = idx;
         onSelect();
-      });
-
-      pillsRow.appendChild(pill);
+      },
     });
-
-    bar.appendChild(pillsRow);
-    container.appendChild(bar);
   }
 
   public getOwnedStoneCount(stone: EvolutionStoneItemDef): number {
-    if (!this.inventory.items) return 0;
-    let count = (this.inventory.items[stone.id] ?? 0) + (this.inventory.items[stone.altId] ?? 0);
-    if (stone.isLinkStone) {
-      count += (this.inventory.items['linking_cord'] ?? 0) + (this.inventory.items['linking-cord'] ?? 0);
-    }
-    return count;
-  }
-
-  private consumeOwnedStone(stone: EvolutionStoneItemDef): string {
-    if (!this.inventory.items) return stone.id;
-    if ((this.inventory.items[stone.id] ?? 0) > 0) {
-      this.inventory.items[stone.id]!--;
-      return stone.id;
-    }
-    if ((this.inventory.items[stone.altId] ?? 0) > 0) {
-      this.inventory.items[stone.altId]!--;
-      return stone.altId;
-    }
-    if (stone.isLinkStone) {
-      if ((this.inventory.items['linking_cord'] ?? 0) > 0) {
-        this.inventory.items['linking_cord']!--;
-        return 'linking_cord';
-      }
-      if ((this.inventory.items['linking-cord'] ?? 0) > 0) {
-        this.inventory.items['linking-cord']!--;
-        return 'linking-cord';
-      }
-    }
-    return stone.id;
-  }
-
-  private refundOwnedStone(key: string): void {
-    if (!this.inventory.items) this.inventory.items = {};
-    this.inventory.items[key] = (this.inventory.items[key] ?? 0) + 1;
+    return BagPartyTargetRenderer.getOwnedStoneCount(this.inventory, stone);
   }
 
   public async useEvolutionStoneOnTarget(
     stone: EvolutionStoneItemDef,
     target: PokemonInstance | undefined
   ): Promise<boolean> {
-    if (!target) {
-      BattleAudio.playMenuSound('CANCEL');
-      this.showFeedback('Select a party Pokémon first!', true);
-      return false;
-    }
-
-    if (target.isEgg) {
-      BattleAudio.playMenuSound('CANCEL');
-      this.showFeedback("An EGG won't evolve from a stone!", true);
-      return false;
-    }
-
-    const evoCandidate = EvolutionManager.canEvolve(target, {
-      trigger: 'ITEM',
-      itemId: stone.altId,
+    return BagPartyTargetRenderer.useEvolutionStoneOnTarget({
+      stone,
+      target,
+      inventory: this.inventory,
+      hideModal: () => this.hide(),
+      showFeedback: (msg, isErr) => this.showFeedback(msg, isErr),
+      onInventoryChanged: this.onInventoryChanged,
     });
+  }
 
-    if (!evoCandidate) {
-      BattleAudio.playMenuSound('CANCEL');
-      this.showFeedback(`It won't have any effect on ${target.nickname}!`, true);
-      return false;
-    }
+  public useMedicineOnTarget(med: MedicineItemDef, target: PokemonInstance | undefined): boolean {
+    return BagPartyTargetRenderer.useMedicineOnTarget({
+      med,
+      target,
+      inventory: this.inventory,
+      showFeedback: (msg, isErr) => this.showFeedback(msg, isErr),
+      onInventoryChanged: this.onInventoryChanged,
+      reRender: () => this.renderItemsTab(),
+    });
+  }
 
-    const currentCount = this.getOwnedStoneCount(stone);
-    if (currentCount <= 0) {
-      BattleAudio.playMenuSound('CANCEL');
-      this.showFeedback(`You don't have any ${stone.name} left!`, true);
-      return false;
-    }
-
-    const consumedKey = this.consumeOwnedStone(stone);
-    this.hide();
-
-    const evoScene = new EvolutionSceneUI('modal-container');
-    const res = await evoScene.play(target, evoCandidate.targetSpeciesId, { mutatePokemon: true });
-
-    if (res.evolved) {
-      const targetSpecies = res.newSpeciesId || res.targetSpecies || evoCandidate.targetSpeciesId;
-      if (target.speciesId.toLowerCase() !== targetSpecies.toLowerCase()) {
-        EvolutionManager.executeEvolution(target, targetSpecies);
-      }
-
-      // Check and teach learnset moves at current level
-      const evoMoves = await PokemonFactory.getLearnableMovesAtLevel(target.speciesId, target.level);
-      for (const moveId of evoMoves) {
-        if (target.moves.some((m) => m.moveId === moveId)) continue;
-        const moveData = PokemonFactory.getMoveData(moveId);
-        if (target.moves.length < 4) {
-          target.moves.push({
-            moveId: moveData.id,
-            currentPp: moveData.pp,
-            maxPp: moveData.pp,
-          });
-        } else {
-          const modal = new MoveReplacementModalUI('modal-container');
-          const chosenSlot = await modal.open(target, moveData);
-          if (chosenSlot !== null && chosenSlot >= 0 && chosenSlot < 4) {
-            target.moves[chosenSlot] = {
-              moveId: moveData.id,
-              currentPp: moveData.pp,
-              maxPp: moveData.pp,
-            };
-          }
-        }
-      }
-
-      this.onInventoryChanged?.();
-      return true;
-    } else {
-      // Cancelled via B-button: refund the stone
-      this.refundOwnedStone(consumedKey);
-      this.onInventoryChanged?.();
-      return false;
-    }
+  public useRepelItem(repel: RepelItemDef): boolean {
+    return BagPartyTargetRenderer.useRepelItem({
+      repel,
+      inventory: this.inventory,
+      showFeedback: (msg, isErr) => this.showFeedback(msg, isErr),
+      onUseRepel: this.onUseRepel,
+      onInventoryChanged: this.onInventoryChanged,
+      reRender: () => this.renderItemsTab(),
+    });
   }
 
   private renderItemsTab(): void {
@@ -1048,94 +590,6 @@ export class BagAndMartUI {
     }
   }
 
-  public useRepelItem(repel: RepelItemDef): boolean {
-    if (!this.inventory.items) return false;
-    const currentCount = this.inventory.items[repel.id] ?? 0;
-    if (currentCount <= 0) return false;
-
-    this.inventory.items[repel.id] = currentCount - 1;
-    BattleAudio.playMenuSound('CONFIRM');
-    this.showFeedback(`🛡️ Sprayed ${repel.name}! Wild Pokémon warded off for ${repel.steps} steps.`);
-    if (this.onUseRepel) {
-      this.onUseRepel(repel.steps, repel.name);
-    }
-    this.renderItemsTab();
-    if (this.onInventoryChanged) this.onInventoryChanged();
-    return true;
-  }
-
-  public useMedicineOnTarget(med: MedicineItemDef, target: PokemonInstance | undefined): boolean {
-    if (!target || !this.inventory.items) return false;
-    const currentCount = this.inventory.items[med.id] ?? 0;
-    if (currentCount <= 0) return false;
-
-    if (med.id === 'potion' || med.id === 'super-potion') {
-      if (target.currentHp <= 0) {
-        BattleAudio.playMenuSound('CANCEL');
-        this.showFeedback(`${target.nickname} has fainted! Use a Revive first.`, true);
-        return false;
-      }
-      if (target.currentHp >= target.stats.hp) {
-        BattleAudio.playMenuSound('CANCEL');
-        this.showFeedback(`It won't have any effect! (${target.nickname} is already at full HP)`, true);
-        return false;
-      }
-      const healAmount = med.id === 'potion' ? 20 : 50;
-      const before = target.currentHp;
-      target.currentHp = Math.min(target.stats.hp, target.currentHp + healAmount);
-      const recovered = target.currentHp - before;
-      this.inventory.items[med.id] = currentCount - 1;
-      BattleAudio.playMenuSound('HEAL');
-      this.showFeedback(`💖 ${target.nickname}'s HP was restored by ${recovered} point(s)!`);
-    } else if (med.id === 'antidote') {
-      if (target.status !== 'PSN' && target.status !== 'TOX') {
-        BattleAudio.playMenuSound('CANCEL');
-        this.showFeedback(`It won't have any effect on ${target.nickname}!`, true);
-        return false;
-      }
-      target.status = 'NONE';
-      this.inventory.items[med.id] = currentCount - 1;
-      BattleAudio.playMenuSound('HEAL');
-      this.showFeedback(`✨ ${target.nickname} was cured of its poisoning!`);
-    } else if (med.id === 'parlyz-heal') {
-      if (target.status !== 'PAR') {
-        BattleAudio.playMenuSound('CANCEL');
-        this.showFeedback(`It won't have any effect on ${target.nickname}!`, true);
-        return false;
-      }
-      target.status = 'NONE';
-      this.inventory.items[med.id] = currentCount - 1;
-      BattleAudio.playMenuSound('HEAL');
-      this.showFeedback(`✨ ${target.nickname} was cured of paralysis!`);
-    } else if (med.id === 'awakening') {
-      if (target.status !== 'SLP') {
-        BattleAudio.playMenuSound('CANCEL');
-        this.showFeedback(`It won't have any effect on ${target.nickname}!`, true);
-        return false;
-      }
-      target.status = 'NONE';
-      target.sleepTurns = 0;
-      this.inventory.items[med.id] = currentCount - 1;
-      BattleAudio.playMenuSound('HEAL');
-      this.showFeedback(`✨ ${target.nickname} woke up!`);
-    } else if (med.id === 'revive') {
-      if (target.currentHp > 0) {
-        BattleAudio.playMenuSound('CANCEL');
-        this.showFeedback(`${target.nickname} hasn't fainted!`, true);
-        return false;
-      }
-      target.currentHp = Math.max(1, Math.floor(target.stats.hp / 2));
-      target.status = 'NONE';
-      this.inventory.items[med.id] = currentCount - 1;
-      BattleAudio.playMenuSound('HEAL');
-      this.showFeedback(`💎 ${target.nickname} recovered from fainting!`);
-    }
-
-    this.renderItemsTab();
-    if (this.onInventoryChanged) this.onInventoryChanged();
-    return true;
-  }
-
   public setActiveTeachingTM(tm: TMDefinition | null): void {
     this.activeTeachingTM = tm;
     this.renderTMsTab();
@@ -1143,567 +597,46 @@ export class BagAndMartUI {
 
   private async renderTMsTab(): Promise<void> {
     const container = this.bagModal.querySelector('#bag-content') as HTMLDivElement;
-    container.innerHTML = '';
-
-    if (this.activeTeachingTM) {
-      const tm = this.activeTeachingTM;
-      // Party Compatibility View
-      const headerBox = document.createElement('div');
-      headerBox.style.cssText = `
-        background: #080E1D;
-        border: 2px solid #38BDF8;
-        border-radius: 10px;
-        padding: 12px 14px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 8px;
-        box-shadow: 0 4px 0 0 #070B14;
-      `;
-      headerBox.innerHTML = `
-        <div style="flex: 1;">
-          <div style="font-size: 10px; font-weight: 800; color: #38BDF8; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">
-            PARTY COMPATIBILITY // SELECT POKÉMON TO TEACH:
-          </div>
-          <div style="font-size: 16px; font-weight: 800; color: #FFFFFF; display: flex; align-items: center; gap: 8px; margin-top: 2px; font-family: 'Space Mono', monospace;">
-            <span>${tm.id}: ${tm.name}</span>
-            <span style="font-size: 10px; background: #22324F; padding: 2px 6px; border-radius: 4px; color: #CBD5E1;">${tm.type.toUpperCase()}</span>
-            <span style="font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">INFINITE USE</span>
-          </div>
-          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">${tm.desc}</div>
-        </div>
-        <button id="btn-back-to-tms" style="
-          background: #1E293B;
-          color: #F8FAFC;
-          border: 1.5px solid #475569;
-          border-radius: 6px;
-          padding: 8px 14px;
-          font-family: 'Space Mono', monospace;
-          font-size: 11px;
-          font-weight: 800;
-          cursor: pointer;
-          white-space: nowrap;
-          box-shadow: 0 3px 0 0 #070B14;
-        ">← BACK TO TM LIST</button>
-      `;
-
-      headerBox.querySelector('#btn-back-to-tms')?.addEventListener('click', () => {
-        BattleAudio.playMenuSound('CANCEL');
-        this.activeTeachingTM = null;
-        this.renderTMsTab();
-      });
-
-      container.appendChild(headerBox);
-
-      const partyListContainer = document.createElement('div');
-      partyListContainer.id = 'party-compatibility-list';
-      partyListContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px; margin-top: 4px;';
-      container.appendChild(partyListContainer);
-
-      for (let i = 0; i < this.party.length; i++) {
-        const pkmn = this.party[i];
-        const alreadyKnows = pkmn.moves.some((m) => m.moveId === tm.moveId);
-        const canLearn = await PokemonFactory.canLearnMove(pkmn.speciesId, tm.moveId);
-        const movesSummary = pkmn.moves
-          .map((m) => {
-            try {
-              return PokemonFactory.getMoveData(m.moveId).name;
-            } catch {
-              return m.moveId.toUpperCase();
-            }
-          })
-          .join(' • ');
-
-        const card = document.createElement('div');
-        card.className = 'party-compat-card';
-        card.style.cssText = `
-          background: #141E33;
-          border: 1.5px solid ${alreadyKnows ? '#38BDF8' : canLearn ? '#22C55E' : '#22324F'};
-          box-shadow: 0 3px 0 0 #070B14;
-          border-radius: 10px;
-          padding: 10px 14px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 12px;
-          opacity: ${canLearn || alreadyKnows ? '1' : '0.65'};
-        `;
-
-        const badgeHtml = alreadyKnows
-          ? `<span class="compat-badge-learned" style="
-              background: #0284C7;
-              color: white;
-              padding: 6px 12px;
-              border-radius: 6px;
-              font-family: 'Space Mono', monospace;
-              font-weight: 800;
-              font-size: 11px;
-              white-space: nowrap;
-              box-shadow: 0 2px 0 0 #070B14;
-            ">LEARNED ✓</span>`
-          : canLearn
-            ? `<button class="teach-pokemon-btn" data-index="${i}" style="
-                background: #16A34A;
-                color: white;
-                border: 1.5px solid #22C55E;
-                border-radius: 6px;
-                padding: 8px 14px;
-                font-family: 'Space Mono', monospace;
-                font-weight: 800;
-                font-size: 11px;
-                cursor: pointer;
-                white-space: nowrap;
-                box-shadow: 0 3px 0 0 #070B14;
-              ">ABLE — TEACH</button>`
-            : `<span class="compat-badge-not-able" style="
-                background: #1E293B;
-                color: #94A3B8;
-                border: 1px solid #334155;
-                padding: 6px 12px;
-                border-radius: 6px;
-                font-family: 'Space Mono', monospace;
-                font-weight: 700;
-                font-size: 11px;
-                white-space: nowrap;
-              ">NOT ABLE</span>`;
-
-        card.innerHTML = `
-          <div style="flex: 1;">
-            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-              <span style="font-weight: 800; font-size: 14px; color: #FFFFFF;">${pkmn.nickname}</span>
-              <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #38BDF8; font-weight: 700;">Lv. ${pkmn.level}</span>
-              <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #CBD5E1;">HP: ${pkmn.currentHp}/${pkmn.stats.hp}</span>
-            </div>
-            <div style="font-size: 11px; color: #94A3B8; margin-top: 3px;">
-              Moves: <span style="color: #E2E8F0;">${movesSummary}</span>
-            </div>
-          </div>
-          <div>${badgeHtml}</div>
-        `;
-
-        if (canLearn && !alreadyKnows) {
-          const btn = card.querySelector('.teach-pokemon-btn') as HTMLButtonElement;
-          btn?.addEventListener('click', async () => {
-            await this.teachTM(tm, pkmn);
-          });
-        }
-
-        partyListContainer.appendChild(card);
-      }
-      return;
-    }
-
-    this.renderPartyTargetSelector(container, () => this.renderTMsTab());
-
-    const targetPkmn = this.party[this.selectedPartyIndex] || this.party[0];
-    if (targetPkmn) {
-      const movesSummary = targetPkmn.moves
-        .map((m) => {
-          try {
-            return PokemonFactory.getMoveData(m.moveId).name;
-          } catch {
-            return m.moveId.toUpperCase();
-          }
-        })
-        .join(' • ');
-      const partyInfo = document.createElement('div');
-      partyInfo.style.cssText = `
-        background: #080E1D;
-        border: 1.5px solid #22324F;
-        border-radius: 10px;
-        padding: 10px 14px;
-        font-size: 12px;
-        color: #CBD5E1;
-        box-shadow: 0 3px 0 0 #070B14;
-      `;
-      partyInfo.innerHTML = `<strong>Selected Pokémon:</strong> ${targetPkmn.nickname} (Lv. ${targetPkmn.level}) — <span style="color: #38BDF8; font-family: 'Space Mono', monospace;">${movesSummary}</span>`;
-      container.appendChild(partyInfo);
-    }
-
-    const tms = this.inventory.tms;
-    if (tms.length === 0) {
-      container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; background: #141E33; border: 1px dashed #22324F; border-radius: 10px; box-shadow: 0 3px 0 0 #070B14;">No TMs acquired yet.</div>`;
-      return;
-    }
-
-    const seenCanonicalIds = new Set<string>();
-    for (const tmId of tms) {
-      const tm: TMDefinition = INFINITE_TMS[tmId] || {
-        id: tmId,
-        moveId: tmId.toLowerCase().replace(/[^a-z0-9]/g, ''),
-        name: OverworldItemManager.formatItemName(tmId),
-        type: 'Normal',
-        desc: `Teaches ${OverworldItemManager.formatItemName(tmId)} to a compatible Pokémon.`,
-      };
-      if (seenCanonicalIds.has(tm.id)) continue;
-      seenCanonicalIds.add(tm.id);
-
-      const isFieldHM = tm.id.startsWith('HM');
-      const fieldBadgeHtml = isFieldHM
-        ? `<span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #D97706; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">FIELD READY (NO SLOT NEEDED)</span>`
-        : '';
-
-      const card = document.createElement('div');
-      card.style.cssText = CARD_STYLE;
-
-      card.innerHTML = `
-        <div style="flex: 1;">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-family: 'Space Mono', monospace; font-weight: 800; color: #38BDF8; font-size: 13px;">${tm.id}</span>
-            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${tm.name}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #22324F; padding: 2px 6px; border-radius: 4px; font-weight: 700; color: #CBD5E1;">${tm.type.toUpperCase()}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">INFINITE USE</span>
-            ${fieldBadgeHtml}
-          </div>
-          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${tm.desc}</div>
-        </div>
-        <button class="teach-tm-btn" style="
-          background: #2563EB;
-          color: white;
-          border: 1.5px solid #38BDF8;
-          border-radius: 6px;
-          padding: 8px 14px;
-          font-family: 'Space Mono', monospace;
-          font-weight: 800;
-          font-size: 11px;
-          cursor: pointer;
-          white-space: nowrap;
-          box-shadow: 0 3px 0 0 #070B14;
-        ">TEACH</button>
-      `;
-
-      const teachBtn = card.querySelector('.teach-tm-btn') as HTMLButtonElement;
-      teachBtn.addEventListener('click', () => {
-        BattleAudio.playMenuSound('CURSOR');
+    await BagTMTabRenderer.renderTMsTab({
+      container,
+      party: this.party,
+      selectedPartyIndex: this.selectedPartyIndex,
+      inventory: this.inventory,
+      activeTeachingTM: this.activeTeachingTM,
+      setActiveTeachingTM: (tm) => {
         this.activeTeachingTM = tm;
-        this.renderTMsTab();
-      });
-
-      container.appendChild(card);
-    }
+      },
+      renderPartyTargetSelector: (c, onSel) => this.renderPartyTargetSelector(c, onSel),
+      reRender: () => this.renderTMsTab(),
+      teachTM: (tm, pkmn) => this.teachTM(tm, pkmn),
+    });
   }
 
   private renderBallsTab(): void {
     const container = this.bagModal.querySelector('#bag-content') as HTMLDivElement;
-    container.innerHTML = '';
-
-    const ballEntries = Object.entries(this.inventory.balls).filter(([, count]) => (count ?? 0) > 0) as Array<
-      [PokeballId, number]
-    >;
-    if (ballEntries.length === 0) {
-      container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; background: #141E33; border: 1px dashed #22324F; border-radius: 10px; box-shadow: 0 3px 0 0 #070B14;">No Pokéballs in bag. Visit a Poké Mart to stock up!</div>`;
-      return;
-    }
-
-    for (const [ballId, count] of ballEntries) {
-      const catalogInfo = MART_POKEBALL_CATALOG.find((b) => b.id === ballId);
-      const formattedName = catalogInfo?.name || ballId.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
-      const desc = catalogInfo?.desc || 'Guaranteed capture device.';
-      const mult = catalogInfo?.multiplierLabel || '255x Guaranteed';
-
-      const card = document.createElement('div');
-      card.style.cssText = CARD_STYLE;
-
-      card.innerHTML = `
-        <div style="flex: 1;">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">🔴 ${formattedName}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${mult}</span>
-          </div>
-          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${desc}</div>
-        </div>
-        <div style="font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 800; color: #38BDF8;">x${count}</div>
-      `;
-
-      container.appendChild(card);
-    }
+    PokeMartRenderer.renderBallsTab(container, this.inventory);
   }
 
   private renderMartTab(): void {
     const container = this.bagModal.querySelector('#bag-content') as HTMLDivElement;
-    container.innerHTML = '';
-
-    const currentBadges = this.inventory.badges.length;
-
-    // Badge Progression Display
-    const badgeBar = document.createElement('div');
-    badgeBar.style.cssText = `
-      background: #080E1D;
-      border: 1.5px solid #22324F;
-      border-radius: 10px;
-      padding: 10px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      box-shadow: 0 3px 0 0 #070B14;
-    `;
-
-    badgeBar.innerHTML = `
-      <div style="font-size: 12px; font-weight: 700; color: #CBD5E1;">
-        🏅 Gym Badges Earned: <strong style="color: #38BDF8; font-family: 'Space Mono', monospace;">${currentBadges} / 8</strong>
-      </div>
-      <div style="font-size: 11px; color: #94A3B8; font-family: 'Space Mono', monospace;">
-        New badges unlock specialty Pokéballs.
-      </div>
-    `;
-    container.appendChild(badgeBar);
-
-    // Medicine Section Header
-    const medHeader = document.createElement('div');
-    medHeader.style.cssText =
-      "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 4px; letter-spacing: 0.5px;";
-    medHeader.innerText = '🧪 MEDICINE & STATUS HEALERS';
-    container.appendChild(medHeader);
-
-    if (!this.inventory.items) {
-      this.inventory.items = {};
-    }
-
-    for (const med of MART_MEDICINE_CATALOG) {
-      const ownedCount = this.inventory.items[med.id] ?? 0;
-      const card = document.createElement('div');
-      card.style.cssText = CARD_STYLE;
-
-      card.innerHTML = `
-        <div style="flex: 1;">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${med.icon} ${med.name}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${med.badgeLabel}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94A3B8;">Owned: x${ownedCount}</span>
-          </div>
-          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${med.desc}</div>
-        </div>
-        <button class="buy-med-btn" style="
-          background: #16A34A;
-          color: white;
-          border: 1.5px solid #22C55E;
-          border-radius: 6px;
-          padding: 8px 12px;
-          font-family: 'Space Mono', monospace;
-          font-weight: 800;
-          font-size: 11px;
-          cursor: pointer;
-          white-space: nowrap;
-          box-shadow: 0 3px 0 0 #070B14;
-        ">BUY $${med.price}</button>
-      `;
-
-      const buyMedBtn = card.querySelector('.buy-med-btn') as HTMLButtonElement;
-      buyMedBtn.addEventListener('click', () => {
-        if (this.inventory.money < med.price) {
-          BattleAudio.playMenuSound('CANCEL');
-          this.showFeedback(`Not enough money to buy ${med.name}! ($${med.price} required)`, true);
-          return;
-        }
-        BattleAudio.playMenuSound('CONFIRM');
-        this.inventory.money -= med.price;
-        this.inventory.items![med.id] = (this.inventory.items![med.id] ?? 0) + 1;
-        this.updateHeaderDisplay();
-        this.showFeedback(`Purchased 1x ${med.name}! (Now holding x${this.inventory.items![med.id]})`);
-        this.renderMartTab();
-        if (this.onInventoryChanged) this.onInventoryChanged();
-      });
-
-      container.appendChild(card);
-    }
-
-    // Field Repels Section Header
-    const repelHeader = document.createElement('div');
-    repelHeader.style.cssText =
-      "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 8px; letter-spacing: 0.5px;";
-    repelHeader.innerText = '🛡️ FIELD REPELS (WARD OFF WILD POKÉMON)';
-    container.appendChild(repelHeader);
-
-    for (const repel of MART_REPEL_CATALOG) {
-      const ownedCount = this.inventory.items[repel.id] ?? 0;
-      const card = document.createElement('div');
-      card.style.cssText = CARD_STYLE;
-
-      card.innerHTML = `
-        <div style="flex: 1;">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${repel.icon} ${repel.name}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${repel.badgeLabel}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94A3B8;">Owned: x${ownedCount}</span>
-          </div>
-          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${repel.desc}</div>
-        </div>
-        <button class="buy-repel-btn" style="
-          background: #16A34A;
-          color: white;
-          border: 1.5px solid #22C55E;
-          border-radius: 6px;
-          padding: 8px 12px;
-          font-family: 'Space Mono', monospace;
-          font-weight: 800;
-          font-size: 11px;
-          cursor: pointer;
-          white-space: nowrap;
-          box-shadow: 0 3px 0 0 #070B14;
-        ">BUY $${repel.price}</button>
-      `;
-
-      const buyRepelBtn = card.querySelector('.buy-repel-btn') as HTMLButtonElement;
-      buyRepelBtn.addEventListener('click', () => {
-        if (this.inventory.money < repel.price) {
-          BattleAudio.playMenuSound('CANCEL');
-          this.showFeedback(`Not enough money to buy ${repel.name}! ($${repel.price} required)`, true);
-          return;
-        }
-        BattleAudio.playMenuSound('CONFIRM');
-        this.inventory.money -= repel.price;
-        this.inventory.items![repel.id] = (this.inventory.items![repel.id] ?? 0) + 1;
-        this.updateHeaderDisplay();
-        this.showFeedback(`Purchased 1x ${repel.name}! (Now holding x${this.inventory.items![repel.id]})`);
-        this.renderMartTab();
-        if (this.onInventoryChanged) this.onInventoryChanged();
-      });
-
-      container.appendChild(card);
-    }
-
-    // Pokéball Section Header
-    const ballHeader = document.createElement('div');
-    ballHeader.style.cssText =
-      "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 8px; letter-spacing: 0.5px;";
-    ballHeader.innerText = '🔴 SPECIALTY & STANDARD POKÉ BALLS';
-    container.appendChild(ballHeader);
-
-    // Only render available balls unlocked by badge count (completely hide locked items)
-    const availableBalls = MART_POKEBALL_CATALOG.filter((item) => currentBadges >= item.requiredBadges);
-
-    for (const item of availableBalls) {
-      const ownedCount = this.inventory.balls[item.id] ?? 0;
-
-      const card = document.createElement('div');
-      card.style.cssText = CARD_STYLE;
-
-      card.innerHTML = `
-        <div style="flex: 1;">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">🔴 ${item.name}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${item.multiplierLabel}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94A3B8;">Owned: x${ownedCount}</span>
-          </div>
-          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${item.desc}</div>
-        </div>
-        <button class="buy-ball-btn" style="
-          background: #16A34A;
-          color: white;
-          border: 1.5px solid #22C55E;
-          border-radius: 6px;
-          padding: 8px 12px;
-          font-family: 'Space Mono', monospace;
-          font-weight: 800;
-          font-size: 11px;
-          cursor: pointer;
-          white-space: nowrap;
-          box-shadow: 0 3px 0 0 #070B14;
-        ">BUY $${item.price}</button>
-      `;
-
-      const buyBtn = card.querySelector('.buy-ball-btn') as HTMLButtonElement;
-      buyBtn.addEventListener('click', () => {
-        if (this.inventory.money < item.price) {
-          BattleAudio.playMenuSound('CANCEL');
-          this.showFeedback(`Not enough money to buy ${item.name}! ($${item.price} required)`, true);
-          return;
-        }
-        BattleAudio.playMenuSound('CONFIRM');
-        this.inventory.money -= item.price;
-        this.inventory.balls[item.id] = (this.inventory.balls[item.id] ?? 0) + 1;
-        this.updateHeaderDisplay();
-        this.showFeedback(`Purchased 1x ${item.name}! (Now holding x${this.inventory.balls[item.id]})`);
-        this.renderMartTab();
-        if (this.onInventoryChanged) this.onInventoryChanged();
-      });
-
-      container.appendChild(card);
-    }
+    PokeMartRenderer.renderMartTab({
+      container,
+      inventory: this.inventory,
+      updateHeaderDisplay: () => this.updateHeaderDisplay(),
+      showFeedback: (msg, isErr) => this.showFeedback(msg, isErr),
+      onInventoryChanged: this.onInventoryChanged,
+      reRender: () => this.renderMartTab(),
+    });
   }
 
-  /**
-   * Teaches an Infinite TM to the selected party Pokémon.
-   * If the Pokémon has 4 moves, opens MoveReplacementModalUI to choose which move to forget.
-   */
   public async teachTM(tm: TMDefinition, target: PokemonInstance | undefined = this.party[0]): Promise<void> {
-    if (!target) return;
-
-    const alreadyKnows = target.moves.some((m) => m.moveId === tm.moveId);
-    if (alreadyKnows) {
-      BattleAudio.playMenuSound('CANCEL');
-      this.showFeedback(`${target.nickname} already knows ${tm.name}!`, true);
-      return;
-    }
-
-    const canLearn = await PokemonFactory.canLearnMove(target.speciesId, tm.moveId);
-    if (!canLearn) {
-      BattleAudio.playMenuSound('CANCEL');
-      this.showFeedback(`${target.nickname} cannot learn ${tm.name}!`, true);
-      return;
-    }
-
-    let moveData: MoveData;
-    try {
-      moveData = PokemonFactory.getMoveData(tm.moveId);
-    } catch {
-      moveData = {
-        id: tm.moveId,
-        name: tm.name,
-        type: tm.type as any,
-        category: 'Physical',
-        power: 50,
-        accuracy: 100,
-        pp: 20,
-        priority: 0,
-        leavesOneHp: false,
-        trapsTarget: false,
-      };
-    }
-
-    if (target.moves.length < 4) {
-      target.moves.push({
-        moveId: moveData.id,
-        currentPp: moveData.pp,
-        maxPp: moveData.pp,
-      });
-      BattleAudio.playMenuSound('HEAL');
-      this.showFeedback(`✨ ${target.nickname} learned ${tm.name}! (TM ${tm.id} remains intact)`);
-      this.renderTMsTab();
-      if (this.onInventoryChanged) {
-        this.onInventoryChanged();
-      }
-    } else {
-      const modal = new MoveReplacementModalUI(this.container);
-      const chosenSlot = await modal.open(target, moveData);
-
-      if (chosenSlot !== null && chosenSlot >= 0 && chosenSlot < 4) {
-        const replacedMove = target.moves[chosenSlot];
-        let replacedName = replacedMove.moveId.toUpperCase();
-        try {
-          replacedName = PokemonFactory.getMoveData(replacedMove.moveId).name.toUpperCase();
-        } catch {}
-
-        target.moves[chosenSlot] = {
-          moveId: moveData.id,
-          currentPp: moveData.pp,
-          maxPp: moveData.pp,
-        };
-        BattleAudio.playMenuSound('HEAL');
-        this.showFeedback(
-          `✨ 1, 2, and... Poof! ${target.nickname} forgot ${replacedName} and learned ${tm.name}!`
-        );
-        this.renderTMsTab();
-        if (this.onInventoryChanged) {
-          this.onInventoryChanged();
-        }
-      } else {
-        BattleAudio.playMenuSound('CANCEL');
-        this.showFeedback(`${target.nickname} did not learn ${tm.name}.`);
-      }
-    }
+    return BagTMTabRenderer.teachTM({
+      modalContainer: this.container,
+      tm,
+      target,
+      showFeedback: (msg, isErr) => this.showFeedback(msg, isErr),
+      reRender: () => this.renderTMsTab(),
+      onInventoryChanged: this.onInventoryChanged,
+    });
   }
 }
