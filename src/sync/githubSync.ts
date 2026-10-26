@@ -101,6 +101,47 @@ export const ISSUE_RESOLUTIONS: Record<number, { titleMatch: string; resolution:
      - **🚀 OPEN GITHUB ISSUE ↗**: Opens the pre-filled issue form in a new tab when the player is ready to attach the downloaded screenshot.
   3. Updated the issue description template to instruct players to attach their saved screenshot file.`,
   },
+  17: {
+    titleMatch: 'ilex_forest (8, 22)',
+    resolution: `### Resolution Details for Issue #17
+- **Root Cause**: In \`public/assets/data/maps/ilex_forest.json\`, coordinate \`(8, 22)\` had \`collision = 0\` and was mistakenly cleared as a cut tree in \`src/main.ts\`, allowing players to walk across the Ilex Forest shrine roof.
+- **Fix**:
+  1. Updated \`public/assets/data/maps/ilex_forest.json\` so that shrine tiles \`(7, 22)\`, \`(8, 22)\`, \`(9, 22)\`, and \`(8, 23)\` are solid (\`collision = 1\`).
+  2. Registered the \`⛩️ ILEX FOREST SHRINE\` bgEvent at \`(8, 23)\` facing UP from \`(8, 24)\`.
+  3. Removed \`(8, 22)\` from \`applyMapStoryMutations\` and cut logic in \`src/main.ts\` so the shrine roof is never made walkable.`,
+  },
+  18: {
+    titleMatch: 'ilex_forest (4, 24)',
+    resolution: `### Resolution Details for Issue #18
+- **Root Cause**: The NPC \`forest_lass\` was placed at \`(3, 24)\` in \`src/world/npcData.ts\`, which occupied the single-tile-wide corridor between trees and trapped players traveling west towards the shrine.
+- **Fix**:
+  1. Relocated \`forest_lass\` in \`src/world/npcData.ts\` from \`(3, 24)\` to \`(7, 23)\` facing \`DOWN\` in the open clearing beside the shrine.
+  2. The single-tile passage at \`(3, 24)\` is now completely unobstructed while her lore dialogue remains accessible.`,
+  },
+  19: {
+    titleMatch: 'azalea_town (3, 10)',
+    resolution: `### Resolution Details for Issue #19
+- **Root Cause**: Cut-tree detection in \`src/main.ts\` tested \`facingTileName.includes('_5f')\`, which broadly matched tile \`jt_m_4e_4f_5e_5f\` (the Ilex Forest gate sign at \`3, 9\` in Azalea Town), triggering false "This tree looks like it can be CUT down!" prompts.
+- **Fix**:
+  1. Added the missing \`🪧 ILEX FOREST GATE\` bgEvent at \`(3, 9)\` in \`public/assets/data/maps/azalea_town.json\`.
+  2. Removed ambiguous substrings (\`_5f\` and \`_5b\`) from cut-tree tile checks in \`src/main.ts\` and restricted Cut to authentic cut-tree tile identifiers.`,
+  },
+  20: {
+    titleMatch: 'ilex_forest (8, 25)',
+    resolution: `### Resolution Details for Issue #20
+- **Root Cause**: When loading a save with \`ilex_tree_cut\`, \`overworldRenderer.renderMap()\` drew the map tile array before \`syncMapOverworldItems\` mutated tile \`(8, 25)\`, causing the cut tree to be rendered on screen.
+- **Fix**:
+  1. Extracted \`applyMapStoryMutations(map)\` in \`src/main.ts\` which synchronously replaces \`(8, 25)\` with \`in_forest_05_05_05_05\` and sets collision to \`0\`.
+  2. Wired \`applyMapStoryMutations\` into boot initialization, map border transitions (West, East, North, South), and \`executeWarpTransition\` immediately before \`overworldRenderer.renderMap()\`.`,
+  },
+  21: {
+    titleMatch: 'ilex_forest (8, 23)',
+    resolution: `### Resolution Details for Issue #21
+- **Root Cause**: The cut tree replacement logic in \`src/main.ts\` originally cleared coordinate \`(8, 22)\` on every cut tree action and save load, cutting the upper half of the Ilex Forest shrine structure in half.
+- **Fix**:
+  1. Removed coordinate \`(8, 22)\` completely from cut tree mutation logic in \`src/main.ts\` and \`applyMapStoryMutations\`.
+  2. The cut path is strictly confined to \`(8, 25)\`, preserving the intact 3x2 shrine structure at \`y=22-23\` with solid collision.`,
+  },
 };
 
 export async function fetchOpenIssues(

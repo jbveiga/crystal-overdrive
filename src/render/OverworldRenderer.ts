@@ -72,6 +72,9 @@ const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   youngster: './assets/sprites/characters/youngster.png',
   slowpoke: './assets/sprites/characters/slowpoke.png',
   farfetchd: './assets/sprites/characters/farfetchd.png',
+  blackbelt: './assets/sprites/characters/npc_boy.png',
+  cooltrainer_f: './assets/sprites/characters/cooltrainer_f.png',
+  cooltrainer_m: './assets/sprites/characters/camper.png',
 };
 
 export class OverworldRenderer {

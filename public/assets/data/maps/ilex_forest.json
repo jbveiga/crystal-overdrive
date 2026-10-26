@@ -2295,9 +2295,9 @@
     1,
     1,
     1,
-    0,
     1,
-    0,
+    1,
+    1,
     1,
     1,
     1,
@@ -2326,7 +2326,7 @@
     1,
     1,
     0,
-    0,
+    1,
     0,
     1,
     1,
@@ -4899,6 +4899,15 @@
     {
       "x": 8,
       "y": 22,
+      "speaker": "⛩️ ILEX FOREST SHRINE",
+      "pages": [
+        "ILEX FOREST SHRINE…",
+        "It's in honor of the forest's protector: CELEBI!"
+      ]
+    },
+    {
+      "x": 8,
+      "y": 23,
       "speaker": "⛩️ ILEX FOREST SHRINE",
       "pages": [
         "ILEX FOREST SHRINE…",

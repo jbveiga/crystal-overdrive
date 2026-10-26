@@ -690,6 +690,29 @@ async function bootstrap() {
       if (!inventory.items) inventory.items = {};
       inventory.items[norm] = (inventory.items[norm] || 0) + 1;
     }
+
+    // Auto-detect key progression HMs/items and trigger associated story/mission flags
+    if (rawItemId.toLowerCase().includes('waterfall') || rawItemId.toLowerCase().includes('hm07')) {
+      if (!inventory.tms.includes('HM07')) inventory.tms.push('HM07');
+      if (!inventory.tms.includes('HM07_WATERFALL')) inventory.tms.push('HM07_WATERFALL');
+      storyFlags.add('has_hm07_waterfall');
+      storyFlags.add('EVENT_GOT_HM07_WATERFALL');
+      missionManager.checkStoryFlags(storyFlags);
+    }
+    if (rawItemId.toLowerCase().includes('basement')) {
+      storyFlags.add('has_basement_key');
+      storyFlags.add('warehouse_unlocked');
+      missionManager.checkStoryFlags(storyFlags);
+    }
+    if (rawItemId.toLowerCase().includes('card')) {
+      storyFlags.add('has_card_key');
+      storyFlags.add('card_key_obtained');
+      missionManager.checkStoryFlags(storyFlags);
+    }
+    if (rawItemId.toLowerCase().includes('clear_bell') || rawItemId.toLowerCase().includes('clear-bell')) {
+      storyFlags.add('has_clear_bell');
+      missionManager.checkStoryFlags(storyFlags);
+    }
   };
 
   let triggerItemfinderScan = () => {};
@@ -1068,16 +1091,19 @@ async function bootstrap() {
     return undefined;
   };
 
-  const syncMapOverworldItems = (map: MapData | null) => {
+  const applyMapStoryMutations = (map: MapData | null) => {
     if (!map) return;
     if (map.id === 'ilex_forest' && storyFlags.has('ilex_tree_cut')) {
       map.collisionGrid[25 * map.width + 8] = 0;
-      map.collisionGrid[22 * map.width + 8] = 0;
       if (map.tileMap) {
         map.tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05';
-        map.tileMap[22 * map.width + 8] = 'in_forest_05_05_05_05';
       }
     }
+  };
+
+  const syncMapOverworldItems = (map: MapData | null) => {
+    if (!map) return;
+    applyMapStoryMutations(map);
     const itemBalls = [...overworldItemManager.getActiveItemBalls(map.id)];
     if (map.id === 'elms_lab') {
       itemBalls.push(...OverworldItemManager.getStarterBallsForLab(storyFlags, detectChosenStarterSpecies()));
@@ -1097,6 +1123,7 @@ async function bootstrap() {
       window.updateLoaderProgress?.(snap.percent, snap.currentLabel);
     },
   });
+  applyMapStoryMutations(initialMap);
   overworldRenderer.renderMap(initialMap, lookupMap);
   syncMapOverworldItems(initialMap);
 
@@ -1531,6 +1558,7 @@ async function bootstrap() {
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = nextMap.width - 1;
       targetY -= conn.offset;
+      applyMapStoryMutations(nextMap);
       overworldRenderer.renderMap(nextMap, lookupMap);
       syncMapOverworldItems(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
@@ -1542,6 +1570,7 @@ async function bootstrap() {
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = 0;
       targetY -= conn.offset;
+      applyMapStoryMutations(nextMap);
       overworldRenderer.renderMap(nextMap, lookupMap);
       syncMapOverworldItems(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
@@ -1553,6 +1582,7 @@ async function bootstrap() {
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX -= conn.offset;
       targetY = nextMap.height - 1;
+      applyMapStoryMutations(nextMap);
       overworldRenderer.renderMap(nextMap, lookupMap);
       syncMapOverworldItems(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
@@ -1564,6 +1594,7 @@ async function bootstrap() {
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX -= conn.offset;
       targetY = 0;
+      applyMapStoryMutations(nextMap);
       overworldRenderer.renderMap(nextMap, lookupMap);
       syncMapOverworldItems(nextMap);
       overworldHUD.updateRouteName(nextMap.name);
@@ -2831,6 +2862,79 @@ async function bootstrap() {
       return;
     }
 
+    // Elite Four Chambers & Tin Tower Progression Gating
+    if (warp.targetMapId === 'wills_room' && (inventory.badges.length < 8 && !storyFlags.has('clair_defeated'))) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        ['GUARD: You cannot challenge the ELITE FOUR until you have conquered all 8 JOHTO GYMS and earned their BADGES!'],
+        '👮 LEAGUE GUARD'
+      );
+      return;
+    }
+
+    if (warp.targetMapId === 'kogas_room' && !storyFlags.has('will_defeated')) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        ['The door to the next chamber remains firmly shut! Defeat ELITE FOUR WILL to proceed!'],
+        '🔒 CHAMBER DOOR'
+      );
+      return;
+    }
+
+    if (warp.targetMapId === 'brunos_room' && !storyFlags.has('koga_defeated')) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        ['The door to the next chamber remains firmly shut! Defeat ELITE FOUR KOGA to proceed!'],
+        '🔒 CHAMBER DOOR'
+      );
+      return;
+    }
+
+    if (warp.targetMapId === 'karens_room' && !storyFlags.has('bruno_defeated')) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        ['The door to the next chamber remains firmly shut! Defeat ELITE FOUR BRUNO to proceed!'],
+        '🔒 CHAMBER DOOR'
+      );
+      return;
+    }
+
+    if (warp.targetMapId === 'lances_room' && !storyFlags.has('karen_defeated')) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        ['The door to the CHAMPION\'S chamber remains firmly shut! Defeat ELITE FOUR KAREN to proceed!'],
+        '🔒 CHAMBER DOOR'
+      );
+      return;
+    }
+
+    if (warp.targetMapId === 'tin_tower_1f' && !storyFlags.has('has_clear_bell') && !storyFlags.has('radio_tower_liberated')) {
+      player.isMoving = false;
+      player.progress = 0;
+      isCutsceneLocked = false;
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        ['WISE SAGE: Tin Tower is forbidden to all unless they bear the sacred CLEAR BELL!'],
+        '🏮 WISE SAGE'
+      );
+      return;
+    }
+
     const previousMapId = currentM.id;
     const transitionConfig = mapManager.resolveWarpTransition(warp);
 
@@ -2863,6 +2967,7 @@ async function bootstrap() {
 
         // Strictly await 100% texture hydration while transition veil is 100% black (BUGFIX-ASYNC-TILE-TEXTURE-FADE-SYNC-01)
         await overworldRenderer.ensureMapTilesLoaded(targetMap, lookupMap);
+        applyMapStoryMutations(targetMap);
         overworldRenderer.renderMap(targetMap, lookupMap);
         syncMapOverworldItems(targetMap);
         overworldHUD.updateRouteName(targetMap.name);
@@ -3996,8 +4101,341 @@ async function bootstrap() {
           return;
         }
 
-        // Clair Gym Leader Boss
-        if (targetNpc.action === 'CLAIR_EVENT' && !storyFlags.has('clair_defeated')) {
+        // Radio Tower: Fake Director Petrel (Act 7 Mission M09 Step 1)
+        if (targetNpc.action === 'FAKE_DIRECTOR_EVENT' || targetNpc.id === 'petrel_radio_5f') {
+          if (storyFlags.has('fake_director_defeated')) {
+            overworldHUD.openDialogue(
+              ['PETREL: Grr... The real DIRECTOR is hidden in the underground warehouse! But you\'ll never figure out the path!'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          const challenge = targetNpc.challengePages && targetNpc.challengePages.length > 0
+            ? targetNpc.challengePages
+            : ["PETREL: Wahahaha! I'm an imposter! You'll never get the BASEMENT KEY!"];
+          overworldHUD.openDialogue(challenge, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Executive Petrel',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('petrel');
+                storyFlags.add('fake_director_defeated');
+                addOverworldItemToInventory('basement-key');
+                storyFlags.add('has_basement_key');
+                missionManager.checkStoryFlags(storyFlags);
+                audioManager.playSfx('sfx_badge_get');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    'PETREL: Wah! I lost?! Fine, take the BASEMENT KEY!',
+                    'The real DIRECTOR is imprisoned deep inside the UNDERGROUND WAREHOUSE! But you\'ll never find him in that maze!',
+                    `${playerName} received the BASEMENT KEY!`,
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    const curMap = mapManager.getCurrentMap();
+                    if (curMap) {
+                      overworldRenderer.renderMap(curMap, lookupMap);
+                      syncMapOverworldItems(curMap);
+                    }
+                    saveCurrentGame();
+                    overworldHUD.showToast('🗝️ Defeated Executive Petrel & received BASEMENT KEY!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Goldenrod Underground: True Director Rescue (Act 7 Mission M09 Steps 2 & 3)
+        if (targetNpc.action === 'TRUE_DIRECTOR_EVENT' || targetNpc.id === 'true_director') {
+          if (storyFlags.has('card_key_obtained')) {
+            overworldHUD.openDialogue(
+              ['DIRECTOR: Please use that CARD KEY to unlock the 3F security shutters and save the RADIO TOWER!'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          storyFlags.add('warehouse_unlocked');
+          storyFlags.add('card_key_obtained');
+          addOverworldItemToInventory('card-key');
+          storyFlags.add('has_card_key');
+          missionManager.checkStoryFlags(storyFlags);
+          audioManager.playSfx('sfx_badge_get');
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          overworldHUD.openDialogue(
+            [
+              'DIRECTOR: You came all the way down here to rescue me?! Thank you, thank you!',
+              'TEAM ROCKET locked me away and hijacked the observation deck transmitter on 5F to summon GIOVANNI!',
+              'Take this CARD KEY! It will unlock the 3F security shutters in the RADIO TOWER so you can stop them!',
+              `${playerName} received the CARD KEY!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              saveCurrentGame();
+              overworldHUD.showToast('💳 Rescued the Director & received CARD KEY!');
+            }
+          );
+          return;
+        }
+
+        // Radio Tower: Executive Archer Boss (Act 7 Mission M09 Step 5 Climax)
+        if (targetNpc.action === 'ARCHER_EVENT' || targetNpc.id === 'archer_radio_5f') {
+          if (storyFlags.has('radio_tower_liberated')) {
+            overworldHUD.openDialogue(
+              ['The broadcast console is powered down and the transmitter is peaceful once more.'],
+              '📻 TRANSMITTER'
+            );
+            return;
+          }
+          const challenge = targetNpc.challengePages && targetNpc.challengePages.length > 0
+            ? targetNpc.challengePages
+            : ['ARCHER: TEAM ROCKET will never perish! Feel our ultimate might!'];
+          overworldHUD.openDialogue(challenge, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Executive Archer',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('archer');
+                storyFlags.add('archer_defeated');
+                storyFlags.add('radio_tower_liberated');
+                storyFlags.add('reached_observation_deck');
+                storyFlags.add('has_clear_bell');
+                addOverworldItemToInventory('clear-bell');
+                addOverworldItemToInventory('rainbow-wing');
+                missionManager.checkStoryFlags(storyFlags);
+                missionManager.completeMission('M09');
+                audioManager.playSfx('sfx_badge_get');
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    'ARCHER: How could this be...?! TEAM ROCKET\'s grand ambitions shattered again by a lone child?!',
+                    'It is finished... GIOVANNI will not return. TEAM ROCKET will disband this day!',
+                    'Executive Archer and the remaining grunts fled from Goldenrod City forever!',
+                    'DIRECTOR: You did it! You drove off TEAM ROCKET and saved all of JOHTO\'s airwaves!',
+                    'Please, take these legendary sacred treasures: the CLEAR BELL and RAINBOW WING!',
+                    `${playerName} received the CLEAR BELL and RAINBOW WING!`,
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    const curMap = mapManager.getCurrentMap();
+                    if (curMap) {
+                      overworldRenderer.renderMap(curMap, lookupMap);
+                      syncMapOverworldItems(curMap);
+                    }
+                    saveCurrentGame();
+                    overworldHUD.showToast('🔔 Liberated Radio Tower! Received CLEAR BELL & RAINBOW WING!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Radio Tower: Director Peace Dialogue (After liberation)
+        if (targetNpc.action === 'RADIO_DIRECTOR_AFTER_EVENT' || targetNpc.id === 'radio_director') {
+          overworldHUD.openDialogue(
+            [
+              'DIRECTOR: Hello, Gold! Thanks to your bravery, our music and news programs are broadcasting peacefully throughout JOHTO!',
+              'You should visit the historic TIN TOWER in Ecruteak City with that CLEAR BELL in hand!',
+            ],
+            targetNpc.speaker
+          );
+          return;
+        }
+
+        // Tin Tower: Legendary Suicune Altar Encounter (Act 8 Mission M11)
+        if (targetNpc.action === 'SUICUNE_TIN_TOWER_EVENT' || targetNpc.id === 'suicune_altar') {
+          if (storyFlags.has('suicune_caught_or_defeated')) {
+            overworldHUD.openDialogue(
+              ['The ancient stone altar is serene, bathed in warm, crystal light.'],
+              '💎 TIN TOWER ALTAR'
+            );
+            return;
+          }
+          BattleAudio.playCry('suicune');
+          overworldHUD.openDialogue(
+            [
+              'SUICUNE: Gurr-oooh!',
+              'The sacred north wind swirls through the chamber! The crystal beast tests your worthiness!',
+            ],
+            '💎 SUICUNE',
+            () => {
+              const suicunePkmn = PokemonFactory.create('suicune', 40, [
+                'aurorabeam',
+                'gust',
+                'rain-dance',
+                'surf',
+              ]);
+              triggerBattle(suicunePkmn, {
+                onBattleEnd: (_res) => {
+                  storyFlags.add('suicune_caught_or_defeated');
+                  storyFlags.add('suicune_altar_reached');
+                  storyFlags.add('wise_trio_cleared');
+                  missionManager.checkStoryFlags(storyFlags);
+                  missionManager.completeMission('M11');
+                  const curMap = mapManager.getCurrentMap();
+                  if (curMap) {
+                    overworldRenderer.renderMap(curMap, lookupMap);
+                    syncMapOverworldItems(curMap);
+                  }
+                  saveCurrentGame();
+                  overworldHUD.openDialogue(
+                    [
+                      'SUICUNE bowed with divine elegance before bounding toward the endless horizons!',
+                      'EUSINE: Staggering! The crystal beast recognized your heroic bond and valor!',
+                    ],
+                    '🎩 EUSINE',
+                    () => {
+                      overworldHUD.showToast('💎 Cleared the Suicune Trial at Tin Tower!');
+                    }
+                  );
+                },
+              });
+            }
+          );
+          return;
+        }
+
+        // Dragon Shrine: Dragon Elder Quiz & Rising Badge Grant (Act 8 Mission M10)
+        if (targetNpc.action === 'DRAGON_ELDER_EVENT' || targetNpc.id === 'dragon_elder') {
+          if (storyFlags.has('dragon_elder_quiz_passed')) {
+            overworldHUD.openDialogue(
+              [
+                'ELDER: You possess the soul and empathy of a true master. May dragons watch over your path to the LEAGUE!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          overworldHUD.openDialogue(
+            [
+              'ELDER: Hm! You have traversed the perilous DRAGON\'S DEN to reach our sacred shrine.',
+              'Before granting our blessing, I must test your true philosophy toward POKéMON.',
+              'Question 1: What are POKéMON to you? ...A partner and friend.',
+              'Question 2: What helps you triumph in battles? ...Training, strategy, and mutual trust.',
+              'Question 3: What kind of trainer do you wish to battle? ...Tough opponents to grow together.',
+              'Question 4: What is the most important thing for raising POKéMON? ...Love, knowledge, and compassion.',
+              'Question 5: Strong POKéMON or weak POKéMON? ...Both are precious! True skill brings out the best in all!',
+              'ELDER: Magnificent! You hold POKéMON in the highest esteem. Your answers are exemplary!',
+              'CLAIR burst into the shrine chamber, gasping for breath!',
+              'CLAIR: ELDER! Did this trainer truly pass the Dragon Clan\'s trial?!',
+              'ELDER: They did, CLAIR. You must learn from this trainer\'s humility and deep devotion.',
+              'CLAIR: ...I understand. I lost. You truly deserve this BADGE!',
+              `${playerName} received the RISINGBADGE and TM24 DRAGONBREATH!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              storyFlags.add('dragon_elder_quiz_passed');
+              storyFlags.add('reached_dragon_shrine');
+              storyFlags.add('clair_conceded');
+              storyFlags.add('clair_defeated');
+              if (!inventory.badges.includes('rising')) inventory.badges.push('rising');
+              if (!inventory.tms.includes('TM24')) inventory.tms.push('TM24');
+              addOverworldItemToInventory('master-ball');
+              if (playerParty.length < 6) {
+                const dratini = PokemonFactory.create('dratini', 15, [
+                  'extremespeed',
+                  'thunderwave',
+                  'twister',
+                  'dragonrage',
+                ]);
+                dratini.nickname = 'DRATINI';
+                playerParty.push(dratini);
+                storyFlags.add('received_shrine_dratini');
+              }
+              missionManager.checkStoryFlags(storyFlags);
+              missionManager.completeMission('M10');
+              audioManager.playSfx('sfx_badge_get');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              saveCurrentGame();
+              overworldHUD.showToast('🐉 Earned RISING BADGE, TM24, & Dratini from Dragon Shrine!');
+            }
+          );
+          return;
+        }
+
+        // Victory Road Rival Boss Encounter (Act 9 Mission M12 Step 3)
+        if (targetNpc.action === 'VICTORY_ROAD_RIVAL_EVENT' || targetNpc.id === 'victory_road_rival') {
+          if (storyFlags.has('victory_road_rival_defeated')) {
+            overworldHUD.openDialogue(
+              [
+                'RIVAL: …Go on to the LEAGUE. Next time we battle, I will prove that I have changed!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+          const challenge = targetNpc.challengePages && targetNpc.challengePages.length > 0
+            ? targetNpc.challengePages
+            : ['RIVAL: I have assembled the ultimate team of ruthless, powerful POKéMON! Let\'s finish this!'];
+          overworldHUD.openDialogue(challenge, targetNpc.speaker, () => {
+            const team = buildTrainerTeamInstances(targetNpc);
+            if (team.length === 0) return;
+            triggerBattle(team[0], {
+              isTrainer: true,
+              isGymLeader: true,
+              trainerName: targetNpc.trainerName || 'Rival',
+              trainerTeam: team,
+              onVictory: () => {
+                defeatedTrainers.add('rival_victory_road');
+                storyFlags.add('victory_road_rival_defeated');
+                storyFlags.add('badge_gates_passed');
+                storyFlags.add('crossed_tohjo_falls');
+                missionManager.checkStoryFlags(storyFlags);
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                overworldHUD.openDialogue(
+                  [
+                    'RIVAL: …I couldn\'t win… Even after pushing my POKéMON to their absolute limits…',
+                    'Is it true what LANCE said to me back in Mahogany? That I lacked trust and affection for my partners…?',
+                    '…I won\'t give up. Go on to the LEAGUE! Become the CHAMPION so I have someone worthy to chase!',
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    const curMap = mapManager.getCurrentMap();
+                    if (curMap) {
+                      overworldRenderer.renderMap(curMap, lookupMap);
+                      syncMapOverworldItems(curMap);
+                    }
+                    saveCurrentGame();
+                    overworldHUD.showToast('🔴 Defeated Rival on Victory Road!');
+                  }
+                );
+              },
+            });
+          });
+          return;
+        }
+
+        // Clair Gym Leader Boss (Blackthorn Gym)
+        if (targetNpc.action === 'CLAIR_EVENT') {
+          if (storyFlags.has('dragon_elder_quiz_passed') || storyFlags.has('clair_conceded')) {
+            overworldHUD.openDialogue(
+              ['CLAIR: You passed the DRAGON ELDER\'s test and earned the RISINGBADGE! Good luck at the POKéMON LEAGUE!'],
+              targetNpc.speaker
+            );
+            return;
+          }
+          if (storyFlags.has('clair_defeated')) {
+            overworldHUD.openDialogue(
+              [
+                'CLAIR: I won\'t acknowledge this loss yet!',
+                'Go behind the GYM into the DRAGON\'S DEN and pass the DRAGON ELDER\'s trial if you want the RISINGBADGE!'
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
           overworldHUD.openDialogue(
             targetNpc.challengePages && targetNpc.challengePages.length > 0 ? targetNpc.challengePages : ['CLAIR: I am the best dragon master! Not even you can defeat me!'],
             targetNpc.speaker,
@@ -4012,16 +4450,17 @@ async function bootstrap() {
                 onVictory: () => {
                   defeatedTrainers.add('clair');
                   storyFlags.add('clair_defeated');
-                  if (!inventory.badges.includes('rising')) inventory.badges.push('rising');
-                  if (!inventory.tms.includes('TM24')) inventory.tms.push('TM24');
-                  audioManager.playSfx('sfx_badge_get');
-                  BattleAudio.playOverworldSound('KEY_ITEM');
+                  missionManager.checkStoryFlags(storyFlags);
                   overworldHUD.openDialogue(
-                    ['CLAIR: I lost?! Fine, take the RISINGBADGE and TM24 DRAGONBREATH!'],
+                    [
+                      'CLAIR: I... I lost?! But... I won\'t acknowledge it!',
+                      'I refuse to hand over the BADGE until you take the DRAGON USER\'s test!',
+                      'Enter the DRAGON\'S DEN behind the GYM and pass the DRAGON ELDER\'s trial!'
+                    ],
                     targetNpc.speaker,
                     () => {
                       saveCurrentGame();
-                      overworldHUD.showToast('🐉 Received RISING BADGE & TM24 from Leader Clair!');
+                      overworldHUD.showToast('🐉 Defeated Leader Clair! Enter Dragon\'s Den for the Elder\'s trial!');
                     }
                   );
                 },
@@ -4140,7 +4579,14 @@ async function bootstrap() {
         }
 
         // Elite Four, Champion Lance & Red
-        if (targetNpc.action === 'E4_EVENT' && !storyFlags.has(`${targetNpc.trainerId}_defeated`)) {
+        const isEliteOrChampionAction =
+          targetNpc.action === 'E4_EVENT' ||
+          targetNpc.action === 'CHAMPION_LANCE_EVENT' ||
+          targetNpc.action === 'E4_WILL_EVENT' ||
+          targetNpc.action === 'E4_KOGA_EVENT' ||
+          targetNpc.action === 'E4_BRUNO_EVENT' ||
+          targetNpc.action === 'E4_KAREN_EVENT';
+        if (isEliteOrChampionAction && !storyFlags.has(`${targetNpc.trainerId}_defeated`)) {
           overworldHUD.openDialogue(
             targetNpc.challengePages && targetNpc.challengePages.length > 0 ? targetNpc.challengePages : ['Prepare yourself!'],
             targetNpc.speaker,
@@ -4155,16 +4601,30 @@ async function bootstrap() {
                 onVictory: () => {
                   defeatedTrainers.add(targetNpc.trainerId || 'e4');
                   storyFlags.add(`${targetNpc.trainerId}_defeated`);
+                  if (targetNpc.trainerId === 'karen') {
+                    storyFlags.add('karen_defeated');
+                  }
                   audioManager.playSfx('sfx_badge_get');
                   BattleAudio.playOverworldSound('KEY_ITEM');
                   const champion = targetNpc.trainerId === 'lance';
-                  if (champion) storyFlags.add('champion_defeated');
+                  if (champion) {
+                    storyFlags.add('lance_defeated');
+                    storyFlags.add('champion_lance_defeated');
+                    storyFlags.add('champion_defeated');
+                    addOverworldItemToInventory('ss-ticket');
+                    missionManager.checkStoryFlags(storyFlags);
+                    missionManager.completeMission('M12');
+                  }
                   overworldHUD.openDialogue(
-                    [champion ? 'LANCE: ...It is over. You are the new POKéMON LEAGUE CHAMPION!' : `${targetNpc.speaker}: You have defeated me!`],
+                    [
+                      champion
+                        ? 'LANCE: ...It is over. You and your Pokémon possess unbreakable spirit and mutual trust! Welcome to the HALL OF FAME! You are the new POKéMON LEAGUE CHAMPION! Please accept this S.S. AQUA TICKET for your travels to Kanto!'
+                        : `${targetNpc.speaker}: You have defeated me! Proceed to the next chamber!`
+                    ],
                     targetNpc.speaker,
                     () => {
                       saveCurrentGame();
-                      overworldHUD.showToast(champion ? '🏆 You are the new CHAMPION!' : '⭐ Challenger victorious!');
+                      overworldHUD.showToast(champion ? '👑 INDUCTED INTO THE HALL OF FAME! YOU ARE THE LEAGUE CHAMPION!' : `⭐ Defeated ${targetNpc.trainerName || targetNpc.speaker}!`);
                     }
                   );
                 },
@@ -6354,8 +6814,7 @@ async function bootstrap() {
       const tileIdx = facingY * currentMap.width + facingX;
       const facingTileName = currentMap.tileMap[tileIdx] || '';
       const isIlexCutTree =
-        currentMap.id === 'ilex_forest' &&
-        ((facingX === 8 && facingY === 25) || (facingX === 8 && facingY === 22));
+        currentMap.id === 'ilex_forest' && facingX === 8 && facingY === 25;
       const isCutTree =
         isIlexCutTree ||
         (currentMap.collisionGrid[tileIdx] === 1 &&
@@ -6363,10 +6822,8 @@ async function bootstrap() {
             facingTileName.includes('13_15_45_1d') ||
             facingTileName.includes('2d_2e_3d_3e') ||
             facingTileName.includes('28_39_38_3a') ||
-            facingTileName.includes('_5b') ||
-            facingTileName.includes('_5f') ||
-            facingTileName.includes('_64') ||
-            facingTileName.includes('_65')));
+            facingTileName.includes('cut_tree') ||
+            facingTileName.includes('cuttable')));
 
       if (isCutTree) {
         const cutCheck = ModernHMHandler.checkCut(inventory, storyFlags, playerParty);
@@ -6392,10 +6849,8 @@ async function bootstrap() {
               currentMap.tileMap![tileIdx] = replacementTile;
               if (currentMap.id === 'ilex_forest') {
                 currentMap.collisionGrid[25 * currentMap.width + 8] = 0;
-                currentMap.collisionGrid[22 * currentMap.width + 8] = 0;
                 if (currentMap.tileMap) {
                   currentMap.tileMap[25 * currentMap.width + 8] = 'in_forest_05_05_05_05';
-                  currentMap.tileMap[22 * currentMap.width + 8] = 'in_forest_05_05_05_05';
                 }
                 storyFlags.add('ilex_tree_cut');
                 storyFlags.add('cut_used_in_ilex');

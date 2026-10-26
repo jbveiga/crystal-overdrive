@@ -41,7 +41,10 @@ export type NpcSpriteType =
   | 'super_nerd'
   | 'youngster'
   | 'slowpoke'
-  | 'farfetchd';
+  | 'farfetchd'
+  | 'blackbelt'
+  | 'cooltrainer_f'
+  | 'cooltrainer_m';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
@@ -128,7 +131,19 @@ export interface GridEntity {
     | 'ROCKET_GENERATOR_ELECTRODE'
     | 'AZALEA_RIVAL_EVENT'
     | 'CHARCOAL_KILN_APPRENTICE_EVENT'
-    | 'SWEET_SCENT_TEACHER_EVENT';
+    | 'SWEET_SCENT_TEACHER_EVENT'
+    | 'FAKE_DIRECTOR_EVENT'
+    | 'TRUE_DIRECTOR_EVENT'
+    | 'ARCHER_EVENT'
+    | 'RADIO_DIRECTOR_AFTER_EVENT'
+    | 'SUICUNE_TIN_TOWER_EVENT'
+    | 'DRAGON_ELDER_EVENT'
+    | 'VICTORY_ROAD_RIVAL_EVENT'
+    | 'CHAMPION_LANCE_EVENT'
+    | 'E4_WILL_EVENT'
+    | 'E4_KOGA_EVENT'
+    | 'E4_BRUNO_EVENT'
+    | 'E4_KAREN_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

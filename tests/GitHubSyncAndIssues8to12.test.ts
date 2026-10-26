@@ -130,12 +130,103 @@ describe('GitHub Issues #8, #9, #10, #11, #12 & Headless Sync Suite', () => {
     expect(mainContent).toContain('OPEN GITHUB ISSUE');
   });
 
-  it('Headless GitHub Sync module: contains comprehensive resolution mapping for issues #8 through #16', () => {
-    for (const id of [8, 9, 10, 11, 12, 15, 16]) {
+  it('Headless GitHub Sync module: contains comprehensive resolution mapping for issues #8 through #20', () => {
+    for (const id of [8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20]) {
       expect(ISSUE_RESOLUTIONS[id]).toBeDefined();
       expect(ISSUE_RESOLUTIONS[id].resolution.length).toBeGreaterThan(100);
       expect(ISSUE_RESOLUTIONS[id].resolution).toContain('Root Cause');
       expect(ISSUE_RESOLUTIONS[id].resolution).toContain('Fix');
     }
+  });
+
+  it('Issue #17: Ilex Forest shrine tiles are solid and bgEvent is registered', () => {
+    const ilexMapPath = path.resolve(__dirname, '../public/assets/data/maps/ilex_forest.json');
+    const ilexData = JSON.parse(fs.readFileSync(ilexMapPath, 'utf8'));
+
+    // Shrine tiles (7, 22), (8, 22), (9, 22), (8, 23) must be solid
+    expect(ilexData.collisionGrid[22 * ilexData.width + 7]).toBe(1);
+    expect(ilexData.collisionGrid[22 * ilexData.width + 8]).toBe(1);
+    expect(ilexData.collisionGrid[22 * ilexData.width + 9]).toBe(1);
+    expect(ilexData.collisionGrid[23 * ilexData.width + 8]).toBe(1);
+
+    // Shrine bgEvent registered at (8, 23)
+    const shrineBgEvent = ilexData.bgEvents?.find((bg: any) => bg.x === 8 && bg.y === 23);
+    expect(shrineBgEvent).toBeDefined();
+    expect(shrineBgEvent.speaker).toContain('ILEX FOREST SHRINE');
+  });
+
+  it('Issue #18: forest_lass is relocated out of the 1-tile corridor to the shrine clearing', () => {
+    const npcs = createNpcsByMap();
+    const forestLass = npcs.ilex_forest?.find((n) => n.id === 'forest_lass');
+    expect(forestLass).toBeDefined();
+    expect(forestLass!.x).toBe(7);
+    expect(forestLass!.y).toBe(23);
+    expect(forestLass!.originX).toBe(7);
+    expect(forestLass!.originY).toBe(23);
+    expect(forestLass!.direction).toBe('DOWN');
+
+    // Verify (3, 24) in Ilex Forest is an unblocked walkable corridor
+    const ilexMapPath = path.resolve(__dirname, '../public/assets/data/maps/ilex_forest.json');
+    const ilexData = JSON.parse(fs.readFileSync(ilexMapPath, 'utf8'));
+    expect(ilexData.collisionGrid[24 * ilexData.width + 3]).toBe(0);
+  });
+
+  it('Issue #19: Azalea Town gate sign bgEvent is registered and main.ts avoids broad cut-tree substrings', () => {
+    const azaleaMapPath = path.resolve(__dirname, '../public/assets/data/maps/azalea_town.json');
+    const azaleaData = JSON.parse(fs.readFileSync(azaleaMapPath, 'utf8'));
+
+    const gateSign = azaleaData.bgEvents?.find((bg: any) => bg.x === 3 && bg.y === 9);
+    expect(gateSign).toBeDefined();
+    expect(gateSign.speaker).toContain('ILEX FOREST GATE');
+
+    const mainTsPath = path.resolve(__dirname, '../src/main.ts');
+    const mainContent = fs.readFileSync(mainTsPath, 'utf8');
+
+    // Ensure broad substring checks '_5f' and '_5b' are not in isCutTree
+    expect(mainContent).not.toMatch(/facingTileName\.includes\(['"]_5f['"]\)/);
+    expect(mainContent).not.toMatch(/facingTileName\.includes\(['"]_5b['"]\)/);
+  });
+
+  it('Issue #20: applyMapStoryMutations updates cut tree tile before renderMap', () => {
+    const mainTsPath = path.resolve(__dirname, '../src/main.ts');
+    const mainContent = fs.readFileSync(mainTsPath, 'utf8');
+
+    expect(mainContent).toContain('applyMapStoryMutations(targetMap)');
+    expect(mainContent).toContain("tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05'");
+    // Verify shrine roof at (8, 22) is not made walkable
+    expect(mainContent).not.toMatch(/collisionGrid\[22 \* map\.width \+ 8\] = 0/);
+  });
+
+  it('All Johto climax progression NPCs and events are defined in npcData', () => {
+    const npcs = createNpcsByMap();
+
+    // Radio Tower 5F
+    expect(npcs.radio_tower_5f).toBeDefined();
+    expect(npcs.radio_tower_5f.find((n) => n.id === 'petrel_radio_5f')).toBeDefined();
+    expect(npcs.radio_tower_5f.find((n) => n.id === 'archer_radio_5f')).toBeDefined();
+    expect(npcs.radio_tower_5f.find((n) => n.id === 'radio_director')).toBeDefined();
+
+    // Goldenrod Underground
+    expect(npcs.goldenrod_underground).toBeDefined();
+    expect(npcs.goldenrod_underground.find((n) => n.id === 'true_director')).toBeDefined();
+
+    // Tin Tower 1F Suicune Altar
+    expect(npcs.tin_tower_1f).toBeDefined();
+    expect(npcs.tin_tower_1f.find((n) => n.id === 'suicune_altar')).toBeDefined();
+
+    // Dragon Shrine & Elder
+    expect(npcs.dragon_shrine).toBeDefined();
+    expect(npcs.dragon_shrine.find((n) => n.id === 'dragon_elder')).toBeDefined();
+
+    // Victory Road Rival
+    expect(npcs.victory_road).toBeDefined();
+    expect(npcs.victory_road.find((n) => n.id === 'victory_road_rival')).toBeDefined();
+
+    // Elite Four & Champion Lance
+    expect(npcs.wills_room?.find((n) => n.id === 'e4_will')).toBeDefined();
+    expect(npcs.kogas_room?.find((n) => n.id === 'e4_koga')).toBeDefined();
+    expect(npcs.brunos_room?.find((n) => n.id === 'e4_bruno')).toBeDefined();
+    expect(npcs.karens_room?.find((n) => n.id === 'e4_karen')).toBeDefined();
+    expect(npcs.lances_room?.find((n) => n.id === 'champion_lance')).toBeDefined();
   });
 });

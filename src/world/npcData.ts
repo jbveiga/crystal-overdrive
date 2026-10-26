@@ -335,6 +335,45 @@ export function isNpcActiveForStoryFlags(
     return !storyFlags.has('rocket_base_generator_cleared');
   }
 
+  // Radio Tower & Underground Takeover (Act 7)
+  if (npcId === 'petrel_radio_5f') {
+    return storyFlags.has('pryce_defeated') && !storyFlags.has('fake_director_defeated');
+  }
+  if (npcId === 'archer_radio_5f') {
+    return storyFlags.has('card_key_obtained') && !storyFlags.has('radio_tower_liberated');
+  }
+  if (npcId === 'radio_director') {
+    return !storyFlags.has('pryce_defeated') || storyFlags.has('radio_tower_liberated');
+  }
+  if (npcId === 'true_director') {
+    return storyFlags.has('fake_director_defeated') && !storyFlags.has('radio_tower_liberated');
+  }
+
+  // Tin Tower Suicune Altar (Act 8)
+  if (npcId === 'suicune_altar') {
+    return storyFlags.has('has_clear_bell') && !storyFlags.has('suicune_caught_or_defeated');
+  }
+
+  // Victory Road Rival & Indigo Plateau Elite Four (Act 9)
+  if (npcId === 'victory_road_rival') {
+    return !storyFlags.has('victory_road_rival_defeated');
+  }
+  if (npcId === 'e4_will') {
+    return !storyFlags.has('will_defeated');
+  }
+  if (npcId === 'e4_koga') {
+    return !storyFlags.has('koga_defeated');
+  }
+  if (npcId === 'e4_bruno') {
+    return !storyFlags.has('bruno_defeated');
+  }
+  if (npcId === 'e4_karen') {
+    return !storyFlags.has('karen_defeated');
+  }
+  if (npcId === 'champion_lance') {
+    return !storyFlags.has('champion_defeated');
+  }
+
   return true;
 }
 
@@ -2439,9 +2478,9 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       ),
       makeNpc(
         'forest_lass',
-        3,
-        24,
-        'RIGHT',
+        7,
+        23,
+        'DOWN',
         'girl',
         '👧 LASS',
         [
@@ -3022,6 +3061,20 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
     goldenrod_underground: [
       makeNpc(
+        'true_director',
+        24,
+        25,
+        'DOWN',
+        'elder',
+        '📻 REAL DIRECTOR',
+        [
+          "DIRECTOR: Ah! You found me! I was kidnapped and locked in this dark underground warehouse by TEAM ROCKET!",
+          "They disguised an executive as me to hijack our broadcast frequency!",
+          "Take this CARD KEY! It opens the security shutters on the 3rd floor of the RADIO TOWER!",
+        ],
+        { action: 'TRUE_DIRECTOR_EVENT' }
+      ),
+      makeNpc(
         'super_nerd_eric',
         8,
         12,
@@ -3276,6 +3329,59 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
     radio_tower_5f: [
       makeNpc(
+        'petrel_radio_5f',
+        5,
+        4,
+        'DOWN',
+        'elder',
+        '📻 RADIO DIRECTOR (PETREL)',
+        [
+          "DIRECTOR: Y-you! You drove us out of the MAHOGANY hideout!",
+          "Hahaha! Fooled you! I am PETREL, EXECUTIVE of TEAM ROCKET!",
+          "We are taking over this tower to broadcast across the globe to our lost leader GIOVANNI!",
+        ],
+        {
+          action: 'FAKE_DIRECTOR_EVENT',
+          trainerId: 'petrel_fake_director',
+          trainerName: 'Executive Petrel',
+          challengePages: [
+            "PETREL: Hahaha! You fell right into my trap! I'm disguised as the DIRECTOR! Prepare to feel TEAM ROCKET's wrath!",
+          ],
+          trainerPokemon: { speciesId: 'koffing', level: 30, moves: ['sludge', 'smokescreen', 'tackle'] },
+          trainerTeam: [
+            { speciesId: 'koffing', level: 30, moves: ['sludge', 'smokescreen', 'tackle'] },
+            { speciesId: 'koffing', level: 30, moves: ['sludge', 'smokescreen', 'tackle'] },
+            { speciesId: 'koffing', level: 30, moves: ['sludge', 'smokescreen', 'tackle'] },
+            { speciesId: 'weezing', level: 32, moves: ['sludge', 'explosion', 'tackle'] },
+          ],
+        }
+      ),
+      makeNpc(
+        'archer_radio_5f',
+        5,
+        4,
+        'DOWN',
+        'rocket_grunt_m',
+        '⚡ EXECUTIVE ARCHER',
+        [
+          "ARCHER: It's no use! The broadcast has already reached maximum transmitter power!",
+        ],
+        {
+          action: 'ARCHER_EVENT',
+          trainerId: 'archer_radio',
+          trainerName: 'Executive Archer',
+          challengePages: [
+            "ARCHER: Giovanni will answer our signal! TEAM ROCKET will never perish! I will crush you where you stand!",
+          ],
+          trainerPokemon: { speciesId: 'houndour', level: 33, moves: ['bite', 'ember', 'smog'] },
+          trainerTeam: [
+            { speciesId: 'houndour', level: 33, moves: ['bite', 'ember', 'smog'] },
+            { speciesId: 'koffing', level: 33, moves: ['sludge', 'smokescreen', 'poisongas'] },
+            { speciesId: 'houndoom', level: 35, moves: ['flamethrower', 'crunch', 'roar'] },
+          ],
+        }
+      ),
+      makeNpc(
         'radio_director',
         5,
         4,
@@ -3283,8 +3389,8 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         'elder',
         '📻 RADIO DIRECTOR',
         [
-          "I'm the DIRECTOR of the GOLDENROD RADIO TOWER. Our broadcast tower reaches every corner of JOHTO and KANTO!",
-          'Music and news unite trainers across all regions.',
+          "DIRECTOR: Thank you from the bottom of my heart for liberating our RADIO TOWER!",
+          "Music and peace have returned to Johto!",
         ]
       ),
     ],
@@ -4181,10 +4287,22 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ],
     tin_tower_1f: [
       makeNpc(
-        'tin_tower_sage',
+        'suicune_altar',
         9,
         9,
         'DOWN',
+        'lapras',
+        '💎 SUICUNE',
+        [
+          "SUICUNE: Gurr-oooh! The crystal beast radiates pure, divine luminescence!",
+        ],
+        { action: 'SUICUNE_TIN_TOWER_EVENT' }
+      ),
+      makeNpc(
+        'tin_tower_sage',
+        7,
+        13,
+        'RIGHT',
         'sage',
         '🏮 TOWER SAGE',
         [
@@ -4841,6 +4959,205 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
           "Take this SOFT SAND! It boosts the power of GROUND-type moves!",
         ],
         { action: 'DAY_SIBLING_EVENT' }
+      ),
+    ],
+
+    dragon_shrine: [
+      makeNpc(
+        'dragon_elder',
+        5,
+        3,
+        'DOWN',
+        'elder',
+        '🐉 DRAGON MASTER ELDER',
+        [
+          "ELDER: Welcome, young trainer, to the sacred DRAGON SHRINE.",
+          "CLAIR brought you here to test your worthiness as a true dragon disciple.",
+        ],
+        { action: 'DRAGON_ELDER_EVENT' }
+      ),
+    ],
+
+    victory_road: [
+      makeNpc(
+        'victory_road_rival',
+        10,
+        4,
+        'DOWN',
+        'super_nerd',
+        '🔴 RIVAL',
+        [
+          "RIVAL: You really made it through VICTORY ROAD? Don't think for a second that you're stronger than me!",
+        ],
+        {
+          action: 'VICTORY_ROAD_RIVAL_EVENT',
+          trainerId: 'rival_victory_road',
+          trainerName: 'Rival',
+          visionRange: 3,
+          challengePages: [
+            "RIVAL: I have assembled the ultimate team of ruthless, powerful POKéMON! I'll crush you before you even see the LEAGUE doors!",
+          ],
+          trainerPokemon: { speciesId: 'sneasel', level: 36, moves: ['slash', 'feint-attack', 'quickattack'] },
+          trainerTeam: [
+            { speciesId: 'sneasel', level: 36, moves: ['slash', 'feint-attack', 'quickattack'] },
+            { speciesId: 'golbat', level: 36, moves: ['wing-attack', 'bite', 'confuseray'] },
+            { speciesId: 'magneton', level: 35, moves: ['thundershock', 'sonicboom', 'supersonic'] },
+            { speciesId: 'kadabra', level: 35, moves: ['psybeam', 'recover', 'disable'] },
+            { speciesId: 'haunter', level: 35, moves: ['shadowball', 'curse', 'night-shade'] },
+            { speciesId: 'feraligatr', level: 38, moves: ['surf', 'bite', 'slash', 'scaryface'] },
+          ],
+        }
+      ),
+    ],
+
+    wills_room: [
+      makeNpc(
+        'e4_will',
+        5,
+        5,
+        'DOWN',
+        'psychic',
+        '🎭 ELITE FOUR WILL',
+        [
+          "WILL: Welcome to the POKéMON LEAGUE! I am WILL, master of psychic power!",
+        ],
+        {
+          action: 'E4_WILL_EVENT',
+          trainerId: 'will',
+          trainerName: 'Elite Four Will',
+          challengePages: [
+            "WILL: I have trained all over the world to hone my psychic powers. Even if you defeated all 8 GYM LEADERS, you cannot break through my mind!",
+          ],
+          trainerPokemon: { speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] },
+          trainerTeam: [
+            { speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] },
+            { speciesId: 'jynx', level: 41, moves: ['icepunch', 'lovelykiss', 'psychic'] },
+            { speciesId: 'exeggutor', level: 41, moves: ['reflect', 'eggbomb', 'psychic'] },
+            { speciesId: 'slowbro', level: 41, moves: ['amnesia', 'surf', 'psychic'] },
+            { speciesId: 'xatu', level: 42, moves: ['confuseray', 'psychic', 'future-sight'] },
+          ],
+        }
+      ),
+    ],
+
+    kogas_room: [
+      makeNpc(
+        'e4_koga',
+        5,
+        5,
+        'DOWN',
+        'super_nerd',
+        '🥷 ELITE FOUR KOGA',
+        [
+          "KOGA: Fwahahaha! A mere child reached me?! I am KOGA of the ELITE FOUR!",
+        ],
+        {
+          action: 'E4_KOGA_EVENT',
+          trainerId: 'koga',
+          trainerName: 'Elite Four Koga',
+          challengePages: [
+            "KOGA: I have mastered ancient ninja techniques and toxic poisons! Feel the creeping dread of darkness!",
+          ],
+          trainerPokemon: { speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] },
+          trainerTeam: [
+            { speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] },
+            { speciesId: 'venomoth', level: 41, moves: ['supersonic', 'gust', 'toxic'] },
+            { speciesId: 'forretress', level: 43, moves: ['spikes', 'swift', 'explosion'] },
+            { speciesId: 'muk', level: 42, moves: ['minimize', 'acid-armor', 'sludge-bomb'] },
+            { speciesId: 'crobat', level: 44, moves: ['wing-attack', 'confuseray', 'toxic'] },
+          ],
+        }
+      ),
+    ],
+
+    brunos_room: [
+      makeNpc(
+        'e4_bruno',
+        5,
+        5,
+        'DOWN',
+        'blackbelt',
+        '🥋 ELITE FOUR BRUNO',
+        [
+          "BRUNO: I am BRUNO of the ELITE FOUR! Through rigorous training, humans and POKéMON become one!",
+        ],
+        {
+          action: 'E4_BRUNO_EVENT',
+          trainerId: 'bruno',
+          trainerName: 'Elite Four Bruno',
+          challengePages: [
+            "BRUNO: We have lived and trained together in the deepest mountains! Feel our iron fists!",
+          ],
+          trainerPokemon: { speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] },
+          trainerTeam: [
+            { speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] },
+            { speciesId: 'hitmonlee', level: 42, moves: ['jump-kick', 'high-jump-kick', 'foresight'] },
+            { speciesId: 'hitmonchan', level: 42, moves: ['thunderpunch', 'icepunch', 'firepunch'] },
+            { speciesId: 'onix', level: 43, moves: ['rock-throw', 'earthquake', 'slam'] },
+            { speciesId: 'machamp', level: 46, moves: ['cross-chop', 'rock-slide', 'vital-throw'] },
+          ],
+        }
+      ),
+    ],
+
+    karens_room: [
+      makeNpc(
+        'e4_karen',
+        5,
+        5,
+        'DOWN',
+        'cooltrainer_f',
+        '🌙 ELITE FOUR KAREN',
+        [
+          "KAREN: I am KAREN of the ELITE FOUR. Strong POKéMON. Weak POKéMON. That is only the selfish perception of people.",
+        ],
+        {
+          action: 'E4_KAREN_EVENT',
+          trainerId: 'karen',
+          trainerName: 'Elite Four Karen',
+          challengePages: [
+            "KAREN: Truly skilled trainers should try to win with their favorites. Let me show you what real bond means!",
+          ],
+          trainerPokemon: { speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] },
+          trainerTeam: [
+            { speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] },
+            { speciesId: 'vileplume', level: 42, moves: ['stun-spore', 'acid', 'moonlight', 'petaldance'] },
+            { speciesId: 'gengar', level: 45, moves: ['shadowball', 'spite', 'curse', 'lick'] },
+            { speciesId: 'murkrow', level: 44, moves: ['faint-attack', 'wing-attack', 'whirlwind'] },
+            { speciesId: 'houndoom', level: 47, moves: ['flamethrower', 'crunch', 'roar'] },
+          ],
+        }
+      ),
+    ],
+
+    lances_room: [
+      makeNpc(
+        'champion_lance',
+        5,
+        6,
+        'DOWN',
+        'cooltrainer_m',
+        '👑 CHAMPION LANCE',
+        [
+          "LANCE: I have been waiting for you, trainer. I knew that you, with your valor and bond, would reach me.",
+        ],
+        {
+          action: 'CHAMPION_LANCE_EVENT',
+          trainerId: 'lance',
+          trainerName: 'Champion Lance',
+          challengePages: [
+            "LANCE: As the POKéMON LEAGUE CHAMPION, I accept your challenge! Dragon-types are invincible! Let's begin!",
+          ],
+          trainerPokemon: { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
+          trainerTeam: [
+            { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
+            { speciesId: 'dragonite', level: 47, moves: ['thunderwave', 'twister', 'hyperbeam'] },
+            { speciesId: 'dragonite', level: 47, moves: ['blizzard', 'twister', 'hyperbeam'] },
+            { speciesId: 'aerodactyl', level: 46, moves: ['wing-attack', 'rock-slide', 'hyperbeam'] },
+            { speciesId: 'charizard', level: 46, moves: ['flamethrower', 'wing-attack', 'slash'] },
+            { speciesId: 'dragonite', level: 50, moves: ['outrage', 'safeguard', 'hyperbeam', 'fire-blast'] },
+          ],
+        }
       ),
     ],
   };
