@@ -5376,3 +5376,70 @@ export function applyMapNpcStoryMutations(
 
   return filtered;
 }
+
+/**
+ * Resolves Prof. Elm's lab dialogue and action state.
+ * Guarantees that players who already own a partner Pokémon in party (or have 'starter_chosen')
+ * are never prompted to pick a starter from the table again.
+ */
+export function resolveElmLabDialogue(
+  playerName: string,
+  storyFlags: ReadonlySet<string>,
+  party: ReadonlyArray<{ speciesId: string; isEgg?: boolean }> = []
+): { pages: string[]; action: 'PROMPT_STARTER' | 'PROMPT_POLICE' | 'DELIVER_MYSTERY_EGG' | 'HEAL_AND_SAVE' } {
+  const hasStarter = storyFlags.has('starter_chosen') || party.some((p) => !p.isEgg);
+
+  if (!hasStarter) {
+    return {
+      action: 'PROMPT_STARTER',
+      pages: [
+        `PROF. ELM: Hi, ${playerName}! I've been waiting for you!`,
+        'I want you to run an errand for me! MR. POKéMON beyond CHERRYGROVE CITY on ROUTE 30 sent word of a rare discovery.',
+        "I'd like you to go examine it for me. Choose one of the POKéMON in the BALLS on that table to accompany you!",
+      ],
+    };
+  }
+
+  if (storyFlags.has('HAS_MYSTERY_EGG') && !storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')) {
+    if (storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') && !storyFlags.has('EVENT_RIVAL_NAMED')) {
+      return {
+        action: 'PROMPT_POLICE',
+        pages: [
+          `PROF. ELM: ${playerName}! Did the officer question you about the break-in?`,
+          'Please speak to the POLICE OFFICER first so we can help the investigation!',
+        ],
+      };
+    }
+
+    return {
+      action: 'DELIVER_MYSTERY_EGG',
+      pages: [
+        `PROF. ELM: ${playerName}! You're back!`,
+        'And you brought the MYSTERY EGG!',
+        "This... this is an incredible discovery! I'll examine it thoroughly at once!",
+        `${playerName} handed the MYSTERY EGG to PROF. ELM!`,
+        'PROF. ELM: Take on the JOHTO GYM CHALLENGE! Your first stop is the VIOLET CITY GYM!',
+      ],
+    };
+  }
+
+  if (storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')) {
+    return {
+      action: 'HEAL_AND_SAVE',
+      pages: [
+        `PROF. ELM: How is your POKéMON journey going, ${playerName}?`,
+        'The GYM LEADER in VIOLET CITY is FALKNER, a master of BIRD POKéMON!',
+        "Here—let me heal your team so you're ready!",
+      ],
+    };
+  }
+
+  return {
+    action: 'HEAL_AND_SAVE',
+    pages: [
+      `PROF. ELM: Hi, ${playerName}! How is your partner POKéMON doing?`,
+      'MR. POKéMON lives a bit past CHERRYGROVE CITY on ROUTE 30. Take care on your way!',
+      'Here—let me heal your POKéMON and record your research progress!',
+    ],
+  };
+}

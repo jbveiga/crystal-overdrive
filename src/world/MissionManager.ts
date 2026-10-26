@@ -1,5 +1,6 @@
 import type { Mission, MissionFilter, MissionStep, SerializedMissionState } from '../types/game';
 import { createDefaultMissions } from './missionData';
+import { STARTER_LINEAGE_MAP } from '../core/SaveManager';
 
 export interface MissionManagerCallbacks {
   onMissionUnlocked?: (mission: Mission) => void;
@@ -117,6 +118,49 @@ export class MissionManager {
         storyFlags.add('entered_azalea_town');
       }
     }
+    return this.checkStoryFlags(storyFlags);
+  }
+
+  /**
+   * Reconciles starter story flags from the player's party/species and evaluates mission progression.
+   * Guarantees that legacy saves with a starter in party automatically complete M01 Step 1
+   * and unlock M02, S03, and S04.
+   */
+  public reconcileStarterState(
+    party: ReadonlyArray<{ speciesId: string; isEgg?: boolean }>,
+    storyFlags: Set<string>
+  ): { newlyUnlocked: Mission[]; newlyCompleted: Mission[]; advanced: Mission[] } {
+    let baseStarter: 'cyndaquil' | 'totodile' | 'chikorita' | undefined;
+    for (const p of party) {
+      if (p.isEgg) continue;
+      const sid = (p.speciesId || '').toLowerCase();
+      if (STARTER_LINEAGE_MAP[sid]) {
+        baseStarter = STARTER_LINEAGE_MAP[sid];
+        break;
+      }
+    }
+
+    const hasStarterFlags =
+      storyFlags.has('starter_chosen') ||
+      storyFlags.has('starter_cyndaquil') ||
+      storyFlags.has('starter_totodile') ||
+      storyFlags.has('starter_chikorita');
+
+    const hasPartyPokemon = party.some((p) => !p.isEgg);
+
+    if (baseStarter || hasPartyPokemon || hasStarterFlags) {
+      storyFlags.add('starter_chosen');
+      if (baseStarter) {
+        const hasSpecificStarter =
+          storyFlags.has('starter_cyndaquil') ||
+          storyFlags.has('starter_totodile') ||
+          storyFlags.has('starter_chikorita');
+        if (!hasSpecificStarter) {
+          storyFlags.add(`starter_${baseStarter}`);
+        }
+      }
+    }
+
     return this.checkStoryFlags(storyFlags);
   }
 

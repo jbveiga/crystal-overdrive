@@ -65,6 +65,18 @@ const DB_VERSION = 1;
 const STORE_NAME = 'saves';
 const SAVE_KEY = 'main-save';
 
+export const STARTER_LINEAGE_MAP: Readonly<Record<string, 'cyndaquil' | 'totodile' | 'chikorita'>> = {
+  cyndaquil: 'cyndaquil',
+  quilava: 'cyndaquil',
+  typhlosion: 'cyndaquil',
+  totodile: 'totodile',
+  croconaw: 'totodile',
+  feraligatr: 'totodile',
+  chikorita: 'chikorita',
+  bayleef: 'chikorita',
+  meganium: 'chikorita',
+};
+
 const LOCATION_NAME_TABLE: Record<string, string> = {
   new_bark_town: 'New Bark Town',
   players_house_1f: "Player's House",
@@ -155,8 +167,76 @@ export class SaveManager {
       .join(' ');
   }
 
+  /**
+   * Reconciles legacy save states where the player already owns a starter (or party Pokémon)
+   * from an earlier game version but lacks 'starter_chosen' / 'starter_<species>' in storyFlags.
+   */
+  public static reconcileStarterFlags(save: SaveData): void {
+    if (!save) return;
+    save.storyFlags = Array.isArray(save.storyFlags) ? save.storyFlags : [];
+
+    // 1. Gather all candidate Pokémon from party, box, and storage boxes
+    const candidatePkmn: Array<{ speciesId?: string; isEgg?: boolean }> = [];
+    if (Array.isArray(save.party)) {
+      candidatePkmn.push(...save.party);
+    }
+    if (Array.isArray(save.box)) {
+      candidatePkmn.push(...save.box);
+    }
+    if (save.storage && Array.isArray(save.storage.boxes)) {
+      for (const b of save.storage.boxes) {
+        if (Array.isArray(b.pokemon)) {
+          candidatePkmn.push(...b.pokemon);
+        }
+      }
+    }
+
+    const nonEggPkmn = candidatePkmn.filter((p) => !p.isEgg && p.speciesId);
+    if (nonEggPkmn.length === 0 && (!Array.isArray(save.party) || save.party.length === 0)) {
+      return;
+    }
+
+    // 2. Check for starter lineage
+    let baseStarter: 'cyndaquil' | 'totodile' | 'chikorita' | undefined;
+    for (const p of nonEggPkmn) {
+      const sid = (p.speciesId || '').toLowerCase();
+      if (STARTER_LINEAGE_MAP[sid]) {
+        baseStarter = STARTER_LINEAGE_MAP[sid];
+        break;
+      }
+    }
+
+    // Fallback: check seenSpecies
+    if (!baseStarter && Array.isArray(save.seenSpecies)) {
+      for (const s of save.seenSpecies) {
+        const sid = (s || '').toLowerCase();
+        if (STARTER_LINEAGE_MAP[sid]) {
+          baseStarter = STARTER_LINEAGE_MAP[sid];
+          break;
+        }
+      }
+    }
+
+    const hasPartyPokemon = Array.isArray(save.party) && save.party.some((p) => !p.isEgg);
+    if (baseStarter || hasPartyPokemon) {
+      if (!save.storyFlags.includes('starter_chosen')) {
+        save.storyFlags.push('starter_chosen');
+      }
+      if (baseStarter) {
+        const hasSpecificStarter =
+          save.storyFlags.includes('starter_cyndaquil') ||
+          save.storyFlags.includes('starter_totodile') ||
+          save.storyFlags.includes('starter_chikorita');
+        if (!hasSpecificStarter) {
+          save.storyFlags.push(`starter_${baseStarter}`);
+        }
+      }
+    }
+  }
+
   public async saveGame(data: SaveData): Promise<boolean> {
     try {
+      SaveManager.reconcileStarterFlags(data);
       data.timestamp = Date.now();
       this.memoryStore.set(SAVE_KEY, JSON.parse(JSON.stringify(data)));
       if (this.dbPromise) {
@@ -183,6 +263,7 @@ export class SaveManager {
         loaded = memSave ? JSON.parse(JSON.stringify(memSave)) : null;
       }
       if (loaded) {
+        SaveManager.reconcileStarterFlags(loaded);
         if (!loaded.options) {
           loaded.options = SaveManager.getDefaultOptions();
         } else if (!loaded.options.expShare) {

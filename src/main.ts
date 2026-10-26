@@ -69,6 +69,7 @@ import {
   GUIDE_GENT_TOUR_LEGS,
   isNpcActiveForStoryFlags,
   applyMapNpcStoryMutations,
+  resolveElmLabDialogue,
 } from './world/npcData';
 import { TrackedStoryFlagSet, ActiveNpcCache } from './world/ActiveNpcCache';
 export {
@@ -181,7 +182,7 @@ async function bootstrap() {
       existingSave.fruitTreePicks || existingSave.harvestedFruitTrees
     );
     missionManager.deserialize(existingSave.missions);
-    missionManager.checkStoryFlags(storyFlags);
+    missionManager.reconcileStarterState(playerParty, storyFlags);
 
     initialMapId = existingSave.player.mapId;
     initialPlayerX = existingSave.player.x;
@@ -5628,45 +5629,29 @@ async function bootstrap() {
           return;
         }
 
-        // Prof. Elm Lab Starter Dialogue & Errands (Ticket 6.1 & BUGFIX-NARRATIVE-01)
+        // Prof. Elm Lab Starter Dialogue & Errands (Ticket 6.1, BUGFIX-NARRATIVE-01, BUGFIX-ISSUE-26-STARTER-RECONCILIATION-01)
         if (targetNpc.id === 'elm_npc') {
-          if (!storyFlags.has('starter_chosen')) {
-            overworldHUD.openDialogue(
-              [
-                `PROF. ELM: Hi, ${playerName}! I've been waiting for you!`,
-                'I want you to run an errand for me! MR. POKéMON beyond CHERRYGROVE CITY on ROUTE 30 sent word of a rare discovery.',
-                "I'd like you to go examine it for me. Choose one of the POKéMON in the BALLS on that table to accompany you!",
-              ],
-              targetNpc.speaker
-            );
+          missionManager.reconcileStarterState(playerParty, storyFlags);
+          const elmDialogue = resolveElmLabDialogue(playerName, storyFlags, playerParty);
+
+          if (elmDialogue.action === 'PROMPT_STARTER') {
+            overworldHUD.openDialogue(elmDialogue.pages, targetNpc.speaker);
             return;
           }
 
-          if (storyFlags.has('HAS_MYSTERY_EGG') && !storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')) {
-            if (storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') && !storyFlags.has('EVENT_RIVAL_NAMED')) {
-              overworldHUD.openDialogue(
-                [
-                  `PROF. ELM: ${playerName}! Did the officer question you about the break-in?`,
-                  'Please speak to the POLICE OFFICER first so we can help the investigation!',
-                ],
-                '🔬 PROF. ELM'
-              );
-              return;
-            }
+          if (elmDialogue.action === 'PROMPT_POLICE') {
+            overworldHUD.openDialogue(elmDialogue.pages, '🔬 PROF. ELM');
+            return;
+          }
 
+          if (elmDialogue.action === 'DELIVER_MYSTERY_EGG') {
             storyFlags.add('EVENT_GAVE_MYSTERY_EGG_TO_ELM');
             if (inventory.keyItems) {
               inventory.keyItems = inventory.keyItems.filter((k) => k !== 'MYSTERY EGG');
             }
             BattleAudio.playOverworldSound('KEY_ITEM');
             overworldHUD.openDialogue(
-              [
-                `PROF. ELM: ${playerName}! You're back!`,
-                'And you brought the MYSTERY EGG!',
-                "This... this is an incredible discovery! I'll examine it thoroughly at once!",
-                `${playerName} handed the MYSTERY EGG to PROF. ELM!`,
-                'PROF. ELM: Take on the JOHTO GYM CHALLENGE! Your first stop is the VIOLET CITY GYM!',
-              ],
+              elmDialogue.pages,
               '🔬 PROF. ELM',
               () => {
                 inventory.balls['poke-ball'] = (inventory.balls['poke-ball'] || 0) + 5;
@@ -5687,24 +5672,14 @@ async function bootstrap() {
             return;
           }
 
-          const postEggPages = storyFlags.has('EVENT_GAVE_MYSTERY_EGG_TO_ELM')
-            ? [
-                `PROF. ELM: How is your POKéMON journey going, ${playerName}?`,
-                'The GYM LEADER in VIOLET CITY is FALKNER, a master of BIRD POKéMON!',
-                "Here—let me heal your team so you're ready!",
-              ]
-            : [
-                `PROF. ELM: Hi, ${playerName}! How is your partner POKéMON doing?`,
-                'MR. POKéMON lives a bit past CHERRYGROVE CITY on ROUTE 30. Take care on your way!',
-                'Here—let me heal your POKéMON and record your research progress!',
-              ];
-
-          overworldHUD.openDialogue(postEggPages, '🔬 PROF. ELM', () => {
-            healPlayerParty(false);
-            saveCurrentGame();
-            overworldHUD.playFieldRestAnimation();
-          });
-          return;
+          if (elmDialogue.action === 'HEAL_AND_SAVE') {
+            overworldHUD.openDialogue(elmDialogue.pages, '🔬 PROF. ELM', () => {
+              healPlayerParty(false);
+              saveCurrentGame();
+              overworldHUD.playFieldRestAnimation();
+            });
+            return;
+          }
         }
 
         if (targetNpc.action === 'UNOWN_DEX_EVENT') {
@@ -5891,6 +5866,7 @@ async function bootstrap() {
               seenSpecies.add(chosen.speciesId);
               storyFlags.add('starter_chosen');
               storyFlags.add(`starter_${chosen.speciesId}`);
+              missionManager.reconcileStarterState(playerParty, storyFlags);
               overworldRenderer.removeItemBall(`${chosen.speciesId}_ball`);
               syncMapOverworldItems(currentMap);
               BattleAudio.playOverworldSound('KEY_ITEM');
