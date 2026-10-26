@@ -79,6 +79,8 @@ export {
 } from './world/npcData';
 import { syncGitHubIssues } from './sync/githubSync';
 import { mountGitHubReportButton } from './ui/BugReportModal';
+import { StoryCutscenes, type StoryCutsceneContext } from './world/StoryCutscenes';
+import { BattleController } from './battle/BattleController';
 
 declare global {
   interface Window {
@@ -588,23 +590,8 @@ async function bootstrap() {
     },
   });
 
-  // Hydrate remaining world maps lazily in the background after boot
-  setTimeout(async () => {
-    try {
-      const bundleRes = await fetch('./assets/data/world_maps.json');
-      if (bundleRes.ok) {
-        const bundleMaps: MapData[] = await bundleRes.json();
-        for (const m of bundleMaps) {
-          if (!mapManager.getMap(m.id)) {
-            mapManager.registerMap(m);
-          }
-        }
-      }
-    } catch {
-      // Individual maps will continue to load on-demand via mapManager.ensureMapLoaded
-    }
-  }, 1500);
-
+  // Performance optimization: eliminate eager 3.2MB heap memory spike at t+1.5s.
+  // Maps stream asynchronously on-demand via mapManager.ensureMapLoaded (fallback: './assets/data/world_maps.json').
   let initialMap = mapManager.setCurrentMap(initialMapId);
   if (!mapManager.isWalkable(initialPlayerX, initialPlayerY)) {
     initialMapId = 'new_bark_town';
@@ -749,13 +736,76 @@ async function bootstrap() {
   const missionLogUI = new MissionLogUI('modal-container', missionManager);
   const itemfinderHUD = new ItemfinderHUD('overworld-hud-container');
   const namingModalUI = new NamingModalUI('overworld-hud-container');
-  const boxManagementUI = new BoxManagementUI('modal-container');
-  const townMapUI = new TownMapUI({ containerId: 'modal-container' });
-  const ruinsPuzzleModalUI = new RuinsPuzzleModalUI('modal-container');
+
+  // Lazy-instantiated secondary modal controllers (zero DOM allocation on boot)
+  let _boxManagementUI: BoxManagementUI | null = null;
+  const getBoxManagementUI = () => {
+    if (!_boxManagementUI) _boxManagementUI = new BoxManagementUI('modal-container');
+    return _boxManagementUI;
+  };
+  const boxManagementUI = {
+    isOpen: () => _boxManagementUI?.isOpen() ?? false,
+    open: (...args: Parameters<BoxManagementUI['open']>) => getBoxManagementUI().open(...args),
+    close: () => _boxManagementUI?.close(),
+  };
+
+  let _townMapUI: TownMapUI | null = null;
+  const getTownMapUI = () => {
+    if (!_townMapUI) _townMapUI = new TownMapUI({ containerId: 'modal-container' });
+    return _townMapUI;
+  };
+  const townMapUI = {
+    isOpen: () => _townMapUI?.isOpen() ?? false,
+    open: (...args: Parameters<TownMapUI['open']>) => getTownMapUI().open(...args),
+    close: () => _townMapUI?.close(),
+    handleKeyDown: (e: KeyboardEvent) => _townMapUI?.handleKeyDown(e) ?? false,
+  };
+
+  let _ruinsPuzzleModalUI: RuinsPuzzleModalUI | null = null;
+  const getRuinsPuzzleModalUI = () => {
+    if (!_ruinsPuzzleModalUI) _ruinsPuzzleModalUI = new RuinsPuzzleModalUI('modal-container');
+    return _ruinsPuzzleModalUI;
+  };
+  const ruinsPuzzleModalUI = {
+    isOpen: () => _ruinsPuzzleModalUI?.isOpen() ?? false,
+    open: (...args: Parameters<RuinsPuzzleModalUI['open']>) => getRuinsPuzzleModalUI().open(...args),
+    close: () => _ruinsPuzzleModalUI?.close(),
+  };
+
   const dayCareManager = new DayCareManager(existingSave?.dayCare);
-  const dayCareModalUI = new DayCareModalUI(dayCareManager, 'modal-container');
-  const deptStoreElevatorUI = new DeptStoreElevatorUI('modal-container');
-  const radioTowerQuizUI = new RadioTowerQuizUI('modal-container');
+  let _dayCareModalUI: DayCareModalUI | null = null;
+  const getDayCareModalUI = () => {
+    if (!_dayCareModalUI) _dayCareModalUI = new DayCareModalUI(dayCareManager, 'modal-container');
+    return _dayCareModalUI;
+  };
+  const dayCareModalUI = {
+    isOpen: () => _dayCareModalUI?.isOpen() ?? false,
+    open: (...args: Parameters<DayCareModalUI['open']>) => getDayCareModalUI().open(...args),
+    close: () => _dayCareModalUI?.close(),
+  };
+
+  let _deptStoreElevatorUI: DeptStoreElevatorUI | null = null;
+  const getDeptStoreElevatorUI = () => {
+    if (!_deptStoreElevatorUI) _deptStoreElevatorUI = new DeptStoreElevatorUI('modal-container');
+    return _deptStoreElevatorUI;
+  };
+  const deptStoreElevatorUI = {
+    isOpen: () => _deptStoreElevatorUI?.isOpen() ?? false,
+    open: (...args: Parameters<DeptStoreElevatorUI['open']>) => getDeptStoreElevatorUI().open(...args),
+    close: () => _deptStoreElevatorUI?.close(),
+  };
+
+  let _radioTowerQuizUI: RadioTowerQuizUI | null = null;
+  const getRadioTowerQuizUI = () => {
+    if (!_radioTowerQuizUI) _radioTowerQuizUI = new RadioTowerQuizUI('modal-container');
+    return _radioTowerQuizUI;
+  };
+  const radioTowerQuizUI = {
+    isOpen: () => _radioTowerQuizUI?.isOpen() ?? false,
+    open: (...args: Parameters<RadioTowerQuizUI['open']>) => getRadioTowerQuizUI().open(...args),
+    close: () => _radioTowerQuizUI?.close(),
+  };
+
   const bugContestManager = new BugContestManager(existingSave?.bugContestRecords);
   const stadiumArenaManager = new StadiumArenaManager();
   const bugContestHUD = new BugContestHUDWidget('overworld-hud-container');
@@ -2282,117 +2332,41 @@ async function bootstrap() {
     );
   };
 
+  let isCutsceneLocked = false;
+
+  const getCutsceneContext = (): StoryCutsceneContext => ({
+    player,
+    storyFlags,
+    defeatedTrainers,
+    playerParty,
+    rivalName,
+    playerName,
+    audioManager,
+    overworldRenderer,
+    overworldHUD,
+    npcsByMap,
+    gameClock,
+    mapManager,
+    roamingManager,
+    triggerBattle,
+    buildTrainerTeamInstances,
+    handleTrainerDefeatRewards,
+    saveCurrentGame,
+    setCutsceneLocked: (locked: boolean) => {
+      isCutsceneLocked = locked;
+    },
+  });
+
   const buildTrainerTeamInstances = (trainer: GridEntity): PokemonInstance[] => {
-    if (trainer.trainerTeam && trainer.trainerTeam.length > 0) {
-      return trainer.trainerTeam.map((spec) => {
-        const pkmn = PokemonFactory.create(spec.speciesId, spec.level, spec.moves);
-        if (spec.heldItem) pkmn.heldItem = spec.heldItem;
-        return pkmn;
-      });
-    }
-    if (trainer.trainerPokemon) {
-      const pkmn = PokemonFactory.create(
-        trainer.trainerPokemon.speciesId,
-        trainer.trainerPokemon.level,
-        trainer.trainerPokemon.moves
-      );
-      if (trainer.trainerPokemon.heldItem) pkmn.heldItem = trainer.trainerPokemon.heldItem;
-      return [pkmn];
-    }
-    return [];
+    return BattleController.buildTrainerTeamInstances(trainer);
   };
 
   const getOppositeDirection = (dir: Direction): Direction => {
-    switch (dir) {
-      case 'UP':
-        return 'DOWN';
-      case 'DOWN':
-        return 'UP';
-      case 'LEFT':
-        return 'RIGHT';
-      case 'RIGHT':
-        return 'LEFT';
-    }
+    return BattleController.getOppositeDirection(dir);
   };
 
-  let isCutsceneLocked = false;
-
-  /**
-   * Executes an authentic Gen 2 Line-of-Sight Trainer Encounter:
-   * 1. Locks player input & pops bouncy `[!]` balloon above trainer's head
-   * 2. Walks trainer tile-by-tile up to 1 tile away from the player
-   * 3. Turns player toward trainer, displays challenge dialogue, and starts Trainer Battle
-   */
   const runTrainerSightSequence = async (trainer: GridEntity) => {
-    if (!trainer.trainerId || !trainer.trainerPokemon) return;
-    isCutsceneLocked = true;
-    defeatedTrainers.add(trainer.trainerId);
-    player.isMoving = false;
-    player.progress = 0;
-
-    BattleAudio.playOverworldSound('EXCLAMATION');
-    await overworldRenderer.showExclamationBubble(trainer, Math.round(520 / gameClock.playerSpeed));
-
-    // Walk trainer up to 1 tile away from player
-    const delta = GridPhysics.getDirectionDelta(trainer.direction);
-    const stepsToWalk = Math.max(
-      0,
-      Math.abs(player.x - trainer.x) + Math.abs(player.y - trainer.y) - 1
-    );
-
-    for (let s = 0; s < stepsToWalk; s++) {
-      const startX = trainer.x;
-      const startY = trainer.y;
-      const nextX = startX + delta.dx;
-      const nextY = startY + delta.dy;
-      trainer.targetX = nextX;
-      trainer.targetY = nextY;
-      trainer.isMoving = true;
-      trainer.progress = 0;
-
-      const stepMs = (GridPhysics.BASE_TRAVERSAL_TIME * 1000) / gameClock.playerSpeed;
-      await new Promise<void>((resolve) => {
-        const t0 = performance.now();
-        const animateStep = (now: number) => {
-          const p = Math.min(1, (now - t0) / stepMs);
-          trainer.progress = p;
-          trainer.renderX = startX + (nextX - startX) * p;
-          trainer.renderY = startY + (nextY - startY) * p;
-          if (p < 1) {
-            requestAnimationFrame(animateStep);
-          } else {
-            trainer.x = nextX;
-            trainer.y = nextY;
-            trainer.renderX = nextX;
-            trainer.renderY = nextY;
-            trainer.isMoving = false;
-            trainer.progress = 0;
-            resolve();
-          }
-        };
-        requestAnimationFrame(animateStep);
-      });
-    }
-
-    player.direction = getOppositeDirection(trainer.direction);
-    const dialoguePages =
-      trainer.challengePages && trainer.challengePages.length > 0
-        ? trainer.challengePages
-        : trainer.pages || ['Let us battle!'];
-
-    overworldHUD.openDialogue(dialoguePages, trainer.speaker, () => {
-      isCutsceneLocked = false;
-      const team = buildTrainerTeamInstances(trainer);
-      if (team.length === 0) return;
-      triggerBattle(team[0], {
-        isTrainer: true,
-        trainerName: trainer.trainerName || trainer.speaker || 'Trainer',
-        trainerTeam: team,
-        onVictory: () => {
-          handleTrainerDefeatRewards(trainer);
-        },
-      });
-    });
+    return BattleController.runTrainerSightSequence(trainer, getCutsceneContext());
   };
 
   const completeSlowpokeWellProtonVictory = () => {
@@ -2545,207 +2519,7 @@ async function bootstrap() {
    * Leg 6: Guide Gent enters house at (25, 9) with DOOR sound. Despawns from Cherrygrove City. Unlocks isCutsceneLocked = false.
    */
   const runGuideGentWalkingTour = async (guide: GridEntity) => {
-    isCutsceneLocked = true;
-    player.isMoving = false;
-    player.progress = 0;
-
-    // If player interacted from the left (31, 6), reposition to (32, 7) facing UP so Guide Gent can step LEFT freely
-    if (player.x === 31 && player.y === 6) {
-      player.x = 32;
-      player.y = 7;
-      player.renderX = 32;
-      player.renderY = 7;
-      player.direction = 'UP';
-    }
-
-    const stepSimultaneous = async (
-      guideEntity: GridEntity,
-      guideDir: Direction,
-      follower: GridEntity,
-      followerTarget: { x: number; y: number } | null
-    ) => {
-      const d = GridPhysics.getDirectionDelta(guideDir);
-      const startGx = guideEntity.x;
-      const startGy = guideEntity.y;
-      const nextGx = startGx + d.dx;
-      const nextGy = startGy + d.dy;
-
-      guideEntity.direction = guideDir;
-      guideEntity.targetX = nextGx;
-      guideEntity.targetY = nextGy;
-      guideEntity.isMoving = true;
-      guideEntity.progress = 0;
-
-      const startPx = follower.x;
-      const startPy = follower.y;
-      let nextPx = startPx;
-      let nextPy = startPy;
-
-      if (followerTarget && (followerTarget.x !== startPx || followerTarget.y !== startPy)) {
-        nextPx = followerTarget.x;
-        nextPy = followerTarget.y;
-        if (nextPx > startPx) follower.direction = 'RIGHT';
-        else if (nextPx < startPx) follower.direction = 'LEFT';
-        else if (nextPy > startPy) follower.direction = 'DOWN';
-        else if (nextPy < startPy) follower.direction = 'UP';
-
-        follower.targetX = nextPx;
-        follower.targetY = nextPy;
-        follower.isMoving = true;
-        follower.progress = 0;
-      }
-
-      const stepMs = Math.max(16, Math.round((GridPhysics.BASE_TRAVERSAL_TIME * 1000) / (gameClock.playerSpeed || 1)));
-
-      await new Promise<void>((resolve) => {
-        if (typeof requestAnimationFrame === 'undefined') {
-          guideEntity.x = nextGx;
-          guideEntity.y = nextGy;
-          guideEntity.renderX = nextGx;
-          guideEntity.renderY = nextGy;
-          guideEntity.isMoving = false;
-          guideEntity.progress = 0;
-
-          follower.x = nextPx;
-          follower.y = nextPy;
-          follower.renderX = nextPx;
-          follower.renderY = nextPy;
-          follower.isMoving = false;
-          follower.progress = 0;
-          resolve();
-          return;
-        }
-
-        const t0 = performance.now();
-        const animate = (now: number) => {
-          const p = Math.min(1, (now - t0) / stepMs);
-          guideEntity.progress = p;
-          guideEntity.renderX = startGx + (nextGx - startGx) * p;
-          guideEntity.renderY = startGy + (nextGy - startGy) * p;
-
-          if (follower.isMoving) {
-            follower.progress = p;
-            follower.renderX = startPx + (nextPx - startPx) * p;
-            follower.renderY = startPy + (nextPy - startPy) * p;
-          }
-
-          if (p < 1) {
-            requestAnimationFrame(animate);
-          } else {
-            guideEntity.x = nextGx;
-            guideEntity.y = nextGy;
-            guideEntity.renderX = nextGx;
-            guideEntity.renderY = nextGy;
-            guideEntity.isMoving = false;
-            guideEntity.progress = 0;
-
-            follower.x = nextPx;
-            follower.y = nextPy;
-            follower.renderX = nextPx;
-            follower.renderY = nextPy;
-            follower.isMoving = false;
-            follower.progress = 0;
-            resolve();
-          }
-        };
-        requestAnimationFrame(animate);
-      });
-    };
-
-    const walkLegSteps = async (steps: Direction[], isRetire = false) => {
-      for (const step of steps) {
-        const followerTarget = isRetire ? null : { x: guide.x, y: guide.y };
-        await stepSimultaneous(guide, step, player, followerTarget);
-      }
-    };
-
-    // Leg 1: (32, 6) -> Pokemon Center (29, 5)
-    await walkLegSteps(GUIDE_GENT_TOUR_LEGS[0].steps);
-    guide.direction = 'UP';
-    player.direction = 'UP';
-
-    overworldHUD.openDialogue(
-      GUIDE_GENT_TOUR_LEGS[0].dialoguePages || [],
-      guide.speaker,
-      async () => {
-        // Leg 2: Pokemon Center -> Poke Mart (23, 5)
-        await walkLegSteps(GUIDE_GENT_TOUR_LEGS[1].steps);
-        guide.direction = 'UP';
-        player.direction = 'UP';
-
-        overworldHUD.openDialogue(
-          GUIDE_GENT_TOUR_LEGS[1].dialoguePages || [],
-          guide.speaker,
-          async () => {
-            // Leg 3: Poke Mart -> Route 30 Road (16, 5)
-            await walkLegSteps(GUIDE_GENT_TOUR_LEGS[2].steps);
-            guide.direction = 'UP';
-            player.direction = 'UP';
-
-            overworldHUD.openDialogue(
-              GUIDE_GENT_TOUR_LEGS[2].dialoguePages || [],
-              guide.speaker,
-              async () => {
-                // Leg 4: Route 30 Road -> The Sea (10, 7)
-                await walkLegSteps(GUIDE_GENT_TOUR_LEGS[3].steps);
-                guide.direction = 'LEFT';
-                player.direction = 'LEFT';
-
-                overworldHUD.openDialogue(
-                  GUIDE_GENT_TOUR_LEGS[3].dialoguePages || [],
-                  guide.speaker,
-                  async () => {
-                    // Leg 5: The Sea -> Guide Gent's House porch (25, 11)
-                    await walkLegSteps(GUIDE_GENT_TOUR_LEGS[4].steps);
-                    guide.direction = 'UP';
-                    player.direction = 'UP';
-                    await new Promise((r) => setTimeout(r, 200));
-                    guide.direction = 'LEFT';
-                    player.direction = 'RIGHT';
-
-                    const giftPages = [
-                      "GUIDE GENT: Here... It's my house! Thanks for your company. I'd like you to have this!",
-                      `${playerName}'s POKéGEAR now has a MAP!`,
-                      "GUIDE GENT: POKéGEAR becomes more useful as you add CARDS. I wish you luck on your journey!",
-                    ];
-
-                    overworldHUD.openDialogue(
-                      giftPages,
-                      guide.speaker,
-                      async () => {
-                        storyFlags.add('has_map_card');
-                        if (!inventory.keyItems) inventory.keyItems = [];
-                        if (!inventory.keyItems.includes('MAP CARD')) {
-                          inventory.keyItems.push('MAP CARD');
-                        }
-                        BattleAudio.playOverworldSound('KEY_ITEM');
-                        missionManager.checkStoryFlags(storyFlags);
-                        missionManager.completeMission('S02');
-                        overworldHUD.showToast('🗺️ Received MAP CARD! POKéGEAR can now display the JOHTO TOWN MAP!');
-                        saveCurrentGame();
-
-                        // Leg 6: Guide Gent enters house at (25, 9)
-                        player.direction = 'UP';
-                        await walkLegSteps(GUIDE_GENT_TOUR_LEGS[5].steps, true);
-
-                        BattleAudio.playOverworldSound('DOOR');
-                        if (npcsByMap.cherrygrove_city) {
-                          npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter(
-                            (n) => n.id !== 'cg_guide_gent'
-                          );
-                        }
-                        isCutsceneLocked = false;
-                        saveCurrentGame();
-                      }
-                    );
-                  }
-                );
-              }
-            );
-          }
-        );
-      }
-    );
+    return StoryCutscenes.runGuideGentWalkingTour(guide, getCutsceneContext());
   };
 
   const executeWarpTransition = async (warp: WarpEvent) => {
@@ -7011,407 +6785,25 @@ async function bootstrap() {
     mapManager.setNeighborScratchMap(null);
   };
 
-  // Slowpoke Well B1F: First Team Rocket Grunt Approaches & Blocks Corridor Path
+  // Scripted Story Cutscenes (StoryCutscenes.ts domain controller)
   const triggerSlowpokeWellGruntIntercept = async (grunt: GridEntity) => {
-    if (!grunt.trainerId || !grunt.trainerPokemon || defeatedTrainers.has(grunt.trainerId)) return;
-    isCutsceneLocked = true;
-    player.isMoving = false;
-    player.progress = 0;
-
-    BattleAudio.playOverworldSound('EXCLAMATION');
-    await overworldRenderer.showExclamationBubble(grunt, Math.round(520 / gameClock.playerSpeed));
-
-    const animateNpcStep = async (entity: GridEntity, nextX: number, nextY: number, dir: Direction) => {
-      const startX = entity.x;
-      const startY = entity.y;
-      entity.direction = dir;
-      entity.targetX = nextX;
-      entity.targetY = nextY;
-      entity.isMoving = true;
-      entity.progress = 0;
-      const stepMs = (GridPhysics.BASE_TRAVERSAL_TIME * 1000) / gameClock.playerSpeed;
-      await new Promise<void>((resolve) => {
-        const t0 = performance.now();
-        const animate = (now: number) => {
-          const p = Math.min(1, (now - t0) / stepMs);
-          entity.progress = p;
-          entity.renderX = startX + (nextX - startX) * p;
-          entity.renderY = startY + (nextY - startY) * p;
-          if (p < 1) {
-            requestAnimationFrame(animate);
-          } else {
-            entity.x = nextX;
-            entity.y = nextY;
-            entity.gridX = nextX;
-            entity.gridY = nextY;
-            entity.renderX = nextX;
-            entity.renderY = nextY;
-            entity.isMoving = false;
-            entity.progress = 0;
-            resolve();
-          }
-        };
-        requestAnimationFrame(animate);
-      });
-    };
-
-    // Align horizontally with player's column in the corridor so the grunt physically blocks their path
-    while (grunt.x !== player.x) {
-      const stepDir: Direction = player.x < grunt.x ? 'LEFT' : 'RIGHT';
-      const nextX = grunt.x + (stepDir === 'LEFT' ? -1 : 1);
-      await animateNpcStep(grunt, nextX, grunt.y, stepDir);
-    }
-
-    // Walk down to 1 tile north of the player to block the tunnel
-    grunt.direction = 'DOWN';
-    const targetY = Math.max(grunt.y, player.y - 1);
-    while (grunt.y < targetY) {
-      await animateNpcStep(grunt, grunt.x, grunt.y + 1, 'DOWN');
-    }
-
-    player.direction = 'UP';
-    const dialoguePages =
-      grunt.challengePages && grunt.challengePages.length > 0
-        ? grunt.challengePages
-        : grunt.pages || ["ROCKET GRUNT: Hold it right there, brat! You're not getting past me!"];
-
-    overworldHUD.openDialogue(dialoguePages, grunt.speaker, () => {
-      isCutsceneLocked = false;
-      const team = buildTrainerTeamInstances(grunt);
-      if (team.length === 0) return;
-      triggerBattle(team[0], {
-        isTrainer: true,
-        trainerName: grunt.trainerName || grunt.speaker || 'Rocket Grunt',
-        trainerTeam: team,
-        onVictory: () => {
-          defeatedTrainers.add(grunt.trainerId!);
-          handleTrainerDefeatRewards(grunt);
-          saveCurrentGame();
-        },
-      });
-    });
+    return StoryCutscenes.triggerSlowpokeWellGruntIntercept(grunt, getCutsceneContext());
   };
 
-  // Azalea Town West Gate: Rival Silver Ambush Encounter (Rival Battle 2)
   const triggerAzaleaRivalAmbush = () => {
-    isCutsceneLocked = true;
-    player.isMoving = false;
-    player.progress = 0;
-    player.direction = 'LEFT';
-
-    // Spawn Rival Silver sprite facing player at the west gate
-    const rivalX = Math.max(1, player.x - 1);
-    const rivalY = player.y;
-    const silverNpc = makeNpc(
-      'azalea_rival_cutscene',
-      rivalX,
-      rivalY,
-      'RIGHT',
-      'silver',
-      `❓ RIVAL ${rivalName || 'SILVER'}`,
-      []
-    );
-    if (!npcsByMap.azalea_town) npcsByMap.azalea_town = [];
-    npcsByMap.azalea_town = npcsByMap.azalea_town.filter((n) => n.id !== 'azalea_rival_cutscene');
-    npcsByMap.azalea_town.push(silverNpc);
-
-    let starterSpeciesId: 'croconaw' | 'bayleef' | 'quilava' = 'croconaw';
-    let starterMoves = ['scratch', 'leer', 'rage', 'watergun'];
-
-    if (
-      storyFlags.has('starter_cyndaquil') ||
-      playerParty.some((p) => p.speciesId === 'cyndaquil' || p.speciesId === 'quilava' || p.speciesId === 'typhlosion')
-    ) {
-      starterSpeciesId = 'croconaw';
-      starterMoves = ['scratch', 'leer', 'rage', 'watergun'];
-    } else if (
-      storyFlags.has('starter_totodile') ||
-      playerParty.some((p) => p.speciesId === 'totodile' || p.speciesId === 'croconaw' || p.speciesId === 'feraligatr')
-    ) {
-      starterSpeciesId = 'bayleef';
-      starterMoves = ['tackle', 'growl', 'razorleaf', 'reflect'];
-    } else {
-      starterSpeciesId = 'quilava';
-      starterMoves = ['tackle', 'leer', 'smokescreen', 'ember'];
-    }
-
-    const rivalTeam = [
-      PokemonFactory.create('gastly', 12, ['lick', 'spite', 'meanlook', 'curse']),
-      PokemonFactory.create('zubat', 14, ['leechlife', 'supersonic', 'bite']),
-      PokemonFactory.create(starterSpeciesId, 16, starterMoves),
-    ];
-
-    audioManager.playBattleBgm('trainer');
-    overworldHUD.openDialogue(
-      [
-        `${rivalName || 'SILVER'}: …Tell me something. Is it true that TEAM ROCKET has returned?`,
-        "What? You beat them? Hah! Quit lying!",
-        "You're not joking? Then let's see how good you really are!",
-      ],
-      `❓ RIVAL ${rivalName || 'SILVER'}`,
-      () => {
-        triggerBattle(rivalTeam[0], {
-          isTrainer: true,
-          trainerName: `Rival ${rivalName || 'Silver'}`,
-          trainerTeam: rivalTeam,
-          onVictory: () => {
-            storyFlags.add('azalea_rival_defeated');
-            storyFlags.add('EVENT_BEAT_RIVAL_IN_AZALEA');
-            defeatedTrainers.add('rival_azalea');
-            overworldHUD.openDialogue(
-              [
-                `${rivalName || 'SILVER'}: …Humph! Useless POKéMON!`,
-                'Listen, you. You only won because my POKéMON were weak!',
-                "I hate the weak. POKéMON, trainers. It doesn't matter who or what.",
-                "I'm going to be strong and wipe out the weak. That goes for TEAM ROCKET too.",
-                `Rival ${rivalName || 'Silver'} glared coldly and strode away!`,
-              ],
-              `❓ RIVAL ${rivalName || 'SILVER'}`,
-              () => {
-                if (npcsByMap.azalea_town) {
-                  npcsByMap.azalea_town = npcsByMap.azalea_town.filter(
-                    (n) => n.id !== 'azalea_rival_cutscene'
-                  );
-                }
-                isCutsceneLocked = false;
-                saveCurrentGame();
-                overworldHUD.showToast(`⚔️ Defeated Rival ${rivalName || 'Silver'}! The way to Ilex Forest is open!`);
-              }
-            );
-          },
-          onBattleEnd: (res) => {
-            if (res.winner !== 'PLAYER') {
-              if (npcsByMap.azalea_town) {
-                npcsByMap.azalea_town = npcsByMap.azalea_town.filter(
-                  (n) => n.id !== 'azalea_rival_cutscene'
-                );
-              }
-              isCutsceneLocked = false;
-            }
-          },
-        });
-      }
-    );
+    StoryCutscenes.triggerAzaleaRivalAmbush(getCutsceneContext());
   };
 
-  // Passerby Rival 1 Ambush Encounter (Cherrygrove East Exit)
   const triggerCherrygroveRivalAmbush = () => {
-    isCutsceneLocked = true;
-    player.isMoving = false;
-    player.progress = 0;
-    player.direction = 'RIGHT';
-
-    const rivalNpc = makeNpc(
-      'cherrygrove_rival_cutscene',
-      player.x + 1,
-      player.y,
-      'LEFT',
-      'silver',
-      '❓ PASSERBY BOY',
-      []
-    );
-    if (!npcsByMap.cherrygrove_city) npcsByMap.cherrygrove_city = [];
-    npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter(
-      (n) => n.id !== 'cherrygrove_rival_cutscene'
-    );
-    npcsByMap.cherrygrove_city.push(rivalNpc);
-
-    let rivalSpeciesId: 'totodile' | 'chikorita' | 'cyndaquil' = 'totodile';
-    let rivalMoves = ['scratch', 'leer'];
-    if (storyFlags.has('starter_cyndaquil') || playerParty.some((p) => p.speciesId === 'cyndaquil')) {
-      rivalSpeciesId = 'totodile';
-      rivalMoves = ['scratch', 'leer'];
-    } else if (storyFlags.has('starter_totodile') || playerParty.some((p) => p.speciesId === 'totodile')) {
-      rivalSpeciesId = 'chikorita';
-      rivalMoves = ['tackle', 'growl'];
-    } else if (storyFlags.has('starter_chikorita') || playerParty.some((p) => p.speciesId === 'chikorita')) {
-      rivalSpeciesId = 'cyndaquil';
-      rivalMoves = ['tackle', 'leer'];
-    }
-
-    const rivalPokemon = PokemonFactory.create(rivalSpeciesId, 5, rivalMoves);
-    audioManager.playBattleBgm('trainer');
-    overworldHUD.openDialogue(
-      [
-        '❓ PASSERBY BOY: <……> <……> <……>',
-        'You got a POKéMON at the LAB. What a waste. A wimp like you.',
-        '<……> <……> <……>',
-        "Don't you get what I'm saying?",
-        "Well, I too, have a good POKéMON. I'll show you what I mean!",
-      ],
-      '❓ PASSERBY BOY',
-      () => {
-        triggerBattle(rivalPokemon, {
-          isTrainer: true,
-          trainerName: 'Passerby ???',
-          trainerTeam: [rivalPokemon],
-          onVictory: () => {
-            overworldHUD.openDialogue(
-              [
-                '❓ PASSERBY BOY: Humph. Are you happy you won?',
-                '<……> <……> <……>',
-                "My name's ???. I'm going to be the world's greatest POKéMON trainer.",
-                'Get out of my way!',
-                `*BUMP!* The boy shoved past ${playerName} and bolted toward Route 29!`,
-                'As the boy shoved past, a card slipped from his jacket pocket!',
-                `${playerName} picked up the dropped TRAINER CARD!`,
-                'The name printed on the card reads: SILVER!',
-              ],
-              '❓ PASSERBY BOY',
-              () => {
-                if (npcsByMap.cherrygrove_city) {
-                  npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter(
-                    (n) => n.id !== 'cherrygrove_rival_cutscene'
-                  );
-                }
-                BattleAudio.playOverworldSound('BUMP');
-                BattleAudio.playOverworldSound('KEY_ITEM');
-                storyFlags.add('EVENT_RIVAL_CHERRYGROVE_DEFEATED');
-                defeatedTrainers.add('rival_cherrygrove');
-                isCutsceneLocked = false;
-                const freshNpcs = createNpcsByMap();
-                if (freshNpcs.elms_lab && npcsByMap.elms_lab) {
-                  const officer = freshNpcs.elms_lab.find((n) => n.id === 'lab_police_officer');
-                  if (officer && !npcsByMap.elms_lab.some((n) => n.id === 'lab_police_officer')) {
-                    npcsByMap.elms_lab.push(officer);
-                  }
-                }
-                saveCurrentGame();
-                overworldHUD.showToast('Dropped TRAINER CARD acquired! Suspect: SILVER');
-              }
-            );
-          },
-          onBattleEnd: (res) => {
-            if (res.winner !== 'PLAYER') {
-              if (npcsByMap.cherrygrove_city) {
-                npcsByMap.cherrygrove_city = npcsByMap.cherrygrove_city.filter(
-                  (n) => n.id !== 'cherrygrove_rival_cutscene'
-                );
-              }
-              isCutsceneLocked = false;
-            }
-          },
-        });
-      }
-    );
+    StoryCutscenes.triggerCherrygroveRivalAmbush(getCutsceneContext());
   };
 
-  // Rival Silver Ambush Encounter (Burned Tower 1F)
   const triggerBurnedTowerRivalBattle = () => {
-    isCutsceneLocked = true;
-    player.isMoving = false;
-    player.progress = 0;
-    player.direction = 'UP';
-
-    let starterSpeciesId: 'croconaw' | 'bayleef' | 'quilava' = 'croconaw';
-    let starterMoves = ['watergun', 'bite', 'rage', 'scaryface'];
-
-    if (storyFlags.has('starter_cyndaquil') || playerParty.some((p) => p.speciesId === 'cyndaquil' || p.speciesId === 'quilava' || p.speciesId === 'typhlosion')) {
-      starterSpeciesId = 'croconaw';
-      starterMoves = ['watergun', 'bite', 'rage', 'scaryface'];
-    } else if (storyFlags.has('starter_totodile') || playerParty.some((p) => p.speciesId === 'totodile' || p.speciesId === 'croconaw' || p.speciesId === 'feraligatr')) {
-      starterSpeciesId = 'bayleef';
-      starterMoves = ['razorleaf', 'poisonpowder', 'reflect', 'tackle'];
-    } else {
-      starterSpeciesId = 'quilava';
-      starterMoves = ['flamewheel', 'ember', 'quickattack', 'smokescreen'];
-    }
-
-    const rivalTeam = [
-      PokemonFactory.create('haunter', 20, ['nightshade', 'curse', 'spite', 'hypnosis']),
-      PokemonFactory.create('magnemite', 18, ['thundershock', 'supersonic', 'sonicboom', 'tackle']),
-      PokemonFactory.create('zubat', 20, ['bite', 'confuseray', 'wingattack', 'supersonic']),
-      PokemonFactory.create(starterSpeciesId, 22, starterMoves),
-    ];
-
-    audioManager.playBattleBgm('trainer');
-    overworldHUD.openDialogue(
-      [
-        'SILVER: …Hmph! You followed me all the way to ECRUTEAK?',
-        "Don't tell me you're chasing myths about legendary beasts too! Weaklings need legends. I only need supreme power!",
-        "Get out of my way! I'll show you what real strength looks like!",
-      ],
-      '❓ RIVAL SILVER',
-      () => {
-        triggerBattle(rivalTeam[0], {
-          isTrainer: true,
-          trainerName: rivalName || 'Rival Silver',
-          trainerTeam: rivalTeam,
-          onVictory: () => {
-            storyFlags.add('EVENT_BEAT_BURNED_TOWER_SILVER');
-            defeatedTrainers.add('silver_burned');
-            audioManager.playSfx('sfx_badge_get');
-            BattleAudio.playOverworldSound('KEY_ITEM');
-            overworldHUD.openDialogue(
-              [
-                "SILVER: …Tch! Why can't I beat you?!",
-                'I am training as hard as anyone, but my POKéMON are still lacking something…',
-                "…Whatever! I don't need useless legends anyway! Get lost!",
-              ],
-              '❓ RIVAL SILVER',
-              () => {
-                isCutsceneLocked = false;
-                const mapNpcs = npcsByMap['burned_tower_1f'] || [];
-                const silverNpc = mapNpcs.find((n) => n.id === 'silver_burned');
-                if (silverNpc) {
-                  silverNpc.x = 8;
-                  silverNpc.y = 10;
-                }
-                saveCurrentGame();
-                overworldHUD.showToast('Rival Silver stepped aside from the Burned Tower hole!');
-              }
-            );
-          },
-        });
-      }
-    );
+    StoryCutscenes.triggerBurnedTowerRivalBattle(getCutsceneContext());
   };
 
-  // Legendary Beasts Awakening Cutscene (Burned Tower B1F)
   const triggerBeastsAwakeningCutscene = () => {
-    if (storyFlags.has('beasts_awakened')) return;
-    isCutsceneLocked = true;
-    player.isMoving = false;
-    player.progress = 0;
-
-    BattleAudio.playOverworldSound('KEY_ITEM');
-
-    overworldHUD.openDialogue(
-      [
-        '⚡ Three legendary beasts stand frozen like statues atop ancient stone pedestals…',
-        'As you step forward, their stony skin shatters with radiant celestial energy!',
-      ],
-      '⚡ LEGENDARY BEASTS',
-      () => {
-        BattleAudio.playCry('raikou');
-        setTimeout(() => BattleAudio.playCry('entei'), 400);
-        setTimeout(() => BattleAudio.playCry('suicune'), 800);
-
-        setTimeout(() => {
-          overworldHUD.openDialogue(
-            [
-              'RAIKOU and ENTEI roar fiercely and leap into the ceiling shafts, scattering across the Johto skies!',
-              'SUICUNE slowly steps down from its pedestal… It locks its crystal-clear gaze directly into your eyes.',
-              'With a swift, graceful leap across the subterranean pool, SUICUNE vanishes into the mist!',
-              '🎩 EUSINE rushes down the ladder: "Did you see that?! That was SUICUNE! It acknowledged you before it departed!"',
-              'EUSINE: "I have dedicated my life to pursuing SUICUNE. I will find it across Johto!"',
-              'LEADER MORTY has returned to the ECRUTEAK GYM to await your challenge.',
-            ],
-            '⚡ MYTHICAL AWAKENING',
-            () => {
-              storyFlags.add('beasts_awakened');
-              storyFlags.add('EVENT_RELEASED_THE_BEASTS');
-              roamingManager.awakenBeasts();
-              eventBus.emit('roamer:updated', { roamers: roamingManager.getAllRoamers() });
-              overworldHUD.updatePokegear(roamingManager.getAllRoamers());
-              isCutsceneLocked = false;
-              saveCurrentGame();
-              overworldHUD.showToast('⚡ Raikou & Entei are now roaming Johto! Ecruteak Gym is open!');
-            }
-          );
-        }, 1200);
-      }
-    );
+    StoryCutscenes.triggerBeastsAwakeningCutscene(getCutsceneContext());
   };
 
   const isTileWalkableForPlayer = (x: number, y: number): boolean => {

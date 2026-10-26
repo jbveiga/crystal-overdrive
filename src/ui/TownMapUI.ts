@@ -448,49 +448,82 @@ export class TownMapUI {
           background: #2878c8;
           overflow: hidden;
         ">
-          <!-- Authentic GBC Johto Terrain & Route Highways Layer -->
+          <!-- Authentic GBC Johto Terrain & Orthogonal Route Highways Layer -->
           <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;">
-            <!-- Ocean waves pattern -->
-            <rect x="0" y="0" width="100" height="100" fill="#2878c8" />
-            <!-- Cianwood Western Peninsula -->
-            <polygon points="0,42 15,44 17,76 0,82" fill="#58b848" stroke="#e8d088" stroke-width="1.2" />
-            <!-- Whirl Islands -->
-            <circle cx="16" cy="64" r="2.2" fill="#e8d088" stroke="#409838" stroke-width="0.6" />
-            <circle cx="20" cy="67" r="1.8" fill="#e8d088" stroke="#409838" stroke-width="0.6" />
-            <!-- Main Johto & Western Kanto Continent Landmass -->
-            <polygon points="16,12 96,12 98,84 82,84 68,78 58,88 32,90 28,68 23,54 16,46" fill="#58b848" stroke="#e8d088" stroke-width="1.4" />
+            <defs>
+              <!-- Authentic GBC Scanline Wave Pattern -->
+              <pattern id="gbc-sea-waves" width="10" height="4" patternUnits="userSpaceOnUse">
+                <rect x="0" y="0" width="10" height="2" fill="#2868b8" />
+                <rect x="0" y="2" width="10" height="2" fill="#3878c8" />
+                <line x1="2" y1="1" x2="8" y2="1" stroke="#4888d8" stroke-width="0.6" opacity="0.5" />
+              </pattern>
+            </defs>
+
+            <!-- Ocean waves background -->
+            <rect x="0" y="0" width="100" height="100" fill="url(#gbc-sea-waves)" />
+
+            <!-- Authentic GBC Landmass (Western Cianwood Peninsula & Whirl Islands) -->
+            <polygon points="0,52 14,54 18,78 0,84" fill="#68a850" stroke="#183810" stroke-width="1.2" />
+            <circle cx="16" cy="62" r="2.4" fill="#e8d088" stroke="#183810" stroke-width="0.8" />
+            <circle cx="21" cy="65" r="2.0" fill="#e8d088" stroke="#183810" stroke-width="0.8" />
+
+            <!-- Main Johto Landmass -->
+            <polygon points="18,10 98,10 98,82 84,82 70,76 60,86 34,88 28,66 24,52 18,44" fill="#68a850" stroke="#183810" stroke-width="1.4" />
+
             <!-- Mountain Ranges (Mt. Mortar, Dark Cave, Ice Path, Mt. Silver) -->
-            <polygon points="48,14 94,14 95,46 74,48 62,36 48,34" fill="#987848" opacity="0.85" />
-            <!-- Ilex Forest & National Park Woodland Canopy -->
-            <ellipse cx="42" cy="76" rx="9" ry="7" fill="#308028" />
-            <ellipse cx="38" cy="44" rx="7" ry="6" fill="#308028" />
+            <polygon points="46,12 96,12 97,48 76,50 64,36 46,34" fill="#987040" stroke="#483018" stroke-width="1.0" opacity="0.9" />
+
+            <!-- Forest Canopies (Ilex Forest & National Park) -->
+            <rect x="30" y="70" width="12" height="10" rx="3" fill="#286820" stroke="#183810" stroke-width="0.8" />
+            <rect x="31" y="38" width="10" height="9" rx="3" fill="#286820" stroke="#183810" stroke-width="0.8" />
+
             <!-- Lake of Rage -->
-            <ellipse cx="64" cy="18" rx="6.5" ry="4.2" fill="#2878c8" stroke="#e8d088" stroke-width="0.8" />
-            <!-- Classic GBC Golden-Tan Route Roads -->
+            <ellipse cx="71" cy="14" rx="7" ry="4.5" fill="#2868b8" stroke="#183810" stroke-width="0.8" />
+
+            <!-- Authentic GBC "JOHTO" Corner Plaque -->
+            <g id="johto-banner" transform="translate(4, 4)">
+              <rect x="0" y="0" width="22" height="9" rx="1" fill="#f8f8f0" stroke="#181818" stroke-width="1.0" />
+              <rect x="1" y="1" width="20" height="7" fill="none" stroke="#d04820" stroke-width="0.6" />
+              <text x="11" y="6.5" font-family="'Space Mono', monospace" font-size="5" font-weight="900" fill="#181818" text-anchor="middle" letter-spacing="1">JOHTO</text>
+            </g>
+
+            <!-- Authentic Orthogonal 90-Degree GBC Route Highways -->
             ${JOHTO_CONNECTIONS.map((conn) => {
               const fromLm = JOHTO_LANDMARKS[conn.from];
               const toLm = JOHTO_LANDMARKS[conn.to];
               if (!fromLm || !toLm) return '';
               const p1 = getPercentCoord(fromLm.gridX, fromLm.gridY);
               const p2 = getPercentCoord(toLm.gridX, toLm.gridY);
+
+              let pathD = '';
+              if (p1.leftPct === p2.leftPct || p1.topPct === p2.topPct) {
+                pathD = `M ${p1.leftPct} ${p1.topPct} L ${p2.leftPct} ${p2.topPct}`;
+              } else {
+                // Orthogonal 90° elbow connection matching GBC route alignment
+                // Prioritize horizontal-then-vertical unless vertical movement matches route corridor
+                if (Math.abs(fromLm.gridX - toLm.gridX) > Math.abs(fromLm.gridY - toLm.gridY)) {
+                  pathD = `M ${p1.leftPct} ${p1.topPct} L ${p2.leftPct} ${p1.topPct} L ${p2.leftPct} ${p2.topPct}`;
+                } else {
+                  pathD = `M ${p1.leftPct} ${p1.topPct} L ${p1.leftPct} ${p2.topPct} L ${p2.leftPct} ${p2.topPct}`;
+                }
+              }
+
               return `
-                <line
-                  x1="${p1.leftPct}"
-                  y1="${p1.topPct}"
-                  x2="${p2.leftPct}"
-                  y2="${p2.topPct}"
-                  stroke="#684818"
-                  stroke-width="2.6"
-                  stroke-linecap="round"
+                <path
+                  d="${pathD}"
+                  stroke="#181818"
+                  stroke-width="3.6"
+                  stroke-linecap="square"
+                  stroke-linejoin="miter"
+                  fill="none"
                 />
-                <line
-                  x1="${p1.leftPct}"
-                  y1="${p1.topPct}"
-                  x2="${p2.leftPct}"
-                  y2="${p2.topPct}"
-                  stroke="#f8d878"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
+                <path
+                  d="${pathD}"
+                  stroke="#f8e090"
+                  stroke-width="2.2"
+                  stroke-linecap="square"
+                  stroke-linejoin="miter"
+                  fill="none"
                 />
               `;
             }).join('')}
@@ -505,14 +538,9 @@ export class TownMapUI {
               const isVisitedLm = this.visitedLandmarkIds.has(lm.id);
 
               const isCityOrTown = lm.type === 'city' || lm.type === 'town';
-              const baseSize = isCityOrTown ? 18 : lm.type === 'route' ? 10 : 14;
+              const isLandmarkOrDungeon = lm.type === 'landmark' || lm.type === 'dungeon';
+              const baseSize = isCityOrTown ? 18 : isLandmarkOrDungeon ? 14 : 10;
               const size = isMobile ? Math.max(24, baseSize) : baseSize;
-              const bg = isCityOrTown
-                ? '#e83828'
-                : lm.type === 'route'
-                ? '#f8d878'
-                : '#9858d8';
-              const radius = isCityOrTown ? '3px' : '50%';
 
               // Roamers at this node
               const roamersHere = this.activeRoamers.filter((r) => {
@@ -521,29 +549,68 @@ export class TownMapUI {
                 return rLm?.id === lm.id;
               });
 
+              let nodeStyle = '';
+              let badgeHtml = '';
+
+              if (isCityOrTown) {
+                // Authentic GBC Orange Square City Node with Inner Dark Square ▣
+                nodeStyle = `
+                  left: ${leftPct}%;
+                  top: ${topPct}%;
+                  width: ${size}px;
+                  height: ${size}px;
+                  min-width: ${isMobile ? '24px' : 'auto'};
+                  min-height: ${isMobile ? '24px' : 'auto'};
+                  background: #f85800;
+                  border: 2px solid #000000;
+                  border-radius: 0px;
+                  box-shadow: inset 0 0 0 2px #f85800, inset 0 0 0 3px #000000, 0 2px 6px rgba(0,0,0,0.75);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                `;
+                if (lm.gymLeader) {
+                  badgeHtml = `<span style="font-size: 8px; line-height: 1; pointer-events: none;">${lm.badgeIcon || '⚡'}</span>`;
+                }
+              } else if (isLandmarkOrDungeon) {
+                // Authentic GBC Red Diamond Landmark Marker ◆
+                nodeStyle = `
+                  left: ${leftPct}%;
+                  top: ${topPct}%;
+                  width: ${size}px;
+                  height: ${size}px;
+                  min-width: ${isMobile ? '24px' : 'auto'};
+                  min-height: ${isMobile ? '24px' : 'auto'};
+                  background: #f81800;
+                  border: 2px solid #000000;
+                  transform: translate(-50%, -50%) rotate(45deg);
+                  border-radius: 0px;
+                  box-shadow: 0 2px 6px rgba(0,0,0,0.75);
+                `;
+              } else {
+                // Route Waypoint
+                nodeStyle = `
+                  left: ${leftPct}%;
+                  top: ${topPct}%;
+                  width: ${size}px;
+                  height: ${size}px;
+                  min-width: ${isMobile ? '24px' : 'auto'};
+                  min-height: ${isMobile ? '24px' : 'auto'};
+                  background: #f8e090;
+                  border: 1.5px solid #181818;
+                  border-radius: 0px;
+                  box-shadow: 0 1px 4px rgba(0,0,0,0.6);
+                `;
+              }
+
               return `
                 <div
                   class="town-map-node ${isSelected ? 'selected' : ''}"
                   data-landmark-id="${lm.id}"
-                  style="
-                    left: ${leftPct}%;
-                    top: ${topPct}%;
-                    width: ${size}px;
-                    height: ${size}px;
-                    min-width: ${isMobile ? '24px' : 'auto'};
-                    min-height: ${isMobile ? '24px' : 'auto'};
-                    background: ${bg};
-                    border-radius: ${radius};
-                    border: 2px solid ${isVisitedLm || isCityOrTown ? '#ffffff' : '#1e293b'};
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.75);
-                  "
+                  style="${nodeStyle}"
                   title="${lm.name}"
                 >
-                  ${
-                    isCityOrTown && lm.gymLeader
-                      ? `<span style="font-size: 9px; line-height: 1;">${lm.badgeIcon || '⚡'}</span>`
-                      : ''
-                  }
+                  ${badgeHtml}
                 </div>
 
                 ${
@@ -557,9 +624,10 @@ export class TownMapUI {
                         font-weight: 900;
                         font-family: 'Space Mono', monospace;
                         color: #ffffff;
-                        background: rgba(15, 23, 42, 0.82);
+                        background: rgba(15, 23, 42, 0.88);
                         padding: 1px 4px;
-                        border-radius: 3px;
+                        border: 1px solid rgba(255, 255, 255, 0.2);
+                        border-radius: 2px;
                         white-space: nowrap;
                         pointer-events: none;
                         z-index: 22;

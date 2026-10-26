@@ -27,4 +27,20 @@ export const ANIMATED_WATER_TILES: readonly string[] = [
   'in_forest_2a_0b_14_19',
   'in_forest_1b_14_1b_14',
   'in_forest_14_19_14_19',
+  // Authentic Johto coastal water edge
+  'jt_49_49_14_14',
+  // Authentic Kanto outdoor water tiles (Sea Routes 19, 20, 21, Vermilion City, Cerulean Cape)
+  'kt_14_14_14_14',
+  'kt_33_33_14_14',
+  'kt_14_54_14_54',
+  'kt_33_33_33_14',
+  'kt_33_33_14_54',
+  'kt_33_14_33_14',
+  'kt_14_33_14_14',
+  'kt_33_14_14_14',
+  'kt_31_31_14_14',
+  // Authentic Port water tiles (Olivine Port & Vermilion Port)
+  'in_port_14_14_14_14',
+  'in_port_0b_0b_14_14',
+  'in_port_22_22_14_14',
 ];

@@ -71,8 +71,62 @@ export class MapManager {
     }
   }
 
+  private mapAccessTimestamps: Map<string, number> = new Map();
+
   registerMap(map: MapData): void {
     this.maps.set(map.id, map);
+    this.mapAccessTimestamps.set(map.id, Date.now());
+  }
+
+  touchMap(mapId: string): void {
+    if (this.maps.has(mapId)) {
+      this.mapAccessTimestamps.set(mapId, Date.now());
+    }
+  }
+
+  /**
+   * Evicts distant maps when loaded maps exceed maxResident (default 24).
+   * Never evicts activeMapId, currentMap, 1-hop connected neighbors, or direct warp targets.
+   */
+  evictDistantMaps(activeMapId: string, maxResident: number = 24): number {
+    if (this.maps.size <= maxResident) return 0;
+
+    const protectedMapIds = new Set<string>();
+    protectedMapIds.add(activeMapId);
+    if (this.currentMap) protectedMapIds.add(this.currentMap.id);
+
+    const active = this.maps.get(activeMapId) || this.currentMap;
+    if (active) {
+      if (active.connections) {
+        if (active.connections.NORTH) protectedMapIds.add(active.connections.NORTH.mapId);
+        if (active.connections.SOUTH) protectedMapIds.add(active.connections.SOUTH.mapId);
+        if (active.connections.WEST) protectedMapIds.add(active.connections.WEST.mapId);
+        if (active.connections.EAST) protectedMapIds.add(active.connections.EAST.mapId);
+      }
+      if (active.warps) {
+        for (const w of active.warps) {
+          protectedMapIds.add(w.targetMapId);
+        }
+      }
+    }
+
+    const candidateEntries: Array<{ mapId: string; time: number }> = [];
+    for (const [id] of this.maps) {
+      if (!protectedMapIds.has(id)) {
+        candidateEntries.push({ mapId: id, time: this.mapAccessTimestamps.get(id) || 0 });
+      }
+    }
+
+    candidateEntries.sort((a, b) => a.time - b.time);
+    let evictedCount = 0;
+    while (this.maps.size > maxResident && candidateEntries.length > 0) {
+      const candidate = candidateEntries.shift()!;
+      this.maps.delete(candidate.mapId);
+      this.mapAccessTimestamps.delete(candidate.mapId);
+      this.invalidateSpatialCache(candidate.mapId);
+      evictedCount++;
+    }
+    return evictedCount;
   }
 
   /**
@@ -81,7 +135,10 @@ export class MapManager {
   async ensureMapLoaded(mapId: string): Promise<MapData | undefined> {
     if (!mapId) return undefined;
     const existing = this.maps.get(mapId);
-    if (existing) return existing;
+    if (existing) {
+      this.touchMap(mapId);
+      return existing;
+    }
 
     try {
       const res = await fetch(`./assets/data/maps/${mapId}.json`);
@@ -102,6 +159,8 @@ export class MapManager {
       throw new Error(`Map with id "${mapId}" not found.`);
     }
     this.currentMap = map;
+    this.touchMap(mapId);
+    this.evictDistantMaps(mapId);
     return map;
   }
 

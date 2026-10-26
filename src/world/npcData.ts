@@ -5168,9 +5168,10 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     'If your POKéMON gets hurt, head to the nearest POKéMON CENTER.',
   ];
 
-  // Phase 11+ NPCs & trainers derived directly from pret/pokecrystal object events.
-  for (const [mapId, list] of Object.entries(GENERATED_NPCS)) {
-    const generatedList = list.map((n, idx) => {
+  const buildGeneratedNpcsForMap = (mapId: string): GridEntity[] => {
+    const list = GENERATED_NPCS[mapId];
+    if (!list || list.length === 0) return [];
+    return list.map((n, idx) => {
       const generatedId = n.id || `${mapId}_${n.sprite}_${idx}`;
       return makeNpc(
         generatedId,
@@ -5196,14 +5197,57 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
         }
       );
     });
+  };
 
-    if (base[mapId]) {
-      base[mapId].push(...generatedList);
-    } else {
-      base[mapId] = generatedList;
+  const allKnownKeys = new Set([...Object.keys(base), ...Object.keys(GENERATED_NPCS)]);
+  const generatedAppended = new Set<string>();
+
+  const ensureMapHydrated = (mapId: string) => {
+    if (!generatedAppended.has(mapId)) {
+      generatedAppended.add(mapId);
+      const generatedList = buildGeneratedNpcsForMap(mapId);
+      if (generatedList.length > 0) {
+        if (base[mapId]) {
+          base[mapId].push(...generatedList);
+        } else {
+          base[mapId] = generatedList;
+        }
+      }
     }
-  }
-  return base;
+  };
+
+  return new Proxy(base, {
+    get(target, prop: string | symbol) {
+      if (typeof prop === 'string') {
+        ensureMapHydrated(prop);
+      }
+      return Reflect.get(target, prop);
+    },
+    set(target, prop: string | symbol, value) {
+      if (typeof prop === 'string') {
+        generatedAppended.add(prop);
+      }
+      return Reflect.set(target, prop, value);
+    },
+    has(target, prop: string | symbol) {
+      if (typeof prop === 'string') {
+        return allKnownKeys.has(prop) || Reflect.has(target, prop);
+      }
+      return Reflect.has(target, prop);
+    },
+    ownKeys(target) {
+      for (const k of allKnownKeys) {
+        ensureMapHydrated(k);
+      }
+      return Reflect.ownKeys(target);
+    },
+    getOwnPropertyDescriptor(target, prop: string | symbol) {
+      if (typeof prop === 'string') {
+        ensureMapHydrated(prop);
+      }
+      return Reflect.getOwnPropertyDescriptor(target, prop);
+    },
+  });
 }
 
 export const npcsByMap: Record<string, GridEntity[]> = createNpcsByMap();
