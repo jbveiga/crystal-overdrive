@@ -7,6 +7,7 @@ import type {
   MoveData,
   SpeedMultiplier,
 } from './game';
+import type { GridEntity } from '../world/GridPhysics';
 import type { BattleStateMachine, BattleTurnResult } from '../battle/BattleStateMachine';
 import type { BattleHUD } from '../ui/BattleHUD';
 import type { BattleRenderer } from '../render/BattleRenderer';
@@ -16,7 +17,10 @@ import type { RoamingManager } from '../world/RoamingManager';
 import type { MissionManager } from '../world/MissionManager';
 import type { MapManager } from '../world/MapManager';
 import type { OverworldItemManager } from '../world/OverworldItemManager';
+import type { DayCareManager } from '../world/DayCareManager';
+import type { KurtCraftingManager } from '../world/KurtCraftingManager';
 import type { GameClock } from '../core/GameClock';
+import type { StoryCutsceneContext } from '../world/StoryCutscenes';
 
 export interface TriggerBattleOptions {
   isRoamer?: boolean;
@@ -130,4 +134,88 @@ export interface FieldObstacleContext {
   setSurfEnabled: (enabled: boolean) => void;
   triggerBattle: (pokemon: PokemonInstance, options?: TriggerBattleOptions) => Promise<void>;
   isItemfinderActive: () => boolean;
+}
+
+export type NpcInteractionHandler = (
+  targetNpc: GridEntity,
+  currentMap: MapData,
+  ctx: NpcInteractionContext
+) => boolean | void | Promise<boolean | void>;
+
+export interface NpcInteractionRegistration {
+  /** Exact targetNpc.action keys handled in O(1) via actionMap */
+  actions?: string[];
+  /** Exact targetNpc.id keys handled in O(1) via idMap */
+  npcIds?: string[];
+  /** Optional prefix match (e.g. 'b3f_electrode_', 'dept_elevator') */
+  idPrefixes?: string[];
+  handler: NpcInteractionHandler;
+}
+
+export interface NpcInteractionContext {
+  playerName: string;
+  playerParty: PokemonInstance[];
+  inventory: BagInventory;
+  storyFlags: Set<string>;
+  defeatedTrainers: Set<string>;
+  player: GridEntity;
+  npcsByMap: Record<string, GridEntity[]>;
+  mapManager: MapManager;
+  gameClock: GameClock;
+  audioManager: {
+    playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader') => void;
+    restoreOverworldBgm: (volume?: number) => void;
+    playMapBgm: (mapId: string, volume?: number) => void;
+    playSfx?: (name: string) => void;
+  };
+  missionManager: MissionManager;
+  bugContestManager: BugContestManager;
+  dayCareManager: DayCareManager;
+  kurtCraftingManager?: KurtCraftingManager;
+  boxManager?: BoxManager;
+  lastVisitedPokecenter: { mapId: string; x: number; y: number };
+  setLastVisitedPokecenter: (loc: { mapId: string; x: number; y: number }) => void;
+
+  openDialogue: (pages: string[], speaker?: string, onComplete?: () => void) => void;
+  showToast: (msg: string) => void;
+  healPlayerParty: (playAnim?: boolean) => void;
+  playHealingAnimation: (partyCount?: number, onComplete?: () => void) => void;
+  playFieldRestAnimation: (onComplete?: () => void) => void;
+  saveCurrentGame: () => void;
+  openMart: () => void;
+  openPcStorage: () => void;
+  openTownMap: (mapId: string, visited: Set<string>, roamers: any) => void;
+  addOverworldItemToInventory: (itemId: string) => void;
+  renderMap?: (map: MapData) => void;
+  syncMapOverworldItems?: (map: MapData) => void;
+  setSurfEnabled?: (enabled: boolean) => void;
+
+  // Custom UI Modals (delegated to preserve layer purity)
+  openDayCareModal: () => void;
+  openNamingModal: (title: string, defaultName: string, onConfirm: (name: string) => void) => void;
+  openDeptElevatorModal: (currentMapId: string, onSelectFloor: (targetMapId: string) => void) => void;
+  openRadioTowerQuizModal: (callbacks: { onComplete: () => void }) => void;
+  openKurtCraftingModal: (callbacks: { onOrderPlaced: () => void }) => void;
+  openKyleTradeModal: (callbacks: { bellsproutIndex: number; onConfirm: () => void; onCancel: () => void }) => void;
+  shakeScreen: (durationMs?: number) => void;
+  mountBugContestHUD?: (balls: number, timeSec: number) => void;
+  destroyBugContestHUD?: () => void;
+  executeWarpTransition?: (warp: { x: number; y: number; targetMapId: string; targetX: number; targetY: number; direction?: Direction }) => void;
+
+  // Battle & Trainer Helpers
+  triggerBattle: (pokemon: PokemonInstance, options?: TriggerBattleOptions) => Promise<void>;
+  buildTrainerTeamInstances: (trainer: GridEntity) => PokemonInstance[];
+  handleTrainerDefeatRewards: (trainer: GridEntity) => void;
+  getOppositeDirection: (dir: Direction) => Direction;
+  launchStadiumChallenge: (challengerId: string, cupId: string) => void;
+
+  // Story Cutscenes
+  runGuideGentWalkingTour: (guide: GridEntity) => Promise<void>;
+  triggerBeastsAwakeningCutscene: () => void;
+  triggerBurnedTowerRivalBattle: () => void;
+  triggerAzaleaRivalAmbush: () => void;
+  triggerCherrygroveRivalAmbush: () => void;
+  triggerSlowpokeWellGruntIntercept: (grunt: GridEntity) => Promise<void>;
+  setCutsceneLocked: (locked: boolean) => void;
+  getCutsceneContext: () => StoryCutsceneContext;
 }

@@ -32,6 +32,11 @@ describe('TICKET-NARRATIVE-ELMS-TABLE-POKEBALLS-01', () => {
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
         'utf8'
+      ) +
+      '\n' +
+      fs.readFileSync(
+        path.resolve(__dirname, '../src/world/interactions/EarlyJohtoQuestInteractions.ts'),
+        'utf8'
       );
 
     it('uses context-aware dialogues instead of the generic empty-ball text', () => {
@@ -44,7 +49,13 @@ describe('TICKET-NARRATIVE-ELMS-TABLE-POKEBALLS-01', () => {
 
   describe('HM05 Flash deduplication', () => {
     it('awards only HM05 on Elder Li victory and has no TM70 Bag entry', () => {
-      const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
+      const mainSrc =
+        fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+        '\n' +
+        fs.readFileSync(
+          path.resolve(__dirname, '../src/world/interactions/EarlyJohtoQuestInteractions.ts'),
+          'utf8'
+        );
       expect(mainSrc).toContain("inventory.tms.push('HM05')");
       expect(mainSrc).not.toContain("'TM70'");
       expect(INFINITE_TMS.HM05.moveId).toBe('flash');

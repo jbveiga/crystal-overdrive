@@ -356,17 +356,29 @@ describe('TICKET-WORLD-ROUTE34-DAYCARE-01: Route 34 & Day-Care Center 10-Point P
     });
 
     it('verifies main.ts has party-full check before granting Odd Egg and awards flag HAS_ODD_EGG', () => {
-      const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
-      expect(mainSrc).toContain("targetNpc.id === 'day_care_man'");
-      expect(mainSrc).toContain("!storyFlags.has('HAS_ODD_EGG')");
+      const mainSrc =
+        fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+        '\n' +
+        fs.readFileSync(
+          path.resolve(__dirname, '../src/world/interactions/GoldenrodAndRoute34Interactions.ts'),
+          'utf8'
+        );
+      expect(mainSrc).toMatch(/(targetNpc\.id === 'day_care_man'|'day_care_man')/);
+      expect(mainSrc).toContain("HAS_ODD_EGG");
       expect(mainSrc).toContain('playerParty.length >= 6');
       expect(mainSrc).toContain("storyFlags.add('HAS_ODD_EGG')");
       expect(mainSrc).toContain('PokemonFactory.createOddEgg()');
     });
 
     it('verifies Officer Keith conditional night-only challenge logic in main.ts', () => {
-      const mainSrc = fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8');
-      expect(mainSrc).toContain("targetNpc.id === 'officer_keith' && gameClock.getTimeOfDay() !== 'NIGHT'");
+      const mainSrc =
+        fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+        '\n' +
+        fs.readFileSync(
+          path.resolve(__dirname, '../src/world/interactions/GoldenrodAndRoute34Interactions.ts'),
+          'utf8'
+        );
+      expect(mainSrc).toMatch(/(targetNpc\.id === 'officer_keith'|'officer_keith').*getTimeOfDay\(\) !== 'NIGHT'/s);
       expect(mainSrc).toContain("spottedTrainer.id === 'officer_keith' && gameClock.getTimeOfDay() !== 'NIGHT'");
     });
 

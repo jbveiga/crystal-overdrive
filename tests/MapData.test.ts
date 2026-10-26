@@ -7,6 +7,15 @@ import { npcsByMap, getNpcsForMap } from '../src/world/npcData';
 import { OverworldItemManager } from '../src/world/OverworldItemManager';
 import { MissionManager } from '../src/world/MissionManager';
 
+const getAllInteractionSrc = () => {
+  const interactionsDir = path.resolve(__dirname, '../src/world/interactions');
+  return fs
+    .readdirSync(interactionsDir)
+    .filter((f) => f.endsWith('.ts'))
+    .map((f) => fs.readFileSync(path.join(interactionsDir, f), 'utf8'))
+    .join('\n');
+};
+
 describe('MapData & Authentic Tile Integrity', () => {
   it('validates new_bark_town.json structure, tileMap dimensions, and asset presence', () => {
     const mapPath = path.resolve(__dirname, '../public/assets/data/maps/new_bark_town.json');
@@ -537,7 +546,9 @@ describe('MapData & Authentic Tile Integrity', () => {
     const mainSrc =
       fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
       '\n' +
-      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8');
+      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8') +
+      '\n' +
+      getAllInteractionSrc();
 
     const expectedTrainerIds = [
       'sage_chow',
@@ -564,7 +575,9 @@ describe('MapData & Authentic Tile Integrity', () => {
     const mainSrc =
       fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
       '\n' +
-      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8');
+      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8') +
+      '\n' +
+      getAllInteractionSrc();
     const startMenuSrc = fs.readFileSync(path.resolve(__dirname, '../src/ui/StartMenuUI.ts'), 'utf8');
 
     expect(mainSrc).toContain("'gym_guide'");
@@ -588,7 +601,9 @@ describe('MapData & Authentic Tile Integrity', () => {
     const mainSrc =
       fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
       '\n' +
-      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8');
+      fs.readFileSync(path.resolve(__dirname, '../src/world/npcData.ts'), 'utf8') +
+      '\n' +
+      getAllInteractionSrc();
 
     expect(mainSrc).toContain("'elms_aide'");
     expect(mainSrc).toContain("action: 'ELMS_AIDE_EVENT'");
@@ -788,8 +803,10 @@ describe('MapData & Authentic Tile Integrity', () => {
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
         'utf8'
-      );
-    expect(mainSrc).toContain("action === 'BUGSY_EVENT'");
+      ) +
+      '\n' +
+      getAllInteractionSrc();
+    expect(mainSrc).toMatch(/(action === 'BUGSY_EVENT'|'BUGSY_EVENT')/);
     expect(mainSrc).toContain("inventory.badges.includes('hive')");
     expect(mainSrc).toContain("inventory.tms.includes('TM49')");
   });
@@ -909,8 +926,10 @@ describe('MapData & Authentic Tile Integrity', () => {
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
         'utf8'
-      );
-    expect(mainSrc).toContain("action === 'WHITNEY_EVENT'");
+      ) +
+      '\n' +
+      getAllInteractionSrc();
+    expect(mainSrc).toMatch(/(action === 'WHITNEY_EVENT'|'WHITNEY_EVENT')/);
     expect(mainSrc).toContain("inventory.badges.includes('plain')");
     expect(mainSrc).toContain("inventory.tms.includes('TM45')");
   });
@@ -998,8 +1017,10 @@ describe('MapData & Authentic Tile Integrity', () => {
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
         'utf8'
-      );
-    expect(mainSrc).toContain("action === 'MORTY_EVENT'");
+      ) +
+      '\n' +
+      getAllInteractionSrc();
+    expect(mainSrc).toMatch(/(action === 'MORTY_EVENT'|'MORTY_EVENT')/);
     expect(mainSrc).toContain("inventory.badges.includes('fog')");
     expect(mainSrc).toContain("inventory.tms.includes('TM30')");
   });
@@ -1151,11 +1172,13 @@ describe('MapData & Authentic Tile Integrity', () => {
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
         'utf8'
-      );
-    expect(mainSrc).toContain("action === 'JASMINE_EVENT'");
-    expect(mainSrc).toContain("action === 'CHUCK_EVENT'");
-    expect(mainSrc).toContain("action === 'AMPHY_EVENT'");
-    expect(mainSrc).toContain("action === 'PHARMACY_SECRET_POTION_EVENT'");
+      ) +
+      '\n' +
+      getAllInteractionSrc();
+    expect(mainSrc).toMatch(/(action === 'JASMINE_EVENT'|'JASMINE_EVENT')/);
+    expect(mainSrc).toMatch(/(action === 'CHUCK_EVENT'|'CHUCK_EVENT')/);
+    expect(mainSrc).toMatch(/(action === 'AMPHY_EVENT'|'AMPHY_EVENT')/);
+    expect(mainSrc).toMatch(/(action === 'PHARMACY_SECRET_POTION_EVENT'|'PHARMACY_SECRET_POTION_EVENT')/);
     expect(mainSrc).toContain("inventory.badges.includes('mineral')");
     expect(mainSrc).toContain("inventory.badges.includes('storm')");
     expect(mainSrc).toContain("inventory.tms.includes('TM23')");
@@ -1211,9 +1234,11 @@ describe('MapData & Authentic Tile Integrity', () => {
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
         'utf8'
-      );
-    expect(mainSrc).toContain("action === 'PRYCE_EVENT'");
-    expect(mainSrc).toContain("action === 'CLAIR_EVENT'");
+      ) +
+      '\n' +
+      getAllInteractionSrc();
+    expect(mainSrc).toMatch(/(action === 'PRYCE_EVENT'|'PRYCE_EVENT')/);
+    expect(mainSrc).toMatch(/(action === 'CLAIR_EVENT'|'CLAIR_EVENT')/);
     expect(mainSrc).toContain("inventory.badges.includes('glacier')");
     expect(mainSrc).toContain("inventory.badges.includes('rising')");
   });
@@ -1243,7 +1268,11 @@ describe('MapData & Authentic Tile Integrity', () => {
     for (const room of ['wills_room', 'kogas_room', 'brunos_room', 'karens_room']) {
       expect(npcsByMap[room].some((n) => n.action === 'E4_EVENT')).toBe(true);
     }
-    expect(fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8')).toContain("action === 'E4_EVENT'");
+    const e4Src =
+      fs.readFileSync(path.resolve(__dirname, '../src/main.ts'), 'utf8') +
+      '\n' +
+      getAllInteractionSrc();
+    expect(e4Src).toMatch(/(action === 'E4_EVENT'|'E4_EVENT')/);
   });
 
   it('validates Phase 13 Western & Central Kanto: Pallet, Viridian, Pewter, Cerulean, Routes 1-4, 24-25', () => {
@@ -1316,7 +1345,9 @@ describe('MapData & Authentic Tile Integrity', () => {
       fs.readFileSync(
         path.resolve(__dirname, '../src/world/interactions/FieldObstacleDispatcher.ts'),
         'utf8'
-      );
+      ) +
+      '\n' +
+      getAllInteractionSrc();
     expect(mainSrc).toContain('BROCK_EVENT:');
     expect(mainSrc).toContain('MISTY_EVENT:');
     expect(mainSrc).toContain('BLUE_EVENT:');

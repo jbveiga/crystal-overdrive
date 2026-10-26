@@ -196,9 +196,10 @@ describe('BUGFIX-ROUTE32-FRIEDA-TILES-01: Day Siblings & On-Demand Map Tile Load
 
     it('verifies main.ts integrates strict calendar gating in DAY_SIBLING_EVENT', () => {
       const mainPath = path.resolve(__dirname, '../src/main.ts');
-      const mainCode = fs.readFileSync(mainPath, 'utf8');
+      const interactionsPath = path.resolve(__dirname, '../src/world/interactions/JohtoTownServiceInteractions.ts');
+      const mainCode = fs.readFileSync(mainPath, 'utf8') + '\n' + fs.readFileSync(interactionsPath, 'utf8');
 
-      expect(mainCode).toContain("targetNpc.action === 'DAY_SIBLING_EVENT'");
+      expect(mainCode).toMatch(/['"]DAY_SIBLING_EVENT['"]/);
       expect(mainCode).toContain('todayDayIndex !== sibling.dayOfWeekIndex');
       expect(mainCode).toContain('sibling.wrongDayPages');
     });
