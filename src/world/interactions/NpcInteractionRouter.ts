@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Constant-time O(1) NPC interaction router dispatching dialogues, trainer battles, and custom events.
+ * @module world/interactions/NpcInteractionRouter
+ * @role NPC Interaction Router
+ * @exports NpcInteractionRouter
+ * @layer world
+ */
+
 import type { MapData } from '../../types/game';
 import type { GridEntity } from '../GridPhysics';
 import type {

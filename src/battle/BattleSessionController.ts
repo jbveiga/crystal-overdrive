@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Orchestrates battle lifecycle, turn loop execution, exp distribution, and UI state reconciliation.
+ * @module battle/BattleSessionController
+ * @role Battle Engine Session Orchestrator
+ * @exports BattleSessionController
+ * @layer battle
+ */
+
 import type {
   PokemonInstance,
   PokeballId,

@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Application bootstrap, engine initialization, and top-level lifecycle coordination.
+ * @module main
+ * @role Application Root Coordinator
+ * @exports bootstrap
+ * @layer core
+ */
+
 import { GameClock } from './core/GameClock';
 import { eventBus } from './core/EventBus';
 import { AssetManifestQueue } from './core/AssetManifestQueue';
@@ -150,20 +158,14 @@ async function bootstrap() {
   filterInitialMapNpcs(npcsByMap, storyFlags);
   applyStoryRecoveryFlags(storyFlags, defeatedTrainers, inventory);
 
-  const dayCareManager = new DayCareManager(existingSave?.dayCare);
-  const bugContestManager = new BugContestManager(existingSave?.bugContestRecords);
-  const stadiumArenaManager = new StadiumArenaManager();
-  const kurtCraftingManager = new KurtCraftingManager(existingSave?.kurtCraftingOrder);
+  const dayCareManager = new DayCareManager(existingSave?.dayCare), bugContestManager = new BugContestManager(existingSave?.bugContestRecords);
+  const stadiumArenaManager = new StadiumArenaManager(), kurtCraftingManager = new KurtCraftingManager(existingSave?.kurtCraftingOrder);
 
   const lookupMap = (id: string) => mapManager.getMap(id);
-  const getActiveMapNpcs = (mapId: string): GridEntity[] =>
-    activeNpcCache.getActiveNpcs(mapId, npcsByMap[mapId], storyFlags, isNpcActiveForStoryFlags);
-  const detectChosenStarterSpecies = () =>
-    OverworldTrainerSightAndTourController.detectChosenStarterSpecies(storyFlags, playerParty, playerBox, seenSpecies);
-  const healPlayerParty = (playSound: boolean = true) =>
-    OverworldTrainerSightAndTourController.healParty(playerParty, playSound);
-  const getCaughtSpeciesSet = () =>
-    new Set([...playerParty.map((p) => p.speciesId), ...boxManager.flatten().map((p) => p.speciesId)]);
+  const getActiveMapNpcs = (mapId: string): GridEntity[] => activeNpcCache.getActiveNpcs(mapId, npcsByMap[mapId], storyFlags, isNpcActiveForStoryFlags);
+  const detectChosenStarterSpecies = () => OverworldTrainerSightAndTourController.detectChosenStarterSpecies(storyFlags, playerParty, playerBox, seenSpecies);
+  const healPlayerParty = (playSound: boolean = true) => OverworldTrainerSightAndTourController.healParty(playerParty, playSound);
+  const getCaughtSpeciesSet = () => new Set([...playerParty.map((p) => p.speciesId), ...boxManager.flatten().map((p) => p.speciesId)]);
 
   const buildTrainerTeamInstances = (trainer: GridEntity) => OverworldTrainerSightAndTourController.buildTrainerTeamInstances(trainer);
   const handleTrainerDefeatRewards = (trainer: GridEntity) => OverworldTrainerSightAndTourController.handleTrainerDefeatRewards(trainer, getTrainerSightContext());

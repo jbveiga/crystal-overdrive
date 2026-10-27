@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Main overworld frame ticker coordinator managing player physics, wild encounters, and trainer sight.
+ * @module world/OverworldTickerCoordinator
+ * @role Overworld Frame Loop Coordinator
+ * @exports OverworldTickerCoordinator
+ * @layer world
+ */
+
 import type { GridEntity } from './GridPhysics';
 import type { Direction } from '../types/game';
 import { GridPhysics } from './GridPhysics';

@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Coordinates map transitions, door/cave warps, veil fading, and reciprocal landing positioning.
+ * @module world/OverworldWarpAndMapTransitionController
+ * @role Overworld Warp & Transition Controller
+ * @exports OverworldWarpAndMapTransitionController
+ * @layer world
+ */
+
 import type { Direction, MapData, WarpEvent } from '../types/game';
 import type { GridEntity } from './GridPhysics';
 import { MapManager } from './MapManager';

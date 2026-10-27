@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Neo-Kanto Start Menu UI overlay managing Pokédex, Trainer Card, Bag/Party shortcuts, and options.
+ * @module ui/StartMenuUI
+ * @role Start Menu UI Controller
+ * @exports StartMenuUI
+ * @layer ui
+ */
+
 import type {
   SpeedMultiplier,
   TouchControlStyle,

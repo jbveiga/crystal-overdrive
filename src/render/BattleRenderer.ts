@@ -1,3 +1,11 @@
+/**
+ * @fileoverview PixiJS v8 combat renderer driving Pokémon battle animations, health gauges, and visual effects.
+ * @module render/BattleRenderer
+ * @role Battle Scene Renderer
+ * @exports BattleRenderer
+ * @layer render
+ */
+
 import { Application, Container, Sprite, Texture, Assets, Graphics } from 'pixi.js';
 import gsap from 'gsap';
 import type { PokemonInstance, SpeedMultiplier, PokemonType, MoveCategory, PokeballId } from '../types/game';

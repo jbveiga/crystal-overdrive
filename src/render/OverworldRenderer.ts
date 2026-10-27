@@ -1,3 +1,11 @@
+/**
+ * @fileoverview PixiJS v8 overworld renderer handling tile textures, character sprites, and camera tracking.
+ * @module render/OverworldRenderer
+ * @role Overworld Scene Renderer
+ * @exports OverworldRenderer, ANIMATED_WATER_TILES, NPC_SHEET_PATHS, CharacterFrames
+ * @layer render
+ */
+
 import { Application, Container, Sprite, Texture, Assets, Graphics, loadTextures } from 'pixi.js';
 import type { MapData, Direction, OverworldItemBall, OverworldFruitTree } from '../types/game';
 import type { GridEntity, NpcSpriteType } from '../world/GridPhysics';
@@ -23,14 +31,8 @@ export { ANIMATED_WATER_TILES, NPC_SHEET_PATHS, type CharacterFrames };
 
 export class OverworldRenderer {
   public app!: Application;
-  private stageContainer!: Container;
-  private mapContainer!: Container;
-  private itemBallContainer!: Container;
-  private entityContainer!: Container;
-  private foregroundContainer!: Container;
-  private playerShadow!: Graphics;
-  private playerSprite!: Sprite;
-  private playerGrassMask!: Graphics;
+  private stageContainer!: Container; private mapContainer!: Container; private itemBallContainer!: Container; private entityContainer!: Container; private foregroundContainer!: Container;
+  private playerShadow!: Graphics; private playerSprite!: Sprite; private playerGrassMask!: Graphics;
   private itemBallGraphics: Map<string, Container> = new Map();
   private npcSprites: Map<string, Sprite> = new Map();
   private activeNpcSpriteList: Sprite[] = [];
@@ -45,9 +47,7 @@ export class OverworldRenderer {
   private waterAnimFrames: Map<string, [Texture, Texture, Texture, Texture]> = new Map();
   private animatedWaterSprites: Array<{ sprite: Sprite; frames: [Texture, Texture, Texture, Texture] }> = [];
   private waterAnimState = { timer: 0, step: 0 };
-  private goldFrames!: CharacterFrames;
-  private krisFrames!: CharacterFrames;
-  private playerFrames!: CharacterFrames;
+  private goldFrames!: CharacterFrames; private krisFrames!: CharacterFrames; private playerFrames!: CharacterFrames;
   private npcFrames: Map<NpcSpriteType, CharacterFrames> = new Map();
   private loadingNpcPromises: Map<NpcSpriteType, Promise<void>> = new Map();
   private fruitTreeTexture: Texture | null = null;
@@ -75,21 +75,13 @@ export class OverworldRenderer {
 
     containerElement.appendChild(this.app.canvas);
 
-    this.stageContainer = new Container();
-    this.stageContainer.eventMode = 'none';
-    this.mapContainer = new Container();
-    this.mapContainer.eventMode = 'none';
-    this.itemBallContainer = new Container();
-    this.itemBallContainer.eventMode = 'none';
-    this.entityContainer = new Container();
-    this.entityContainer.eventMode = 'none';
-    this.foregroundContainer = new Container();
-    this.foregroundContainer.eventMode = 'none';
+    this.stageContainer = new Container(); this.stageContainer.eventMode = 'none';
+    this.mapContainer = new Container(); this.mapContainer.eventMode = 'none';
+    this.itemBallContainer = new Container(); this.itemBallContainer.eventMode = 'none';
+    this.entityContainer = new Container(); this.entityContainer.eventMode = 'none';
+    this.foregroundContainer = new Container(); this.foregroundContainer.eventMode = 'none';
 
-    this.stageContainer.addChild(this.mapContainer);
-    this.stageContainer.addChild(this.itemBallContainer);
-    this.stageContainer.addChild(this.entityContainer);
-    this.stageContainer.addChild(this.foregroundContainer);
+    this.stageContainer.addChild(this.mapContainer, this.itemBallContainer, this.entityContainer, this.foregroundContainer);
     this.app.stage.addChild(this.stageContainer);
 
     this.particlePoolAndVfx = new OverworldParticleAndVfxPool(this.tileSize);

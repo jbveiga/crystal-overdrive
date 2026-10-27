@@ -1,3 +1,11 @@
+/**
+ * @fileoverview World map registry, asynchronous streaming, collision evaluation, and wild encounter queries.
+ * @module world/MapManager
+ * @role Map Manager & Collision Engine
+ * @exports MapManager, WildEncounterResult
+ * @layer world
+ */
+
 import type { BgEvent, Direction, EncounterRateMode, MapData, TileCoord, WarpEvent, WarpSoundCue, WarpTransitionConfig } from '../types/game';
 import {
   isOutdoorMap,

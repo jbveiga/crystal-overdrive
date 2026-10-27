@@ -1,3 +1,11 @@
+/**
+ * @fileoverview HTML5/CSS vector battle HUD managing action menus, move selection, target dock, and bag overlay.
+ * @module ui/BattleHUD
+ * @role Battle HUD Interface Controller
+ * @exports BattleHUD
+ * @layer ui
+ */
+
 import type { PokemonInstance, SpeedMultiplier, PokeballId, StatId, MoveData } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
 import { BattleLogUI } from './BattleLogUI';

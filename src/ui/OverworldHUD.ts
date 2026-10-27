@@ -1,3 +1,11 @@
+/**
+ * @fileoverview HTML5/CSS vector overworld HUD managing D-Pad controls, dialogue modals, toasts, and Pokégear.
+ * @module ui/OverworldHUD
+ * @role Overworld HUD Interface Controller
+ * @exports OverworldHUD, OverworldHUDOptions
+ * @layer ui
+ */
+
 import type { Direction, SpeedMultiplier, RoamerState, TouchControlStyle } from '../types/game';
 import { eventBus } from '../core/EventBus';
 import { OverworldTouchAndKeyController } from './hud/OverworldTouchAndKeyController';

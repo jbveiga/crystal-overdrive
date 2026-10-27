@@ -1,3 +1,11 @@
+/**
+ * @fileoverview Core battle state machine modeling turns, combat calculations, status effects, and weather.
+ * @module battle/BattleStateMachine
+ * @role Battle State Machine
+ * @exports BattleStateMachine, BattleActionType, BattlePhase
+ * @layer battle
+ */
+
 import type { PokemonInstance, MoveData, PokeballId, PokemonType, MoveCategory, StatId } from '../types/game';
 import { DamageCalculator } from './DamageCalculator';
 import { PokemonFactory } from './PokemonFactory';
