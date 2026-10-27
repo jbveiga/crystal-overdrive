@@ -11,6 +11,7 @@ export type ExpShareMode = 'OFF' | 'ALL' | 'CAPPED';
 export type ExpShareSetting = ExpShareMode;
 export type EncounterRateMode = 'NORMAL' | 'RELAXED' | 'CLASSIC';
 export type GbcPaletteMode = 'VIBRANT' | 'POCKET' | 'DMG' | 'NIGHT';
+export type BattleStyleMode = 'SHIFT' | 'SET';
 export type RepelId = 'repel' | 'super-repel' | 'max-repel';
 
 export interface PlayerProfile {
@@ -22,11 +23,14 @@ export interface PlayerProfile {
 export interface GameOptions {
   soundVolume: number;
   bgmVolume: number;
+  muted?: boolean;
   textSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT';
+  battleStyle?: BattleStyleMode;
   battleAnimations: boolean;
   playerSpeedDefault: SpeedMultiplier;
   battleSpeedMultiplier?: SpeedMultiplier;
   touchControlStyle?: TouchControlStyle;
+  gamepadActive?: boolean;
   expShare?: ExpShareMode;
   encounterRateMode?: EncounterRateMode;
   autoHm?: boolean;

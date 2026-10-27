@@ -120,6 +120,10 @@ export function buildSettingsModalHtml(
     const isChiptuneMode: boolean = stateProvider.getChiptuneMode
       ? stateProvider.getChiptuneMode()
       : false;
+    const bgmVolume: number = stateProvider.getBgmVolume ? stateProvider.getBgmVolume() : 0.7;
+    const soundVolume: number = stateProvider.getSoundVolume ? stateProvider.getSoundVolume() : 0.7;
+    const battleAnimations: boolean = stateProvider.getBattleAnimations ? stateProvider.getBattleAnimations() : true;
+    const battleStyle: 'SHIFT' | 'SET' = stateProvider.getBattleStyle ? stateProvider.getBattleStyle() : 'SHIFT';
     const gbcPalette: GbcPaletteMode = stateProvider.getGbcPalette
       ? stateProvider.getGbcPalette()
       : 'VIBRANT';
@@ -169,6 +173,24 @@ export function buildSettingsModalHtml(
             border: 1.5px solid ${isMuted ? '#ef4444' : '#38bdf8'};
             ${S.btnBase}
           ">${isMuted ? '🔇 SOUND: OFF' : '🔊 SOUND: ON'}</button>
+        </div>
+
+        <!-- BGM Volume Slider -->
+        <div data-settings-category="AUDIO" style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">BGM VOLUME</div>
+            <div style="${subLabelStyle}">Music playback level (<span id="settings-bgm-val">${Math.round(bgmVolume * 100)}%</span>)</div>
+          </div>
+          <input id="settings-bgm-slider" type="range" min="0" max="100" value="${Math.round(bgmVolume * 100)}" style="accent-color: #38bdf8; cursor: pointer; width: 130px;" />
+        </div>
+
+        <!-- SFX Volume Slider -->
+        <div data-settings-category="AUDIO" style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">SFX VOLUME</div>
+            <div style="${subLabelStyle}">Sound effects & cries (<span id="settings-sfx-val">${Math.round(soundVolume * 100)}%</span>)</div>
+          </div>
+          <input id="settings-sfx-slider" type="range" min="0" max="100" value="${Math.round(soundVolume * 100)}" style="accent-color: #38bdf8; cursor: pointer; width: 130px;" />
         </div>
 
         <!-- 8-Bit Chiptune APU Mode Toggle -->
@@ -336,6 +358,34 @@ export function buildSettingsModalHtml(
           </div>
         </div>
 
+        <!-- Battle Animations Toggle -->
+        <div data-settings-category="GAMEPLAY" style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">BATTLE ANIMATIONS</div>
+            <div style="${subLabelStyle}">Move VFX & combat battle scene effects</div>
+          </div>
+          <button id="settings-battle-anim-btn" class="neo-kanto-tactile-btn" style="
+            background: ${battleAnimations ? '#059669' : '#334155'};
+            color: #ffffff;
+            border: 1.5px solid ${battleAnimations ? '#34d399' : '#64748b'};
+            ${S.btnBase}
+          ">${battleAnimations ? '✨ ANIMATIONS: ON' : '⚡ ANIMATIONS: OFF'}</button>
+        </div>
+
+        <!-- Battle Style Toggle -->
+        <div data-settings-category="GAMEPLAY" style="${rowStyle}">
+          <div>
+            <div style="${titleLabelStyle}">BATTLE STYLE</div>
+            <div style="${subLabelStyle}">Prompt switch on enemy faint (SHIFT vs SET)</div>
+          </div>
+          <button id="settings-battle-style-btn" class="neo-kanto-tactile-btn" style="
+            background: ${battleStyle === 'SHIFT' ? '#2563eb' : '#d97706'};
+            color: #ffffff;
+            border: 1.5px solid ${battleStyle === 'SHIFT' ? '#60a5fa' : '#f59e0b'};
+            ${S.btnBase}
+          ">${battleStyle === 'SHIFT' ? '🔄 STYLE: SHIFT' : '🔒 STYLE: SET'}</button>
+        </div>
+
         <!-- Touch Controls Toggle -->
         <div data-settings-category="CONTROLS" style="${rowStyle}">
           <div>
@@ -376,6 +426,59 @@ export function buildSettingsModalHtml(
             border: 1.5px solid ${isCrtScanlines ? '#34d399' : '#64748b'};
             ${S.btnBase}
           ">${isCrtScanlines ? '📺 CRT: ON' : '📺 CRT: OFF'}</button>
+        </div>
+
+        <!-- GBC Color Palette Group Card -->
+        <div data-settings-category="GRAPHICS" style="${groupCardStyle}">
+          <div style="${S.cardHeader}">
+            <div>
+              <div style="${titleLabelStyle}">GBC COLOR PALETTE</div>
+              <div id="settings-palette-desc" style="${subLabelStyle}">${GBC_PALETTE_SPECS[gbcPalette]?.description || 'Authentic Game Boy Color palette'}</div>
+            </div>
+            <button id="settings-palette-btn" class="neo-kanto-tactile-btn" style="
+              background: #141E33;
+              color: #ffffff;
+              border: 1.5px solid ${GBC_PALETTE_SPECS[gbcPalette]?.accentColor || '#38bdf8'};
+              box-shadow: 0 3px 0 0 #070B14;
+              border-radius: 6px;
+              padding: 7px 12px;
+              font-family: 'Space Mono', monospace;
+              font-size: 11px;
+              font-weight: 800;
+              cursor: pointer;
+              min-width: 130px;
+            ">${GBC_PALETTE_SPECS[gbcPalette]?.label || '🎨 VIBRANT GBC'}</button>
+          </div>
+          <div id="settings-palette-segmented-group" style="${S.rowGroup}">
+            <button id="settings-palette-vibrant-btn" data-palette-choice="VIBRANT" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${gbcPalette === 'VIBRANT' ? '#1e3a8a' : '#080E1D'};
+              color: ${gbcPalette === 'VIBRANT' ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${gbcPalette === 'VIBRANT' ? '#38bdf8' : '#22324F'};
+              ${S.segBtn}
+            ">[ VIBRANT ]</button>
+            <button id="settings-palette-pocket-btn" data-palette-choice="POCKET" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${gbcPalette === 'POCKET' ? '#3f6212' : '#080E1D'};
+              color: ${gbcPalette === 'POCKET' ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${gbcPalette === 'POCKET' ? '#a3e635' : '#22324F'};
+              ${S.segBtn}
+            ">[ POCKET ]</button>
+            <button id="settings-palette-dmg-btn" data-palette-choice="DMG" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${gbcPalette === 'DMG' ? '#365314' : '#080E1D'};
+              color: ${gbcPalette === 'DMG' ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${gbcPalette === 'DMG' ? '#84cc16' : '#22324F'};
+              ${S.segBtn}
+            ">[ DMG-01 ]</button>
+            <button id="settings-palette-night-btn" data-palette-choice="NIGHT" class="neo-kanto-tactile-btn" style="
+              flex: 1;
+              background: ${gbcPalette === 'NIGHT' ? '#581c87' : '#080E1D'};
+              color: ${gbcPalette === 'NIGHT' ? '#ffffff' : '#94a3b8'};
+              border: 1.5px solid ${gbcPalette === 'NIGHT' ? '#c084fc' : '#22324F'};
+              ${S.segBtn}
+            ">[ MIDNIGHT ]</button>
+          </div>
         </div>
 
         <!-- Unbound-Style Exp. Share Mode Toggle (OFF | ALL | CAPPED) -->

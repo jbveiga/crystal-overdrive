@@ -33,6 +33,8 @@ export class AudioManager {
   private bgmGain: number = AudioManager.BGM_GAIN;
   private sfxGain: number = AudioManager.SFX_GAIN;
   private uiGain: number = AudioManager.UI_GAIN;
+  private bgmVolumeSetting: number = 0.7;
+  private sfxVolumeSetting: number = 0.7;
 
   private muted: boolean = false;
   private chiptuneMode: boolean = false;
@@ -436,6 +438,7 @@ export class AudioManager {
    */
   public setBgmVolume(volume: number): void {
     const clamped = Math.max(0, Math.min(1, volume));
+    this.bgmVolumeSetting = clamped;
     this.bgmGain = Number((AudioManager.BGM_GAIN * (clamped / 0.7)).toFixed(4));
     const effective = this.getEffectiveBgmVolume();
     this.chiptuneSynth.setVolume(effective);
@@ -447,12 +450,21 @@ export class AudioManager {
     }
   }
 
+  public getBgmVolume(): number {
+    return this.bgmVolumeSetting;
+  }
+
   /**
    * Updates SFX volume gain (0.0 - 1.0).
    */
   public setSfxVolume(volume: number): void {
     const clamped = Math.max(0, Math.min(1, volume));
+    this.sfxVolumeSetting = clamped;
     this.sfxGain = Number((AudioManager.SFX_GAIN * (clamped / 0.7)).toFixed(4));
+  }
+
+  public getSfxVolume(): number {
+    return this.sfxVolumeSetting;
   }
 
   /**

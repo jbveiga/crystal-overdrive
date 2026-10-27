@@ -324,7 +324,7 @@ describe('StartMenuUI — Neo-Kanto Google Stitch Modernization', () => {
     expect(matchingRows.some((r) => r.getAttribute('data-dex-id') === 'cyndaquil')).toBe(false);
     expect(matchingRows.some((r) => r.getAttribute('data-dex-id') === 'pidgey')).toBe(true);
 
-    // Open Settings and verify CRT Scanlines, single Auto-HM toggle button, & removed GBC Palette controls
+    // Open Settings and verify CRT Scanlines, single Auto-HM toggle button, & GBC Palette controls
     ui.openSettings();
     const settingsModal = doc.getElementById('settings-modal');
     expect(settingsModal?.style.display).toBe('flex');
@@ -335,7 +335,7 @@ describe('StartMenuUI — Neo-Kanto Google Stitch Modernization', () => {
     const autoHmOnBtn = settingsModal?.querySelector('#settings-autohm-on-btn');
     expect(crtBtn).toBeDefined();
     expect(autoHmBtn).toBeDefined();
-    expect(palBtn).toBeNull();
+    expect(palBtn).toBeDefined();
     expect(autoHmOnBtn).toBeNull();
 
     crtBtn?.click();

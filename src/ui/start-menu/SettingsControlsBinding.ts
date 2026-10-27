@@ -9,6 +9,7 @@
 
 import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';
+import { GBC_PALETTE_SPECS } from '../DisplayThemeManager';
 import type {
   SpeedMultiplier,
   TouchControlStyle,
@@ -118,12 +119,24 @@ export function bindSettingsEventListeners(params: {
     tabControls?.addEventListener('click', () => { BattleAudio.playMenuSound('CURSOR'); filterCategory('CONTROLS'); });
 
     const soundBtn = settingsModal.querySelector('#settings-sound-btn') as HTMLButtonElement;
+    const bgmSlider = settingsModal.querySelector('#settings-bgm-slider') as HTMLInputElement | null;
+    const bgmVal = settingsModal.querySelector('#settings-bgm-val') as HTMLElement | null;
+    const sfxSlider = settingsModal.querySelector('#settings-sfx-slider') as HTMLInputElement | null;
+    const sfxVal = settingsModal.querySelector('#settings-sfx-val') as HTMLElement | null;
     const chiptuneBtn = settingsModal.querySelector('#settings-chiptune-btn') as HTMLButtonElement;
     const lowHpBeepBtn = settingsModal.querySelector('#settings-lowhp-beep-btn') as HTMLButtonElement;
     const speedBtn = settingsModal.querySelector('#settings-speed-btn') as HTMLButtonElement;
+    const battleAnimBtn = settingsModal.querySelector('#settings-battle-anim-btn') as HTMLButtonElement | null;
+    const battleStyleBtn = settingsModal.querySelector('#settings-battle-style-btn') as HTMLButtonElement | null;
     const gamepadBtn = settingsModal.querySelector('#settings-gamepad-btn') as HTMLButtonElement;
     const controlStyleBtn = settingsModal.querySelector('#settings-control-style-btn') as HTMLButtonElement;
     const crtBtn = settingsModal.querySelector('#settings-crt-btn') as HTMLButtonElement;
+    const paletteBtn = settingsModal.querySelector('#settings-palette-btn') as HTMLButtonElement | null;
+    const paletteDesc = settingsModal.querySelector('#settings-palette-desc') as HTMLElement | null;
+    const paletteVibrantBtn = settingsModal.querySelector('#settings-palette-vibrant-btn') as HTMLButtonElement | null;
+    const palettePocketBtn = settingsModal.querySelector('#settings-palette-pocket-btn') as HTMLButtonElement | null;
+    const paletteDmgBtn = settingsModal.querySelector('#settings-palette-dmg-btn') as HTMLButtonElement | null;
+    const paletteNightBtn = settingsModal.querySelector('#settings-palette-night-btn') as HTMLButtonElement | null;
     const expShareBtn = settingsModal.querySelector('#settings-exp-share-btn') as HTMLButtonElement;
     const expOffBtn = settingsModal.querySelector('#settings-exp-off-btn') as HTMLButtonElement;
     const expAllBtn = settingsModal.querySelector('#settings-exp-all-btn') as HTMLButtonElement;
@@ -172,6 +185,46 @@ export function bindSettingsEventListeners(params: {
         callbacks.onToggleCrtScanlines?.(activeCrt);
       });
     }
+
+    let activePalette: GbcPaletteMode = stateProvider.getGbcPalette ? stateProvider.getGbcPalette() : 'VIBRANT';
+    const syncPaletteButtons = (pal: GbcPaletteMode) => {
+      activePalette = pal;
+      const spec = GBC_PALETTE_SPECS[pal];
+      if (paletteBtn && spec) {
+        paletteBtn.innerText = spec.label;
+        paletteBtn.style.borderColor = spec.accentColor;
+      }
+      if (paletteDesc && spec) paletteDesc.innerText = spec.description;
+      const choices: Array<{ el: HTMLButtonElement | null; mode: GbcPaletteMode; bg: string; border: string }> = [
+        { el: paletteVibrantBtn, mode: 'VIBRANT', bg: '#1e3a8a', border: '#38bdf8' },
+        { el: palettePocketBtn, mode: 'POCKET', bg: '#3f6212', border: '#a3e635' },
+        { el: paletteDmgBtn, mode: 'DMG', bg: '#365314', border: '#84cc16' },
+        { el: paletteNightBtn, mode: 'NIGHT', bg: '#581c87', border: '#c084fc' },
+      ];
+      for (const c of choices) {
+        if (!c.el) continue;
+        const isSel = pal === c.mode;
+        c.el.style.background = isSel ? c.bg : '#080E1D';
+        c.el.style.color = isSel ? '#ffffff' : '#94a3b8';
+        c.el.style.borderColor = isSel ? c.border : '#22324F';
+      }
+    };
+
+    const applyPalette = (pal: GbcPaletteMode) => {
+      BattleAudio.playMenuSound('CONFIRM');
+      callbacks.onSetGbcPalette?.(pal);
+      syncPaletteButtons(pal);
+    };
+
+    paletteBtn?.addEventListener('click', () => {
+      const modes: GbcPaletteMode[] = ['VIBRANT', 'POCKET', 'DMG', 'NIGHT'];
+      const nextPal = modes[(modes.indexOf(activePalette) + 1) % modes.length];
+      applyPalette(nextPal);
+    });
+    paletteVibrantBtn?.addEventListener('click', () => applyPalette('VIBRANT'));
+    palettePocketBtn?.addEventListener('click', () => applyPalette('POCKET'));
+    paletteDmgBtn?.addEventListener('click', () => applyPalette('DMG'));
+    paletteNightBtn?.addEventListener('click', () => applyPalette('NIGHT'));
 
     let activeExpMode: ExpShareMode = expShareMode;
     const syncExpShareButtons = (mode: ExpShareMode) => {
@@ -278,12 +331,56 @@ export function bindSettingsEventListeners(params: {
       }
     });
 
+    bgmSlider?.addEventListener('input', () => {
+      const vol = Number(bgmSlider.value) / 100;
+      const label = `${Math.round(vol * 100)}%`;
+      if (bgmVal) {
+        bgmVal.innerText = label;
+        bgmVal.textContent = label;
+      }
+      callbacks.onSetBgmVolume?.(vol);
+    });
+
+    sfxSlider?.addEventListener('input', () => {
+      const vol = Number(sfxSlider.value) / 100;
+      const label = `${Math.round(vol * 100)}%`;
+      if (sfxVal) {
+        sfxVal.innerText = label;
+        sfxVal.textContent = label;
+      }
+      callbacks.onSetSoundVolume?.(vol);
+    });
+
     speedBtn.addEventListener('click', () => {
       if (callbacks.onCycleSpeed) {
         const nextSpeed = callbacks.onCycleSpeed();
         BattleAudio.playMenuSound('CONFIRM');
         speedBtn.innerText = `⚡ SPEED: ${nextSpeed}x`;
       }
+    });
+
+    let activeBattleAnim = stateProvider.getBattleAnimations ? stateProvider.getBattleAnimations() : true;
+    battleAnimBtn?.addEventListener('click', () => {
+      activeBattleAnim = !activeBattleAnim;
+      BattleAudio.playMenuSound('CONFIRM');
+      if (battleAnimBtn) {
+        battleAnimBtn.innerText = activeBattleAnim ? '✨ ANIMATIONS: ON' : '⚡ ANIMATIONS: OFF';
+        battleAnimBtn.style.background = activeBattleAnim ? '#059669' : '#334155';
+        battleAnimBtn.style.borderColor = activeBattleAnim ? '#34d399' : '#64748b';
+      }
+      callbacks.onToggleBattleAnimations?.(activeBattleAnim);
+    });
+
+    let activeBattleStyle: 'SHIFT' | 'SET' = stateProvider.getBattleStyle ? stateProvider.getBattleStyle() : 'SHIFT';
+    battleStyleBtn?.addEventListener('click', () => {
+      activeBattleStyle = activeBattleStyle === 'SHIFT' ? 'SET' : 'SHIFT';
+      BattleAudio.playMenuSound('CONFIRM');
+      if (battleStyleBtn) {
+        battleStyleBtn.innerText = activeBattleStyle === 'SHIFT' ? '🔄 STYLE: SHIFT' : '🔒 STYLE: SET';
+        battleStyleBtn.style.background = activeBattleStyle === 'SHIFT' ? '#2563eb' : '#d97706';
+        battleStyleBtn.style.borderColor = activeBattleStyle === 'SHIFT' ? '#60a5fa' : '#f59e0b';
+      }
+      callbacks.onSetBattleStyle?.(activeBattleStyle);
     });
 
     const battleSpeedBtn = settingsModal.querySelector('#settings-battle-speed-btn') as HTMLButtonElement | null;

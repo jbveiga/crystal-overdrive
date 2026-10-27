@@ -373,6 +373,10 @@ export class OverworldModalRegistry {
         getPlayTimeSeconds: () => getPlayTimeSeconds(),
         getMapName: () => mapManager.getCurrentMap()?.name || 'New Bark Town',
         isMuted: () => audioManager.isMuted(),
+        getBgmVolume: () => gameOptions.bgmVolume ?? audioManager.getBgmVolume(),
+        getSoundVolume: () => gameOptions.soundVolume ?? audioManager.getSfxVolume(),
+        getBattleAnimations: () => gameOptions.battleAnimations ?? true,
+        getBattleStyle: () => gameOptions.battleStyle ?? 'SHIFT',
         getSpeedMultiplier: () => gameClock.playerSpeed,
         getBattleSpeedMultiplier: () => gameClock.battleSpeed,
         getTextSpeed: () => gameOptions.textSpeed ?? 'MID',
@@ -434,8 +438,30 @@ export class OverworldModalRegistry {
         },
         onToggleMute: () => {
           const muted = audioManager.toggleMute();
+          gameOptions.muted = muted;
           getOverworldHUD().updateMuteDisplay(muted);
+          void saveCurrentGame();
           return muted;
+        },
+        onSetBgmVolume: (vol: number) => {
+          gameOptions.bgmVolume = vol;
+          audioManager.setBgmVolume(vol);
+          void saveCurrentGame();
+        },
+        onSetSoundVolume: (vol: number) => {
+          gameOptions.soundVolume = vol;
+          audioManager.setSfxVolume(vol);
+          void saveCurrentGame();
+        },
+        onToggleBattleAnimations: (enabled: boolean) => {
+          gameOptions.battleAnimations = enabled;
+          void saveCurrentGame();
+          return enabled;
+        },
+        onSetBattleStyle: (style: 'SHIFT' | 'SET') => {
+          gameOptions.battleStyle = style;
+          void saveCurrentGame();
+          return style;
         },
         onCycleSpeed: () => {
           return cyclePlayerSpeed();
@@ -453,7 +479,10 @@ export class OverworldModalRegistry {
           return setTextSpeed(spd);
         },
         onToggleGamepad: () => {
-          return getOverworldHUD().toggleGamepad();
+          const active = getOverworldHUD().toggleGamepad();
+          gameOptions.gamepadActive = active;
+          void saveCurrentGame();
+          return active;
         },
         onToggleTouchControlStyle: () => {
           const nextStyle = getOverworldHUD().toggleTouchControlStyle();

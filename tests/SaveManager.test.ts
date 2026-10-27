@@ -91,14 +91,21 @@ describe('SaveManager Data Contracts & Ticket 4.1 Extensions', () => {
     expect(defaults).toEqual({
       soundVolume: 0.7,
       bgmVolume: 0.7,
+      muted: false,
       textSpeed: 'MID',
+      battleStyle: 'SHIFT',
       battleAnimations: true,
       playerSpeedDefault: 3,
       battleSpeedMultiplier: 1,
       touchControlStyle: 'DPAD',
+      gamepadActive: false,
       expShare: 'CAPPED',
       encounterRateMode: 'NORMAL',
       autoHm: true,
+      crtScanlines: false,
+      gbcPalette: 'VIBRANT',
+      lowHpBeepEnabled: true,
+      chiptuneMode: false,
     });
   });
 

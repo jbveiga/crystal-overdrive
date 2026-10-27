@@ -68,19 +68,16 @@ export interface SaveData {
   kurtCraftingOrder?: KurtCraftingOrder;
   bugContestRecords?: BugContestLeaderboardEntry[];
 }
-
 const DB_NAME = 'crystal-overdrive-db';
 const DB_VERSION = 1;
 const STORE_NAME = 'saves';
 const SAVE_KEY = 'main-save';
-
 export const LEGACY_STORAGE_KEYS = [
   'crystal-overdrive-save',
   'crystal_overdrive_save',
   'main-save',
   'saveData',
 ];
-
 export const STARTER_LINEAGE_MAP: Readonly<Record<string, 'cyndaquil' | 'totodile' | 'chikorita'>> = {
   cyndaquil: 'cyndaquil',
   quilava: 'cyndaquil',
@@ -92,7 +89,6 @@ export const STARTER_LINEAGE_MAP: Readonly<Record<string, 'cyndaquil' | 'totodil
   bayleef: 'chikorita',
   meganium: 'chikorita',
 };
-
 const LOCATION_NAME_TABLE: Record<string, string> = {
   new_bark_town: 'New Bark Town',
   players_house_1f: "Player's House",
@@ -123,11 +119,9 @@ const LOCATION_NAME_TABLE: Record<string, string> = {
   sprout_tower_3f: 'Sprout Tower 3F',
   violet_gym: 'Violet Gym',
 };
-
 export class SaveManager {
   private dbPromise: Promise<IDBPDatabase> | null = null;
   private memoryStore: Map<string, SaveData> = new Map();
-
   constructor() {
     if (typeof indexedDB !== 'undefined') {
       this.dbPromise = openDB(DB_NAME, DB_VERSION, {
@@ -145,16 +139,39 @@ export class SaveManager {
    */
   public static getDefaultOptions(): GameOptions {
     return {
-      soundVolume: 0.7,
-      bgmVolume: 0.7,
-      textSpeed: 'MID',
-      battleAnimations: true,
-      playerSpeedDefault: 3,
-      battleSpeedMultiplier: 1,
-      touchControlStyle: 'DPAD',
-      expShare: 'CAPPED',
-      encounterRateMode: 'NORMAL',
-      autoHm: true,
+      soundVolume: 0.7, bgmVolume: 0.7, muted: false, textSpeed: 'MID', battleStyle: 'SHIFT',
+      battleAnimations: true, playerSpeedDefault: 3, battleSpeedMultiplier: 1, touchControlStyle: 'DPAD',
+      gamepadActive: false, expShare: 'CAPPED', encounterRateMode: 'NORMAL', autoHm: true,
+      crtScanlines: false, gbcPalette: 'VIBRANT', lowHpBeepEnabled: true, chiptuneMode: false,
+    };
+  }
+
+  /**
+   * Defensively normalizes user options against canonical defaults.
+   */
+  public static normalizeOptions(
+    raw?: Partial<GameOptions> | null,
+    player?: Partial<SaveData['player']> | null
+  ): GameOptions {
+    const def = SaveManager.getDefaultOptions();
+    const r = raw && typeof raw === 'object' ? raw : {};
+    const cv = (v: any, d: number): number => { const n = Number(v); return Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : d; };
+    const pick = <T>(v: any, valid: T[], d: T): T => (valid.includes(v) ? v : d);
+    const b = (v: any, d: boolean): boolean => (typeof v === 'boolean' ? v : d);
+    const pSpeed = [1, 2, 3, 4].includes(r.playerSpeedDefault as any) ? r.playerSpeedDefault! : [1, 2, 3, 4].includes(player?.speedMultiplier as any) ? player!.speedMultiplier! : def.playerSpeedDefault;
+    const bSpeed = [1, 2, 3, 4].includes(r.battleSpeedMultiplier as any) ? r.battleSpeedMultiplier! : [1, 2, 3, 4].includes(player?.battleSpeedMultiplier as any) ? player!.battleSpeedMultiplier! : def.battleSpeedMultiplier!;
+    return {
+      soundVolume: cv(r.soundVolume, def.soundVolume), bgmVolume: cv(r.bgmVolume, def.bgmVolume), muted: b(r.muted, def.muted!),
+      textSpeed: pick(r.textSpeed, ['SLOW', 'MID', 'FAST', 'INSTANT'], def.textSpeed),
+      battleStyle: pick(r.battleStyle, ['SHIFT', 'SET'], def.battleStyle!),
+      battleAnimations: b(r.battleAnimations, def.battleAnimations),
+      playerSpeedDefault: pSpeed as SpeedMultiplier, battleSpeedMultiplier: bSpeed as SpeedMultiplier,
+      touchControlStyle: pick(r.touchControlStyle, ['DPAD', 'JOYSTICK'], def.touchControlStyle!),
+      gamepadActive: b(r.gamepadActive, def.gamepadActive!), expShare: pick(r.expShare, ['OFF', 'ALL', 'CAPPED'], def.expShare!),
+      encounterRateMode: pick(r.encounterRateMode, ['NORMAL', 'RELAXED', 'CLASSIC'], def.encounterRateMode!),
+      autoHm: b(r.autoHm, def.autoHm!), crtScanlines: b(r.crtScanlines, def.crtScanlines!),
+      gbcPalette: pick(r.gbcPalette, ['VIBRANT', 'POCKET', 'DMG', 'NIGHT'], def.gbcPalette!),
+      lowHpBeepEnabled: b(r.lowHpBeepEnabled, def.lowHpBeepEnabled!), chiptuneMode: b(r.chiptuneMode, def.chiptuneMode!),
     };
   }
 
@@ -416,11 +433,7 @@ export class SaveManager {
             loaded.box = loaded.box.filter((p) => p && typeof p === 'object' && p.speciesId);
           }
           SaveManager.reconcileStarterFlags(loaded);
-          if (!loaded.options) {
-            loaded.options = SaveManager.getDefaultOptions();
-          } else if (!loaded.options.expShare) {
-            loaded.options.expShare = 'CAPPED';
-          }
+          loaded.options = SaveManager.normalizeOptions(loaded.options, loaded.player);
           if (loaded.player && !loaded.player.rivalName && loaded.rivalName) {
             loaded.player.rivalName = loaded.rivalName;
           } else if (loaded.player && loaded.player.rivalName && !loaded.rivalName) {
@@ -566,7 +579,8 @@ export class SaveManager {
     const validBox = (existingSave.box || []).filter((p) => p && typeof p === 'object');
     state.playerParty.splice(0, state.playerParty.length, ...validParty);
     state.playerBox.splice(0, state.playerBox.length, ...validBox);
-    Object.assign(state.gameOptions, existingSave.options || {});
+    const normalizedOpts = SaveManager.normalizeOptions(existingSave.options, existingSave.player);
+    Object.assign(state.gameOptions, normalizedOpts);
     state.inventory.balls = existingSave.inventory?.balls || {};
     state.inventory.items = existingSave.inventory?.items || {};
     state.inventory.berries = existingSave.inventory?.berries || {};
@@ -600,10 +614,8 @@ export class SaveManager {
       lastVisitedPokecenter = { mapId: initialMapId, x: 3, y: 3 };
     }
 
-    state.gameClock.playerSpeed =
-      existingSave.player.speedMultiplier || existingSave.options?.playerSpeedDefault || 3;
-    state.gameClock.battleSpeed =
-      existingSave.player.battleSpeedMultiplier || existingSave.options?.battleSpeedMultiplier || 1;
+    state.gameClock.playerSpeed = normalizedOpts.playerSpeedDefault;
+    state.gameClock.battleSpeed = normalizedOpts.battleSpeedMultiplier ?? 1;
     state.gameOptions.playerSpeedDefault = state.gameClock.playerSpeed;
     state.gameOptions.battleSpeedMultiplier = state.gameClock.battleSpeed;
 
@@ -679,6 +691,12 @@ export class SaveManager {
       bugContestManager,
     } = params;
 
+    const normalizedOpts = SaveManager.normalizeOptions({
+      ...gameOptions,
+      playerSpeedDefault: gameClock.playerSpeed,
+      battleSpeedMultiplier: gameClock.battleSpeed,
+    });
+
     return {
       version: 1,
       timestamp: Date.now(),
@@ -690,8 +708,8 @@ export class SaveManager {
         x: player.x,
         y: player.y,
         direction: player.direction,
-        speedMultiplier: gameClock.playerSpeed,
-        battleSpeedMultiplier: gameClock.battleSpeed,
+        speedMultiplier: normalizedOpts.playerSpeedDefault,
+        battleSpeedMultiplier: normalizedOpts.battleSpeedMultiplier,
         badges: inventory.badges,
         money: inventory.money,
         rivalName,
@@ -715,11 +733,11 @@ export class SaveManager {
       harvestedFruitTrees: overworldItemManager.getHarvestedTreeIds(),
       fruitTreePicks: overworldItemManager.getFruitTreePicksRecord(),
       seenSpecies: Array.from(seenSpecies),
-      options: gameOptions,
+      options: normalizedOpts,
       missions: missionManager.serialize(),
-      dayCare: dayCareManager.getState(),
-      kurtCraftingOrder: kurtCraftingManager.activeOrder,
-      bugContestRecords: bugContestManager.serializeRecords(),
+      dayCare: dayCareManager?.getState(),
+      kurtCraftingOrder: kurtCraftingManager?.activeOrder,
+      bugContestRecords: bugContestManager?.serializeRecords(),
     };
   }
 }

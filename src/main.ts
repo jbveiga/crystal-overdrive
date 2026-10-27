@@ -105,20 +105,17 @@ async function bootstrap() {
       playerParty, playerBox, gameOptions, inventory, defeatedTrainers, storyFlags, seenSpecies, overworldItemManager,
       missionManager, gameClock, roamingManager,
     });
-    playTimeSeconds = playTimeBox.val;
-    playerName = playerNameBox.val;
-    playerGender = playerGenderBox.val;
-    rivalName = rivalNameBox.val;
-    initialMapId = loc.mapId;
-    initialPlayerX = loc.x;
-    initialPlayerY = loc.y;
-    initialPlayerDir = loc.direction;
-    lastVisitedPokecenter = loc.lastVisitedPokecenter;
+    playTimeSeconds = playTimeBox.val; playerName = playerNameBox.val; playerGender = playerGenderBox.val; rivalName = rivalNameBox.val;
+    initialMapId = loc.mapId; initialPlayerX = loc.x; initialPlayerY = loc.y; initialPlayerDir = loc.direction; lastVisitedPokecenter = loc.lastVisitedPokecenter;
   }
 
   const displayThemeManager = new DisplayThemeManager(gameOptions.crtScanlines ?? false, gameOptions.gbcPalette ?? 'VIBRANT');
   BattleAudio.setLowHpBeepEnabled(gameOptions.lowHpBeepEnabled ?? true);
   audioManager.setChiptuneMode(gameOptions.chiptuneMode ?? false);
+  if (gameOptions.bgmVolume !== undefined) audioManager.setBgmVolume(gameOptions.bgmVolume);
+  if (gameOptions.soundVolume !== undefined) audioManager.setSfxVolume(gameOptions.soundVolume);
+  if (gameOptions.muted !== undefined) audioManager.setMuted(gameOptions.muted);
+  if (gameOptions.encounterRateMode) mapManager.setEncounterRateMode(gameOptions.encounterRateMode);
 
   let overworldRenderer!: OverworldRenderer, overworldHUD!: OverworldHUD, battleRenderer!: BattleRenderer;
   let battleHUD!: BattleHUD, itemfinderHUD!: ItemfinderHUD, bugContestHUD!: BugContestHUDWidget;
@@ -187,28 +184,25 @@ async function bootstrap() {
     missionManager.checkStoryFlags(storyFlags);
     gameOptions.playerSpeedDefault = gameClock.playerSpeed;
     gameOptions.battleSpeedMultiplier = gameClock.battleSpeed;
-    if (overworldHUD) gameOptions.touchControlStyle = overworldHUD.getTouchControlStyle();
+    gameOptions.muted = audioManager.isMuted();
+    gameOptions.bgmVolume = audioManager.getBgmVolume();
+    gameOptions.soundVolume = audioManager.getSfxVolume();
+    gameOptions.chiptuneMode = audioManager.isChiptuneMode();
+    gameOptions.lowHpBeepEnabled = BattleAudio.lowHpBeepEnabled;
+    gameOptions.crtScanlines = displayThemeManager.isCrtEnabled();
+    gameOptions.gbcPalette = displayThemeManager.getPalette();
+    gameOptions.encounterRateMode = mapManager.getEncounterRateMode();
+    if (overworldHUD) {
+      gameOptions.touchControlStyle = overworldHUD.getTouchControlStyle();
+      gameOptions.gamepadActive = overworldHUD.isGamepadActive();
+    }
     const saveData = SaveManager.createSaveSnapshot({
-      playTimeSeconds,
-      playerName,
-      playerGender,
-      rivalName,
+      playTimeSeconds, playerName, playerGender, rivalName,
       player: { x: player.x, y: player.y, direction: player.direction },
       mapId: mapManager.getCurrentMap()?.id || 'new_bark_town',
-      gameClock,
-      inventory,
-      playerParty,
-      boxManager,
-      roamingManager,
-      defeatedTrainers,
-      storyFlags,
-      seenSpecies,
-      overworldItemManager,
-      gameOptions,
-      missionManager,
-      dayCareManager,
-      kurtCraftingManager,
-      bugContestManager,
+      gameClock, inventory, playerParty, boxManager, roamingManager,
+      defeatedTrainers, storyFlags, seenSpecies, overworldItemManager,
+      gameOptions, missionManager, dayCareManager, kurtCraftingManager, bugContestManager,
     });
     await saveManager.saveGame(saveData);
     console.log('💾 Game state successfully saved to IndexedDB.');
@@ -338,6 +332,7 @@ async function bootstrap() {
     modalRegistry.startMenuUI.setSpeedMultiplier(newSpeed);
     if (overworldHUD) overworldHUD.updateSpeedDisplay(newSpeed);
     eventBus.emit('player:speedChanged', { playerSpeed: newSpeed });
+    void saveCurrentGame();
     return newSpeed;
   };
 
@@ -361,7 +356,12 @@ async function bootstrap() {
 
   overworldHUD = new OverworldHUD('overworld-hud-container', {
     onSpeedCycle: () => cyclePlayerSpeed(),
-    onMuteToggle: () => audioManager.toggleMute(),
+    onMuteToggle: () => {
+      const m = audioManager.toggleMute();
+      gameOptions.muted = m;
+      void saveCurrentGame();
+      return m;
+    },
     onMenuToggle: () => {
       if (dayCareModalUI.isOpen()) { dayCareModalUI.close(); return; }
       if (ruinsPuzzleModalUI.isOpen()) { ruinsPuzzleModalUI.close(); return; }
@@ -381,6 +381,7 @@ async function bootstrap() {
   });
   overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
   overworldHUD.setTouchControlStyle(gameOptions.touchControlStyle || 'DPAD');
+  if (gameOptions.gamepadActive !== undefined) overworldHUD.setGamepadVisible(gameOptions.gamepadActive);
   overworldHUD.setTextSpeed(gameOptions.textSpeed ?? 'MID');
   overworldHUD.updateMuteDisplay(audioManager.isMuted());
   overworldHUD.updateRouteName(initialMap.name);
@@ -518,6 +519,7 @@ async function bootstrap() {
       bagUI.setSpeedMultiplier(gameClock.playerSpeed);
       partyUI.setSpeedMultiplier(gameClock.playerSpeed);
       startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
+      void saveCurrentGame();
     },
   });
 
