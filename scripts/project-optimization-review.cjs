@@ -160,12 +160,15 @@ function getTsFilesRecursively(dir) {
   return results;
 }
 
-const srcTsFiles = getTsFilesRecursively(path.resolve(__dirname, '../src'));
+const allTsFiles = [
+  ...getTsFilesRecursively(path.resolve(__dirname, '../src')),
+  ...getTsFilesRecursively(path.resolve(__dirname, '../tests')),
+];
 let fileCeilingViolations = 0;
 let repoMaxLines = 0;
 let repoMaxFile = '';
 
-for (const filePath of srcTsFiles) {
+for (const filePath of allTsFiles) {
   const lineCount = fs.readFileSync(filePath, 'utf8').split('\n').length;
   if (lineCount > repoMaxLines) {
     repoMaxLines = lineCount;
@@ -180,7 +183,7 @@ for (const filePath of srcTsFiles) {
 }
 
 if (fileCeilingViolations === 0) {
-  console.log(`  ✅ 100% of TypeScript files in src/ strictly adhere to < 800-line single-window ceiling (${srcTsFiles.length} files audited, max: ${repoMaxLines} lines in ${repoMaxFile}).\n`);
+  console.log(`  ✅ 100% of TypeScript files across src/ and tests/ strictly adhere to <= 800-line single-window ceiling (${allTsFiles.length} files audited, max: ${repoMaxLines} lines in ${repoMaxFile}).\n`);
 } else {
   console.log(`  ⚠️  Found ${fileCeilingViolations} files exceeding the 800-line ceiling.\n`);
 }
