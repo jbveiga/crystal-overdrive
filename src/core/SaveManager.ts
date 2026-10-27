@@ -65,6 +65,13 @@ const DB_VERSION = 1;
 const STORE_NAME = 'saves';
 const SAVE_KEY = 'main-save';
 
+export const LEGACY_STORAGE_KEYS = [
+  'crystal-overdrive-save',
+  'crystal_overdrive_save',
+  'main-save',
+  'saveData',
+];
+
 export const STARTER_LINEAGE_MAP: Readonly<Record<string, 'cyndaquil' | 'totodile' | 'chikorita'>> = {
   cyndaquil: 'cyndaquil',
   quilava: 'cyndaquil',
@@ -302,6 +309,13 @@ export class SaveManager {
         const db = await this.dbPromise;
         await db.put(STORE_NAME, data, SAVE_KEY);
       }
+      if (typeof localStorage !== 'undefined') {
+        try {
+          localStorage.setItem('crystal-overdrive-save', JSON.stringify(data));
+        } catch (err) {
+          console.warn('Could not mirror save to localStorage:', err);
+        }
+      }
       return true;
     } catch (err) {
       console.error('Failed to save game to IndexedDB:', err);
@@ -316,6 +330,27 @@ export class SaveManager {
         const db = await this.dbPromise;
         const save = await db.get(STORE_NAME, SAVE_KEY);
         if (save) loaded = save;
+      }
+      if (!loaded && typeof localStorage !== 'undefined') {
+        for (const k of LEGACY_STORAGE_KEYS) {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            try {
+              const parsed = JSON.parse(raw);
+              if (parsed && typeof parsed === 'object' && parsed.player) {
+                loaded = parsed;
+                // Auto-migrate legacy localStorage save into IndexedDB
+                if (this.dbPromise) {
+                  const db = await this.dbPromise;
+                  await db.put(STORE_NAME, loaded, SAVE_KEY);
+                }
+                break;
+              }
+            } catch {
+              // Ignore corrupt legacy JSON
+            }
+          }
+        }
       }
       if (!loaded) {
         const memSave = this.memoryStore.get(SAVE_KEY);
@@ -362,6 +397,15 @@ export class SaveManager {
     if (this.dbPromise) {
       const db = await this.dbPromise;
       await db.delete(STORE_NAME, SAVE_KEY);
+    }
+    if (typeof localStorage !== 'undefined') {
+      for (const k of LEGACY_STORAGE_KEYS) {
+        try {
+          localStorage.removeItem(k);
+        } catch {
+          // ignore
+        }
+      }
     }
   }
 

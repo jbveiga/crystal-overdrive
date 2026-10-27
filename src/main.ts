@@ -20,13 +20,8 @@ import { PokemonFactory } from './battle/PokemonFactory';
 import { BattleSessionController } from './battle/BattleSessionController';
 import { FieldObstacleDispatcher, createDefaultNpcInteractionRouter } from './world/interactions';
 import type {
-  BattleSessionContext,
-  FieldObstacleContext,
-  NpcInteractionContext,
-  TriggerBattleOptions,
-  OverworldTransitionContext,
-  OverworldTrainerSightContext,
-  OverworldTickerContext,
+  BattleSessionContext, FieldObstacleContext, NpcInteractionContext,
+  TriggerBattleOptions, OverworldTransitionContext, OverworldTrainerSightContext, OverworldTickerContext,
 } from './types/gameContext';
 import { MoveReplacementModalUI } from './ui/MoveReplacementModalUI';
 import { BattleAudio } from './audio/BattleAudio';
@@ -48,11 +43,12 @@ import { BugContestManager } from './world/BugContestManager';
 import { BugContestHUDWidget } from './ui/BugContestHUDWidget';
 import { KurtCraftingManager } from './world/KurtCraftingManager';
 import { EvolutionSceneUI } from './ui/EvolutionSceneUI';
+import { ensureGlobalNeoKantoStyles } from './ui/styles/globalNeoKantoStyles';
 import { DisplayThemeManager } from './ui/DisplayThemeManager';
 import type { MapData, WarpEvent, Direction, PokemonInstance, PlayerGender, GameOptions, SpeedMultiplier } from './types/game';
 import {
-  makeNpc, createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS, isNpcActiveForStoryFlags,
-  applyMapNpcStoryMutations, resolveElmLabDialogue, applyStoryRecoveryFlags, filterInitialMapNpcs, resetStoryNpcSpawns,
+  makeNpc, createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS, isNpcActiveForStoryFlags, applyMapNpcStoryMutations,
+  resolveElmLabDialogue, applyStoryRecoveryFlags, filterInitialMapNpcs, resetStoryNpcSpawns,
 } from './world/npcData';
 import { TrackedStoryFlagSet, ActiveNpcCache } from './world/ActiveNpcCache';
 export { npcsByMap, createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS, isNpcActiveForStoryFlags, applyMapNpcStoryMutations } from './world/npcData';
@@ -72,6 +68,7 @@ declare global {
 }
 
 async function bootstrap() {
+  ensureGlobalNeoKantoStyles();
   console.log('⚡ Initializing Crystal Overdrive (Neo-Kanto Protocol)...');
   window.updateLoaderProgress?.(5, 'Parsing save state...');
 
@@ -413,8 +410,7 @@ async function bootstrap() {
   });
 
   window.updateLoaderProgress?.(40, 'Mounting overworld engine...');
-  const canvasContainer = (document.getElementById('canvas-container') ||
-    document.getElementById('game-container') || document.body) as HTMLElement;
+  const canvasContainer = (document.getElementById('canvas-container') || document.getElementById('game-container') || document.body) as HTMLElement;
   overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer, {
     startPercent: 40, endPercent: 72, concurrency: 6,

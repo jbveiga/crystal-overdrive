@@ -65,35 +65,35 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
 export class OverworldNpcAndItemSprites {
   public static extractCharacterFrames(sheet: Texture): CharacterFrames {
     const fw = 16;
-    const fh = 16;
-    const makeFrame = (x: number, y: number): Texture => {
+    const fh = 32;
+
+    const getFrame = (idx: number): Texture => {
       return new Texture({
         source: sheet.source,
-        frame: new Rectangle(x, y, fw, fh),
+        frame: new Rectangle(idx * fw, 0, fw, fh),
       });
     };
 
     return {
-      downStand: makeFrame(0, 0),
-      downWalk1: makeFrame(16, 0),
-      downWalk2: makeFrame(32, 0),
-      upStand: makeFrame(0, 16),
-      upWalk1: makeFrame(16, 16),
-      upWalk2: makeFrame(32, 16),
-      sideStand: makeFrame(0, 32),
-      sideWalk1: makeFrame(16, 32),
-      sideWalk2: makeFrame(32, 32),
+      downStand: getFrame(0),
+      upStand: getFrame(1),
+      sideStand: getFrame(2),
+      downWalk1: getFrame(3),
+      downWalk2: getFrame(4),
+      upWalk1: getFrame(5),
+      upWalk2: getFrame(6),
+      sideWalk1: getFrame(7),
+      sideWalk2: getFrame(8),
     };
   }
 
   public static createGrassWadingGraphic(tileSize: number = 64): Graphics {
     const g = new Graphics();
-    g.rect(-tileSize * 0.45, 0, tileSize * 0.9, tileSize * 0.35)
-      .fill({ color: 0x2a7a32, alpha: 0.85 });
-    g.rect(-tileSize * 0.35, -4, 6, 8).fill({ color: 0x48a044 });
-    g.rect(-tileSize * 0.15, -6, 6, 10).fill({ color: 0x65c458 });
-    g.rect(tileSize * 0.05, -5, 6, 9).fill({ color: 0x48a044 });
-    g.rect(tileSize * 0.25, -6, 6, 10).fill({ color: 0x65c458 });
+    g.rect(-22, -12, 44, 14).fill({ color: 0x3b8a3e, alpha: 0.92 });
+    for (let bx = -20; bx <= 16; bx += 8) {
+      g.moveTo(bx, -12).lineTo(bx + 4, -20).lineTo(bx + 8, -12).fill({ color: 0x1e5926 });
+      g.moveTo(bx + 2, -10).lineTo(bx + 5, -16).lineTo(bx + 8, -10).fill({ color: 0x48a044 });
+    }
     return g;
   }
 
@@ -103,17 +103,35 @@ export class OverworldNpcAndItemSprites {
     isMoving: boolean,
     progress: number
   ): Texture {
-    if (dir === 'DOWN') {
-      if (!isMoving) return frames.downStand;
-      return progress < 0.5 ? frames.downWalk1 : frames.downWalk2;
+    if (!isMoving) {
+      switch (dir) {
+        case 'UP':
+          return frames.upStand;
+        case 'DOWN':
+          return frames.downStand;
+        case 'LEFT':
+        case 'RIGHT':
+          return frames.sideStand;
+      }
     }
-    if (dir === 'UP') {
-      if (!isMoving) return frames.upStand;
-      return progress < 0.5 ? frames.upWalk1 : frames.upWalk2;
+
+    // Authentic Gen 2 4-step walk cycle (Walk1 -> Stand -> Walk2 -> Stand)
+    const step = Math.floor((progress * 4) % 4);
+    switch (dir) {
+      case 'UP':
+        if (step === 0) return frames.upWalk1;
+        if (step === 2) return frames.upWalk2;
+        return frames.upStand;
+      case 'DOWN':
+        if (step === 0) return frames.downWalk1;
+        if (step === 2) return frames.downWalk2;
+        return frames.downStand;
+      case 'LEFT':
+      case 'RIGHT':
+        if (step === 0) return frames.sideWalk1;
+        if (step === 2) return frames.sideWalk2;
+        return frames.sideStand;
     }
-    // LEFT or RIGHT (mirrored via scale.x = -1)
-    if (!isMoving) return frames.sideStand;
-    return progress < 0.5 ? frames.sideWalk1 : frames.sideWalk2;
   }
 
   public static ensureNpcSpriteLoaded(

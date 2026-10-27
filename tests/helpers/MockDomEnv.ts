@@ -210,15 +210,15 @@ export class MockDocument {
 
   getElementById(id: string): MockElement | null {
     if (this.elementsById.has(id)) return this.elementsById.get(id)!;
-    return this.body.querySelector(`#${id}`);
+    return this.body.querySelector(`#${id}`) || this.head.querySelector(`#${id}`);
   }
 
   querySelector(selector: string): MockElement | null {
-    return this.body.querySelector(selector);
+    return this.body.querySelector(selector) || this.head.querySelector(selector);
   }
 
   querySelectorAll(selector: string): MockElement[] {
-    return this.body.querySelectorAll(selector);
+    return [...this.body.querySelectorAll(selector), ...this.head.querySelectorAll(selector)];
   }
 
   register(el: MockElement): void {
