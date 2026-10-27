@@ -1,3 +1,12 @@
+/**
+ * @fileoverview OverworldAndEnvironmentalAudio domain module implementation.
+ * @module audio/battle/OverworldAndEnvironmentalAudio
+ * @role OverworldAndEnvironmentalAudio Component
+ * @exports OverworldSoundCue, AudioHelperContext, playWarpSound
+ * @layer audio
+ * @sections L1-15: Micro-Header & Imports | L16-305: Implementation | L306-611: Handlers & Exports
+ */
+
 import type { WarpSoundCue } from '../../types/game';
 
 export type OverworldSoundCue =

@@ -2,6 +2,7 @@
  * @fileoverview Neo-Kanto stylesheet injection, badge color palettes, and summary inspector for party management.
  * @module ui/styles/partyStylesAndSummary
  * @layer ui
+ * @sections L1-5: Micro-Header & Types | L6-133: Core Implementation | L134-266: Public Interface & Exports
  */
 
 import type { PokemonInstance } from '../../types/game';

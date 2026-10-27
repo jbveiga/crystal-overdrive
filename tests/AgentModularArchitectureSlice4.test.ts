@@ -388,10 +388,10 @@ describe('AgentModularArchitectureSlice4 — StartMenuUI Modularization & Semant
 
     expect(archContent).toContain('## 0. Agent Semantic Routing Index (1-Hop File Lookup Table)');
     expect(archContent).toContain('`src/types/gameContext.d.ts`');
-    expect(archContent).toContain('`src/types/game.ts`');
+    expect(archContent).toContain('`src/types/game.d.ts`');
     expect(archContent).toContain('`src/battle/BattleStateMachine.ts`');
     expect(archContent).toContain('`src/world/GridPhysics.ts`');
-    expect(archContent).toContain('`src/world/interactions/npcRouter.ts`');
+    expect(archContent).toContain('`src/world/interactions/NpcInteractionRouter.ts`');
     expect(archContent).toContain('`src/world/npcs/npcShared.ts`');
     expect(archContent).toContain('`src/world/npcData.ts`');
     expect(archContent).toContain('`src/ui/StartMenuUI.ts`');
@@ -400,6 +400,58 @@ describe('AgentModularArchitectureSlice4 — StartMenuUI Modularization & Semant
     expect(archContent).toContain('`src/ui/start-menu/TrainerCardAndSaveRenderer.ts`');
     expect(archContent).toContain('`src/ui/start-menu/SettingsModalRenderer.ts`');
     expect(archContent).toContain('`src/ui/start-menu/SettingsControlsBinding.ts`');
+
+    // 1. Every src/... and tests/... path in ARCHITECTURE.md exists on disk
+    const matches = archContent.match(/`(src\/[^`]+|tests\/[^`]+)`/g) || [];
+    for (const m of matches) {
+      const p = path.resolve(rootDir, m.slice(1, -1));
+      expect(fs.existsSync(p), `Path in ARCHITECTURE.md must exist on disk: ${m}`).toBe(true);
+    }
+
+    // 2. 100% of .ts/.d.ts files in src/ are indexed in ARCHITECTURE.md Section 0
+    function getTsFilesRecursively(dir: string): string[] {
+      let results: string[] = [];
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          results = results.concat(getTsFilesRecursively(full));
+        } else if (entry.name.endsWith('.ts') || entry.name.endsWith('.d.ts')) {
+          results.push(path.relative(rootDir, full));
+        }
+      }
+      return results;
+    }
+
+    const allSrcFiles = getTsFilesRecursively(path.resolve(rootDir, 'src'));
+    const section0 = archContent.slice(
+      archContent.indexOf('## 0. Agent Semantic Routing Index'),
+      archContent.indexOf('## 1. Executive Overview')
+    );
+    for (const srcFile of allSrcFiles) {
+      expect(section0, `ARCHITECTURE.md Section 0 must index ${srcFile}`).toContain('`' + srcFile + '`');
+    }
+
+    // 3. 100% of .ts files across src/ and tests/ are strictly <= 42,000 bytes (< 46,080 limit)
+    const allRepoTsFiles = [
+      ...getTsFilesRecursively(path.resolve(rootDir, 'src')),
+      ...getTsFilesRecursively(path.resolve(rootDir, 'tests')),
+    ].filter((f) => f.endsWith('.ts'));
+
+    for (const tsFile of allRepoTsFiles) {
+      const stat = fs.statSync(path.resolve(rootDir, tsFile));
+      expect(stat.size, `${tsFile} size (${stat.size} bytes) must be <= 42000 bytes`).toBeLessThanOrEqual(42000);
+    }
+
+    // 4. Every .ts file in src/ with > 200 lines contains @fileoverview and @sections in lines 1-15
+    for (const srcFile of allSrcFiles.filter((f) => f.endsWith('.ts'))) {
+      const filePath = path.resolve(rootDir, srcFile);
+      const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+      if (lines.length > 200) {
+        const first15 = lines.slice(0, 15).join('\n');
+        expect(first15, `${srcFile} (>200 lines) must include @fileoverview in first 15 lines`).toContain('@fileoverview');
+        expect(first15, `${srcFile} (>200 lines) must include @sections in first 15 lines`).toContain('@sections');
+      }
+    }
   });
 
   it('Pillar 2: verifies Asset & Media Integrity Scan for species front sprites referenced in pokedexData', () => {

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview lateJohtoAndLeagueMissions domain module implementation.
+ * @module world/missions/lateJohtoAndLeagueMissions
+ * @role lateJohtoAndLeagueMissions Component
+ * @exports LATE_JOHTO_AND_LEAGUE_MISSIONS
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-190: Implementation | L191-381: Handlers & Exports
+ */
+
 import type { Mission } from '../../types/game';
 
 export const LATE_JOHTO_AND_LEAGUE_MISSIONS: ReadonlyArray<Mission> = [

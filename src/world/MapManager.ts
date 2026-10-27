@@ -4,6 +4,7 @@
  * @role Map Manager & Collision Engine
  * @exports MapManager, WildEncounterResult
  * @layer world
+ * @sections L1-7: Micro-Header & Types | L8-356: Core Implementation | L357-713: Public Interface & Exports
  */
 
 import type { BgEvent, Direction, EncounterRateMode, MapData, TileCoord, WarpEvent, WarpSoundCue, WarpTransitionConfig } from '../types/game';

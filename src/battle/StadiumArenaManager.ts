@@ -1,4 +1,13 @@
 /**
+ * @fileoverview StadiumArenaManager domain module implementation.
+ * @module battle/StadiumArenaManager
+ * @role StadiumArenaManager Component
+ * @exports StadiumChallengerSpec, STADIUM_CUPS, STADIUM_CHALLENGERS
+ * @layer battle
+ * @sections L1-15: Micro-Header & Imports | L16-127: Implementation | L128-254: Handlers & Exports
+ */
+
+/**
  * StadiumArenaManager.ts
  * Pure TypeScript domain manager for Advanced Stadium Cups & 2v2 Double Battle Challengers.
  */

@@ -1,4 +1,13 @@
 /**
+ * @fileoverview ChiptuneSynthesizer domain module implementation.
+ * @module audio/ChiptuneSynthesizer
+ * @role ChiptuneSynthesizer Component
+ * @exports ChiptuneStep, ChiptunePattern, ChiptuneSynthesizer
+ * @layer audio
+ * @sections L1-15: Micro-Header & Imports | L16-299: Implementation | L300-599: Handlers & Exports
+ */
+
+/**
  * Game Boy Color (DMG/CGB) 4-Channel Programmable Sound Generator (APU) Synthesizer.
  *
  * Emulates the classic 4 hardware sound channels using Web Audio API:

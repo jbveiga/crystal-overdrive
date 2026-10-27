@@ -1,4 +1,13 @@
 /**
+ * @fileoverview RadioTowerQuizUI domain module implementation.
+ * @module ui/RadioTowerQuizUI
+ * @role RadioTowerQuizUI Component
+ * @exports QuizQuestion, RADIO_TOWER_QUIZ_QUESTIONS, RadioTowerQuizCallbacks
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-258: Implementation | L259-516: Handlers & Exports
+ */
+
+/**
  * Goldenrod Radio Tower Quiz Overlay (Google Stitch Neo-Kanto Protocol)
  * Desktop Screen: 1a4d03fc112b4e90ae7562f68744370f
  * Mobile Screen: 928ff00c501e4cb49eec4d25088a3be0 (100dvh safe-area)

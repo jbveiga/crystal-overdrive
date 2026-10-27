@@ -1,3 +1,12 @@
+/**
+ * @fileoverview GymLeaderInteractions domain module implementation.
+ * @module world/interactions/GymLeaderInteractions
+ * @role GymLeaderInteractions Component
+ * @exports getGymLeaderInteractions
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-216: Implementation | L217-432: Handlers & Exports
+ */
+
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
 import { getKantoAndLeagueInteractions } from './KantoAndLeagueInteractions';

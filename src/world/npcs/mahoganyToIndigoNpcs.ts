@@ -1,40 +1,31 @@
+/**
+ * @fileoverview mahoganyToIndigoNpcs domain module implementation.
+ * @module world/npcs/mahoganyToIndigoNpcs
+ * @role mahoganyToIndigoNpcs Component
+ * @exports createMahoganyToIndigoNpcs
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-130: Implementation | L131-261: Handlers & Exports
+ */
+
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
 
 export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
   return {
     lake_of_rage: [
-      makeNpc(
-        'lake_of_rage_red_gyarados',
-        21,
-        15,
-        'DOWN',
-        'lapras',
-        '🐉 GYARADOS',
+      makeNpc('lake_of_rage_red_gyarados', 21, 15, 'DOWN', 'lapras', '🐉 GYARADOS', 
         [
           "GYARADOS: Gyashaa! The lake's waters churn violently as the crimson Gyarados thrashes with fury!",
         ],
         { action: 'RED_GYARADOS_EVENT' }
       ),
-      makeNpc(
-        'lake_of_rage_lance',
-        21,
-        30,
-        'UP',
-        'gentleman',
-        '🏆 CHAMPION LANCE',
+      makeNpc('lake_of_rage_lance', 21, 30, 'UP', 'gentleman', '🏆 CHAMPION LANCE', 
         [
           "LANCE: ...So you're the one who quelled that Gyarados. Impressive!",
         ],
         { action: 'LANCE_LAKE_EVENT' }
       ),
-      makeNpc(
-        'wesley_of_wednesday',
-        8,
-        18,
-        'DOWN',
-        'boy',
-        '🥋 WESLEY OF WEDNESDAY',
+      makeNpc('wesley_of_wednesday', 8, 18, 'DOWN', 'boy', '🥋 WESLEY OF WEDNESDAY', 
         [
           "WESLEY: Yo! I'm WESLEY of Wednesday! You must train diligently!",
           "Here's a BLACK BELT! It boosts the power of FIGHTING-type moves!",
@@ -44,13 +35,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     mahogany_town: [
-      makeNpc(
-        'mahogany_gym_blocker',
-        6,
-        14,
-        'DOWN',
-        'fat_man',
-        'TOWN RESIDENT',
+      makeNpc('mahogany_gym_blocker', 6, 14, 'DOWN', 'fat_man', 'TOWN RESIDENT', 
         [
           "Gym Leader Pryce went up to the Lake of Rage to investigate the strange Pokémon disturbance.",
           "The Gym is closed until the emergency at the lake and the souvenir shop is resolved!",
@@ -60,13 +45,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     mahogany_mart: [
-      makeNpc(
-        'mahogany_mart_lance',
-        4,
-        4,
-        'UP',
-        'gentleman',
-        '🏆 CHAMPION LANCE',
+      makeNpc('mahogany_mart_lance', 4, 4, 'UP', 'gentleman', '🏆 CHAMPION LANCE', 
         [
           "LANCE: You made it! The transmitter signal is emanating right from beneath this floor.",
           "Lance moves the heavy cabinet to reveal a secret stairway descending underground!",
@@ -77,13 +56,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     team_rocket_base_b2f: [
-      makeNpc(
-        'team_rocket_base_b2f_lance',
-        18,
-        10,
-        'DOWN',
-        'gentleman',
-        '🏆 CHAMPION LANCE',
+      makeNpc('team_rocket_base_b2f_lance', 18, 10, 'DOWN', 'gentleman', '🏆 CHAMPION LANCE', 
         [
           "LANCE: Are your Pokémon holding up? Here, let me restore your team to full fighting strength!",
         ],
@@ -92,76 +65,34 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     team_rocket_base_b3f: [
-      makeNpc(
-        'b3f_electrode_1',
-        20,
-        5,
-        'DOWN',
-        'pokefan_m',
-        '⚡ ELECTRODE',
+      makeNpc('b3f_electrode_1', 20, 5, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
         ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
         { action: 'ROCKET_GENERATOR_ELECTRODE' }
       ),
-      makeNpc(
-        'b3f_electrode_2',
-        20,
-        7,
-        'DOWN',
-        'pokefan_m',
-        '⚡ ELECTRODE',
+      makeNpc('b3f_electrode_2', 20, 7, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
         ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
         { action: 'ROCKET_GENERATOR_ELECTRODE' }
       ),
-      makeNpc(
-        'b3f_electrode_3',
-        20,
-        9,
-        'DOWN',
-        'pokefan_m',
-        '⚡ ELECTRODE',
+      makeNpc('b3f_electrode_3', 20, 9, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
         ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
         { action: 'ROCKET_GENERATOR_ELECTRODE' }
       ),
-      makeNpc(
-        'b3f_electrode_4',
-        25,
-        5,
-        'DOWN',
-        'pokefan_m',
-        '⚡ ELECTRODE',
+      makeNpc('b3f_electrode_4', 25, 5, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
         ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
         { action: 'ROCKET_GENERATOR_ELECTRODE' }
       ),
-      makeNpc(
-        'b3f_electrode_5',
-        25,
-        7,
-        'DOWN',
-        'pokefan_m',
-        '⚡ ELECTRODE',
+      makeNpc('b3f_electrode_5', 25, 7, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
         ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
         { action: 'ROCKET_GENERATOR_ELECTRODE' }
       ),
-      makeNpc(
-        'b3f_electrode_6',
-        25,
-        9,
-        'DOWN',
-        'pokefan_m',
-        '⚡ ELECTRODE',
+      makeNpc('b3f_electrode_6', 25, 9, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
         ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
         { action: 'ROCKET_GENERATOR_ELECTRODE' }
       ),
     ],
 
     blackthorn_city: [
-      makeNpc(
-        'santos_of_saturday',
-        16,
-        16,
-        'DOWN',
-        'boy',
-        '🏖️ SANTOS OF SATURDAY',
+      makeNpc('santos_of_saturday', 16, 16, 'DOWN', 'boy', '🏖️ SANTOS OF SATURDAY', 
         [
           "SANTOS: It's Saturday! I'm SANTOS of Saturday! Good to see you, trainer!",
           "Take this SOFT SAND! It boosts the power of GROUND-type moves!",
@@ -171,13 +102,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     dragon_shrine: [
-      makeNpc(
-        'dragon_elder',
-        5,
-        3,
-        'DOWN',
-        'elder',
-        '🐉 DRAGON MASTER ELDER',
+      makeNpc('dragon_elder', 5, 3, 'DOWN', 'elder', '🐉 DRAGON MASTER ELDER', 
         [
           "ELDER: Welcome, young trainer, to the sacred DRAGON SHRINE.",
           "CLAIR brought you here to test your worthiness as a true dragon disciple.",
@@ -187,13 +112,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     victory_road: [
-      makeNpc(
-        'victory_road_rival',
-        10,
-        4,
-        'DOWN',
-        'super_nerd',
-        '🔴 RIVAL',
+      makeNpc('victory_road_rival', 10, 4, 'DOWN', 'super_nerd', '🔴 RIVAL', 
         [
           "RIVAL: You really made it through VICTORY ROAD? Don't think for a second that you're stronger than me!",
         ],
@@ -219,13 +138,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     wills_room: [
-      makeNpc(
-        'e4_will',
-        5,
-        5,
-        'DOWN',
-        'psychic',
-        '🎭 ELITE FOUR WILL',
+      makeNpc('e4_will', 5, 5, 'DOWN', 'psychic', '🎭 ELITE FOUR WILL', 
         [
           "WILL: Welcome to the POKéMON LEAGUE! I am WILL, master of psychic power!",
         ],
@@ -249,13 +162,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     kogas_room: [
-      makeNpc(
-        'e4_koga',
-        5,
-        5,
-        'DOWN',
-        'super_nerd',
-        '🥷 ELITE FOUR KOGA',
+      makeNpc('e4_koga', 5, 5, 'DOWN', 'super_nerd', '🥷 ELITE FOUR KOGA', 
         [
           "KOGA: Fwahahaha! A mere child reached me?! I am KOGA of the ELITE FOUR!",
         ],
@@ -279,13 +186,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     brunos_room: [
-      makeNpc(
-        'e4_bruno',
-        5,
-        5,
-        'DOWN',
-        'blackbelt',
-        '🥋 ELITE FOUR BRUNO',
+      makeNpc('e4_bruno', 5, 5, 'DOWN', 'blackbelt', '🥋 ELITE FOUR BRUNO', 
         [
           "BRUNO: I am BRUNO of the ELITE FOUR! Through rigorous training, humans and POKéMON become one!",
         ],
@@ -309,13 +210,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     karens_room: [
-      makeNpc(
-        'e4_karen',
-        5,
-        5,
-        'DOWN',
-        'cooltrainer_f',
-        '🌙 ELITE FOUR KAREN',
+      makeNpc('e4_karen', 5, 5, 'DOWN', 'cooltrainer_f', '🌙 ELITE FOUR KAREN', 
         [
           "KAREN: I am KAREN of the ELITE FOUR. Strong POKéMON. Weak POKéMON. That is only the selfish perception of people.",
         ],
@@ -339,13 +234,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     lances_room: [
-      makeNpc(
-        'champion_lance',
-        5,
-        6,
-        'DOWN',
-        'cooltrainer_m',
-        '👑 CHAMPION LANCE',
+      makeNpc('champion_lance', 5, 6, 'DOWN', 'cooltrainer_m', '👑 CHAMPION LANCE', 
         [
           "LANCE: I have been waiting for you, trainer. I knew that you, with your valor and bond, would reach me.",
         ],

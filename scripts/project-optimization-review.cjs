@@ -144,7 +144,7 @@ try {
   totalIssues++;
 }
 
-// 6. Agent-Optimized Architecture & File Ceiling (< 800 Lines) Audit
+// 6. Agent-Optimized Architecture & File Ceiling (< 800 Lines, <= 42,000 Bytes) Audit
 console.log('6️⃣  Auditing Agent-Optimized Architecture & Single-Window File Ceiling (< 800 Lines)...');
 function getTsFilesRecursively(dir) {
   let results = [];
@@ -153,7 +153,7 @@ function getTsFilesRecursively(dir) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       results = results.concat(getTsFilesRecursively(full));
-    } else if (entry.name.endsWith('.ts')) {
+    } else if (entry.name.endsWith('.ts') || entry.name.endsWith('.d.ts')) {
       results.push(full);
     }
   }
@@ -165,14 +165,24 @@ const allTsFiles = [
   ...getTsFilesRecursively(path.resolve(__dirname, '../tests')),
 ];
 let fileCeilingViolations = 0;
+let byteCeilingViolations = 0;
 let repoMaxLines = 0;
 let repoMaxFile = '';
+let repoMaxBytes = 0;
+let repoMaxByteFile = '';
 
 for (const filePath of allTsFiles) {
+  const fileStat = fs.statSync(filePath);
   const lineCount = fs.readFileSync(filePath, 'utf8').split('\n').length;
+  const byteCount = fileStat.size;
+
   if (lineCount > repoMaxLines) {
     repoMaxLines = lineCount;
     repoMaxFile = path.relative(path.resolve(__dirname, '..'), filePath);
+  }
+  if (byteCount > repoMaxBytes) {
+    repoMaxBytes = byteCount;
+    repoMaxByteFile = path.relative(path.resolve(__dirname, '..'), filePath);
   }
   if (lineCount > 800) {
     const relPath = path.relative(path.resolve(__dirname, '..'), filePath);
@@ -180,12 +190,77 @@ for (const filePath of allTsFiles) {
     fileCeilingViolations++;
     totalIssues++;
   }
+  if (byteCount > 42000) {
+    const relPath = path.relative(path.resolve(__dirname, '..'), filePath);
+    console.error(`  ❌ File exceeds 42,000-byte single-window ceiling: ${relPath} (${byteCount} bytes)`);
+    byteCeilingViolations++;
+    totalIssues++;
+  }
 }
 
-if (fileCeilingViolations === 0) {
-  console.log(`  ✅ 100% of TypeScript files across src/ and tests/ strictly adhere to <= 800-line single-window ceiling (${allTsFiles.length} files audited, max: ${repoMaxLines} lines in ${repoMaxFile}).\n`);
+if (fileCeilingViolations === 0 && byteCeilingViolations === 0) {
+  console.log(`  ✅ 100% of TypeScript files strictly adhere to <= 800-line and <= 42,000-byte ceilings (${allTsFiles.length} files audited, max lines: ${repoMaxLines} in ${repoMaxFile}, max bytes: ${repoMaxBytes} B in ${repoMaxByteFile}).\n`);
 } else {
-  console.log(`  ⚠️  Found ${fileCeilingViolations} files exceeding the 800-line ceiling.\n`);
+  console.log(`  ⚠️  Found ${fileCeilingViolations} line-ceiling and ${byteCeilingViolations} byte-ceiling violations.\n`);
+}
+
+// 7. Semantic Routing Index & @sections Header Integrity
+console.log('7️⃣  Auditing ARCHITECTURE.md Semantic Routing Index & @sections Headers...');
+const archPath = path.resolve(__dirname, '../ARCHITECTURE.md');
+let archIssues = 0;
+
+if (!fs.existsSync(archPath)) {
+  console.error('  ❌ ARCHITECTURE.md not found!');
+  archIssues++;
+  totalIssues++;
+} else {
+  const archContent = fs.readFileSync(archPath, 'utf8');
+
+  // Verify all src/... and tests/... paths cited in ARCHITECTURE.md exist on disk
+  const citedPaths = archContent.match(/`(src\/[^`]+|tests\/[^`]+)`/g) || [];
+  for (const m of citedPaths) {
+    const p = path.resolve(__dirname, '..', m.slice(1, -1));
+    if (!fs.existsSync(p)) {
+      console.error(`  ❌ Broken path cited in ARCHITECTURE.md: ${m}`);
+      archIssues++;
+      totalIssues++;
+    }
+  }
+
+  // Verify all src/ files are indexed in Section 0
+  const srcTsFiles = getTsFilesRecursively(path.resolve(__dirname, '../src'));
+  const section0 = archContent.slice(
+    archContent.indexOf('## 0. Agent Semantic Routing Index'),
+    archContent.indexOf('## 1. Executive Overview')
+  );
+  for (const srcFile of srcTsFiles) {
+    const relSrc = path.relative(path.resolve(__dirname, '..'), srcFile);
+    if (!section0.includes('`' + relSrc + '`')) {
+      console.error(`  ❌ Missing from ARCHITECTURE.md Section 0: ${relSrc}`);
+      archIssues++;
+      totalIssues++;
+    }
+  }
+
+  // Verify @fileoverview and @sections in all src/ files > 200 lines
+  for (const srcFile of srcTsFiles.filter((f) => f.endsWith('.ts'))) {
+    const lines = fs.readFileSync(srcFile, 'utf8').split('\n');
+    if (lines.length > 200) {
+      const first15 = lines.slice(0, 15).join('\n');
+      const relSrc = path.relative(path.resolve(__dirname, '..'), srcFile);
+      if (!first15.includes('@fileoverview') || !first15.includes('@sections')) {
+        console.error(`  ❌ Missing @fileoverview or @sections header in lines 1-15: ${relSrc}`);
+        archIssues++;
+        totalIssues++;
+      }
+    }
+  }
+}
+
+if (archIssues === 0) {
+  console.log('  ✅ 100% of src/ files are indexed in ARCHITECTURE.md Section 0, 0 broken paths, and all files > 200 lines contain @fileoverview and @sections.\n');
+} else {
+  console.log(`  ⚠️  Found ${archIssues} Semantic Routing Index or header issues.\n`);
 }
 
 console.log('===========================================================');

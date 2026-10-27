@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BoxStylesAndReleaseModal domain module implementation.
+ * @module ui/box/BoxStylesAndReleaseModal
+ * @role BoxStylesAndReleaseModal Component
+ * @exports TYPE_COLORS, BoxSelectedSlot, cleanBoxSpeciesId
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-241: Implementation | L242-482: Handlers & Exports
+ */
+
 import type { PokemonInstance } from '../../types/game';
 import { BattleAudio } from '../../audio/BattleAudio';
 

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview DayCareModalUI domain module implementation.
+ * @module ui/DayCareModalUI
+ * @role DayCareModalUI Component
+ * @exports DayCareModalCallbacks, DayCareModalUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-275: Implementation | L276-550: Handlers & Exports
+ */
+
 import type { PokemonInstance } from '../types/game';
 import { DayCareManager, type DayCareSlot } from '../world/DayCareManager';
 import { BattleAudio } from '../audio/BattleAudio';

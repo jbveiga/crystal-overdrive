@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BagItemCatalogs domain module implementation.
+ * @module ui/bag/BagItemCatalogs
+ * @role BagItemCatalogs Component
+ * @exports BagInventory, TMDefinition, MartBallItem
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-199: Implementation | L200-398: Handlers & Exports
+ */
+
 import type { PokeballId, MedicineId, RepelId } from '../../types/game';
 
 export interface BagInventory {

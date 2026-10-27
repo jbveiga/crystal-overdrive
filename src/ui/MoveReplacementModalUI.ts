@@ -1,3 +1,12 @@
+/**
+ * @fileoverview MoveReplacementModalUI domain module implementation.
+ * @module ui/MoveReplacementModalUI
+ * @role MoveReplacementModalUI Component
+ * @exports HM_MOVES, MoveReplacementModalUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-221: Implementation | L222-443: Handlers & Exports
+ */
+
 import { Dex } from '@pkmn/dex';
 import type { PokemonInstance, MoveData } from '../types/game';
 import { PokemonFactory } from '../battle/PokemonFactory';

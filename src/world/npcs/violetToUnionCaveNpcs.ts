@@ -1,28 +1,25 @@
+/**
+ * @fileoverview violetToUnionCaveNpcs domain module implementation.
+ * @module world/npcs/violetToUnionCaveNpcs
+ * @role violetToUnionCaveNpcs Component
+ * @exports createVioletToUnionCaveNpcs
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-229: Implementation | L230-458: Handlers & Exports
+ */
+
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
 
 export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
   return {
     violet_gym: [
-      makeNpc(
-        'gym_guide',
-        7,
-        13,
-        'DOWN',
-        'fat_man',
-        '🕶️ GYM GUIDE',
+      makeNpc('gym_guide', 7, 13, 'DOWN', 'fat_man', '🕶️ GYM GUIDE', 
         [
           "Yo! I'm no trainer, but I can give some advice! Believe me! If you believe, a championship dream can come true. You believe? Then listen.",
           'The grass-type is weak against the flying-type. Keep this in mind.',
         ]
       ),
-      makeNpc(
-        'bird_keeper_abe',
-        2,
-        10,
-        'RIGHT',
-        'bird_keeper',
-        '🦅 BIRD KEEPER ABE',
+      makeNpc('bird_keeper_abe', 2, 10, 'RIGHT', 'bird_keeper', '🦅 BIRD KEEPER ABE', 
         [
           "This can't be true!",
         ],
@@ -44,13 +41,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'bird_keeper_rod',
-        7,
-        6,
-        'LEFT',
-        'bird_keeper',
-        '🦅 BIRD KEEPER ROD',
+      makeNpc('bird_keeper_rod', 7, 6, 'LEFT', 'bird_keeper', '🦅 BIRD KEEPER ROD', 
         [
           "FALKNER's skills are for real! Don't get cocky just because you beat me!",
         ],
@@ -73,13 +64,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'falkner',
-        5,
-        1,
-        'DOWN',
-        'falkner',
-        '🦅 LEADER FALKNER',
+      makeNpc('falkner', 5, 1, 'DOWN', 'falkner', '🦅 LEADER FALKNER', 
         [
           "FALKNER: …Darn! My dad's cherished bird POKéMON… All right. Take this. It's the official POKéMON LEAGUE ZEPHYRBADGE!",
           "There are POKéMON GYMS in cities and towns ahead. You should test your skills at these GYMS. I'm going to train harder to become the greatest bird master!",
@@ -104,13 +89,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     violet_poke_center: [
-      makeNpc(
-        'nurse_violet',
-        3,
-        1,
-        'DOWN',
-        'mom',
-        '💖 NURSE JOY',
+      makeNpc('nurse_violet', 3, 1, 'DOWN', 'mom', '💖 NURSE JOY', 
         [
           'Welcome to our POKéMON CENTER!',
           'We can heal your POKéMON back to perfect health in just a moment!',
@@ -133,100 +112,52 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     violet_mart: [
-      makeNpc(
-        'mart_clerk_violet',
-        1,
-        3,
-        'RIGHT',
-        'boy',
-        '🛒 MART CLERK',
+      makeNpc('mart_clerk_violet', 1, 3, 'RIGHT', 'boy', '🛒 MART CLERK', 
         ['Welcome to the VIOLET CITY POKéMON MART! How may I serve you?'],
         { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
     ],
     violet_city: [
-      makeNpc(
-        'earl',
-        28,
-        18,
-        'DOWN',
-        'earl',
-        '🎓 EARL DERVISH',
+      makeNpc('earl', 28, 18, 'DOWN', 'earl', '🎓 EARL DERVISH', 
         [
           'Twirl! Twirl! Did you beat FALKNER at the GYM? Magnificent!',
           'I am EARL! I teach young trainers all about POKéMON at the POKéMON ACADEMY right behind me!',
         ],
         { wanders: true }
       ),
-      makeNpc(
-        'violet_girl',
-        14,
-        20,
-        'RIGHT',
-        'girl',
-        '👧 VIOLET LASS',
+      makeNpc('violet_girl', 14, 20, 'RIGHT', 'girl', '👧 VIOLET LASS', 
         [
           'Ghosts are rumored to appear in SPROUT TOWER at night.',
           'Wait—you already climbed to the top and defeated ELDER LI?! Amazing!',
         ],
         { wanders: true }
       ),
-      makeNpc(
-        'violet_bird_trainer',
-        26,
-        25,
-        'LEFT',
-        'bird_keeper',
-        '🦅 BIRD FAN',
+      makeNpc('violet_bird_trainer', 26, 25, 'LEFT', 'bird_keeper', '🦅 BIRD FAN', 
         [
           'Hey, are you a POKéMON trainer? PIDGEY and SPEAROW are both Flying-types, but SPEAROW has a much fiercer Attack stat!',
         ]
       ),
     ],
     earls_pokemon_academy: [
-      makeNpc(
-        'earl_teacher',
-        4,
-        3,
-        'UP',
-        'earl',
-        '🎓 PROFESSOR EARL',
+      makeNpc('earl_teacher', 4, 3, 'UP', 'earl', '🎓 PROFESSOR EARL', 
         [
           'Twirl! Welcome to EARL\'S POKéMON ACADEMY!',
           'In battle, a move matching your POKéMON\'s own type deals 1.5x damage! That\'s Same-Type Attack Bonus!',
         ]
       ),
-      makeNpc(
-        'academy_boy',
-        3,
-        5,
-        'UP',
-        'boy',
-        '👦 STUDENT',
+      makeNpc('academy_boy', 3, 5, 'UP', 'boy', '👦 STUDENT', 
         [
           "I'm taking notes from the blackboard! PARALYSIS cuts a POKéMON's Speed in half and may prevent it from moving!",
         ]
       ),
-      makeNpc(
-        'academy_girl',
-        5,
-        5,
-        'UP',
-        'girl',
-        '👧 STUDENT',
+      makeNpc('academy_girl', 5, 5, 'UP', 'girl', '👧 STUDENT', 
         [
           'Electric- and Rock-type moves are super effective against Flying-types like FALKNER\'s bird POKéMON!',
         ]
       ),
     ],
     violet_kyles_house: [
-      makeNpc(
-        'kyle',
-        2,
-        4,
-        'RIGHT',
-        'boy',
-        '👦 KYLE',
+      makeNpc('kyle', 2, 4, 'RIGHT', 'boy', '👦 KYLE', 
         [
           'A POKéMON you get in a trade grows quickly, even if it can be willful if you lack GYM BADGES!',
           'I love BELLSPROUT and POLIWAG!',
@@ -245,26 +176,14 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     violet_nickname_speech_house: [
-      makeNpc(
-        'nickname_teacher',
-        2,
-        4,
-        'RIGHT',
-        'teacher',
-        '👩 NICKNAME FAN',
+      makeNpc('nickname_teacher', 2, 4, 'RIGHT', 'teacher', '👩 NICKNAME FAN', 
         [
           'She gives her POKéMON nicknames like STRAWBERRY! Giving a POKéMON a thoughtful nickname makes your bond even stronger!',
         ]
       ),
     ],
     route_32: [
-      makeNpc(
-        'youngster_albert',
-        12,
-        22,
-        'DOWN',
-        'boy',
-        '👦 YOUNGSTER ALBERT',
+      makeNpc('youngster_albert', 12, 22, 'DOWN', 'boy', '👦 YOUNGSTER ALBERT', 
         ['I gave it my all, but your POKéMON were too tough!'],
         {
           action: 'TRAINER_BATTLE',
@@ -279,13 +198,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'picnicker_liz',
-        10,
-        30,
-        'LEFT',
-        'girl',
-        '👧 PICNICKER LIZ',
+      makeNpc('picnicker_liz', 10, 30, 'LEFT', 'girl', '👧 PICNICKER LIZ', 
         ['My NIDORAN is the cutest! Be gentle with her!'],
         {
           action: 'TRAINER_BATTLE',
@@ -299,13 +212,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'camper_roland',
-        3,
-        45,
-        'RIGHT',
-        'boy',
-        '⛺ CAMPER ROLAND',
+      makeNpc('camper_roland', 3, 45, 'RIGHT', 'boy', '⛺ CAMPER ROLAND', 
         ['Camping out here with my POKéMON is the best feeling in the world!'],
         {
           action: 'TRAINER_BATTLE',
@@ -319,13 +226,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'fisher_justin',
-        8,
-        49,
-        'LEFT',
-        'fisherman',
-        '🎣 FISHER JUSTIN',
+      makeNpc('fisher_justin', 8, 49, 'LEFT', 'fisherman', '🎣 FISHER JUSTIN', 
         ['Fish are biting, but you bit harder!'],
         {
           action: 'TRAINER_BATTLE',
@@ -340,13 +241,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'fisher_ralph',
-        12,
-        56,
-        'LEFT',
-        'fisherman',
-        '🎣 FISHER RALPH',
+      makeNpc('fisher_ralph', 12, 56, 'LEFT', 'fisherman', '🎣 FISHER RALPH', 
         ["I'm saving up for a SUPER ROD! Then I'll catch giant water POKéMON!"],
         {
           action: 'TRAINER_BATTLE',
@@ -360,26 +255,14 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'frieda',
-        12,
-        67,
-        'DOWN',
-        'girl',
-        '🎀 FRIEDA OF FRIDAY',
+      makeNpc('frieda', 12, 67, 'DOWN', 'girl', '🎀 FRIEDA OF FRIDAY', 
         [
           "FRIEDA: Yahoo! It's Friday! I'm FRIEDA of Friday! Nice to meet you!",
           "Here's a POISON BARB to power up POISON-type moves!",
         ],
         { action: 'DAY_SIBLING_EVENT' }
       ),
-      makeNpc(
-        'salesman',
-        11,
-        82,
-        'DOWN',
-        'fat_man',
-        '🕴️ SUSPICIOUS MAN',
+      makeNpc('salesman', 11, 82, 'DOWN', 'fat_man', '🕴️ SUSPICIOUS MAN', 
         [
           'How would you like some tasty, nutritious SLOWPOKETAIL?',
           "It's only ¥9,800,000! What, you don't want it? Then step aside, kid!",
@@ -387,13 +270,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     route_32_poke_center: [
-      makeNpc(
-        'r32_nurse_joy',
-        3,
-        1,
-        'DOWN',
-        'teacher',
-        '👩‍⚕️ NURSE JOY',
+      makeNpc('r32_nurse_joy', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to the ROUTE 32 POKéMON CENTER!',
           'We heal your POKéMON to full health in no time.',
@@ -401,108 +278,48 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
         ],
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),
-      makeNpc(
-        'r32_cooltrainer',
-        1,
-        6,
-        'RIGHT',
-        'boy',
-        '🧢 COOLTRAINER',
+      makeNpc('r32_cooltrainer', 1, 6, 'RIGHT', 'boy', '🧢 COOLTRAINER', 
         ['UNION CAVE ahead is labyrinthine! Make sure your team is rested and you have POTIONS ready!']
       ),
-      makeNpc(
-        'r32_gentleman',
-        6,
-        4,
-        'LEFT',
-        'fat_man',
-        '🎩 GENTLEMAN',
+      makeNpc('r32_gentleman', 6, 4, 'LEFT', 'fat_man', '🎩 GENTLEMAN', 
         ['A fisherman gave me an OLD ROD here. It works on MAGIKARP, but you can find rarer fish deeper in caves!']
       ),
     ],
     route_32_ruins_of_alph_gate: [
-      makeNpc(
-        'alph_gate_officer',
-        5,
-        2,
-        'DOWN',
-        'fat_man',
-        '👮 OFFICER',
+      makeNpc('alph_gate_officer', 5, 2, 'DOWN', 'fat_man', '👮 OFFICER', 
         ['RUINS OF ALPH are to the west. Strange radio signals and patterns have been reported inside!']
       ),
-      makeNpc(
-        'alph_gate_youngster',
-        1,
-        4,
-        'RIGHT',
-        'boy',
-        '👦 TOURIST',
+      makeNpc('alph_gate_youngster', 1, 4, 'RIGHT', 'boy', '👦 TOURIST', 
         ['Have you heard the weird sounds on the POKéGEAR radio near the ruins? It gives me goosebumps!']
       ),
     ],
     ruins_of_alph_outside: [
-      makeNpc(
-        'alph_scientist',
-        11,
-        15,
-        'DOWN',
-        'sage',
-        '🔬 ARCHEOLOGIST',
+      makeNpc('alph_scientist', 11, 15, 'DOWN', 'sage', '🔬 ARCHEOLOGIST', 
         ['The stone chambers contain sliding tile puzzles that awakened ancient hieroglyphic beings known as UNOWN!']
       ),
-      makeNpc(
-        'alph_youngster',
-        7,
-        20,
-        'UP',
-        'boy',
-        '👦 BOY',
+      makeNpc('alph_youngster', 7, 20, 'UP', 'boy', '👦 BOY', 
         ['I heard there are secret chambers behind hidden walls that open only if you use FLASH or ESCAPE ROPE!'],
         { wanders: true }
       ),
     ],
     ruins_of_alph_research_center: [
-      makeNpc(
-        'research_scientist1',
-        3,
-        2,
-        'DOWN',
-        'sage',
-        '🔬 HEAD RESEARCHER',
+      makeNpc('research_scientist1', 3, 2, 'DOWN', 'sage', '🔬 HEAD RESEARCHER', 
         ['The ruins are quiet today... We are researching ancient glyphs, but our equipment detects no active signals from the chambers.'],
         { action: 'UNOWN_DEX_EVENT' }
       ),
-      makeNpc(
-        'research_scientist2',
-        5,
-        4,
-        'LEFT',
-        'sage',
-        '🔬 RESEARCH ASSISTANT',
+      makeNpc('research_scientist2', 5, 4, 'LEFT', 'sage', '🔬 RESEARCH ASSISTANT', 
         ['The past and future intertwine in these ancient stones. They date back over 1,500 years!']
       ),
     ],
     ruins_of_alph_kabuto_chamber: [
-      makeNpc(
-        'kabuto_chamber_guide',
-        5,
-        5,
-        'DOWN',
-        'sage',
-        '🏛️ CHAMBER GUIDE',
+      makeNpc('kabuto_chamber_guide', 5, 5, 'DOWN', 'sage', '🏛️ CHAMBER GUIDE', 
         [
           'Welcome to this chamber. There are sliding stone panels that depict a POKéMON drawn by the ancients. Slide the panels around to form the picture.',
         ]
       ),
     ],
     union_cave_1f: [
-      makeNpc(
-        'hiker_daniel',
-        3,
-        6,
-        'RIGHT',
-        'fat_man',
-        '🥾 HIKER DANIEL',
+      makeNpc('hiker_daniel', 3, 6, 'RIGHT', 'fat_man', '🥾 HIKER DANIEL', 
         ['Whoa! You broke through my rock defenses!'],
         {
           action: 'TRAINER_BATTLE',
@@ -516,13 +333,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'pokemaniac_larry',
-        4,
-        21,
-        'RIGHT',
-        'boy',
-        '🎒 POKÉMANIAC LARRY',
+      makeNpc('pokemaniac_larry', 4, 21, 'RIGHT', 'boy', '🎒 POKÉMANIAC LARRY', 
         ['My rare collection... beaten?! No way!'],
         {
           action: 'TRAINER_BATTLE',
@@ -536,13 +347,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'firebreather_ray',
-        15,
-        27,
-        'LEFT',
-        'fat_man',
-        '🔥 FIREBREATHER RAY',
+      makeNpc('firebreather_ray', 15, 27, 'LEFT', 'fat_man', '🔥 FIREBREATHER RAY', 
         ['Whew! You totally quenched my flames!'],
         {
           action: 'TRAINER_BATTLE',
@@ -559,13 +364,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     union_cave_b1f: [
-      makeNpc(
-        'hiker_phillip',
-        4,
-        14,
-        'RIGHT',
-        'fat_man',
-        '🥾 HIKER PHILLIP',
+      makeNpc('hiker_phillip', 4, 14, 'RIGHT', 'fat_man', '🥾 HIKER PHILLIP', 
         ['I need to train harder in the subterranean depths!'],
         {
           action: 'TRAINER_BATTLE',
@@ -579,13 +378,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'pokemaniac_andrew',
-        15,
-        23,
-        'LEFT',
-        'boy',
-        '🎒 POKÉMANIAC ANDREW',
+      makeNpc('pokemaniac_andrew', 15, 23, 'LEFT', 'boy', '🎒 POKÉMANIAC ANDREW', 
         ['My MARILL is totally out of energy!'],
         {
           action: 'TRAINER_BATTLE',
@@ -601,13 +394,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     union_cave_b2f: [
-      makeNpc(
-        'ace_trainer_nick',
-        13,
-        8,
-        'DOWN',
-        'boy',
-        '⭐ ACE TRAINER NICK',
+      makeNpc('ace_trainer_nick', 13, 8, 'DOWN', 'boy', '⭐ ACE TRAINER NICK', 
         ["Incredible skill! You're ready for anything the LEAGUE can throw at you!"],
         {
           action: 'TRAINER_BATTLE',
@@ -622,13 +409,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'ace_trainer_gwen',
-        5,
-        21,
-        'RIGHT',
-        'girl',
-        '⭐ ACE TRAINER GWEN',
+      makeNpc('ace_trainer_gwen', 5, 21, 'RIGHT', 'girl', '⭐ ACE TRAINER GWEN', 
         ['You and your POKéMON are in perfect sync! Remarkable battle!'],
         {
           action: 'TRAINER_BATTLE',
@@ -643,25 +424,13 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'lapras_fan',
-        6,
-        26,
-        'UP',
-        'girl',
-        '🌊 LAPRAS ENTHUSIAST',
+      makeNpc('lapras_fan', 6, 26, 'UP', 'girl', '🌊 LAPRAS ENTHUSIAST', 
         [
           'Every Friday, a beautiful wild LAPRAS swims up in this underground lake!',
           'If you use SURF, you can meet it yourself!',
         ]
       ),
-      makeNpc(
-        'union_cave_lapras',
-        11,
-        31,
-        'DOWN',
-        'lapras',
-        '🌊 LAPRAS',
+      makeNpc('union_cave_lapras', 11, 31, 'DOWN', 'lapras', '🌊 LAPRAS', 
         ['Gyaoo!'],
         {
           action: 'LAPRAS_EVENT',
@@ -669,13 +438,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     route_33: [
-      makeNpc(
-        'hiker_anthony',
-        13,
-        11,
-        'LEFT',
-        'fat_man',
-        '🥾 HIKER ANTHONY',
+      makeNpc('hiker_anthony', 13, 11, 'LEFT', 'fat_man', '🥾 HIKER ANTHONY', 
         ["A rainstorm or a tough loss won't stop me from hiking through Johto!"],
         {
           action: 'TRAINER_BATTLE',

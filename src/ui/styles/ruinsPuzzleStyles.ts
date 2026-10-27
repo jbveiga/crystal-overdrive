@@ -2,6 +2,7 @@
  * @fileoverview Responsive CSS stylesheet and injection helper for the Ruins of Alph tile slide puzzle modal.
  * @module ui/styles/ruinsPuzzleStyles
  * @layer ui
+ * @sections L1-5: Micro-Header & Types | L6-130: Core Implementation | L131-260: Public Interface & Exports
  */
 
 export const RUINS_PUZZLE_CSS: string = `

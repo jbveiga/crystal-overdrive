@@ -1,3 +1,12 @@
+/**
+ * @fileoverview PartyManagementUI domain module implementation.
+ * @module ui/PartyManagementUI
+ * @role PartyManagementUI Component
+ * @exports PartyManagementUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-243: Implementation | L244-486: Handlers & Exports
+ */
+
 import type { PokemonInstance, SpeedMultiplier } from '../types/game';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { BattleAudio } from '../audio/BattleAudio';
@@ -32,15 +41,12 @@ export class PartyManagementUI {
     this.ensureNeoKantoStyles();
     this.createUI();
   }
-
   private ensureNeoKantoStyles(): void {
     ensureNeoKantoPartyStyles();
   }
-
   public setParty(party: PokemonInstance[]): void {
     this.party = party;
   }
-
   public setSpeedMultiplier(speed: SpeedMultiplier): void {
     this.speedMultiplier = speed;
     if (this.modal) {
@@ -48,11 +54,9 @@ export class PartyManagementUI {
       this.modal.style.transition = `opacity ${dur}s ease`;
     }
   }
-
   public isOpen(): boolean {
     return this.modal?.style.display === 'flex';
   }
-
   public open(): void {
     BattleAudio.playMenuSound('CONFIRM');
     this.selectedIndex = null;
@@ -61,14 +65,12 @@ export class PartyManagementUI {
     this.modal.style.display = 'flex';
     this.render();
   }
-
   public hide(): void {
     this.modal.style.display = 'none';
     this.selectedIndex = null;
     this.switchSourceIndex = null;
     this.summaryIndex = null;
   }
-
   private createUI(): void {
     const modal = document.createElement('div');
     modal.id = 'party-management-modal';
@@ -93,7 +95,6 @@ export class PartyManagementUI {
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       box-sizing: border-box;
     `;
-
     modal.innerHTML = `
       <!-- Header -->
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
@@ -104,13 +105,11 @@ export class PartyManagementUI {
             <h2 style="font-family: 'Space Mono', monospace; margin: 2px 0 0 0; font-size: 20px; font-weight: 900; color: #F6F8F3; letter-spacing: -0.5px;">🟢 DEPLOYABLE SQUAD</h2>
           </div>
         </div>
-
         <div style="display: flex; align-items: center; gap: 8px;">
           <span id="party-count-badge" style="background: #141E33; border: 1.5px solid #48C774; color: #4ADE80; padding: 5px 12px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; box-shadow: 0 2px 0 0 #070B14;">1 / 6</span>
           <button id="close-party-modal-btn" class="party-tactile-btn" style="background: #1E293B; color: #F6F8F3; border: 1.5px solid #475569; border-radius: 6px; padding: 6px 12px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 0 #070B14;">← BACK TO MENU</button>
         </div>
       </div>
-
       <!-- Prompt / Status Banner -->
       <div id="party-prompt-banner" style="
         background: #141E33;
@@ -123,7 +122,6 @@ export class PartyManagementUI {
         color: #DDE2F7;
         box-shadow: 0 2px 0 0 #070B14;
       ">Choose a POKéMON to view Summary or Switch battle order.</div>
-
       <!-- Content Area -->
       <div id="party-content-area" class="party-scrollbar" style="
         display: flex;
@@ -134,7 +132,6 @@ export class PartyManagementUI {
         padding-right: 4px;
       "></div>
     `;
-
     this.container.appendChild(modal);
     this.modal = modal;
     this.contentEl = modal.querySelector('#party-content-area') as HTMLDivElement;

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview IntroSequenceUI domain module implementation.
+ * @module ui/IntroSequenceUI
+ * @role IntroSequenceUI Component
+ * @exports IntroStage, IntroCompletionPayload, IntroSequenceCallbacks
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-310: Implementation | L311-621: Handlers & Exports
+ */
+
 import type { PlayerGender } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
 import {

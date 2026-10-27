@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BattleLogUI domain module implementation.
+ * @module ui/BattleLogUI
+ * @role BattleLogUI Component
+ * @exports BattleLogEntry, BattleLogUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-143: Implementation | L144-287: Handlers & Exports
+ */
+
 export interface BattleLogEntry {
   id: string;
   turn?: number;

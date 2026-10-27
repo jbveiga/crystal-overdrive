@@ -1,3 +1,12 @@
+/**
+ * @fileoverview PokeMartRenderer domain module implementation.
+ * @module ui/bag/PokeMartRenderer
+ * @role PokeMartRenderer Component
+ * @exports MartRendererContext, PokeMartRenderer
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-135: Implementation | L136-270: Handlers & Exports
+ */
+
 import type { PokeballId } from '../../types/game';
 import { BattleAudio } from '../../audio/BattleAudio';
 import {

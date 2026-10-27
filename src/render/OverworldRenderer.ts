@@ -4,6 +4,7 @@
  * @role Overworld Scene Renderer
  * @exports OverworldRenderer, ANIMATED_WATER_TILES, NPC_SHEET_PATHS, CharacterFrames
  * @layer render
+ * @sections L1-7: Micro-Header & Types | L8-374: Core Implementation | L375-748: Public Interface & Exports
  */
 
 import { Application, Container, Sprite, Texture, Assets, Graphics, loadTextures } from 'pixi.js';
@@ -53,7 +54,6 @@ export class OverworldRenderer {
   private fruitTreeTexture: Texture | null = null;
   private lookupMapNpcs?: (mapId: string) => GridEntity[];
   private lastCullState = { camX: Number.NaN, camY: Number.NaN, screenW: 0, screenH: 0 };
-
   public async init(
     containerElement: HTMLElement,
     queueOptions?: ManifestQueueOptions
@@ -62,9 +62,7 @@ export class OverworldRenderer {
       loadTextures.config.preferWorkers = false;
       loadTextures.config.preferCreateImageBitmap = false;
     }
-
     const target = containerElement || (typeof document !== 'undefined' ? (document.getElementById('canvas-container') || document.getElementById('game-container') || document.body) : null);
-
     this.app = new Application();
     await this.app.init({
       resizeTo: target || undefined,
@@ -74,14 +72,12 @@ export class OverworldRenderer {
       antialias: false,
       preserveDrawingBuffer: true,
     });
-
     if (this.app?.canvas) {
       this.app.canvas.id = 'game-canvas';
     }
     if (target && this.app?.canvas) {
       target.appendChild(this.app.canvas);
     }
-
     this.stageContainer = new Container(); this.stageContainer.eventMode = 'none';
     this.mapContainer = new Container(); this.mapContainer.eventMode = 'none';
     this.itemBallContainer = new Container(); this.itemBallContainer.eventMode = 'none';

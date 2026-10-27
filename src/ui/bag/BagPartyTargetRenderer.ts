@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BagPartyTargetRenderer domain module implementation.
+ * @module ui/bag/BagPartyTargetRenderer
+ * @role BagPartyTargetRenderer Component
+ * @exports PartySelectorContext, UseStoneContext, UseMedicineContext
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-178: Implementation | L179-356: Handlers & Exports
+ */
+
 import type { PokemonInstance } from '../../types/game';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 import { BattleAudio } from '../../audio/BattleAudio';

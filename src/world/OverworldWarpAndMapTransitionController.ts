@@ -4,6 +4,7 @@
  * @role Overworld Warp & Transition Controller
  * @exports OverworldWarpAndMapTransitionController
  * @layer world
+ * @sections L1-7: Micro-Header & Types | L8-328: Core Implementation | L329-656: Public Interface & Exports
  */
 
 import type { Direction, MapData, WarpEvent } from '../types/game';

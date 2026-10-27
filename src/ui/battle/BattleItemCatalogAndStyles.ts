@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BattleItemCatalogAndStyles domain module implementation.
+ * @module ui/battle/BattleItemCatalogAndStyles
+ * @role BattleItemCatalogAndStyles Component
+ * @exports BattleBagTab, BattleUsableItemMeta, BATTLE_ITEM_CATALOG
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-106: Implementation | L107-212: Handlers & Exports
+ */
+
 import type { PokemonType, StatId, MoveData } from '../../types/game';
 
 export type BattleBagTab = 'ALL' | 'MEDICINE' | 'BALLS';

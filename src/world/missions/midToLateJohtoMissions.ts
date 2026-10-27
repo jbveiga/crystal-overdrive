@@ -1,3 +1,12 @@
+/**
+ * @fileoverview midToLateJohtoMissions domain module implementation.
+ * @module world/missions/midToLateJohtoMissions
+ * @role midToLateJohtoMissions Component
+ * @exports MID_TO_LATE_JOHTO_MISSIONS
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-195: Implementation | L196-391: Handlers & Exports
+ */
+
 import type { Mission } from '../../types/game';
 import { LATE_JOHTO_AND_LEAGUE_MISSIONS } from './lateJohtoAndLeagueMissions';
 

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview EarlyJohtoQuestInteractions domain module implementation.
+ * @module world/interactions/EarlyJohtoQuestInteractions
+ * @role EarlyJohtoQuestInteractions Component
+ * @exports completeSlowpokeWellProtonVictory, getEarlyJohtoQuestInteractions
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-323: Implementation | L324-647: Handlers & Exports
+ */
+
 import type { MapData } from '../../types/game';
 import type { GridEntity } from '../GridPhysics';
 import type { NpcInteractionContext, NpcInteractionRegistration } from '../../types/gameContext';

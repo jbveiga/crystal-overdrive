@@ -1,3 +1,12 @@
+/**
+ * @fileoverview MissionManager domain module implementation.
+ * @module world/MissionManager
+ * @role MissionManager Component
+ * @exports MissionManagerCallbacks, MissionManager
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-139: Implementation | L140-279: Handlers & Exports
+ */
+
 import type { Mission, MissionFilter, MissionStep, SerializedMissionState } from '../types/game';
 import { createDefaultMissions } from './missionData';
 import { STARTER_LINEAGE_MAP } from '../core/SaveManager';

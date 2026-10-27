@@ -1,3 +1,12 @@
+/**
+ * @fileoverview IlexForestInteractions domain module implementation.
+ * @module world/interactions/IlexForestInteractions
+ * @role IlexForestInteractions Component
+ * @exports getIlexForestInteractions
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-135: Implementation | L136-270: Handlers & Exports
+ */
+
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
 

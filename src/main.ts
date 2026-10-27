@@ -4,6 +4,7 @@
  * @role Application Root Coordinator
  * @exports bootstrap
  * @layer core
+ * @sections L1-7: Micro-Header & Types | L8-372: Core Implementation | L373-744: Public Interface & Exports
  */
 
 import { GameClock } from './core/GameClock';
@@ -59,7 +60,6 @@ import { OverworldWarpAndMapTransitionController } from './world/OverworldWarpAn
 import { OverworldTrainerSightAndTourController } from './world/OverworldTrainerSightAndTourController';
 import { OverworldTickerCoordinator } from './world/OverworldTickerCoordinator';
 import { OverworldModalRegistry } from './ui/OverworldModalRegistry';
-
 declare global {
   interface Window {
     updateLoaderProgress?: (pct: number, label: string) => void;
@@ -67,12 +67,10 @@ declare global {
     syncGitHubIssues?: typeof syncGitHubIssues;
   }
 }
-
 async function bootstrap() {
   ensureGlobalNeoKantoStyles();
   console.log('⚡ Initializing Crystal Overdrive (Neo-Kanto Protocol)...');
   window.updateLoaderProgress?.(5, 'Parsing save state...');
-
   let gameState: 'TITLE' | 'OVERWORLD' | 'BATTLE' = 'TITLE';
   let isCutsceneLocked = false, playTimeSeconds = 0, playerName = 'CHRIS', rivalName = 'SILVER';
   let playerGender: PlayerGender = 'BOY', initialMapId = 'players_house_2f', initialPlayerX = 7, initialPlayerY = 1, initialPlayerDir: Direction = 'DOWN';

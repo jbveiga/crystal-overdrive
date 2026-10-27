@@ -1,3 +1,12 @@
+/**
+ * @fileoverview OverworldTrainerSightAndTourController domain module implementation.
+ * @module world/OverworldTrainerSightAndTourController
+ * @role OverworldTrainerSightAndTourController Component
+ * @exports TM_MOVE_CODE_MAP, OverworldTrainerSightAndTourController
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-266: Implementation | L267-533: Handlers & Exports
+ */
+
 import type { Direction, PokemonInstance, PokeballId } from '../types/game';
 import type { BagInventory } from '../ui/BagAndMartUI';
 import type { GridEntity } from './GridPhysics';

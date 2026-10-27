@@ -1,3 +1,12 @@
+/**
+ * @fileoverview TownMapUI domain module implementation.
+ * @module ui/TownMapUI
+ * @role TownMapUI Component
+ * @exports TownMapResponsiveMetrics, TownMapFilter, TownMapUIOptions
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-281: Implementation | L282-562: Handlers & Exports
+ */
+
 import { BattleAudio } from '../audio/BattleAudio';
 import type { RoamerState } from '../types/game';
 import {

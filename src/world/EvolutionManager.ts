@@ -1,3 +1,12 @@
+/**
+ * @fileoverview EvolutionManager domain module implementation.
+ * @module world/EvolutionManager
+ * @role EvolutionManager Component
+ * @exports EvolutionManager
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-171: Implementation | L172-343: Handlers & Exports
+ */
+
 import { Dex } from '@pkmn/dex';
 import type {
   PokemonInstance,

@@ -15,54 +15,101 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Pokemon Domain Contracts** | Entities, base stats, moves, evolutions, roamer state, and storage | `src/types/pokemon.d.ts` | < 150 lines |
 | **Map Domain Contracts** | Direction, sprites, warps, wild encounters, items, and radar pings | `src/types/map.d.ts` | < 150 lines |
 | **Options & Save Contracts** | Game options, save previews, player profiles, and mission schemas | `src/types/optionsAndSave.d.ts` | < 150 lines |
-| **Unified Game Types Barrel** | Backward-compatible re-exports for pokemon, map, and options/save | `src/types/game.ts` / `src/types/game.d.ts` | < 45 lines |
+| **Unified Game Types Barrel** | Backward-compatible re-exports for pokemon, map, and options/save | `src/types/game.d.ts` | < 45 lines |
 | **Battle Execution Context** | BattleTriggerOptions and BattleSessionContext interface contracts | `src/types/battleContext.d.ts` | < 150 lines |
 | **Overworld Execution Context** | Transition, interaction, ticker, and trainer sight context contracts | `src/types/worldContext.d.ts` | < 150 lines |
 | **Unified Game Context Barrel** | Backward-compatible re-exports for battleContext and worldContext | `src/types/gameContext.d.ts` | < 45 lines |
+| **Asset Manifest Preload Queue** | Asynchronous sprite sheet, audio sample, and map asset loading | `src/core/AssetManifestQueue.ts` | < 200 lines |
+| **Event Bus Pub/Sub Engine** | Decoupled typed inter-system communication channel | `src/core/EventBus.ts` | < 150 lines |
+| **Game Clock & Speed Scaler** | Decoupled 1x/2x/3x/4x overworld & battle tick rate accumulator | `src/core/GameClock.ts` | < 200 lines |
+| **Save State Manager** | IndexedDB / localStorage state persistence & backup slots | `src/core/SaveManager.ts` | < 750 lines |
+| **Main Application Bootstrapper** | Core engine initialization, state coordination, input dispatch | `src/main.ts` | < 750 lines |
+| **GitHub Cloud Sync Engine** | GitHub issues/sync client for live telemetry and bug reporting | `src/sync/githubSync.ts` | < 350 lines |
+| **Battle Controller Engine** | High-level battle workflow dispatch and action scheduling | `src/battle/BattleController.ts` | < 200 lines |
+| **Battle Session Controller** | Wild battles, trainer duels, 2v2 double battles, pacing, learnsets | `src/battle/BattleSessionController.ts` | < 600 lines |
 | **Pure Battle Engine Facade** | Turn order, priority, status effects, damage calculations, stat stages | `src/battle/BattleStateMachine.ts` | < 750 lines |
 | **Battle Move & Item Executor** | Spread moves, residuals, weather multipliers, move execution, item effects | `src/battle/state/BattleMoveAndItemExecutor.ts` | < 600 lines |
-| **Battle Session Controller** | Wild battles, trainer duels, 2v2 double battles, pacing, learnsets | `src/battle/BattleSessionController.ts` | < 550 lines |
 | **Damage Calculator** | Gen 4+ Physical/Special split, STAB, type effectiveness, crits | `src/battle/DamageCalculator.ts` | < 350 lines |
+| **Pokeball Catch Calculator** | Gen 2/4 catch rate calculations, status multipliers, ball bonuses | `src/battle/CatchCalculator.ts` | < 250 lines |
+| **Type Effectiveness Helper** | Dual-type damage multipliers, immunities, and resistances table | `src/battle/EffectivenessHelper.ts` | < 350 lines |
 | **Pokemon Factory & Dex** | Level caps, EXP formulas, IV/DV generation, starter hydration | `src/battle/PokemonFactory.ts` | < 700 lines |
 | **Stadium Cup Manager** | 2v2 Double Battle Cup tournaments, Item Clause, Challenger AI | `src/battle/StadiumArenaManager.ts` | < 500 lines |
+| **Audio Engine Facade** | 8-bit APU chiptune emulation, Web Audio API, authentic cry synthesis | `src/audio/BattleAudio.ts` | < 650 lines |
+| **Chiptune APU Synthesizer** | Programmable 4-channel square/wave/noise audio oscillator bank | `src/audio/ChiptuneSynthesizer.ts` | < 600 lines |
+| **Overworld & Environmental Audio** | Warp sounds, footsteps, itemfinder sonar, status sounds, weather | `src/audio/battle/OverworldAndEnvironmentalAudio.ts` | < 650 lines |
+| **Seamless BGM Audio Manager** | WebM/MP3 loop streaming, map crossfades, battle ducking, chiptune mode | `src/audio/AudioManager.ts` | < 500 lines |
+| **Johto & Kanto Map BGM Table** | Universal mapping of Johto/Kanto locations & battle types to BGM tracks | `src/audio/mapBgmTable.ts` | < 400 lines |
+| **PixiJS Overworld Render Facade** | 64x64 Metatiles, view frustum culling, daylight tint shaders | `src/render/OverworldRenderer.ts` | < 750 lines |
+| **Overworld NPC & Item Sprites** | NPC sprite texture cache, character frames, overworld item balls & fruit trees | `src/render/OverworldNpcAndItemSprites.ts` | < 700 lines |
+| **Overworld Particle & VFX Pool** | Zero-GC graphic particle pool, grass rustle, cut slash, doorway fade veil | `src/render/OverworldParticleAndVfxPool.ts` | < 400 lines |
+| **Graphic Particle Pool** | Reusable GPU sprite particle buffers for ambient dust and weather | `src/render/GraphicParticlePool.ts` | < 200 lines |
+| **Metatile Constants & Enums** | Metatile IDs, collision masks, tile flags, and texture atlas keys | `src/render/tileConstants.ts` | < 150 lines |
+| **PixiJS Battle Render Facade** | 2.5D layered arena, GSAP battle animations, particle VFX | `src/render/BattleRenderer.ts` | < 600 lines |
+| **Battle Pokeball & Switch VFX** | Parabolic Pokeball toss, switch recall, faint collapse, capture shake | `src/render/BattlePokeballAndSwitchAnimations.ts` | < 450 lines |
 | **Grid Physics & Motion** | 1x/2x/3x speed, tile collisions, ledges, trainer vision, zero-alloc loop | `src/world/GridPhysics.ts` | < 550 lines |
-| **Map Engine Facade** | Binary `.blk` maps, streaming, collision queries, encounter rolling | `src/world/MapManager.ts` | < 750 lines |
+| **Map Engine Facade** | Binary .blk maps, streaming, collision queries, encounter rolling | `src/world/MapManager.ts` | < 750 lines |
 | **Map Classification & Warp Rules** | Outdoor/cave/dungeon classification, carpet warps, transition contexts | `src/world/map/MapClassificationAndWarpRules.ts` | < 350 lines |
 | **Predictive Neighbor & Warp Prefetcher** | Background 1-hop cardinal & warp target preloading, NPC/sprite/tile warmup | `src/world/AdjacentMapPrefetcher.ts` | < 350 lines |
+| **Active NPC Cache** | High-speed cached NPC state mapping, talker registry, and lookup | `src/world/ActiveNpcCache.ts` | < 200 lines |
+| **Overworld Warp & Map Transition** | Async tile texture hydration, reciprocal warps, story mutations, black veil sync | `src/world/OverworldWarpAndMapTransitionController.ts` | < 650 lines |
+| **Trainer Sight & Walking Tour** | Line-of-sight trigger, rewards, stadium duels, Guide Gent tour | `src/world/OverworldTrainerSightAndTourController.ts` | < 550 lines |
+| **Overworld Ticker & Itemfinder** | Zero-alloc ticker hot paths, player bump, neighbor NPC wander, radar sonar | `src/world/OverworldTickerCoordinator.ts` | < 600 lines |
+| **Roaming Beast Engine** | Markov beast adjacency graph, Entei/Raikou/Suicune roamer hops | `src/world/RoamingManager.ts` | < 300 lines |
+| **Story Cutscenes Machine** | Elm starter choice, Red Gyarados Lake of Rage, Sudowoodo cutscenes | `src/world/StoryCutscenes.ts` | < 650 lines |
+| **Ecruteak Gym Maze Logic** | Invisible tile floor paths, pitfall warps, and puzzle validation | `src/world/ecruteakGymMaze.ts` | < 150 lines |
+| **Box Storage Manager** | Unbound 14-box PC box deposit, withdraw, and swap mechanics | `src/world/BoxManager.ts` | < 250 lines |
+| **Storage Manager Facade** | Aggregated PC storage grid, active box pointer, and party synchronization | `src/world/StorageManager.ts` | < 350 lines |
+| **Bug-Catching Contest Manager** | National Park contest timer, score calculator, prize distribution | `src/world/BugContestManager.ts` | < 400 lines |
+| **Day-Care Breeding Manager** | 2-slot breeding compatibility, EXP accumulation, Egg generation | `src/world/DayCareManager.ts` | < 300 lines |
+| **Kurt Apricorn Crafting Manager** | Daily Apricorn harvesting, custom Pokéball forging, delivery timers | `src/world/KurtCraftingManager.ts` | < 200 lines |
+| **Evolution Manager** | Level-up, evolutionary stones, trade cable item triggers and validation | `src/world/EvolutionManager.ts` | < 350 lines |
+| **Modern HM Ability Handler** | Badge-gated field abilities (Cut, Fly, Surf, Strength, Flash, Whirlpool, Waterfall) | `src/world/ModernHMHandler.ts` | < 600 lines |
+| **Overworld Item Manager** | Overworld ball pickups, hidden item radar coordinates, fruit tree respawns | `src/world/OverworldItemManager.ts` | < 400 lines |
+| **Itemfinder Sonar Radar** | BFS distance radar, directional audio pings, hidden item discovery | `src/world/ItemfinderRadar.ts` | < 200 lines |
+| **Mission Manager** | Canonical quest tracking, objective states, progression gates | `src/world/MissionManager.ts` | < 300 lines |
 | **Early Johto Missions** | Canonical missions M01–M10 (New Bark to Slowpoke Well) | `src/world/missions/earlyJohtoMissions.ts` | < 600 lines |
 | **Mid-to-Late Missions Facade** | Missions M11–M15 & Early Side Quests S01–S05 | `src/world/missions/midToLateJohtoMissions.ts` | < 450 lines |
 | **Late Johto & League Quests** | Side Missions S06–S21, Mt. Silver & Kanto prerequisites | `src/world/missions/lateJohtoAndLeagueMissions.ts` | < 450 lines |
-| **Mission Data Barrel Facade** | Compact re-export of `CANONICAL_MISSIONS` and `createDefaultMissions()` | `src/world/missionData.ts` | < 50 lines |
-| **Roaming Beast Engine** | Markov beast adjacency graph, Entei/Raikou/Suicune roamer hops | `src/world/RoamingManager.ts` | < 300 lines |
-| **Overworld World State** | Day-Care breeding, Kurt Apricorn crafting, Bug-Catching Contests | `src/world/WorldState.ts` | < 450 lines |
-| **$O(1)$ NPC Field Router** | Universal NPC facing talk actions, dialogue trees, shopkeepers | `src/world/interactions/npcRouter.ts` | < 500 lines |
-| **$O(1)$ Gym Leader Router** | Johto Gym Leader battles, badge awards, TM rewards | `src/world/interactions/gymLeaderRouter.ts` | < 450 lines |
-| **$O(1)$ Day-Care Router** | Route 34 Day-Care breeding dialogues, compatibility, egg retrieval | `src/world/interactions/dayCareRouter.ts` | < 350 lines |
-| **$O(1)$ Story Script Router**| Elm's Lab starter choice, Togepi Egg delivery, narrative gates | `src/world/interactions/storyScriptRouter.ts` | < 400 lines |
-| **$O(1)$ Warp Transition Router** | Doorways, cave holes, ladders, reciprocal threshold alignments | `src/world/interactions/warpTransitionRouter.ts` | < 350 lines |
-| **$O(1)$ Field Obstacle Router** | Cut trees, Rock Smash boulders, Headbutt trees, fruit trees | `src/world/interactions/fieldObstacleRouter.ts` | < 400 lines |
-| **NPC Shared Helpers** | NPC builders, Guide Gent tour legs, Day-of-Week siblings logic | `src/world/npcs/npcShared.ts` | < 450 lines |
-| **New Bark to Sprout Tower NPCs** | New Bark, Route 29, Cherrygrove, Routes 30/31, Sprout Tower | `src/world/npcs/newBarkToSproutTowerNpcs.ts` | < 650 lines |
-| **Violet to Union Cave NPCs** | Violet City, Violet Gym, Route 32, Ruins of Alph, Union Cave, Route 33 | `src/world/npcs/violetToUnionCaveNpcs.ts` | < 700 lines |
-| **Azalea to Ilex Forest NPCs**| Azalea Town, Azalea Gym, Slowpoke Well, Ilex Forest | `src/world/npcs/azaleaToIlexNpcs.ts` | < 600 lines |
-| **Goldenrod Overworld NPCs** | Route 34, Goldenrod City streets, Goldenrod Underground | `src/world/npcs/goldenrodCityNpcs.ts` | < 650 lines |
-| **Goldenrod Buildings & Park**| Dept Store 1F-6F, Radio Tower, Gym, National Park, Routes 35/36 | `src/world/npcs/goldenrodBuildingsAndParkNpcs.ts` | < 750 lines |
-| **Ecruteak to Route 39 NPCs**| Route 37, Ecruteak City, Gym, Burned/Tin Towers, Routes 38/39 | `src/world/npcs/ecruteakToRoute39Npcs.ts` | < 700 lines |
-| **Olivine to Indigo NPCs** | Olivine, Lighthouse, Cianwood, Mahogany, Blackthorn, League | `src/world/npcs/olivineToIndigoNpcs.ts` | < 750 lines |
-| **NPC Data Aggregator Facade**| Backward-compatible barrel exports, `createNpcsByMap()`, `npcsByMap` | `src/world/npcData.ts` | < 250 lines |
-| **East Johto Generated NPCs** | Object event dialogue and trainer teams for East & Early Johto | `src/world/generated-npcs/eastJohtoGeneratedNpcs.ts` | < 300 lines |
-| **Central Johto Generated NPCs** | Object event dialogue and trainer teams for Central & Goldenrod | `src/world/generated-npcs/centralJohtoGeneratedNpcs.ts` | < 300 lines |
-| **West & North Johto Generated NPCs** | Object event dialogue and trainer teams for West & North Johto | `src/world/generated-npcs/westAndNorthJohtoGeneratedNpcs.ts` | < 300 lines |
-| **Generated NPCs Barrel Facade** | Unified `GENERATED_NPCS` aggregator and `GeneratedNpc` interface contract | `src/world/generatedNpcs.ts` | < 35 lines |
-| **Start Menu Drawer Facade** | Keyboard shortcuts, tactile menu drawer shell, sub-modal facade | `src/ui/StartMenuUI.ts` | < 700 lines |
+| **Mission Data Barrel Facade** | Compact re-export of CANONICAL_MISSIONS and createDefaultMissions() | `src/world/missionData.ts` | < 50 lines |
+| **NPC Interaction Router** | Universal NPC facing talk actions, dialogue trees, shopkeepers | `src/world/interactions/NpcInteractionRouter.ts` | < 500 lines |
+| **Early Johto Quest Interactions** | New Bark, Elm Lab, Cherrygrove, Mr. Pokemon, Sprout Tower dialogues | `src/world/interactions/EarlyJohtoQuestInteractions.ts` | < 650 lines |
+| **Johto Town Service Interactions** | Pokemon Center Nurse, Mart Clerks, Day-Care Man/Lady, Name Rater | `src/world/interactions/JohtoTownServiceInteractions.ts` | < 700 lines |
+| **Mid-to-Late Johto Interactions** | Slowpoke Well, Ilex Charcoal, Radio Tower takeover, Lighthouse Jasmine | `src/world/interactions/MidToLateJohtoQuestInteractions.ts` | < 650 lines |
+| **Gym Leader Interactions** | Johto Gym Leader pre-battle dialogue, badge grants, TM rewards | `src/world/interactions/GymLeaderInteractions.ts` | < 450 lines |
+| **Goldenrod & Route 34 Interactions** | Bike Shop, Underground, Game Corner, Dept Store, Day-Care gate | `src/world/interactions/GoldenrodAndRoute34Interactions.ts` | < 650 lines |
+| **Ilex Forest Interactions** | Farfetchd chase puzzle, Charcoal maker, Headbutt tutor, shrine | `src/world/interactions/IlexForestInteractions.ts` | < 300 lines |
+| **Kanto & Indigo Interactions** | Indigo Plateau Elite Four, Kanto Gym Leaders, Mt. Silver Red dialogue | `src/world/interactions/KantoAndLeagueInteractions.ts` | < 350 lines |
+| **Field Obstacle Dispatcher (Interactions)** | Cut trees, Rock Smash boulders, Headbutt trees, fruit trees router | `src/world/interactions/FieldObstacleDispatcher.ts` | < 600 lines |
+| **Field Obstacle Dispatcher (World)** | Core world collision and interaction dispatch for field obstacles | `src/world/FieldObstacleDispatcher.ts` | < 200 lines |
+| **Interactions Index Barrel** | Aggregated export barrel for all interaction handlers and routers | `src/world/interactions/index.ts` | < 100 lines |
+| **NPC Shared Helpers** | NPC builders, Guide Gent tour legs, Day-of-Week siblings logic | `src/world/npcs/npcShared.ts` | < 650 lines |
+| **New Bark to Sprout Tower NPCs** | New Bark, Route 29, Cherrygrove, Routes 30/31, Sprout Tower | `src/world/npcs/newBarkToSproutTowerNpcs.ts` | < 600 lines |
+| **Violet to Union Cave NPCs** | Violet City, Violet Gym, Route 32, Ruins of Alph, Union Cave, Route 33 | `src/world/npcs/violetToUnionCaveNpcs.ts` | < 500 lines |
+| **Azalea to Ilex Forest NPCs** | Azalea Town, Azalea Gym, Slowpoke Well, Ilex Forest | `src/world/npcs/azaleaToIlexNpcs.ts` | < 400 lines |
+| **Goldenrod Overworld NPCs** | Route 34, Goldenrod City streets, Goldenrod Underground | `src/world/npcs/goldenrodCityNpcs.ts` | < 450 lines |
+| **Goldenrod Buildings & Park** | Dept Store 1F-6F, Radio Tower, Gym, National Park, Routes 35/36 | `src/world/npcs/goldenrodBuildingsAndParkNpcs.ts` | < 500 lines |
+| **Ecruteak to Route 39 NPCs** | Route 37, Ecruteak City, Gym, Burned/Tin Towers, Routes 38/39 | `src/world/npcs/ecruteakToRoute39Npcs.ts` | < 450 lines |
+| **Olivine to Indigo NPCs** | Olivine, Lighthouse, Cianwood, Mahogany, Blackthorn, League | `src/world/npcs/olivineToIndigoNpcs.ts` | < 400 lines |
+| **Mahogany to Indigo NPCs** | Route 42-44, Lake of Rage, Ice Path, Dragon Den, Victory Road | `src/world/npcs/mahoganyToIndigoNpcs.ts` | < 300 lines |
+| **NPC Data Aggregator Facade** | Backward-compatible barrel exports, createNpcsByMap(), npcsByMap | `src/world/npcData.ts` | < 350 lines |
+| **East Johto Generated NPCs** | Object event dialogue and trainer teams for East & Early Johto | `src/world/generated-npcs/eastJohtoGeneratedNpcs.ts` | < 350 lines |
+| **Central Johto Generated NPCs** | Object event dialogue and trainer teams for Central & Goldenrod | `src/world/generated-npcs/centralJohtoGeneratedNpcs.ts` | < 350 lines |
+| **West & North Johto Generated NPCs** | Object event dialogue and trainer teams for West & North Johto | `src/world/generated-npcs/westAndNorthJohtoGeneratedNpcs.ts` | < 350 lines |
+| **Generated NPCs Barrel Facade** | Unified GENERATED_NPCS aggregator and GeneratedNpc interface contract | `src/world/generatedNpcs.ts` | < 35 lines |
+| **Johto Cartography & POIs** | 16x14 Johto regional landmark topology, connections, radar coordinates | `src/world/townMapData.ts` | < 500 lines |
+| **Town Map Resolvers & Radar** | Map ID to landmark resolution, BFS distance hops, species wild habitats | `src/world/map/townMapResolvers.ts` | < 400 lines |
+| **Town Map & Roamer Radar** | Interactive Johto/Kanto map, fly landmarks, Legendary Beast radar | `src/ui/TownMapUI.ts` | < 600 lines |
+| **Town Map Styles & Inspector** | Neo-Kanto HUD styles, SVG topology, interactive nodes, inspector telemetry | `src/ui/town-map/TownMapStylesAndInspectorRenderer.ts` | < 500 lines |
+| **Start Menu Drawer Facade** | Keyboard shortcuts, tactile menu drawer shell, sub-modal facade | `src/ui/StartMenuUI.ts` | < 750 lines |
+| **Overworld Modal Registry** | Lazy modal instantiations, sub-modal lifecycle, shortcut handling | `src/ui/OverworldModalRegistry.ts` | < 550 lines |
 | **Pokédex Species Data** | 251 Johto/Kanto species telemetry, BST, mass, types, base stats | `src/ui/start-menu/pokedexData.ts` | < 350 lines |
 | **Pokédex Modal Renderer** | 3-pane Neo-Kanto Pokédex workstation, habitat tracker, search/filter | `src/ui/start-menu/PokedexModalRenderer.ts` | < 650 lines |
-| **Trainer Card & Save Renderer**| Holographic Johto ID card, 8-badge dock, save progress modal | `src/ui/start-menu/TrainerCardAndSaveRenderer.ts` | < 450 lines |
+| **Trainer Card & Save Renderer** | Holographic Johto ID card, 8-badge dock, save progress modal | `src/ui/start-menu/TrainerCardAndSaveRenderer.ts` | < 450 lines |
 | **Settings Modal Renderer** | Neo-Kanto System Config tabs (Audio, Gameplay, Graphics, Controls) | `src/ui/start-menu/SettingsModalRenderer.ts` | < 600 lines |
 | **Settings Controls Binding** | Event listeners for speed toggles, CRT, 8-bit APU, Exp Share, palettes | `src/ui/start-menu/SettingsControlsBinding.ts` | < 450 lines |
-| **Party Management UI** | 6-slot party roster, item hold/take, move reordering, speed scaling | `src/ui/PartyManagementUI.ts` | < 480 lines |
+| **Party Management UI** | 6-slot party roster, item hold/take, move reordering, speed scaling | `src/ui/PartyManagementUI.ts` | < 500 lines |
 | **Party Styles & Summary Vector** | Neo-Kanto party CSS stylesheet and summary modal HTML vector generator | `src/ui/styles/partyStylesAndSummary.ts` | < 500 lines |
-| **Ruins Puzzle Modal UI** | Ruins of Alph 4x4 sliding tile puzzle logic and completion validation | `src/ui/RuinsPuzzleModalUI.ts` | < 430 lines |
+| **Ruins Puzzle Modal UI** | Ruins of Alph 4x4 sliding tile puzzle logic and completion validation | `src/ui/RuinsPuzzleModalUI.ts` | < 450 lines |
 | **Ruins Puzzle Styles** | Ruins of Alph sliding tile puzzle modal CSS stylesheet and responsive rules | `src/ui/styles/ruinsPuzzleStyles.ts` | < 500 lines |
 | **Global Neo-Kanto Styles** | Shared base Neo-Kanto tokens, typography, root variables, and keyframe animations | `src/ui/styles/globalNeoKantoStyles.ts` | < 150 lines |
 | **Bag & Mart UI Facade** | Multi-pocket Bag (Items, Balls, Key Items, TMs), Poké Mart shop | `src/ui/BagAndMartUI.ts` | < 700 lines |
@@ -73,42 +120,35 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Box Management UI** | Unbound-style 14-box PC storage grid, 1-click pick/swap inspector | `src/ui/BoxManagementUI.ts` | < 700 lines |
 | **Box Styles & Release Modal** | Box CSS tokens, release confirm modal, detail inspector, slot renderers | `src/ui/box/BoxStylesAndReleaseModal.ts` | < 500 lines |
 | **Mission Log UI** | Quests (Main & Side), rewards, dossier inspection, objective checklist | `src/ui/MissionLogUI.ts` | < 600 lines |
-| **Town Map & Roamer Radar** | Interactive Johto/Kanto map, fly landmarks, Legendary Beast radar | `src/ui/TownMapUI.ts` | < 600 lines |
-| **Town Map Styles & Inspector** | Neo-Kanto HUD styles, SVG topology, interactive nodes, inspector telemetry | `src/ui/town-map/TownMapStylesAndInspectorRenderer.ts` | < 500 lines |
-| **Johto Cartography & POIs** | 16x14 Johto regional landmark topology, connections, radar coordinates | `src/world/townMapData.ts` | < 500 lines |
-| **Town Map Resolvers & Radar** | Map ID to landmark resolution, BFS distance hops, species wild habitats | `src/world/map/townMapResolvers.ts` | < 400 lines |
 | **Title Screen UI Facade** | Crystalline Title Screen, Audio Unlock Gate, SavePreview Card | `src/ui/TitleScreenUI.ts` | < 700 lines |
 | **Title Screen Modals & Styles** | Title particle animation, Overwrite Confirmation & Options modals | `src/ui/title/TitleScreenModalsAndStyles.ts` | < 600 lines |
 | **Intro Sequence UI Facade** | Prof. Oak introduction 6-stage machine, boy/girl selection, character creation | `src/ui/IntroSequenceUI.ts` | < 750 lines |
 | **Intro Stage Renderers & Styles** | Spotlight dais, gender cards, QWERTY keyboard, RTC clock & shrink ray | `src/ui/intro/IntroStageRenderersAndStyles.ts` | < 600 lines |
 | **Evolution Scene UI Facade** | Fullscreen metamorphosis, oscillation engine, B-button cancel guardrail | `src/ui/EvolutionSceneUI.ts` | < 750 lines |
-| **Evolution Scene DOM & Handlers**| Dais arena, celebration card, stat deltas, responsive stage container | `src/ui/evolution/EvolutionDomAndStyles.ts` | < 250 lines |
+| **Evolution Scene DOM & Handlers** | Dais arena, celebration card, stat deltas, responsive stage container | `src/ui/evolution/EvolutionDomAndStyles.ts` | < 250 lines |
 | **Evolution Scene Styles** | Responsive CSS stylesheet, animations, and keyframes for Evolution | `src/ui/styles/evolutionStyles.ts` | < 500 lines |
 | **Overworld HUD Facade** | D-Pad / Analog Joystick overlay, A/B buttons, header telemetry | `src/ui/OverworldHUD.ts` | < 700 lines |
 | **Overworld Touch & Key Controller** | Touch D-Pad / Joystick event routing, keyboard listeners, direction state | `src/ui/hud/OverworldTouchAndKeyController.ts` | < 400 lines |
 | **Overworld Cutscene & Pokegear Modals** | Starter choice modal, Pokémon Center healing tray, field rest, roamer radar | `src/ui/hud/OverworldCutsceneAndPokegearModals.ts` | < 450 lines |
 | **Battle HUD Facade** | Neo-Kanto battle dialogue, move cards, HP/EXP bars, type badges | `src/ui/BattleHUD.ts` | < 750 lines |
-| **Battle Catalogs & Stage Badges** | Battle item catalog, type/status colors, stat stage badge generators | `src/ui/battle/BattleItemCatalogAndStyles.ts` | < 230 lines |
-| **Battle HUD Keyframes & Template**| Keyframe animations and HTML vector template for the Battle HUD | `src/ui/styles/battleHudStyles.ts` | < 500 lines |
+| **Battle Catalogs & Stage Badges** | Battle item catalog, type/status colors, stat stage badge generators | `src/ui/battle/BattleItemCatalogAndStyles.ts` | < 250 lines |
+| **Battle HUD Keyframes & Template** | Keyframe animations and HTML vector template for the Battle HUD | `src/ui/styles/battleHudStyles.ts` | < 500 lines |
 | **Battle Bag & Party Sub-Modal** | In-battle medicine/items/ball use, mid-battle party switch menu | `src/ui/battle/BattleBagAndPartySubModal.ts` | < 500 lines |
 | **Battle Move Menu & Modal** | 2x2 move matrix, tactical tooltips, 2v2 targeting, move forget prompt | `src/ui/battle/BattleMoveMenuAndForgetModal.ts` | < 600 lines |
-| **PixiJS Overworld Render Facade** | 64x64 Metatiles, view frustum culling, daylight tint shaders | `src/render/OverworldRenderer.ts` | < 750 lines |
-| **Overworld NPC & Item Sprites** | NPC sprite texture cache, character frames, overworld item balls & fruit trees | `src/render/OverworldNpcAndItemSprites.ts` | < 700 lines |
-| **Overworld Particle & VFX Pool** | Zero-GC graphic particle pool, grass rustle, cut slash, doorway fade veil | `src/render/OverworldParticleAndVfxPool.ts` | < 400 lines |
-| **PixiJS Battle Render Facade** | 2.5D layered arena, GSAP battle animations, particle VFX | `src/render/BattleRenderer.ts` | < 600 lines |
-| **Battle Pokeball & Switch VFX** | Parabolic Pokeball toss, switch recall, faint collapse, capture shake | `src/render/BattlePokeballAndSwitchAnimations.ts` | < 450 lines |
-| **Overworld Warp & Map Transition** | Async tile texture hydration, reciprocal warps, story mutations, black veil sync | `src/world/OverworldWarpAndMapTransitionController.ts` | < 650 lines |
-| **Trainer Sight & Walking Tour** | Line-of-sight trigger, rewards, stadium duels, Guide Gent tour | `src/world/OverworldTrainerSightAndTourController.ts` | < 550 lines |
-| **Overworld Ticker & Itemfinder** | Zero-alloc ticker hot paths, player bump, neighbor NPC wander, radar sonar | `src/world/OverworldTickerCoordinator.ts` | < 600 lines |
-| **Overworld Modal Registry** | Lazy modal instantiations, sub-modal lifecycle, shortcut handling | `src/ui/OverworldModalRegistry.ts` | < 550 lines |
-| **Main Application Bootstrapper** | Core engine initialization, state coordination, input dispatch | `src/main.ts` | < 750 lines |
-| **Audio Engine Facade** | 8-bit APU chiptune emulation, Web Audio API, authentic cry synthesis | `src/audio/BattleAudio.ts` | < 650 lines |
-| **Overworld & Environmental Audio** | Warp sounds, footsteps, itemfinder sonar, status sounds, weather | `src/audio/battle/OverworldAndEnvironmentalAudio.ts` | < 650 lines |
-| **Seamless BGM Audio Manager** | WebM/MP3 loop streaming, map crossfades, battle ducking, chiptune mode | `src/audio/AudioManager.ts` | < 500 lines |
-| **Johto & Kanto Map BGM Table** | Universal mapping of Johto/Kanto locations & battle types to BGM tracks | `src/audio/mapBgmTable.ts` | < 400 lines |
+| **Battle Log UI Drawer** | Chronological combat log drawer, turn separators, action breakdown | `src/ui/BattleLogUI.ts` | < 300 lines |
+| **Bug Contest Specimen Swap Modal** | Contest catch comparison card, base stat display, release confirmation | `src/ui/BugContestSpecimenSwapModal.ts` | < 350 lines |
+| **Bug Contest HUD Widget** | Overworld timer countdown, 20-park-ball counter, contest status widget | `src/ui/BugContestHUDWidget.ts` | < 200 lines |
+| **Bug Report Diagnostic Modal** | Tactile GitHub issue reporting modal with system telemetry and copy button | `src/ui/BugReportModal.ts` | < 200 lines |
+| **Day-Care Breeding Modal UI** | Route 34 Day-Care inspection card, egg status, level preview, retrieval modal | `src/ui/DayCareModalUI.ts` | < 550 lines |
+| **Dept Store Elevator Modal UI** | Goldenrod/Celadon 6-floor elevator selector, indicator lights, bell chime | `src/ui/DeptStoreElevatorUI.ts` | < 550 lines |
+| **Display Theme Manager** | CRT scanline filter state, GBC palette profiles, canvas filter coordinator | `src/ui/DisplayThemeManager.ts` | < 200 lines |
+| **Itemfinder Sonar HUD** | Overworld faceted sonar dial, directional radar waves, proximity detector | `src/ui/ItemfinderHUD.ts` | < 200 lines |
+| **Kurt Crafting Modal UI** | Azalea Town Apricorn crafting station, batch selection, ball output previews | `src/ui/KurtCraftingModalUI.ts` | < 450 lines |
+| **Move Replacement Modal UI** | Tactile 4-move replacement menu, stat delta tooltips, forget confirmation | `src/ui/MoveReplacementModalUI.ts` | < 450 lines |
+| **Naming / Nickname Modal UI** | On-screen QWERTY keyboard, letter slots, character limits, nickname prompt | `src/ui/NamingModalUI.ts` | < 500 lines |
+| **Radio Tower Quiz Modal UI** | Goldenrod Radio Tower 5-question trivia quiz, answer cards, Radio Card award | `src/ui/RadioTowerQuizUI.ts` | < 550 lines |
 | **Test Source Inspector Helper** | Reusable file inspection, recursive TS search, line counters | `tests/helpers/SourceInspector.ts` | < 100 lines |
 | **Test Mock DOM Environment** | Lightweight in-memory DOM element/document mock & container reset | `tests/helpers/MockDomEnv.ts` | < 300 lines |
-
 ---
 
 ## 1. Executive Overview & Core Architectural Pillars
@@ -415,7 +455,7 @@ Every code addition and pull request must strictly honor these five non-negotiab
 ## 6. QA Verification Matrix & Test Standards
 
 * **Test Framework:** Vitest (`vitest run`), configured for ultra-fast, in-memory execution (~45ms baseline).
-* **Test Location & Naming:** `tests/<ModuleName>.test.ts`, matching corresponding source module in `src/`.
+* **Test Location & Naming:** `tests/AdjacentMapPrefetch.test.ts`, matching corresponding source module in `src/`.
 * **Deterministic Execution:** Seeded PRNG or explicit test vectors for RNG-heavy logic (damage rolls, catch rates, roamer graph selections).
 * **Periodic Optimization Review Cadence:** Every 5 to 10 completed feature implementations (e.g. after Tickets 5.1–5.5, Tickets 6.1–6.5, etc.), an automated and manual health review is run via `npm run review` (`scripts/project-optimization-review.cjs`) to audit layer purity, NPC walkability, reciprocal warps, test suite, and bundle budgets.
 * **Pre-Merge / Verification Gate:**

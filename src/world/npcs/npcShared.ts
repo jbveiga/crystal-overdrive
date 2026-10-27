@@ -1,3 +1,12 @@
+/**
+ * @fileoverview npcShared domain module implementation.
+ * @module world/npcs/npcShared
+ * @role npcShared Component
+ * @exports makeNpc, GuideGentTourLegDef, GUIDE_GENT_TOUR_LEGS
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-327: Implementation | L328-655: Handlers & Exports
+ */
+
 import type { Direction } from '../../types/game';
 import type { GridEntity } from '../GridPhysics';
 

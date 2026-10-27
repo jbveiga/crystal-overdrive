@@ -1,4 +1,13 @@
 /**
+ * @fileoverview BugContestManager domain module implementation.
+ * @module world/BugContestManager
+ * @role BugContestManager Component
+ * @exports SudowoodoObstacle, getSudowoodoObstacle, BugContestState
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-185: Implementation | L186-371: Handlers & Exports
+ */
+
+/**
  * BugContestManager.ts
  * Pure TypeScript domain logic for the National Park Bug-Catching Contest and Sudowoodo Obstacle (Ticket Sprint 15 / TICKET-WORLD-ROUTE35-NATIONAL-PARK-01).
  * Zero DOM or PixiJS dependencies.

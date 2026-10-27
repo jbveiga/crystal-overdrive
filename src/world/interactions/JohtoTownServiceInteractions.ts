@@ -1,3 +1,12 @@
+/**
+ * @fileoverview JohtoTownServiceInteractions domain module implementation.
+ * @module world/interactions/JohtoTownServiceInteractions
+ * @role JohtoTownServiceInteractions Component
+ * @exports getJohtoTownServiceInteractions
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-344: Implementation | L345-689: Handlers & Exports
+ */
+
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';

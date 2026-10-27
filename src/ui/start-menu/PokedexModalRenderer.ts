@@ -1,3 +1,12 @@
+/**
+ * @fileoverview PokedexModalRenderer domain module implementation.
+ * @module ui/start-menu/PokedexModalRenderer
+ * @role PokedexModalRenderer Component
+ * @exports PokedexModalRenderer
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-325: Implementation | L326-650: Handlers & Exports
+ */
+
 import { BattleAudio } from '../../audio/BattleAudio';
 import { findHabitatsForSpecies } from '../../world/townMapData';
 import type { StartMenuStateProvider, StartMenuCallbacks } from '../StartMenuUI';
@@ -16,6 +25,19 @@ export {
   getNeoKantoTypeColor,
   getCompleteDexSpecies,
 };
+
+const S = {
+  statRow: "${S.statRow}",
+  statLbl: "${S.statLbl}",
+  statTrack: "${S.statTrack}",
+  statVal: "${S.statVal}",
+  vitalsCard: "${S.vitalsCard}",
+  vitalsLbl: "${S.vitalsLbl}",
+  vitalsVal: "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 2px;",
+  stageNavBtn: "${S.stageNavBtn}",
+  filterBtn: "${S.filterBtn}",
+  paneBox: "background: #141E33; border: 1px solid #22324F; border-radius: 8px; box-shadow: 0 4px 0 0 #070B14;",
+} as const;
 
 export class PokedexModalRenderer {
   public selectedDexSpeciesId: string = 'cyndaquil';
@@ -115,12 +137,12 @@ export class PokedexModalRenderer {
         </div>
 
         <div style="display: flex; gap: 4px; align-items: center; overflow-x: auto;">
-          <button id="dex-filter-all" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'ALL' ? activeBtnStyle : inactiveBtnStyle}">ALL (251)</button>
-          <button id="dex-filter-johto" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'JOHTO' ? activeBtnStyle : inactiveBtnStyle}">JOHTO (#152-251)</button>
-          <button id="dex-filter-kanto" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'KANTO' ? activeBtnStyle : inactiveBtnStyle}">KANTO (#001-151)</button>
-          <button id="dex-filter-caught" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'CAUGHT' ? activeBtnStyle : inactiveBtnStyle}">OWNED (${caughtSet.size})</button>
-          <button id="dex-filter-seen" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'SEEN' ? activeBtnStyle : inactiveBtnStyle}">SEEN (${seenSet.size})</button>
-          <button id="dex-filter-habitat" class="neo-kanto-tactile-btn" style="border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${this.dexFilter === 'HABITAT' ? activeBtnStyle : inactiveBtnStyle}">🗺️ HABITATS</button>
+          <button id="dex-filter-all" class="neo-kanto-tactile-btn" style="${S.filterBtn} ${this.dexFilter === 'ALL' ? activeBtnStyle : inactiveBtnStyle}">ALL (251)</button>
+          <button id="dex-filter-johto" class="neo-kanto-tactile-btn" style="${S.filterBtn} ${this.dexFilter === 'JOHTO' ? activeBtnStyle : inactiveBtnStyle}">JOHTO (#152-251)</button>
+          <button id="dex-filter-kanto" class="neo-kanto-tactile-btn" style="${S.filterBtn} ${this.dexFilter === 'KANTO' ? activeBtnStyle : inactiveBtnStyle}">KANTO (#001-151)</button>
+          <button id="dex-filter-caught" class="neo-kanto-tactile-btn" style="${S.filterBtn} ${this.dexFilter === 'CAUGHT' ? activeBtnStyle : inactiveBtnStyle}">OWNED (${caughtSet.size})</button>
+          <button id="dex-filter-seen" class="neo-kanto-tactile-btn" style="${S.filterBtn} ${this.dexFilter === 'SEEN' ? activeBtnStyle : inactiveBtnStyle}">SEEN (${seenSet.size})</button>
+          <button id="dex-filter-habitat" class="neo-kanto-tactile-btn" style="${S.filterBtn} ${this.dexFilter === 'HABITAT' ? activeBtnStyle : inactiveBtnStyle}">🗺️ HABITATS</button>
         </div>
 
         <div style="display: flex; align-items: center; gap: 4px;">
@@ -152,8 +174,8 @@ export class PokedexModalRenderer {
               <span style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; color: #FFD028;">HOLOGRAPHIC SPECIMEN BAY</span>
             </div>
             <div style="display: flex; gap: 6px;">
-              <button id="dex-prev-btn" class="neo-kanto-tactile-btn" style="background: #080E1D; border: 1px solid #22324F; color: #F6F8F3; border-radius: 4px; padding: 4px 8px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 0 0 #070B14;">◀ PREV</button>
-              <button id="dex-next-btn" class="neo-kanto-tactile-btn" style="background: #080E1D; border: 1px solid #22324F; color: #F6F8F3; border-radius: 4px; padding: 4px 8px; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 0 0 #070B14;">NEXT ▶</button>
+              <button id="dex-prev-btn" class="neo-kanto-tactile-btn" style="${S.stageNavBtn}">◀ PREV</button>
+              <button id="dex-next-btn" class="neo-kanto-tactile-btn" style="${S.stageNavBtn}">NEXT ▶</button>
             </div>
           </div>
 
@@ -193,16 +215,16 @@ export class PokedexModalRenderer {
 
           <!-- Vitals Bento -->
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
-            <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px; text-align: center;">
-              <div style="font-family: 'Space Mono', monospace; font-size: 9px; color: #94A3B8; font-weight: 700;">HEIGHT</div>
+            <div style="${S.vitalsCard}">
+              <div style="${S.vitalsLbl}">HEIGHT</div>
               <div id="dex-height-val" style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 2px;">0.5 m</div>
             </div>
-            <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px; text-align: center;">
-              <div style="font-family: 'Space Mono', monospace; font-size: 9px; color: #94A3B8; font-weight: 700;">WEIGHT</div>
+            <div style="${S.vitalsCard}">
+              <div style="${S.vitalsLbl}">WEIGHT</div>
               <div id="dex-weight-val" style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 2px;">7.9 kg</div>
             </div>
-            <div style="background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px; text-align: center;">
-              <div style="font-family: 'Space Mono', monospace; font-size: 9px; color: #94A3B8; font-weight: 700;">BST</div>
+            <div style="${S.vitalsCard}">
+              <div style="${S.vitalsLbl}">BST</div>
               <div id="dex-bst-val" style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #FFD028; margin-top: 2px;">309</div>
             </div>
           </div>
@@ -212,57 +234,57 @@ export class PokedexModalRenderer {
             <div style="font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 800; color: #94A3B8; margin-bottom: 2px;">BASE STAT CALIBRATION</div>
 
             <!-- HP -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">HP</span>
-              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+            <div style="${S.statRow}">
+              <span style="${S.statLbl}">HP</span>
+              <div style="${S.statTrack}">
                 <div id="dex-bar-hp" style="height: 100%; width: 25%; background: #EE4238; border-radius: 3px; transition: width 0.3s ease;"></div>
               </div>
-              <span id="dex-val-hp" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">39</span>
+              <span id="dex-val-hp" style="${S.statVal}">39</span>
             </div>
 
             <!-- ATK -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">ATK</span>
-              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+            <div style="${S.statRow}">
+              <span style="${S.statLbl}">ATK</span>
+              <div style="${S.statTrack}">
                 <div id="dex-bar-atk" style="height: 100%; width: 32%; background: #FFD028; border-radius: 3px; transition: width 0.3s ease;"></div>
               </div>
-              <span id="dex-val-atk" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">52</span>
+              <span id="dex-val-atk" style="${S.statVal}">52</span>
             </div>
 
             <!-- DEF -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">DEF</span>
-              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+            <div style="${S.statRow}">
+              <span style="${S.statLbl}">DEF</span>
+              <div style="${S.statTrack}">
                 <div id="dex-bar-def" style="height: 100%; width: 28%; background: #EE4238; border-radius: 3px; transition: width 0.3s ease;"></div>
               </div>
-              <span id="dex-val-def" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">43</span>
+              <span id="dex-val-def" style="${S.statVal}">43</span>
             </div>
 
             <!-- SP.ATK -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">SP.ATK</span>
-              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+            <div style="${S.statRow}">
+              <span style="${S.statLbl}">SP.ATK</span>
+              <div style="${S.statTrack}">
                 <div id="dex-bar-spa" style="height: 100%; width: 38%; background: #FFD028; border-radius: 3px; transition: width 0.3s ease;"></div>
               </div>
-              <span id="dex-val-spa" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">60</span>
+              <span id="dex-val-spa" style="${S.statVal}">60</span>
             </div>
 
             <!-- SP.DEF -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">SP.DEF</span>
-              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+            <div style="${S.statRow}">
+              <span style="${S.statLbl}">SP.DEF</span>
+              <div style="${S.statTrack}">
                 <div id="dex-bar-spd" style="height: 100%; width: 31%; background: #EE4238; border-radius: 3px; transition: width 0.3s ease;"></div>
               </div>
-              <span id="dex-val-spd" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">50</span>
+              <span id="dex-val-spd" style="${S.statVal}">50</span>
             </div>
 
             <!-- SPEED -->
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-              <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #DDE2F7; width: 44px;">SPEED</span>
-              <div style="flex: 1; height: 6px; background: #141E33; border-radius: 3px; overflow: hidden;">
+            <div style="${S.statRow}">
+              <span style="${S.statLbl}">SPEED</span>
+              <div style="${S.statTrack}">
                 <div id="dex-bar-spe" style="height: 100%; width: 40%; background: #FFD028; border-radius: 3px; transition: width 0.3s ease;"></div>
               </div>
-              <span id="dex-val-spe" style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #DDE2F7; width: 26px; text-align: right;">65</span>
+              <span id="dex-val-spe" style="${S.statVal}">65</span>
             </div>
           </div>
 
@@ -314,7 +336,7 @@ export class PokedexModalRenderer {
         this.dexFilter = filter;
         filterIds.forEach((f) => {
           const btn = this.pokedexModal.querySelector(f.id) as HTMLButtonElement | null;
-          if (btn) btn.style.cssText = `border-radius: 4px; padding: 5px 8px; font-family: 'Space Mono', monospace; font-size: 10px; cursor: pointer; ${f.filter === filter ? activeBtnStyle : inactiveBtnStyle}`;
+          if (btn) btn.style.cssText = `${S.filterBtn} ${f.filter === filter ? activeBtnStyle : inactiveBtnStyle}`;
         });
         this.renderPokedexRoster(caughtSet, seenSet);
       });

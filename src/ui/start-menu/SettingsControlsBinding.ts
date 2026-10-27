@@ -1,3 +1,12 @@
+/**
+ * @fileoverview SettingsControlsBinding domain module implementation.
+ * @module ui/start-menu/SettingsControlsBinding
+ * @role SettingsControlsBinding Component
+ * @exports bindSettingsEventListeners
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-211: Implementation | L212-422: Handlers & Exports
+ */
+
 import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 import type {

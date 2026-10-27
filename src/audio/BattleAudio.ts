@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BattleAudio domain module implementation.
+ * @module audio/BattleAudio
+ * @role BattleAudio Component
+ * @exports BattleAudio
+ * @layer audio
+ * @sections L1-15: Micro-Header & Imports | L16-270: Implementation | L271-540: Handlers & Exports
+ */
+
 import type { PokemonType, MoveCategory, WarpSoundCue } from '../types/game';
 import {
   playWarpSound,

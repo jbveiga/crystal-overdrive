@@ -1,3 +1,12 @@
+/**
+ * @fileoverview earlyJohtoMissions domain module implementation.
+ * @module world/missions/earlyJohtoMissions
+ * @role earlyJohtoMissions Component
+ * @exports EARLY_JOHTO_MISSIONS
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-272: Implementation | L273-545: Handlers & Exports
+ */
+
 import type { Mission } from '../../types/game';
 
 export const EARLY_JOHTO_MISSIONS: ReadonlyArray<Mission> = [

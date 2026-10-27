@@ -1,4 +1,13 @@
 /**
+ * @fileoverview townMapData domain module implementation.
+ * @module world/townMapData
+ * @role townMapData Component
+ * @exports TownMapLandmark, TownMapConnection, JOHTO_LANDMARKS
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-234: Implementation | L235-469: Handlers & Exports
+ */
+
+/**
  * Pure TypeScript Johto Regional Cartography & Landmark Domain.
  * ZERO DOM / Pixi imports (Separation of Concerns).
  *

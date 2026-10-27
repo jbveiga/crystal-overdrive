@@ -1,3 +1,12 @@
+/**
+ * @fileoverview mapBgmTable domain module implementation.
+ * @module audio/mapBgmTable
+ * @role mapBgmTable Component
+ * @exports BgmTrackId, BattleBgmType, MAP_BGM_TABLE
+ * @layer audio
+ * @sections L1-15: Micro-Header & Imports | L16-196: Implementation | L197-393: Handlers & Exports
+ */
+
 export type BgmTrackId =
   | 'bgm_new_bark_town'
   | 'bgm_elms_lab'

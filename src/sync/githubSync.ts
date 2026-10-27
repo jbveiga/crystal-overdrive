@@ -1,4 +1,13 @@
 /**
+ * @fileoverview githubSync domain module implementation.
+ * @module sync/githubSync
+ * @role githubSync Component
+ * @exports GitHubIssue, SyncResult, SyncOptions
+ * @layer sync
+ * @sections L1-15: Micro-Header & Imports | L16-159: Implementation | L160-319: Handlers & Exports
+ */
+
+/**
  * githubSync.ts
  * Programmatic headless GitHub synchronization module.
  * Checks for unresolved GitHub issues, validates resolution status against current codebase,

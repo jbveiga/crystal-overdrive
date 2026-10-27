@@ -4,6 +4,7 @@
  * @role Battle Engine Session Orchestrator
  * @exports BattleSessionController
  * @layer battle
+ * @sections L1-7: Micro-Header & Types | L8-281: Core Implementation | L282-563: Public Interface & Exports
  */
 
 import type {

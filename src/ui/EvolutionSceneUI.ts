@@ -1,3 +1,12 @@
+/**
+ * @fileoverview EvolutionSceneUI domain module implementation.
+ * @module ui/EvolutionSceneUI
+ * @role EvolutionSceneUI Component
+ * @exports EvolutionPhase, StatDeltas, EvolutionSceneResult
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-255: Implementation | L256-510: Handlers & Exports
+ */
+
 import { Dex } from '@pkmn/dex';
 import type { PokemonInstance, PokemonType, BaseStats } from '../types/game';
 import { EvolutionManager } from '../world/EvolutionManager';

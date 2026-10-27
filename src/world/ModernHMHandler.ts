@@ -1,3 +1,12 @@
+/**
+ * @fileoverview ModernHMHandler domain module implementation.
+ * @module world/ModernHMHandler
+ * @role ModernHMHandler Component
+ * @exports HMFieldMoveId, HMFieldCheckResult, ModernHMHandler
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-285: Implementation | L286-570: Handlers & Exports
+ */
+
 import type { PokemonInstance } from '../types/game';
 import type { BagInventory } from '../ui/BagAndMartUI';
 

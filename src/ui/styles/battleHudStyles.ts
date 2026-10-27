@@ -2,6 +2,7 @@
  * @fileoverview Keyframe animations and HTML vector template for the Neo-Kanto Battle HUD.
  * @module ui/styles/battleHudStyles
  * @layer ui
+ * @sections L1-5: Micro-Header & Types | L6-228: Core Implementation | L229-456: Public Interface & Exports
  */
 export function injectKeyframeStyles(): void {
   if (typeof document === 'undefined' || document.getElementById('crystal-battle-hud-styles')) return;

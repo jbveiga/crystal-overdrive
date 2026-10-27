@@ -1,16 +1,19 @@
+/**
+ * @fileoverview goldenrodCityNpcs domain module implementation.
+ * @module world/npcs/goldenrodCityNpcs
+ * @role goldenrodCityNpcs Component
+ * @exports createGoldenrodCityNpcs
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-204: Implementation | L205-409: Handlers & Exports
+ */
+
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
 
 export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
   return {
     route_34: [
-      makeNpc(
-        'camper_todd',
-        13,
-        7,
-        'LEFT',
-        'camper',
-        '⛺ CAMPER TODD',
+      makeNpc('camper_todd', 13, 7, 'LEFT', 'camper', '⛺ CAMPER TODD', 
         ["I'm confident in my ability to raise POKéMON. Want to see?"],
         {
           action: 'TRAINER_BATTLE',
@@ -24,13 +27,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'youngster_samuel',
-        15,
-        32,
-        'DOWN',
-        'youngster',
-        '🧢 YOUNGSTER SAMUEL',
+      makeNpc('youngster_samuel', 15, 32, 'DOWN', 'youngster', '🧢 YOUNGSTER SAMUEL', 
         ['This is where I do my training!'],
         {
           action: 'TRAINER_BATTLE',
@@ -47,13 +44,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'youngster_ian',
-        11,
-        20,
-        'DOWN',
-        'youngster',
-        '🧢 YOUNGSTER IAN',
+      makeNpc('youngster_ian', 11, 20, 'DOWN', 'youngster', '🧢 YOUNGSTER IAN', 
         ["I'm the best in my class at POKéMON."],
         {
           action: 'TRAINER_BATTLE',
@@ -68,13 +59,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'picnicker_gina',
-        10,
-        26,
-        'RIGHT',
-        'picnicker',
-        '👧 PICNICKER GINA',
+      makeNpc('picnicker_gina', 10, 26, 'RIGHT', 'picnicker', '👧 PICNICKER GINA', 
         ["Are you a trainer? Let's have a practice battle."],
         {
           action: 'TRAINER_BATTLE',
@@ -90,13 +75,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'officer_keith',
-        9,
-        11,
-        'DOWN',
-        'officer',
-        '👮 OFFICER KEITH',
+      makeNpc('officer_keith', 9, 11, 'DOWN', 'officer', '👮 OFFICER KEITH', 
         ["I'm on patrol for suspicious individuals.", "It's safe now, but trouble stirs after dark."],
         {
           action: 'TRAINER_BATTLE',
@@ -110,13 +89,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'pokefan_brandon',
-        18,
-        28,
-        'LEFT',
-        'fat_man',
-        '🎀 POKéFAN BRANDON',
+      makeNpc('pokefan_brandon', 18, 28, 'LEFT', 'fat_man', '🎀 POKéFAN BRANDON', 
         ["I just got my POKéMON back from DAY-CARE. Let's see how much stronger it got!"],
         {
           action: 'TRAINER_BATTLE',
@@ -130,13 +103,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'cooltrainer_irene',
-        11,
-        48,
-        'LEFT',
-        'girl',
-        '🏊 COOLTRAINER IRENE',
+      makeNpc('cooltrainer_irene', 11, 48, 'LEFT', 'girl', '🏊 COOLTRAINER IRENE', 
         ['Kyaaah! Someone entered our swimming lagoon!'],
         {
           action: 'TRAINER_BATTLE',
@@ -151,13 +118,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'cooltrainer_jenn',
-        3,
-        48,
-        'RIGHT',
-        'girl',
-        '🏊 COOLTRAINER JENN',
+      makeNpc('cooltrainer_jenn', 3, 48, 'RIGHT', 'girl', '🏊 COOLTRAINER JENN', 
         ["You can't defeat the three of us!"],
         {
           action: 'TRAINER_BATTLE',
@@ -172,13 +133,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'cooltrainer_kate',
-        6,
-        51,
-        'UP',
-        'girl',
-        '🏊 COOLTRAINER KATE',
+      makeNpc('cooltrainer_kate', 6, 51, 'UP', 'girl', '🏊 COOLTRAINER KATE', 
         ["I'm the strongest sister! Let's see what you've got!"],
         {
           action: 'TRAINER_BATTLE',
@@ -195,88 +150,46 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     day_care: [
-      makeNpc(
-        'day_care_man',
-        2,
-        3,
-        'DOWN',
-        'elder',
-        '👴 DAY-CARE MAN',
+      makeNpc('day_care_man', 2, 3, 'DOWN', 'elder', '👴 DAY-CARE MAN', 
         [
           "I'm the DAY-CARE MAN. We were shocked to find an EGG in the meadow!",
           "Wouldn't you like this EGG? Please take good care of it!",
         ]
       ),
-      makeNpc(
-        'day_care_lady',
-        5,
-        3,
-        'DOWN',
-        'mom',
-        '👵 DAY-CARE LADY',
+      makeNpc('day_care_lady', 5, 3, 'DOWN', 'mom', '👵 DAY-CARE LADY', 
         [
           "I'm the DAY-CARE LADY. Should I raise a POKéMON for you?",
         ]
       ),
     ],
     goldenrod_city: [
-      makeNpc(
-        'goldenrod_pokefan',
-        18,
-        14,
-        'DOWN',
-        'fat_man',
-        '🎩 GENTLEMAN',
+      makeNpc('goldenrod_pokefan', 18, 14, 'DOWN', 'fat_man', '🎩 GENTLEMAN', 
         [
           'GOLDENROD CITY is the grandest metropolis in JOHTO!',
           'We have a 6-story DEPT. STORE, a bustling GAME CORNER, and the famous RADIO TOWER!',
         ],
         { wanders: true }
       ),
-      makeNpc(
-        'goldenrod_lass',
-        30,
-        18,
-        'LEFT',
-        'girl',
-        '👧 LASS',
+      makeNpc('goldenrod_lass', 30, 18, 'LEFT', 'girl', '👧 LASS', 
         [
           'WHITNEY at the GYM is super cute, but her MILTANK’s ROLLOUT attack is terrifying!',
           'It builds up speed and power every single turn!',
         ],
         { wanders: true }
       ),
-      makeNpc(
-        'goldenrod_cooltrainer',
-        28,
-        22,
-        'UP',
-        'boy',
-        '🧢 COOLTRAINER',
+      makeNpc('goldenrod_cooltrainer', 28, 22, 'UP', 'boy', '🧢 COOLTRAINER', 
         [
           'The MAGNET TRAIN station is just north of here! It connects JOHTO directly to KANTO at 340 miles per hour!',
         ]
       ),
-      makeNpc(
-        'goldenrod_fisher',
-        12,
-        9,
-        'DOWN',
-        'fisherman',
-        '🎣 FISHER',
+      makeNpc('goldenrod_fisher', 12, 9, 'DOWN', 'fisherman', '🎣 FISHER', 
         [
           'You can take the UNDERGROUND tunnel to cross under town, browse the herb shop, and groom your POKéMON!',
         ]
       ),
     ],
     goldenrod_gym: [
-      makeNpc(
-        'whitney',
-        10,
-        3,
-        'DOWN',
-        'girl',
-        '🎀 LEADER WHITNEY',
+      makeNpc('whitney', 10, 3, 'DOWN', 'girl', '🎀 LEADER WHITNEY', 
         [
           "WHITNEY: You're really amazing! The PLAINBADGE proves your strength!",
           'NORMAL-type POKéMON have so much versatility. Keep believing in your team!',
@@ -295,13 +208,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'lass_carrie',
-        9,
-        13,
-        'DOWN',
-        'girl',
-        '👧 LASS CARRIE',
+      makeNpc('lass_carrie', 9, 13, 'DOWN', 'girl', '👧 LASS CARRIE', 
         ['Don’t underestimate our cute POKéMON!'],
         {
           action: 'TRAINER_BATTLE',
@@ -315,13 +222,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'lass_bridget',
-        9,
-        6,
-        'LEFT',
-        'girl',
-        '👧 LASS BRIDGET',
+      makeNpc('lass_bridget', 9, 6, 'LEFT', 'girl', '👧 LASS BRIDGET', 
         [
           'WHITNEY is so pretty, but she gets emotional after tough battles!',
         ],
@@ -339,13 +240,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'beauty_victoria',
-        13,
-        8,
-        'LEFT',
-        'girl',
-        '💄 BEAUTY VICTORIA',
+      makeNpc('beauty_victoria', 13, 8, 'LEFT', 'girl', '💄 BEAUTY VICTORIA', 
         ['SENTRET is so fluffy and quick!'],
         {
           action: 'TRAINER_BATTLE',
@@ -361,13 +256,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'beauty_samantha',
-        5,
-        9,
-        'RIGHT',
-        'girl',
-        '💄 BEAUTY SAMANTHA',
+      makeNpc('beauty_samantha', 5, 9, 'RIGHT', 'girl', '💄 BEAUTY SAMANTHA', 
         ['MEOWTH loves shiny coins and quick scratches!'],
         {
           action: 'TRAINER_BATTLE',
@@ -382,13 +271,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'goldenrod_gym_guide',
-        3,
-        15,
-        'UP',
-        'fat_man',
-        '🥊 GYM GUIDE',
+      makeNpc('goldenrod_gym_guide', 3, 15, 'UP', 'fat_man', '🥊 GYM GUIDE', 
         [
           'Yo! CHAMP in the making!',
           'WHITNEY uses NORMAL-type POKéMON! FIGHTING-type moves are super effective against them!',
@@ -397,13 +280,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_poke_center: [
-      makeNpc(
-        'goldenrod_nurse_joy',
-        3,
-        1,
-        'DOWN',
-        'teacher',
-        '👩‍⚕️ NURSE JOY',
+      makeNpc('goldenrod_nurse_joy', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to the GOLDENROD POKéMON CENTER!',
           'We heal your POKéMON to full health in no time.',
@@ -411,33 +288,15 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
         ],
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),
-      makeNpc(
-        'goldenrod_pc_clerk',
-        1,
-        6,
-        'RIGHT',
-        'fat_man',
-        '👨‍💼 NETWORK CLERK',
+      makeNpc('goldenrod_pc_clerk', 1, 6, 'RIGHT', 'fat_man', '👨‍💼 NETWORK CLERK', 
         ['This POKéMON CENTER connects trainers across the globe through high-speed mobile communications!']
       ),
-      makeNpc(
-        'goldenrod_pc_lass',
-        6,
-        4,
-        'LEFT',
-        'girl',
-        '👧 LASS',
+      makeNpc('goldenrod_pc_lass', 6, 4, 'LEFT', 'girl', '👧 LASS', 
         ['A boy on the 5th floor of the DEPT. STORE traded me a MACHOP named MUSCLE!']
       ),
     ],
     goldenrod_bike_shop: [
-      makeNpc(
-        'bike_shop_owner',
-        2,
-        3,
-        'DOWN',
-        'fat_man',
-        '🚲 BIKE SHOP OWNER',
+      makeNpc('bike_shop_owner', 2, 3, 'DOWN', 'fat_man', '🚲 BIKE SHOP OWNER', 
         [
           'Welcome to MIRACLE CYCLE! I moved here from CERULEAN CITY, but nobody knows my bikes yet!',
           'Would you take one of our BICYCLES and ride it everywhere to advertise for me? It’ll double your travel speed!',
@@ -445,13 +304,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_flower_shop: [
-      makeNpc(
-        'florist',
-        2,
-        3,
-        'DOWN',
-        'girl',
-        '🌸 FLORIST',
+      makeNpc('florist', 2, 3, 'DOWN', 'girl', '🌸 FLORIST', 
         [
           'Have you seen that weird, wiggling tree on ROUTE 36? Whenever anyone splashes water on it, it gets furious!',
           'Take this SQUIRTBOTTLE! Use it on that tree and see what happens!',
@@ -459,33 +312,15 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_game_corner: [
-      makeNpc(
-        'coin_guy',
-        14,
-        6,
-        'LEFT',
-        'fat_man',
-        '🎰 PRIZE CLERK',
+      makeNpc('coin_guy', 14, 6, 'LEFT', 'fat_man', '🎰 PRIZE CLERK', 
         ['You can trade GAME CORNER coins for valuable TMs like BLIZZARD, FIRE BLAST, and THUNDER, or rare POKéMON!']
       ),
-      makeNpc(
-        'slot_player',
-        5,
-        8,
-        'UP',
-        'boy',
-        '👦 SLOT PLAYER',
+      makeNpc('slot_player', 5, 8, 'UP', 'boy', '👦 SLOT PLAYER', 
         ['7-7-7! Come on! Just one more match! The slot machines here are so addictive!']
       ),
     ],
     goldenrod_name_rater: [
-      makeNpc(
-        'name_rater',
-        2,
-        3,
-        'DOWN',
-        'elder',
-        '👴 NAME RATER',
+      makeNpc('name_rater', 2, 3, 'DOWN', 'elder', '👴 NAME RATER', 
         [
           'Hello, hello! I am the official NAME RATER! I evaluate the nicknames of POKéMON!',
           'A fine nickname deepens the friendship between you and your companion!',
@@ -513,13 +348,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
         "👧 BILL'S SISTER",
         ['My big brother loves EEVEE! If you visit our family in Ecruteak, he might have a gift for you!']
       ),
-      makeNpc(
-        'bill',
-        2,
-        4,
-        'RIGHT',
-        'boy',
-        '💻 BILL',
+      makeNpc('bill', 2, 4, 'RIGHT', 'boy', '💻 BILL', 
         [
           'BILL: Hi, Gold! Thanks for helping out with the PC Storage System!',
           'I have this rare EEVEE that was sent to me. Would you take good care of it?',
@@ -527,36 +356,18 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_magnet_train_station: [
-      makeNpc(
-        'station_officer',
-        9,
-        9,
-        'DOWN',
-        'fat_man',
-        '👮 STATION OFFICER',
+      makeNpc('station_officer', 9, 9, 'DOWN', 'fat_man', '👮 STATION OFFICER', 
         [
           'The MAGNET TRAIN reaches speeds over 340 mph between GOLDENROD and SAFFRON CITY!',
           'Only authorized travelers with a RAIL PASS may board the train.',
         ]
       ),
-      makeNpc(
-        'train_passenger',
-        5,
-        14,
-        'RIGHT',
-        'boy',
-        '👦 PASSENGER',
+      makeNpc('train_passenger', 5, 14, 'RIGHT', 'boy', '👦 PASSENGER', 
         ['I can’t wait to ride the bullet train all the way to KANTO!']
       ),
     ],
     goldenrod_underground: [
-      makeNpc(
-        'true_director',
-        24,
-        25,
-        'DOWN',
-        'elder',
-        '📻 REAL DIRECTOR',
+      makeNpc('true_director', 24, 25, 'DOWN', 'elder', '📻 REAL DIRECTOR', 
         [
           "DIRECTOR: Ah! You found me! I was kidnapped and locked in this dark underground warehouse by TEAM ROCKET!",
           "They disguised an executive as me to hijack our broadcast frequency!",
@@ -564,13 +375,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'TRUE_DIRECTOR_EVENT' }
       ),
-      makeNpc(
-        'super_nerd_eric',
-        8,
-        12,
-        'DOWN',
-        'boy',
-        '🤓 SUPER NERD ERIC',
+      makeNpc('super_nerd_eric', 8, 12, 'DOWN', 'boy', '🤓 SUPER NERD ERIC', 
         ['My electric and poison POKéMON thrive in the subterranean tunnels!'],
         {
           action: 'TRAINER_BATTLE',
@@ -585,13 +390,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'pokemaniac_donald',
-        8,
-        24,
-        'UP',
-        'boy',
-        '🎒 POKÉMANIAC DONALD',
+      makeNpc('pokemaniac_donald', 8, 24, 'UP', 'boy', '🎒 POKÉMANIAC DONALD', 
         ['SLOWPOKE may be slow, but its psychic power is immense!'],
         {
           action: 'TRAINER_BATTLE',

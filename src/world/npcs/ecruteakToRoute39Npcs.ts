@@ -1,16 +1,19 @@
+/**
+ * @fileoverview ecruteakToRoute39Npcs domain module implementation.
+ * @module world/npcs/ecruteakToRoute39Npcs
+ * @role ecruteakToRoute39Npcs Component
+ * @exports createEcruteakToRoute39Npcs
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-218: Implementation | L219-437: Handlers & Exports
+ */
+
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
 
 export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
   return {
     route_37: [
-      makeNpc(
-        'twins_ann_anne',
-        7,
-        6,
-        'DOWN',
-        'girl',
-        '👭 TWINS ANN & ANNE',
+      makeNpc('twins_ann_anne', 7, 6, 'DOWN', 'girl', '👭 TWINS ANN & ANNE', 
         ['We train together every single afternoon!'],
         {
           action: 'TRAINER_BATTLE',
@@ -25,26 +28,14 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'sunny_of_sunday',
-        14,
-        10,
-        'LEFT',
-        'girl',
-        '⚡ SUNNY OF SUNDAY',
+      makeNpc('sunny_of_sunday', 14, 10, 'LEFT', 'girl', '⚡ SUNNY OF SUNDAY', 
         [
           "SUNNY: Hi! I'm SUNNY of Sunday! Nice to meet you!",
           'Here is a MAGNET to power up ELECTRIC-type moves!',
         ],
         { action: 'DAY_SIBLING_EVENT' }
       ),
-      makeNpc(
-        'psychic_greg',
-        6,
-        12,
-        'UP',
-        'youngster',
-        '🔮 PSYCHIC GREG',
+      makeNpc('psychic_greg', 6, 12, 'UP', 'youngster', '🔮 PSYCHIC GREG', 
         ['POKéMON can’t do a thing if they are asleep!'],
         {
           action: 'TRAINER_BATTLE',
@@ -62,49 +53,25 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     ecruteak_city: [
-      makeNpc(
-        'ecruteak_sage',
-        22,
-        14,
-        'DOWN',
-        'sage',
-        '🏮 ECRUTEAK SAGE',
+      makeNpc('ecruteak_sage', 22, 14, 'DOWN', 'sage', '🏮 ECRUTEAK SAGE', 
         [
           'ECRUTEAK CITY is steeped in ancient lore.',
           'Long ago, two magnificent towers stood tall to honor the great silver bird LUGIA and rainbow bird HO-OH.',
         ]
       ),
-      makeNpc(
-        'ecruteak_girl',
-        10,
-        20,
-        'RIGHT',
-        'girl',
-        '👧 TOWN GIRL',
+      makeNpc('ecruteak_girl', 10, 20, 'RIGHT', 'girl', '👧 TOWN GIRL', 
         [
           'The KIMONO GIRLS in the DANCE THEATER dance gracefully with their five evolved EEVEE partners!',
         ]
       ),
-      makeNpc(
-        'ecruteak_gramps',
-        32,
-        26,
-        'DOWN',
-        'elder',
-        '👴 ELDER CITIZEN',
+      makeNpc('ecruteak_gramps', 32, 26, 'DOWN', 'elder', '👴 ELDER CITIZEN', 
         [
           'MORTY is our GYM LEADER. His spectral powers allow him to communicate with GHOST POKéMON across generations.',
         ]
       ),
     ],
     ecruteak_poke_center: [
-      makeNpc(
-        'ecruteak_nurse_joy',
-        3,
-        1,
-        'DOWN',
-        'teacher',
-        '👩‍⚕️ NURSE JOY',
+      makeNpc('ecruteak_nurse_joy', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to the ECRUTEAK CITY POKéMON CENTER!',
           'We heal your POKéMON to full health in no time.',
@@ -112,13 +79,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         ],
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),
-      makeNpc(
-        'bill_cameo',
-        6,
-        4,
-        'DOWN',
-        'boy',
-        '💻 BILL',
+      makeNpc('bill_cameo', 6, 4, 'DOWN', 'boy', '💻 BILL', 
         [
           'BILL: Hey Gold! I just finished setting up the TIME CAPSULE upstairs!',
           'Come visit my family in GOLDENROD CITY sometime—I might have an EEVEE looking for a good home!',
@@ -126,34 +87,16 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     ecruteak_mart: [
-      makeNpc(
-        'ecruteak_clerk',
-        1,
-        3,
-        'RIGHT',
-        'fat_man',
-        '🏪 MART CLERK',
+      makeNpc('ecruteak_clerk', 1, 3, 'RIGHT', 'fat_man', '🏪 MART CLERK', 
         ['Welcome to ECRUTEAK MART! Stock up on AWAKENINGS and HYPER POTIONS before entering the towers!'],
         { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
-      makeNpc(
-        'mart_trainer',
-        6,
-        6,
-        'UP',
-        'boy',
-        '🧢 TRAINER',
+      makeNpc('mart_trainer', 6, 6, 'UP', 'boy', '🧢 TRAINER', 
         ['GHOST POKéMON love putting opponents to sleep with HYPNOSIS! Always carry AWAKENING!']
       ),
     ],
     ecruteak_gym: [
-      makeNpc(
-        'morty',
-        4,
-        3,
-        'DOWN',
-        'sage',
-        '👻 LEADER MORTY',
+      makeNpc('morty', 4, 3, 'DOWN', 'sage', '👻 LEADER MORTY', 
         [
           'MORTY: The FOGBADGE is proof of your extraordinary spiritual bond with your partners.',
           'Continue on your journey with courage and quiet contemplation.',
@@ -174,13 +117,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'medium_martha',
-        2,
-        7,
-        'RIGHT',
-        'girl',
-        '🔮 MEDIUM MARTHA',
+      makeNpc('medium_martha', 2, 7, 'RIGHT', 'girl', '🔮 MEDIUM MARTHA', 
         ['I communicate with wandering spirits in the mist!'],
         {
           action: 'TRAINER_BATTLE',
@@ -195,13 +132,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'sage_ping',
-        7,
-        9,
-        'LEFT',
-        'sage',
-        '🙏 SAGE PING',
+      makeNpc('sage_ping', 7, 9, 'LEFT', 'sage', '🙏 SAGE PING', 
         ['Our gym floor hides an abyss beneath invisible glass tiles!'],
         {
           action: 'TRAINER_BATTLE',
@@ -215,13 +146,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'medium_grace',
-        3,
-        13,
-        'RIGHT',
-        'girl',
-        '🔮 MEDIUM GRACE',
+      makeNpc('medium_grace', 3, 13, 'RIGHT', 'girl', '🔮 MEDIUM GRACE', 
         ['The spirits illuminate only those who tread with steady resolve.'],
         {
           action: 'TRAINER_BATTLE',
@@ -236,13 +161,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'sage_jeffrey',
-        6,
-        5,
-        'LEFT',
-        'sage',
-        '🙏 SAGE JEFFREY',
+      makeNpc('sage_jeffrey', 6, 5, 'LEFT', 'sage', '🙏 SAGE JEFFREY', 
         ['Beyond this misty bridge awaits LEADER MORTY himself!'],
         {
           action: 'TRAINER_BATTLE',
@@ -256,13 +175,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'ecruteak_gym_guide',
-        2,
-        16,
-        'UP',
-        'fat_man',
-        '🥊 GYM GUIDE',
+      makeNpc('ecruteak_gym_guide', 2, 16, 'UP', 'fat_man', '🥊 GYM GUIDE', 
         [
           'Yo! CHAMP in the making!',
           'MORTY uses GHOST-type POKéMON! NORMAL and FIGHTING moves cannot damage them at all!',
@@ -271,13 +184,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     dance_theater: [
-      makeNpc(
-        'kimono_naoko',
-        2,
-        5,
-        'DOWN',
-        'girl',
-        '👘 KIMONO NAOKO',
+      makeNpc('kimono_naoko', 2, 5, 'DOWN', 'girl', '👘 KIMONO NAOKO', 
         ['My FLAREON’s flame burns bright!'],
         {
           action: 'TRAINER_BATTLE',
@@ -291,13 +198,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'kimono_sayo',
-        4,
-        5,
-        'DOWN',
-        'girl',
-        '👘 KIMONO SAYO',
+      makeNpc('kimono_sayo', 4, 5, 'DOWN', 'girl', '👘 KIMONO SAYO', 
         ['My ESPEON sees the dance of the sun!'],
         {
           action: 'TRAINER_BATTLE',
@@ -311,13 +212,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'kimono_zuki',
-        6,
-        5,
-        'DOWN',
-        'girl',
-        '👘 KIMONO ZUKI',
+      makeNpc('kimono_zuki', 6, 5, 'DOWN', 'girl', '👘 KIMONO ZUKI', 
         ['My UMBREON dances beneath the moon!'],
         {
           action: 'TRAINER_BATTLE',
@@ -331,13 +226,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'kimono_kuni',
-        8,
-        5,
-        'DOWN',
-        'girl',
-        '👘 KIMONO KUNI',
+      makeNpc('kimono_kuni', 8, 5, 'DOWN', 'girl', '👘 KIMONO KUNI', 
         ['My VAPOREON melts into pure water!'],
         {
           action: 'TRAINER_BATTLE',
@@ -351,13 +240,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'kimono_miki',
-        10,
-        4,
-        'DOWN',
-        'girl',
-        '👘 KIMONO MIKI',
+      makeNpc('kimono_miki', 10, 4, 'DOWN', 'girl', '👘 KIMONO MIKI', 
         ['My JOLTEON strikes like a crack of lightning!'],
         {
           action: 'TRAINER_BATTLE',
@@ -371,13 +254,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'surf_gentleman',
-        9,
-        10,
-        'UP',
-        'fat_man',
-        '🎩 ADMIRER',
+      makeNpc('surf_gentleman', 9, 10, 'UP', 'fat_man', '🎩 ADMIRER', 
         [
           'Bravo! Magnificent! You defeated all five KIMONO GIRLS with peerless grace!',
           'Take this HM03 SURF! With the FOGBADGE, your POKéMON can carry you across oceans and lakes!',
@@ -385,13 +262,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     ecruteak_itemfinder_house: [
-      makeNpc(
-        'item_man',
-        3,
-        3,
-        'DOWN',
-        'fat_man',
-        '🔍 ITEM COLLECTOR',
+      makeNpc('item_man', 3, 3, 'DOWN', 'fat_man', '🔍 ITEM COLLECTOR', 
         [
           "There are countless items hidden in the grass, rocks, and ruins of Johto that aren't obvious to the naked eye.",
           'Aha! I see you already have the upgraded Neo-Kanto Dowsing Machine equipped! It projects a real-time radar beam pointing straight toward buried treasures within 8 paces!',
@@ -399,39 +270,21 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     burned_tower_1f: [
-      makeNpc(
-        'eusine',
-        10,
-        12,
-        'DOWN',
-        'silver',
-        '🎩 EUSINE',
+      makeNpc('eusine', 10, 12, 'DOWN', 'silver', '🎩 EUSINE', 
         [
           "I'm EUSINE! I’ve spent my entire life pursuing the legendary SUICUNE across the world!",
           'It is said to represent the north wind and pure water!',
           'Morty and I have been investigating the mysterious aura pulsating beneath this floor.',
         ]
       ),
-      makeNpc(
-        'morty_burned',
-        12,
-        12,
-        'LEFT',
-        'sage',
-        '👻 MORTY',
+      makeNpc('morty_burned', 12, 12, 'LEFT', 'sage', '👻 MORTY', 
         [
           'ECRUTEAK GYM LEADER MORTY: The BURNED TOWER burned down 150 years ago in a lightning storm.',
           'Three nameless POKéMON perished here, but were revived by the rainbow phoenix into legends.',
           'Until the spirits show themselves, I meditate here in solemn contemplation.',
         ]
       ),
-      makeNpc(
-        'silver_burned',
-        10,
-        10,
-        'DOWN',
-        'silver',
-        '❓ RIVAL SILVER',
+      makeNpc('silver_burned', 10, 10, 'DOWN', 'silver', '❓ RIVAL SILVER', 
         [
           'SILVER: …Hmph! What are you doing here?',
           'Only weak trainers talk about legendaries. I only care about strong, ruthless POKéMON!',
@@ -449,13 +302,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     burned_tower_b1f: [
-      makeNpc(
-        'beasts',
-        10,
-        3,
-        'DOWN',
-        'fat_man',
-        '⚡ LEGENDARY BEASTS',
+      makeNpc('beasts', 10, 3, 'DOWN', 'fat_man', '⚡ LEGENDARY BEASTS', 
         [
           'Three majestic beasts stand petrified in stone: RAIKOU, ENTEI, and SUICUNE!',
           'As you approach, their eyes glow with ancient celestial energy!',
@@ -467,25 +314,13 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     tin_tower_1f: [
-      makeNpc(
-        'suicune_altar',
-        9,
-        9,
-        'DOWN',
-        'lapras',
-        '💎 SUICUNE',
+      makeNpc('suicune_altar', 9, 9, 'DOWN', 'lapras', '💎 SUICUNE', 
         [
           "SUICUNE: Gurr-oooh! The crystal beast radiates pure, divine luminescence!",
         ],
         { action: 'SUICUNE_TIN_TOWER_EVENT' }
       ),
-      makeNpc(
-        'tin_tower_sage',
-        7,
-        13,
-        'RIGHT',
-        'sage',
-        '🏮 TOWER SAGE',
+      makeNpc('tin_tower_sage', 7, 13, 'RIGHT', 'sage', '🏮 TOWER SAGE', 
         [
           'Only those who carry the CLEAR BELL and RAINBOW WING may ascend the sacred staircase to the summit of TIN TOWER!',
         ]

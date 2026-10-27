@@ -1,3 +1,12 @@
+/**
+ * @fileoverview MapClassificationAndWarpRules domain module implementation.
+ * @module world/map/MapClassificationAndWarpRules
+ * @role MapClassificationAndWarpRules Component
+ * @exports isOutdoorMap, isCaveMap, isDungeonOrCaveMap
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-133: Implementation | L134-266: Handlers & Exports
+ */
+
 import type { Direction, MapData, WarpEvent, WarpSoundCue, WarpTransitionConfig } from '../../types/game';
 
 /**

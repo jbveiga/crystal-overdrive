@@ -1,29 +1,26 @@
+/**
+ * @fileoverview newBarkToSproutTowerNpcs domain module implementation.
+ * @module world/npcs/newBarkToSproutTowerNpcs
+ * @role newBarkToSproutTowerNpcs Component
+ * @exports createNewBarkToSproutTowerNpcs
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-276: Implementation | L277-552: Handlers & Exports
+ */
+
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
 
 export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
   return {
     new_bark_town: [
-      makeNpc(
-        'nbt_teacher',
-        6,
-        8,
-        'DOWN',
-        'teacher',
-        '👩‍🏫 TEACHER',
+      makeNpc('nbt_teacher', 6, 8, 'DOWN', 'teacher', '👩‍🏫 TEACHER', 
         [
           'Wow, your POKéGEAR is impressive! Did your mom get it for you?',
           'Oh! Your POKéMON is adorable! I wish I had one!',
         ],
         { wanders: true }
       ),
-      makeNpc(
-        'nbt_fisher',
-        12,
-        9,
-        'DOWN',
-        'fisherman',
-        '🎣 FISHER',
+      makeNpc('nbt_fisher', 12, 9, 'DOWN', 'fisherman', '🎣 FISHER', 
         ['Yo, GOLD!', 'I hear PROF. ELM discovered some new POKéMON.'],
         { wanders: true }
       ),
@@ -37,13 +34,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
         "POKéMON hide in the grass. Who knows when they'll pop out…",
         'If you weaken them first, POKéMON are much easier to catch!',
       ]),
-      makeNpc(
-        'youngster_joey',
-        28,
-        6,
-        'DOWN',
-        'boy',
-        '👦 YOUNGSTER JOEY',
+      makeNpc('youngster_joey', 28, 6, 'DOWN', 'boy', '👦 YOUNGSTER JOEY', 
         [
           'Yo! My RATTATA is in the top percentage of all RATTATA!',
           'If your POKéMON are weak and not ready for battle, keep out of the grass!',
@@ -71,13 +62,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'r29_teacher',
-        15,
-        11,
-        'RIGHT',
-        'teacher',
-        '👩‍🏫 TEACHER',
+      makeNpc('r29_teacher', 15, 11, 'RIGHT', 'teacher', '👩‍🏫 TEACHER', 
         [
           "See those ledges? It's scary to jump off them.",
           'But you can go to NEW BARK without walking through the grass.',
@@ -93,13 +78,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
         "You can't climb up those jagged cliff ledges, and the mountain Pokémon up there are fierce!",
         'Get some more training under your belt before heading into the northern ridges!',
       ]),
-      makeNpc(
-        'tuscany_of_tuesday',
-        29,
-        12,
-        'DOWN',
-        'girl',
-        '🎀 TUSCANY OF TUESDAY',
+      makeNpc('tuscany_of_tuesday', 29, 12, 'DOWN', 'girl', '🎀 TUSCANY OF TUESDAY', 
         [
           "TUSCANY: Yahoo! I'm TUSCANY of Tuesday! Nice to meet you!",
           "Take this PINK BOW! It strengthens NORMAL-type moves!",
@@ -108,13 +87,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     cherrygrove_city: [
-      makeNpc(
-        'cg_guide_gent',
-        32,
-        6,
-        'DOWN',
-        'fat_man',
-        '👴 GUIDE GENT',
+      makeNpc('cg_guide_gent', 32, 6, 'DOWN', 'fat_man', '👴 GUIDE GENT', 
         [
           "You're a rookie trainer, aren't you? I can tell!",
           "That's OK! Everyone is a rookie at some point!",
@@ -122,26 +95,14 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'GUIDE_GENT_EVENT' }
       ),
-      makeNpc(
-        'cg_teacher',
-        27,
-        12,
-        'LEFT',
-        'teacher',
-        '👩‍🏫 TEACHER',
+      makeNpc('cg_teacher', 27, 12, 'LEFT', 'teacher', '👩‍🏫 TEACHER', 
         [
           'Did you talk to the old man by the POKéMON CENTER?',
           "When you're with POKéMON, going anywhere is fun.",
         ],
         { wanders: true }
       ),
-      makeNpc(
-        'cg_youngster',
-        23,
-        7,
-        'RIGHT',
-        'boy',
-        '👦 YOUNGSTER',
+      makeNpc('cg_youngster', 23, 7, 'RIGHT', 'boy', '👦 YOUNGSTER', 
         [
           "MR. POKéMON's house is still farther up ahead on ROUTE 30.",
           "Be careful—trainers on ROUTE 30 will challenge you if you cross their line of sight!",
@@ -154,13 +115,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ]),
     ],
     route_30: [
-      makeNpc(
-        'youngster_mikey',
-        4,
-        26,
-        'RIGHT',
-        'boy',
-        '👦 YOUNGSTER MIKEY',
+      makeNpc('youngster_mikey', 4, 26, 'RIGHT', 'boy', '👦 YOUNGSTER MIKEY', 
         [
           'Becoming a good trainer is really tough.',
           "I'm going to battle other people to get better.",
@@ -188,13 +143,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'bug_catcher_don',
-        2,
-        18,
-        'RIGHT',
-        'bug_catcher',
-        '🐞 BUG CATCHER DON',
+      makeNpc('bug_catcher_don', 2, 18, 'RIGHT', 'bug_catcher', '🐞 BUG CATCHER DON', 
         [
           'I ran out of POKé BALLS while I was catching bugs.',
           'You should buy extra at CHERRYGROVE MART!',
@@ -221,13 +170,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'r30_cooltrainer',
-        11,
-        40,
-        'UP',
-        'girl',
-        '🧢 COOLTRAINER',
+      makeNpc('r30_cooltrainer', 11, 40, 'UP', 'girl', '🧢 COOLTRAINER', 
         [
           "MR. POKéMON's house is straight ahead on the right fork!",
           'The left path leads north to ROUTE 31 and VIOLET CITY.',
@@ -236,13 +179,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     route_31: [
-      makeNpc(
-        'bug_catcher_wade',
-        21,
-        8,
-        'LEFT',
-        'bug_catcher',
-        '🐞 BUG CATCHER WADE',
+      makeNpc('bug_catcher_wade', 21, 8, 'LEFT', 'bug_catcher', '🐞 BUG CATCHER WADE', 
         [
           'You can catch POKéMON even if you already have six with you.',
           "They're automatically transferred to your BOX!",
@@ -289,13 +226,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
         'I walked too far today looking for POKéMON in DARK CAVE.',
         "My feet hurt and I'm sleepy… Zzz…",
       ]),
-      makeNpc(
-        'r31_mail_guy',
-        28,
-        9,
-        'DOWN',
-        'boy',
-        '📬 KENYA DELIVERER',
+      makeNpc('r31_mail_guy', 28, 9, 'DOWN', 'boy', '📬 KENYA DELIVERER', 
         [
           'I found a good POKéMON in DARK CAVE.',
           "I'm going to raise it to take on FALKNER at VIOLET GYM!",
@@ -310,13 +241,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ]),
     ],
     mr_pokemons_house: [
-      makeNpc(
-        'mr_pokemon_npc',
-        3,
-        3,
-        'DOWN',
-        'fat_man',
-        '🎩 MR. POKéMON',
+      makeNpc('mr_pokemon_npc', 3, 3, 'DOWN', 'fat_man', '🎩 MR. POKéMON', 
         [
           'Hello, hello! You must be GOLD, sent by PROF. ELM!',
           'This is the rare egg I asked PROF. ELM to examine—the MYSTERY EGG!',
@@ -324,13 +249,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'MR_POKEMON_EVENT' }
       ),
-      makeNpc(
-        'prof_oak_npc',
-        5,
-        3,
-        'DOWN',
-        'oak',
-        '🎓 PROF. OAK',
+      makeNpc('prof_oak_npc', 5, 3, 'DOWN', 'oak', '🎓 PROF. OAK', 
         [
           'Aha! So you are GOLD! I am OAK, a POKéMON researcher.',
           'I was just visiting my old friend MR. POKéMON.',
@@ -340,13 +259,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     route_30_berry_house: [
-      makeNpc(
-        'berry_man_npc',
-        2,
-        3,
-        'DOWN',
-        'fat_man',
-        '🍎 BERRY HOUSE MAN',
+      makeNpc('berry_man_npc', 2, 3, 'DOWN', 'fat_man', '🍎 BERRY HOUSE MAN', 
         [
           'You know, POKéMON eat BERRIES.',
           'Well, my POKéMON got healthier by eating a BERRY! Here, share this POTION for the road!',
@@ -355,13 +268,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     elms_lab: [
-      makeNpc(
-        'elm_npc',
-        5,
-        2,
-        'DOWN',
-        'prof_elm',
-        '🔬 PROF. ELM',
+      makeNpc('elm_npc', 5, 2, 'DOWN', 'prof_elm', '🔬 PROF. ELM', 
         [
           "Hi, GOLD! I've been researching unusual POKéMON evolutions here in NEW BARK TOWN.",
           "MR. POKéMON beyond CHERRYGROVE CITY on ROUTE 30 sent word of a rare discovery, and legends speak of three Legendary Beasts slumbering in ECRUTEAK's BURNED TOWER.",
@@ -373,13 +280,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
         'There was a loud noise outside…',
         'To add to your POKéDEX, you have to catch POKéMON. Throw POKé BALLS at wild POKéMON to get them!',
       ]),
-      makeNpc(
-        'lab_police_officer',
-        4,
-        4,
-        'DOWN',
-        'officer',
-        '👮 POLICE OFFICER',
+      makeNpc('lab_police_officer', 4, 4, 'DOWN', 'officer', '👮 POLICE OFFICER', 
         [
           'OFFICER: I heard a POKéMON was stolen here…',
           'Apparently, it was a young male with long, red hair…',
@@ -389,13 +290,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     players_house_1f: [
-      makeNpc(
-        'mom_npc',
-        7,
-        4,
-        'LEFT',
-        'mom',
-        '🏠 MOM',
+      makeNpc('mom_npc', 7, 4, 'LEFT', 'mom', '🏠 MOM', 
         [
           'Oh, GOLD…! Your POKéMON GEAR is back from the repair shop.',
           'Rest up for a moment, sweetheart! Your POKéMON are looking fit and energized!',
@@ -424,13 +319,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ]),
     ],
     cherrygrove_poke_center: [
-      makeNpc(
-        'nurse_joy',
-        3,
-        1,
-        'DOWN',
-        'girl',
-        '👩‍⚕️ NURSE JOY',
+      makeNpc('nurse_joy', 3, 1, 'DOWN', 'girl', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to our POKéMON CENTER!',
           'We can heal your POKéMON to perfect health in no time at all.',
@@ -450,23 +339,11 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ]),
     ],
     cherrygrove_mart: [
-      makeNpc(
-        'mart_clerk',
-        1,
-        3,
-        'RIGHT',
-        'fat_man',
-        '🏪 MART CLERK',
+      makeNpc('mart_clerk', 1, 3, 'RIGHT', 'fat_man', '🏪 MART CLERK', 
         ['Welcome to CHERRYGROVE POKé MART! How may I serve you?'],
         { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
-      makeNpc(
-        'mart_cooltrainer',
-        7,
-        6,
-        'LEFT',
-        'boy',
-        '🧢 COOLTRAINER',
+      makeNpc('mart_cooltrainer', 7, 6, 'LEFT', 'boy', '🧢 COOLTRAINER', 
         ['POKé BALLS are in stock! Now I can catch POKéMON!'],
         { wanders: true }
       ),
@@ -494,13 +371,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ]),
     ],
     sprout_tower_1f: [
-      makeNpc(
-        'sage_chow',
-        14,
-        7,
-        'DOWN',
-        'sage',
-        '🙏 SAGE CHOW',
+      makeNpc('sage_chow', 14, 7, 'DOWN', 'sage', '🙏 SAGE CHOW', 
         [
           'We stand guard in this tower.',
           'Here, we express our gratitude to honor all POKéMON.',
@@ -527,13 +398,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     sprout_tower_2f: [
-      makeNpc(
-        'sage_nico',
-        12,
-        12,
-        'RIGHT',
-        'sage',
-        '🙏 SAGE NICO',
+      makeNpc('sage_nico', 12, 12, 'RIGHT', 'sage', '🙏 SAGE NICO', 
         [
           'However hard we battle, the TOWER will stand strong.',
         ],
@@ -557,13 +422,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'sage_edmond',
-        9,
-        4,
-        'LEFT',
-        'sage',
-        '🙏 SAGE EDMOND',
+      makeNpc('sage_edmond', 9, 4, 'LEFT', 'sage', '🙏 SAGE EDMOND', 
         [
           '…Sway like leaves in the wind…',
         ],
@@ -589,13 +448,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     sprout_tower_3f: [
-      makeNpc(
-        'sage_jin',
-        8,
-        11,
-        'RIGHT',
-        'sage',
-        '🙏 SAGE JIN',
+      makeNpc('sage_jin', 8, 11, 'RIGHT', 'sage', '🙏 SAGE JIN', 
         [
           'I train to find enlightenment in POKéMON!',
         ],
@@ -621,13 +474,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'sage_neal',
-        11,
-        11,
-        'LEFT',
-        'sage',
-        '🙏 SAGE NEAL',
+      makeNpc('sage_neal', 11, 11, 'LEFT', 'sage', '🙏 SAGE NEAL', 
         [
           "The ELDER's HM illuminates even the pitch-black darkness.",
         ],
@@ -653,13 +500,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'sage_troy',
-        6,
-        3,
-        'DOWN',
-        'sage',
-        '🙏 SAGE TROY',
+      makeNpc('sage_troy', 6, 3, 'DOWN', 'sage', '🙏 SAGE TROY', 
         [
           'It is not far to the ELDER.',
         ],
@@ -682,13 +523,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'elder_li',
-        10,
-        3,
-        'DOWN',
-        'elder_li',
-        '🏮 ELDER LI',
+      makeNpc('elder_li', 10, 3, 'DOWN', 'elder_li', '🏮 ELDER LI', 
         [
           'ELDER LI: You care deeply for your POKéMON. With HM05 FLASH, even the darkest caves will shine bright.',
           'Go forth and challenge FALKNER at the VIOLET CITY GYM!',

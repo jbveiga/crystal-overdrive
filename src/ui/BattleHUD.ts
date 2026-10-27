@@ -4,6 +4,7 @@
  * @role Battle HUD Interface Controller
  * @exports BattleHUD
  * @layer ui
+ * @sections L1-7: Micro-Header & Types | L8-359: Core Implementation | L360-718: Public Interface & Exports
  */
 
 import type { PokemonInstance, SpeedMultiplier, PokeballId, StatId, MoveData } from '../types/game';

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview DayCareManager domain module implementation.
+ * @module world/DayCareManager
+ * @role DayCareManager Component
+ * @exports DayCareSlot, DayCareState, CompatibilityTier
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-146: Implementation | L147-292: Handlers & Exports
+ */
+
 import { Dex } from '@pkmn/dex';
 import type { PokemonInstance } from '../types/game';
 import { PokemonFactory } from '../battle/PokemonFactory';

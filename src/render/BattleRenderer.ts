@@ -4,6 +4,7 @@
  * @role Battle Scene Renderer
  * @exports BattleRenderer
  * @layer render
+ * @sections L1-7: Micro-Header & Types | L8-274: Core Implementation | L275-548: Public Interface & Exports
  */
 
 import { Application, Container, Sprite, Texture, Assets, Graphics } from 'pixi.js';

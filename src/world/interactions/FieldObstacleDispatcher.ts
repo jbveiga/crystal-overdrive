@@ -1,3 +1,12 @@
+/**
+ * @fileoverview FieldObstacleDispatcher domain module implementation.
+ * @module world/interactions/FieldObstacleDispatcher
+ * @role FieldObstacleDispatcher Component
+ * @exports FieldObstacleDispatcher
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-283: Implementation | L284-567: Handlers & Exports
+ */
+
 import type { MapData } from '../../types/game';
 import type { FieldObstacleContext } from '../../types/gameContext';
 import { ModernHMHandler } from '../ModernHMHandler';

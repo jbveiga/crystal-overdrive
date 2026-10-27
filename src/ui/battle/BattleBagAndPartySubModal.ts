@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BattleBagAndPartySubModal domain module implementation.
+ * @module ui/battle/BattleBagAndPartySubModal
+ * @role BattleBagAndPartySubModal Component
+ * @exports BattleHUDCallbacks, BagAndPartyUIContext, BattleBagAndPartySubModal
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-234: Implementation | L235-469: Handlers & Exports
+ */
+
 import type { PokemonInstance, PokeballId } from '../../types/game';
 import { EffectivenessHelper } from '../../battle/EffectivenessHelper';
 import {

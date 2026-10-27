@@ -1,94 +1,55 @@
+/**
+ * @fileoverview azaleaToIlexNpcs domain module implementation.
+ * @module world/npcs/azaleaToIlexNpcs
+ * @role azaleaToIlexNpcs Component
+ * @exports createAzaleaToIlexNpcs
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-176: Implementation | L177-352: Handlers & Exports
+ */
+
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
 
 export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
   return {
     azalea_town: [
-      makeNpc(
-        'azalea_well_grunt',
-        31,
-        9,
-        'DOWN',
-        'rocket_grunt_m',
-        '⚡ ROCKET GRUNT',
+      makeNpc('azalea_well_grunt', 31, 9, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', 
         [
           "ROCKET GRUNT: Beat it, kid! SLOWPOKE WELL is off-limits today! We're busy collecting... er, doing maintenance!",
         ]
       ),
-      makeNpc(
-        'azalea_gym_grunt',
-        10,
-        16,
-        'DOWN',
-        'rocket_grunt_m',
-        '⚡ ROCKET GRUNT',
+      makeNpc('azalea_gym_grunt', 10, 16, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', 
         [
           "ROCKET GRUNT: No one gets in the GYM! Buzz off, brat!",
         ]
       ),
-      makeNpc(
-        'azalea_slowpoke',
-        21,
-        10,
-        'DOWN',
-        'slowpoke',
-        '🦛 SLOWPOKE',
+      makeNpc('azalea_slowpoke', 21, 10, 'DOWN', 'slowpoke', '🦛 SLOWPOKE', 
         [
           'SLOWPOKE: ... ... ...',
           'Yaaawn? It seems peaceful and blissfully unbothered.',
         ]
       ),
-      makeNpc(
-        'azalea_slowpoke_2',
-        15,
-        13,
-        'RIGHT',
-        'slowpoke',
-        '🦛 SLOWPOKE',
+      makeNpc('azalea_slowpoke_2', 15, 13, 'RIGHT', 'slowpoke', '🦛 SLOWPOKE', 
         [
           'SLOWPOKE: ... ... ...',
           'Yaaawn? It seems to be enjoying the pleasant breeze in Azalea Town.',
         ]
       ),
-      makeNpc(
-        'azalea_apprentice',
-        17,
-        10,
-        'UP',
-        'youngster',
-        '👦 APPRENTICE',
+      makeNpc('azalea_apprentice', 17, 10, 'UP', 'youngster', '👦 APPRENTICE', 
         ['The master charcoal-maker uses wood from ILEX FOREST to fire the kiln.'],
         { wanders: true }
       ),
-      makeNpc(
-        'azalea_kurt',
-        9,
-        6,
-        'DOWN',
-        'elder',
-        '🔨 BALL SMITH KURT',
+      makeNpc('azalea_kurt', 9, 6, 'DOWN', 'elder', '🔨 BALL SMITH KURT', 
         [
           'KURT: Those TEAM ROCKET thugs are cutting off SLOWPOKE TAILS at the well! I am going to put a stop to them!',
         ]
       ),
-      makeNpc(
-        'azalea_gramps',
-        21,
-        8,
-        'DOWN',
-        'gentleman',
-        '🎩 AZALEA GENTLEMAN',
+      makeNpc('azalea_gramps', 21, 8, 'DOWN', 'gentleman', '🎩 AZALEA GENTLEMAN', 
         ["KURT creates handmade custom POKé BALLS from APRICORNS gathered from trees. No factory can match his touch!"]
       ),
     ],
     azalea_poke_center: [
-      makeNpc(
-        'azalea_nurse_joy',
-        3,
-        1,
-        'DOWN',
-        'teacher',
-        '👩‍⚕️ NURSE JOY',
+      makeNpc('azalea_nurse_joy', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to the AZALEA TOWN POKéMON CENTER!',
           'We heal your POKéMON to full health.',
@@ -96,45 +57,21 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
         ],
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),
-      makeNpc(
-        'azalea_pc_lass',
-        8,
-        4,
-        'LEFT',
-        'girl',
-        '👧 LASS',
+      makeNpc('azalea_pc_lass', 8, 4, 'LEFT', 'girl', '👧 LASS', 
         ['KURT will make special POKé BALLS like FAST BALL, LURE BALL, or FRIEND BALL if you bring him APRICORNS!']
       ),
     ],
     azalea_mart: [
-      makeNpc(
-        'azalea_mart_clerk',
-        1,
-        3,
-        'RIGHT',
-        'fat_man',
-        '🏪 MART CLERK',
+      makeNpc('azalea_mart_clerk', 1, 3, 'RIGHT', 'fat_man', '🏪 MART CLERK', 
         ['Welcome to AZALEA MART! Stock up on POTIONS and POKé BALLS before venturing into ILEX FOREST!'],
         { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
-      makeNpc(
-        'azalea_mart_bug_catcher',
-        6,
-        6,
-        'UP',
-        'bug_catcher',
-        '🐞 BUG CATCHER',
+      makeNpc('azalea_mart_bug_catcher', 6, 6, 'UP', 'bug_catcher', '🐞 BUG CATCHER', 
         ["CHARCOAL boosts FIRE-type moves! It's great against BUGSY's bug POKéMON in the GYM!"]
       ),
     ],
     azalea_gym: [
-      makeNpc(
-        'bugsy',
-        5,
-        7,
-        'DOWN',
-        'bug_catcher',
-        '🐞 LEADER BUGSY',
+      makeNpc('bugsy', 5, 7, 'DOWN', 'bug_catcher', '🐞 LEADER BUGSY', 
         [
           'BUGSY: Bug POKéMON are deep and complex. There are so many mysteries to unravel!',
         ],
@@ -153,13 +90,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'bug_catcher_benny',
-        5,
-        3,
-        'DOWN',
-        'bug_catcher',
-        '🐞 BUG CATCHER BENNY',
+      makeNpc('bug_catcher_benny', 5, 3, 'DOWN', 'bug_catcher', '🐞 BUG CATCHER BENNY', 
         ["Just evolving isn't enough!"],
         {
           action: 'TRAINER_BATTLE',
@@ -175,13 +106,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'bug_catcher_al',
-        8,
-        8,
-        'LEFT',
-        'bug_catcher',
-        '🐞 BUG CATCHER AL',
+      makeNpc('bug_catcher_al', 8, 8, 'LEFT', 'bug_catcher', '🐞 BUG CATCHER AL', 
         ['You proved how tough you are…'],
         {
           action: 'TRAINER_BATTLE',
@@ -196,13 +121,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'bug_catcher_josh',
-        0,
-        2,
-        'RIGHT',
-        'bug_catcher',
-        '🐞 BUG CATCHER JOSH',
+      makeNpc('bug_catcher_josh', 0, 2, 'RIGHT', 'bug_catcher', '🐞 BUG CATCHER JOSH', 
         ['Urrgggh!'],
         {
           action: 'TRAINER_BATTLE',
@@ -216,13 +135,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'twins_amy',
-        4,
-        10,
-        'DOWN',
-        'girl',
-        '👭 TWIN AMY',
+      makeNpc('twins_amy', 4, 10, 'DOWN', 'girl', '👭 TWIN AMY', 
         ['AMY: Oh, double goodness!'],
         {
           action: 'TRAINER_BATTLE',
@@ -236,13 +149,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'twins_may',
-        5,
-        10,
-        'DOWN',
-        'girl',
-        '👭 TWIN MAY',
+      makeNpc('twins_may', 5, 10, 'DOWN', 'girl', '👭 TWIN MAY', 
         ['MAY: Our bug POKéMON lost! Oh, what a shame.'],
         {
           action: 'TRAINER_BATTLE',
@@ -256,80 +163,38 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'azalea_gym_guide',
-        7,
-        13,
-        'UP',
-        'fat_man',
-        '🥊 GYM GUIDE',
+      makeNpc('azalea_gym_guide', 7, 13, 'UP', 'fat_man', '🥊 GYM GUIDE', 
         [
           "Yo, challenger! BUGSY's young, but his knowledge of bug POKéMON is for real. Let's see… Bug POKéMON don't like fire. Flying-type moves are super-effective too.",
         ]
       ),
     ],
     kurts_house: [
-      makeNpc(
-        'kurt_house_kurt',
-        3,
-        2,
-        'DOWN',
-        'elder',
-        '👴 KURT',
+      makeNpc('kurt_house_kurt', 3, 2, 'DOWN', 'elder', '👴 KURT', 
         [
           'KURT: You drove off TEAM ROCKET from SLOWPOKE WELL? You\'re a wonderful trainer!',
           "Bring me any APRICORNS you find on trees, and I'll gladly craft custom POKé BALLS for you free of charge!",
         ]
       ),
-      makeNpc(
-        'kurt_granddaughter',
-        5,
-        3,
-        'LEFT',
-        'girl',
-        '👧 GRANDDAUGHTER',
+      makeNpc('kurt_granddaughter', 5, 3, 'LEFT', 'girl', '👧 GRANDDAUGHTER', 
         ['Grandpa makes the most reliable POKé BALLS in the whole world! Everyone in Johto knows his name!']
       ),
     ],
     charcoal_kiln: [
-      makeNpc(
-        'kiln_boss',
-        2,
-        3,
-        'DOWN',
-        'fat_man',
-        '🧔 KILN BOSS',
+      makeNpc('kiln_boss', 2, 3, 'DOWN', 'fat_man', '🧔 KILN BOSS', 
         ['The kiln burns day and night to cure authentic AZALEA CHARCOAL. It boosts the power of FIRE-type moves!'],
         { action: 'CHARCOAL_MASTER_EVENT' }
       ),
-      makeNpc(
-        'kiln_apprentice',
-        5,
-        3,
-        'LEFT',
-        'youngster',
-        '👦 APPRENTICE',
+      makeNpc('kiln_apprentice', 5, 3, 'LEFT', 'youngster', '👦 APPRENTICE', 
         ["Thank you so much for chasing down FARFETCH'D in ILEX FOREST! Please take this CHARCOAL that we made in the kiln!"],
         { action: 'CHARCOAL_KILN_APPRENTICE_EVENT' }
       ),
-      makeNpc(
-        'kiln_farfetchd',
-        6,
-        3,
-        'LEFT',
-        'farfetchd',
-        '🦆 FARFETCH’D',
+      makeNpc('kiln_farfetchd', 6, 3, 'LEFT', 'farfetchd', '🦆 FARFETCH’D', 
         ["FARFETCH'D: Kwaa! It looks happy to be back home at the kiln!"]
       ),
     ],
     slowpoke_well_b1f: [
-      makeNpc(
-        'rocket_grunt_1',
-        15,
-        7,
-        'DOWN',
-        'rocket_grunt_m',
-        '⚡ ROCKET GRUNT',
+      makeNpc('rocket_grunt_1', 15, 7, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', 
         ["Sure, we've been hacking the tails off SLOWPOKE and selling them. Everything we do is for profit. That's right! We're TEAM ROCKET, and we'll do anything for money!"],
         {
           action: 'TRAINER_BATTLE',
@@ -344,13 +209,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'rocket_grunt_2',
-        5,
-        6,
-        'RIGHT',
-        'rocket_grunt_m',
-        '⚡ ROCKET GRUNT',
+      makeNpc('rocket_grunt_2', 5, 6, 'RIGHT', 'rocket_grunt_m', '⚡ ROCKET GRUNT', 
         ["We need the money, but selling SLOWPOKETAILS? It's tough being a ROCKET GRUNT!"],
         {
           action: 'TRAINER_BATTLE',
@@ -365,13 +224,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'rocket_grunt_3',
-        10,
-        4,
-        'RIGHT',
-        'rocket_grunt_f',
-        '⚡ ROCKET GRUNT',
+      makeNpc('rocket_grunt_3', 10, 4, 'RIGHT', 'rocket_grunt_f', '⚡ ROCKET GRUNT', 
         ["SLOWPOKETAILS grow back fast! What's wrong with selling them?"],
         {
           action: 'TRAINER_BATTLE',
@@ -387,13 +240,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'executive_proton',
-        5,
-        2,
-        'DOWN',
-        'rocket_grunt_m',
-        '⚡ EXECUTIVE PROTON',
+      makeNpc('executive_proton', 5, 2, 'DOWN', 'rocket_grunt_m', '⚡ EXECUTIVE PROTON', 
         ["PROTON: What do you want? If you interrupt our work, don't expect any mercy! We're TEAM ROCKET, and we'll do anything for money!"],
         {
           action: 'PROTON_EVENT',
@@ -410,36 +257,18 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'well_kurt',
-        16,
-        14,
-        'UP',
-        'elder',
-        '👴 KURT',
+      makeNpc('well_kurt', 16, 14, 'UP', 'elder', '👴 KURT', 
         [
           "KURT: Hey there, rookie! The guard up top took off when I shouted at him. But then I took a tumble down the WELL. I slammed down hard on my back, so I can't move. Rats! Show them how gutsy you are in my place!",
         ]
       ),
-      makeNpc(
-        'well_slowpoke',
-        6,
-        2,
-        'DOWN',
-        'slowpoke',
-        '🦛 RESCUED SLOWPOKE',
+      makeNpc('well_slowpoke', 6, 2, 'DOWN', 'slowpoke', '🦛 RESCUED SLOWPOKE', 
         [
           'SLOWPOKE: ... ... ...',
           'A SLOWPOKE with its TAIL cut off…',
         ]
       ),
-      makeNpc(
-        'well_slowpoke_2',
-        7,
-        4,
-        'DOWN',
-        'slowpoke',
-        '🦛 RESCUED SLOWPOKE',
+      makeNpc('well_slowpoke_2', 7, 4, 'DOWN', 'slowpoke', '🦛 RESCUED SLOWPOKE', 
         [
           'SLOWPOKE: ... ... ...',
           'A SLOWPOKE with its TAIL cut off… Huh? It has MAIL.',
@@ -448,13 +277,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     slowpoke_well_b2f: [
-      makeNpc(
-        'well_guide',
-        16,
-        5,
-        'DOWN',
-        'fat_man',
-        '🔦 CAVERN EXPLORER',
+      makeNpc('well_guide', 16, 5, 'DOWN', 'fat_man', '🔦 CAVERN EXPLORER', 
         [
           "CAVERN EXPLORER: I'm waiting to see SLOWPOKE's moment of evolution. Through observation, I made a new discovery.",
           "A SLOWPOKE with a KING'S ROCK often gets bitten by a SHELLDER. Here, I'll share a KING'S ROCK with you!",
@@ -463,63 +286,33 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     ilex_forest: [
-      makeNpc(
-        'forest_apprentice',
-        14,
-        30,
-        'UP',
-        'boy',
-        '👦 APPRENTICE',
+      makeNpc('forest_apprentice', 14, 30, 'UP', 'boy', '👦 APPRENTICE', 
         [
           "The boss's FARFETCH'D escaped deeper into the forest! Can you help me find it?",
           'If you sneak up behind it, you might be able to steer it back toward the charcoal kiln!',
         ]
       ),
-      makeNpc(
-        'forest_farfetchd',
-        15,
-        23,
-        'DOWN',
-        'farfetchd',
-        '🦆 FARFETCH’D',
+      makeNpc('forest_farfetchd', 15, 23, 'DOWN', 'farfetchd', '🦆 FARFETCH’D', 
         [
           "FARFETCH'D: Quaaack! It clutches its fresh green onion stalk proudly!",
         ],
         { action: 'FARFETCHD_HERD_EVENT' }
       ),
-      makeNpc(
-        'cut_master',
-        16,
-        28,
-        'DOWN',
-        'elder',
-        '🧔 CHARCOAL MASTER',
+      makeNpc('cut_master', 16, 28, 'DOWN', 'elder', '🧔 CHARCOAL MASTER', 
         [
           "Thank you for finding our FARFETCH'D! Without it, we couldn't collect wood for the kiln!",
           'As a reward, take HM01 CUT! With the HIVEBADGE, you can cut down small thorny trees blocking paths!',
         ],
         { action: 'CHARCOAL_MASTER_EVENT' }
       ),
-      makeNpc(
-        'headbutt_tutor',
-        15,
-        14,
-        'RIGHT',
-        'boy',
-        '🥊 HEADBUTT GUY',
+      makeNpc('headbutt_tutor', 15, 14, 'RIGHT', 'boy', '🥊 HEADBUTT GUY', 
         [
           "What am I doing? I'm shaking trees using HEADBUTT! It's so much fun!",
           "Rattle trees with HEADBUTT! Sometimes sleeping POKéMON fall right out on you!",
         ],
         { action: 'HEADBUTT_TUTOR_EVENT' }
       ),
-      makeNpc(
-        'bug_catcher_wayne',
-        12,
-        1,
-        'DOWN',
-        'bug_catcher',
-        '🐛 BUG CATCHER WAYNE',
+      makeNpc('bug_catcher_wayne', 12, 1, 'DOWN', 'bug_catcher', '🐛 BUG CATCHER WAYNE', 
         [
           "BUG CATCHER WAYNE: I found all kinds of neat bug POKéMON in these woods! Don't step on them!",
         ],
@@ -536,13 +329,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'forest_lass',
-        7,
-        23,
-        'DOWN',
-        'girl',
-        '👧 LASS',
+      makeNpc('forest_lass', 7, 23, 'DOWN', 'girl', '👧 LASS', 
         [
           'Did something happen to the shrine deeper in the forest?',
           'My grandma said a mythical POKéMON watches over all the trees in ILEX FOREST.',
@@ -550,26 +337,14 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     route_34_ilex_forest_gate: [
-      makeNpc(
-        'gate_teacher',
-        3,
-        3,
-        'RIGHT',
-        'teacher',
-        '👩‍🏫 TEACHER',
+      makeNpc('gate_teacher', 3, 3, 'RIGHT', 'teacher', '👩‍🏫 TEACHER', 
         [
           "Oh, honey. You're making a POKéDEX? Here, take TM12 SWEET SCENT! It lures wild POKéMON right to you!",
           'Use it in tall grass to attract wild POKéMON anytime!',
         ],
         { action: 'SWEET_SCENT_TEACHER_EVENT' }
       ),
-      makeNpc(
-        'gate_butterfree',
-        4,
-        3,
-        'LEFT',
-        'lass',
-        '🦋 BUTTERFREE',
+      makeNpc('gate_butterfree', 4, 3, 'LEFT', 'lass', '🦋 BUTTERFREE', 
         ['BUTTERFREE: Freeh! It spreads a sweet, soothing floral scent around the gatehouse.']
       ),
     ],

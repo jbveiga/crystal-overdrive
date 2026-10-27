@@ -1,3 +1,12 @@
+/**
+ * @fileoverview EffectivenessHelper domain module implementation.
+ * @module battle/EffectivenessHelper
+ * @role EffectivenessHelper Component
+ * @exports TYPE_CHART, EffectivenessHelper
+ * @layer battle
+ * @sections L1-15: Micro-Header & Imports | L16-176: Implementation | L177-353: Handlers & Exports
+ */
+
 import type { PokemonType, MoveData, PokemonInstance, EffectivenessBadge } from '../types/game';
 
 // Multiplier chart: TypeChart[attackingType][defendingType]

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview KantoAndLeagueInteractions domain module implementation.
+ * @module world/interactions/KantoAndLeagueInteractions
+ * @role KantoAndLeagueInteractions Component
+ * @exports getKantoAndLeagueInteractions
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-170: Implementation | L171-341: Handlers & Exports
+ */
+
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
 

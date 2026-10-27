@@ -1,3 +1,12 @@
+/**
+ * @fileoverview OverworldModalRegistry domain module implementation.
+ * @module ui/OverworldModalRegistry
+ * @role OverworldModalRegistry Component
+ * @exports OverworldModalRegistryParams, OverworldModalRegistry
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-260: Implementation | L261-520: Handlers & Exports
+ */
+
 import { BoxManagementUI } from './BoxManagementUI';
 import { TownMapUI } from './TownMapUI';
 import { RuinsPuzzleModalUI } from './RuinsPuzzleModalUI';

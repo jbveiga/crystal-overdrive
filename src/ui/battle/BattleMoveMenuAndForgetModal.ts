@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BattleMoveMenuAndForgetModal domain module implementation.
+ * @module ui/battle/BattleMoveMenuAndForgetModal
+ * @role BattleMoveMenuAndForgetModal Component
+ * @exports BattleMoveMenuContext, BattleMoveMenuAndForgetModal
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-276: Implementation | L277-553: Handlers & Exports
+ */
+
 import type { PokemonInstance, MoveData } from '../../types/game';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 import { EffectivenessHelper } from '../../battle/EffectivenessHelper';

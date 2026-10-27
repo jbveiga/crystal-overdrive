@@ -1,3 +1,12 @@
+/**
+ * @fileoverview pokedexData domain module implementation.
+ * @module ui/start-menu/pokedexData
+ * @role pokedexData Component
+ * @exports JOHTO_DEX_SPECIES, DexSpeciesData, CANONICAL_SPECIES_DATA
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-150: Implementation | L151-301: Handlers & Exports
+ */
+
 import { Dex } from '@pkmn/dex';
 
 export const JOHTO_DEX_SPECIES: Array<{ id: string; name: string; types: string[] }> = [

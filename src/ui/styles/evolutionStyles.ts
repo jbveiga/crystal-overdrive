@@ -2,6 +2,7 @@
  * @fileoverview Responsive CSS stylesheets, animations, and keyframes for the Neo-Kanto Evolution scene.
  * @module ui/styles/evolutionStyles
  * @layer ui
+ * @sections L1-5: Micro-Header & Types | L6-237: Core Implementation | L238-474: Public Interface & Exports
  */
 
 /**

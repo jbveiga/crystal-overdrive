@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BattleMoveAndItemExecutor domain module implementation.
+ * @module battle/state/BattleMoveAndItemExecutor
+ * @role BattleMoveAndItemExecutor Component
+ * @exports SPREAD_MOVE_IDS, STAT_LABELS, getWeatherDamageMultiplier
+ * @layer battle
+ * @sections L1-15: Micro-Header & Imports | L16-261: Implementation | L262-522: Handlers & Exports
+ */
+
 import type { MoveData, PokemonInstance, PokemonType, StatId } from '../../types/game';
 import type { BattleEvent, StadiumWeather } from '../BattleStateMachine';
 import { DamageCalculator } from '../DamageCalculator';

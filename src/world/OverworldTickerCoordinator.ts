@@ -4,6 +4,7 @@
  * @role Overworld Frame Loop Coordinator
  * @exports OverworldTickerCoordinator
  * @layer world
+ * @sections L1-7: Micro-Header & Types | L8-281: Core Implementation | L282-562: Public Interface & Exports
  */
 
 import type { GridEntity } from './GridPhysics';

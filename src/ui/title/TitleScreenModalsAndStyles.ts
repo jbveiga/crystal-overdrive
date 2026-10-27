@@ -1,3 +1,12 @@
+/**
+ * @fileoverview TitleScreenModalsAndStyles domain module implementation.
+ * @module ui/title/TitleScreenModalsAndStyles
+ * @role TitleScreenModalsAndStyles Component
+ * @exports injectTitleScreenStyles, RenderMainMenuParams, renderMainMenu
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-289: Implementation | L290-578: Handlers & Exports
+ */
+
 import type { GameOptions, SavePreview, SpeedMultiplier } from '../../types/game';
 import { BattleAudio } from '../../audio/BattleAudio';
 

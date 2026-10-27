@@ -1,3 +1,12 @@
+/**
+ * @fileoverview npcData domain module implementation.
+ * @module world/npcData
+ * @role npcData Component
+ * @exports createNpcsByMap, npcsByMap, getNpcsForMap
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-166: Implementation | L167-333: Handlers & Exports
+ */
+
 import type { GridEntity } from './GridPhysics';
 import { GENERATED_NPCS } from './generatedNpcs';
 import {

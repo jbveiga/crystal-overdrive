@@ -1,3 +1,12 @@
+/**
+ * @fileoverview OverworldParticleAndVfxPool domain module implementation.
+ * @module render/OverworldParticleAndVfxPool
+ * @role OverworldParticleAndVfxPool Component
+ * @exports GrassParticle, OverworldParticleAndVfxPool
+ * @layer render
+ * @sections L1-15: Micro-Header & Imports | L16-189: Implementation | L190-379: Handlers & Exports
+ */
+
 import { Application, Container, Graphics, Text, TextStyle, Sprite, Texture } from 'pixi.js';
 import type { GridEntity } from '../world/GridPhysics';
 import { GraphicParticlePool } from './GraphicParticlePool';

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview OverworldNpcAndItemSprites domain module implementation.
+ * @module render/OverworldNpcAndItemSprites
+ * @role OverworldNpcAndItemSprites Component
+ * @exports CharacterFrames, NPC_SHEET_PATHS, OverworldNpcAndItemSprites
+ * @layer render
+ * @sections L1-15: Micro-Header & Imports | L16-354: Implementation | L355-708: Handlers & Exports
+ */
+
 import { Container, Sprite, Texture, Rectangle, Assets, Graphics } from 'pixi.js';
 import type { MapData, Direction, OverworldItemBall, OverworldFruitTree } from '../types/game';
 import type { GridEntity, NpcSpriteType } from '../world/GridPhysics';

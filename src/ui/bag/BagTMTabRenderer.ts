@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BagTMTabRenderer domain module implementation.
+ * @module ui/bag/BagTMTabRenderer
+ * @role BagTMTabRenderer Component
+ * @exports TMTabRenderContext, TeachTMContext, BagTMTabRenderer
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-188: Implementation | L189-376: Handlers & Exports
+ */
+
 import type { PokemonInstance, MoveData } from '../../types/game';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 import { BattleAudio } from '../../audio/BattleAudio';

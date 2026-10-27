@@ -1,3 +1,12 @@
+/**
+ * @fileoverview MidToLateJohtoQuestInteractions domain module implementation.
+ * @module world/interactions/MidToLateJohtoQuestInteractions
+ * @role MidToLateJohtoQuestInteractions Component
+ * @exports getMidToLateJohtoQuestInteractions
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-313: Implementation | L314-626: Handlers & Exports
+ */
+
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';

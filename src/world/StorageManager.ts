@@ -1,3 +1,12 @@
+/**
+ * @fileoverview StorageManager domain module implementation.
+ * @module world/StorageManager
+ * @role StorageManager Component
+ * @exports DepositResult, ReleaseResult, StorageManager
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-162: Implementation | L163-325: Handlers & Exports
+ */
+
 import type { PokemonInstance, StorageBox, PokemonStorageState } from '../types/game';
 
 export interface DepositResult {

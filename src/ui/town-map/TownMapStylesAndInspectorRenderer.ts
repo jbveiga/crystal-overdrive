@@ -1,3 +1,12 @@
+/**
+ * @fileoverview TownMapStylesAndInspectorRenderer domain module implementation.
+ * @module ui/town-map/TownMapStylesAndInspectorRenderer
+ * @role TownMapStylesAndInspectorRenderer Component
+ * @exports getTownMapPercentCoord, injectTownMapStyles, renderSvgTopology
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-246: Implementation | L247-492: Handlers & Exports
+ */
+
 import type { RoamerState } from '../../types/game';
 import {
   JOHTO_LANDMARKS,

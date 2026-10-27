@@ -1,3 +1,12 @@
+/**
+ * @fileoverview IntroStageRenderersAndStyles domain module implementation.
+ * @module ui/intro/IntroStageRenderersAndStyles
+ * @role IntroStageRenderersAndStyles Component
+ * @exports injectIntroStyles, renderSpotlightDais, RenderGenderSelectStageParams
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-279: Implementation | L280-559: Handlers & Exports
+ */
+
 import { BattleAudio } from '../../audio/BattleAudio';
 
 /**

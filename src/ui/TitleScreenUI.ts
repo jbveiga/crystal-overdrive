@@ -1,3 +1,12 @@
+/**
+ * @fileoverview TitleScreenUI domain module implementation.
+ * @module ui/TitleScreenUI
+ * @role TitleScreenUI Component
+ * @exports TitleScreenCallbacks, TitleMenuOptionId, TitleScreenUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-332: Implementation | L333-664: Handlers & Exports
+ */
+
 import type { GameOptions, SavePreview, SpeedMultiplier } from '../types/game';
 import { SaveManager } from '../core/SaveManager';
 import { BattleAudio } from '../audio/BattleAudio';

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview EvolutionDomAndStyles domain module implementation.
+ * @module ui/evolution/EvolutionDomAndStyles
+ * @role EvolutionDomAndStyles Component
+ * @exports TYPE_COLORS, RenderEvolutionModalDomParams, renderEvolutionModalDom
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-117: Implementation | L118-234: Handlers & Exports
+ */
+
 import { EvolutionManager } from '../../world/EvolutionManager';
 import type { EvolutionPhase, StatDeltas } from '../EvolutionSceneUI';
 

@@ -4,6 +4,7 @@
  * @role Start Menu UI Controller
  * @exports StartMenuUI
  * @layer ui
+ * @sections L1-7: Micro-Header & Types | L8-364: Core Implementation | L365-729: Public Interface & Exports
  */
 
 import type {

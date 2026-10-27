@@ -1,3 +1,12 @@
+/**
+ * @fileoverview olivineToIndigoNpcs domain module implementation.
+ * @module world/npcs/olivineToIndigoNpcs
+ * @role olivineToIndigoNpcs Component
+ * @exports createOlivineToIndigoNpcs
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-166: Implementation | L167-332: Handlers & Exports
+ */
+
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
 import { createMahoganyToIndigoNpcs } from './mahoganyToIndigoNpcs';
@@ -19,13 +28,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     olivine_poke_center: [
-      makeNpc(
-        'olivine_nurse',
-        3,
-        1,
-        'DOWN',
-        'teacher',
-        '👩‍⚕️ NURSE JOY',
+      makeNpc('olivine_nurse', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
         ['Welcome to the Olivine Pokémon Center!', 'We can heal your Pokémon to full health.'],
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),
@@ -35,26 +38,14 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     olivine_mart: [
-      makeNpc(
-        'olivine_clerk',
-        1,
-        3,
-        'DOWN',
-        'boy',
-        '🏪 CLERK',
+      makeNpc('olivine_clerk', 1, 3, 'DOWN', 'boy', '🏪 CLERK', 
         ['Welcome to Olivine Poké Mart! How may I help you?'],
         { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
     ],
 
     olivine_gym: [
-      makeNpc(
-        'leader_jasmine',
-        5,
-        3,
-        'DOWN',
-        'girl',
-        '🔩 LEADER JASMINE',
+      makeNpc('leader_jasmine', 5, 3, 'DOWN', 'girl', '🔩 LEADER JASMINE', 
         [
           'JASMINE: …Thank you for your kindness at the LIGHTHOUSE.',
           'Steel-clad determination will illuminate your path across Johto!',
@@ -75,13 +66,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'olivine_gym_guide',
-        7,
-        14,
-        'DOWN',
-        'boy',
-        '🏆 GYM GUIDE',
+      makeNpc('olivine_gym_guide', 7, 14, 'DOWN', 'boy', '🏆 GYM GUIDE', 
         [
           'Yo! CHAMP in the making!',
           'Jasmine specializes in the newly discovered STEEL type!',
@@ -185,26 +170,14 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     olivine_lighthouse_6f: [
-      makeNpc(
-        'lighthouse_jasmine',
-        8,
-        8,
-        'DOWN',
-        'girl',
-        '🔩 JASMINE',
+      makeNpc('lighthouse_jasmine', 8, 8, 'DOWN', 'girl', '🔩 JASMINE', 
         [
           'JASMINE: …Amphy is sick. It used to shine so brightly across the dark sea…',
           'I heard there is a pharmacy in CIANWOOD CITY across the sea that carries miracle medicine…',
         ],
         { action: 'AMPHY_EVENT' }
       ),
-      makeNpc(
-        'lighthouse_amphy',
-        9,
-        8,
-        'DOWN',
-        'fat_man',
-        '💡 AMPHAROS',
+      makeNpc('lighthouse_amphy', 9, 8, 'DOWN', 'fat_man', '💡 AMPHAROS', 
         ['AMPHAROS: …Palu… (It looks pale and feverish…)'],
         { action: 'AMPHY_EVENT' }
       ),
@@ -232,13 +205,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
         trainerPokemon: { speciesId: 'staryu', level: 21, moves: ['watergun', 'swift', 'recover'] },
         trainerTeam: [{ speciesId: 'staryu', level: 21, moves: ['watergun', 'swift', 'recover'] }],
       }),
-      makeNpc(
-        'monica_of_monday',
-        10,
-        12,
-        'DOWN',
-        'girl',
-        '🎀 MONICA OF MONDAY',
+      makeNpc('monica_of_monday', 10, 12, 'DOWN', 'girl', '🎀 MONICA OF MONDAY', 
         [
           "MONICA: Hello! I'm MONICA of Monday! As a token of friendship, please take this!",
           "It's a SHARP BEAK! It boosts the power of FLYING-type moves!",
@@ -294,26 +261,14 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     cianwood_poke_center: [
-      makeNpc(
-        'cianwood_nurse',
-        3,
-        1,
-        'DOWN',
-        'teacher',
-        '👩‍⚕️ NURSE JOY',
+      makeNpc('cianwood_nurse', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
         ['Welcome to the Cianwood Pokémon Center!', 'We can heal your Pokémon to full health.'],
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),
     ],
 
     cianwood_gym: [
-      makeNpc(
-        'leader_chuck',
-        4,
-        2,
-        'DOWN',
-        'fat_man',
-        '🥋 LEADER CHUCK',
+      makeNpc('leader_chuck', 4, 2, 'DOWN', 'fat_man', '🥋 LEADER CHUCK', 
         [
           'CHUCK: WAHAHA! The STORMBADGE proves you have true fighting spirit!',
           'Never back down, and face every obstacle head on!',
@@ -333,13 +288,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc(
-        'cianwood_gym_guide',
-        7,
-        14,
-        'DOWN',
-        'boy',
-        '🏆 GYM GUIDE',
+      makeNpc('cianwood_gym_guide', 7, 14, 'DOWN', 'boy', '🏆 GYM GUIDE', 
         [
           'Yo! CHAMP in the making!',
           'Chuck is a master of FIGHTING-type POKéMON!',
@@ -359,13 +308,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     cianwood_pharmacy: [
-      makeNpc(
-        'cianwood_pharmacist',
-        2,
-        3,
-        'DOWN',
-        'fat_man',
-        '💊 PHARMACIST',
+      makeNpc('cianwood_pharmacist', 2, 3, 'DOWN', 'fat_man', '💊 PHARMACIST', 
         ['Welcome to Cianwood Pharmacy! 500 years of herbal tradition in every bottle.'],
         { action: 'PHARMACY_SECRET_POTION_EVENT' }
       ),

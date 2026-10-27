@@ -1,3 +1,12 @@
+/**
+ * @fileoverview OverworldTouchAndKeyController domain module implementation.
+ * @module ui/hud/OverworldTouchAndKeyController
+ * @role OverworldTouchAndKeyController Component
+ * @exports TouchAndKeyControllerOptions, OverworldTouchAndKeyController
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-175: Implementation | L176-351: Handlers & Exports
+ */
+
 import type { Direction, TouchControlStyle, SpeedMultiplier } from '../../types/game';
 
 export interface TouchAndKeyControllerOptions {

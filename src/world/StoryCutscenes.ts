@@ -1,3 +1,12 @@
+/**
+ * @fileoverview StoryCutscenes domain module implementation.
+ * @module world/StoryCutscenes
+ * @role StoryCutscenes Component
+ * @exports StoryCutsceneContext, StoryCutscenes
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-318: Implementation | L319-637: Handlers & Exports
+ */
+
 import type { Direction, PokemonInstance } from '../types/game';
 import type { GridEntity } from './GridPhysics';
 import { GridPhysics } from './GridPhysics';

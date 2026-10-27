@@ -1,3 +1,12 @@
+/**
+ * @fileoverview GoldenrodAndRoute34Interactions domain module implementation.
+ * @module world/interactions/GoldenrodAndRoute34Interactions
+ * @role GoldenrodAndRoute34Interactions Component
+ * @exports getGoldenrodAndRoute34Interactions
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-305: Implementation | L306-610: Handlers & Exports
+ */
+
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';

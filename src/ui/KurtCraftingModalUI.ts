@@ -1,4 +1,13 @@
 /**
+ * @fileoverview KurtCraftingModalUI domain module implementation.
+ * @module ui/KurtCraftingModalUI
+ * @role KurtCraftingModalUI Component
+ * @exports KurtCraftingModalUIOptions, KurtCraftingModalUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-227: Implementation | L228-455: Handlers & Exports
+ */
+
+/**
  * KurtCraftingModalUI.ts
  * Interactive HTML5/CSS vector modal for Kurt's Apricorn Poké Ball Crafting Workshop.
  * Adheres to Google Stitch screens:

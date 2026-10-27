@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BoxManagementUI domain module implementation.
+ * @module ui/BoxManagementUI
+ * @role BoxManagementUI Component
+ * @exports BoxManagementCallbacks, SelectedSlot, BoxManagementUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-346: Implementation | L347-692: Handlers & Exports
+ */
+
 import type { PokemonInstance, PokemonStorageState } from '../types/game';
 import { StorageManager, BoxManager } from '../world/StorageManager';
 import { BattleAudio } from '../audio/BattleAudio';

@@ -4,6 +4,7 @@
  * @role Predictive Neighbor & Warp Preloading Coordinator
  * @exports AdjacentMapPrefetcher, PrefetchTargetDescriptor, PrefetchStats, AdjacentMapPrefetcherOptions
  * @layer world
+ * @sections L1-7: Micro-Header & Types | L8-158: Core Implementation | L159-316: Public Interface & Exports
  */
 
 import type { MapData } from '../types/game';

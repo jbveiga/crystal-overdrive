@@ -1,3 +1,12 @@
+/**
+ * @fileoverview MissionLogUI domain module implementation.
+ * @module ui/MissionLogUI
+ * @role MissionLogUI Component
+ * @exports MissionLogUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-258: Implementation | L259-516: Handlers & Exports
+ */
+
 import type { Mission, MissionFilter } from '../types/game';
 import type { MissionManager } from '../world/MissionManager';
 import { BattleAudio } from '../audio/BattleAudio';

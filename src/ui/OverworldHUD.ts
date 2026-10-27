@@ -4,6 +4,7 @@
  * @role Overworld HUD Interface Controller
  * @exports OverworldHUD, OverworldHUDOptions
  * @layer ui
+ * @sections L1-7: Micro-Header & Types | L8-346: Core Implementation | L347-692: Public Interface & Exports
  */
 
 import type { Direction, SpeedMultiplier, RoamerState, TouchControlStyle } from '../types/game';

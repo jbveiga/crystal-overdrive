@@ -1,3 +1,12 @@
+/**
+ * @fileoverview CatchCalculator domain module implementation.
+ * @module battle/CatchCalculator
+ * @role CatchCalculator Component
+ * @exports CatchAttemptResult, CatchContext, MOON_STONE_EVOLVERS
+ * @layer battle
+ * @sections L1-15: Micro-Header & Imports | L16-114: Implementation | L115-228: Handlers & Exports
+ */
+
 import type { PokemonInstance, PokeballId } from '../types/game';
 
 export interface CatchAttemptResult {

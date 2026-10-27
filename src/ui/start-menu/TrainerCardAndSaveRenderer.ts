@@ -1,3 +1,12 @@
+/**
+ * @fileoverview TrainerCardAndSaveRenderer domain module implementation.
+ * @module ui/start-menu/TrainerCardAndSaveRenderer
+ * @role TrainerCardAndSaveRenderer Component
+ * @exports JOHTO_BADGES, TrainerCardAndSaveRenderer
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-223: Implementation | L224-447: Handlers & Exports
+ */
+
 import { BattleAudio } from '../../audio/BattleAudio';
 import { DEFAULT_NPC_CONTEST_RECORDS } from '../../world/BugContestManager';
 import { STADIUM_CHALLENGERS, STADIUM_CUPS } from '../../battle/StadiumArenaManager';
@@ -13,6 +22,14 @@ export const JOHTO_BADGES = [
   { id: 'glacier', name: 'Glacier', leader: 'Pryce', icon: '❄️' },
   { id: 'rising', name: 'Rising', leader: 'Clair', icon: '🐉' },
 ];
+
+const S = {
+  flexBetween: "${S.flexBetween}",
+  cardSection: "background: #141E33; border: 1px solid #22324F; border-radius: 10px; padding: 14px; box-shadow: 0 4px 0 0 #070B14;",
+  backBtn: "${S.backBtn}",
+  telemetryPill: "background: #141E33; border: 1px solid #2A75D3; color: #38BDF8; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;",
+  subMono: "font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;",
+} as const;
 
 export class TrainerCardAndSaveRenderer {
   constructor(
@@ -75,7 +92,7 @@ export class TrainerCardAndSaveRenderer {
 
     this.trainerCardModal.innerHTML = `
       <!-- Top System Telemetry Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+      <div style="${S.flexBetween} border-bottom: 2px solid #22324F; padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span class="neo-kanto-pulse-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #FFD028; box-shadow: 0 0 8px #FFD028;"></span>
           <span style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #FFD028; letter-spacing: 0.8px;">REGISTRATION ACTIVE // INDIGO NETWORK VERIFIED</span>
@@ -84,7 +101,7 @@ export class TrainerCardAndSaveRenderer {
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;">CHIP: <span style="color: #38BDF8;">SILPH-NFC-v9</span></span>
           <span style="background: #141E33; border: 1px solid #2A75D3; color: #38BDF8; font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px;">LVL-4 ENCRYPTED</span>
-          <button id="close-trainer-card-btn" class="neo-kanto-tactile-btn" style="background: #1E293B; color: #F6F8F3; border: 1.5px solid #475569; border-radius: 6px; padding: 6px 12px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 0 #070B14;">← BACK TO MENU</button>
+          <button id="close-trainer-card-btn" class="neo-kanto-tactile-btn" style="${S.backBtn}">← BACK TO MENU</button>
         </div>
       </div>
 
@@ -153,7 +170,7 @@ export class TrainerCardAndSaveRenderer {
 
         <!-- Right Column: Official Johto League Gym Badges Rack -->
         <div style="background: #141E33; border: 1px solid #22324F; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 0 0 #070B14;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="${S.flexBetween}">
             <div>
               <div style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #FFD028; letter-spacing: 0.5px;">JOHTO LEAGUE SANCTION</div>
               <div style="font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 900; color: #F6F8F3;">GYM BADGE RACK</div>
@@ -240,7 +257,7 @@ export class TrainerCardAndSaveRenderer {
           style="background: #080E1D; border: 1.5px solid #22324F; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;"
         >
           <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+            <div style="${S.flexBetween} gap: 6px;">
               <span style="font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 900; color: #FFD028; background: #141E33; border: 1px solid #FFD028; padding: 2px 6px; border-radius: 4px;">${weatherTag}</span>
               <span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 800; color: #4ADE80;">+$${challenger.rewardMoney}</span>
             </div>
@@ -262,7 +279,7 @@ export class TrainerCardAndSaveRenderer {
 
     this.contestLeaderboardModal.innerHTML = `
       <!-- Top Header -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+      <div style="${S.flexBetween} border-bottom: 2px solid #22324F; padding-bottom: 10px; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span class="neo-kanto-pulse-dot" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #4ADE80; box-shadow: 0 0 8px #4ADE80;"></span>
           <div>
@@ -270,14 +287,14 @@ export class TrainerCardAndSaveRenderer {
             <h2 style="font-family: 'Space Mono', monospace; margin: 2px 0 0 0; font-size: 18px; font-weight: 900; color: #F6F8F3;">🏆 BUG-CATCHING CONTEST & STADIUM ARENA</h2>
           </div>
         </div>
-        <button id="close-contest-leaderboard-btn" class="neo-kanto-tactile-btn" style="background: #1E293B; color: #F6F8F3; border: 1.5px solid #475569; border-radius: 6px; padding: 6px 12px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 0 #070B14;">← BACK TO MENU</button>
+        <button id="close-contest-leaderboard-btn" class="neo-kanto-tactile-btn" style="${S.backBtn}">← BACK TO MENU</button>
       </div>
 
       <!-- Two-Column Bento: Bug Contest Leaderboard + Stadium Arena -->
       <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; align-items: start;">
         <!-- Left Column: National Park Bug-Catching Contest Leaderboard -->
         <div style="background: #141E33; border: 1px solid #22324F; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 0 0 #070B14;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="${S.flexBetween}">
             <span style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 900; color: #FFD028;">🐞 NATIONAL PARK TOP 5 STANDINGS</span>
             <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;">TUE / THU / SAT</span>
           </div>
@@ -302,7 +319,7 @@ export class TrainerCardAndSaveRenderer {
 
         <!-- Right Column: Johto Stadium 2v2 Double Battle Arena -->
         <div id="stadium-arena-section" style="background: #141E33; border: 1px solid #22324F; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 0 0 #070B14;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="${S.flexBetween}">
             <span style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 900; color: #38BDF8;">🏟️ JOHTO STADIUM CUP ARENA</span>
             <span style="font-family: 'Space Mono', monospace; font-size: 10px; color: #FFD028;">1v1 & 2v2 MODES</span>
           </div>
@@ -352,7 +369,7 @@ export class TrainerCardAndSaveRenderer {
     const playTime = this.formatPlayTime(this.stateProvider.getPlayTimeSeconds());
 
     this.saveConfirmModal.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #22324F; padding-bottom: 10px;">
+      <div style="${S.flexBetween} border-bottom: 1.5px solid #22324F; padding-bottom: 10px;">
         <div style="font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38bdf8; letter-spacing: 0.6px; display: flex; align-items: center; gap: 6px;">
           <span class="neo-kanto-pulse-dot" style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
           <span>💾 MEMORY CARD // SAVE CONSOLE</span>
@@ -361,11 +378,11 @@ export class TrainerCardAndSaveRenderer {
       </div>
 
       <div class="nk-save-slot-card" style="background: #080E1D; border: 1.5px solid #22324F; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 7px; font-family: 'Space Mono', monospace; font-size: 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">PLAYER</span><strong style="color: #38BDF8;">${name}</strong></div>
-        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">LOCATION</span><strong style="color: #F8FAFC;">${mapName}</strong></div>
-        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">BADGES</span><strong style="color: #FFD028;">${badgesCount}</strong></div>
-        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">POKéDEX</span><strong style="color: #4ADE80;">${pokedexCount}</strong></div>
-        <div style="display: flex; justify-content: space-between; align-items: center;"><span style="color: #94a3b8;">TIME</span><strong style="color: #E2E8F0;">${playTime}</strong></div>
+        <div style="${S.flexBetween}"><span style="color: #94a3b8;">PLAYER</span><strong style="color: #38BDF8;">${name}</strong></div>
+        <div style="${S.flexBetween}"><span style="color: #94a3b8;">LOCATION</span><strong style="color: #F8FAFC;">${mapName}</strong></div>
+        <div style="${S.flexBetween}"><span style="color: #94a3b8;">BADGES</span><strong style="color: #FFD028;">${badgesCount}</strong></div>
+        <div style="${S.flexBetween}"><span style="color: #94a3b8;">POKéDEX</span><strong style="color: #4ADE80;">${pokedexCount}</strong></div>
+        <div style="${S.flexBetween}"><span style="color: #94a3b8;">TIME</span><strong style="color: #E2E8F0;">${playTime}</strong></div>
       </div>
 
       <div id="save-confirm-status" style="font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: #f8fafc; text-align: center; padding: 4px 0;">

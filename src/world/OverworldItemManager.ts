@@ -1,3 +1,12 @@
+/**
+ * @fileoverview OverworldItemManager domain module implementation.
+ * @module world/OverworldItemManager
+ * @role OverworldItemManager Component
+ * @exports OverworldItemManager
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-185: Implementation | L186-371: Handlers & Exports
+ */
+
 import overworldItemsJson from '../../public/assets/data/overworld_items.json';
 import type {
   ItemPocket,

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview AudioManager domain module implementation.
+ * @module audio/AudioManager
+ * @role AudioManager Component
+ * @exports AudioManager
+ * @layer audio
+ * @sections L1-15: Micro-Header & Imports | L16-241: Implementation | L242-483: Handlers & Exports
+ */
+
 import { Howl, Howler } from 'howler';
 import { BattleAudio } from './BattleAudio';
 import { ChiptuneSynthesizer } from './ChiptuneSynthesizer';

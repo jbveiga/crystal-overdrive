@@ -1,3 +1,12 @@
+/**
+ * @fileoverview SaveManager domain module implementation.
+ * @module core/SaveManager
+ * @role SaveManager Component
+ * @exports SaveData, LEGACY_STORAGE_KEYS, STARTER_LINEAGE_MAP
+ * @layer core
+ * @sections L1-15: Micro-Header & Imports | L16-362: Implementation | L363-725: Handlers & Exports
+ */
+
 import { openDB, type IDBPDatabase } from 'idb';
 import type {
   PokemonInstance,

@@ -1,3 +1,12 @@
+/**
+ * @fileoverview PokemonFactory domain module implementation.
+ * @module battle/PokemonFactory
+ * @role PokemonFactory Component
+ * @exports PartyExpAward, PokemonFactory
+ * @layer battle
+ * @sections L1-15: Micro-Header & Imports | L16-310: Implementation | L311-621: Handlers & Exports
+ */
+
 import { Dex } from '@pkmn/dex';
 import type {
   PokemonInstance,

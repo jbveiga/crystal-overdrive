@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BagAndMartUI domain module implementation.
+ * @module ui/BagAndMartUI
+ * @role BagAndMartUI Component
+ * @exports BagAndMartUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-325: Implementation | L326-651: Handlers & Exports
+ */
+
 import type { PokemonInstance, SpeedMultiplier } from '../types/game';
 import { BattleAudio } from '../audio/BattleAudio';
 import { EvolutionManager } from '../world/EvolutionManager';

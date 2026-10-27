@@ -1,3 +1,12 @@
+/**
+ * @fileoverview NamingModalUI domain module implementation.
+ * @module ui/NamingModalUI
+ * @role NamingModalUI Component
+ * @exports NamingModalCallbacks, RIVAL_NAME_PRESETS, NamingModalUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-236: Implementation | L237-473: Handlers & Exports
+ */
+
 import { BattleAudio } from '../audio/BattleAudio';
 
 export interface NamingModalCallbacks {

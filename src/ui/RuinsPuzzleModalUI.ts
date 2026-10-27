@@ -1,3 +1,12 @@
+/**
+ * @fileoverview RuinsPuzzleModalUI domain module implementation.
+ * @module ui/RuinsPuzzleModalUI
+ * @role RuinsPuzzleModalUI Component
+ * @exports RuinsPuzzleState, RuinsPuzzleModalCallbacks, RuinsPuzzleModalUI
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-210: Implementation | L211-420: Handlers & Exports
+ */
+
 import { BattleAudio } from '../audio/BattleAudio';
 import { injectRuinsPuzzleStyles } from './styles/ruinsPuzzleStyles';
 

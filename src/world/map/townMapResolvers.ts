@@ -1,4 +1,13 @@
 /**
+ * @fileoverview townMapResolvers domain module implementation.
+ * @module world/map/townMapResolvers
+ * @role townMapResolvers Component
+ * @exports resolveCurrentLandmark, computeLandmarkDistance, findHabitatsForSpecies
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-172: Implementation | L173-345: Handlers & Exports
+ */
+
+/**
  * Town Map Resolvers & Distance/Habitat Algorithms.
  * Pure TypeScript logic extracted from townMapData.ts.
  */

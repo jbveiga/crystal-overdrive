@@ -4,6 +4,7 @@
  * @role Battle State Machine
  * @exports BattleStateMachine, BattleActionType, BattlePhase
  * @layer battle
+ * @sections L1-7: Micro-Header & Types | L8-351: Core Implementation | L352-703: Public Interface & Exports
  */
 
 import type { PokemonInstance, MoveData, PokeballId, PokemonType, MoveCategory, StatId } from '../types/game';

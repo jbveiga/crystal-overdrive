@@ -1,3 +1,12 @@
+/**
+ * @fileoverview BattlePokeballAndSwitchAnimations domain module implementation.
+ * @module render/BattlePokeballAndSwitchAnimations
+ * @role BattlePokeballAndSwitchAnimations Component
+ * @exports BattleAnimationHost, animateFaint, animateShake
+ * @layer render
+ * @sections L1-15: Micro-Header & Imports | L16-192: Implementation | L193-385: Handlers & Exports
+ */
+
 import { Application, Assets, Container, Graphics, Sprite, Texture } from 'pixi.js';
 import gsap from 'gsap';
 import type { PokemonInstance, PokeballId } from '../types/game';

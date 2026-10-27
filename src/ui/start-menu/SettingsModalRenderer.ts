@@ -1,3 +1,12 @@
+/**
+ * @fileoverview SettingsModalRenderer domain module implementation.
+ * @module ui/start-menu/SettingsModalRenderer
+ * @role SettingsModalRenderer Component
+ * @exports getBattleSpeedBg, getBattleSpeedBorder, getTextSpeedBg
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-253: Implementation | L254-507: Handlers & Exports
+ */
+
 import type {
   SpeedMultiplier,
   TouchControlStyle,
@@ -10,6 +19,20 @@ import { STADIUM_CUPS, STADIUM_CHALLENGERS } from '../../battle/StadiumArenaMana
 import { PokemonFactory } from '../../battle/PokemonFactory';
 import { BattleAudio } from '../../audio/BattleAudio';
 import type { StartMenuStateProvider } from '../StartMenuUI';
+
+const S = {
+  row: 'background: #141E33; border: 1.5px solid #22324F; box-shadow: 0 4px 0 0 #070B14; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px;',
+  card: 'background: #141E33; border: 1.5px solid #22324F; box-shadow: 0 4px 0 0 #070B14; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;',
+  sub: 'font-size: 11px; color: #94A3B8; font-family: "Plus Jakarta Sans", system-ui, sans-serif;',
+  title: 'font-size: 13px; font-weight: 800; color: #F8FAFC; font-family: "Space Mono", monospace; letter-spacing: 0.3px;',
+  btnBase: "box-shadow: 0 3px 0 0 #070B14; border-radius: 6px; padding: 8px 14px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer; min-width: 130px;",
+  groupActionBtn: "box-shadow: 0 3px 0 0 #070B14; border-radius: 6px; padding: 7px 12px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer; min-width: 130px;",
+  segBtn: "box-shadow: 0 3px 0 0 #070B14; border-radius: 6px; padding: 6px 8px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer;",
+  segBtn6: "flex: 1; box-shadow: 0 3px 0 0 #070B14; border-radius: 6px; padding: 6px 6px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; cursor: pointer;",
+  cardHeader: 'display:flex;justify-content:space-between;align-items:center;gap:10px;',
+  rowGroup: 'display:flex;gap:6px;width:100%;',
+  tabBtnBase: "flex: 1; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; box-shadow: 0 3px 0 0 #070B14;",
+} as const;
 
 export function getBattleSpeedBg(spd: SpeedMultiplier): string {
   if (spd === 1) return '#2563eb';
@@ -110,10 +133,10 @@ export function buildSettingsModalHtml(
       ? stateProvider.getTextSpeed()
       : 'MID';
 
-    const rowStyle = 'background: #141E33; border: 1.5px solid #22324F; box-shadow: 0 4px 0 0 #070B14; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px;';
-    const groupCardStyle = 'background: #141E33; border: 1.5px solid #22324F; box-shadow: 0 4px 0 0 #070B14; border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;';
-    const subLabelStyle = 'font-size: 11px; color: #94A3B8; font-family: "Plus Jakarta Sans", system-ui, sans-serif;';
-    const titleLabelStyle = 'font-size: 13px; font-weight: 800; color: #F8FAFC; font-family: "Space Mono", monospace; letter-spacing: 0.3px;';
+    const rowStyle = S.row;
+    const groupCardStyle = S.card;
+    const subLabelStyle = S.sub;
+    const titleLabelStyle = S.title;
 
     return `
       <div style="position: sticky; top: 0; background: #0D1322; z-index: 3; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 10px; flex-shrink: 0;">
@@ -144,14 +167,7 @@ export function buildSettingsModalHtml(
             background: ${isMuted ? '#7f1d1d' : '#0284c7'};
             color: #ffffff;
             border: 1.5px solid ${isMuted ? '#ef4444' : '#38bdf8'};
-            box-shadow: 0 3px 0 0 #070B14;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 130px;
+            ${S.btnBase}
           ">${isMuted ? '🔇 SOUND: OFF' : '🔊 SOUND: ON'}</button>
         </div>
 
@@ -165,14 +181,7 @@ export function buildSettingsModalHtml(
             background: ${isChiptuneMode ? '#7c3aed' : '#0284c7'};
             color: #ffffff;
             border: 1.5px solid ${isChiptuneMode ? '#c084fc' : '#38bdf8'};
-            box-shadow: 0 3px 0 0 #070B14;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 130px;
+            ${S.btnBase}
           ">${isChiptuneMode ? '🎵 8-BIT APU: ON' : '🎼 STUDIO BGM'}</button>
         </div>
 
@@ -186,14 +195,7 @@ export function buildSettingsModalHtml(
             background: ${isLowHpBeep ? '#059669' : '#334155'};
             color: #ffffff;
             border: 1.5px solid ${isLowHpBeep ? '#34d399' : '#64748b'};
-            box-shadow: 0 3px 0 0 #070B14;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 130px;
+            ${S.btnBase}
           ">${isLowHpBeep ? '🚨 LOW-HP BEEP: ON' : '🔕 LOW-HP BEEP: OFF'}</button>
         </div>
 
@@ -207,20 +209,13 @@ export function buildSettingsModalHtml(
             background: #2563eb;
             color: #ffffff;
             border: 1.5px solid #60a5fa;
-            box-shadow: 0 3px 0 0 #070B14;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 130px;
+            ${S.btnBase}
           ">⚡ SPEED: ${currentSpeed}x</button>
         </div>
 
         <!-- Battle Speed Group Card -->
         <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div style="${S.cardHeader}">
             <div>
               <div style="${titleLabelStyle}">BATTLE SPEED</div>
               <div style="${subLabelStyle}">Combat animations, HP/EXP bars & battle text pacing</div>
@@ -239,52 +234,34 @@ export function buildSettingsModalHtml(
               min-width: 130px;
             ">⚔️ BATTLE: ${battleSpeed}x</button>
           </div>
-          <div id="settings-battle-speed-segmented-group" style="display:flex;gap:6px;width:100%;">
+          <div id="settings-battle-speed-segmented-group" style="${S.rowGroup}">
             <button id="settings-battle-speed-1x-btn" data-battle-speed-choice="1" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${battleSpeed === 1 ? '#2563eb' : '#080E1D'};
               color: ${battleSpeed === 1 ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${battleSpeed === 1 ? '#60a5fa' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ 1x NORMAL ]</button>
             <button id="settings-battle-speed-2x-btn" data-battle-speed-choice="2" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${battleSpeed === 2 ? '#d97706' : '#080E1D'};
               color: ${battleSpeed === 2 ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${battleSpeed === 2 ? '#f59e0b' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ 2x FAST ]</button>
             <button id="settings-battle-speed-3x-btn" data-battle-speed-choice="3" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${battleSpeed === 3 ? '#dc2626' : '#080E1D'};
               color: ${battleSpeed === 3 ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${battleSpeed === 3 ? '#ef4444' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ 3x TURBO ]</button>
           </div>
         </div>
 
         <!-- Text Speed Group Card -->
         <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div style="${S.cardHeader}">
             <div>
               <div style="${titleLabelStyle}">TEXT SPEED</div>
               <div style="${subLabelStyle}">Overworld & battle dialogue typewriter cadence</div>
@@ -303,7 +280,7 @@ export function buildSettingsModalHtml(
               min-width: 130px;
             ">💬 TEXT: ${getTextSpeedLabel(textSpeed)}</button>
           </div>
-          <div id="settings-text-speed-segmented-group" style="display:flex;gap:6px;width:100%;">
+          <div id="settings-text-speed-segmented-group" style="${S.rowGroup}">
             <button id="settings-text-slow-btn" data-text-speed-choice="SLOW" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${textSpeed === 'SLOW' ? '#475569' : '#080E1D'};
@@ -369,14 +346,7 @@ export function buildSettingsModalHtml(
             background: ${isGamepad ? '#059669' : '#334155'};
             color: #ffffff;
             border: 1.5px solid ${isGamepad ? '#34d399' : '#64748b'};
-            box-shadow: 0 3px 0 0 #070B14;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 130px;
+            ${S.btnBase}
           ">${isGamepad ? '🎮 TOUCH: ON' : '🎮 TOUCH: OFF'}</button>
         </div>
 
@@ -390,14 +360,7 @@ export function buildSettingsModalHtml(
             background: ${isJoystick ? '#7c3aed' : '#0284c7'};
             color: #ffffff;
             border: 1.5px solid ${isJoystick ? '#c084fc' : '#38bdf8'};
-            box-shadow: 0 3px 0 0 #070B14;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 130px;
+            ${S.btnBase}
           ">${isJoystick ? '🕹️ JOYSTICK (Analog)' : '🕹️ D-PAD (Buttons)'}</button>
         </div>
 
@@ -411,20 +374,13 @@ export function buildSettingsModalHtml(
             background: ${isCrtScanlines ? '#059669' : '#334155'};
             color: #ffffff;
             border: 1.5px solid ${isCrtScanlines ? '#34d399' : '#64748b'};
-            box-shadow: 0 3px 0 0 #070B14;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 130px;
+            ${S.btnBase}
           ">${isCrtScanlines ? '📺 CRT: ON' : '📺 CRT: OFF'}</button>
         </div>
 
         <!-- Unbound-Style Exp. Share Mode Toggle (OFF | ALL | CAPPED) -->
         <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div style="${S.cardHeader}">
             <div>
               <div style="${titleLabelStyle}">EXP. SHARE MODE</div>
               <div style="${subLabelStyle}">Party EXP distribution & level caps</div>
@@ -443,52 +399,34 @@ export function buildSettingsModalHtml(
               min-width: 130px;
             ">${getExpShareButtonLabel(expShareMode, currentLevelCap)}</button>
           </div>
-          <div id="settings-exp-segmented-group" style="display:flex;gap:6px;width:100%;">
+          <div id="settings-exp-segmented-group" style="${S.rowGroup}">
             <button id="settings-exp-off-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${expShareMode === 'OFF' ? '#475569' : '#080E1D'};
               color: ${expShareMode === 'OFF' ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${expShareMode === 'OFF' ? '#cbd5e1' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ OFF ]</button>
             <button id="settings-exp-all-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${expShareMode === 'ALL' ? '#059669' : '#080E1D'};
               color: ${expShareMode === 'ALL' ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${expShareMode === 'ALL' ? '#34d399' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ ALL ]</button>
             <button id="settings-exp-capped-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${expShareMode === 'CAPPED' ? '#7c3aed' : '#080E1D'};
               color: ${expShareMode === 'CAPPED' ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${expShareMode === 'CAPPED' ? '#c084fc' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ 🧢 CAPPED ]</button>
           </div>
         </div>
 
         <!-- Wild Encounter Rate Cap Toggle (RELAXED 4.0% | NORMAL 6.25% | CLASSIC 10.0%) -->
         <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div style="${S.cardHeader}">
             <div>
               <div style="${titleLabelStyle}">WILD ENCOUNTER RATE</div>
               <div style="${subLabelStyle}">4-step grace buffer + step probability cap</div>
@@ -507,45 +445,27 @@ export function buildSettingsModalHtml(
               min-width: 130px;
             ">${getEncounterRateLabel(encounterRateMode)}</button>
           </div>
-          <div id="settings-encounter-segmented-group" style="display:flex;gap:6px;width:100%;">
+          <div id="settings-encounter-segmented-group" style="${S.rowGroup}">
             <button id="settings-enc-relaxed-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${encounterRateMode === 'RELAXED' ? '#059669' : '#080E1D'};
               color: ${encounterRateMode === 'RELAXED' ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${encounterRateMode === 'RELAXED' ? '#34d399' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ RELAXED 4% ]</button>
             <button id="settings-enc-normal-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${encounterRateMode === 'NORMAL' ? '#0284c7' : '#080E1D'};
               color: ${encounterRateMode === 'NORMAL' ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${encounterRateMode === 'NORMAL' ? '#38bdf8' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ NORMAL 6.25% ]</button>
             <button id="settings-enc-classic-btn" class="neo-kanto-tactile-btn" style="
               flex: 1;
               background: ${encounterRateMode === 'CLASSIC' ? '#d97706' : '#080E1D'};
               color: ${encounterRateMode === 'CLASSIC' ? '#ffffff' : '#94a3b8'};
               border: 1.5px solid ${encounterRateMode === 'CLASSIC' ? '#fbbf24' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 8px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
+              ${S.segBtn}
             ">[ CLASSIC 10% ]</button>
           </div>
         </div>
@@ -560,14 +480,7 @@ export function buildSettingsModalHtml(
             background: ${isAutoHm ? '#059669' : '#334155'};
             color: #ffffff;
             border: 1.5px solid ${isAutoHm ? '#34d399' : '#64748b'};
-            box-shadow: 0 3px 0 0 #070B14;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-family: 'Space Mono', monospace;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-            min-width: 130px;
+            ${S.btnBase}
           ">${isAutoHm ? '🌊 AUTO-HM: ON' : '💬 AUTO-HM: OFF'}</button>
         </div>
       </div>

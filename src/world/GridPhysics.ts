@@ -1,3 +1,12 @@
+/**
+ * @fileoverview GridPhysics domain module implementation.
+ * @module world/GridPhysics
+ * @role GridPhysics Component
+ * @exports NpcSpriteType, TrainerPokemonSpec, GridEntity
+ * @layer world
+ * @sections L1-15: Micro-Header & Imports | L16-220: Implementation | L221-440: Handlers & Exports
+ */
+
 import type { Direction, TileCoord } from '../types/game';
 
 export type NpcSpriteType =

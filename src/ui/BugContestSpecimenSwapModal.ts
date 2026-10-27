@@ -1,4 +1,13 @@
 /**
+ * @fileoverview BugContestSpecimenSwapModal domain module implementation.
+ * @module ui/BugContestSpecimenSwapModal
+ * @role BugContestSpecimenSwapModal Component
+ * @exports BugContestSpecimenSwapModalOptions, BugContestSpecimenSwapModal
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-176: Implementation | L177-352: Handlers & Exports
+ */
+
+/**
  * BugContestSpecimenSwapModal.ts
  * Interactive HTML5/CSS vector modal for the Bug-Catching Contest Specimen Swap.
  * Adheres to Google Stitch screens:

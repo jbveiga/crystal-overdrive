@@ -1,3 +1,12 @@
+/**
+ * @fileoverview OverworldCutsceneAndPokegearModals domain module implementation.
+ * @module ui/hud/OverworldCutsceneAndPokegearModals
+ * @role OverworldCutsceneAndPokegearModals Component
+ * @exports CutsceneAndPokegearContext, OverworldCutsceneAndPokegearModals
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-215: Implementation | L216-431: Handlers & Exports
+ */
+
 import type { RoamerState } from '../../types/game';
 import { BattleAudio } from '../../audio/BattleAudio';
 

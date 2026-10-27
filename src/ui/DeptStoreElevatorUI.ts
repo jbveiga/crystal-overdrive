@@ -1,4 +1,13 @@
 /**
+ * @fileoverview DeptStoreElevatorUI domain module implementation.
+ * @module ui/DeptStoreElevatorUI
+ * @role DeptStoreElevatorUI Component
+ * @exports DeptStoreFloor, DEPT_STORE_FLOORS, DeptStoreElevatorCallbacks
+ * @layer ui
+ * @sections L1-15: Micro-Header & Imports | L16-259: Implementation | L260-518: Handlers & Exports
+ */
+
+/**
  * Goldenrod Dept Store Elevator UI (Google Stitch Neo-Kanto Protocol)
  * Desktop Screen: ce7ddb8c8e3a48f1aafce49d45d44e21
  * Mobile Screen: f9a712020093425fbf7dda836027f9da (100dvh safe-area)
