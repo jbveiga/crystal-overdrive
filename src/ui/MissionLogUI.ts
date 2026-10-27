@@ -315,12 +315,12 @@ export class MissionLogUI {
 
   private getStatusBadgeHtml(mission: Mission): string {
     if (mission.status === 'COMPLETED') {
-      return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #4ade80; background: rgba(34, 197, 94, 0.16); border: 1.5px solid #4ade80; padding: 2px 7px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">✓ COMPLETED</span>`;
+      return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #4ade80; background: rgba(34, 197, 94, 0.16); border: 1.5px solid #4ade80; padding: 2px 8px; border-radius: 999px;">✓ COMPLETED</span>`;
     }
     if (mission.status === 'ACTIVE') {
-      return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.16); border: 1.5px solid #38bdf8; padding: 2px 7px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">● ACTIVE</span>`;
+      return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #38bdf8; background: rgba(56, 189, 248, 0.16); border: 1.5px solid #38bdf8; padding: 2px 8px; border-radius: 999px;">● ACTIVE</span>`;
     }
-    return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #94a3b8; background: #080E1D; border: 1.5px solid #22324F; padding: 2px 7px; border-radius: 6px;">🔒 LOCKED</span>`;
+    return `<span style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #94a3b8; background: #080E1D; border: 1.5px solid #22324F; padding: 2px 8px; border-radius: 999px;">🔒 LOCKED</span>`;
   }
 
   private renderMissionList(): void {
@@ -437,9 +437,9 @@ export class MissionLogUI {
             font-family: 'Space Mono', monospace;
             font-size: 11px;
             font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
-            box-shadow: 0 2px 0 0 #070B14;
+            padding: 4px 12px;
+            border-radius: 999px;
+            box-shadow: 0 2px 8px rgba(254, 240, 138, 0.15);
           ">${r.label}</span>
         `
       )
@@ -456,8 +456,8 @@ export class MissionLogUI {
             font-family: 'Space Mono', monospace;
             font-size: 10px;
             font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 3px 10px;
+            border-radius: 999px;
             margin-bottom: 6px;
           ">${catTag}</span>
           <h3 id="mission-dossier-title" style="margin: 0; font-family: 'Space Mono', monospace; font-size: 18px; font-weight: 700; color: #f8fafc;">${mission.id}: ${mission.title}</h3>

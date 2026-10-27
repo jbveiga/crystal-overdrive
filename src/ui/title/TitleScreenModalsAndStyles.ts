@@ -71,26 +71,25 @@ export function renderMainMenu({
     flex-direction: column;
     gap: 8px;
     padding: 14px 18px;
-    border-radius: 10px;
+    border-radius: 12px;
     background: ${
       !hasSaveData
-        ? 'rgba(13, 19, 34, 0.42)'
+        ? 'rgba(15, 23, 42, 0.42)'
         : continueFocused
-        ? '#141E33'
-        : '#0D1322'
+        ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))'
+        : 'rgba(15, 23, 42, 0.82)'
     };
     border: 2px solid ${
       !hasSaveData
-        ? '#22324F'
+        ? 'rgba(148, 163, 184, 0.18)'
         : continueFocused
-        ? '#38BDF8'
-        : '#22324F'
+        ? '#38bdf8'
+        : 'rgba(148, 163, 184, 0.3)'
     };
-    box-shadow: 0 4px 0 0 #070B14;
+    box-shadow: ${continueFocused && hasSaveData ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'};
     opacity: ${hasSaveData ? '1' : '0.48'};
     cursor: ${hasSaveData ? 'pointer' : 'not-allowed'};
-    transition: all 0.12s ease;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.15s ease;
   `;
 
   if (hasSaveData && preview) {
@@ -104,31 +103,28 @@ export function renderMainMenu({
 
     continueBtn.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div style="font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.8px;">
+        <div style="font-size: 16px; font-weight: 900; color: #f8fafc; letter-spacing: 1px;">
           ${continueFocused ? '▶ ' : ''}CONTINUE JOURNEY
         </div>
         <span style="
-          background: rgba(56, 189, 248, 0.15);
-          border: 1.5px solid #38bdf8;
+          background: rgba(56, 189, 248, 0.2);
+          border: 1px solid rgba(56, 189, 248, 0.5);
           color: #7dd3fc;
           padding: 2px 10px;
-          border-radius: 6px;
-          font-size: 11px;
-          font-weight: 700;
-          box-shadow: 0 2px 0 0 #070B14;
-          font-family: 'Space Mono', monospace;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 800;
         ">📍 ${preview.currentLocationName}</span>
       </div>
       <div style="
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
         gap: 8px;
-        padding-top: 8px;
-        border-top: 1.5px solid #22324F;
-        font-size: 11.5px;
+        padding-top: 6px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        font-size: 12px;
         color: #cbd5e1;
         font-weight: 700;
-        font-family: 'Space Mono', monospace;
       ">
         <div>👤 ${preview.playerName} ${genderBadge}</div>
         <div>🏅 BADGES: <span style="color: #facc15;">${preview.badgeCount} / 8</span></div>
@@ -141,7 +137,7 @@ export function renderMainMenu({
     continueBtn.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <span style="font-size: 15px; font-weight: 800; color: #94a3b8;">CONTINUE</span>
-        <span style="font-size: 11px; color: #64748b; font-weight: 700; font-family: 'Space Mono', monospace;">NO SAVE DATA FOUND</span>
+        <span style="font-size: 12px; color: #64748b; font-weight: 700;">NO SAVE DATA FOUND</span>
       </div>
     `;
   }
@@ -165,19 +161,22 @@ export function renderMainMenu({
     justify-content: space-between;
     align-items: center;
     padding: 14px 18px;
-    border-radius: 10px;
-    background: ${newGameFocused ? '#141E33' : '#0D1322'};
-    border: 2px solid ${newGameFocused ? '#38BDF8' : '#22324F'};
-    box-shadow: 0 4px 0 0 #070B14;
+    border-radius: 12px;
+    background: ${
+      newGameFocused
+        ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))'
+        : 'rgba(15, 23, 42, 0.82)'
+    };
+    border: 2px solid ${newGameFocused ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)'};
+    box-shadow: ${newGameFocused ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'};
     cursor: pointer;
-    transition: all 0.12s ease;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.15s ease;
   `;
   newGameBtn.innerHTML = `
-    <span style="font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.8px;">
+    <span style="font-size: 16px; font-weight: 900; color: #f8fafc; letter-spacing: 1px;">
       ${newGameFocused ? '▶ ' : ''}NEW GAME
     </span>
-    <span style="font-size: 11px; font-weight: 700; color: #94a3b8; font-family: 'Space Mono', monospace;">Start Fresh in New Bark Town</span>
+    <span style="font-size: 12px; font-weight: 700; color: #94a3b8;">Start Fresh in New Bark Town</span>
   `;
   newGameBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -194,19 +193,22 @@ export function renderMainMenu({
     justify-content: space-between;
     align-items: center;
     padding: 14px 18px;
-    border-radius: 10px;
-    background: ${optionsFocused ? '#141E33' : '#0D1322'};
-    border: 2px solid ${optionsFocused ? '#38BDF8' : '#22324F'};
-    box-shadow: 0 4px 0 0 #070B14;
+    border-radius: 12px;
+    background: ${
+      optionsFocused
+        ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))'
+        : 'rgba(15, 23, 42, 0.82)'
+    };
+    border: 2px solid ${optionsFocused ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)'};
+    box-shadow: ${optionsFocused ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'};
     cursor: pointer;
-    transition: all 0.12s ease;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all 0.15s ease;
   `;
   optionsBtn.innerHTML = `
-    <span style="font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 0.8px;">
+    <span style="font-size: 16px; font-weight: 900; color: #f8fafc; letter-spacing: 1px;">
       ${optionsFocused ? '▶ ' : ''}OPTIONS
     </span>
-    <span style="font-size: 11px; font-weight: 700; color: #94a3b8; font-family: 'Space Mono', monospace;">Audio, Text Speed & Overdrive</span>
+    <span style="font-size: 12px; font-weight: 700; color: #94a3b8;">Audio, Text Speed & Overdrive Settings</span>
   `;
   optionsBtn.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -242,48 +244,44 @@ export function renderOverwriteModal({
 
   overwriteModalElement.innerHTML = `
     <div style="
-      background: #0D1322;
-      border: 2px solid #EF4444;
-      border-radius: 12px;
+      background: #0f172a;
+      border: 2px solid #f43f5e;
+      border-radius: 14px;
       padding: 24px;
       width: min(440px, 92vw);
-      box-shadow: 0 8px 0 0 #070B14;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
       display: flex;
       flex-direction: column;
       gap: 16px;
       color: #f8fafc;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     ">
-      <div style="font-size: 17px; font-weight: 800; color: #fb7185; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">
+      <div style="font-size: 18px; font-weight: 900; color: #fb7185;">
         ⚠️ OVERWRITE EXISTING SAVE?
       </div>
-      <div style="font-size: 13.5px; line-height: 1.5; color: #cbd5e1;">
+      <div style="font-size: 14px; line-height: 1.5; color: #cbd5e1;">
         An active adventure for <strong>${savePreview?.playerName ?? 'GOLD'}</strong> (${savePreview?.playTimeFormatted ?? '00:00'}) already exists. Saving in the new adventure will replace the previous save.
       </div>
       <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 6px;">
         <button id="overwrite-confirm-yes" style="
           padding: 10px 16px;
           border-radius: 8px;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 800;
           cursor: pointer;
-          background: ${yesFocused ? '#DC2626' : '#141E33'};
+          background: ${yesFocused ? '#dc2626' : '#1e293b'};
           color: #ffffff;
-          border: 1.5px solid ${yesFocused ? '#FCA5A5' : '#22324F'};
-          box-shadow: 0 3px 0 0 #070B14;
-          font-family: 'Space Mono', monospace;
+          border: 1px solid ${yesFocused ? '#fca5a5' : '#475569'};
         ">${yesFocused ? '▶ ' : ''}START NEW GAME</button>
         <button id="overwrite-confirm-no" style="
           padding: 10px 16px;
           border-radius: 8px;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 800;
           cursor: pointer;
-          background: ${noFocused ? '#0284C7' : '#141E33'};
+          background: ${noFocused ? '#0284c7' : '#1e293b'};
           color: #ffffff;
-          border: 1.5px solid ${noFocused ? '#7DD3FC' : '#22324F'};
-          box-shadow: 0 3px 0 0 #070B14;
-          font-family: 'Space Mono', monospace;
+          border: 1px solid ${noFocused ? '#7dd3fc' : '#475569'};
         ">${noFocused ? '▶ ' : ''}CANCEL</button>
       </div>
     </div>
@@ -330,31 +328,29 @@ export function renderOptionsModal({
 
   optionsModalElement.innerHTML = `
     <div style="
-      background: #0D1322;
-      border: 2px solid #38BDF8;
-      border-radius: 12px;
+      background: #0f172a;
+      border: 2px solid #38bdf8;
+      border-radius: 14px;
       padding: 24px;
       width: min(480px, 94vw);
-      box-shadow: 0 8px 0 0 #070B14;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
       display: flex;
       flex-direction: column;
       gap: 16px;
       color: #f8fafc;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     ">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #38bdf8; font-family: 'Space Mono', monospace; letter-spacing: 0.5px;">⚙️ SYSTEM OPTIONS</h3>
+        <h3 style="margin: 0; font-size: 18px; font-weight: 900; color: #38bdf8;">⚙️ SYSTEM OPTIONS</h3>
         <button id="options-close-btn" style="
-          background: #141E33;
+          background: #1e293b;
           color: #cbd5e1;
-          border: 1.5px solid #22324F;
+          border: 1px solid #475569;
           border-radius: 6px;
           padding: 4px 10px;
-          font-size: 11px;
-          font-weight: 700;
+          font-size: 12px;
+          font-weight: 800;
           cursor: pointer;
-          box-shadow: 0 2px 0 0 #070B14;
-          font-family: 'Space Mono', monospace;
         ">✕ CLOSE</button>
       </div>
 
@@ -362,7 +358,7 @@ export function renderOptionsModal({
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700;">
           <span>🎵 BGM VOLUME</span>
-          <span style="color: #38bdf8; font-family: 'Space Mono', monospace;">${Math.round(options.bgmVolume * 100)}%</span>
+          <span style="color: #38bdf8;">${Math.round(options.bgmVolume * 100)}%</span>
         </div>
         <input id="opt-bgm-slider" type="range" min="0" max="100" value="${Math.round(options.bgmVolume * 100)}" style="width: 100%; cursor: pointer;" />
       </div>
@@ -371,7 +367,7 @@ export function renderOptionsModal({
       <div style="display: flex; flex-direction: column; gap: 6px;">
         <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700;">
           <span>🔊 SFX VOLUME</span>
-          <span style="color: #38bdf8; font-family: 'Space Mono', monospace;">${Math.round(options.soundVolume * 100)}%</span>
+          <span style="color: #38bdf8;">${Math.round(options.soundVolume * 100)}%</span>
         </div>
         <input id="opt-sfx-slider" type="range" min="0" max="100" value="${Math.round(options.soundVolume * 100)}" style="width: 100%; cursor: pointer;" />
       </div>
@@ -386,14 +382,12 @@ export function renderOptionsModal({
             <button data-text-speed="${ts}" style="
               padding: 8px 6px;
               border-radius: 6px;
-              font-size: 11px;
-              font-weight: 700;
+              font-size: 12px;
+              font-weight: 800;
               cursor: pointer;
-              background: ${options.textSpeed === ts ? '#0284c7' : '#141E33'};
+              background: ${options.textSpeed === ts ? '#0284c7' : '#1e293b'};
               color: #ffffff;
-              border: 1.5px solid ${options.textSpeed === ts ? '#38bdf8' : '#22324F'};
-              box-shadow: 0 2px 0 0 #070B14;
-              font-family: 'Space Mono', monospace;
+              border: 1px solid ${options.textSpeed === ts ? '#7dd3fc' : '#475569'};
             ">${ts}</button>
           `
             )
@@ -407,14 +401,12 @@ export function renderOptionsModal({
         <button id="opt-battle-anim-btn" style="
           padding: 8px 16px;
           border-radius: 6px;
-          font-size: 11px;
-          font-weight: 700;
+          font-size: 12px;
+          font-weight: 800;
           cursor: pointer;
-          background: ${options.battleAnimations ? '#059669' : '#141E33'};
+          background: ${options.battleAnimations ? '#059669' : '#1e293b'};
           color: #ffffff;
-          border: 1.5px solid ${options.battleAnimations ? '#10b981' : '#22324F'};
-          box-shadow: 0 2px 0 0 #070B14;
-          font-family: 'Space Mono', monospace;
+          border: 1px solid ${options.battleAnimations ? '#34d399' : '#475569'};
         ">${options.battleAnimations ? 'ON' : 'OFF'}</button>
       </div>
 
@@ -424,14 +416,12 @@ export function renderOptionsModal({
         <button id="opt-chiptune-btn" style="
           padding: 8px 16px;
           border-radius: 6px;
-          font-size: 11px;
-          font-weight: 700;
+          font-size: 12px;
+          font-weight: 800;
           cursor: pointer;
-          background: ${options.chiptuneMode ? '#7c3aed' : '#141E33'};
+          background: ${options.chiptuneMode ? '#7c3aed' : '#1e293b'};
           color: #ffffff;
-          border: 1.5px solid ${options.chiptuneMode ? '#a855f7' : '#22324F'};
-          box-shadow: 0 2px 0 0 #070B14;
-          font-family: 'Space Mono', monospace;
+          border: 1px solid ${options.chiptuneMode ? '#c084fc' : '#475569'};
         ">${options.chiptuneMode ? 'ON' : 'OFF'}</button>
       </div>
 
@@ -441,14 +431,12 @@ export function renderOptionsModal({
         <button id="opt-lowhp-beep-btn" style="
           padding: 8px 16px;
           border-radius: 6px;
-          font-size: 11px;
-          font-weight: 700;
+          font-size: 12px;
+          font-weight: 800;
           cursor: pointer;
-          background: ${(options.lowHpBeepEnabled ?? true) ? '#059669' : '#141E33'};
+          background: ${(options.lowHpBeepEnabled ?? true) ? '#059669' : '#1e293b'};
           color: #ffffff;
-          border: 1.5px solid ${(options.lowHpBeepEnabled ?? true) ? '#10b981' : '#22324F'};
-          box-shadow: 0 2px 0 0 #070B14;
-          font-family: 'Space Mono', monospace;
+          border: 1px solid ${(options.lowHpBeepEnabled ?? true) ? '#34d399' : '#475569'};
         ">${(options.lowHpBeepEnabled ?? true) ? 'ON' : 'OFF'}</button>
       </div>
 
@@ -462,14 +450,12 @@ export function renderOptionsModal({
             <button data-battle-speed="${spd}" style="
               padding: 8px 6px;
               border-radius: 6px;
-              font-size: 11px;
-              font-weight: 700;
+              font-size: 12px;
+              font-weight: 800;
               cursor: pointer;
-              background: ${(options.battleSpeedMultiplier ?? 1) === spd ? '#2563eb' : '#141E33'};
+              background: ${(options.battleSpeedMultiplier ?? 1) === spd ? '#2563eb' : '#1e293b'};
               color: #ffffff;
-              border: 1.5px solid ${(options.battleSpeedMultiplier ?? 1) === spd ? '#60a5fa' : '#22324F'};
-              box-shadow: 0 2px 0 0 #070B14;
-              font-family: 'Space Mono', monospace;
+              border: 1px solid ${(options.battleSpeedMultiplier ?? 1) === spd ? '#60a5fa' : '#475569'};
             ">${spd === 1 ? '1x NORMAL' : spd === 2 ? '2x FAST' : '3x TURBO'}</button>
           `
             )
@@ -487,14 +473,12 @@ export function renderOptionsModal({
             <button data-default-speed="${spd}" style="
               padding: 8px 6px;
               border-radius: 6px;
-              font-size: 11px;
-              font-weight: 700;
+              font-size: 12px;
+              font-weight: 800;
               cursor: pointer;
-              background: ${options.playerSpeedDefault === spd ? '#7c3aed' : '#141E33'};
+              background: ${options.playerSpeedDefault === spd ? '#7c3aed' : '#1e293b'};
               color: #ffffff;
-              border: 1.5px solid ${options.playerSpeedDefault === spd ? '#a855f7' : '#22324F'};
-              box-shadow: 0 2px 0 0 #070B14;
-              font-family: 'Space Mono', monospace;
+              border: 1px solid ${options.playerSpeedDefault === spd ? '#a855f7' : '#475569'};
             ">${spd}x</button>
           `
             )

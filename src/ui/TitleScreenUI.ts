@@ -449,11 +449,10 @@ export class TitleScreenUI {
       justify-content: space-between;
       align-items: center;
       z-index: 2;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
       color: #94a3b8;
       letter-spacing: 1px;
-      font-family: 'Space Mono', monospace;
     `;
     topBar.innerHTML = `
       <span>💎 JOHTO GEN II REIMAGINED</span>
@@ -515,14 +514,14 @@ export class TitleScreenUI {
       width: fit-content;
       box-sizing: border-box;
       padding: 12px clamp(14px, 4vw, 28px);
-      border-radius: 8px;
-      background: #0D1322;
-      border: 2px solid #38BDF8;
-      box-shadow: 0 4px 0 0 #070B14;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.78);
+      border: 2px solid rgba(56, 189, 248, 0.65);
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
       color: #f8fafc;
-      font-size: clamp(11px, 3.2vw, 14px);
+      font-size: clamp(11px, 3.2vw, 15px);
       font-weight: 800;
-      letter-spacing: clamp(0.6px, 0.35vw, 1.5px);
+      letter-spacing: clamp(0.6px, 0.35vw, 1.8px);
       line-height: 1.35;
       white-space: normal;
       cursor: pointer;

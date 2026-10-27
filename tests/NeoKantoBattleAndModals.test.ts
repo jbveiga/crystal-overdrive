@@ -257,18 +257,18 @@ describe('Neo-Kanto Google Stitch Overhaul — Sprint 16 Slice 2 UI Modules', ()
     const root = doc.getElementById('battle-hud-root');
     expect(root).toBeDefined();
 
-    // Verify enemy and player status cards have Neo-Kanto #0D1322 chassis and block shadow
+    // Verify enemy and player status cards have classic glass cards
     const enemyCard = doc.getElementById('enemy-card');
     const playerCard = doc.getElementById('player-card');
     expect(enemyCard).toBeDefined();
     expect(playerCard).toBeDefined();
-    expect(enemyCard?.style.background).toBe('rgba(13, 19, 34, 0.95)');
-    expect(enemyCard?.style.border).toBe('2px solid #22324F');
-    expect(enemyCard?.style.boxShadow).toBe('0 4px 0 0 #070B14');
+    expect(enemyCard?.style.background).toBe('rgba(15, 23, 42, 0.92)');
+    expect(enemyCard?.style.border).toBe('2px solid rgba(226, 232, 240, 0.25)');
+    expect(enemyCard?.style.boxShadow).toBe('0 6px 18px rgba(0, 0, 0, 0.55)');
 
-    expect(playerCard?.style.background).toBe('rgba(13, 19, 34, 0.95)');
-    expect(playerCard?.style.border).toBe('2px solid #22324F');
-    expect(playerCard?.style.boxShadow).toBe('0 4px 0 0 #070B14');
+    expect(playerCard?.style.background).toBe('rgba(15, 23, 42, 0.92)');
+    expect(playerCard?.style.border).toBe('2px solid rgba(226, 232, 240, 0.25)');
+    expect(playerCard?.style.boxShadow).toBe('0 6px 18px rgba(0, 0, 0, 0.55)');
 
     // Verify Speed Toggle button has #2563eb 1x indicator and Space Mono telemetry
     const speedBtn = doc.getElementById('battle-speed-btn');
@@ -278,8 +278,8 @@ describe('Neo-Kanto Google Stitch Overhaul — Sprint 16 Slice 2 UI Modules', ()
 
     // Verify command panel and 4 tactical action buttons
     const bottomPanel = doc.getElementById('battle-bottom-panel');
-    expect(bottomPanel?.style.background).toBe('rgba(13, 19, 34, 0.96)');
-    expect(bottomPanel?.style.boxShadow).toBe('0 6px 0 0 #070B14');
+    expect(bottomPanel?.style.background).toBe('rgba(15, 23, 42, 0.95)');
+    expect(bottomPanel?.style.boxShadow).toBe('0 6px 24px rgba(0, 0, 0, 0.65)');
 
     const btnFight = doc.getElementById('btn-fight');
     const btnBag = doc.getElementById('btn-bag');
@@ -309,11 +309,12 @@ describe('Neo-Kanto Google Stitch Overhaul — Sprint 16 Slice 2 UI Modules', ()
     const container = doc.createElement('div');
     const battleLog = new BattleLogUI(container as any);
 
-    const toggleBtn = container.querySelector('.battle-log-toggle-btn');
+    const toggleBtn = container.querySelector('.battle-log-toggle-btn') as HTMLElement;
     expect(toggleBtn).toBeDefined();
     expect(toggleBtn?.style.background).toBe('#0D1322');
     expect(toggleBtn?.style.border).toBe('2px solid #38BDF8');
-    expect(toggleBtn?.style.boxShadow).toBe('0 3px 0 0 #070B14');
+    expect(toggleBtn?.style.boxShadow).toBe('0 4px 12px rgba(0, 0, 0, 0.5)');
+    expect(toggleBtn?.style.borderRadius).toBe('999px');
     expect(toggleBtn?.style.fontFamily).toContain('Space Mono');
 
     const panel = container.querySelector('.battle-log-panel');
@@ -353,7 +354,8 @@ describe('Neo-Kanto Google Stitch Overhaul — Sprint 16 Slice 2 UI Modules', ()
     expect(reportBtn).toBeDefined();
     expect(reportBtn?.style.background).toBe('rgba(13, 19, 34, 0.92)');
     expect(reportBtn?.style.border).toBe('2px solid #22324F');
-    expect(reportBtn?.style.boxShadow).toBe('0 3px 0 0 #070B14');
+    expect(reportBtn?.style.boxShadow).toBe('0 4px 12px rgba(0, 0, 0, 0.4)');
+    expect(reportBtn?.style.borderRadius).toBe('999px');
     expect(reportBtn?.style.fontFamily).toContain('Space Mono');
 
     // Click to mount diagnostic card
@@ -422,9 +424,10 @@ describe('Neo-Kanto Google Stitch Overhaul — Sprint 16 Slice 2 UI Modules', ()
     // Audio Unlock Gate
     const gate = doc.getElementById('title-unlock-gate');
     expect(gate).toBeDefined();
-    expect(gate?.style.background).toBe('#0D1322');
-    expect(gate?.style.border).toBe('2px solid #38BDF8');
-    expect(gate?.style.boxShadow).toBe('0 4px 0 0 #070B14');
+    expect(gate?.style.background).toBe('rgba(15, 23, 42, 0.78)');
+    expect(gate?.style.border).toBe('2px solid rgba(56, 189, 248, 0.65)');
+    expect(gate?.style.boxShadow).toBe('0 0 24px rgba(56, 189, 248, 0.35)');
+    expect(gate?.style.borderRadius).toBe('999px');
     expect(gate?.style.fontFamily).toContain('Space Mono');
 
     // Unlock Gate to reveal main menu
@@ -434,17 +437,13 @@ describe('Neo-Kanto Google Stitch Overhaul — Sprint 16 Slice 2 UI Modules', ()
     const optionsOpt = doc.getElementById('title-opt-options');
     expect(newGameOpt).toBeDefined();
     expect(optionsOpt).toBeDefined();
-    expect(newGameOpt?.style.boxShadow).toBe('0 4px 0 0 #070B14');
-    expect(optionsOpt?.style.boxShadow).toBe('0 4px 0 0 #070B14');
 
     // Open Options Modal
     titleScreen.openOptionsModal();
     const optionsModal = doc.getElementById('title-options-modal');
     expect(optionsModal).toBeDefined();
-    const innerCard = optionsModal?.children[0];
-    expect(innerCard?.style.background).toBe('#0D1322');
-    expect(innerCard?.style.border).toBe('2px solid #38BDF8');
-    expect(innerCard?.style.boxShadow).toBe('0 8px 0 0 #070B14');
+    const innerCard = optionsModal?.children[0] as HTMLElement;
+    expect(innerCard?.style.borderRadius).toBe('14px');
     expect(innerCard?.style.fontFamily).toContain('Plus Jakarta Sans');
 
     // Verify Battle Speed options in TitleScreenUI

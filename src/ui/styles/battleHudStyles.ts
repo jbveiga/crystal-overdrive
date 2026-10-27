@@ -168,13 +168,14 @@ export function createBattleHUDTemplateHtml(): string {
     <!-- Top Area: Asymmetric Enemy HUD Card (Top-Left) & Speed Toggle Pill (Top-Right) -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
       <div id="enemy-card" style="
-        background: rgba(13, 19, 34, 0.95);
+        background: rgba(15, 23, 42, 0.92);
         backdrop-filter: blur(8px);
-        border: 2px solid #22324F;
-        border-radius: 10px;
+        border: 2px solid rgba(226, 232, 240, 0.25);
+        border-bottom: 4px solid #334155;
+        border-radius: 10px 10px 18px 10px;
         padding: 12px 20px;
         min-width: min(280px, calc(100vw - 120px));
-        box-shadow: 0 4px 0 0 #070B14;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
       ">
         <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
           <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
@@ -183,7 +184,7 @@ export function createBattleHUDTemplateHtml(): string {
             <span id="enemy-gender"></span>
             <span id="enemy-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap;"></span>
           </div>
-          <span id="enemy-level" style="background: rgba(250, 204, 21, 0.16); border: 1.5px solid #FFD028; color: #FFD028; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">Lv. 3</span>
+          <span id="enemy-level" style="background: rgba(250, 204, 21, 0.16); border: 1.5px solid #FFD028; color: #FFD028; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; box-shadow: 0 2px 0 0 #070B14;">Lv. 3</span>
         </div>
         <div style="margin-top: 8px;">
           <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 700;">
@@ -234,7 +235,7 @@ export function createBattleHUDTemplateHtml(): string {
           background: #141E33;
           color: #38BDF8;
           border: 2px solid #38BDF8;
-          border-radius: 8px;
+          border-radius: 999px;
           padding: 7px 14px;
           font-size: 12px;
           font-weight: 700;
@@ -251,13 +252,14 @@ export function createBattleHUDTemplateHtml(): string {
     <!-- Mid-Right Area: Asymmetric Player HUD Card with Numeric HP, Cyan EXP Bar & 6-Dot Party Dock -->
     <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;">
       <div id="player-card" style="
-        background: rgba(13, 19, 34, 0.95);
+        background: rgba(15, 23, 42, 0.92);
         backdrop-filter: blur(8px);
-        border: 2px solid #22324F;
-        border-radius: 10px;
+        border: 2px solid rgba(226, 232, 240, 0.25);
+        border-bottom: 4px solid #334155;
+        border-radius: 18px 10px 10px 10px;
         padding: 12px 20px 10px 20px;
         min-width: min(290px, calc(100vw - 60px));
-        box-shadow: 0 4px 0 0 #070B14;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
       ">
         <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 16px; gap: 10px;">
           <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
@@ -265,7 +267,7 @@ export function createBattleHUDTemplateHtml(): string {
             <span id="player-gender"></span>
             <span id="player-status-badges" style="display: flex; gap: 4px; flex-wrap: wrap;"></span>
           </div>
-          <span id="player-level" style="background: rgba(250, 204, 21, 0.16); border: 1.5px solid #FFD028; color: #FFD028; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; box-shadow: 0 2px 0 0 #070B14;">Lv. 5</span>
+          <span id="player-level" style="background: rgba(250, 204, 21, 0.16); border: 1.5px solid #FFD028; color: #FFD028; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; box-shadow: 0 2px 0 0 #070B14;">Lv. 5</span>
         </div>
         <div style="margin-top: 8px;">
           <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: #94a3b8; font-weight: 700;">
@@ -311,12 +313,12 @@ export function createBattleHUDTemplateHtml(): string {
 
     <!-- Bottom Control & Classic Double-Framed Dialogue Panel -->
     <div id="battle-bottom-panel" style="
-      background: rgba(13, 19, 34, 0.96);
+      background: rgba(15, 23, 42, 0.95);
       backdrop-filter: blur(12px);
-      border: 2px solid #22324F;
+      border: 2px solid rgba(255, 255, 255, 0.24);
       border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 6px 0 0 #070B14;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65);
       pointer-events: auto;
       min-height: 132px;
       display: flex;
@@ -326,17 +328,12 @@ export function createBattleHUDTemplateHtml(): string {
       <!-- Dialogue Text -->
       <div id="battle-message-box" style="
         flex: 1;
-        background: #141E33;
-        border: 1.5px solid #22324F;
-        border-radius: 8px;
-        padding: 12px 16px;
-        font-size: 16px;
+        font-size: 18px;
         font-weight: 600;
         color: #f8fafc;
         line-height: 1.5;
         display: flex;
         align-items: center;
-        font-family: 'Plus Jakarta Sans', sans-serif;
       ">
         What will Cyndaquil do?
       </div>

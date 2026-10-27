@@ -38,9 +38,9 @@ export class ItemfinderHUD {
       background: #0D1322;
       backdrop-filter: blur(10px);
       border: 2px solid #38bdf8;
-      border-radius: 10px;
+      border-radius: 9999px;
       padding: 4px 14px 4px 8px;
-      box-shadow: 0 4px 0 0 #070B14, 0 8px 20px rgba(0, 0, 0, 0.75);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(56, 189, 248, 0.15);
       align-items: center;
       gap: 10px;
       z-index: 40;
@@ -54,7 +54,7 @@ export class ItemfinderHUD {
       <div id="itemfinder-compass-dial" style="
         width: 32px;
         height: 32px;
-        border-radius: 8px;
+        border-radius: 50%;
         background: #080E1D;
         border: 1.5px solid #38bdf8;
         display: flex;

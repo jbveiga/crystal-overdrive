@@ -80,11 +80,11 @@ describe('StartMenuUI — Settings, Drawer & Submodals', () => {
 
     ui.open();
 
-    // 1. Start Menu Panel drawer styling
+    // 1. Start Menu Panel drawer styling (Gen 2 double-framed panel)
     const startPanel = doc.getElementById('start-menu-panel');
     expect(startPanel).not.toBeNull();
-    expect(startPanel?.style.background).toBe('#0D1322');
-    expect(startPanel?.style.boxShadow).toContain('0 6px 0 0 #070B14');
+    expect(startPanel?.style.background).toContain('linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 29, 0.99) 100%)');
+    expect(startPanel?.style.boxShadow).toContain('0 12px 32px rgba(0, 0, 0, 0.8)');
 
     // Tactile buttons
     const pokedexBtn = doc.getElementById('start-opt-pokedex');
@@ -96,8 +96,8 @@ describe('StartMenuUI — Settings, Drawer & Submodals', () => {
     const saveModal = doc.getElementById('save-confirm-modal');
     expect(saveModal).not.toBeNull();
     expect(saveModal?.style.display).toBe('flex');
-    expect(saveModal?.style.background).toBe('#0D1322');
-    expect(saveModal?.style.boxShadow).toContain('0 6px 0 0 #070B14');
+    expect(saveModal?.style.background).toBe('rgba(15, 23, 42, 0.98)');
+    expect(saveModal?.style.boxShadow).toContain('0 12px 36px rgba(0, 0, 0, 0.85)');
 
     // Check telemetry fields
     expect(saveModal?.innerHTML).toContain('GOLD');
@@ -121,8 +121,8 @@ describe('StartMenuUI — Settings, Drawer & Submodals', () => {
     const settingsModal = doc.getElementById('settings-modal');
     expect(settingsModal).not.toBeNull();
     expect(settingsModal?.style.display).toBe('flex');
-    expect(settingsModal?.style.background).toBe('#0D1322');
-    expect(settingsModal?.style.boxShadow).toContain('0 6px 0 0 #070B14');
+    expect(settingsModal?.style.background).toBe('rgba(15, 23, 42, 0.98)');
+    expect(settingsModal?.style.boxShadow).toContain('0 12px 36px rgba(0, 0, 0, 0.88)');
 
     const tabAll = doc.getElementById('settings-tab-all');
     const tabAudio = doc.getElementById('settings-tab-audio');
@@ -228,13 +228,13 @@ describe('StartMenuUI — Settings, Drawer & Submodals', () => {
     const capsule = doc.getElementById('itemfinder-hud-capsule');
     expect(capsule).not.toBeNull();
     expect(capsule?.style.background).toBe('#0D1322');
-    expect(capsule?.style.borderRadius).toBe('10px');
-    expect(capsule?.style.boxShadow).toContain('0 4px 0 0 #070B14');
+    expect(capsule?.style.borderRadius).toBe('9999px');
+    expect(capsule?.style.boxShadow).toContain('0 4px 16px rgba(0, 0, 0, 0.6)');
 
     const dial = doc.getElementById('itemfinder-compass-dial');
     expect(dial).not.toBeNull();
     expect(dial?.style.background).toBe('#080E1D');
-    expect(dial?.style.borderRadius).toBe('8px');
+    expect(dial?.style.borderRadius).toBe('50%');
 
     // Test Idle / No Response Ping
     hud.update({

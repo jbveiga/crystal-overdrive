@@ -501,7 +501,7 @@ export class StartMenuUI {
     this.menuPanel.id = 'start-menu-panel';
     this.menuPanel.className = 'neo-kanto-scrollbar';
     this.menuPanel.style.cssText =
-      'position: absolute; top: 64px; right: 18px; width: 236px; background: #0D1322; border: 2px solid #22324F; box-shadow: 0 6px 0 0 #070B14, 0 16px 36px rgba(0, 0, 0, 0.85); border-radius: 12px; padding: 12px; display: none; flex-direction: column; gap: 6px; z-index: 60; pointer-events: auto; color: #f8fafc; box-sizing: border-box; font-family: "Plus Jakarta Sans", system-ui, sans-serif;';
+      'position: absolute; top: 64px; right: 18px; width: 236px; background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 29, 0.99) 100%); border: 3px solid #f8fafc; outline: 3px solid #1e293b; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), inset 0 0 0 2px #38bdf8; border-radius: 10px; padding: 12px; display: none; flex-direction: column; gap: 6px; z-index: 60; pointer-events: auto; color: #f8fafc; box-sizing: border-box;';
     this.container.appendChild(this.menuPanel);
 
     // 2. Sub-Modal: Pokedex
@@ -533,7 +533,7 @@ export class StartMenuUI {
     this.saveConfirmModal.id = 'save-confirm-modal';
     this.saveConfirmModal.className = 'neo-kanto-scrollbar';
     this.saveConfirmModal.style.cssText =
-      'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(440px, 94vw); background: #0D1322; border: 2px solid #22324F; box-shadow: 0 6px 0 0 #070B14, 0 16px 48px rgba(0, 0, 0, 0.9); border-radius: 12px; padding: 20px; display: none; flex-direction: column; gap: 14px; z-index: 65; pointer-events: auto; color: #f8fafc; box-sizing: border-box; font-family: "Plus Jakarta Sans", system-ui, sans-serif;';
+      'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(440px, 94vw); background: rgba(15, 23, 42, 0.98); border: 3px solid #f8fafc; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85), inset 0 0 0 2px #38bdf8; border-radius: 12px; padding: 20px; display: none; flex-direction: column; gap: 14px; z-index: 65; pointer-events: auto; color: #f8fafc; box-sizing: border-box;';
     this.container.appendChild(this.saveConfirmModal);
 
     // 5. Sub-Modal: Settings
@@ -541,7 +541,7 @@ export class StartMenuUI {
     this.settingsModal.id = 'settings-modal';
     this.settingsModal.className = 'neo-kanto-scrollbar';
     this.settingsModal.style.cssText =
-      'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(560px, 95vw); max-height: 88vh; max-height: 88dvh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; background: #0D1322; border: 2px solid #22324F; box-shadow: 0 6px 0 0 #070B14, 0 16px 48px rgba(0, 0, 0, 0.9); border-radius: 14px; padding: 18px 20px; display: none; flex-direction: column; gap: 12px; z-index: 65; pointer-events: auto; color: #dde2f7; box-sizing: border-box; font-family: "Plus Jakarta Sans", system-ui, sans-serif;';
+      'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(560px, 95vw); max-height: 88vh; max-height: 88dvh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(16px); border: 3px solid #38bdf8; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.88), inset 0 0 0 2px rgba(56, 189, 248, 0.3); border-radius: 14px; padding: 18px 20px; display: none; flex-direction: column; gap: 12px; z-index: 65; pointer-events: auto; color: #dde2f7; box-sizing: border-box;';
     this.container.appendChild(this.settingsModal);
 
     // Instantiate Delegated Sub-Modal Renderers

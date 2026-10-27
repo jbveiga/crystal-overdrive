@@ -189,4 +189,61 @@ describe('SaveManager Data Contracts & Ticket 4.1 Extensions', () => {
     expect(preview?.partyLeadSpeciesId).toBe('totodile');
     expect(preview?.partyLeadLevel).toBe(5);
   });
+
+  it('safely handles storage with 14 boxes of 20 null slots without throwing in reconcileStarterFlags or hydration', async () => {
+    const saveManager = new SaveManager();
+    const lead = PokemonFactory.create('chikorita', 5);
+
+    const storageWithNullSlots = {
+      currentBoxIndex: 0,
+      boxes: Array.from({ length: 14 }, (_, i) => ({
+        id: i,
+        name: `BOX ${i + 1}`,
+        pokemon: new Array(20).fill(null),
+      })),
+    };
+
+    const mockSaveWithNullSlots: SaveData = {
+      version: 1,
+      timestamp: Date.now(),
+      player: {
+        name: 'GOLD',
+        gender: 'BOY',
+        mapId: 'new_bark_town',
+        x: 6,
+        y: 6,
+        direction: 'DOWN',
+        speedMultiplier: 2,
+        badges: [],
+        money: 3000,
+      },
+      party: [lead, null as unknown as any],
+      box: [null as unknown as any],
+      storage: storageWithNullSlots as any,
+      inventory: {
+        balls: { 'poke-ball': 5 },
+        tms: [],
+      },
+      roamers: [],
+      defeatedTrainers: [],
+      storyFlags: {},
+      options: SaveManager.getDefaultOptions(),
+    };
+
+    // Save with null slots
+    await expect(saveManager.saveGame(mockSaveWithNullSlots)).resolves.not.toThrow();
+
+    // Preview with null slots
+    const preview = await saveManager.getSavePreview();
+    expect(preview).not.toBeNull();
+    expect(preview?.partyLeadSpeciesId).toBe('chikorita');
+
+    // Load with null slots
+    const loaded = await saveManager.loadGame();
+    expect(loaded).not.toBeNull();
+    expect(loaded?.party).toHaveLength(1);
+    expect(loaded?.party[0].speciesId).toBe('chikorita');
+    expect(loaded?.storyFlags).toContain('starter_chosen');
+    expect(loaded?.storyFlags).toContain('starter_chikorita');
+  });
 });

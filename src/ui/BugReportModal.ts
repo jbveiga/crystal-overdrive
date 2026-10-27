@@ -29,12 +29,12 @@ export function mountGitHubReportButton(ctx: BugReportContext): void {
     background: rgba(13, 19, 34, 0.92);
     color: #F8FAFC;
     border: 2px solid #22324F;
-    border-radius: 8px;
-    padding: 6px 12px;
+    border-radius: 999px;
+    padding: 6px 14px;
     font-size: 11px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 3px 0 0 #070B14;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     z-index: 50;
     pointer-events: auto;
     display: flex;

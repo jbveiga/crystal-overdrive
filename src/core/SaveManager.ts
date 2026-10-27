@@ -244,20 +244,26 @@ export class SaveManager {
     // 1. Gather all candidate Pokémon from party, box, and storage boxes
     const candidatePkmn: Array<{ speciesId?: string; isEgg?: boolean }> = [];
     if (Array.isArray(save.party)) {
-      candidatePkmn.push(...save.party);
+      for (const p of save.party) {
+        if (p && typeof p === 'object') candidatePkmn.push(p);
+      }
     }
     if (Array.isArray(save.box)) {
-      candidatePkmn.push(...save.box);
+      for (const p of save.box) {
+        if (p && typeof p === 'object') candidatePkmn.push(p);
+      }
     }
     if (save.storage && Array.isArray(save.storage.boxes)) {
       for (const b of save.storage.boxes) {
-        if (Array.isArray(b.pokemon)) {
-          candidatePkmn.push(...b.pokemon);
+        if (b && Array.isArray(b.pokemon)) {
+          for (const p of b.pokemon) {
+            if (p && typeof p === 'object') candidatePkmn.push(p);
+          }
         }
       }
     }
 
-    const nonEggPkmn = candidatePkmn.filter((p) => !p.isEgg && p.speciesId);
+    const nonEggPkmn = candidatePkmn.filter((p) => Boolean(p && !p.isEgg && p.speciesId));
     if (nonEggPkmn.length === 0 && (!Array.isArray(save.party) || save.party.length === 0)) {
       return;
     }
@@ -283,7 +289,7 @@ export class SaveManager {
       }
     }
 
-    const hasPartyPokemon = Array.isArray(save.party) && save.party.some((p) => !p.isEgg);
+    const hasPartyPokemon = Array.isArray(save.party) && save.party.some((p) => Boolean(p && !p.isEgg));
     if (baseStarter || hasPartyPokemon) {
       if (!save.storyFlags.includes('starter_chosen')) {
         save.storyFlags.push('starter_chosen');
@@ -329,7 +335,17 @@ export class SaveManager {
       if (this.dbPromise) {
         const db = await this.dbPromise;
         const save = await db.get(STORE_NAME, SAVE_KEY);
-        if (save) loaded = save;
+        if (save) {
+          loaded = save;
+        } else {
+          try {
+            const allSaves = await db.getAll(STORE_NAME);
+            const found = allSaves.find((s) => s && typeof s === 'object' && s.player);
+            if (found) loaded = found;
+          } catch {
+            // ignore getAll errors
+          }
+        }
       }
       if (!loaded && typeof localStorage !== 'undefined') {
         for (const k of LEGACY_STORAGE_KEYS) {
@@ -351,33 +367,69 @@ export class SaveManager {
             }
           }
         }
+        if (!loaded) {
+          try {
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (!key) continue;
+              const raw = localStorage.getItem(key);
+              if (raw && (raw.startsWith('{') || raw.startsWith('"{\\'))) {
+                try {
+                  const parsed = JSON.parse(raw);
+                  if (parsed && typeof parsed === 'object' && parsed.player && Array.isArray(parsed.party)) {
+                    loaded = parsed;
+                    if (this.dbPromise) {
+                      const db = await this.dbPromise;
+                      await db.put(STORE_NAME, loaded, SAVE_KEY);
+                    }
+                    break;
+                  }
+                } catch {
+                  // ignore
+                }
+              }
+            }
+          } catch {
+            // ignore localStorage scan errors
+          }
+        }
       }
       if (!loaded) {
         const memSave = this.memoryStore.get(SAVE_KEY);
         loaded = memSave ? JSON.parse(JSON.stringify(memSave)) : null;
       }
       if (loaded) {
-        SaveManager.reconcileStarterFlags(loaded);
-        if (!loaded.options) {
-          loaded.options = SaveManager.getDefaultOptions();
-        } else if (!loaded.options.expShare) {
-          loaded.options.expShare = 'CAPPED';
-        }
-        if (loaded.player && !loaded.player.rivalName && loaded.rivalName) {
-          loaded.player.rivalName = loaded.rivalName;
-        } else if (loaded.player && loaded.player.rivalName && !loaded.rivalName) {
-          loaded.rivalName = loaded.player.rivalName;
-        }
-        // Gen 2 has no TM70: Flash is exclusively HM05. Prune legacy duplicate.
-        if (loaded.inventory && Array.isArray(loaded.inventory.tms) && loaded.inventory.tms.includes('TM70')) {
-          const hadHm05 = loaded.inventory.tms.includes('HM05');
-          loaded.inventory.tms = loaded.inventory.tms.filter((id) => id !== 'TM70');
-          if (!hadHm05 && loaded.storyFlags?.includes('sprout_tower_cleared')) {
-            loaded.inventory.tms.push('HM05');
+        try {
+          if (Array.isArray(loaded.party)) {
+            loaded.party = loaded.party.filter((p) => p && typeof p === 'object' && p.speciesId);
           }
-        }
-        if (!loaded.storage) {
-          loaded.storage = StorageManager.createDefaultStorage(loaded.box);
+          if (Array.isArray(loaded.box)) {
+            loaded.box = loaded.box.filter((p) => p && typeof p === 'object' && p.speciesId);
+          }
+          SaveManager.reconcileStarterFlags(loaded);
+          if (!loaded.options) {
+            loaded.options = SaveManager.getDefaultOptions();
+          } else if (!loaded.options.expShare) {
+            loaded.options.expShare = 'CAPPED';
+          }
+          if (loaded.player && !loaded.player.rivalName && loaded.rivalName) {
+            loaded.player.rivalName = loaded.rivalName;
+          } else if (loaded.player && loaded.player.rivalName && !loaded.rivalName) {
+            loaded.rivalName = loaded.player.rivalName;
+          }
+          // Gen 2 has no TM70: Flash is exclusively HM05. Prune legacy duplicate.
+          if (loaded.inventory && Array.isArray(loaded.inventory.tms) && loaded.inventory.tms.includes('TM70')) {
+            const hadHm05 = loaded.inventory.tms.includes('HM05');
+            loaded.inventory.tms = loaded.inventory.tms.filter((id) => id !== 'TM70');
+            if (!hadHm05 && loaded.storyFlags?.includes('sprout_tower_cleared')) {
+              loaded.inventory.tms.push('HM05');
+            }
+          }
+          if (!loaded.storage) {
+            loaded.storage = StorageManager.createDefaultStorage(loaded.box);
+          }
+        } catch (normErr) {
+          console.warn('Error normalizing loaded save:', normErr);
         }
       }
       return loaded;
@@ -501,21 +553,23 @@ export class SaveManager {
     state.playerName.val = existingSave.player.name || 'GOLD';
     state.playerGender.val = existingSave.player.gender || 'BOY';
     state.rivalName.val = existingSave.player.rivalName || existingSave.rivalName || 'SILVER';
-    state.playerParty.splice(0, state.playerParty.length, ...(existingSave.party || []));
-    state.playerBox.splice(0, state.playerBox.length, ...(existingSave.box || []));
+    const validParty = (existingSave.party || []).filter((p) => p && typeof p === 'object');
+    const validBox = (existingSave.box || []).filter((p) => p && typeof p === 'object');
+    state.playerParty.splice(0, state.playerParty.length, ...validParty);
+    state.playerBox.splice(0, state.playerBox.length, ...validBox);
     Object.assign(state.gameOptions, existingSave.options || {});
-    state.inventory.balls = existingSave.inventory.balls || {};
-    state.inventory.items = existingSave.inventory.items || {};
-    state.inventory.berries = existingSave.inventory.berries || {};
-    if (existingSave.inventory.keyItems) state.inventory.keyItems = existingSave.inventory.keyItems;
-    state.inventory.tms = existingSave.inventory.tms || [];
+    state.inventory.balls = existingSave.inventory?.balls || {};
+    state.inventory.items = existingSave.inventory?.items || {};
+    state.inventory.berries = existingSave.inventory?.berries || {};
+    if (existingSave.inventory?.keyItems) state.inventory.keyItems = existingSave.inventory.keyItems;
+    state.inventory.tms = existingSave.inventory?.tms || [];
     state.inventory.money = existingSave.player.money ?? 3000;
     state.inventory.badges = existingSave.player.badges || [];
     existingSave.defeatedTrainers?.forEach((t) => state.defeatedTrainers.add(t));
     existingSave.storyFlags?.forEach((f) => state.storyFlags.add(f));
     existingSave.seenSpecies?.forEach((s) => state.seenSpecies.add(s));
-    state.playerParty.forEach((p) => state.seenSpecies.add(p.speciesId));
-    state.playerBox.forEach((p) => state.seenSpecies.add(p.speciesId));
+    state.playerParty.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
+    state.playerBox.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
 
     state.overworldItemManager.setCollectedFlags([
       ...(existingSave.collectedItems || []),

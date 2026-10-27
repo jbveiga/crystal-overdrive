@@ -163,9 +163,8 @@ export class OverworldHUD {
   }
 
   private getDialogueContinuePromptHtml(pageLabel: string = ''): string {
-    const isMobile = this.isTouchOrMobile();
-    const actionHint = isMobile ? 'Tap / [A] to continue' : 'Space / Enter / [A] to continue';
-    return `<span>${pageLabel}${actionHint}</span><span style="display:inline-block; animation: bounce 0.6s infinite alternate;">▼</span>`;
+    const label = this.isTouchOrMobile() ? 'TAP / [A]' : 'SPACE / CLICK';
+    return `<span>${pageLabel}${label}</span> <span style="font-size: 14px;">▼</span>`;
   }
 
   private updateInputModeLabels(): void {
@@ -210,26 +209,24 @@ export class OverworldHUD {
       justify-content: space-between;
       padding: env(safe-area-inset-top, 12px) env(safe-area-inset-right, 12px) env(safe-area-inset-bottom, 12px) env(safe-area-inset-left, 12px);
       box-sizing: border-box;
-      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       z-index: 20;
     `;
 
     this.rootElement.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 12px; pointer-events: none;">
         <div id="route-banner" style="
-          background: rgba(15, 23, 42, 0.88);
+          background: rgba(18, 22, 28, 0.85);
           backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.16);
+          border: 1px solid rgba(255, 255, 255, 0.15);
           border-radius: 8px;
-          padding: 6px 14px;
-          color: #f8fafc;
-          font-size: 13px;
-          font-weight: 800;
+          padding: 8px 16px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #ffffff;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
           letter-spacing: 0.5px;
-          text-transform: uppercase;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
           pointer-events: auto;
-        ">NEW BARK TOWN</div>
+        ">New Bark Town</div>
 
         <div id="top-menu-capsule" style="
           display: flex;

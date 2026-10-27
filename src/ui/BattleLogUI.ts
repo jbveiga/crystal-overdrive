@@ -53,7 +53,7 @@ export class BattleLogUI {
     this.toggleButton.type = 'button';
     this.toggleButton.className = 'battle-log-toggle-btn';
     this.toggleButton.style.cssText =
-      'padding: 6px 12px; background: #0D1322; color: #F8FAFC; border: 2px solid #38BDF8; border-radius: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 3px 0 0 #070B14; font-family: \'Space Mono\', monospace; pointer-events: auto;';
+      'padding: 6px 14px; background: #0D1322; color: #F8FAFC; border: 2px solid #38BDF8; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); font-family: \'Space Mono\', monospace; pointer-events: auto;';
 
     const iconSpan = document.createElement('span');
     iconSpan.textContent = '📜';
@@ -63,7 +63,7 @@ export class BattleLogUI {
     this.countBadge = document.createElement('span');
     this.countBadge.className = 'battle-log-count';
     this.countBadge.style.cssText =
-      'font-size: 10px; background: rgba(56, 189, 248, 0.18); border: 1px solid #38BDF8; padding: 1px 6px; border-radius: 4px; color: #38BDF8; font-family: \'Space Mono\', monospace; font-weight: 700;';
+      'font-size: 10px; background: rgba(56, 189, 248, 0.18); border: 1px solid #38BDF8; padding: 1px 6px; border-radius: 999px; color: #38BDF8; font-family: \'Space Mono\', monospace; font-weight: 700;';
     this.countBadge.textContent = '0';
 
     this.toggleButton.appendChild(iconSpan);

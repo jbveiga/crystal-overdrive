@@ -216,8 +216,8 @@ export class NamingModalUI {
           (preset) => `
           <button class="rival-preset-btn interactive" data-name="${preset}" style="
             pointer-events: auto !important;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
