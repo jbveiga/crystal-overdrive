@@ -109,6 +109,11 @@ export class OverworldRenderer {
     );
   }
 
+  public async warmNpcSpriteTypes(spriteTypes: NpcSpriteType[]): Promise<void> {
+    if (!this.app || !spriteTypes?.length) return;
+    for (let i = 0; i < spriteTypes.length; i++) await this.ensureNpcSpriteLoaded(spriteTypes[i]);
+  }
+
   public setNpcLookup(lookupMapNpcs: (mapId: string) => GridEntity[]): void {
     this.lookupMapNpcs = lookupMapNpcs;
   }
@@ -420,14 +425,17 @@ export class OverworldRenderer {
     await manifest.run(queueOptions);
   }
 
-  public evictDistantTileTextures(
-    currentMap: MapData,
-    lookupMap?: (mapId: string) => MapData | undefined
-  ): number {
+  public evictDistantTileTextures(currentMap: MapData, lookupMap?: (mapId: string) => MapData | undefined): number {
     this.evictDistantNpcSprites();
     const activeTileNames = new Set<string>(BASELINE_TILES);
 
-    const mapsToScan = [currentMap, ...this.getConnectedMaps(currentMap, lookupMap)];
+    const mapsToScan: MapData[] = [currentMap, ...this.getConnectedMaps(currentMap, lookupMap)];
+    if (lookupMap && currentMap.warps) {
+      for (let i = 0; i < currentMap.warps.length; i++) {
+        const wm = lookupMap(currentMap.warps[i].targetMapId);
+        if (wm) mapsToScan.push(wm);
+      }
+    }
     for (let mIdx = 0; mIdx < mapsToScan.length; mIdx++) {
       const m = mapsToScan[mIdx];
       if (m.tileMap) {
@@ -727,12 +735,8 @@ export class OverworldRenderer {
     pickedTreeIds: Set<string>
   ): void {
     OverworldNpcAndItemSprites.renderOverworldItems({
-      itemBalls,
-      fruitTrees,
-      pickedTreeIds,
-      itemBallContainer: this.itemBallContainer,
-      itemBallGraphics: this.itemBallGraphics,
-      tileSize: this.tileSize,
+      itemBalls, fruitTrees, pickedTreeIds, tileSize: this.tileSize,
+      itemBallContainer: this.itemBallContainer, itemBallGraphics: this.itemBallGraphics,
       fruitTreeTexture: this.fruitTreeTexture || undefined,
     });
   }

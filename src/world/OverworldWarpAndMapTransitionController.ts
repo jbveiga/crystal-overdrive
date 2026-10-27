@@ -202,6 +202,7 @@ export class OverworldWarpAndMapTransitionController {
       }
 
       nextMapId = conn.mapId;
+      ctx.adjacentMapPrefetcher?.recordTransitionLookup(conn.mapId);
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = nextMap.width - 1;
       targetY -= conn.offset;
@@ -214,6 +215,7 @@ export class OverworldWarpAndMapTransitionController {
     else if (entity.x >= current.width && current.connections.EAST) {
       const conn = current.connections.EAST;
       nextMapId = conn.mapId;
+      ctx.adjacentMapPrefetcher?.recordTransitionLookup(conn.mapId);
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX = 0;
       targetY -= conn.offset;
@@ -226,6 +228,7 @@ export class OverworldWarpAndMapTransitionController {
     else if (entity.y < 0 && current.connections.NORTH) {
       const conn = current.connections.NORTH;
       nextMapId = conn.mapId;
+      ctx.adjacentMapPrefetcher?.recordTransitionLookup(conn.mapId);
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX -= conn.offset;
       targetY = nextMap.height - 1;
@@ -238,6 +241,7 @@ export class OverworldWarpAndMapTransitionController {
     else if (entity.y >= current.height && current.connections.SOUTH) {
       const conn = current.connections.SOUTH;
       nextMapId = conn.mapId;
+      ctx.adjacentMapPrefetcher?.recordTransitionLookup(conn.mapId);
       const nextMap = mapManager.setCurrentMap(conn.mapId);
       targetX -= conn.offset;
       targetY = 0;
@@ -282,6 +286,7 @@ export class OverworldWarpAndMapTransitionController {
           overworldRenderer.evictDistantTileTextures(loadedMap, lookupMap);
         }
       });
+      void ctx.adjacentMapPrefetcher?.prefetchAroundMap(nextMapId);
 
       // Reset 4-step grace period on route transition
       mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
@@ -317,6 +322,8 @@ export class OverworldWarpAndMapTransitionController {
 
     const currentM = mapManager.getCurrentMap();
     if (!currentM) return;
+
+    ctx.adjacentMapPrefetcher?.recordTransitionLookup(warp.targetMapId);
 
     let targetMapExists = mapManager.getMap(warp.targetMapId);
     if (!targetMapExists) {
@@ -546,6 +553,7 @@ export class OverworldWarpAndMapTransitionController {
         this.syncMapOverworldItems(ctx, targetMap);
         overworldHUD.updateRouteName(targetMap.name);
         audioManager.playMapBgm(targetMap.id, 0.8);
+        void ctx.adjacentMapPrefetcher?.prefetchAroundMap(targetMap.id);
       }, transitionConfig.fadeDurationMs)
       .then(() => {
         setCutsceneLocked(false);

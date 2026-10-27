@@ -51,6 +51,7 @@ import {
   resolveElmLabDialogue, applyStoryRecoveryFlags, filterInitialMapNpcs, resetStoryNpcSpawns,
 } from './world/npcData';
 import { TrackedStoryFlagSet, ActiveNpcCache } from './world/ActiveNpcCache';
+import { AdjacentMapPrefetcher } from './world/AdjacentMapPrefetcher';
 export { npcsByMap, createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS, isNpcActiveForStoryFlags, applyMapNpcStoryMutations } from './world/npcData';
 import { syncGitHubIssues } from './sync/githubSync';
 import { StoryCutscenes, type StoryCutsceneContext } from './world/StoryCutscenes';
@@ -95,34 +96,16 @@ async function bootstrap() {
 
   const initialSavePreview = await saveManager.getSavePreview();
 
-  const mapManager = new MapManager();
-  const roamingManager = new RoamingManager();
-  const missionManager = new MissionManager();
-  const overworldItemManager = new OverworldItemManager();
-  const boxManager = new BoxManager(existingSave?.storage, existingSave?.box);
+  const mapManager = new MapManager(), roamingManager = new RoamingManager(), missionManager = new MissionManager();
+  const overworldItemManager = new OverworldItemManager(), boxManager = new BoxManager(existingSave?.storage, existingSave?.box);
   let lastVisitedPokecenter = { mapId: 'new_bark_town', x: 13, y: 6 };
 
   if (existingSave) {
-    const playTimeBox = { val: playTimeSeconds };
-    const playerNameBox = { val: playerName };
-    const playerGenderBox = { val: playerGender };
-    const rivalNameBox = { val: rivalName };
+    const playTimeBox = { val: playTimeSeconds }, playerNameBox = { val: playerName }, playerGenderBox = { val: playerGender }, rivalNameBox = { val: rivalName };
     const loc = SaveManager.hydrateGameState(existingSave, {
-      playTimeSeconds: playTimeBox,
-      playerName: playerNameBox,
-      playerGender: playerGenderBox,
-      rivalName: rivalNameBox,
-      playerParty,
-      playerBox,
-      gameOptions,
-      inventory,
-      defeatedTrainers,
-      storyFlags,
-      seenSpecies,
-      overworldItemManager,
-      missionManager,
-      gameClock,
-      roamingManager,
+      playTimeSeconds: playTimeBox, playerName: playerNameBox, playerGender: playerGenderBox, rivalName: rivalNameBox,
+      playerParty, playerBox, gameOptions, inventory, defeatedTrainers, storyFlags, seenSpecies, overworldItemManager,
+      missionManager, gameClock, roamingManager,
     });
     playTimeSeconds = playTimeBox.val;
     playerName = playerNameBox.val;
@@ -142,6 +125,7 @@ async function bootstrap() {
   let overworldRenderer!: OverworldRenderer, overworldHUD!: OverworldHUD, battleRenderer!: BattleRenderer;
   let battleHUD!: BattleHUD, itemfinderHUD!: ItemfinderHUD, bugContestHUD!: BugContestHUDWidget;
   let modalRegistry!: OverworldModalRegistry, cycleBattleSpeed!: () => SpeedMultiplier;
+  let adjacentMapPrefetcher: AdjacentMapPrefetcher | null = null;
   let setBattleSpeed!: (speed: SpeedMultiplier) => SpeedMultiplier, cyclePlayerSpeed!: () => SpeedMultiplier;
   let setTextSpeed!: (speed: GameOptions['textSpeed']) => GameOptions['textSpeed'], cycleTextSpeed!: () => GameOptions['textSpeed'];
 
@@ -239,6 +223,7 @@ async function bootstrap() {
     detectChosenStarterSpecies, getLastVisitedPokecenter: () => lastVisitedPokecenter,
     setLastVisitedPokecenter: (loc) => { lastVisitedPokecenter = loc; },
     lookupMap, getActiveMapNpcs, eventBus, triggerAzaleaRivalAmbush, playerName, inventory, audioManager,
+    adjacentMapPrefetcher: adjacentMapPrefetcher || undefined,
     setCutsceneLocked: (locked: boolean) => { isCutsceneLocked = locked; },
     triggerCanvasEarthquake: () => {
       const canvas = document.getElementById('game-canvas');
@@ -434,6 +419,16 @@ async function bootstrap() {
   applyMapStoryMutations(initialMap);
   overworldRenderer.renderMap(initialMap, lookupMap);
   syncMapOverworldItems(initialMap);
+
+  adjacentMapPrefetcher = new AdjacentMapPrefetcher({
+    mapManager,
+    activeNpcCache,
+    prepareMapNpcs: (id) => { resetMapNpcsToOrigin(id); return getActiveMapNpcs(id); },
+    onWarmNpcSprites: (types) => overworldRenderer?.warmNpcSpriteTypes(types),
+    onWarmMapTiles: (m) => (overworldRenderer ? overworldRenderer.ensureMapTilesLoaded(m, lookupMap) : undefined),
+  });
+  mapManager.setPrefetcher(adjacentMapPrefetcher);
+  void adjacentMapPrefetcher.prefetchAroundMap(initialMap.id);
 
   window.updateLoaderProgress?.(97, 'Initializing battle engine...');
   battleRenderer = new BattleRenderer(overworldRenderer.app);

@@ -20,8 +20,8 @@ import type { BugContestManager } from '../world/BugContestManager';
 import type { StadiumArenaManager } from '../battle/StadiumArenaManager';
 import type { GameClock } from '../core/GameClock';
 import type { StoryCutsceneContext } from '../world/StoryCutscenes';
-import type { OverworldHUD } from '../ui/OverworldHUD';
-import type { ItemfinderHUD } from '../ui/ItemfinderHUD';
+import type { OverworldHUD } from '../ui/OverworldHUD'; import type { ItemfinderHUD } from '../ui/ItemfinderHUD';
+import type { AdjacentMapPrefetcher } from '../world/AdjacentMapPrefetcher';
 
 export interface FieldObstacleContext {
   playerName: string; playerParty: PokemonInstance[]; inventory: BagInventory; storyFlags: Set<string>;
@@ -68,7 +68,7 @@ export interface OverworldTransitionContext {
   roamingManager: RoamingManager; eventBus: { emit: (event: string, payload: any) => void };
   getLastVisitedPokecenter: () => { mapId: string; x: number; y: number };
   setLastVisitedPokecenter: (loc: { mapId: string; x: number; y: number }) => void;
-  triggerAzaleaRivalAmbush: () => void; triggerCanvasEarthquake?: () => void;
+  triggerAzaleaRivalAmbush: () => void; triggerCanvasEarthquake?: () => void; adjacentMapPrefetcher?: AdjacentMapPrefetcher;
   overworldItemManager: OverworldItemManager; detectChosenStarterSpecies: () => 'cyndaquil' | 'totodile' | 'chikorita' | undefined;
 }
 

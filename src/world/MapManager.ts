@@ -7,6 +7,7 @@
  */
 
 import type { BgEvent, Direction, EncounterRateMode, MapData, TileCoord, WarpEvent, WarpSoundCue, WarpTransitionConfig } from '../types/game';
+import type { AdjacentMapPrefetcher } from './AdjacentMapPrefetcher';
 import {
   isOutdoorMap,
   isCaveMap,
@@ -49,6 +50,7 @@ export class MapManager {
   private repelStepsRemaining: number = 0;
   private encounterRateMode: EncounterRateMode = 'NORMAL';
   private surfEnabled: boolean = false;
+  private prefetcher: AdjacentMapPrefetcher | null = null;
   private spatialWarpCache: Map<string, Map<string, WarpEvent>> = new Map();
   private spatialBgEventCache: Map<string, Map<string, BgEvent>> = new Map();
 
@@ -243,7 +245,9 @@ export class MapManager {
     }
 
     // 1-hop door & warp targets (non-blocking prefetch for fast door transitions)
-    if (activeMap.warps && activeMap.warps.length > 0) {
+    if (this.prefetcher) {
+      void this.prefetcher.prefetchAroundMap(mapId);
+    } else if (activeMap.warps && activeMap.warps.length > 0) {
       const warpTargets = new Set<string>();
       for (const w of activeMap.warps) {
         if (w.targetMapId && !this.maps.has(w.targetMapId)) {
@@ -256,6 +260,14 @@ export class MapManager {
     }
 
     return activeMap;
+  }
+
+  public setPrefetcher(prefetcher: AdjacentMapPrefetcher | null): void {
+    this.prefetcher = prefetcher;
+  }
+
+  public getPrefetcher(): AdjacentMapPrefetcher | null {
+    return this.prefetcher;
   }
 
   setCurrentMap(mapId: string): MapData {
