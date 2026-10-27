@@ -114,6 +114,10 @@ export class ActiveNpcCache {
     }
   }
 
+  public invalidateAll(): void {
+    this.cache.clear();
+  }
+
   public hasMap(mapId: string): boolean {
     return this.cache.has(mapId);
   }

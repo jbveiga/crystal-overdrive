@@ -38,6 +38,7 @@ export interface OverworldModalRegistryParams {
   visitedMaps: Set<string>;
   seenSpecies: Set<string>;
   playerName: string;
+  getPlayerName?: () => string;
   initialMapId: string;
   getCaughtSpeciesSet: () => Set<string>;
   getPlayTimeSeconds: () => number;
@@ -339,7 +340,7 @@ export class OverworldModalRegistry {
     this.startMenuUI = new StartMenuUI(
       containerId || 'modal-container',
       {
-        getTrainerName: () => playerName,
+        getTrainerName: () => (this.params.getPlayerName ? this.params.getPlayerName() : playerName),
         getMoney: () => inventory.money,
         getBadges: () => inventory.badges,
         getPartyCount: () => playerParty.length,

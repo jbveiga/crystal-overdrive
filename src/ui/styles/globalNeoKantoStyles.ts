@@ -69,6 +69,50 @@ export const GLOBAL_NEO_KANTO_CSS = `
     #party-slot-grid {
       grid-template-columns: 1fr !important;
     }
+    #start-menu-panel {
+      top: calc(52px + env(safe-area-inset-top, 0px)) !important;
+      right: max(10px, env(safe-area-inset-right, 10px)) !important;
+      width: min(220px, calc(100vw - 20px)) !important;
+    }
+    #save-confirm-modal {
+      width: 94vw !important;
+      padding: 14px !important;
+    }
+    #settings-modal {
+      width: 95vw !important;
+      max-height: 92dvh !important;
+      padding: 12px !important;
+    }
+    #settings-category-tabs {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+    #pokedex-modal-workstation {
+      flex-direction: column !important;
+      overflow-y: auto !important;
+    }
+    #dex-roster-column {
+      max-width: 100% !important;
+      flex: none !important;
+      max-height: 200px !important;
+    }
+    #dex-telemetry-column {
+      max-width: 100% !important;
+      flex: none !important;
+    }
+    #trainer-card-bento {
+      grid-template-columns: 1fr !important;
+      gap: 12px !important;
+    }
+    #bug-contest-leaderboard-modal {
+      width: 95vw !important;
+      max-height: 92dvh !important;
+      padding: 12px !important;
+    }
+    [data-contest-rank] {
+      grid-template-columns: 50px 1fr 1fr !important;
+      gap: 6px !important;
+    }
   }
 `;
 

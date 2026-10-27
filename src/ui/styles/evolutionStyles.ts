@@ -166,47 +166,59 @@ export function injectNeoKantoEvolutionStyles(): void {
       z-index: 2;
     }
 
-    .nk-evo-sprite-base {
-      opacity: 1;
-      transform: scale(1);
+    .nk-evo-sprite-base { opacity: 1; transform: scale(1); }
+    .nk-evo-sprite-target { opacity: 0; transform: scale(0.9); }
+
+    .nk-evo-sprite-base.phase-prompt { opacity: 1; filter: drop-shadow(0 0 14px #00F5D4); }
+    .nk-evo-sprite-target.phase-prompt { opacity: 0; }
+
+    /* Phase 2: Pulse — Alternating white silhouettes */
+    .nk-evo-sprite-base.phase-pulse {
+      filter: brightness(0) invert(1) drop-shadow(0 0 18px #FFFFFF);
+      animation: nkEvoBaseOscillate var(--evo-period, 0.4s) infinite ease-in-out;
+    }
+    .nk-evo-sprite-target.phase-pulse {
+      filter: brightness(0) invert(1) drop-shadow(0 0 18px #00F5D4);
+      animation: nkEvoTargetOscillate var(--evo-period, 0.4s) infinite ease-in-out;
     }
 
-    .nk-evo-sprite-target {
-      opacity: 0;
-      transform: scale(0.9);
+    /* Phase 3: Transform Climax */
+    .nk-evo-sprite-base.phase-transform { opacity: 0; transform: scale(1.35); }
+    .nk-evo-sprite-target.phase-transform {
+      opacity: 1;
+      filter: brightness(0) invert(1) drop-shadow(0 0 28px #FFFFFF);
+      transform: scale(1.18);
     }
+
+    /* Phase 4: Triumph — Full color reveal of evolved species */
+    .nk-evo-sprite-base.phase-triumph { opacity: 0; }
+    .nk-evo-sprite-target.phase-triumph {
+      opacity: 1;
+      filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.75));
+      transform: scale(1.08);
+    }
+
+    /* Cancelled — Base sprite restored in full color */
+    .nk-evo-sprite-base.phase-cancelled { opacity: 1; filter: none; transform: scale(1); }
+    .nk-evo-sprite-target.phase-cancelled { opacity: 0; }
 
     .nk-evo-stage[data-phase="PULSE"] .nk-evo-sprite-base {
       animation: nkEvoBasePulse var(--evo-period, 0.5s) infinite ease-in-out;
     }
-
     .nk-evo-stage[data-phase="TRANSFORM"] .nk-evo-sprite-base {
       animation: nkEvoBaseOscillate var(--evo-period, 0.1s) infinite ease-in-out;
     }
-
     .nk-evo-stage[data-phase="TRANSFORM"] .nk-evo-sprite-target {
       animation: nkEvoTargetOscillate var(--evo-period, 0.1s) infinite ease-in-out;
     }
-
-    .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite-base {
-      display: none;
-    }
-
+    .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite-base { display: none; }
     .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite-target {
-      opacity: 1;
-      transform: scale(1);
-      animation: nkEvoTriumphFloat 3s infinite ease-in-out;
+      opacity: 1; transform: scale(1); animation: nkEvoTriumphFloat 3s infinite ease-in-out;
     }
-
     .nk-evo-stage[data-phase="CANCELLED"] .nk-evo-sprite-base {
-      opacity: 1;
-      transform: scale(1);
-      filter: grayscale(0.6) brightness(0.8);
+      opacity: 1; transform: scale(1); filter: grayscale(0.6) brightness(0.8);
     }
-
-    .nk-evo-stage[data-phase="CANCELLED"] .nk-evo-sprite-target {
-      display: none;
-    }
+    .nk-evo-stage[data-phase="CANCELLED"] .nk-evo-sprite-target { display: none; }
 
     .nk-evo-whiteout-flash {
       position: absolute;
@@ -273,6 +285,14 @@ export function injectNeoKantoEvolutionStyles(): void {
       z-index: 5;
       animation: nkEvoCardSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       pointer-events: auto !important;
+    }
+
+    .nk-evo-celebration-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 8px;
     }
 
     .nk-evo-species-headline {
@@ -418,45 +438,14 @@ export function injectNeoKantoEvolutionStyles(): void {
       color: #F8FAFC;
     }
 
-    @keyframes nkEvoCaretBlink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    @keyframes nkEvoCardSlideIn {
-      0% { opacity: 0; transform: translateY(-40%) translateX(20px); }
-      100% { opacity: 1; transform: translateY(-50%) translateX(0); }
-    }
-
-    @keyframes nkEvoTriumphFloat {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-8px); }
-    }
-
-    @keyframes nkEvoFlashStrobe {
-      0% { opacity: 0.55; }
-      100% { opacity: 0.98; }
-    }
-
-    @keyframes nkEvoBasePulse {
-      0%, 100% { transform: scale(1); filter: brightness(1); }
-      50% { transform: scale(1.08); filter: brightness(1.7) drop-shadow(0 0 16px #FFFFFF); }
-    }
-
-    @keyframes nkEvoBaseOscillate {
-      0%, 100% { opacity: 1; transform: scale(1); filter: brightness(2) drop-shadow(0 0 20px #FFFFFF); }
-      50% { opacity: 0; transform: scale(0.78); }
-    }
-
-    @keyframes nkEvoTargetOscillate {
-      0%, 100% { opacity: 0; transform: scale(0.82); }
-      50% { opacity: 1; transform: scale(1.12); }
-    }
-
-    @keyframes nkEvoRingSpin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes nkEvoCaretBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes nkEvoCardSlideIn { 0% { opacity: 0; transform: translateY(-40%) translateX(20px); } 100% { opacity: 1; transform: translateY(-50%) translateX(0); } }
+    @keyframes nkEvoTriumphFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+    @keyframes nkEvoFlashStrobe { 0% { opacity: 0.55; } 100% { opacity: 0.98; } }
+    @keyframes nkEvoBasePulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.7) drop-shadow(0 0 16px #FFFFFF); } }
+    @keyframes nkEvoBaseOscillate { 0%, 100% { opacity: 1; transform: scale(1); filter: brightness(2) drop-shadow(0 0 20px #FFFFFF); } 50% { opacity: 0; transform: scale(0.78); } }
+    @keyframes nkEvoTargetOscillate { 0%, 100% { opacity: 0; transform: scale(0.82); } 50% { opacity: 1; transform: scale(1.12); } }
+    @keyframes nkEvoRingSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     @media (max-width: 767px) {
       .nk-evo-stage {

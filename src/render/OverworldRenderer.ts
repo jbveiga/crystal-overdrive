@@ -167,18 +167,19 @@ export class OverworldRenderer {
         this.playerFrames = frames;
       } else if (type === 'kris') {
         this.krisFrames = frames;
+        this.npcFrames.set('kris', frames);
       } else if (type === 'boy') {
         this.npcFrames.set('boy', frames);
       }
     });
 
     manifest.enqueue({
-      id: 'object:fruit_tree',
-      label: 'Loading Fruit Tree berry texture',
-      category: 'TILE_TEXTURE',
+      id: 'sprite:fruit_tree_64',
+      label: 'Loading sprite fruit_tree_64.png',
+      category: 'CHARACTER_SPRITE',
       execute: async () => {
         try {
-          const tex = await Assets.load<Texture>('./assets/tiles/berry_tree.png');
+          const tex = await Assets.load<Texture>('./assets/sprites/fruit_tree_64.png');
           tex.source.scaleMode = 'nearest';
           this.fruitTreeTexture = tex;
         } catch {
@@ -625,14 +626,12 @@ export class OverworldRenderer {
   }
 
   private isEntityOnTallGrass(entity: GridEntity): boolean {
-    if (!this.currentRenderedMap) return false;
-    const tx = Math.floor(entity.renderX);
-    const ty = Math.floor(entity.renderY);
-    if (tx < 0 || tx >= this.currentRenderedMap.width || ty < 0 || ty >= this.currentRenderedMap.height) {
-      return false;
-    }
-    const idx = ty * this.currentRenderedMap.width + tx;
-    return this.currentRenderedMap.collisionGrid[idx] === 2;
+    const map = this.currentRenderedMap;
+    if (!map || entity.isJumping) return false;
+    const tx = Math.round(entity.renderX);
+    const ty = Math.round(entity.renderY);
+    if (tx < 0 || tx >= map.width || ty < 0 || ty >= map.height) return false;
+    return map.collisionGrid[ty * map.width + tx] === 2;
   }
 
   public update(player: GridEntity, npcs: GridEntity[] = [], dtWorld: number = 0): void {

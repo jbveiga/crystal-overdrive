@@ -352,7 +352,8 @@ export function getEarlyJohtoQuestInteractions(): NpcInteractionRegistration[] {
           ],
           '👮 POLICE OFFICER',
           () => {
-            ctx.openNamingModal('👮 RIVAL IDENTIFICATION', 'SILVER', (chosenName) => {
+            ctx.openNamingModal('👮 RIVAL IDENTIFICATION', ctx.getRivalName?.() || 'SILVER', (chosenName) => {
+              ctx.setRivalName?.(chosenName);
               ctx.storyFlags.add('EVENT_RIVAL_NAMED');
               if (ctx.npcsByMap.elms_lab) {
                 ctx.npcsByMap.elms_lab = ctx.npcsByMap.elms_lab.filter((n) => n.id !== 'lab_police_officer');

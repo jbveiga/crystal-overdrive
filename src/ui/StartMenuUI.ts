@@ -271,7 +271,12 @@ export class StartMenuUI {
     if (!this.isOpen()) return false;
 
     if (this.pokedexModal.style.display === 'flex') {
-      if (e.code === 'Escape') {
+      const activeEl = typeof document !== 'undefined' ? document.activeElement : null;
+      const isInput = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA');
+      if (isInput && e.code !== 'Escape') {
+        return false;
+      }
+      if (e.code === 'Escape' || e.code === 'KeyZ') {
         e.preventDefault();
         BattleAudio.playMenuSound('CANCEL');
         this.pokedexModal.style.display = 'none';
@@ -282,7 +287,7 @@ export class StartMenuUI {
     }
 
     if (this.trainerCardModal.style.display === 'flex') {
-      if (e.code === 'Escape') {
+      if (e.code === 'Escape' || e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ') {
         e.preventDefault();
         BattleAudio.playMenuSound('CANCEL');
         this.trainerCardModal.style.display = 'none';
@@ -293,7 +298,7 @@ export class StartMenuUI {
     }
 
     if (this.contestLeaderboardModal.style.display === 'flex') {
-      if (e.code === 'Escape') {
+      if (e.code === 'Escape' || e.code === 'KeyZ') {
         e.preventDefault();
         BattleAudio.playMenuSound('CANCEL');
         this.contestLeaderboardModal.style.display = 'none';
@@ -332,7 +337,7 @@ export class StartMenuUI {
       this.renderMenuItems();
       return true;
     }
-    if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+    if (e.code === 'ArrowDown') {
       e.preventDefault();
       BattleAudio.playMenuSound('CURSOR');
       this.cursorIndex = (this.cursorIndex + 1) % this.menuItems.length;
@@ -430,17 +435,60 @@ export class StartMenuUI {
         background: #38BDF8;
       }
       @media (max-width: 768px) {
+        #start-menu-panel {
+          top: calc(52px + env(safe-area-inset-top, 0px)) !important;
+          right: max(10px, env(safe-area-inset-right, 10px)) !important;
+          width: min(220px, calc(100vw - 20px)) !important;
+        }
+        #save-confirm-modal {
+          width: 94vw !important;
+          padding: 14px !important;
+        }
+        #settings-modal {
+          width: 95vw !important;
+          max-height: 92dvh !important;
+          padding: 12px !important;
+        }
+        #settings-category-tabs {
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+        #pokedex-modal {
+          width: 95vw !important;
+          height: 92dvh !important;
+          max-height: 92dvh !important;
+          padding: 12px !important;
+        }
         #pokedex-modal-workstation {
           flex-direction: column !important;
+          overflow-y: auto !important;
         }
         #dex-roster-column {
+          max-width: 100% !important;
           flex: none !important;
-          max-width: none !important;
-          max-height: 180px !important;
+          max-height: 200px !important;
         }
         #dex-telemetry-column {
+          max-width: 100% !important;
           flex: none !important;
-          max-width: none !important;
+        }
+        #trainer-card-modal {
+          width: 95vw !important;
+          max-height: 92dvh !important;
+          padding: 14px !important;
+        }
+        #trainer-card-bento {
+          grid-template-columns: 1fr !important;
+          gap: 12px !important;
+        }
+        #bug-contest-leaderboard-modal {
+          width: 95vw !important;
+          max-height: 92dvh !important;
+          padding: 12px !important;
+        }
+        [data-contest-rank] {
+          grid-template-columns: 50px 1fr 1fr !important;
+          gap: 6px !important;
         }
       }
     `;

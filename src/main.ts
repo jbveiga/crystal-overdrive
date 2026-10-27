@@ -362,6 +362,7 @@ async function bootstrap() {
     dayCareManager, kurtCraftingManager, bugContestManager, stadiumArenaManager, audioManager, gameClock, gameOptions,
     displayThemeManager, mapManager, missionManager, roamingManager, overworldItemManager, inventory,
     playerParty, storyFlags, visitedMaps, seenSpecies, playerName, initialMapId, getCaughtSpeciesSet,
+    getPlayerName: () => playerName,
     getPlayTimeSeconds: () => playTimeSeconds, getOverworldHUD: () => overworldHUD,
     getPartyUI: () => partyUI, getBagUI: () => bagUI, getMissionLogUI: () => missionLogUI,
     getNamingModalUI: () => namingModalUI, saveCurrentGame, launchStadiumChallenge,
@@ -465,10 +466,12 @@ async function bootstrap() {
       rivalName = 'SILVER';
       boxManager.getState().boxes.forEach((b) => b.pokemon.fill(null));
       boxManager.changeBox(0);
-      playerBox = [];
+      playerBox.length = 0;
       overworldItemManager.setCollectedFlags([]);
       overworldItemManager.setFruitTreePicks({});
-      resetStoryNpcSpawns(npcsByMap);
+      Object.assign(npcsByMap, createNpcsByMap());
+      filterInitialMapNpcs(npcsByMap, storyFlags);
+      activeNpcCache.invalidateAll();
       roamingManager.sleepBeasts();
       missionManager.deserialize(new MissionManager().serialize());
 
@@ -507,7 +510,7 @@ async function bootstrap() {
     },
     onNewGame: async () => { titleScreenUI.hide(); introSequenceUI.start(); },
     onOptionsChanged: (opts) => {
-      gameOptions = opts;
+      Object.assign(gameOptions, opts);
       audioManager.setBgmVolume(opts.bgmVolume);
       audioManager.setSfxVolume(opts.soundVolume);
       gameClock.playerSpeed = opts.playerSpeedDefault;
@@ -617,6 +620,8 @@ async function bootstrap() {
 
   const getNpcInteractionContext = (): NpcInteractionContext => ({
     playerName,
+    getRivalName: () => rivalName,
+    setRivalName: (name: string) => { rivalName = name; },
     playerParty,
     inventory,
     storyFlags,

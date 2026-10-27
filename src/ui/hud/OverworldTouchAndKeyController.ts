@@ -13,6 +13,7 @@ export interface TouchAndKeyControllerOptions {
   updateRadarDisplay?: (active: boolean) => void;
   advanceDialogue?: () => void;
   isVisible: () => boolean;
+  onGamepadVisibilityChanged?: () => void;
 }
 
 export class OverworldTouchAndKeyController {
@@ -56,6 +57,7 @@ export class OverworldTouchAndKeyController {
     if (this.gamepadContainer) {
       this.gamepadContainer.style.display = this.isGamepadVisible ? 'block' : 'none';
     }
+    this.opts.onGamepadVisibilityChanged?.();
   }
 
   public toggleGamepad(): boolean {

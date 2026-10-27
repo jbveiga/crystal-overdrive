@@ -118,6 +118,7 @@ export interface NpcInteractionContext {
   playerName: string; playerParty: PokemonInstance[]; inventory: BagInventory; storyFlags: Set<string>;
   defeatedTrainers: Set<string>; player: GridEntity; npcsByMap: Record<string, GridEntity[]>;
   mapManager: MapManager; gameClock: GameClock;
+  getRivalName?: () => string; setRivalName?: (name: string) => void;
   audioManager: {
     playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader') => void; restoreOverworldBgm: (volume?: number) => void;
     playMapBgm: (mapId: string, volume?: number) => void; playSfx?: (name: string) => void;

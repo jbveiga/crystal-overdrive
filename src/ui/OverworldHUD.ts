@@ -112,9 +112,11 @@ export class OverworldHUD {
       updateRadarDisplay: (active) => this.updateRadarDisplay(active),
       advanceDialogue: () => this.advanceDialogue(),
       isVisible: () => this.isVisible(),
+      onGamepadVisibilityChanged: () => this.updateInputModeLabels(),
     });
 
     this.touchAndKeyController.initDOM();
+    this.updateInputModeLabels();
   }
 
   public show(): void {
@@ -143,16 +145,20 @@ export class OverworldHUD {
         #desktop-controls-bar { display: none !important; }
         #route-banner { font-size: 11px !important; padding: 4px 10px !important; }
       }
+      @media (max-width: 768px), (pointer: coarse) {
+        #desktop-controls-bar { display: none !important; }
+      }
     `;
     document.head.appendChild(style);
   }
 
   private isTouchOrMobile(): boolean {
+    if (this.touchAndKeyController?.isGamepadActive()) return true;
+    if (typeof window === 'undefined') return false;
     return (
-      typeof window !== 'undefined' &&
-      (window.innerWidth <= 768 ||
-        'ontouchstart' in window ||
-        (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0))
+      window.innerWidth <= 768 ||
+      'ontouchstart' in window ||
+      (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0)
     );
   }
 
@@ -163,21 +169,35 @@ export class OverworldHUD {
   }
 
   private updateInputModeLabels(): void {
-    const isMobile = this.isTouchOrMobile();
+    const mobileMode = this.isTouchOrMobile();
     if (this.speedButton) {
-      const mult = `${this.currentSpeed}x`;
-      this.speedButton.innerText = isMobile ? `⚡ ${mult}` : `⚡ SPEED: ${mult} (Shift)`;
+      this.speedButton.innerText = mobileMode
+        ? `⚡ SPEED: ${this.currentSpeed}x`
+        : `⚡ SPEED: ${this.currentSpeed}x (Shift)`;
     }
-    const talkBtn = this.rootElement.querySelector('#interact-btn') as HTMLButtonElement | null;
-    if (talkBtn) {
-      talkBtn.innerText = isMobile ? '💬 TALK / READ' : '💬 TALK / READ (Space)';
+    if (this.startMenuButton) {
+      this.startMenuButton.innerText = mobileMode ? '☰ MENU' : '☰ MENU (M / Esc)';
+    }
+    if (this.dialoguePrompt) {
+      const pageLabel =
+        this.dialogueActive && this.dialoguePages.length > 1
+          ? `(${this.dialoguePageIndex + 1}/${this.dialoguePages.length}) `
+          : '';
+      this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
+    }
+    if (this.desktopControlsBar) {
+      if (mobileMode) {
+        this.desktopControlsBar.style.setProperty('display', 'none', 'important');
+      } else {
+        this.desktopControlsBar.style.display = 'flex';
+      }
     }
   }
 
   private createUI(): void {
     this.injectResponsiveStyles();
     this.rootElement = document.createElement('div');
-    this.rootElement.id = 'overworld-hud-root';
+    this.rootElement.id = 'hud-root';
     this.rootElement.style.cssText = `
       position: absolute;
       top: 0;
@@ -372,18 +392,12 @@ export class OverworldHUD {
           <div id="dialogue-prompt" style="display: flex; justify-content: flex-end; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: #38bdf8; margin-top: 6px;"></div>
         </div>
 
-        <button id="interact-btn" style="
-          pointer-events: auto;
-          background: #0284c7;
-          color: #ffffff;
-          border: 2px solid #38bdf8;
-          border-radius: 999px;
-          padding: 8px 20px;
-          font-size: 13px;
-          font-weight: 800;
-          cursor: pointer;
-          box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
-        ">💬 TALK / READ (Space)</button>
+        <div id="desktop-controls-bar" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <div style="background: rgba(18, 22, 28, 0.8); backdrop-filter: blur(4px); border-radius: 6px; padding: 6px 12px; font-size: 12px; color: #94a3b8;">
+            Move: <strong>WASD / Arrows</strong> | Talk / Read Signs: <strong>Space / Enter / Z</strong> | Speed: <strong>Shift</strong>
+          </div>
+          <button id="interact-btn" style="pointer-events: auto; background: #0284c7; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);">💬 TALK / READ (Space)</button>
+        </div>
       </div>
     `;
 
