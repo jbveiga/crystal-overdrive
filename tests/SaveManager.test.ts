@@ -59,9 +59,9 @@ describe('SaveManager Data Contracts & Ticket 4.1 Extensions', () => {
     expect(restored.defeatedTrainers).toContain('youngster_joey');
   });
 
-  it('defines all 6 classic out-of-battle medicine items and persists them in SaveData', () => {
+  it('defines all classic out-of-battle medicine items and persists them in SaveData', () => {
     const medIds = MART_MEDICINE_CATALOG.map((m) => m.id);
-    expect(medIds).toEqual(['potion', 'super-potion', 'antidote', 'parlyz-heal', 'awakening', 'revive']);
+    expect(medIds).toEqual(['potion', 'super-potion', 'moomoo-milk', 'antidote', 'parlyz-heal', 'awakening', 'revive']);
 
     const cyndaquil = PokemonFactory.create('cyndaquil', 5);
     const pidgey = PokemonFactory.create('pidgey', 4);

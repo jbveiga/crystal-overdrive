@@ -4,7 +4,7 @@
  * @role ecruteakToRoute39Npcs Component
  * @exports createEcruteakToRoute39Npcs
  * @layer world
- * @sections L1-15: Micro-Header & Imports | L16-218: Implementation | L219-437: Handlers & Exports
+ * @sections L1-15: Micro-Header & Imports | L16-218: Implementation | L219-503: Handlers & Exports
  */
 
 import type { GridEntity } from '../GridPhysics';
@@ -371,6 +371,34 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         trainerPokemon: { speciesId: 'wooper', level: 19, moves: ['watergun', 'slam', 'tailwhip'] },
         trainerTeam: [{ speciesId: 'wooper', level: 19, moves: ['watergun', 'slam', 'tailwhip'] }],
       }),
+      makeNpc('bird_keeper_toby', 12, 15, 'DOWN', 'bird_keeper', '🦅 BIRD KEEPER TOBY',
+        ['I plan to train in CIANWOOD CITY to teach my POKéMON how to FLY.'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'bird_keeper_toby',
+          trainerName: 'Bird Keeper Toby',
+          visionRange: 2,
+          challengePages: ['BIRD KEEPER TOBY: Fly high into the sky, my beloved bird POKéMON!'],
+          trainerPokemon: { speciesId: 'doduo', level: 15, moves: ['peck', 'growl', 'pursuit', 'furyattack'] },
+          trainerTeam: [
+            { speciesId: 'doduo', level: 15, moves: ['peck', 'growl', 'pursuit', 'furyattack'] },
+            { speciesId: 'doduo', level: 16, moves: ['peck', 'growl', 'pursuit', 'furyattack'] },
+            { speciesId: 'doduo', level: 17, moves: ['peck', 'growl', 'pursuit', 'furyattack'] },
+          ],
+        }
+      ),
+      makeNpc('beauty_olivia', 5, 8, 'DOWN', 'beauty', '💄 BEAUTY OLIVIA',
+        ['MOOMOO MILK is good for beauty and health, but inconveniently, they only sell a bottle at a time.'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'beauty_olivia',
+          trainerName: 'Beauty Olivia',
+          visionRange: 2,
+          challengePages: ["BEAUTY OLIVIA: Don't you think my POKéMON and I are beautiful?"],
+          trainerPokemon: { speciesId: 'corsola', level: 19, moves: ['tackle', 'harden', 'watergun', 'recover'] },
+          trainerTeam: [{ speciesId: 'corsola', level: 19, moves: ['tackle', 'harden', 'watergun', 'recover'] }],
+        }
+      ),
     ],
 
     route_38_ecruteak_gate: [
@@ -380,15 +408,22 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
     ],
 
     route_39: [
-      makeNpc('sailor_eugene', 13, 29, 'LEFT', 'fisherman', '⚓ SAILOR EUGENE', ['Poliwhirl spins like a whirlpool!'], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'sailor_eugene',
-        trainerName: 'Sailor Eugene',
-        visionRange: 2,
-        challengePages: ['EUGENE: Just docking from sea! Let’s test your strength!'],
-        trainerPokemon: { speciesId: 'poliwhirl', level: 20, moves: ['watergun', 'hypnosis', 'doubleslap'] },
-        trainerTeam: [{ speciesId: 'poliwhirl', level: 20, moves: ['watergun', 'hypnosis', 'doubleslap'] }],
-      }),
+      makeNpc('sailor_eugene', 13, 29, 'LEFT', 'fisherman', '⚓ SAILOR EUGENE',
+        ['My POKéMON were caught and raised overseas. They are my companions on long voyages.'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'sailor_eugene',
+          trainerName: 'Sailor Eugene',
+          visionRange: 2,
+          challengePages: ['EUGENE: I just got back to OLIVINE! So how about a POKéMON battle?'],
+          trainerPokemon: { speciesId: 'poliwhirl', level: 17, moves: ['watergun', 'hypnosis', 'doubleslap'] },
+          trainerTeam: [
+            { speciesId: 'poliwhirl', level: 17, moves: ['watergun', 'hypnosis', 'doubleslap'] },
+            { speciesId: 'raticate', level: 17, moves: ['tackle', 'tailwhip', 'quickattack', 'hyperfang'] },
+            { speciesId: 'krabby', level: 19, moves: ['bubble', 'leer', 'vicegrip', 'harden'] },
+          ],
+        }
+      ),
       makeNpc('pokefan_derek', 10, 21, 'UP', 'fat_man', '🧢 POKéFAN DEREK', ['Pikachu’s cheeks spark with joy!'], {
         action: 'TRAINER_BATTLE',
         trainerId: 'pokefan_derek',
@@ -398,18 +433,49 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         trainerPokemon: { speciesId: 'pikachu', level: 18, moves: ['thunderbolt', 'quickattack', 'tailwhip'] },
         trainerTeam: [{ speciesId: 'pikachu', level: 18, moves: ['thunderbolt', 'quickattack', 'tailwhip'] }],
       }),
-      makeNpc('pokefan_ruth', 11, 19, 'RIGHT', 'teacher', '👒 POKéFAN RUTH', ['Clefairy dances under the moon.'], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'pokefan_ruth',
-        trainerName: 'Pokéfan Ruth',
-        visionRange: 2,
-        challengePages: ['RUTH: My darling Clefairy loves to meet new travelers!'],
-        trainerPokemon: { speciesId: 'clefairy', level: 18, moves: ['metronome', 'pound', 'sing'] },
-        trainerTeam: [{ speciesId: 'clefairy', level: 18, moves: ['metronome', 'pound', 'sing'] }],
-      }),
-      makeNpc('pokefan_jaime', 4, 22, 'DOWN', 'teacher', '🌾 POKéFAN JAIME', [
-        'The Miltank here produce the richest milk in all of Johto!',
-      ]),
+      makeNpc('pokefan_ruth', 11, 19, 'RIGHT', 'teacher', '👒 POKéFAN RUTH',
+        ["Do you know about baby POKéMON? I bet they're just adorable!"],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokefan_ruth',
+          trainerName: 'Pokéfan Ruth',
+          visionRange: 2,
+          challengePages: ["POKéFAN RUTH: Such darling POKéMON. Let's show our POKéMON together at the same time."],
+          trainerPokemon: { speciesId: 'pikachu', level: 17, moves: ['thundershock', 'growl', 'tailwhip', 'quickattack'], heldItem: 'berry' },
+          trainerTeam: [{ speciesId: 'pikachu', level: 17, moves: ['thundershock', 'growl', 'tailwhip', 'quickattack'], heldItem: 'berry' }],
+        }
+      ),
+      makeNpc('psychic_norman', 13, 7, 'DOWN', 'psychic', '🔮 PSYCHIC NORMAN',
+        ['You know how POKéMON have different abilities? People are like that too. Everyone has different potential.'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'psychic_norman',
+          trainerName: 'Psychic Norman',
+          visionRange: 2,
+          challengePages: ['PSYCHIC NORMAN: Let me see what your POKéMON are capable of.'],
+          trainerPokemon: { speciesId: 'slowpoke', level: 17, moves: ['tackle', 'growl', 'watergun'] },
+          trainerTeam: [
+            { speciesId: 'slowpoke', level: 17, moves: ['tackle', 'growl', 'watergun'] },
+            { speciesId: 'slowpoke', level: 20, moves: ['curse', 'bodyslam', 'watergun', 'confusion'] },
+          ],
+        }
+      ),
+      makeNpc('pokefan_jaime', 4, 22, 'DOWN', 'teacher', '🌾 POKéFAN JAIME',
+        ['I met my MEOWTH at night, right here on ROUTE 39. It seems to become friendlier by training here than anywhere else.'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokefan_jaime',
+          trainerName: 'Pokéfan Jaime',
+          visionRange: 2,
+          challengePages: ["POKéFAN JAIME: You came at just the right time. Let's battle."],
+          trainerPokemon: { speciesId: 'meowth', level: 16, moves: ['scratch', 'growl', 'bite', 'payday'], heldItem: 'berry' },
+          trainerTeam: [{ speciesId: 'meowth', level: 16, moves: ['scratch', 'growl', 'bite', 'payday'], heldItem: 'berry' }],
+        }
+      ),
+      makeNpc('route_39_miltank_1', 3, 12, 'DOWN', 'slowpoke', '🐮 MILTANK', ['MILTANK: Mooo!']),
+      makeNpc('route_39_miltank_2', 6, 11, 'DOWN', 'slowpoke', '🐮 MILTANK', ['MILTANK: Mooo!']),
+      makeNpc('route_39_miltank_3', 4, 15, 'DOWN', 'slowpoke', '🐮 MILTANK', ['MILTANK: Mooo!']),
+      makeNpc('route_39_miltank_4', 8, 13, 'DOWN', 'slowpoke', '🐮 MILTANK', ['MILTANK: Mooo!']),
     ],
 
     route_39_barn: [

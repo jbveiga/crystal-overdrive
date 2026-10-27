@@ -2201,10 +2201,10 @@
     {
       "x": 5,
       "y": 31,
-      "speaker": "📍 ROUTE 39 SIGN",
+      "speaker": "📋 TRAINER TIPS",
       "pages": [
-        "ROUTE 39",
-        "Olivine City Ahead"
+        "TRAINER TIPS",
+        "Use HEADBUTT on trees to shake wild POKéMON out! Different kinds of POKéMON drop out of trees."
       ]
     },
     {
@@ -2213,7 +2213,16 @@
       "speaker": "🥛 MOOMOO FARM SIGN",
       "pages": [
         "MOOMOO FARM",
-        "Home of Delicious, Nutritious Moomoo Milk!"
+        "Enjoy Our Fresh and Tasty Milk"
+      ]
+    },
+    {
+      "x": 15,
+      "y": 7,
+      "speaker": "📍 ROUTE 39 SIGN",
+      "pages": [
+        "ROUTE 39",
+        "OLIVINE CITY - ECRUTEAK CITY"
       ]
     }
   ],
@@ -2268,6 +2277,13 @@
       "timeOfDay": "MORNING"
     },
     {
+      "speciesId": "farfetchd",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
       "speciesId": "rattata",
       "minLevel": 16,
       "maxLevel": 16,
@@ -2314,6 +2330,13 @@
       "minLevel": 15,
       "maxLevel": 15,
       "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "farfetchd",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 10,
       "timeOfDay": "DAY"
     },
     {

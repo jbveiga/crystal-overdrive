@@ -270,7 +270,7 @@ export class BagPartyTargetRenderer {
     const currentCount = inventory.items[med.id] ?? 0;
     if (currentCount <= 0) return false;
 
-    if (med.id === 'potion' || med.id === 'super-potion') {
+    if (med.id === 'potion' || med.id === 'super-potion' || med.id === 'moomoo-milk') {
       if (target.currentHp <= 0) {
         BattleAudio.playMenuSound('CANCEL');
         showFeedback(`${target.nickname} has fainted! Use a Revive first.`, true);
@@ -281,7 +281,7 @@ export class BagPartyTargetRenderer {
         showFeedback(`It won't have any effect! (${target.nickname} is already at full HP)`, true);
         return false;
       }
-      const healAmount = med.id === 'potion' ? 20 : 50;
+      const healAmount = med.id === 'potion' ? 20 : med.id === 'super-potion' ? 50 : 100;
       const before = target.currentHp;
       target.currentHp = Math.min(target.stats.hp, target.currentHp + healAmount);
       const recovered = target.currentHp - before;

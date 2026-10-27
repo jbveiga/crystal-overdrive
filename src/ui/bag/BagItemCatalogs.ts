@@ -43,6 +43,7 @@ export interface MedicineItemDef {
   badgeLabel: string;
   desc: string;
   icon: string;
+  farmExclusive?: boolean;
 }
 
 export const MART_MEDICINE_CATALOG: MedicineItemDef[] = [
@@ -61,6 +62,15 @@ export const MART_MEDICINE_CATALOG: MedicineItemDef[] = [
     badgeLabel: '+50 HP',
     desc: 'A concentrated spray-type medicine. Restores the HP of one Pokémon by 50 points.',
     icon: '⚗️',
+  },
+  {
+    id: 'moomoo-milk',
+    name: 'Moomoo Milk',
+    price: 500,
+    badgeLabel: '+100 HP',
+    desc: 'Nutritious farm milk rich in calcium. Restores the HP of one Pokémon by 100 points.',
+    icon: '🥛',
+    farmExclusive: true,
   },
   {
     id: 'antidote',

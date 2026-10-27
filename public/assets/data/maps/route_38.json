@@ -2269,6 +2269,13 @@
       "timeOfDay": "MORNING"
     },
     {
+      "speciesId": "farfetchd",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
       "speciesId": "rattata",
       "minLevel": 16,
       "maxLevel": 16,
@@ -2315,6 +2322,13 @@
       "minLevel": 13,
       "maxLevel": 13,
       "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "farfetchd",
+      "minLevel": 16,
+      "maxLevel": 16,
+      "weight": 10,
       "timeOfDay": "DAY"
     },
     {

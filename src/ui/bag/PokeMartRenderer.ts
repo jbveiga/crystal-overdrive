@@ -105,7 +105,7 @@ export class PokeMartRenderer {
       inventory.items = {};
     }
 
-    for (const med of MART_MEDICINE_CATALOG) {
+    for (const med of MART_MEDICINE_CATALOG.filter((m) => !m.farmExclusive)) {
       const ownedCount = inventory.items[med.id] ?? 0;
       const card = document.createElement('div');
       card.style.cssText = CARD_STYLE;

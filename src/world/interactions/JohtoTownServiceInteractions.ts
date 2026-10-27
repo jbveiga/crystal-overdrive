@@ -4,7 +4,7 @@
  * @role JohtoTownServiceInteractions Component
  * @exports getJohtoTownServiceInteractions
  * @layer world
- * @sections L1-15: Micro-Header & Imports | L16-344: Implementation | L345-689: Handlers & Exports
+ * @sections L1-15: Micro-Header & Imports | L16-344: Implementation | L345-726: Handlers & Exports
  */
 
 import type { NpcInteractionRegistration } from '../../types/gameContext';
@@ -223,75 +223,112 @@ export function getJohtoTownServiceInteractions(): NpcInteractionRegistration[] 
       },
     },
 
-    // 6. Route 39 Moomoo Farm: Miltank & Dairy Farmer
+    // 6. Route 39 Moomoo Farm: Pasture Miltank, Moomoo, Farmer's Wife & Dairy Farmer Shop
+    {
+      npcIds: ['route_39_miltank_1', 'route_39_miltank_2', 'route_39_miltank_3', 'route_39_miltank_4'],
+      handler: (targetNpc, _map, ctx) => {
+        BattleAudio.playCry('miltank');
+        ctx.openDialogue(['MILTANK: Mooo!'], targetNpc.speaker);
+        return true;
+      },
+    },
     {
       npcIds: ['moomoo_miltank'],
       handler: (targetNpc, _map, ctx) => {
         if (ctx.storyFlags.has('moomoo_healed')) {
-          ctx.openDialogue(
-            ['MILTANK: Mooo! (Moomoo is bursting with energy and happiness!)'],
-            targetNpc.speaker
-          );
+          BattleAudio.playCry('miltank');
+          ctx.openDialogue(['MILTANK: Mooo! (Moomoo is bursting with energy and happiness!)'], targetNpc.speaker);
           return true;
         }
-        const berryCount: number = ctx.inventory.berries
-          ? Object.values(ctx.inventory.berries).reduce<number>((a, b) => a + ((b as number) || 0), 0)
-          : 0;
-        if (berryCount > 0) {
+        const berries = ctx.inventory.berries || {};
+        const berryKey = Object.keys(berries).find((k) => (berries[k] || 0) > 0);
+        const hasBerryBucket = berryKey && (berries[berryKey] || 0) > 0;
+        const hasLegacyBerry = (ctx.inventory.items?.['berry'] || 0) > 0;
+
+        if (hasBerryBucket || hasLegacyBerry) {
+          if (hasBerryBucket && berryKey) {
+            berries[berryKey] = (berries[berryKey] || 0) - 1;
+            if (berries[berryKey] <= 0) delete berries[berryKey];
+          } else if (hasLegacyBerry && ctx.inventory.items) {
+            ctx.inventory.items['berry'] = ctx.inventory.items['berry'] - 1;
+          }
           ctx.storyFlags.add('moomoo_healed');
+          ctx.storyFlags.add('EVENT_HEALED_MOOMOO');
+          BattleAudio.playCry('miltank');
+          BattleAudio.playMenuSound('HEAL');
           ctx.openDialogue(
-            [
-              `${ctx.playerName} fed a sweet BERRY to MOOMOO!`,
-              'MOOMOO munched happily… Its energy came rushing back!',
-              'MILTANK: Mooo! Mooooo!',
-            ],
+            [`${ctx.playerName} fed a sweet BERRY to MOOMOO!`, 'MOOMOO munched happily… Its energy came rushing back!', 'MILTANK: Mooo! Mooooo!'],
             targetNpc.speaker,
-            () => {
-              ctx.saveCurrentGame();
-              ctx.showToast('🐮 Moomoo Miltank was restored to full health!');
-            }
+            () => { ctx.saveCurrentGame(); ctx.showToast('🐮 Moomoo Miltank was restored to full health!'); }
           );
           return true;
         }
-        ctx.openDialogue(
-          ['MILTANK: …Moo… (Moomoo looks sick and weak… It needs sweet BERRYS to recover!)'],
-          targetNpc.speaker
-        );
+        BattleAudio.playCry('miltank');
+        ctx.openDialogue(['MILTANK: …Moo… (Its cry is weak… It needs sweet BERRIES to recover!)'], targetNpc.speaker);
+        return true;
+      },
+    },
+    {
+      npcIds: ['farmer_wife'],
+      handler: (targetNpc, _map, ctx) => {
+        if (!ctx.storyFlags.has('moomoo_healed')) {
+          ctx.openDialogue(["FARMER'S WIFE: Our milk even goes out to KANTO. So if our own MILTANK won't give us any milk, we're in trouble."], targetNpc.speaker);
+          return true;
+        }
+        if (!ctx.storyFlags.has('has_tm13_snore')) {
+          ctx.storyFlags.add('has_tm13_snore');
+          ctx.storyFlags.add('EVENT_GOT_TM13_SNORE_FROM_MOOMOO_FARM');
+          if (!ctx.inventory.tms) ctx.inventory.tms = [];
+          if (!ctx.inventory.tms.includes('TM13')) ctx.inventory.tms.push('TM13');
+          ctx.audioManager.playSfx?.('sfx_badge_get');
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          ctx.openDialogue(
+            ["FARMER'S WIFE: You fixed our MILTANK, hon. Now it gives MOOMOO MILK again. Here's somethin' fer your trouble!", "That there's TM13 SNORE! It's a rare move that only works while the POKéMON is asleep."],
+            targetNpc.speaker,
+            () => { ctx.saveCurrentGame(); ctx.showToast('🐮 Received TM13 SNORE!'); }
+          );
+          return true;
+        }
+        ctx.openDialogue(["FARMER'S WIFE: Keeping up with a POKéMON that only attacks in its sleep isn't easy, hon!"], targetNpc.speaker);
         return true;
       },
     },
     {
       npcIds: ['dairy_farmer'],
       handler: (targetNpc, _map, ctx) => {
-        if (ctx.storyFlags.has('moomoo_healed')) {
-          if (!ctx.storyFlags.has('has_tm13_snore')) {
-            ctx.storyFlags.add('has_tm13_snore');
-            if (!ctx.inventory.tms.includes('TM13')) ctx.inventory.tms.push('TM13');
-            ctx.audioManager.playSfx?.('sfx_badge_get');
-            BattleAudio.playOverworldSound('KEY_ITEM');
-            ctx.openDialogue(
-              [
-                'DAIRY FARMER: You healed our Moomoo? Bless your kind heart!',
-                'Take this TM13 SNORE as a token of our appreciation!',
-              ],
-              targetNpc.speaker,
-              () => {
-                ctx.saveCurrentGame();
-                ctx.showToast('🐮 Received TM13 SNORE from Dairy Farmer!');
-              }
-            );
-            return true;
-          }
+        if (!ctx.storyFlags.has('moomoo_healed')) {
+          ctx.storyFlags.add('EVENT_TALKED_TO_FARMER_ABOUT_MOOMOO');
+          ctx.openDialogue(['DAIRY FARMER: Our Moomoo in the barn is sick… Feed it sweet BERRYS to nurse it back to health!'], targetNpc.speaker);
+          return true;
+        }
+        if (!ctx.storyFlags.has('has_tm13_snore')) {
+          ctx.storyFlags.add('has_tm13_snore');
+          ctx.storyFlags.add('EVENT_GOT_TM13_SNORE_FROM_MOOMOO_FARM');
+          if (!ctx.inventory.tms) ctx.inventory.tms = [];
+          if (!ctx.inventory.tms.includes('TM13')) ctx.inventory.tms.push('TM13');
+          ctx.audioManager.playSfx?.('sfx_badge_get');
+          BattleAudio.playOverworldSound('KEY_ITEM');
           ctx.openDialogue(
-            ['DAIRY FARMER: Fresh MOOMOO MILK is the finest drink in Johto!'],
-            targetNpc.speaker
+            ['DAIRY FARMER: You healed our Moomoo? Bless your kind heart!', 'Take this TM13 SNORE as a token of our appreciation!'],
+            targetNpc.speaker,
+            () => { ctx.saveCurrentGame(); ctx.showToast('🐮 Received TM13 SNORE from Dairy Farmer!'); }
           );
           return true;
         }
-        ctx.openDialogue(
-          ['DAIRY FARMER: Our Moomoo in the barn is sick… Feed it sweet BERRYS to nurse it back to health!'],
-          targetNpc.speaker
-        );
+        if (ctx.inventory.money >= 500) {
+          ctx.inventory.money -= 500;
+          if (!ctx.inventory.items) ctx.inventory.items = {};
+          ctx.inventory.items['moomoo-milk'] = (ctx.inventory.items['moomoo-milk'] || 0) + 1;
+          BattleAudio.playMenuSound('CONFIRM');
+          ctx.openDialogue(
+            ["DAIRY FARMER: How'd you like my MOOMOO MILK? It's my pride and joy! Give it to POKéMON to restore 100 HP!", "Here ya go! Drink up'n enjoy! (Purchased 1x MOOMOO MILK for ¥500)"],
+            targetNpc.speaker,
+            () => { ctx.saveCurrentGame(); ctx.showToast('🥛 Purchased MOOMOO MILK for ¥500!'); }
+          );
+          return true;
+        }
+        BattleAudio.playMenuSound('CANCEL');
+        ctx.openDialogue(["DAIRY FARMER: Sorry, there. No cash, no sale! Come back when you have ¥500 for MOOMOO MILK!"], targetNpc.speaker);
         return true;
       },
     },
