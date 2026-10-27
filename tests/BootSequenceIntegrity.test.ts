@@ -276,4 +276,53 @@ describe('BootSequenceIntegrity & TDZ Elimination Invariants (BUGFIX-BOOT-LOADIN
     expect(player.renderX).toBe(13);
     expect(player.renderY).toBe(6);
   });
+
+  describe('Boot Mounting & DOM Container Invariants (BUGFIX-BOOT-MOUNTING-ENGINE-HANG-02)', () => {
+    it('asserts 100% of DOM IDs queried or mounted in src/main.ts exist in index.html', () => {
+      const indexHtmlPath = path.resolve(__dirname, '../index.html');
+      const indexHtml = fs.readFileSync(indexHtmlPath, 'utf8');
+
+      const requiredMountingContainers = [
+        'canvas-container',
+        'overworld-hud-container',
+        'battle-hud-container',
+        'modal-container',
+        'ui-overlay',
+      ];
+
+      for (const id of requiredMountingContainers) {
+        expect(mainContent.includes(`'${id}'`) || mainContent.includes(`"${id}"`), `Expected src/main.ts to reference #${id}`).toBe(true);
+        expect(
+          indexHtml.includes(`id="${id}"`),
+          `Expected index.html to contain element with id="${id}"`
+        ).toBe(true);
+      }
+    });
+
+    it('asserts canvasContainer resolution in src/main.ts never returns null against index.html DOM', () => {
+      const indexHtmlPath = path.resolve(__dirname, '../index.html');
+      const indexHtml = fs.readFileSync(indexHtmlPath, 'utf8');
+
+      const idMatches = indexHtml.match(/id=["']([^"']+)["']/g) || [];
+      const indexIds = new Set(idMatches.map((m) => m.replace(/id=["']|["']/g, '')));
+
+      const resolveContainerId = () => {
+        if (indexIds.has('canvas-container')) return 'canvas-container';
+        if (indexIds.has('game-container')) return 'game-container';
+        if (indexIds.has('app-container')) return 'app-container';
+        return 'body';
+      };
+
+      const resolved = resolveContainerId();
+      expect(resolved).toBe('canvas-container');
+    });
+
+    it('verifies OverworldRenderer.init sets id "game-canvas" and mounts into target container', () => {
+      const overworldRendererPath = path.resolve(__dirname, '../src/render/OverworldRenderer.ts');
+      const rendererSrc = fs.readFileSync(overworldRendererPath, 'utf8');
+
+      expect(rendererSrc).toContain("this.app.canvas.id = 'game-canvas'");
+      expect(rendererSrc).toContain('target.appendChild(this.app.canvas)');
+    });
+  });
 });

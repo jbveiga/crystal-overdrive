@@ -413,7 +413,8 @@ async function bootstrap() {
   });
 
   window.updateLoaderProgress?.(40, 'Mounting overworld engine...');
-  const canvasContainer = document.getElementById('game-container') as HTMLElement;
+  const canvasContainer = (document.getElementById('canvas-container') ||
+    document.getElementById('game-container') || document.body) as HTMLElement;
   overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer, {
     startPercent: 40, endPercent: 72, concurrency: 6,

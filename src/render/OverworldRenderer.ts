@@ -63,17 +63,24 @@ export class OverworldRenderer {
       loadTextures.config.preferCreateImageBitmap = false;
     }
 
+    const target = containerElement || (typeof document !== 'undefined' ? (document.getElementById('canvas-container') || document.getElementById('game-container') || document.body) : null);
+
     this.app = new Application();
     await this.app.init({
-      resizeTo: containerElement,
+      resizeTo: target || undefined,
       backgroundColor: 0x0f172a,
-      resolution: window.devicePixelRatio || 1,
+      resolution: (typeof window !== 'undefined' ? window.devicePixelRatio : 1) || 1,
       autoDensity: true,
       antialias: false,
       preserveDrawingBuffer: true,
     });
 
-    containerElement.appendChild(this.app.canvas);
+    if (this.app?.canvas) {
+      this.app.canvas.id = 'game-canvas';
+    }
+    if (target && this.app?.canvas) {
+      target.appendChild(this.app.canvas);
+    }
 
     this.stageContainer = new Container(); this.stageContainer.eventMode = 'none';
     this.mapContainer = new Container(); this.mapContainer.eventMode = 'none';
