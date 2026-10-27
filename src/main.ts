@@ -134,6 +134,74 @@ async function bootstrap() {
   BattleAudio.setLowHpBeepEnabled(gameOptions.lowHpBeepEnabled ?? true);
   audioManager.setChiptuneMode(gameOptions.chiptuneMode ?? false);
 
+  let overworldRenderer!: OverworldRenderer, overworldHUD!: OverworldHUD, battleRenderer!: BattleRenderer;
+  let battleHUD!: BattleHUD, itemfinderHUD!: ItemfinderHUD, bugContestHUD!: BugContestHUDWidget;
+  let modalRegistry!: OverworldModalRegistry, cycleBattleSpeed!: () => SpeedMultiplier;
+  let setBattleSpeed!: (speed: SpeedMultiplier) => SpeedMultiplier, cyclePlayerSpeed!: () => SpeedMultiplier;
+  let setTextSpeed!: (speed: GameOptions['textSpeed']) => GameOptions['textSpeed'], cycleTextSpeed!: () => GameOptions['textSpeed'];
+
+  const player: GridEntity = {
+    id: 'player', x: initialPlayerX, y: initialPlayerY, targetX: initialPlayerX, targetY: initialPlayerY,
+    renderX: initialPlayerX, renderY: initialPlayerY, direction: initialPlayerDir, isMoving: false, progress: 0, isPlayer: true,
+  };
+
+  const visitedMaps = new Set<string>([initialMapId]);
+  const npcsByMap: Record<string, GridEntity[]> = createNpcsByMap();
+  filterInitialMapNpcs(npcsByMap, storyFlags);
+  applyStoryRecoveryFlags(storyFlags, defeatedTrainers, inventory);
+
+  const dayCareManager = new DayCareManager(existingSave?.dayCare);
+  const bugContestManager = new BugContestManager(existingSave?.bugContestRecords);
+  const stadiumArenaManager = new StadiumArenaManager();
+  const kurtCraftingManager = new KurtCraftingManager(existingSave?.kurtCraftingOrder);
+
+  const lookupMap = (id: string) => mapManager.getMap(id);
+  const getActiveMapNpcs = (mapId: string): GridEntity[] =>
+    activeNpcCache.getActiveNpcs(mapId, npcsByMap[mapId], storyFlags, isNpcActiveForStoryFlags);
+  const detectChosenStarterSpecies = () =>
+    OverworldTrainerSightAndTourController.detectChosenStarterSpecies(storyFlags, playerParty, playerBox, seenSpecies);
+  const healPlayerParty = (playSound: boolean = true) =>
+    OverworldTrainerSightAndTourController.healParty(playerParty, playSound);
+  const getCaughtSpeciesSet = () =>
+    new Set([...playerParty.map((p) => p.speciesId), ...boxManager.flatten().map((p) => p.speciesId)]);
+
+  const buildTrainerTeamInstances = (trainer: GridEntity) => OverworldTrainerSightAndTourController.buildTrainerTeamInstances(trainer);
+  const handleTrainerDefeatRewards = (trainer: GridEntity) => OverworldTrainerSightAndTourController.handleTrainerDefeatRewards(trainer, getTrainerSightContext());
+
+  const getBattleSessionContext = (): BattleSessionContext => ({
+    setGameState: (state) => { gameState = state; },
+    overworldHUD: { hide: () => overworldHUD.hide(), show: () => overworldHUD.show(), showToast: (m) => overworldHUD.showToast(m), hideRoamerAlert: () => overworldHUD.hideRoamerAlert() },
+    itemfinderHUD: { suspend: () => itemfinderHUD.suspend(), resume: () => itemfinderHUD.resume() },
+    player, audioManager, seenSpecies, playerParty, playerBox,
+    setPlayerBox: (box) => { playerBox = box; },
+    healPlayerParty: (playAnim) => healPlayerParty(playAnim),
+    battleHUD, battleRenderer, inventory, gameClock, gameOptions, eventBus, mapManager, boxManager, storyFlags,
+    bugContestManager, roamingManager, missionManager, playerName,
+    cycleBattleSpeed: () => cycleBattleSpeed(),
+    saveCurrentGame: () => saveCurrentGame(),
+    respawnAtLastPokecenter: async () => OverworldWarpAndMapTransitionController.respawnAtLastPokecenter(getTransitionContext(), lastVisitedPokecenter, audioManager, itemfinderHUD, healPlayerParty),
+    promptBugContestSpecimenSwap: async (newCatch) => modalRegistry.promptBugContestSpecimenSwap(newCatch, bugContestHUD),
+    playEvolutionScene: (pokemon, targetSpeciesId) => new EvolutionSceneUI('modal-container').play(pokemon, targetSpeciesId),
+    openMoveReplacementModal: (pokemon, moveData) => new MoveReplacementModalUI('modal-container').open(pokemon, moveData),
+  });
+
+  const triggerBattle = async (initialOpponent: PokemonInstance, options: TriggerBattleOptions = {}) => {
+    await BattleSessionController.runBattleSession(getBattleSessionContext(), initialOpponent, options);
+  };
+
+  const getCutsceneContext = (): StoryCutsceneContext => ({
+    player, storyFlags, defeatedTrainers, playerParty, rivalName, playerName, audioManager, overworldRenderer,
+    overworldHUD, npcsByMap, gameClock, mapManager, roamingManager, triggerBattle, buildTrainerTeamInstances,
+    handleTrainerDefeatRewards, saveCurrentGame,
+    setCutsceneLocked: (locked) => { isCutsceneLocked = locked; },
+  });
+
+  const triggerSlowpokeWellGruntIntercept = async (grunt: GridEntity) => StoryCutscenes.triggerSlowpokeWellGruntIntercept(grunt, getCutsceneContext());
+  const triggerAzaleaRivalAmbush = () => StoryCutscenes.triggerAzaleaRivalAmbush(getCutsceneContext());
+  const triggerCherrygroveRivalAmbush = () => StoryCutscenes.triggerCherrygroveRivalAmbush(getCutsceneContext());
+  const triggerBurnedTowerRivalBattle = () => StoryCutscenes.triggerBurnedTowerRivalBattle(getCutsceneContext());
+  const triggerBeastsAwakeningCutscene = () => StoryCutscenes.triggerBeastsAwakeningCutscene(getCutsceneContext());
+
   const saveCurrentGame = async () => {
     missionManager.checkStoryFlags(storyFlags);
     gameOptions.playerSpeedDefault = gameClock.playerSpeed;
@@ -208,6 +276,12 @@ async function bootstrap() {
     initialMap = mapManager.setCurrentMap(initialMapId);
     initialPlayerX = 13;
     initialPlayerY = 6;
+    player.x = 13;
+    player.y = 6;
+    player.targetX = 13;
+    player.targetY = 6;
+    player.renderX = 13;
+    player.renderY = 6;
   }
   missionManager.registerMapEntry(initialMap.id, storyFlags);
   mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
@@ -225,10 +299,8 @@ async function bootstrap() {
   const getApricornCount = (apricornId: string) => OverworldTrainerSightAndTourController.getApricornCount(getTrainerSightContext(), apricornId);
   const deductApricorn = (apricornId: string, qty: number) => OverworldTrainerSightAndTourController.deductApricorn(getTrainerSightContext(), apricornId, qty);
   const launchStadiumChallenge = (challengerId: string, cupId: string) => OverworldTrainerSightAndTourController.launchStadiumChallenge(challengerId, cupId, getTrainerSightContext());
-  const buildTrainerTeamInstances = (trainer: GridEntity) => OverworldTrainerSightAndTourController.buildTrainerTeamInstances(trainer);
   const runTrainerSightSequence = (trainer: GridEntity) => OverworldTrainerSightAndTourController.runTrainerSightSequence(trainer, getCutsceneContext());
   const completeSlowpokeWellProtonVictory = () => OverworldTrainerSightAndTourController.completeSlowpokeWellProtonVictory(getTrainerSightContext());
-  const handleTrainerDefeatRewards = (trainer: GridEntity) => OverworldTrainerSightAndTourController.handleTrainerDefeatRewards(trainer, getTrainerSightContext());
   const runGuideGentWalkingTour = (guide: GridEntity) => OverworldTrainerSightAndTourController.runGuideGentWalkingTour(guide, getCutsceneContext());
 
   const bagUI = new BagAndMartUI(
@@ -243,23 +315,11 @@ async function bootstrap() {
 
   const partyUI = new PartyManagementUI('modal-container', playerParty, () => { saveCurrentGame(); });
   const missionLogUI = new MissionLogUI('modal-container', missionManager);
-  const itemfinderHUD = new ItemfinderHUD('overworld-hud-container');
+  itemfinderHUD = new ItemfinderHUD('overworld-hud-container');
   const namingModalUI = new NamingModalUI('overworld-hud-container');
-  const dayCareManager = new DayCareManager(existingSave?.dayCare);
-  const bugContestManager = new BugContestManager(existingSave?.bugContestRecords);
-  const stadiumArenaManager = new StadiumArenaManager();
-  const bugContestHUD = new BugContestHUDWidget('overworld-hud-container');
-  const kurtCraftingManager = new KurtCraftingManager(existingSave?.kurtCraftingOrder);
-  const visitedMaps = new Set<string>([initialMapId]);
+  bugContestHUD = new BugContestHUDWidget('overworld-hud-container');
 
-  const getCaughtSpeciesSet = () =>
-    new Set([...playerParty.map((p) => p.speciesId), ...boxManager.flatten().map((p) => p.speciesId)]);
-
-  let overworldHUD!: OverworldHUD;
-  let battleRenderer!: BattleRenderer;
-  let battleHUD!: BattleHUD;
-
-  const setBattleSpeed = (speed: SpeedMultiplier): SpeedMultiplier => {
+  setBattleSpeed = (speed: SpeedMultiplier): SpeedMultiplier => {
     gameClock.battleSpeed = speed;
     gameOptions.battleSpeedMultiplier = speed;
     if (battleRenderer) battleRenderer.setSpeedMultiplier(speed);
@@ -268,12 +328,12 @@ async function bootstrap() {
     return speed;
   };
 
-  const cycleBattleSpeed = (): SpeedMultiplier => {
+  cycleBattleSpeed = (): SpeedMultiplier => {
     const nextSpeed: SpeedMultiplier = gameClock.battleSpeed === 1 ? 2 : gameClock.battleSpeed === 2 ? 3 : 1;
     return setBattleSpeed(nextSpeed);
   };
 
-  const setTextSpeed = (speed: GameOptions['textSpeed']): GameOptions['textSpeed'] => {
+  setTextSpeed = (speed: GameOptions['textSpeed']): GameOptions['textSpeed'] => {
     gameOptions.textSpeed = speed;
     if (overworldHUD) overworldHUD.setTextSpeed(speed);
     if (battleHUD) battleHUD.setTextSpeed(speed);
@@ -281,14 +341,14 @@ async function bootstrap() {
     return speed;
   };
 
-  const cycleTextSpeed = (): GameOptions['textSpeed'] => {
+  cycleTextSpeed = (): GameOptions['textSpeed'] => {
     const speeds: Array<GameOptions['textSpeed']> = ['SLOW', 'MID', 'FAST', 'INSTANT'];
     const current = gameOptions.textSpeed ?? 'MID';
     const nextIdx = (speeds.indexOf(current) + 1) % speeds.length;
     return setTextSpeed(speeds[nextIdx]);
   };
 
-  const cyclePlayerSpeed = (): SpeedMultiplier => {
+  cyclePlayerSpeed = (): SpeedMultiplier => {
     const newSpeed = gameClock.cyclePlayerSpeed();
     gameOptions.playerSpeedDefault = newSpeed;
     bagUI.setSpeedMultiplier(newSpeed);
@@ -299,7 +359,7 @@ async function bootstrap() {
     return newSpeed;
   };
 
-  const modalRegistry = new OverworldModalRegistry({
+  modalRegistry = new OverworldModalRegistry({
     dayCareManager, kurtCraftingManager, bugContestManager, stadiumArenaManager, audioManager, gameClock, gameOptions,
     displayThemeManager, mapManager, missionManager, roamingManager, overworldItemManager, inventory,
     playerParty, storyFlags, visitedMaps, seenSpecies, playerName, initialMapId, getCaughtSpeciesSet,
@@ -352,16 +412,12 @@ async function bootstrap() {
 
   window.updateLoaderProgress?.(40, 'Mounting overworld engine...');
   const canvasContainer = document.getElementById('game-container') as HTMLElement;
-  const overworldRenderer = new OverworldRenderer();
+  overworldRenderer = new OverworldRenderer();
   await overworldRenderer.init(canvasContainer, {
     startPercent: 40, endPercent: 72, concurrency: 6,
     onProgress: (snap) => { window.updateLoaderProgress?.(snap.percent, snap.currentLabel); },
   });
   overworldRenderer.setPlayerGender(playerGender);
-  const lookupMap = (id: string) => mapManager.getMap(id);
-
-  const getActiveMapNpcs = (mapId: string): GridEntity[] =>
-    activeNpcCache.getActiveNpcs(mapId, npcsByMap[mapId], storyFlags, isNpcActiveForStoryFlags);
 
   mapManager.setNpcLifecycleCallbacks({
     onMapLoaded: (map) => { resetMapNpcsToOrigin(map.id); getActiveMapNpcs(map.id); },
@@ -370,9 +426,6 @@ async function bootstrap() {
 
   overworldRenderer.setNpcLookup((id) => getActiveMapNpcs(id));
   resetMapNpcsToOrigin(initialMap.id);
-
-  const detectChosenStarterSpecies = () =>
-    OverworldTrainerSightAndTourController.detectChosenStarterSpecies(storyFlags, playerParty, playerBox, seenSpecies);
 
   await overworldRenderer.ensureMapTilesLoaded(initialMap, lookupMap, {
     startPercent: 72, endPercent: 95, concurrency: 8,
@@ -487,52 +540,6 @@ async function bootstrap() {
       }
     }
   });
-
-  const healPlayerParty = (playSound: boolean = true) =>
-    OverworldTrainerSightAndTourController.healParty(playerParty, playSound);
-
-  const player: GridEntity = {
-    id: 'player', x: initialPlayerX, y: initialPlayerY, targetX: initialPlayerX, targetY: initialPlayerY,
-    renderX: initialPlayerX, renderY: initialPlayerY, direction: initialPlayerDir, isMoving: false, progress: 0, isPlayer: true,
-  };
-
-  const npcsByMap: Record<string, GridEntity[]> = createNpcsByMap();
-  filterInitialMapNpcs(npcsByMap, storyFlags);
-  applyStoryRecoveryFlags(storyFlags, defeatedTrainers, inventory);
-
-  const getBattleSessionContext = (): BattleSessionContext => ({
-    setGameState: (state) => { gameState = state; },
-    overworldHUD: { hide: () => overworldHUD.hide(), show: () => overworldHUD.show(), showToast: (m) => overworldHUD.showToast(m), hideRoamerAlert: () => overworldHUD.hideRoamerAlert() },
-    itemfinderHUD: { suspend: () => itemfinderHUD.suspend(), resume: () => itemfinderHUD.resume() },
-    player, audioManager, seenSpecies, playerParty, playerBox,
-    setPlayerBox: (box) => { playerBox = box; },
-    healPlayerParty: (playAnim) => healPlayerParty(playAnim),
-    battleHUD, battleRenderer, inventory, gameClock, gameOptions, eventBus, mapManager, boxManager, storyFlags,
-    bugContestManager, roamingManager, missionManager, playerName,
-    cycleBattleSpeed: () => cycleBattleSpeed(),
-    saveCurrentGame: () => saveCurrentGame(),
-    respawnAtLastPokecenter: async () => OverworldWarpAndMapTransitionController.respawnAtLastPokecenter(getTransitionContext(), lastVisitedPokecenter, audioManager, itemfinderHUD, healPlayerParty),
-    promptBugContestSpecimenSwap: async (newCatch) => modalRegistry.promptBugContestSpecimenSwap(newCatch, bugContestHUD),
-    playEvolutionScene: (pokemon, targetSpeciesId) => new EvolutionSceneUI('modal-container').play(pokemon, targetSpeciesId),
-    openMoveReplacementModal: (pokemon, moveData) => new MoveReplacementModalUI('modal-container').open(pokemon, moveData),
-  });
-
-  const triggerBattle = async (initialOpponent: PokemonInstance, options: TriggerBattleOptions = {}) => {
-    await BattleSessionController.runBattleSession(getBattleSessionContext(), initialOpponent, options);
-  };
-
-  const getCutsceneContext = (): StoryCutsceneContext => ({
-    player, storyFlags, defeatedTrainers, playerParty, rivalName, playerName, audioManager, overworldRenderer,
-    overworldHUD, npcsByMap, gameClock, mapManager, roamingManager, triggerBattle, buildTrainerTeamInstances,
-    handleTrainerDefeatRewards, saveCurrentGame,
-    setCutsceneLocked: (locked) => { isCutsceneLocked = locked; },
-  });
-
-  const triggerSlowpokeWellGruntIntercept = async (grunt: GridEntity) => StoryCutscenes.triggerSlowpokeWellGruntIntercept(grunt, getCutsceneContext());
-  const triggerAzaleaRivalAmbush = () => StoryCutscenes.triggerAzaleaRivalAmbush(getCutsceneContext());
-  const triggerCherrygroveRivalAmbush = () => StoryCutscenes.triggerCherrygroveRivalAmbush(getCutsceneContext());
-  const triggerBurnedTowerRivalBattle = () => StoryCutscenes.triggerBurnedTowerRivalBattle(getCutsceneContext());
-  const triggerBeastsAwakeningCutscene = () => StoryCutscenes.triggerBeastsAwakeningCutscene(getCutsceneContext());
 
   const getTickerContext = (): OverworldTickerContext & { dayCareManager: any; playerParty: any[]; seenSpecies: Set<string>; defeatedTrainers: Set<string>; overworldRenderer: any; } => ({
     getGameState: () => gameState,

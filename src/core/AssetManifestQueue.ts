@@ -100,6 +100,13 @@ export class AssetManifestQueue {
         try {
           await item.execute();
         } catch (err) {
+          if (
+            err instanceof ReferenceError ||
+            err instanceof TypeError ||
+            err instanceof SyntaxError
+          ) {
+            throw err;
+          }
           console.warn(`[AssetManifestQueue] Non-fatal error loading ${item.id} (${item.label}):`, err);
         } finally {
           completed++;
