@@ -138,7 +138,19 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       makeNpc('dj_mary', 7, 4, 'DOWN', 'girl', '🎙️ DJ MARY', 
         [
           'PROF. OAK and I host the POKéMON TALK radio show every day! We announce where rare POKéMON are swarming in Johto!',
-        ]
+        ],
+        { action: 'DJ_MARY_EVENT' }
+      ),
+      makeNpc('executive_proton_radio_4f', 14, 1, 'DOWN', 'rocket_grunt_m', '⚡ EXECUTIVE PROTON',
+        ['PROTON: You! You took down our team at the SLOWPOKE WELL!', 'I will not lose to you again!'],
+        {
+          action: 'EXECUTIVE_PROTON_EVENT',
+          trainerId: 'proton_radio',
+          trainerName: 'Executive Proton',
+          challengePages: ['PROTON: We are reclaiming JOHTO for GIOVANNI! Out of my way!'],
+          trainerPokemon: { speciesId: 'weezing', level: 33, moves: ['sludge', 'smokescreen', 'tackle', 'toxic'] },
+          trainerTeam: [{ speciesId: 'weezing', level: 33, moves: ['sludge', 'smokescreen', 'tackle', 'toxic'] }],
+        }
       ),
     ],
     radio_tower_5f: [
@@ -164,12 +176,27 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
           ],
         }
       ),
+      makeNpc('executive_ariana_radio_5f', 17, 2, 'LEFT', 'rocket_grunt_f', '⚡ EXECUTIVE ARIANA',
+        ['ARIANA: I am ARIANA, one of TEAM ROCKET’s four EXECUTIVES!', 'You shall not pass this door!'],
+        {
+          action: 'EXECUTIVE_ARIANA_EVENT',
+          trainerId: 'ariana_radio',
+          trainerName: 'Executive Ariana',
+          challengePages: ['ARIANA: I will show you why I am an EXECUTIVE of TEAM ROCKET!'],
+          trainerPokemon: { speciesId: 'arbok', level: 32, moves: ['poisonsting', 'bite', 'glare', 'screech'] },
+          trainerTeam: [
+            { speciesId: 'arbok', level: 32, moves: ['poisonsting', 'bite', 'glare', 'screech'] },
+            { speciesId: 'vileplume', level: 32, moves: ['absorb', 'sweetscent', 'acid', 'stunspore'] },
+            { speciesId: 'murkrow', level: 32, moves: ['peck', 'pursuit', 'haze', 'nightshade'] },
+          ],
+        }
+      ),
       makeNpc('archer_radio_5f', 5, 4, 'DOWN', 'rocket_grunt_m', '⚡ EXECUTIVE ARCHER', 
         [
           "ARCHER: It's no use! The broadcast has already reached maximum transmitter power!",
         ],
         {
-          action: 'ARCHER_EVENT',
+          action: 'EXECUTIVE_ARCHER_EVENT',
           trainerId: 'archer_radio',
           trainerName: 'Executive Archer',
           challengePages: [
@@ -183,11 +210,28 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
           ],
         }
       ),
+      makeNpc('liberated_director_radio_5f', 16, 5, 'DOWN', 'elder', '📻 DIRECTOR', 
+        [
+          "DIRECTOR: Thank you from the bottom of my heart for liberating our RADIO TOWER!",
+          "Music and peace have returned to Johto!",
+        ],
+        { action: 'LIBERATED_DIRECTOR_EVENT' }
+      ),
       makeNpc('radio_director', 5, 4, 'DOWN', 'elder', '📻 RADIO DIRECTOR', 
         [
           "DIRECTOR: Thank you from the bottom of my heart for liberating our RADIO TOWER!",
           "Music and peace have returned to Johto!",
         ]
+      ),
+    ],
+    goldenrod_underground_warehouse: [
+      makeNpc('real_director_warehouse', 8, 2, 'DOWN', 'elder', '📻 REAL DIRECTOR', 
+        [
+          "DIRECTOR: You came all the way down here to rescue me?! Thank you!",
+          "TEAM ROCKET locked me away and hijacked the observation deck transmitter on 5F to summon GIOVANNI!",
+          "Take this CARD KEY! It will unlock the 3F security shutters in the RADIO TOWER so you can stop them!",
+        ],
+        { action: 'UNDERGROUND_REAL_DIRECTOR' }
       ),
     ],
     route_35: [

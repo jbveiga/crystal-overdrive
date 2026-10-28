@@ -175,7 +175,16 @@ export interface GridEntity {
     | 'KIYO_EVENT'
     | 'BIKE_SHOP_CLERK'
     | 'BITTER_MERCHANT'
-    | 'BARGAIN_MERCHANT';
+    | 'BARGAIN_MERCHANT'
+    | 'UNDERGROUND_BASEMENT_DOOR'
+    | 'UNDERGROUND_SHUTTER_SWITCH'
+    | 'UNDERGROUND_REAL_DIRECTOR'
+    | 'RADIO_TOWER_CARD_KEY_SHUTTER'
+    | 'EXECUTIVE_PROTON_EVENT'
+    | 'EXECUTIVE_ARIANA_EVENT'
+    | 'EXECUTIVE_ARCHER_EVENT'
+    | 'LIBERATED_DIRECTOR_EVENT'
+    | 'DJ_MARY_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

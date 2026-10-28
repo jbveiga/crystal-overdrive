@@ -2349,8 +2349,29 @@ buildMapFromBlk({
   warps: [
     { x: 3, y: 2, targetMapId: 'goldenrod_city', targetX: 9, targetY: 6 },
     { x: 3, y: 34, targetMapId: 'goldenrod_city', targetX: 11, targetY: 30 },
+    { x: 18, y: 6, targetMapId: 'goldenrod_underground_switch_room_entrances', targetX: 23, targetY: 3 },
   ],
   bgEvents: [],
+});
+
+buildMapFromBlk({
+  id: 'goldenrod_underground_switch_room_entrances',
+  name: 'Goldenrod Underground Switch Room Entrances',
+  tileset: 'underground',
+  blkFile: 'maps__GoldenrodUndergroundSwitchRoomEntrances.blk',
+  blocksW: 15,
+  blocksH: 9,
+  warps: [
+    { x: 23, y: 3, targetMapId: 'goldenrod_underground', targetX: 18, targetY: 6 },
+    { x: 22, y: 10, targetMapId: 'goldenrod_underground_warehouse', targetX: 1, targetY: 1 },
+    { x: 23, y: 10, targetMapId: 'goldenrod_underground_warehouse', targetX: 2, targetY: 1 },
+  ],
+  bgEvents: [
+    { x: 16, y: 1, speaker: '🔌 SWITCH 1', pages: ['A wall switch labeled SWITCH 1.'] },
+    { x: 10, y: 1, speaker: '🔌 SWITCH 2', pages: ['A wall switch labeled SWITCH 2.'] },
+    { x: 2, y: 1, speaker: '🔌 SWITCH 3', pages: ['A wall switch labeled SWITCH 3.'] },
+    { x: 20, y: 11, speaker: '🔌 EMERGENCY SWITCH', pages: ['A wall switch labeled EMERGENCY.'] },
+  ],
 });
 
 buildMapFromBlk({

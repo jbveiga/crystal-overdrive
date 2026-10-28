@@ -422,6 +422,59 @@ export class OverworldTickerCoordinator {
             return;
           }
 
+          // Underground Switch Room Rival Silver 4th Ambush
+          if (
+            currentMap?.id === 'goldenrod_underground_switch_room_entrances' &&
+            coord.x === 19 &&
+            (coord.y === 4 || coord.y === 5) &&
+            !storyFlags.has('EVENT_RIVAL_GOLDENROD_UNDERGROUND')
+          ) {
+            storyFlags.add('EVENT_RIVAL_GOLDENROD_UNDERGROUND');
+            defeatedTrainers.add('rival_underground_4');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            overworldHUD.openDialogue(
+              [
+                'SILVER: Hold it right there!',
+                "You again?! You're trying to bust TEAM ROCKET all by yourself?",
+                "Don't make me laugh! You're nowhere near tough enough. I'll prove it to you right now!",
+                "...Humph! You got lucky again. But don't think you're better than me!",
+                "I'll wipe out TEAM ROCKET myself! Just stay out of my way!",
+              ],
+              '🔴 RIVAL SILVER',
+              () => void saveCurrentGame()
+            );
+            return;
+          }
+
+          // Radio Tower 3F Card Key Shutter
+          if (
+            currentMap?.id === 'radio_tower_3f' &&
+            coord.x === 0 &&
+            coord.y === 7 &&
+            !storyFlags.has('EVENT_USED_CARD_KEY')
+          ) {
+            const hasCardKey =
+              storyFlags.has('card_key_obtained') ||
+              storyFlags.has('has_card_key') ||
+              Boolean((ctx as any).inventory?.keyItems?.some((k: string) => k.toLowerCase().includes('card')));
+            if (hasCardKey) {
+              storyFlags.add('EVENT_USED_CARD_KEY');
+              currentMap.collisionGrid[7 * currentMap.width + 0] = 0;
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              overworldHUD.openDialogue(
+                ['Inserted the CARD KEY!', 'The 3F security shutter opened!'],
+                '💳 CARD KEY SHUTTER',
+                () => void saveCurrentGame()
+              );
+            } else {
+              overworldHUD.openDialogue(
+                ['A heavy security shutter blocks the way. A CARD KEY is required to open it.'],
+                '💳 CARD KEY SHUTTER'
+              );
+            }
+            return;
+          }
+
           // Ecruteak Gym Invisible Floor Pitfall Maze
           if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15) {
             if (!isEcruteakGymSafeTile(coord.x, coord.y)) {

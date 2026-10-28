@@ -3266,6 +3266,13 @@
       "targetMapId": "goldenrod_city",
       "targetX": 11,
       "targetY": 30
+    },
+    {
+      "x": 18,
+      "y": 6,
+      "targetMapId": "goldenrod_underground_switch_room_entrances",
+      "targetX": 23,
+      "targetY": 3
     }
   ],
   "bgEvents": [],

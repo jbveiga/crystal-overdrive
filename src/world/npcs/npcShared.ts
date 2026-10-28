@@ -358,13 +358,19 @@ export function isNpcActiveForStoryFlags(
   if (npcId === 'petrel_radio_5f') {
     return storyFlags.has('pryce_defeated') && !storyFlags.has('fake_director_defeated');
   }
+  if (npcId === 'executive_proton_radio_4f') {
+    return storyFlags.has('card_key_obtained') && !storyFlags.has('proton_defeated') && !storyFlags.has('radio_tower_liberated');
+  }
+  if (npcId === 'executive_ariana_radio_5f') {
+    return storyFlags.has('card_key_obtained') && !storyFlags.has('ariana_defeated') && !storyFlags.has('radio_tower_liberated');
+  }
   if (npcId === 'archer_radio_5f') {
     return storyFlags.has('card_key_obtained') && !storyFlags.has('radio_tower_liberated');
   }
-  if (npcId === 'radio_director') {
+  if (npcId === 'liberated_director_radio_5f' || npcId === 'radio_director') {
     return !storyFlags.has('pryce_defeated') || storyFlags.has('radio_tower_liberated');
   }
-  if (npcId === 'true_director') {
+  if (npcId === 'true_director' || npcId === 'real_director_warehouse') {
     return storyFlags.has('fake_director_defeated') && !storyFlags.has('radio_tower_liberated');
   }
 

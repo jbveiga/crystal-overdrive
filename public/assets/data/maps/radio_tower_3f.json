@@ -460,6 +460,23 @@
       "targetY": 1
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 0,
+      "y": 7,
+      "speaker": "💳 CARD KEY SHUTTER",
+      "pages": [
+        "A heavy security shutter blocks the stairwell. A CARD KEY slot is installed next to the door."
+      ]
+    },
+    {
+      "x": 14,
+      "y": 2,
+      "speaker": "💳 CARD KEY SHUTTER",
+      "pages": [
+        "It's the CARD KEY slot."
+      ]
+    }
+  ],
   "grassEncounters": []
 }
