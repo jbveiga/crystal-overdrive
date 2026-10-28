@@ -100,7 +100,8 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
         if (
           ctx.storyFlags.has('has_squirtbottle') ||
           ctx.storyFlags.has('HAS_SQUIRTBOTTLE') ||
-          ctx.storyFlags.has('EVENT_GOT_SQUIRTBOTTLE')
+          ctx.storyFlags.has('EVENT_GOT_SQUIRTBOTTLE') ||
+          Boolean(ctx.inventory.keyItems?.some((k) => k.toLowerCase() === 'squirtbottle'))
         ) {
           ctx.openDialogue(
             ['FLORIST: Did you try using that SQUIRTBOTTLE on the weird tree on ROUTE 36?'],
@@ -126,7 +127,9 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
         ctx.storyFlags.add('HAS_SQUIRTBOTTLE');
         ctx.storyFlags.add('EVENT_GOT_SQUIRTBOTTLE');
         if (!ctx.inventory.keyItems) ctx.inventory.keyItems = [];
-        if (!ctx.inventory.keyItems.includes('SQUIRTBOTTLE')) ctx.inventory.keyItems.push('SQUIRTBOTTLE');
+        if (!ctx.inventory.keyItems.some((k) => k.toLowerCase() === 'squirtbottle')) {
+          ctx.inventory.keyItems.push('SQUIRTBOTTLE');
+        }
         BattleAudio.playOverworldSound('KEY_ITEM');
         ctx.openDialogue(
           [
@@ -146,7 +149,8 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
 
     // 5. Goldenrod Bike Shop: Bicycle Loan
     {
-      npcIds: ['bike_shop_owner'],
+      npcIds: ['goldenrod_bike_shop_clerk', 'bike_shop_owner'],
+      actions: ['BIKE_SHOP_CLERK'],
       handler: (targetNpc, _map, ctx) => {
         if (ctx.storyFlags.has('HAS_BICYCLE') || ctx.storyFlags.has('EVENT_GOT_BICYCLE')) {
           ctx.openDialogue(
@@ -397,7 +401,7 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
           ctx.storyFlags.has('has_squirtbottle') ||
           ctx.storyFlags.has('HAS_SQUIRTBOTTLE') ||
           ctx.storyFlags.has('EVENT_GOT_SQUIRTBOTTLE') ||
-          (ctx.inventory.keyItems || []).includes('squirtbottle');
+          Boolean(ctx.inventory.keyItems?.some((k) => k.toLowerCase() === 'squirtbottle'));
 
         if (!hasSquirtbottle) {
           BattleAudio.playOverworldSound('RUSTLE');

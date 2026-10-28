@@ -266,6 +266,20 @@
       "targetMapId": "route_34",
       "targetX": 11,
       "targetY": 15
+    },
+    {
+      "x": 0,
+      "y": 5,
+      "targetMapId": "route_34",
+      "targetX": 13,
+      "targetY": 15
+    },
+    {
+      "x": 0,
+      "y": 6,
+      "targetMapId": "route_34",
+      "targetX": 13,
+      "targetY": 15
     }
   ],
   "bgEvents": [],

@@ -192,9 +192,17 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
         }
 
         if (!ctx.storyFlags.has('whitney_calmed')) {
+          ctx.storyFlags.add('whitney_calmed');
           ctx.openDialogue(
-            ["WHITNEY: …Sniffle… …Waaaaaaah! What a meanie! Leave me alone! Waaaaah!"],
-            targetNpc.speaker
+            [
+              "WHITNEY: …Sniffle… …Waaaaaaah! What a meanie! Leave me alone! Waaaaah!",
+              "LASS BRIDGET: Oh, no. You made WHITNEY cry! It's OK, she'll stop soon. She always cries when she loses.",
+              "Go on and talk to her again! She should be calmed down now.",
+            ],
+            targetNpc.speaker,
+            () => {
+              ctx.saveCurrentGame();
+            }
           );
           return true;
         }
@@ -224,7 +232,10 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
         }
 
         ctx.openDialogue(
-          ['WHITNEY: The PLAINBADGE proves your strength! Normal-type POKéMON have so much versatility. Keep believing in your team!'],
+          [
+            'WHITNEY: Ah, that was a good cry! Come for a visit again! Bye-bye!',
+            'Normal-type POKéMON have so much versatility. Keep believing in your team!',
+          ],
           targetNpc.speaker
         );
         return true;

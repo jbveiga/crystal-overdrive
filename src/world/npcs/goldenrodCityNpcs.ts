@@ -296,11 +296,12 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_bike_shop: [
-      makeNpc('bike_shop_owner', 2, 3, 'DOWN', 'fat_man', '🚲 BIKE SHOP OWNER', 
+      makeNpc('goldenrod_bike_shop_clerk', 7, 2, 'LEFT', 'clerk', '🚲 BIKE SHOP CLERK', 
         [
           'Welcome to MIRACLE CYCLE! I moved here from CERULEAN CITY, but nobody knows my bikes yet!',
           'Would you take one of our BICYCLES and ride it everywhere to advertise for me? It’ll double your travel speed!',
-        ]
+        ],
+        { action: 'BIKE_SHOP_CLERK' }
       ),
     ],
     goldenrod_flower_shop: [
@@ -389,11 +390,11 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
       makeNpc('bitter_merchant', 2, 6, 'RIGHT', 'fat_man', '🌿 HERB SHOP',
         ['Welcome to the HERB SHOP! Our bitter medicine is harsh, but it heals POKéMON effectively!'],
-        { talkAcrossCounter: true, action: 'OPEN_MART' }
+        { talkAcrossCounter: true, action: 'BITTER_MERCHANT' }
       ),
       makeNpc('bargain_merchant', 2, 8, 'RIGHT', 'clerk', '💎 BARGAIN SHOP',
         ['Step right up! I sell rare, valuable goods at bargain prices only on weekend mornings!'],
-        { talkAcrossCounter: true, action: 'OPEN_MART' }
+        { talkAcrossCounter: true, action: 'BARGAIN_MERCHANT' }
       ),
       makeNpc('older_haircut_brother', 2, 11, 'RIGHT', 'boy', '✂️ OLDER HAIRCUT BROTHER',
         ['I can groom your POKéMON with expert care for ¥500! It will adore you!'],

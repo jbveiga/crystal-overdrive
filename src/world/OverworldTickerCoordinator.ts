@@ -401,6 +401,27 @@ export class OverworldTickerCoordinator {
             return;
           }
 
+          // Goldenrod Gym Whitney Cry Step Trigger
+          if (
+            currentMap?.id === 'goldenrod_gym' &&
+            coord.x === 8 &&
+            coord.y === 5 &&
+            storyFlags.has('whitney_defeated') &&
+            !storyFlags.has('whitney_calmed')
+          ) {
+            storyFlags.add('whitney_calmed');
+            overworldHUD.openDialogue(
+              [
+                'LASS BRIDGET: Oh, no. You made WHITNEY cry.',
+                "It's OK. She'll stop soon. She always cries when she loses.",
+                'Go on back and talk to her now. She should be calmed down.',
+              ],
+              '👧 LASS BRIDGET',
+              () => void saveCurrentGame()
+            );
+            return;
+          }
+
           // Ecruteak Gym Invisible Floor Pitfall Maze
           if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15) {
             if (!isEcruteakGymSafeTile(coord.x, coord.y)) {

@@ -172,7 +172,10 @@ export interface GridEntity {
     | 'ROUTE_42_SUICUNE_EVENT'
     | 'ROUTE_42_GATE_OFFICER'
     | 'STRENGTH_BOULDER'
-    | 'KIYO_EVENT';
+    | 'KIYO_EVENT'
+    | 'BIKE_SHOP_CLERK'
+    | 'BITTER_MERCHANT'
+    | 'BARGAIN_MERCHANT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

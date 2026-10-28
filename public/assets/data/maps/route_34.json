@@ -3285,6 +3285,13 @@
       "targetMapId": "day_care",
       "targetX": 3,
       "targetY": 7
+    },
+    {
+      "x": 13,
+      "y": 15,
+      "targetMapId": "day_care",
+      "targetX": 0,
+      "targetY": 5
     }
   ],
   "bgEvents": [

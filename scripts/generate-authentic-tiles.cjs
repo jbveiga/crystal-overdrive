@@ -2248,7 +2248,7 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'goldenrod_bike_shop',
   name: 'Goldenrod Bike Shop',
-  tileset: 'house',
+  tileset: 'champions_room',
   blkFile: 'maps__GoldenrodBikeShop.blk',
   blocksW: 4,
   blocksH: 4,
@@ -2256,7 +2256,17 @@ buildMapFromBlk({
     { x: 2, y: 7, targetMapId: 'goldenrod_city', targetX: 29, targetY: 29 },
     { x: 3, y: 7, targetMapId: 'goldenrod_city', targetX: 29, targetY: 29 },
   ],
-  bgEvents: [],
+  bgEvents: [
+    { x: 1, y: 2, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+    { x: 0, y: 3, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+    { x: 1, y: 3, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+    { x: 0, y: 5, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+    { x: 1, y: 5, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+    { x: 0, y: 6, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+    { x: 1, y: 6, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+    { x: 6, y: 6, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+    { x: 7, y: 6, speaker: '🚲 BICYCLE', pages: ["It's a shiny new BICYCLE!"] },
+  ],
 });
 
 buildMapFromBlk({

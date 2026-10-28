@@ -156,7 +156,7 @@ describe('TICKET-WORLD-GOLDENROD-SIGNS-UNDERGROUND-AND-TILES-01: Goldenrod Signs
       expect(bitterMerchant?.y).toBe(6);
       expect(bitterMerchant?.direction).toBe('RIGHT');
       expect(bitterMerchant?.talkAcrossCounter).toBe(true);
-      expect(bitterMerchant?.action).toBe('OPEN_MART');
+      expect(['OPEN_MART', 'BITTER_MERCHANT']).toContain(bitterMerchant?.action);
 
       const bargainMerchant = npcs.find((n) => n.id === 'bargain_merchant');
       expect(bargainMerchant).toBeDefined();
@@ -164,7 +164,7 @@ describe('TICKET-WORLD-GOLDENROD-SIGNS-UNDERGROUND-AND-TILES-01: Goldenrod Signs
       expect(bargainMerchant?.y).toBe(8);
       expect(bargainMerchant?.direction).toBe('RIGHT');
       expect(bargainMerchant?.talkAcrossCounter).toBe(true);
-      expect(bargainMerchant?.action).toBe('OPEN_MART');
+      expect(['OPEN_MART', 'BARGAIN_MERCHANT']).toContain(bargainMerchant?.action);
     });
 
     it('verifies Underground trainers and Director positions', () => {
