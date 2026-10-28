@@ -421,5 +421,17 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('ice_path_b2f_boulder_3', 4, 12, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from the floor above!']),
       makeNpc('ice_path_b2f_boulder_4', 12, 12, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from the floor above!']),
     ],
+
+    blackthorn_gym_2f: [
+      makeNpc('blackthorn_gym_2f_boulder_1', 8, 2, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder! It can be moved with STRENGTH.'], { action: 'BLACKTHORN_BOULDER' }),
+      makeNpc('blackthorn_gym_2f_boulder_2', 3, 7, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder! It can be moved with STRENGTH.'], { action: 'BLACKTHORN_BOULDER' }),
+      makeNpc('blackthorn_gym_2f_boulder_3', 3, 15, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder! It can be moved with STRENGTH.'], { action: 'BLACKTHORN_BOULDER' }),
+    ],
+
+    blackthorn_gym_1f: [
+      makeNpc('blackthorn_gym_1f_boulder_1', 7, 6, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from 2F, bridging the lava!']),
+      makeNpc('blackthorn_gym_1f_boulder_2', 3, 7, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from 2F, bridging the lava!']),
+      makeNpc('blackthorn_gym_1f_boulder_3', 4, 14, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from 2F, bridging the lava!']),
+    ],
   };
 }

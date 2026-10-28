@@ -9,6 +9,7 @@
 
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
+import { handleClairInteraction } from './BlackthornGymAndDragonDenInteractions';
 
 /**
  * KantoAndLeagueInteractions — Handlers for Late Johto (Pryce, Clair), Kanto Gym Leaders, Elite Four, Champion Lance, Red & Stadium Host.
@@ -20,59 +21,7 @@ export function getKantoAndLeagueInteractions(): NpcInteractionRegistration[] {
     // 9. Blackthorn Gym: Clair
     {
       actions: ['CLAIR_EVENT'],
-      handler: (targetNpc, _map, ctx) => {
-        if (ctx.storyFlags.has('dragon_elder_quiz_passed') || ctx.storyFlags.has('clair_conceded')) {
-          ctx.openDialogue(
-            ["CLAIR: You passed the DRAGON ELDER's test and earned the RISINGBADGE! Good luck at the POKéMON LEAGUE!"],
-            targetNpc.speaker
-          );
-          return true;
-        }
-        if (ctx.storyFlags.has('clair_defeated')) {
-          ctx.openDialogue(
-            [
-              "CLAIR: I won't acknowledge this loss yet!",
-              "Go behind the GYM into the DRAGON'S DEN and pass the DRAGON ELDER's trial if you want the RISINGBADGE!",
-            ],
-            targetNpc.speaker
-          );
-          return true;
-        }
-        ctx.openDialogue(
-          targetNpc.challengePages && targetNpc.challengePages.length > 0
-            ? targetNpc.challengePages
-            : ['CLAIR: I am the best dragon master! Not even you can defeat me!'],
-          targetNpc.speaker,
-          () => {
-            const team = ctx.buildTrainerTeamInstances(targetNpc);
-            if (team.length === 0) return;
-            ctx.triggerBattle(team[0], {
-              isTrainer: true,
-              isGymLeader: true,
-              trainerName: targetNpc.trainerName || 'Leader Clair',
-              trainerTeam: team,
-              onVictory: () => {
-                ctx.defeatedTrainers.add('clair');
-                ctx.storyFlags.add('clair_defeated');
-                ctx.missionManager.checkStoryFlags(ctx.storyFlags);
-                ctx.openDialogue(
-                  [
-                    "CLAIR: I... I lost?! But... I won't acknowledge it!",
-                    "I refuse to hand over the BADGE until you take the DRAGON USER's test!",
-                    "Enter the DRAGON'S DEN behind the GYM and pass the DRAGON ELDER's trial!",
-                  ],
-                  targetNpc.speaker,
-                  () => {
-                    ctx.saveCurrentGame();
-                    ctx.showToast("🐉 Defeated Leader Clair! Enter Dragon's Den for the Elder's trial!");
-                  }
-                );
-              },
-            });
-          }
-        );
-        return true;
-      },
+      handler: handleClairInteraction,
     },
 
     // 10. Kanto Gym Leaders (Brock, Misty, Surge, Erika, Janine, Sabrina, Blaine, Blue)

@@ -603,6 +603,27 @@
       "targetY": 3
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 3,
+      "y": 15,
+      "type": "SIGN",
+      "text": "BLACKTHORN CITY POKéMON GYM\nLEADER: CLAIR\nWINNING TRAINERS:\n<PLAYER>",
+      "speaker": "🏆 GYM STATUE",
+      "pages": [
+        "BLACKTHORN CITY POKéMON GYM\nLEADER: CLAIR\nWINNING TRAINERS:\n<PLAYER>"
+      ]
+    },
+    {
+      "x": 6,
+      "y": 15,
+      "type": "SIGN",
+      "text": "BLACKTHORN CITY POKéMON GYM\nLEADER: CLAIR\nWINNING TRAINERS:\n<PLAYER>",
+      "speaker": "🏆 GYM STATUE",
+      "pages": [
+        "BLACKTHORN CITY POKéMON GYM\nLEADER: CLAIR\nWINNING TRAINERS:\n<PLAYER>"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

@@ -172,6 +172,7 @@ export interface GridEntity {
     | 'ROUTE_42_SUICUNE_EVENT'
     | 'ROUTE_42_GATE_OFFICER'
     | 'STRENGTH_BOULDER'
+    | 'BLACKTHORN_BOULDER'
     | 'KIYO_EVENT'
     | 'BIKE_SHOP_CLERK'
     | 'BITTER_MERCHANT'

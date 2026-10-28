@@ -12,6 +12,7 @@ import { getMahoganyRocketHideoutInteractions } from './MahoganyRocketHideoutInt
 import { getWhirlIslandsInteractions } from './WhirlIslandsInteractions';
 import { getMahoganyGymInteractions } from './MahoganyGymInteractions';
 import { getRoute44AndIcePathInteractions } from './Route44AndIcePathInteractions';
+import { getBlackthornGymAndDragonDenInteractions } from './BlackthornGymAndDragonDenInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -29,6 +30,7 @@ export * from './MahoganyRocketHideoutInteractions';
 export * from './WhirlIslandsInteractions';
 export * from './MahoganyGymInteractions';
 export * from './Route44AndIcePathInteractions';
+export * from './BlackthornGymAndDragonDenInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.
@@ -47,5 +49,6 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getMahoganyRocketHideoutInteractions(),
     ...getWhirlIslandsInteractions(),
     ...getRoute44AndIcePathInteractions(),
+    ...getBlackthornGymAndDragonDenInteractions(),
   ]);
 }

@@ -30,34 +30,14 @@ export const makeNpc = (
     trainerTeam?: GridEntity['trainerTeam'];
   } = {}
 ): GridEntity => ({
-  id,
-  x,
-  y,
-  originX: x,
-  originY: y,
-  originDirection: direction,
-  gridX: x,
-  gridY: y,
-  targetX: x,
-  targetY: y,
-  renderX: x,
-  renderY: y,
-  direction,
-  isMoving: false,
-  progress: 0,
-  isPlayer: false,
-  spriteType,
-  speaker,
-  pages,
-  wanders: opts.wanders ?? false,
-  talkAcrossCounter: opts.talkAcrossCounter ?? false,
-  action: opts.action,
-  trainerId: opts.trainerId,
-  trainerName: opts.trainerName,
-  visionRange: opts.visionRange,
-  challengePages: opts.challengePages,
-  trainerPokemon: opts.trainerPokemon,
-  trainerTeam: opts.trainerTeam,
+  id, x, y, originX: x, originY: y, originDirection: direction,
+  gridX: x, gridY: y, targetX: x, targetY: y, renderX: x, renderY: y,
+  direction, isMoving: false, progress: 0, isPlayer: false,
+  spriteType, speaker, pages,
+  wanders: opts.wanders ?? false, talkAcrossCounter: opts.talkAcrossCounter ?? false,
+  action: opts.action, trainerId: opts.trainerId, trainerName: opts.trainerName,
+  visionRange: opts.visionRange, challengePages: opts.challengePages,
+  trainerPokemon: opts.trainerPokemon, trainerTeam: opts.trainerTeam,
 });
 
 export interface GuideGentTourLegDef {
@@ -114,27 +94,7 @@ export const GUIDE_GENT_TOUR_LEGS: GuideGentTourLegDef[] = [
   {
     leg: 5,
     name: "Guide Gent's House Porch",
-    steps: [
-      'DOWN',
-      'DOWN',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'DOWN',
-      'DOWN',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-      'RIGHT',
-    ],
+    steps: ['DOWN', 'DOWN', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT', 'DOWN', 'DOWN', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT', 'RIGHT'],
     guideEnd: { x: 25, y: 11, direction: 'LEFT' },
     playerEnd: { x: 24, y: 11, direction: 'RIGHT' },
     dialoguePages: [
@@ -464,6 +424,19 @@ export function isNpcActiveForStoryFlags(
   if (npcId.startsWith('ice_path_b2f_boulder_')) {
     const num = npcId.split('_').pop();
     return storyFlags.has(`EVENT_BOULDER_IN_ICE_PATH_${num}`);
+  }
+
+  // Blackthorn Gym 2F & 1F Strength Boulders
+  if (npcId.startsWith('blackthorn_gym_2f_boulder_')) {
+    const num = npcId.split('_').pop();
+    return !storyFlags.has(`EVENT_BOULDER_IN_BLACKTHORN_GYM_${num}`);
+  }
+  if (npcId.startsWith('blackthorn_gym_1f_boulder_')) {
+    const num = npcId.split('_').pop();
+    return storyFlags.has(`EVENT_BOULDER_IN_BLACKTHORN_GYM_${num}`);
+  }
+  if (npcId === 'dragon_shrine_clair_3') {
+    return storyFlags.has('dragon_elder_quiz_passed');
   }
 
   // Victory Road Rival & Indigo Plateau Elite Four (Act 9)
