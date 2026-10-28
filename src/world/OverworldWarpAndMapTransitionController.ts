@@ -295,12 +295,17 @@ export class OverworldWarpAndMapTransitionController {
         overworldHUD.hideRoamerAlert();
       }
 
-      // Prefetch newly connected neighbor maps in the background and maintain resident LRU cap
-      void this.ensureMapAndNeighborsLoaded(ctx, nextMapId).then((loadedMap) => {
+      // Prefetch newly connected neighbor maps in the background and re-render if any neighbor was missing
+      void this.ensureMapAndNeighborsLoaded(ctx, nextMapId).then(async (loadedMap) => {
         if (loadedMap) {
           mapManager.evictDistantMaps(nextMapId, 16);
           activeNpcCache.evictMapsNotIn(mapManager.getProtectedMapIds(nextMapId));
           overworldRenderer.evictDistantTileTextures(loadedMap, lookupMap);
+          await overworldRenderer.ensureMapTilesLoaded(loadedMap, lookupMap);
+          // If the player remains on this map, re-render to stitch newly resolved neighbors seamlessly
+          if (mapManager.getCurrentMap()?.id === nextMapId) {
+            overworldRenderer.renderMap(loadedMap, lookupMap);
+          }
         }
       });
       void ctx.adjacentMapPrefetcher?.prefetchAroundMap(nextMapId);

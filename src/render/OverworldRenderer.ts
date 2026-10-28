@@ -517,7 +517,8 @@ export class OverworldRenderer {
     this.spawnMapNpcs(undefined, lookupMap);
 
     if (map.tileMap) {
-      const hasMissing = map.tileMap.some((name) => name && !this.tileTextures.has(name));
+      const connected = this.getConnectedMaps(map, lookupMap);
+      const hasMissing = [map, ...connected].some((m) => m.tileMap?.some((n) => n && !this.tileTextures.has(n)));
       if (hasMissing) {
         console.warn(
           `[OverworldRenderer] renderMap invoked with unbuffered textures for map "${map.id}". Caller should await ensureMapTilesLoaded(map) before calling renderMap.`
