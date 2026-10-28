@@ -203,5 +203,17 @@ export function createRoute26And27Npcs(): Record<string, GridEntity[]> {
         'Hello, young traveler! Rest here before challenging the POKéMON LEAGUE.',
       ], { action: 'ROUTE26_HEAL_EVENT' }),
     ],
+
+    victory_road_gate: [
+      makeNpc('victory_road_gate_officer', 8, 11, 'RIGHT', 'officer', '👮 OFFICER', [
+        'Only trainers who have proven themselves may pass.',
+      ], { action: 'VICTORY_ROAD_GATE_OFFICER', talkAcrossCounter: true }),
+      makeNpc('victory_road_gate_mt_silver_guard', 7, 5, 'RIGHT', 'blackbelt', '🥋 BLACK BELT', [
+        'This way leads to MT. SILVER. The wild POKéMON out there are terrifyingly powerful!',
+      ], { action: 'MT_SILVER_GATE_GUARD' }),
+      makeNpc('victory_road_gate_kanto_guard', 12, 5, 'LEFT', 'blackbelt', '🥋 BLACK BELT', [
+        "Off to the POKéMON LEAGUE, are you? The ELITE FOUR are ready for you!",
+      ], { action: 'KANTO_GATE_GUARD' }),
+    ],
   };
 }

@@ -436,11 +436,13 @@ function buildMapFromBlk({
     collisionGrid[31 * width + 11] = 2;
   }
 
-  // For route_34, ensure canonical trainer coordinates are walkable (0)
+  // For route_34, ensure canonical trainer coordinates and Day-Care entrance are walkable (0)
   if (id === 'route_34') {
     collisionGrid[20 * width + 11] = 0; // Youngster Ian
     collisionGrid[26 * width + 10] = 0; // Picnicker Gina
     collisionGrid[28 * width + 18] = 0; // Pokefan Brandon
+    collisionGrid[15 * width + 12] = 0; // Day-Care entrance door (Issue #28)
+    collisionGrid[16 * width + 12] = 0; // Day-Care step tile (Issue #28)
   }
 
   // For goldenrod_underground, ensure stairs, merchants, haircut brothers, and item tiles are walkable
@@ -2067,8 +2069,7 @@ buildMapFromBlk({
   warps: [
     { x: 13, y: 37, targetMapId: 'route_34_ilex_forest_gate', targetX: 4, targetY: 0 },
     { x: 14, y: 37, targetMapId: 'route_34_ilex_forest_gate', targetX: 5, targetY: 0 },
-    { x: 11, y: 14, targetMapId: 'day_care', targetX: 2, targetY: 7 },
-    { x: 11, y: 15, targetMapId: 'day_care', targetX: 3, targetY: 7 },
+    { x: 12, y: 15, targetMapId: 'day_care', targetX: 2, targetY: 7 },
   ],
   bgEvents: [
     {
@@ -2110,8 +2111,10 @@ buildMapFromBlk({
   blocksW: 5,
   blocksH: 4,
   warps: [
-    { x: 2, y: 7, targetMapId: 'route_34', targetX: 11, targetY: 15 },
-    { x: 3, y: 7, targetMapId: 'route_34', targetX: 11, targetY: 15 },
+    { x: 2, y: 7, targetMapId: 'route_34', targetX: 12, targetY: 16 },
+    { x: 3, y: 7, targetMapId: 'route_34', targetX: 12, targetY: 16 },
+    { x: 0, y: 5, targetMapId: 'route_34', targetX: 13, targetY: 15 },
+    { x: 0, y: 6, targetMapId: 'route_34', targetX: 13, targetY: 15 },
   ],
   bgEvents: [],
 });
@@ -2357,7 +2360,7 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'goldenrod_underground_switch_room_entrances',
   name: 'Goldenrod Underground Switch Room Entrances',
-  tileset: 'underground',
+  tileset: 'elite_four_room',
   blkFile: 'maps__GoldenrodUndergroundSwitchRoomEntrances.blk',
   blocksW: 15,
   blocksH: 18,

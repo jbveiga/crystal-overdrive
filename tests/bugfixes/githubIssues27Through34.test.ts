@@ -88,6 +88,17 @@ describe('TICKET-BUGFIX-GITHUB-ISSUES-27-THROUGH-34-01: GitHub Issues #27 - #34 
         expect(mapData.collisionGrid[warp.y * mapData.width + warp.x]).toBe(0);
       }
     });
+
+    it('uses authentic elite_four_room tileset for 100% of tiles with 0 underground tiles', () => {
+      expect(mapData.tileMap.length).toBeGreaterThan(0);
+      expect(mapData.tileMap.every((t) => t.startsWith('in_elite_four_room_'))).toBe(true);
+      expect(mapData.tileMap.some((t) => t.startsWith('in_underground_'))).toBe(false);
+    });
+
+    it('asserts rival ambush corridor coordinates (19, 4) and (19, 5) have walkable collision 0', () => {
+      expect(mapData.collisionGrid[4 * mapData.width + 19]).toBe(0);
+      expect(mapData.collisionGrid[5 * mapData.width + 19]).toBe(0);
+    });
   });
 
   // =========================================================================

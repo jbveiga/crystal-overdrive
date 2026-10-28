@@ -15,6 +15,7 @@ import { BattleAudio } from '../audio/BattleAudio';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { ItemfinderRadar } from '../world/ItemfinderRadar';
 import { isEcruteakGymSafeTile, ECRUTEAK_GYM_RESPAWN } from './ecruteakGymMaze';
+import { handleVictoryRoadGateStep } from './interactions/VictoryRoadGateInteractions';
 import type { OverworldTickerContext } from '../types/gameContext';
 
 export class OverworldTickerCoordinator {
@@ -178,7 +179,7 @@ export class OverworldTickerCoordinator {
       triggerCherrygroveRivalAmbush, triggerAzaleaRivalAmbush, triggerOlivineRivalConfrontation,
       triggerCianwoodSuicuneAndEusine, triggerRoute42Suicune, saveCurrentGame, triggerWildEncounter,
       addPlayTimeDelta, overworldItemManager, storyFlags, itemfinderHUD, dayCareManager, playerParty,
-      seenSpecies, defeatedTrainers, roamingManager,
+      seenSpecies, defeatedTrainers, roamingManager, inventory,
     } = ctx as any;
 
     const { dtWorld, dtPlayer } = gameClock.tick(rawDeltaSec);
@@ -522,16 +523,20 @@ export class OverworldTickerCoordinator {
           }
 
           // Ecruteak Gym Invisible Floor Pitfall Maze
-          if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15) {
-            if (!isEcruteakGymSafeTile(coord.x, coord.y)) {
-              BattleAudio.playOverworldSound('BUMP');
-              player.x = ECRUTEAK_GYM_RESPAWN.x;
-              player.y = ECRUTEAK_GYM_RESPAWN.y;
-              player.direction = ECRUTEAK_GYM_RESPAWN.direction;
-              overworldHUD.showToast('Whoa! Stepped off the invisible path! Returned to entrance.');
-              return;
-            }
+          if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15 && !isEcruteakGymSafeTile(coord.x, coord.y)) {
+            BattleAudio.playOverworldSound('BUMP');
+            player.x = ECRUTEAK_GYM_RESPAWN.x; player.y = ECRUTEAK_GYM_RESPAWN.y;
+            player.direction = ECRUTEAK_GYM_RESPAWN.direction;
+            overworldHUD.showToast('Whoa! Stepped off the invisible path! Returned to entrance.');
+            return;
           }
+
+          // Victory Road Gate 8-Badge Security Gauntlet & Mt. Silver / Kanto Check
+          if (currentMap?.id === 'victory_road_gate' && handleVictoryRoadGateStep(coord, currentMap, {
+            player, inventory, storyFlags,
+            openDialogue: (p, s, c) => overworldHUD.openDialogue(p, s, c),
+            showToast: (m) => overworldHUD.showToast(m),
+          })) return;
 
           // Tall Grass Rustle FX + Sound
           if (tileType === 2) {

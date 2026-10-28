@@ -13,6 +13,7 @@ import { MapManager } from './MapManager';
 import { OverworldItemManager } from './OverworldItemManager';
 import { applyMapNpcStoryMutations } from './npcData';
 import { BattleAudio } from '../audio/BattleAudio';
+import { checkHasAllJohtoBadges } from './interactions/VictoryRoadGateInteractions';
 import type { OverworldTransitionContext } from '../types/gameContext';
 
 export class OverworldWarpAndMapTransitionController {
@@ -453,6 +454,55 @@ export class OverworldWarpAndMapTransitionController {
         return;
       }
       triggerAzaleaRivalAmbush();
+      return;
+    }
+
+    // Victory Road Gate 8-Badge Security Checkpoint & Kanto / Mt. Silver Defensive Guards
+    if (warp.targetMapId === 'victory_road') {
+      const has8Badges = checkHasAllJohtoBadges(inventory.badges, storyFlags);
+      if (!has8Badges) {
+        player.isMoving = false;
+        player.progress = 0;
+        setCutsceneLocked(false);
+        BattleAudio.playMenuSound('CANCEL');
+        overworldHUD.openDialogue(
+          [
+            'OFFICER: Only trainers who have proven themselves may pass.',
+            "You don't have all the GYM BADGES of JOHTO. I'm sorry, but I can't let you go through.",
+          ],
+          '👮 OFFICER'
+        );
+        return;
+      }
+    }
+
+    if (warp.targetMapId === 'route_28' && !storyFlags.has('champion_defeated')) {
+      player.isMoving = false;
+      player.progress = 0;
+      setCutsceneLocked(false);
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        [
+          'BLACK BELT: Hold on! This way leads to MT. SILVER.',
+          'Only a verified CHAMPION who has conquered both JOHTO and KANTO may pass!',
+        ],
+        '🥋 BLACK BELT'
+      );
+      return;
+    }
+
+    if (warp.targetMapId === 'route_22' && !storyFlags.has('champion_defeated')) {
+      player.isMoving = false;
+      player.progress = 0;
+      setCutsceneLocked(false);
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        [
+          'BLACK BELT: Off to the POKéMON LEAGUE, are you?',
+          'The route to VIRIDIAN CITY is closed to incoming challengers. Proceed through VICTORY ROAD!',
+        ],
+        '🥋 BLACK BELT'
+      );
       return;
     }
 

@@ -16,6 +16,7 @@ import { getBlackthornGymAndDragonDenInteractions } from './BlackthornGymAndDrag
 import { getRoute45And46Interactions } from './Route45And46Interactions';
 import { getTinTowerHoOhInteractions } from './TinTowerHoOhInteractions';
 import { getRoute27AndTohjoFallsInteractions } from './Route27AndTohjoFallsInteractions';
+import { getVictoryRoadGateInteractions } from './VictoryRoadGateInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -37,6 +38,7 @@ export * from './BlackthornGymAndDragonDenInteractions';
 export * from './Route45And46Interactions';
 export * from './TinTowerHoOhInteractions';
 export * from './Route27AndTohjoFallsInteractions';
+export * from './VictoryRoadGateInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.
@@ -59,5 +61,6 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getRoute45And46Interactions(),
     ...getTinTowerHoOhInteractions(),
     ...getRoute27AndTohjoFallsInteractions(),
+    ...getVictoryRoadGateInteractions(),
   ]);
 }

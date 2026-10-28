@@ -94,7 +94,12 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
       const generatedList = buildGeneratedNpcsForMap(mapId);
       if (generatedList.length > 0) {
         if (base[mapId]) {
-          base[mapId].push(...generatedList);
+          const existingCoords = new Set(base[mapId].map((n) => `${n.x},${n.y}`));
+          for (const gen of generatedList) {
+            if (!existingCoords.has(`${gen.x},${gen.y}`)) {
+              base[mapId].push(gen);
+            }
+          }
         } else {
           base[mapId] = generatedList;
         }
