@@ -327,20 +327,22 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('leader_chuck', 4, 2, 'DOWN', 'fat_man', '🥋 LEADER CHUCK', 
         [
           'CHUCK: WAHAHA! The STORMBADGE proves you have true fighting spirit!',
-          'Never back down, and face every obstacle head on!',
+          'From now on, I am going to train 24 hours a day!',
         ],
         {
           action: 'CHUCK_EVENT',
           trainerId: 'chuck',
           trainerName: 'Leader Chuck',
           challengePages: [
-            'CHUCK: WAHAHA! So you’ve come this far! We train day and night beneath the raging waterfalls of Cianwood!',
-            'My roaring fists and my partners will shatter any defense! Prepare yourself!',
+            'CHUCK: WAHAHA! So you’ve come this far! Let me tell you, I’m tough!',
+            'My POKéMON will crush stones and shatter bones! Watch this!',
+            'CHUCK: Urggh! … Oooarrgh!',
+            'There! Scared now, are you? What? It has nothing to do with POKéMON? That’s true! Come on. We shall do battle!',
           ],
-          trainerPokemon: { speciesId: 'primeape', level: 27, moves: ['karatechop', 'furyswipes', 'leer', 'rage'] },
+          trainerPokemon: { speciesId: 'primeape', level: 27, moves: ['leer', 'rage', 'karatechop', 'furyswipes'] },
           trainerTeam: [
-            { speciesId: 'primeape', level: 27, moves: ['karatechop', 'furyswipes', 'leer', 'rage'] },
-            { speciesId: 'poliwrath', level: 30, moves: ['dynamicpunch', 'hypnosis', 'surf', 'mindreader'] },
+            { speciesId: 'primeape', level: 27, moves: ['leer', 'rage', 'karatechop', 'furyswipes'] },
+            { speciesId: 'poliwrath', level: 30, moves: ['hypnosis', 'mindreader', 'surf', 'dynamicpunch'] },
           ],
         }
       ),
@@ -352,14 +354,48 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
           'Counter them with FLYING and PSYCHIC moves to dodge their physical blows and strike from above!',
         ]
       ),
-      makeNpc('blackbelt_yoshi', 2, 12, 'RIGHT', 'boy', '🥋 BLACKBELT YOSHI', ['My kicks strike like lightning!'], {
+      makeNpc('blackbelt_yoshi', 2, 12, 'RIGHT', 'boy', '🥋 BLACKBELT YOSHI', ['Our bond will never be broken!'], {
         action: 'TRAINER_BATTLE',
         trainerId: 'blackbelt_yoshi',
         trainerName: 'Blackbelt Yoshi',
+        visionRange: 3,
+        challengePages: ['YOSHI: My POKéMON and I are bound together by friendship. Our bond will never be broken!'],
+        trainerPokemon: { speciesId: 'hitmonlee', level: 27, moves: ['doublekick', 'meditate', 'jumpkick', 'focusenergy'] },
+        trainerTeam: [{ speciesId: 'hitmonlee', level: 27, moves: ['doublekick', 'meditate', 'jumpkick', 'focusenergy'] }],
+      }),
+      makeNpc('blackbelt_lao', 7, 12, 'LEFT', 'boy', '🥋 BLACKBELT LAO', ['Fighting POKéMON are afraid of psychics…'], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'blackbelt_lao',
+        trainerName: 'Blackbelt Lao',
+        visionRange: 3,
+        challengePages: ['LAO: We martial artists fear nothing!'],
+        trainerPokemon: { speciesId: 'hitmonchan', level: 27, moves: ['cometpunch', 'thunderpunch', 'icepunch', 'firepunch'] },
+        trainerTeam: [{ speciesId: 'hitmonchan', level: 27, moves: ['cometpunch', 'thunderpunch', 'icepunch', 'firepunch'] }],
+      }),
+      makeNpc('blackbelt_nob', 3, 9, 'RIGHT', 'boy', '🥋 BLACKBELT NOB', ['I lost! I am speechless!'], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'blackbelt_nob',
+        trainerName: 'Blackbelt Nob',
         visionRange: 2,
-        challengePages: ['YOSHI: We hone our bodies against iron rocks! Let’s see your technique!'],
-        trainerPokemon: { speciesId: 'hitmonlee', level: 27, moves: ['doublekick', 'jumpkick', 'meditate'] },
-        trainerTeam: [{ speciesId: 'hitmonlee', level: 27, moves: ['doublekick', 'jumpkick', 'meditate'] }],
+        challengePages: ['NOB: Words are useless. Let your fists do the talking!'],
+        trainerPokemon: { speciesId: 'machop', level: 25, moves: ['leer', 'focusenergy', 'karatechop', 'seismictoss'] },
+        trainerTeam: [
+          { speciesId: 'machop', level: 25, moves: ['leer', 'focusenergy', 'karatechop', 'seismictoss'] },
+          { speciesId: 'machoke', level: 25, moves: ['leer', 'karatechop', 'seismictoss', 'rockslide'] },
+        ],
+      }),
+      makeNpc('blackbelt_lung', 5, 5, 'LEFT', 'boy', '🥋 BLACKBELT LUNG', ['My POKéMON lost… My pride is shattered…'], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'blackbelt_lung',
+        trainerName: 'Blackbelt Lung',
+        visionRange: 1,
+        challengePages: ['LUNG: My raging fists will shatter your POKéMON!'],
+        trainerPokemon: { speciesId: 'mankey', level: 23, moves: ['scratch', 'leer', 'karatechop', 'focusenergy'] },
+        trainerTeam: [
+          { speciesId: 'mankey', level: 23, moves: ['scratch', 'leer', 'karatechop', 'focusenergy'] },
+          { speciesId: 'mankey', level: 23, moves: ['scratch', 'leer', 'karatechop', 'focusenergy'] },
+          { speciesId: 'primeape', level: 25, moves: ['karatechop', 'furyswipes', 'rage', 'seismictoss'] },
+        ],
       }),
     ],
 
