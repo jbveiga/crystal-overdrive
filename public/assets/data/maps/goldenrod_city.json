@@ -4413,13 +4413,6 @@
       "targetY": 7
     },
     {
-      "x": 11,
-      "y": 29,
-      "targetMapId": "goldenrod_underground",
-      "targetX": 3,
-      "targetY": 2
-    },
-    {
       "x": 19,
       "y": 1,
       "targetMapId": "route_35_goldenrod_gate",
@@ -4432,9 +4425,59 @@
       "targetMapId": "route_35_goldenrod_gate",
       "targetX": 5,
       "targetY": 7
+    },
+    {
+      "x": 9,
+      "y": 5,
+      "targetMapId": "goldenrod_underground",
+      "targetX": 3,
+      "targetY": 3
+    },
+    {
+      "x": 11,
+      "y": 29,
+      "targetMapId": "goldenrod_underground",
+      "targetX": 3,
+      "targetY": 33
     }
   ],
   "bgEvents": [
+    {
+      "x": 10,
+      "y": 14,
+      "speaker": "🚅 GOLDENROD MAGNET TRAIN STATION",
+      "pages": [
+        "GOLDENROD CITY STATION",
+        "Super High-Speed Magnet Train to KANTO"
+      ]
+    },
+    {
+      "x": 4,
+      "y": 17,
+      "speaker": "📻 RADIO TOWER",
+      "pages": [
+        "GOLDENROD CITY RADIO TOWER"
+      ]
+    },
+    {
+      "x": 26,
+      "y": 27,
+      "speaker": "🏬 DEPT. STORE",
+      "pages": [
+        "Full Selection of POKéMON Goods!",
+        "GOLDENROD CITY DEPT. STORE"
+      ]
+    },
+    {
+      "x": 26,
+      "y": 9,
+      "speaker": "🏆 GOLDENROD GYM",
+      "pages": [
+        "GOLDENROD CITY POKéMON GYM",
+        "LEADER: WHITNEY",
+        "The Incredibly Pretty Girl!"
+      ]
+    },
     {
       "x": 22,
       "y": 18,
@@ -4445,80 +4488,74 @@
       ]
     },
     {
-      "x": 22,
-      "y": 9,
-      "speaker": "🏆 GOLDENROD GYM",
-      "pages": [
-        "GOLDENROD CITY POKéMON GYM",
-        "LEADER: WHITNEY",
-        "The Incredibly Pretty Girl!"
-      ]
-    },
-    {
-      "x": 8,
-      "y": 15,
-      "speaker": "📻 RADIO TOWER",
-      "pages": [
-        "GOLDENROD RADIO TOWER"
-      ]
-    },
-    {
       "x": 28,
-      "y": 27,
-      "speaker": "🏬 DEPT. STORE",
-      "pages": [
-        "Full Selection of POKéMON Goods! GOLDENROD DEPT. STORE"
-      ]
-    },
-    {
-      "x": 26,
-      "y": 29,
+      "y": 30,
       "speaker": "🚲 BIKE SHOP",
       "pages": [
-        "The World is a Cycle Path! MIRACLE CYCLE"
+        "The World is a Cycle Path!",
+        "BIKE SHOP — MIRACLE CYCLE"
       ]
     },
     {
-      "x": 18,
-      "y": 21,
+      "x": 16,
+      "y": 22,
       "speaker": "🎰 GAME CORNER",
       "pages": [
-        "Your Playground! GOLDENROD GAME CORNER"
+        "Your Playground!",
+        "GOLDENROD CITY GAME CORNER"
       ]
     },
     {
-      "x": 17,
+      "x": 12,
       "y": 7,
       "speaker": "👴 NAME RATER",
       "pages": [
         "NAME RATER",
-        "Get Your POKéMON Nicknames Evaluated!"
+        "Get Your POKéMON Nicknames Rated!"
       ]
     },
     {
-      "x": 31,
-      "y": 5,
-      "speaker": "🌸 FLOWER SHOP",
-      "pages": [
-        "Blooming Beautiful! GOLDENROD FLOWER SHOP"
-      ]
-    },
-    {
-      "x": 11,
-      "y": 13,
-      "speaker": "🚅 MAGNET TRAIN STATION",
-      "pages": [
-        "GOLDENROD CITY STATION",
-        "Super High-Speed Magnet Train to KANTO"
-      ]
-    },
-    {
-      "x": 13,
-      "y": 29,
-      "speaker": "🚇 UNDERGROUND TUNNEL",
+      "x": 8,
+      "y": 6,
+      "speaker": "🚇 UNDERGROUND ENTRANCE",
       "pages": [
         "UNDERGROUND ENTRANCE",
         "Travel Beneath Goldenrod City"
+      ]
+    },
+    {
+      "x": 12,
+      "y": 30,
+      "speaker": "🚇 UNDERGROUND ENTRANCE",
+      "pages": [
+        "UNDERGROUND ENTRANCE",
+        "Travel Beneath Goldenrod City"
+      ]
+    },
+    {
+      "x": 16,
+      "y": 27,
+      "speaker": "🏥 POKéMON CENTER",
+      "pages": [
+        "POKéMON CENTER",
+        "Heal Your POKéMON to Full Health!"
+      ]
+    },
+    {
+      "x": 30,
+      "y": 6,
+      "speaker": "🌸 FLOWER SHOP",
+      "pages": [
+        "Blooming Beautiful",
+        "FLOWER SHOP"
+      ]
+    },
+    {
+      "x": 4,
+      "y": 25,
+      "speaker": "🏠 BILL'S HOUSE",
+      "pages": [
+        "BILL'S HOUSE"
       ]
     }
   ],

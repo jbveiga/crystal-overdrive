@@ -387,36 +387,23 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'TRUE_DIRECTOR_EVENT' }
       ),
-      makeNpc('super_nerd_eric', 8, 12, 'DOWN', 'boy', '🤓 SUPER NERD ERIC', 
-        ['My electric and poison POKéMON thrive in the subterranean tunnels!'],
-        {
-          action: 'TRAINER_BATTLE',
-          trainerId: 'super_nerd_eric',
-          trainerName: 'Super Nerd Eric',
-          visionRange: 3,
-          challengePages: ['SUPER NERD ERIC: The underground is my secret laboratory! Prepare for a shock!'],
-          trainerPokemon: { speciesId: 'grimer', level: 12, moves: ['pound', 'poisongas', 'harden'] },
-          trainerTeam: [
-            { speciesId: 'grimer', level: 12, moves: ['pound', 'poisongas', 'harden'] },
-            { speciesId: 'magnemite', level: 12, moves: ['tackle', 'thundershock', 'supersonic'] },
-          ],
-        }
+      makeNpc('bitter_merchant', 2, 6, 'RIGHT', 'fat_man', '🌿 HERB SHOP',
+        ['Welcome to the HERB SHOP! Our bitter medicine is harsh, but it heals POKéMON effectively!'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
-      makeNpc('pokemaniac_donald', 8, 24, 'UP', 'boy', '🎒 POKÉMANIAC DONALD', 
-        ['SLOWPOKE may be slow, but its psychic power is immense!'],
-        {
-          action: 'TRAINER_BATTLE',
-          trainerId: 'pokemaniac_donald',
-          trainerName: 'Pokemaniac Donald',
-          visionRange: 3,
-          challengePages: ['POKÉMANIAC DONALD: Underground trainers have the best costume parties! Battle me!'],
-          trainerPokemon: { speciesId: 'slowpoke', level: 13, moves: ['confusion', 'tackle', 'growl'] },
-          trainerTeam: [
-            { speciesId: 'slowpoke', level: 13, moves: ['confusion', 'tackle', 'growl'] },
-          ],
-        }
+      makeNpc('bargain_merchant', 2, 8, 'RIGHT', 'clerk', '💎 BARGAIN SHOP',
+        ['Step right up! I sell rare, valuable goods at bargain prices only on weekend mornings!'],
+        { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
-      makeNpc('super_nerd_teru', 8, 9, 'UP', 'super_nerd', '🤓 SUPER NERD TERU',
+      makeNpc('older_haircut_brother', 2, 11, 'RIGHT', 'boy', '✂️ OLDER HAIRCUT BROTHER',
+        ['I can groom your POKéMON with expert care for ¥500! It will adore you!'],
+        { talkAcrossCounter: true, action: 'OLDER_HAIRCUT_BROTHER' }
+      ),
+      makeNpc('younger_haircut_brother', 2, 12, 'RIGHT', 'boy', '✂️ YOUNGER HAIRCUT BROTHER',
+        ['I give neat trims for ¥300! It will make your POKéMON very happy!'],
+        { talkAcrossCounter: true, action: 'YOUNGER_HAIRCUT_BROTHER' }
+      ),
+      makeNpc('super_nerd_teru', 6, 9, 'UP', 'super_nerd', '🤓 SUPER NERD TERU',
         ['Do you calculate type advantages before every single battle?'],
         {
           action: 'TRAINER_BATTLE',
@@ -433,7 +420,21 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('pokemaniac_issac', 8, 27, 'RIGHT', 'super_nerd', '🤪 POKéMANIAC ISSAC',
+      makeNpc('pokemaniac_donald', 4, 14, 'UP', 'boy', '🎒 POKÉMANIAC DONALD', 
+        ['SLOWPOKE may be slow, but its psychic power is immense!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokemaniac_donald',
+          trainerName: 'Pokemaniac Donald',
+          visionRange: 3,
+          challengePages: ['POKÉMANIAC DONALD: Underground trainers have the best costume parties! Battle me!'],
+          trainerPokemon: { speciesId: 'slowpoke', level: 13, moves: ['confusion', 'tackle', 'growl'] },
+          trainerTeam: [
+            { speciesId: 'slowpoke', level: 13, moves: ['confusion', 'tackle', 'growl'] },
+          ],
+        }
+      ),
+      makeNpc('pokemaniac_issac', 3, 27, 'RIGHT', 'super_nerd', '🤪 POKéMANIAC ISSAC',
         ['My POKéMON just got a fresh haircut from the brothers upstairs!'],
         {
           action: 'TRAINER_BATTLE',
@@ -445,13 +446,20 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
           trainerTeam: [{ speciesId: 'lickitung', level: 12, moves: ['lick', 'supersonic', 'cut'] }],
         }
       ),
-      makeNpc('older_haircut_brother', 10, 14, 'LEFT', 'boy', '✂️ OLDER HAIRCUT BROTHER',
-        ['I can groom your POKéMON with expert care for ¥500! It will adore you!'],
-        { action: 'OLDER_HAIRCUT_BROTHER' }
-      ),
-      makeNpc('younger_haircut_brother', 10, 16, 'LEFT', 'boy', '✂️ YOUNGER HAIRCUT BROTHER',
-        ['I give neat trims for ¥300! It will make your POKéMON very happy!'],
-        { action: 'YOUNGER_HAIRCUT_BROTHER' }
+      makeNpc('super_nerd_eric', 5, 31, 'LEFT', 'boy', '🤓 SUPER NERD ERIC', 
+        ['My electric and poison POKéMON thrive in the subterranean tunnels!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'super_nerd_eric',
+          trainerName: 'Super Nerd Eric',
+          visionRange: 3,
+          challengePages: ['SUPER NERD ERIC: The underground is my secret laboratory! Prepare for a shock!'],
+          trainerPokemon: { speciesId: 'grimer', level: 12, moves: ['pound', 'poisongas', 'harden'] },
+          trainerTeam: [
+            { speciesId: 'grimer', level: 12, moves: ['pound', 'poisongas', 'harden'] },
+            { speciesId: 'magnemite', level: 12, moves: ['tackle', 'thundershock', 'supersonic'] },
+          ],
+        }
       ),
     ],
   };

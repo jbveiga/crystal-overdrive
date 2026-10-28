@@ -443,9 +443,16 @@ function buildMapFromBlk({
     collisionGrid[28 * width + 18] = 0; // Pokefan Brandon
   }
 
-  // For goldenrod_underground, ensure Coin Case item ball at (7, 25) is walkable (0)
+  // For goldenrod_underground, ensure stairs, merchants, haircut brothers, and item tiles are walkable
   if (id === 'goldenrod_underground') {
-    collisionGrid[25 * width + 7] = 0;
+    collisionGrid[2 * width + 3] = 0; // North stairs (3, 2)
+    collisionGrid[34 * width + 3] = 0; // South stairs (3, 34)
+    collisionGrid[6 * width + 2] = 0; // Bitter merchant
+    collisionGrid[8 * width + 2] = 0; // Bargain merchant
+    collisionGrid[11 * width + 2] = 0; // Older haircut brother
+    collisionGrid[12 * width + 2] = 0; // Younger haircut brother
+    collisionGrid[25 * width + 7] = 0; // Coin case
+    collisionGrid[27 * width + 18] = 0; // Warehouse item
   }
 
   const existingMapPath = path.join(MAPS_DIR, `${id}.json`);
@@ -2318,13 +2325,13 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'goldenrod_underground',
   name: 'Goldenrod Underground',
-  tileset: 'underground',
+  tileset: 'gate',
   blkFile: 'maps__GoldenrodUnderground.blk',
   blocksW: 15,
   blocksH: 18,
   warps: [
-    { x: 3, y: 2, targetMapId: 'goldenrod_city', targetX: 11, targetY: 29 },
-    { x: 3, y: 33, targetMapId: 'goldenrod_city', targetX: 9, targetY: 5 },
+    { x: 3, y: 2, targetMapId: 'goldenrod_city', targetX: 9, targetY: 6 },
+    { x: 3, y: 34, targetMapId: 'goldenrod_city', targetX: 11, targetY: 30 },
   ],
   bgEvents: [],
 });
