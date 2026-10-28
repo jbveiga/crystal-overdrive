@@ -137,14 +137,32 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     olivine_lighthouse_2f: [
-      makeNpc('sailor_huey', 9, 3, 'DOWN', 'fisherman', '⚓ SAILOR HUEY', ['Poliwhirl keeps me fit!'], {
+      makeNpc('sailor_huey', 9, 3, 'RIGHT', 'fisherman', '⚓ SAILOR HUEY', [
+        'Men of the sea are always spoiling for a good fight!'
+      ], {
         action: 'TRAINER_BATTLE',
         trainerId: 'sailor_huey',
         trainerName: 'Sailor Huey',
-        visionRange: 2,
-        challengePages: ['HUEY: Training in the lighthouse makes us tough as steel!'],
-        trainerPokemon: { speciesId: 'poliwhirl', level: 20, moves: ['watergun', 'hypnosis', 'doubleslap'] },
-        trainerTeam: [{ speciesId: 'poliwhirl', level: 20, moves: ['watergun', 'hypnosis', 'doubleslap'] }],
+        visionRange: 3,
+        challengePages: ['HUEY: Men of the sea are always spoiling for a good fight!'],
+        trainerPokemon: { speciesId: 'poliwag', level: 18, moves: ['watergun', 'hypnosis', 'bubble'] },
+        trainerTeam: [
+          { speciesId: 'poliwag', level: 18, moves: ['watergun', 'hypnosis', 'bubble'] },
+          { speciesId: 'poliwhirl', level: 18, moves: ['watergun', 'hypnosis', 'doubleslap'] },
+        ],
+      }),
+      makeNpc('gentleman_alfred', 17, 8, 'LEFT', 'gentleman', '🎩 GENTLEMAN ALFRED', [
+        'Up top is a POKéMON that keeps the LIGHTHOUSE lit. But I hear that it is sick now and cannot be cured by ordinary medicine.'
+      ], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'gentleman_alfred',
+        trainerName: 'Gentleman Alfred',
+        visionRange: 3,
+        challengePages: ['ALFRED: Hm? This is no place for playing.'],
+        trainerPokemon: { speciesId: 'noctowl', level: 20, moves: ['peck', 'hypnosis', 'reflect', 'confusion'] },
+        trainerTeam: [
+          { speciesId: 'noctowl', level: 20, moves: ['peck', 'hypnosis', 'reflect', 'confusion'] },
+        ],
       }),
     ],
 
@@ -170,31 +188,78 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'poliwhirl', level: 20, moves: ['watergun', 'doubleslap'] },
         ],
       }),
+      makeNpc('gentleman_preston', 13, 5, 'RIGHT', 'gentleman', '🎩 GENTLEMAN PRESTON', [
+        'JASMINE used to use rock POKéMON like ONIX.'
+      ], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'gentleman_preston',
+        trainerName: 'Gentleman Preston',
+        visionRange: 4,
+        challengePages: ['PRESTON: I travel the world to train my POKéMON. I wish to battle with you.'],
+        trainerPokemon: { speciesId: 'growlithe', level: 18, moves: ['bite', 'roar', 'ember'] },
+        trainerTeam: [
+          { speciesId: 'growlithe', level: 18, moves: ['bite', 'roar', 'ember'] },
+          { speciesId: 'growlithe', level: 18, moves: ['bite', 'roar', 'ember'] },
+        ],
+      }),
     ],
 
     olivine_lighthouse_4f: [
-      makeNpc('lass_connie', 7, 14, 'DOWN', 'girl', '🎀 LASS CONNIE', ['Marill floats like a buoy!'], {
+      makeNpc('lass_connie', 11, 2, 'DOWN', 'girl', '🎀 LASS CONNIE', [
+        'Right. Anybody would be worried if his or her own POKéMON were hurt. I will pray for the POKéMON here, so JASMINE can come back to the GYM.'
+      ], {
         action: 'TRAINER_BATTLE',
         trainerId: 'lass_connie',
         trainerName: 'Lass Connie',
-        visionRange: 2,
-        challengePages: ['CONNIE: Are you going to see Amphy? Battle me first!'],
+        visionRange: 1,
+        challengePages: ['CONNIE: JASMINE is this city’s GYM LEADER. I mean to bring her back with me. Nobody had better get in my way!'],
         trainerPokemon: { speciesId: 'marill', level: 21, moves: ['tackle', 'watergun', 'rollout'] },
         trainerTeam: [{ speciesId: 'marill', level: 21, moves: ['tackle', 'watergun', 'rollout'] }],
+      }),
+      makeNpc('sailor_kent', 7, 14, 'LEFT', 'fisherman', '⚓ SAILOR KENT', [
+        'Speaking of sick, I have heard there is a good PHARMACY in CIANWOOD across the sea.'
+      ], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'sailor_kent',
+        trainerName: 'Sailor Kent',
+        visionRange: 3,
+        challengePages: ['KENT: JASMINE must be worried sick about the POKéMON here. She will not even smile these days.'],
+        trainerPokemon: { speciesId: 'krabby', level: 18, moves: ['bubble', 'leer', 'vicegrip', 'harden'] },
+        trainerTeam: [
+          { speciesId: 'krabby', level: 18, moves: ['bubble', 'leer', 'vicegrip', 'harden'] },
+          { speciesId: 'krabby', level: 20, moves: ['bubblebeam', 'leer', 'vicegrip', 'harden'] },
+        ],
       }),
     ],
 
     olivine_lighthouse_5f: [
-      makeNpc('sailor_ernest', 8, 13, 'DOWN', 'fisherman', '⚓ SAILOR ERNEST', ['Machop’s karate chops are fierce!'], {
+      makeNpc('sailor_ernest', 8, 11, 'DOWN', 'fisherman', '⚓ SAILOR ERNEST', [
+        'A GYM LEADER is not just about being strong. A LEADER also needs to be compassionate.'
+      ], {
         action: 'TRAINER_BATTLE',
         trainerId: 'sailor_ernest',
         trainerName: 'Sailor Ernest',
-        visionRange: 2,
-        challengePages: ['ERNEST: Almost at the top! Can you overcome my physical power?'],
+        visionRange: 3,
+        challengePages: ['ERNEST: I wanted to battle JASMINE, but she is not up to it now. So, how about you?'],
         trainerPokemon: { speciesId: 'machop', level: 18, moves: ['karatechop', 'lowkick', 'leer'] },
         trainerTeam: [
           { speciesId: 'machop', level: 18, moves: ['karatechop', 'lowkick', 'leer'] },
-          { speciesId: 'poliwhirl', level: 20, moves: ['watergun', 'hypnosis', 'slam'] },
+          { speciesId: 'machop', level: 18, moves: ['karatechop', 'lowkick', 'leer'] },
+          { speciesId: 'poliwhirl', level: 18, moves: ['watergun', 'hypnosis', 'doubleslap'] },
+        ],
+      }),
+      makeNpc('bird_keeper_denis', 8, 3, 'LEFT', 'bird_keeper', '🦅 BIRD KEEPER DENIS', [
+        'My POKéMON learned how to use FLY in CIANWOOD. Well, since I lost, I will FLY across the sea…'
+      ], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'bird_keeper_denis',
+        trainerName: 'Bird Keeper Denis',
+        visionRange: 4,
+        challengePages: ['DENIS: We are pretty high up here. My bird POKéMON are in prime form!'],
+        trainerPokemon: { speciesId: 'spearow', level: 18, moves: ['peck', 'leer', 'furyattack', 'aerialace'] },
+        trainerTeam: [
+          { speciesId: 'spearow', level: 18, moves: ['peck', 'leer', 'furyattack', 'aerialace'] },
+          { speciesId: 'fearow', level: 20, moves: ['peck', 'leer', 'furyattack', 'pursuit'] },
         ],
       }),
     ],
