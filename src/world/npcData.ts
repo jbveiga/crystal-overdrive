@@ -151,7 +151,11 @@ export function getNpcsForMap(
 ): GridEntity[] {
   const list = registry[mapId] || [];
   return list.filter((n) => {
-    if (mapId === 'route_43_gate' && storyFlags.has('rocket_base_generator_cleared') && n.id.includes('rocket')) {
+    if (
+      mapId === 'route_43_gate' &&
+      (storyFlags.has('rocket_base_generator_cleared') || storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')) &&
+      n.id.includes('rocket')
+    ) {
       return false;
     }
     return isNpcActiveForStoryFlags(n.id, storyFlags);
@@ -196,7 +200,11 @@ export function applyMapNpcStoryMutations(
     }
 
     // Route 43 Gate rocket check
-    if (mapId === 'route_43_gate' && storyFlags.has('rocket_base_generator_cleared') && npc.id.includes('rocket')) {
+    if (
+      mapId === 'route_43_gate' &&
+      (storyFlags.has('rocket_base_generator_cleared') || storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')) &&
+      npc.id.includes('rocket')
+    ) {
       continue;
     }
 

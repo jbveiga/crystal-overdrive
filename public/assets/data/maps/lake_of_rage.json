@@ -4353,7 +4353,20 @@
       "targetY": 7
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 21,
+      "y": 27,
+      "type": "SIGN",
+      "text": "LAKE OF RAGE,\nalso known as GYARADOS LAKE."
+    },
+    {
+      "x": 25,
+      "y": 31,
+      "type": "SIGN",
+      "text": "FISHING GURU'S HOUSE"
+    }
+  ],
   "grassEncounters": [],
   "waterEncounters": [
     {

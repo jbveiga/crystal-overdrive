@@ -332,26 +332,34 @@ export function isNpcActiveForStoryFlags(
 
   // Phase 11: Lake of Rage, Mahogany Town, and Team Rocket Base
   if (npcId === 'lake_of_rage_red_gyarados') {
-    return !storyFlags.has('red_gyarados_subdued');
+    return !storyFlags.has('red_gyarados_subdued') && !storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS');
   }
   if (npcId === 'lake_of_rage_lance') {
-    return storyFlags.has('red_gyarados_subdued') && !storyFlags.has('lance_lake_talked');
+    return (
+      (storyFlags.has('red_gyarados_subdued') || storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS')) &&
+      !storyFlags.has('lance_lake_talked') &&
+      !storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE')
+    );
   }
   if (npcId === 'mahogany_gym_blocker') {
-    return !storyFlags.has('rocket_base_generator_cleared');
+    return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
   }
   if (npcId === 'mahogany_mart_lance') {
-    return storyFlags.has('lance_lake_talked') && !storyFlags.has('rocket_base_generator_cleared');
+    return (
+      (storyFlags.has('lance_lake_talked') || storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE')) &&
+      !storyFlags.has('rocket_base_generator_cleared') &&
+      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+    );
   }
   if (npcId === 'team_rocket_base_b2f_lance') {
-    return !storyFlags.has('rocket_base_generator_cleared');
+    return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
   }
   if (npcId.startsWith('b3f_electrode_')) {
-    if (storyFlags.has('rocket_base_generator_cleared')) return false;
+    if (storyFlags.has('rocket_base_generator_cleared') || storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')) return false;
     return !storyFlags.has(npcId + '_cleared');
   }
   if (npcId === 'route_43_gate_rocket_1' || npcId === 'route_43_gate_rocket_2') {
-    return !storyFlags.has('rocket_base_generator_cleared');
+    return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
   }
 
   // Radio Tower & Underground Takeover (Act 7)

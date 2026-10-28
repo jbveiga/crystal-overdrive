@@ -184,7 +184,11 @@ export interface GridEntity {
     | 'EXECUTIVE_ARIANA_EVENT'
     | 'EXECUTIVE_ARCHER_EVENT'
     | 'LIBERATED_DIRECTOR_EVENT'
-    | 'DJ_MARY_EVENT';
+    | 'DJ_MARY_EVENT'
+    | 'MAHOGANY_RAGECANDYBAR_SALESMAN'
+    | 'ROUTE_43_GATE_OFFICER'
+    | 'LAKE_OF_RAGE_HIDDEN_POWER'
+    | 'LAKE_OF_RAGE_MAGIKARP_GURU';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

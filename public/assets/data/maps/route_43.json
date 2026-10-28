@@ -3298,7 +3298,26 @@
       "targetY": 0
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 13,
+      "y": 3,
+      "type": "SIGN",
+      "text": "ROUTE 43\nLAKE OF RAGE - MAHOGANY TOWN"
+    },
+    {
+      "x": 11,
+      "y": 49,
+      "type": "SIGN",
+      "text": "ROUTE 43\nLAKE OF RAGE - MAHOGANY TOWN"
+    },
+    {
+      "x": 16,
+      "y": 38,
+      "type": "SIGN",
+      "text": "TRAINER TIPS\nAll POKéMON have pros and cons depending on their types."
+    }
+  ],
   "grassEncounters": [
     {
       "speciesId": "sentret",

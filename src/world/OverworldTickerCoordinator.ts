@@ -475,6 +475,57 @@ export class OverworldTickerCoordinator {
             return;
           }
 
+          // Mahogany Town Route 44 East Blocker
+          if (
+            currentMap?.id === 'mahogany_town' &&
+            coord.x === 19 &&
+            (coord.y === 8 || coord.y === 9) &&
+            !storyFlags.has('rocket_base_generator_cleared') &&
+            !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+          ) {
+            player.x = 18;
+            player.targetX = 18;
+            player.renderX = 18;
+            player.direction = 'LEFT';
+            player.isMoving = false;
+            overworldHUD.openDialogue(
+              [
+                'Hiya, kid! I see you are new in MAHOGANY TOWN.',
+                'Since you are new, you should try a yummy RAGECANDYBAR!',
+                'Right now, it can be yours for just ¥300! Want one?',
+              ],
+              '🍬 RAGECANDYBAR SALESMAN',
+              () => void saveCurrentGame()
+            );
+            return;
+          }
+
+          // Route 43 Gate Rocket Extortion
+          if (
+            currentMap?.id === 'route_43_gate' &&
+            coord.y === 4 &&
+            !storyFlags.has('rocket_base_generator_cleared') &&
+            !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+          ) {
+            const currentMoney = (ctx as any).inventory?.money ?? 1000;
+            const fee = Math.min(1000, currentMoney);
+            if ((ctx as any).inventory) {
+              (ctx as any).inventory.money = Math.max(0, currentMoney - 1000);
+            }
+            overworldHUD.openDialogue(
+              [
+                'TEAM ROCKET: Hold it right there! This is a toll gate!',
+                'Pay the toll fee of ¥1000!',
+                fee >= 1000
+                  ? 'Hehehe, thank you for your generous contribution to TEAM ROCKET!'
+                  : 'You are broke? Well, hand over everything you have got!',
+              ],
+              '⚡ TEAM ROCKET',
+              () => void saveCurrentGame()
+            );
+            return;
+          }
+
           // Ecruteak Gym Invisible Floor Pitfall Maze
           if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15) {
             if (!isEcruteakGymSafeTile(coord.x, coord.y)) {
@@ -682,16 +733,16 @@ export class OverworldTickerCoordinator {
         }
 
         // Update wandering NPCs on connected neighbor maps
-        this.stepNeighborNpcs(currentMap?.connections.WEST?.mapId, triggerNewWanderStep, dtWorld, mapManager, getActiveMapNpcs);
-        this.stepNeighborNpcs(currentMap?.connections.EAST?.mapId, triggerNewWanderStep, dtWorld, mapManager, getActiveMapNpcs);
-        this.stepNeighborNpcs(currentMap?.connections.NORTH?.mapId, triggerNewWanderStep, dtWorld, mapManager, getActiveMapNpcs);
-        this.stepNeighborNpcs(currentMap?.connections.SOUTH?.mapId, triggerNewWanderStep, dtWorld, mapManager, getActiveMapNpcs);
+        this.stepNeighborNpcs(currentMap?.connections?.WEST?.mapId, triggerNewWanderStep, dtWorld, mapManager, getActiveMapNpcs);
+        this.stepNeighborNpcs(currentMap?.connections?.EAST?.mapId, triggerNewWanderStep, dtWorld, mapManager, getActiveMapNpcs);
+        this.stepNeighborNpcs(currentMap?.connections?.NORTH?.mapId, triggerNewWanderStep, dtWorld, mapManager, getActiveMapNpcs);
+        this.stepNeighborNpcs(currentMap?.connections?.SOUTH?.mapId, triggerNewWanderStep, dtWorld, mapManager, getActiveMapNpcs);
       }
 
       // Render active & connected map NPCs after any border/warp transitions
       const mapAfterMove = mapManager.getCurrentMap();
       const npcsToRender = populateWorldNpcs(mapAfterMove);
-      overworldRenderer.update(player, npcsToRender, dtWorld);
+      overworldRenderer?.update?.(player, npcsToRender, dtWorld);
     }
   }
 }

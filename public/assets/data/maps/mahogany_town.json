@@ -1142,6 +1142,31 @@
       "targetY": 7
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 1,
+      "y": 5,
+      "type": "SIGN",
+      "text": "MAHOGANY TOWN\nWelcome to the Home of the Ninja"
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "type": "SIGN",
+      "text": "While visiting MAHOGANY TOWN, try a RAGECANDYBAR!"
+    },
+    {
+      "x": 3,
+      "y": 13,
+      "type": "SIGN",
+      "text": "MAHOGANY TOWN POKéMON GYM\nLEADER: PRYCE\nThe Teacher of Winter's Harshness"
+    },
+    {
+      "x": 16,
+      "y": 13,
+      "type": "SIGN",
+      "text": "POKéMON CENTER\nHeal Your POKéMON!"
+    }
+  ],
   "grassEncounters": []
 }

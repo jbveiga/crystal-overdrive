@@ -7,6 +7,7 @@ import { getJohtoTownServiceInteractions } from './JohtoTownServiceInteractions'
 import { getGoldenrodExpansionInteractions } from './GoldenrodExpansionInteractions';
 import { getEastJohtoQuestInteractions } from './EastJohtoQuestInteractions';
 import { createGoldenrodTakeoverInteractions } from './GoldenrodTakeoverInteractions';
+import { getMahoganyTownAndLakeInteractions } from './MahoganyTownAndLakeInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -19,6 +20,7 @@ export * from './JohtoTownServiceInteractions';
 export * from './GoldenrodExpansionInteractions';
 export * from './EastJohtoQuestInteractions';
 export * from './GoldenrodTakeoverInteractions';
+export * from './MahoganyTownAndLakeInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.
@@ -33,5 +35,6 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getGoldenrodExpansionInteractions(),
     ...getEastJohtoQuestInteractions(),
     ...createGoldenrodTakeoverInteractions(),
+    ...getMahoganyTownAndLakeInteractions(),
   ]);
 }

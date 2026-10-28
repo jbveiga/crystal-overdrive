@@ -577,6 +577,7 @@ async function bootstrap() {
     isSurfEnabled: () => mapManager.isSurfEnabled(),
     openDeptElevatorModal: (currentMapId, onSelectFloor) => deptStoreElevatorUI.open({ currentMapId, onSelectFloor: (f) => onSelectFloor(f.mapId), onClose: () => {} }),
     dayCareManager,
+    inventory,
     playerParty,
     seenSpecies,
     defeatedTrainers,

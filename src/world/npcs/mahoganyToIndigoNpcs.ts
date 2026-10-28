@@ -165,6 +165,12 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'MAHOGANY_GYM_BLOCKER' }
       ),
+      makeNpc('mahogany_rage_candy_bar_salesman', 19, 8, 'DOWN', 'pokefan_m', '🍬 RAGECANDYBAR SALESMAN', 
+        [
+          'While visiting MAHOGANY TOWN, try a delicious RAGECANDYBAR!',
+        ],
+        { action: 'MAHOGANY_RAGECANDYBAR_SALESMAN' }
+      ),
     ],
 
     mahogany_mart: [
