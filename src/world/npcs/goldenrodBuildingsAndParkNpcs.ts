@@ -375,12 +375,12 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       ),
     ],
     route_35_national_park_gate: [
-      makeNpc('park_gate_officer', 2, 3, 'DOWN', 'officer', '👮 PARK OFFICER', 
+      makeNpc('park_gate_officer', 0, 3, 'RIGHT', 'officer', '👮 PARK OFFICER', 
         [
           'Welcome to the NATIONAL PARK!',
           'The Bug-Catching Contest is held every Tuesday, Thursday, and Saturday! You could win a rare SUN STONE!',
         ],
-        { action: 'BUG_CONTEST_OFFICER_EVENT' }
+        { action: 'BUG_CONTEST_OFFICER_EVENT', talkAcrossCounter: true }
       ),
       makeNpc('gate_civilian', 6, 4, 'DOWN', 'youngster', '👦 VISITOR', 
         ['The Bug-Catching Contest is tough! High level and rare species score higher!']
@@ -466,7 +466,8 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
         [
           'ROUTE 36 is straight ahead to the east.',
           'There’s an odd tree blocking the road intersection that wiggles whenever it rains!',
-        ]
+        ],
+        { talkAcrossCounter: true }
       ),
     ],
     route_36: [

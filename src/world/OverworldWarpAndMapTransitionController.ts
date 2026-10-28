@@ -476,31 +476,35 @@ export class OverworldWarpAndMapTransitionController {
       }
     }
 
-    if (warp.targetMapId === 'route_28' && !storyFlags.has('champion_defeated')) {
-      player.isMoving = false;
-      player.progress = 0;
-      setCutsceneLocked(false);
+    if (
+      currentM.id === 'victory_road' &&
+      warp.targetMapId === 'route_23' &&
+      !storyFlags.has('victory_road_rival_defeated')
+    ) {
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false);
       BattleAudio.playMenuSound('CANCEL');
       overworldHUD.openDialogue(
-        [
-          'BLACK BELT: Hold on! This way leads to MT. SILVER.',
-          'Only a verified CHAMPION who has conquered both JOHTO and KANTO may pass!',
-        ],
+        ["SILVER: Hold it! You're not getting past me to the LEAGUE!"],
+        '🔴 RIVAL SILVER'
+      );
+      return;
+    }
+
+    if (warp.targetMapId === 'route_28' && !storyFlags.has('champion_defeated')) {
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false);
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(
+        ['BLACK BELT: Hold on! This way leads to MT. SILVER.', 'Only a verified CHAMPION who has conquered both JOHTO and KANTO may pass!'],
         '🥋 BLACK BELT'
       );
       return;
     }
 
     if (warp.targetMapId === 'route_22' && !storyFlags.has('champion_defeated')) {
-      player.isMoving = false;
-      player.progress = 0;
-      setCutsceneLocked(false);
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false);
       BattleAudio.playMenuSound('CANCEL');
       overworldHUD.openDialogue(
-        [
-          'BLACK BELT: Off to the POKéMON LEAGUE, are you?',
-          'The route to VIRIDIAN CITY is closed to incoming challengers. Proceed through VICTORY ROAD!',
-        ],
+        ['BLACK BELT: Off to the POKéMON LEAGUE, are you?', 'The route to VIRIDIAN CITY is closed to incoming challengers. Proceed through VICTORY ROAD!'],
         '🥋 BLACK BELT'
       );
       return;

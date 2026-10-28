@@ -441,7 +441,7 @@ export function isNpcActiveForStoryFlags(
 
   // Victory Road Rival & Indigo Plateau Elite Four (Act 9)
   if (npcId === 'victory_road_rival') {
-    return !storyFlags.has('victory_road_rival_defeated');
+    return true;
   }
   if (npcId === 'e4_will') {
     return !storyFlags.has('will_defeated');

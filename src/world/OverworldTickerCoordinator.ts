@@ -16,6 +16,7 @@ import { PokemonFactory } from '../battle/PokemonFactory';
 import { ItemfinderRadar } from '../world/ItemfinderRadar';
 import { isEcruteakGymSafeTile, ECRUTEAK_GYM_RESPAWN } from './ecruteakGymMaze';
 import { handleVictoryRoadGateStep } from './interactions/VictoryRoadGateInteractions';
+import { handleVictoryRoadStep } from './interactions/VictoryRoadInteractions';
 import type { OverworldTickerContext } from '../types/gameContext';
 
 export class OverworldTickerCoordinator {
@@ -531,12 +532,9 @@ export class OverworldTickerCoordinator {
             return;
           }
 
-          // Victory Road Gate 8-Badge Security Gauntlet & Mt. Silver / Kanto Check
-          if (currentMap?.id === 'victory_road_gate' && handleVictoryRoadGateStep(coord, currentMap, {
-            player, inventory, storyFlags,
-            openDialogue: (p, s, c) => overworldHUD.openDialogue(p, s, c),
-            showToast: (m) => overworldHUD.showToast(m),
-          })) return;
+          // Victory Road Gate 8-Badge Security Gauntlet & Victory Road Rival Ambush Step Checks
+          if (currentMap?.id === 'victory_road_gate' && handleVictoryRoadGateStep(coord, currentMap, { player, inventory, storyFlags, openDialogue: (p, s, c) => overworldHUD.openDialogue(p, s, c), showToast: (m) => overworldHUD.showToast(m) })) return;
+          if (currentMap?.id === 'victory_road' && handleVictoryRoadStep(coord, currentMap, ctx as any)) return;
 
           // Tall Grass Rustle FX + Sound
           if (tileType === 2) {

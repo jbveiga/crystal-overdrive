@@ -259,6 +259,20 @@ export function applyMapNpcStoryMutations(
       }
     }
 
+    if (npc.id === 'victory_road_rival' && storyFlags.has('victory_road_rival_defeated')) {
+      npc.x = 12;
+      npc.y = 7;
+      npc.gridX = 12;
+      npc.gridY = 7;
+      npc.targetX = 12;
+      npc.targetY = 7;
+      npc.renderX = 12;
+      npc.renderY = 7;
+      npc.direction = 'RIGHT';
+      npc.isMoving = false;
+      npc.progress = 0;
+    }
+
     filtered.push(npc);
   }
 

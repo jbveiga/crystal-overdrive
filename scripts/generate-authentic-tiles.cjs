@@ -2592,7 +2592,7 @@ buildMapFromBlk({
   id: 'route_35_national_park_gate',
   name: 'Route 35 National Park Gate',
   tileset: 'gate',
-  blkFile: 'maps__NorthSouthGate.blk',
+  blkFile: 'maps__Route35NationalParkGate.blk',
   blocksW: 4,
   blocksH: 4,
   warps: [
@@ -2601,7 +2601,17 @@ buildMapFromBlk({
     { x: 3, y: 7, targetMapId: 'route_35', targetX: 3, targetY: 5 },
     { x: 4, y: 7, targetMapId: 'route_35', targetX: 3, targetY: 5 },
   ],
-  bgEvents: [],
+  bgEvents: [
+    {
+      x: 5,
+      y: 0,
+      speaker: '📋 CONTEST NOTICE',
+      pages: [
+        'The Bug-Catching Contest is held on Tuesday, Thursday, and Saturday.',
+        'Not only do you earn a prize just for participating, you also get to keep the bug POKéMON you may have at the end of the contest.',
+      ],
+    },
+  ],
 });
 
 buildMapFromBlk({
@@ -2646,7 +2656,7 @@ buildMapFromBlk({
   id: 'route_36_national_park_gate',
   name: 'Route 36 National Park Gate',
   tileset: 'gate',
-  blkFile: 'maps__NorthSouthGate.blk',
+  blkFile: 'maps__Route36NationalParkGate.blk',
   blocksW: 5,
   blocksH: 4,
   warps: [
@@ -2655,7 +2665,17 @@ buildMapFromBlk({
     { x: 9, y: 4, targetMapId: 'route_36', targetX: 18, targetY: 8 },
     { x: 9, y: 5, targetMapId: 'route_36', targetX: 18, targetY: 9 },
   ],
-  bgEvents: [],
+  bgEvents: [
+    {
+      x: 6,
+      y: 0,
+      speaker: '📋 CONTEST NOTICE',
+      pages: [
+        'The Bug-Catching Contest is held on Tuesday, Thursday, and Saturday.',
+        'Check with the gate officer to enter.',
+      ],
+    },
+  ],
 });
 
 buildMapFromBlk({

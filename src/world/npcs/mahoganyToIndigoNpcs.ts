@@ -256,29 +256,36 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     victory_road: [
-      makeNpc('victory_road_rival', 10, 4, 'DOWN', 'super_nerd', '🔴 RIVAL', 
-        [
-          "RIVAL: You really made it through VICTORY ROAD? Don't think for a second that you're stronger than me!",
+      // Rival Silver Ambush at exit chokepoint
+      makeNpc('victory_road_rival', 13, 7, 'DOWN', 'silver', '🔴 RIVAL SILVER', [
+        "RIVAL: You really made it through VICTORY ROAD? Don't think for a second that you're stronger than me!",
+      ], {
+        action: 'VICTORY_ROAD_RIVAL_EVENT',
+        trainerId: 'rival_victory_road',
+        trainerName: 'Rival Silver',
+        visionRange: 2,
+        challengePages: [
+          "RIVAL: Hold it! You really made it this far? Don't think for a second that you're stronger than me!",
+          "I have assembled the ultimate team of ruthless, powerful POKéMON! I'll crush you before you even see the LEAGUE doors!",
         ],
-        {
-          action: 'VICTORY_ROAD_RIVAL_EVENT',
-          trainerId: 'rival_victory_road',
-          trainerName: 'Rival',
-          visionRange: 3,
-          challengePages: [
-            "RIVAL: I have assembled the ultimate team of ruthless, powerful POKéMON! I'll crush you before you even see the LEAGUE doors!",
-          ],
-          trainerPokemon: { speciesId: 'sneasel', level: 36, moves: ['slash', 'feint-attack', 'quickattack'] },
-          trainerTeam: [
-            { speciesId: 'sneasel', level: 36, moves: ['slash', 'feint-attack', 'quickattack'] },
-            { speciesId: 'golbat', level: 36, moves: ['wing-attack', 'bite', 'confuseray'] },
-            { speciesId: 'magneton', level: 35, moves: ['thundershock', 'sonicboom', 'supersonic'] },
-            { speciesId: 'kadabra', level: 35, moves: ['psybeam', 'recover', 'disable'] },
-            { speciesId: 'haunter', level: 35, moves: ['shadowball', 'curse', 'night-shade'] },
-            { speciesId: 'feraligatr', level: 38, moves: ['surf', 'bite', 'slash', 'scaryface'] },
-          ],
-        }
-      ),
+        trainerPokemon: { speciesId: 'sneasel', level: 36, moves: ['slash', 'feint-attack', 'quickattack'] },
+        trainerTeam: [
+          { speciesId: 'sneasel', level: 36, moves: ['slash', 'feint-attack', 'quickattack'] },
+          { speciesId: 'golbat', level: 36, moves: ['wing-attack', 'bite', 'confuseray'] },
+          { speciesId: 'magneton', level: 35, moves: ['thundershock', 'sonicboom', 'supersonic'] },
+          { speciesId: 'kadabra', level: 35, moves: ['psybeam', 'recover', 'disable'] },
+          { speciesId: 'haunter', level: 35, moves: ['shadowball', 'curse', 'night-shade'] },
+          { speciesId: 'feraligatr', level: 38, moves: ['surf', 'bite', 'slash', 'scaryface'] },
+        ],
+      }),
+
+      // Strength Boulders on 2F
+      makeNpc('victory_road_boulder_1', 4, 28, 'DOWN', 'boulder', '🪨 BOULDER', [
+        'A giant boulder! It can be moved with STRENGTH.',
+      ], { action: 'STRENGTH_BOULDER' }),
+      makeNpc('victory_road_boulder_2', 16, 33, 'DOWN', 'boulder', '🪨 BOULDER', [
+        'A giant boulder! It can be moved with STRENGTH.',
+      ], { action: 'STRENGTH_BOULDER' }),
     ],
 
     wills_room: [
