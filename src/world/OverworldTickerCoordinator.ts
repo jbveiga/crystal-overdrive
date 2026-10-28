@@ -33,11 +33,7 @@ export class OverworldTickerCoordinator {
   }
 
   public static isTileWalkableForPlayer(
-    x: number,
-    y: number,
-    mapManager: MapManager,
-    overworldItemManager: any,
-    storyFlags: Set<string>
+    x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>
   ): boolean {
     if (!mapManager.isWalkable(x, y)) return false;
     const activeMap = mapManager.getCurrentMap();
@@ -48,11 +44,7 @@ export class OverworldTickerCoordinator {
   }
 
   public static isTileWalkableForActiveMapNpc(
-    x: number,
-    y: number,
-    mapManager: MapManager,
-    overworldItemManager: any,
-    storyFlags: Set<string>
+    x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>
   ): boolean {
     if (!mapManager.isWalkableInBounds(x, y)) return false;
     const activeMap = mapManager.getCurrentMap();
@@ -64,26 +56,14 @@ export class OverworldTickerCoordinator {
 
   public static refreshItemfinderRadar(
     playSonar: boolean,
-    ctx: {
-      itemfinderHUD: any;
-      mapManager: MapManager;
-      overworldItemManager: any;
-      storyFlags: Set<string>;
-      player: GridEntity;
-    }
+    ctx: { itemfinderHUD: any; mapManager: MapManager; overworldItemManager: any; storyFlags: Set<string>; player: GridEntity }
   ): void {
     const { itemfinderHUD, mapManager, overworldItemManager, storyFlags, player } = ctx;
     if (!itemfinderHUD.isActive()) return;
     const currentMap = mapManager.getCurrentMap();
     if (!currentMap) return;
     const hiddenItems = overworldItemManager.getHiddenItemsForMap(currentMap.id, storyFlags);
-    const ping = ItemfinderRadar.scan(
-      player.x,
-      player.y,
-      player.direction,
-      hiddenItems,
-      storyFlags
-    );
+    const ping = ItemfinderRadar.scan(player.x, player.y, player.direction, hiddenItems, storyFlags);
     itemfinderHUD.update(ping);
     if (playSonar && ping.hasItemInRange) {
       BattleAudio.playItemfinderSonar(ping.distance, ping.isFacingDirectly);
@@ -91,21 +71,10 @@ export class OverworldTickerCoordinator {
   }
 
   public static toggleLiveItemfinderRadar(ctx: {
-    getGameState: () => string;
-    isCutsceneLocked: () => boolean;
-    overworldHUD: any;
-    itemfinderHUD: any;
-    mapManager: MapManager;
-    overworldItemManager: any;
-    storyFlags: Set<string>;
-    player: GridEntity;
+    getGameState: () => string; isCutsceneLocked: () => boolean; overworldHUD: any;
+    itemfinderHUD: any; mapManager: MapManager; overworldItemManager: any; storyFlags: Set<string>; player: GridEntity;
   }): boolean {
-    const {
-      getGameState,
-      isCutsceneLocked,
-      overworldHUD,
-      itemfinderHUD,
-    } = ctx;
+    const { getGameState, isCutsceneLocked, overworldHUD, itemfinderHUD } = ctx;
 
     if (getGameState() !== 'OVERWORLD' || isCutsceneLocked() || overworldHUD.isDialogueOpen()) {
       return itemfinderHUD.isActive();
@@ -188,13 +157,8 @@ export class OverworldTickerCoordinator {
           : null;
 
       GridPhysics.updateEntity(
-        npcEntity,
-        dtWorld,
-        desiredDir,
-        mapManager.isWalkableInNeighborBounds,
-        mapManager.getTileType,
-        undefined,
-        neighborNpcs
+        npcEntity, dtWorld, desiredDir, mapManager.isWalkableInNeighborBounds,
+        mapManager.getTileType, undefined, neighborNpcs
       );
     }
     mapManager.setNeighborScratchMap(null);
@@ -203,45 +167,18 @@ export class OverworldTickerCoordinator {
   public static updateOverworldTick(
     rawDeltaSec: number,
     ctx: OverworldTickerContext & {
-      dayCareManager: any;
-      playerParty: any[];
-      seenSpecies: Set<string>;
-      defeatedTrainers: Set<string>;
-      overworldRenderer: any;
+      dayCareManager: any; playerParty: any[]; seenSpecies: Set<string>;
+      defeatedTrainers: Set<string>; overworldRenderer: any;
     }
   ): void {
     const {
-      getGameState,
-      isCutsceneLocked,
-      player,
-      mapManager,
-      gameClock,
-      overworldRenderer,
-      overworldHUD,
-      getActiveMapNpcs,
-      populateWorldNpcs,
-      handleMapTransition,
-      executeWarpTransition,
-      runTrainerSightSequence,
-      triggerSlowpokeWellGruntIntercept,
-      triggerBeastsAwakeningCutscene,
-      triggerBurnedTowerRivalBattle,
-      triggerCherrygroveRivalAmbush,
-      triggerAzaleaRivalAmbush,
-      triggerOlivineRivalConfrontation,
-      triggerCianwoodSuicuneAndEusine,
-      triggerRoute42Suicune,
-      saveCurrentGame,
-      triggerWildEncounter,
-      addPlayTimeDelta,
-      overworldItemManager,
-      storyFlags,
-      itemfinderHUD,
-      dayCareManager,
-      playerParty,
-      seenSpecies,
-      defeatedTrainers,
-      roamingManager,
+      getGameState, isCutsceneLocked, player, mapManager, gameClock, overworldRenderer, overworldHUD,
+      getActiveMapNpcs, populateWorldNpcs, handleMapTransition, executeWarpTransition, runTrainerSightSequence,
+      triggerSlowpokeWellGruntIntercept, triggerBeastsAwakeningCutscene, triggerBurnedTowerRivalBattle,
+      triggerCherrygroveRivalAmbush, triggerAzaleaRivalAmbush, triggerOlivineRivalConfrontation,
+      triggerCianwoodSuicuneAndEusine, triggerRoute42Suicune, saveCurrentGame, triggerWildEncounter,
+      addPlayTimeDelta, overworldItemManager, storyFlags, itemfinderHUD, dayCareManager, playerParty,
+      seenSpecies, defeatedTrainers, roamingManager,
     } = ctx as any;
 
     const { dtWorld, dtPlayer } = gameClock.tick(rawDeltaSec);
@@ -526,6 +463,64 @@ export class OverworldTickerCoordinator {
             return;
           }
 
+          // Team Rocket Hideout B1F Persian Surveillance Cameras
+          if (
+            currentMap?.id === 'team_rocket_base_b1f' &&
+            !storyFlags.has('EVENT_SECURITY_CAMERA_DISABLED') &&
+            !storyFlags.has('rocket_base_generator_cleared') &&
+            !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+          ) {
+            const isStatueCamera =
+              (coord.x === 19 && (coord.y === 2 || coord.y === 3)) ||
+              (coord.x === 4 && (coord.y === 7 || coord.y === 8)) ||
+              (coord.x === 19 && (coord.y === 6 || coord.y === 7)) ||
+              (coord.x === 4 && (coord.y === 11 || coord.y === 12)) ||
+              (coord.x === 27 && coord.y === 13);
+            if (isStatueCamera) {
+              (ctx as any).audioManager?.playSfx?.('sfx_alarm');
+              overworldHUD.openDialogue(
+                [
+                  'A secret surveillance camera is embedded in the PERSIAN statue!',
+                  'The alarm blares loudly!',
+                  'ROCKET GRUNT: Intruder detected! You are not getting past me!',
+                ],
+                '🚨 SECURITY CAMERA',
+                () => {
+                  const grunt = [
+                    PokemonFactory.create('drowzee', 20, ['pound', 'hypnosis']),
+                    PokemonFactory.create('zubat', 20, ['leechlife', 'bite']),
+                  ];
+                  (ctx as any).triggerBattle?.(grunt, {
+                    onBattleEnd: () => void saveCurrentGame(),
+                  });
+                }
+              );
+              return;
+            }
+          }
+
+          // Team Rocket Hideout B3F Rival Silver Ambush
+          if (
+            currentMap?.id === 'team_rocket_base_b3f' &&
+            coord.y === 2 &&
+            (coord.x === 8 || coord.x === 9 || coord.x === 10) &&
+            !storyFlags.has('EVENT_RIVAL_TEAM_ROCKET_BASE')
+          ) {
+            storyFlags.add('EVENT_RIVAL_TEAM_ROCKET_BASE');
+            overworldHUD.openDialogue(
+              [
+                'SILVER: ...Tell me something.',
+                'Is it true that TEAM ROCKET has returned? What a pathetic bunch of weaklings.',
+                'Some guy in a black cape with a dragon lectured me earlier about love and trust with Pokémon.',
+                'Hmph! Love? Trust? As if that ever won a battle! Absolute power is all that matters!',
+                'Out of my way!',
+              ],
+              '🔴 RIVAL SILVER',
+              () => void saveCurrentGame()
+            );
+            return;
+          }
+
           // Ecruteak Gym Invisible Floor Pitfall Maze
           if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15) {
             if (!isEcruteakGymSafeTile(coord.x, coord.y)) {
@@ -568,12 +563,9 @@ export class OverworldTickerCoordinator {
                 p.eggSteps = 0;
 
                 const oddEggMoves: Record<string, string[]> = {
-                  pichu: ['thundershock', 'charm', 'dizzypunch'],
-                  cleffa: ['pound', 'charm', 'dizzypunch'],
-                  igglybuff: ['sing', 'charm', 'dizzypunch'],
-                  tyrogue: ['tackle', 'dizzypunch'],
-                  smoochum: ['pound', 'lick', 'dizzypunch'],
-                  elekid: ['quickattack', 'leer', 'dizzypunch'],
+                  pichu: ['thundershock', 'charm', 'dizzypunch'], cleffa: ['pound', 'charm', 'dizzypunch'],
+                  igglybuff: ['sing', 'charm', 'dizzypunch'], tyrogue: ['tackle', 'dizzypunch'],
+                  smoochum: ['pound', 'lick', 'dizzypunch'], elekid: ['quickattack', 'leer', 'dizzypunch'],
                   magby: ['ember', 'leer', 'dizzypunch'],
                 };
 

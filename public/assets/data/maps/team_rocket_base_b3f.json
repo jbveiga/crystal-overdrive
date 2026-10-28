@@ -1662,6 +1662,47 @@
       "targetY": 14
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 10,
+      "y": 9,
+      "speaker": "🔒 BLAST DOOR",
+      "pages": [
+        "The door is heavily sealed.",
+        "Two passwords are required to unlock it!"
+      ],
+      "action": "ROCKET_BASE_OFFICE_DOOR"
+    },
+    {
+      "x": 11,
+      "y": 9,
+      "speaker": "🔒 BLAST DOOR",
+      "pages": [
+        "The door is heavily sealed.",
+        "Two passwords are required to unlock it!"
+      ],
+      "action": "ROCKET_BASE_OFFICE_DOOR"
+    },
+    {
+      "x": 10,
+      "y": 8,
+      "speaker": "🔒 BLAST DOOR",
+      "pages": [
+        "The door is heavily sealed.",
+        "Two passwords are required to unlock it!"
+      ],
+      "action": "ROCKET_BASE_OFFICE_DOOR"
+    },
+    {
+      "x": 11,
+      "y": 8,
+      "speaker": "🔒 BLAST DOOR",
+      "pages": [
+        "The door is heavily sealed.",
+        "Two passwords are required to unlock it!"
+      ],
+      "action": "ROCKET_BASE_OFFICE_DOOR"
+    }
+  ],
   "grassEncounters": []
 }

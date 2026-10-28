@@ -1669,6 +1669,27 @@
       "targetY": 14
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 14,
+      "y": 12,
+      "speaker": "🔒 BLAST DOOR",
+      "pages": [
+        "The door is locked electronically.",
+        "It requires a voice password to open!"
+      ],
+      "action": "ROCKET_BASE_TRANSMITTER_DOOR"
+    },
+    {
+      "x": 15,
+      "y": 12,
+      "speaker": "🔒 BLAST DOOR",
+      "pages": [
+        "The door is locked electronically.",
+        "It requires a voice password to open!"
+      ],
+      "action": "ROCKET_BASE_TRANSMITTER_DOOR"
+    }
+  ],
   "grassEncounters": []
 }

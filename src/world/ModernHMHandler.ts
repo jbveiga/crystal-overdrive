@@ -10,7 +10,7 @@
 import type { PokemonInstance } from '../types/game';
 import type { BagInventory } from '../ui/BagAndMartUI';
 
-export type HMFieldMoveId = 'cut' | 'flash' | 'surf' | 'strength' | 'fly';
+export type HMFieldMoveId = 'cut' | 'flash' | 'surf' | 'strength' | 'fly' | 'whirlpool';
 
 export interface HMFieldCheckResult {
   allowed: boolean;
@@ -18,6 +18,7 @@ export interface HMFieldCheckResult {
   hasBadge: boolean;
   hasHM: boolean;
   compatiblePokemon: PokemonInstance | null;
+  compatiblePokemonName?: string;
   userPokemon: PokemonInstance | null;
   reason?: string;
   missingReason?: string;
@@ -121,6 +122,15 @@ const FLY_COMPATIBLE_SPECIES = new Set<string>([
   'togetic', 'xatu', 'natu', 'murkrow', 'skarmory', 'charizard', 'lugia', 'ho-oh', 'mew',
 ]);
 
+const WHIRLPOOL_COMPATIBLE_SPECIES = new Set<string>([
+  'squirtle', 'wartortle', 'blastoise', 'psyduck', 'golduck', 'poliwag', 'poliwhirl', 'poliwrath',
+  'tentacool', 'tentacruel', 'slowpoke', 'slowbro', 'seel', 'dewgong', 'shellder', 'cloyster',
+  'krabby', 'kingler', 'horsea', 'seadra', 'goldeen', 'seaking', 'staryu', 'starmie', 'gyarados',
+  'lapras', 'vaporeon', 'omanyte', 'omastar', 'kabuto', 'kabutops', 'totodile', 'croconaw',
+  'feraligatr', 'chinchou', 'lanturn', 'marill', 'azumarill', 'politoed', 'wooper', 'quagsire',
+  'slowking', 'qwilfish', 'corsola', 'remoraid', 'octillery', 'mantine', 'kingdra', 'suicune', 'lugia',
+]);
+
 export class ModernHMHandler {
   /**
    * Checks whether a given species is innately compatible with the specified HM field move.
@@ -143,6 +153,9 @@ export class ModernHMHandler {
     if (moveId === 'fly') {
       return FLY_COMPATIBLE_SPECIES.has(normalized);
     }
+    if (moveId === 'whirlpool') {
+      return WHIRLPOOL_COMPATIBLE_SPECIES.has(normalized);
+    }
     return false;
   }
 
@@ -159,6 +172,9 @@ export class ModernHMHandler {
       hasBadge,
       hasHM,
       compatiblePokemon,
+      compatiblePokemonName: compatiblePokemon
+        ? compatiblePokemon.nickname || compatiblePokemon.speciesId.toUpperCase()
+        : undefined,
       userPokemon: compatiblePokemon,
       reason,
       missingReason: reason,
@@ -566,5 +582,92 @@ export class ModernHMHandler {
     }
 
     return this.makeResult(true, true, true, partyKnowsFly);
+  }
+
+  /**
+   * Evaluates whether the player can use HM06 Whirlpool in the overworld right now.
+   * Requires Glacier Badge from Mahogany Gym and HM06 Whirlpool.
+   */
+  public static canUseWhirlpool(
+    party: PokemonInstance[],
+    inventory: BagInventory,
+    storyFlags: Set<string>
+  ): HMFieldCheckResult {
+    return this.checkWhirlpool(inventory, storyFlags, party);
+  }
+
+  public static checkWhirlpool(
+    inventory: BagInventory,
+    storyFlags: Set<string>,
+    party: PokemonInstance[]
+  ): HMFieldCheckResult {
+    const badges = inventory?.badges || [];
+    const tms = inventory?.tms || [];
+
+    const hasBadge =
+      badges.includes('glacier') ||
+      badges.includes('glacier_badge') ||
+      storyFlags.has('pryce_defeated') ||
+      storyFlags.has('glacierbadge');
+
+    const partyKnowsWhirlpool = party.find(
+      (p) => !p.isEgg && p.moves.some((m) => m.moveId.toLowerCase() === 'whirlpool')
+    );
+
+    const hasHM =
+      tms.includes('HM06') ||
+      tms.includes('HM06_WHIRLPOOL') ||
+      storyFlags.has('has_hm06_whirlpool') ||
+      storyFlags.has('EVENT_GOT_HM06_WHIRLPOOL') ||
+      Boolean(partyKnowsWhirlpool);
+
+    const nonEggParty = party.filter((p) => !p.isEgg);
+    const compatiblePokemon =
+      partyKnowsWhirlpool ||
+      nonEggParty.find((p) => this.canSpeciesUseFieldHM(p.speciesId, 'whirlpool')) ||
+      nonEggParty.find((p) => p.types.includes('Water')) ||
+      null;
+
+    if (!compatiblePokemon) {
+      return this.makeResult(
+        false,
+        hasBadge,
+        hasHM,
+        null,
+        'It is a fierce whirlpool! You need a compatible Pokémon that knows Whirlpool or can learn it.'
+      );
+    }
+
+    if (!hasBadge && !hasHM) {
+      return this.makeResult(
+        false,
+        false,
+        false,
+        compatiblePokemon,
+        'It is a fierce whirlpool! You need HM06 WHIRLPOOL and the GLACIER BADGE from Mahogany Gym.'
+      );
+    }
+
+    if (!hasHM) {
+      return this.makeResult(
+        false,
+        true,
+        false,
+        compatiblePokemon,
+        'It is a fierce whirlpool! Free the Pokémon in Team Rocket Hideout to receive HM06 WHIRLPOOL.'
+      );
+    }
+
+    if (!hasBadge) {
+      return this.makeResult(
+        false,
+        false,
+        true,
+        compatiblePokemon,
+        'It is a fierce whirlpool! Defeat Leader Pryce at Mahogany Gym to earn the GLACIER BADGE first.'
+      );
+    }
+
+    return this.makeResult(true, true, true, compatiblePokemon);
   }
 }

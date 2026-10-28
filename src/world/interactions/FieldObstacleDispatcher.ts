@@ -354,6 +354,49 @@ export class FieldObstacleDispatcher {
           }
         } else if (bgEvent.action === 'OPEN_MART') {
           ctx.openMart(currentMap.id);
+        } else if (bgEvent.action === 'ROCKET_BASE_SECURITY_SWITCH') {
+          if (!ctx.storyFlags.has('EVENT_SECURITY_CAMERA_DISABLED')) {
+            ctx.storyFlags.add('EVENT_SECURITY_CAMERA_DISABLED');
+            ctx.storyFlags.add('security_cameras_disabled');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            ctx.showToast('🚨 Surveillance cameras deactivated!');
+            ctx.saveCurrentGame();
+          }
+        } else if (bgEvent.action === 'ROCKET_BASE_OFFICE_DOOR') {
+          const hasP1 = ctx.storyFlags.has('EVENT_LEARNED_SLOWPOKETAIL');
+          const hasP2 =
+            ctx.storyFlags.has('EVENT_LEARNED_RATICATETAIL') ||
+            ctx.storyFlags.has('EVENT_LEARNED_RATICATE_TAIL');
+          if (hasP1 && hasP2) {
+            ctx.storyFlags.add('EVENT_OPENED_DOOR_TO_GIOVANNIS_OFFICE');
+            currentMap.collisionGrid[9 * currentMap.width + 10] = 0;
+            currentMap.collisionGrid[9 * currentMap.width + 11] = 0;
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            ctx.openDialogue(
+              ['The passwords matched!', "The door to GIOVANNI'S office clicked open!"],
+              bgEvent.speaker,
+              () => {
+                ctx.saveCurrentGame();
+                ctx.renderMap?.(currentMap);
+              }
+            );
+          }
+        } else if (bgEvent.action === 'ROCKET_BASE_TRANSMITTER_DOOR') {
+          const hasVoice = ctx.storyFlags.has('EVENT_LEARNED_HAIL_GIOVANNI');
+          if (hasVoice) {
+            ctx.storyFlags.add('EVENT_OPENED_DOOR_TO_ROCKET_HIDEOUT_TRANSMITTER');
+            currentMap.collisionGrid[12 * currentMap.width + 14] = 0;
+            currentMap.collisionGrid[12 * currentMap.width + 15] = 0;
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            ctx.openDialogue(
+              ['Spoke the secret voice password: "Hail GIOVANNI"!', 'The master blast door slid open!'],
+              bgEvent.speaker,
+              () => {
+                ctx.saveCurrentGame();
+                ctx.renderMap?.(currentMap);
+              }
+            );
+          }
         }
       });
       return true;

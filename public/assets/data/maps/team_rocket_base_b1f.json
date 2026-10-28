@@ -1662,6 +1662,37 @@
       "targetY": 15
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 19,
+      "y": 11,
+      "speaker": "💻 SECURITY TERMINAL",
+      "pages": [
+        "A surveillance camera control terminal.",
+        "The security switch is right here!"
+      ],
+      "action": "ROCKET_BASE_SECURITY_SWITCH"
+    },
+    {
+      "x": 24,
+      "y": 14,
+      "speaker": "💻 SECURITY TERMINAL",
+      "pages": [
+        "A surveillance camera control terminal.",
+        "The security switch is right here!"
+      ],
+      "action": "ROCKET_BASE_SECURITY_SWITCH"
+    },
+    {
+      "x": 24,
+      "y": 15,
+      "speaker": "💻 SECURITY TERMINAL",
+      "pages": [
+        "A surveillance camera control terminal.",
+        "The security switch is right here!"
+      ],
+      "action": "ROCKET_BASE_SECURITY_SWITCH"
+    }
+  ],
   "grassEncounters": []
 }

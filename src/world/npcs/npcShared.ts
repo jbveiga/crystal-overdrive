@@ -351,12 +351,55 @@ export function isNpcActiveForStoryFlags(
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
   }
+  if (
+    npcId === 'mahogany_town_rocket_1' ||
+    npcId === 'mahogany_mart_rocket' ||
+    npcId.startsWith('team_rocket_base_b1f_')
+  ) {
+    return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
+  }
   if (npcId === 'team_rocket_base_b2f_lance') {
     return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
   }
-  if (npcId.startsWith('b3f_electrode_')) {
+  if (npcId === 'team_rocket_base_b2f_ariana') {
+    return (
+      !storyFlags.has('EVENT_BEAT_ROCKET_EXECUTIVEF_2') &&
+      !storyFlags.has('rocket_base_generator_cleared') &&
+      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+    );
+  }
+  if (npcId.startsWith('b3f_electrode_') || npcId.startsWith('b2f_electrode_')) {
     if (storyFlags.has('rocket_base_generator_cleared') || storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')) return false;
     return !storyFlags.has(npcId + '_cleared');
+  }
+  if (npcId === 'team_rocket_base_b3f_petrel') {
+    return (
+      !storyFlags.has('EVENT_BEAT_ROCKET_EXECUTIVEM_4') &&
+      !storyFlags.has('rocket_base_generator_cleared') &&
+      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+    );
+  }
+  if (npcId === 'team_rocket_base_b3f_murkrow') {
+    return (
+      storyFlags.has('EVENT_BEAT_ROCKET_EXECUTIVEM_4') &&
+      !storyFlags.has('rocket_base_generator_cleared') &&
+      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+    );
+  }
+  if (npcId === 'team_rocket_base_b3f_grunt_f') {
+    return (
+      !storyFlags.has('EVENT_LEARNED_SLOWPOKETAIL') &&
+      !storyFlags.has('rocket_base_generator_cleared') &&
+      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+    );
+  }
+  if (npcId === 'team_rocket_base_b3f_grunt_m') {
+    return (
+      !storyFlags.has('EVENT_LEARNED_RATICATETAIL') &&
+      !storyFlags.has('EVENT_LEARNED_RATICATE_TAIL') &&
+      !storyFlags.has('rocket_base_generator_cleared') &&
+      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+    );
   }
   if (npcId === 'route_43_gate_rocket_1' || npcId === 'route_43_gate_rocket_2') {
     return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');

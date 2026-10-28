@@ -48,6 +48,14 @@ export class OverworldWarpAndMapTransitionController {
         map.tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05';
       }
     }
+    if (map.id === 'team_rocket_base_b3f' && ctx.storyFlags.has('EVENT_OPENED_DOOR_TO_GIOVANNIS_OFFICE')) {
+      map.collisionGrid[9 * map.width + 10] = 0;
+      map.collisionGrid[9 * map.width + 11] = 0;
+    }
+    if (map.id === 'team_rocket_base_b2f' && ctx.storyFlags.has('EVENT_OPENED_DOOR_TO_ROCKET_HIDEOUT_TRANSMITTER')) {
+      map.collisionGrid[12 * map.width + 14] = 0;
+      map.collisionGrid[12 * map.width + 15] = 0;
+    }
   }
 
   public static syncMapOverworldItems(

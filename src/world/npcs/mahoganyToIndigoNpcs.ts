@@ -158,66 +158,87 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     mahogany_town: [
-      makeNpc('mahogany_gym_blocker', 6, 14, 'DOWN', 'fat_man', 'TOWN RESIDENT', 
-        [
-          "Gym Leader Pryce went up to the Lake of Rage to investigate the strange Pokémon disturbance.",
-          "The Gym is closed until the emergency at the lake and the souvenir shop is resolved!",
-        ],
-        { action: 'MAHOGANY_GYM_BLOCKER' }
-      ),
-      makeNpc('mahogany_rage_candy_bar_salesman', 19, 8, 'DOWN', 'pokefan_m', '🍬 RAGECANDYBAR SALESMAN', 
-        [
-          'While visiting MAHOGANY TOWN, try a delicious RAGECANDYBAR!',
-        ],
-        { action: 'MAHOGANY_RAGECANDYBAR_SALESMAN' }
-      ),
+      makeNpc('mahogany_gym_blocker', 6, 14, 'DOWN', 'fat_man', 'TOWN RESIDENT', [
+        "Gym Leader Pryce went up to the Lake of Rage to investigate the strange Pokémon disturbance.",
+        "The Gym is closed until the emergency at the lake and the souvenir shop is resolved!",
+      ], { action: 'MAHOGANY_GYM_BLOCKER' }),
+      makeNpc('mahogany_rage_candy_bar_salesman', 19, 8, 'DOWN', 'pokefan_m', '🍬 RAGECANDYBAR SALESMAN', [
+        'While visiting MAHOGANY TOWN, try a delicious RAGECANDYBAR!',
+      ], { action: 'MAHOGANY_RAGECANDYBAR_SALESMAN' }),
+      makeNpc('mahogany_town_rocket_1', 15, 13, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
+        "TEAM ROCKET: What are you looking at? Mind your own business, brat!",
+      ]),
     ],
 
     mahogany_mart: [
-      makeNpc('mahogany_mart_lance', 4, 4, 'UP', 'gentleman', '🏆 CHAMPION LANCE', 
-        [
-          "LANCE: You made it! The transmitter signal is emanating right from beneath this floor.",
-          "Lance moves the heavy cabinet to reveal a secret stairway descending underground!",
-          "LANCE: Follow me down! We need to shut down the generator Electrodes powering their broadcast!",
-        ],
-        { action: 'LANCE_MART_EVENT' }
-      ),
+      makeNpc('mahogany_mart_lance', 4, 4, 'UP', 'gentleman', '🏆 CHAMPION LANCE', [
+        "LANCE: You made it! The transmitter signal is emanating right from beneath this floor.",
+        "Lance moves the heavy cabinet to reveal a secret stairway descending underground!",
+        "LANCE: Follow me down! We need to shut down the generator Electrodes powering their broadcast!",
+      ], { action: 'LANCE_MART_EVENT' }),
+      makeNpc('mahogany_mart_rocket', 3, 3, 'DOWN', 'rocket_grunt_m', '⚡ SOUVENIR CLERK', [
+        "TEAM ROCKET: We only sell the finest souvenirs... Hey, don't snoop around back there!",
+      ]),
+    ],
+
+    route_43_gate: [
+      makeNpc('route_43_gate_rocket_1', 2, 4, 'RIGHT', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
+        "TEAM ROCKET: This gate belongs to TEAM ROCKET! Pay the ¥1000 toll if you want to pass!",
+      ]),
+      makeNpc('route_43_gate_rocket_2', 7, 4, 'LEFT', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
+        "TEAM ROCKET: Don't complain to us! If you can't afford ¥1000, go through the grass maze!",
+      ]),
+    ],
+
+    team_rocket_base_b1f: [
+      makeNpc('team_rocket_base_b1f_switch', 19, 11, 'UP', 'super_nerd', '💻 SECURITY TERMINAL', [
+        "A surveillance camera control terminal.", "The security switch is right here!",
+      ], { action: 'ROCKET_BASE_SECURITY_SWITCH' }),
+      makeNpc('team_rocket_base_b1f_grunt_1', 17, 6, 'LEFT', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
+        "ROCKET GRUNT: The Persian statues watch every move! You'll never slip past our surveillance network!",
+      ]),
     ],
 
     team_rocket_base_b2f: [
-      makeNpc('team_rocket_base_b2f_lance', 18, 10, 'DOWN', 'gentleman', '🏆 CHAMPION LANCE', 
-        [
-          "LANCE: Are your Pokémon holding up? Here, let me restore your team to full fighting strength!",
-        ],
-        { action: 'LANCE_BASE_HEAL' }
-      ),
+      makeNpc('team_rocket_base_b2f_lance', 18, 10, 'DOWN', 'gentleman', '🏆 CHAMPION LANCE', [
+        "LANCE: Are your Pokémon holding up? Here, let me restore your team to full fighting strength!",
+      ], { action: 'LANCE_BASE_HEAL' }),
+      makeNpc('team_rocket_base_b2f_ariana', 15, 10, 'DOWN', 'rocket_grunt_f', '⚡ EXECUTIVE ARIANA', [
+        "ARIANA: You've meddled in TEAM ROCKET's affairs for the last time!",
+      ], { action: 'ROCKET_BASE_ARIANA_EVENT' }),
+      makeNpc('b2f_electrode_1', 7, 5, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', [
+        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
+      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
+      makeNpc('b2f_electrode_2', 7, 7, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', [
+        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
+      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
+      makeNpc('b2f_electrode_3', 7, 9, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', [
+        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
+      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
     ],
 
     team_rocket_base_b3f: [
-      makeNpc('b3f_electrode_1', 20, 5, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
-        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
-        { action: 'ROCKET_GENERATOR_ELECTRODE' }
-      ),
-      makeNpc('b3f_electrode_2', 20, 7, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
-        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
-        { action: 'ROCKET_GENERATOR_ELECTRODE' }
-      ),
-      makeNpc('b3f_electrode_3', 20, 9, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
-        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
-        { action: 'ROCKET_GENERATOR_ELECTRODE' }
-      ),
-      makeNpc('b3f_electrode_4', 25, 5, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
-        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
-        { action: 'ROCKET_GENERATOR_ELECTRODE' }
-      ),
-      makeNpc('b3f_electrode_5', 25, 7, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
-        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
-        { action: 'ROCKET_GENERATOR_ELECTRODE' }
-      ),
-      makeNpc('b3f_electrode_6', 25, 9, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', 
-        ["⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"],
-        { action: 'ROCKET_GENERATOR_ELECTRODE' }
-      ),
+      makeNpc('team_rocket_base_b3f_grunt_f', 21, 7, 'LEFT', 'rocket_grunt_f', '⚡ ROCKET GRUNT', [
+        "ROCKET GRUNT: You want the password to the BOSS's office? You'll have to beat me first!",
+      ], { action: 'ROCKET_BASE_PASSWORD_GRUNT_F' }),
+      makeNpc('team_rocket_base_b3f_grunt_m', 5, 14, 'UP', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
+        "ROCKET GRUNT: The password? I'd never leak that to a meddling kid like you!",
+      ], { action: 'ROCKET_BASE_PASSWORD_GRUNT_M' }),
+      makeNpc('team_rocket_base_b3f_petrel', 10, 3, 'DOWN', 'super_nerd', '⚡ EXECUTIVE PETREL', [
+        "PETREL: What? Who let a child into the Executive Suite?",
+      ], { action: 'ROCKET_BASE_PETREL_EVENT' }),
+      makeNpc('team_rocket_base_b3f_murkrow', 10, 2, 'DOWN', 'farfetchd', '🐦 MURKROW', [
+        "MURKROW: Squawk! Hail GIOVANNI!",
+      ], { action: 'ROCKET_BASE_MURKROW_EVENT' }),
+      makeNpc('b3f_electrode_1', 20, 5, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', [
+        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
+      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
+      makeNpc('b3f_electrode_2', 20, 7, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', [
+        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
+      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
+      makeNpc('b3f_electrode_3', 20, 9, 'DOWN', 'pokefan_m', '⚡ ELECTRODE', [
+        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
+      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
     ],
 
     blackthorn_city: [
