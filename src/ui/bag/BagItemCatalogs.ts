@@ -515,6 +515,13 @@ export const INFINITE_TMS: Record<string, TMDefinition> = {
     type: 'Ice',
     desc: '75 Power Ice attack that may freeze the target.',
   },
+  TM34: {
+    id: 'TM34',
+    moveId: 'swagger',
+    name: 'Swagger',
+    type: 'Normal',
+    desc: 'Confuses the target and sharply raises its Attack stat.',
+  },
   TM38: {
     id: 'TM38',
     moveId: 'fireblast',

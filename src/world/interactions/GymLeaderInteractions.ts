@@ -382,7 +382,7 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
         if (!ctx.storyFlags.has('jasmine_defeated')) {
           if (!ctx.storyFlags.has('amphy_cured')) {
             ctx.openDialogue(
-              ["JASMINE: …I'm sorry. I must care for Amphy at the LIGHTHOUSE. Please meet me there…"],
+              ["JASMINE: …I cannot battle now. Amphy is terribly ill at the top of the LIGHTHOUSE. Please… someone find help in CIANWOOD across the sea…"],
               targetNpc.speaker
             );
             return true;
@@ -425,6 +425,30 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
           return true;
         }
         return false;
+      },
+    },
+
+    // 7b. Olivine Gym: Gym Guide
+    {
+      npcIds: ['olivine_gym_guide'],
+      handler: (targetNpc, _map, ctx) => {
+        if (!ctx.storyFlags.has('amphy_cured')) {
+          ctx.openDialogue(
+            ["GYM GUIDE: Yo! CHAMP in the making! JASMINE, the GYM LEADER, is at the LIGHTHOUSE. She's looking after a sick POKéMON. A strong trainer has to be compassionate too."],
+            targetNpc.speaker
+          );
+          return true;
+        }
+        ctx.openDialogue(
+          [
+            'Yo! CHAMP in the making!',
+            'Jasmine specializes in the newly discovered STEEL type!',
+            'Steel Pokémon have impenetrable defenses against Normal, Flying, Rock, Bug, Ghost, Steel, Grass, Psychic, Ice, and Dragon!',
+            'Strike them with FIRE, FIGHTING, or GROUND attacks to crack their armor!',
+          ],
+          targetNpc.speaker
+        );
+        return true;
       },
     },
     ...getKantoAndLeagueInteractions(),

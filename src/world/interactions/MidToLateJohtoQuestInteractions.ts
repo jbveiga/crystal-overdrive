@@ -622,5 +622,88 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
         return true;
       },
     },
+
+    // 21. Olivine City: Tim's Krabby for Voltorb Trade
+    {
+      actions: ['TIM_TRADE'],
+      npcIds: ['olivine_tim'],
+      handler: (targetNpc, _map, ctx) => {
+        if (ctx.storyFlags.has('EVENT_TRADED_TIM_VOLTORB')) {
+          ctx.openDialogue(
+            ["TIM: Hi! How's that VOLTORB I traded you? My KRABBY is growing bigger every day!"],
+            targetNpc.speaker
+          );
+          return true;
+        }
+
+        const krabbyIndex = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'krabby');
+        if (krabbyIndex === -1) {
+          ctx.openDialogue(
+            [
+              "TIM: I love sea POKéMON! Do you have a KRABBY?",
+              "If you trade me a KRABBY, I'll give you my prized VOLTORB (VOLTY)!",
+            ],
+            targetNpc.speaker
+          );
+          return true;
+        }
+
+        const voltorb = PokemonFactory.create('voltorb', 20, ['tackle', 'screech', 'sonicboom', 'spark']);
+        voltorb.nickname = 'VOLTY';
+        voltorb.heldItem = 'cheri-berry';
+        voltorb.originalTrainer = 'TIM';
+
+        ctx.playerParty[krabbyIndex] = voltorb;
+        ctx.storyFlags.add('EVENT_TRADED_TIM_VOLTORB');
+        BattleAudio.playOverworldSound('FANFARE');
+
+        ctx.openDialogue(
+          [
+            'TIM: Wow! A real KRABBY! Thank you so much!',
+            `${ctx.playerName} traded KRABBY for TIM's VOLTORB (VOLTY)!`,
+            "TIM: Take good care of VOLTY! It's super fast!",
+          ],
+          targetNpc.speaker,
+          () => {
+            ctx.saveCurrentGame();
+            ctx.showToast('⚡ Traded KRABBY for TIM’s VOLTORB (VOLTY)!');
+          }
+        );
+        return true;
+      },
+    },
+
+    // 22. Olivine Port Sailor Guard Ticket Barrier
+    {
+      actions: ['PORT_SAILOR_GUARD'],
+      npcIds: ['port_sailor_guard'],
+      handler: (targetNpc, _map, ctx) => {
+        const hasTicket =
+          ctx.storyFlags.has('has_ss_ticket') ||
+          ctx.storyFlags.has('EVENT_GOT_SS_TICKET') ||
+          (ctx.inventory.keyItems || []).includes('ss_ticket') ||
+          (ctx.inventory.keyItems || []).includes('S.S. TICKET');
+
+        if (!hasTicket) {
+          ctx.openDialogue(
+            [
+              "SAILOR: We don't want you to fall into the sea, so you're not allowed onto the pier without an S.S. TICKET!",
+              'Only certified trainers who have conquered the JOHTO LEAGUE receive a ticket from PROF. ELM.',
+            ],
+            targetNpc.speaker
+          );
+          return true;
+        }
+
+        ctx.openDialogue(
+          [
+            'SAILOR: Welcome aboard the FAST SHIP S.S. AQUA!',
+            'Have your ticket ready as you board the ship at the gangway ahead!',
+          ],
+          targetNpc.speaker
+        );
+        return true;
+      },
+    },
   ];
 }

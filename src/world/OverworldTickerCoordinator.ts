@@ -228,6 +228,7 @@ export class OverworldTickerCoordinator {
       triggerBurnedTowerRivalBattle,
       triggerCherrygroveRivalAmbush,
       triggerAzaleaRivalAmbush,
+      triggerOlivineRivalConfrontation,
       saveCurrentGame,
       triggerWildEncounter,
       addPlayTimeDelta,
@@ -320,6 +321,18 @@ export class OverworldTickerCoordinator {
             !storyFlags.has('azalea_rival_defeated')
           ) {
             triggerAzaleaRivalAmbush();
+            return;
+          }
+
+          // Olivine City Rival Confrontation
+          if (
+            currentMap?.id === 'olivine_city' &&
+            coord.x === 13 &&
+            (coord.y === 12 || coord.y === 13) &&
+            !storyFlags.has('EVENT_RIVAL_OLIVINE_CITY') &&
+            triggerOlivineRivalConfrontation
+          ) {
+            triggerOlivineRivalConfrontation();
             return;
           }
 

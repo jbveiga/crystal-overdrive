@@ -457,7 +457,7 @@
       "region": "johto",
       "x": 2,
       "y": 13,
-      "itemId": "tm_swagger",
+      "itemId": "TM34",
       "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_TM_SWAGGER"
     },
     {
@@ -3261,7 +3261,7 @@
           "region": "johto",
           "x": 2,
           "y": 13,
-          "itemId": "tm_swagger",
+          "itemId": "TM34",
           "eventFlag": "EVENT_OLIVINE_LIGHTHOUSE_5F_TM_SWAGGER"
         }
       ],

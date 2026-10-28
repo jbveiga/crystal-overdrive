@@ -455,6 +455,13 @@ function buildMapFromBlk({
     collisionGrid[27 * width + 18] = 0; // Warehouse item
   }
 
+  // For route_39, align south cliff edge (y=35, x=2..6) with Olivine City tree boundary
+  if (id === 'route_39') {
+    for (let x = 2; x <= 6; x++) {
+      collisionGrid[35 * width + x] = 1;
+    }
+  }
+
   const existingMapPath = path.join(MAPS_DIR, `${id}.json`);
   const existingMapData = fs.existsSync(existingMapPath)
     ? JSON.parse(fs.readFileSync(existingMapPath, 'utf8'))

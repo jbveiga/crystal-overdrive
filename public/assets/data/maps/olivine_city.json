@@ -4404,6 +4404,13 @@
       "targetMapId": "olivine_port_passage",
       "targetX": 15,
       "targetY": 0
+    },
+    {
+      "x": 29,
+      "y": 11,
+      "targetMapId": "olivine_punishment_speech_house",
+      "targetX": 2,
+      "targetY": 7
     }
   ],
   "bgEvents": [
@@ -4433,6 +4440,51 @@
       "pages": [
         "OLIVINE LIGHTHOUSE",
         "Also known as the Glitter Lighthouse"
+      ]
+    },
+    {
+      "x": 20,
+      "y": 24,
+      "speaker": "⚓ OLIVINE PORT",
+      "pages": [
+        "OLIVINE PORT",
+        "FAST SHIP PIER — S.S. AQUA to VERMILION CITY"
+      ]
+    },
+    {
+      "x": 5,
+      "y": 21,
+      "speaker": "☕ OLIVINE CAFÉ",
+      "pages": [
+        "OLIVINE CAFÉ",
+        "Stretch your sea legs with our hearty sailor stew!"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 23,
+      "speaker": "🗼 BATTLE TOWER",
+      "pages": [
+        "BATTLE TOWER AHEAD",
+        "Opening Soon for Johto & Kanto Champions!"
+      ]
+    },
+    {
+      "x": 14,
+      "y": 21,
+      "speaker": "🏥 POKéMON CENTER",
+      "pages": [
+        "POKéMON CENTER",
+        "Heal Your POKéMON to Full Health!"
+      ]
+    },
+    {
+      "x": 20,
+      "y": 17,
+      "speaker": "🏪 POKé MART",
+      "pages": [
+        "POKé MART",
+        "Supplies for Long Ocean Voyages!"
       ]
     }
   ],

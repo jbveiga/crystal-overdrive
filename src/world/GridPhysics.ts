@@ -159,7 +159,9 @@ export interface GridEntity {
     | 'GAME_CORNER_TM_PRIZE'
     | 'GAME_CORNER_MON_PRIZE'
     | 'OLDER_HAIRCUT_BROTHER'
-    | 'YOUNGER_HAIRCUT_BROTHER';
+    | 'YOUNGER_HAIRCUT_BROTHER'
+    | 'TIM_TRADE'
+    | 'PORT_SAILOR_GUARD';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

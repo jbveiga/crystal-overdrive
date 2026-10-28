@@ -424,6 +424,34 @@ export class StoryCutscenes {
   }
 
   /**
+   * Rival Silver Confrontation Outside Olivine Gym
+   */
+  public static triggerOlivineRivalConfrontation(ctx: StoryCutsceneContext): void {
+    ctx.setCutsceneLocked(true);
+    ctx.player.isMoving = false;
+    ctx.player.progress = 0;
+    ctx.audioManager.playBattleBgm('trainer');
+    ctx.overworldHUD.openDialogue(
+      [
+        "RIVAL: …You again?",
+        "There's no need to panic. I don't bother with wimps like you.",
+        "Speaking of weaklings, the city's GYM LEADER isn't here.",
+        "Supposedly taking care of a sick POKéMON at the LIGHTHOUSE.",
+        "Humph! Boo-hoo! Just let sick POKéMON go! A POKéMON that can't battle is worthless!",
+        "Why don't you go train at the LIGHTHOUSE? Who knows. It may make you a bit less weak!",
+      ],
+      '🥊 RIVAL SILVER',
+      () => {
+        ctx.storyFlags.add('EVENT_RIVAL_OLIVINE_CITY');
+        ctx.setCutsceneLocked(false);
+        ctx.audioManager.restoreOverworldBgm();
+        void ctx.saveCurrentGame();
+        ctx.overworldHUD.showToast('⚔️ Rival Silver departed for the Lighthouse!');
+      }
+    );
+  }
+
+  /**
    * Legendary Beasts Awakening Cutscene (Burned Tower B1F)
    */
   public static triggerBeastsAwakeningCutscene(ctx: StoryCutsceneContext): void {

@@ -88,6 +88,36 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     olivine_tims_house: [
       makeNpc('olivine_tim', 2, 3, 'DOWN', 'boy', '👦 TIM', [
         'My dad is a sailor. He travels all over the world and brings back amazing stories!',
+      ], { action: 'TIM_TRADE' }),
+    ],
+
+    olivine_punishment_speech_house: [
+      makeNpc('punishment_dad', 2, 4, 'DOWN', 'fat_man', '👨 FATHER', [
+        'Along the way to CIANWOOD, there are four deserted islands.',
+        'Bad kids are taken to the Whirl Islands for punishment!',
+      ]),
+      makeNpc('punishment_daughter', 5, 3, 'LEFT', 'girl', '👧 DAUGHTER', [
+        'Whenever I do something bad, Dad scolds me!',
+        'He tells me sea monsters will carry me away to the Whirl Islands!',
+      ]),
+    ],
+
+    olivine_port_passage: [
+      makeNpc('port_passage_pokefan_m', 17, 1, 'LEFT', 'fat_man', '🧢 POKéFAN', [
+        'FAST SHIP S.S. AQUA sails from here to VERMILION CITY in KANTO!',
+        'It departs regularly on Mondays and Fridays.',
+      ]),
+    ],
+
+    olivine_port: [
+      makeNpc('port_sailor_guard', 7, 15, 'UP', 'fisherman', '⚓ SAILOR', [
+        "We don't want you to fall into the sea, so you're not allowed onto the pier without an S.S. TICKET!",
+      ], { action: 'PORT_SAILOR_GUARD' }),
+      makeNpc('port_fisher_1', 4, 14, 'UP', 'fisherman', '🎣 FISHER', [
+        'The ocean air in the harbor is brisk! Water POKéMON bite well near the shipping piers.',
+      ]),
+      makeNpc('port_fisher_2', 13, 14, 'UP', 'fisherman', '🎣 FISHER', [
+        "I've seen massive TENTACRUEL swimming beneath the S.S. AQUA!",
       ]),
     ],
 

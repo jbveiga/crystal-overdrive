@@ -103,6 +103,7 @@ export interface OverworldTickerContext {
   saveCurrentGame: () => void | Promise<void>; triggerWildEncounter: (encounter: any, options?: any) => Promise<void>;
   addPlayTimeDelta: (dtSec: number) => void; isSurfEnabled: () => boolean;
   openDeptElevatorModal?: (currentMapId: string, onSelectFloor: (targetMapId: string) => void) => void;
+  triggerOlivineRivalConfrontation?: () => void;
 }
 
 export type NpcInteractionHandler = (
