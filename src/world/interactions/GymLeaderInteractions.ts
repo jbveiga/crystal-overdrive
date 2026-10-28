@@ -10,8 +10,9 @@
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
 import { getKantoAndLeagueInteractions } from './KantoAndLeagueInteractions';
+import { getMahoganyGymInteractions } from './MahoganyGymInteractions';
 
-export { getKantoAndLeagueInteractions };
+export { getKantoAndLeagueInteractions, getMahoganyGymInteractions };
 
 /**
  * GymLeaderInteractions — Handlers for Early & Mid Johto Gym Leaders (Falkner, Bugsy, Whitney, Morty, Chuck, Jasmine)
@@ -448,17 +449,11 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
       npcIds: ['olivine_gym_guide'],
       handler: (targetNpc, _map, ctx) => {
         if (ctx.storyFlags.has('jasmine_defeated')) {
-          ctx.openDialogue(
-            ['GYM GUIDE: That was awesome! The steel-type, huh? That was a close encounter of an unknown kind!'],
-            targetNpc.speaker
-          );
+          ctx.openDialogue(['GYM GUIDE: That was awesome! The steel-type, huh? That was a close encounter of an unknown kind!'], targetNpc.speaker);
           return true;
         }
         if (!ctx.storyFlags.has('amphy_cured')) {
-          ctx.openDialogue(
-            ["GYM GUIDE: Yo! CHAMP in the making! JASMINE, the GYM LEADER, is at the LIGHTHOUSE. She's looking after a sick POKéMON. A strong trainer has to be compassionate too."],
-            targetNpc.speaker
-          );
+          ctx.openDialogue(["GYM GUIDE: Yo! CHAMP in the making! JASMINE, the GYM LEADER, is at the LIGHTHOUSE. She's looking after a sick POKéMON. A strong trainer has to be compassionate too."], targetNpc.speaker);
           return true;
         }
         ctx.openDialogue(
@@ -473,6 +468,7 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
         return true;
       },
     },
+    ...getMahoganyGymInteractions(),
     ...getKantoAndLeagueInteractions(),
   ];
 }

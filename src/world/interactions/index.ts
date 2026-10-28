@@ -10,6 +10,7 @@ import { createGoldenrodTakeoverInteractions } from './GoldenrodTakeoverInteract
 import { getMahoganyTownAndLakeInteractions } from './MahoganyTownAndLakeInteractions';
 import { getMahoganyRocketHideoutInteractions } from './MahoganyRocketHideoutInteractions';
 import { getWhirlIslandsInteractions } from './WhirlIslandsInteractions';
+import { getMahoganyGymInteractions } from './MahoganyGymInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -25,6 +26,7 @@ export * from './GoldenrodTakeoverInteractions';
 export * from './MahoganyTownAndLakeInteractions';
 export * from './MahoganyRocketHideoutInteractions';
 export * from './WhirlIslandsInteractions';
+export * from './MahoganyGymInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.

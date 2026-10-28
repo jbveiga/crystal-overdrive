@@ -30,10 +30,8 @@ export class FieldObstacleDispatcher {
     }
     if (map.tileMap) {
       const neighbors = [
-        { x: tileX, y: tileY + 1 },
-        { x: tileX, y: tileY - 1 },
-        { x: tileX - 1, y: tileY },
-        { x: tileX + 1, y: tileY },
+        { x: tileX, y: tileY + 1 }, { x: tileX, y: tileY - 1 },
+        { x: tileX - 1, y: tileY }, { x: tileX + 1, y: tileY },
       ];
       for (const n of neighbors) {
         if (n.x >= 0 && n.x < map.width && n.y >= 0 && n.y < map.height) {
@@ -142,25 +140,10 @@ export class FieldObstacleDispatcher {
           return true;
         }
 
-        const starterConfig: Record<
-          string,
-          { speciesId: 'cyndaquil' | 'totodile' | 'chikorita'; name: string; type: string }
-        > = {
-          STARTER_CYNDAQUIL: {
-            speciesId: 'cyndaquil',
-            name: 'CYNDAQUIL',
-            type: 'FIRE',
-          },
-          STARTER_TOTODILE: {
-            speciesId: 'totodile',
-            name: 'TOTODILE',
-            type: 'WATER',
-          },
-          STARTER_CHIKORITA: {
-            speciesId: 'chikorita',
-            name: 'CHIKORITA',
-            type: 'GRASS',
-          },
+        const starterConfig: Record<string, { speciesId: 'cyndaquil' | 'totodile' | 'chikorita'; name: string; type: string }> = {
+          STARTER_CYNDAQUIL: { speciesId: 'cyndaquil', name: 'CYNDAQUIL', type: 'FIRE' },
+          STARTER_TOTODILE: { speciesId: 'totodile', name: 'TOTODILE', type: 'WATER' },
+          STARTER_CHIKORITA: { speciesId: 'chikorita', name: 'CHIKORITA', type: 'GRASS' },
         };
 
         const chosen = starterConfig[bgEvent.action];
@@ -245,6 +228,16 @@ export class FieldObstacleDispatcher {
             'AZALEA TOWN POKéMON GYM',
             'LEADER: BUGSY',
             ctx.storyFlags.has('bugsy_defeated')
+              ? `WINNING TRAINERS: SILVER, ${ctx.playerName}`
+              : 'WINNING TRAINERS: SILVER',
+          ];
+          ctx.openDialogue(statuePages, bgEvent.speaker);
+          return true;
+        }
+        if (currentMap.id === 'mahogany_gym' || bgEvent.action === 'MAHOGANY_GYM_STATUE') {
+          const statuePages = [
+            'MAHOGANY TOWN POKéMON GYM\nLEADER: PRYCE',
+            ctx.storyFlags.has('pryce_defeated')
               ? `WINNING TRAINERS: SILVER, ${ctx.playerName}`
               : 'WINNING TRAINERS: SILVER',
           ];

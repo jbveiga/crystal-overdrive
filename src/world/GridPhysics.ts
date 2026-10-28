@@ -200,7 +200,9 @@ export interface GridEntity {
     | 'LUGIA_SHRINE_EVENT'
     | 'LUGIA_BOSS_EVENT'
     | 'WHIRLPOOL_OBSTACLE_EVENT'
-    | 'WHIRL_ISLAND_LORE_EVENT';
+    | 'WHIRL_ISLAND_LORE_EVENT'
+    | 'MAHOGANY_GYM_STATUE'
+    | 'MAHOGANY_GYM_GUIDE';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

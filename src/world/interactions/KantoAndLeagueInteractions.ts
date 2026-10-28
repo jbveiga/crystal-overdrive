@@ -17,58 +17,6 @@ import { BattleAudio } from '../../audio/BattleAudio';
  */
 export function getKantoAndLeagueInteractions(): NpcInteractionRegistration[] {
   return [
-    // 8. Mahogany Gym: Pryce
-    {
-      actions: ['PRYCE_EVENT'],
-      handler: (targetNpc, _map, ctx) => {
-        if (ctx.storyFlags.has('pryce_defeated')) {
-          ctx.openDialogue(
-            [
-              "PRYCE: POKéMON and humans both grow stronger as they endure life's bitter cold.",
-              'Continue striving with an unyielding spirit!',
-            ],
-            targetNpc.speaker
-          );
-          return true;
-        }
-        ctx.openDialogue(
-          targetNpc.challengePages && targetNpc.challengePages.length > 0
-            ? targetNpc.challengePages
-            : ['PRYCE: In my 60 years of training, I have seen it all. Let me show you the power of ice!'],
-          targetNpc.speaker,
-          () => {
-            const team = ctx.buildTrainerTeamInstances(targetNpc);
-            if (team.length === 0) return;
-            ctx.triggerBattle(team[0], {
-              isTrainer: true,
-              isGymLeader: true,
-              trainerName: targetNpc.trainerName || 'Leader Pryce',
-              trainerTeam: team,
-              onVictory: () => {
-                ctx.defeatedTrainers.add('pryce');
-                ctx.storyFlags.add('pryce_defeated');
-                if (!ctx.inventory.badges.includes('glacier')) ctx.inventory.badges.push('glacier');
-                if (!ctx.inventory.tms.includes('TM16')) ctx.inventory.tms.push('TM16');
-                ctx.audioManager.playSfx?.('sfx_badge_get');
-                BattleAudio.playOverworldSound('KEY_ITEM');
-                ctx.missionManager.checkStoryFlags(ctx.storyFlags);
-                ctx.missionManager.completeMission('M08');
-                ctx.openDialogue(
-                  ['PRYCE: Your strong bond is clear. Take the GLACIERBADGE and TM16 ICY WIND!'],
-                  targetNpc.speaker,
-                  () => {
-                    ctx.saveCurrentGame();
-                    ctx.showToast('❄️ Received GLACIER BADGE & TM16 from Leader Pryce!');
-                  }
-                );
-              },
-            });
-          }
-        );
-        return true;
-      },
-    },
-
     // 9. Blackthorn Gym: Clair
     {
       actions: ['CLAIR_EVENT'],
