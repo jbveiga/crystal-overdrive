@@ -56,6 +56,13 @@ export class OverworldWarpAndMapTransitionController {
       map.collisionGrid[12 * map.width + 14] = 0;
       map.collisionGrid[12 * map.width + 15] = 0;
     }
+    if (map.id === 'route_41') {
+      const whirlpoolCoords = [[12, 17], [36, 19], [12, 37], [36, 45]];
+      for (const [wx, wy] of whirlpoolCoords) {
+        const isCleared = ctx.storyFlags.has(`whirlpool_cleared_${wx}_${wy}`);
+        map.collisionGrid[wy * map.width + wx] = isCleared ? 0 : 1;
+      }
+    }
   }
 
   public static syncMapOverworldItems(

@@ -196,7 +196,11 @@ export interface GridEntity {
     | 'ROCKET_BASE_PASSWORD_GRUNT_F'
     | 'ROCKET_BASE_PASSWORD_GRUNT_M'
     | 'ROCKET_BASE_TRANSMITTER_DOOR'
-    | 'ROCKET_BASE_ARIANA_EVENT';
+    | 'ROCKET_BASE_ARIANA_EVENT'
+    | 'LUGIA_SHRINE_EVENT'
+    | 'LUGIA_BOSS_EVENT'
+    | 'WHIRLPOOL_OBSTACLE_EVENT'
+    | 'WHIRL_ISLAND_LORE_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

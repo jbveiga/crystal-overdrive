@@ -451,6 +451,11 @@ export function isNpcActiveForStoryFlags(
     return storyFlags.has('has_clear_bell') && !storyFlags.has('suicune_caught_or_defeated');
   }
 
+  // Whirl Islands Lugia Chamber (Act 8 / Post-Radio Tower)
+  if (npcId === 'whirl_island_lugia') {
+    return !storyFlags.has('lugia_defeated') && !storyFlags.has('EVENT_FOUGHT_LUGIA');
+  }
+
   // Victory Road Rival & Indigo Plateau Elite Four (Act 9)
   if (npcId === 'victory_road_rival') {
     return !storyFlags.has('victory_road_rival_defeated');

@@ -1109,7 +1109,8 @@
       "pages": [
         "A cascading underground waterfall echoes through the sacred chamber…",
         "Deep within the basin, the legendary Silver-Winged guardian of the seas, LUGIA, rests in slumber."
-      ]
+      ],
+      "action": "LUGIA_SHRINE_EVENT"
     }
   ],
   "grassEncounters": [

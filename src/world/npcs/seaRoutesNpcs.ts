@@ -241,5 +241,31 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
         ],
       }),
     ],
+
+    whirl_island_lugia_chamber: [
+      makeNpc(
+        'whirl_island_lugia',
+        9,
+        9,
+        'DOWN',
+        'lapras',
+        '🌊 LUGIA',
+        ['Gyaoooon!'],
+        { action: 'LUGIA_BOSS_EVENT' }
+      ),
+    ],
+
+    whirl_island_b1f: [
+      makeNpc(
+        'whirl_islands_lore_sage',
+        23,
+        27,
+        'DOWN',
+        'super_nerd',
+        '🧭 CAVE EXPLORER',
+        ['EXPLORER: These sea caverns are a treacherous labyrinth beneath Route 41.'],
+        { action: 'WHIRL_ISLAND_LORE_EVENT' }
+      ),
+    ],
   };
 }

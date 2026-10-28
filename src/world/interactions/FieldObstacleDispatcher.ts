@@ -13,6 +13,7 @@ import { ModernHMHandler } from '../ModernHMHandler';
 import { OverworldItemManager } from '../OverworldItemManager';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 import { BattleAudio } from '../../audio/BattleAudio';
+import { handleLugiaShrineOrBoss } from './WhirlIslandsInteractions';
 
 export class FieldObstacleDispatcher {
   /**
@@ -397,6 +398,12 @@ export class FieldObstacleDispatcher {
               }
             );
           }
+        } else if (bgEvent.action === 'LUGIA_SHRINE_EVENT' || bgEvent.speaker?.includes('LUGIA')) {
+          handleLugiaShrineOrBoss(
+            { id: 'lugia_shrine', x: facingX, y: facingY } as any,
+            currentMap,
+            ctx as any
+          );
         }
       });
       return true;
@@ -589,6 +596,64 @@ export class FieldObstacleDispatcher {
                 'Obtain HM01 CUT and the HIVE BADGE to clear this obstacle.',
             ],
             '🌳 CUTTABLE TREE'
+          );
+        }
+        return true;
+      }
+
+      // 3b. Check Ocean Whirlpools (HM06 Whirlpool interaction)
+      const isRoute41Whirlpool =
+        currentMap.id === 'route_41' &&
+        ((facingX === 12 && facingY === 17) ||
+          (facingX === 36 && facingY === 19) ||
+          (facingX === 12 && facingY === 37) ||
+          (facingX === 36 && facingY === 45));
+
+      const isWhirlpool =
+        facingTileName.includes('whirlpool') ||
+        facingTileName.includes('46_47_56_57') ||
+        (isRoute41Whirlpool &&
+          !ctx.storyFlags.has(`whirlpool_cleared_${facingX}_${facingY}`));
+
+      if (isWhirlpool) {
+        const wpCheck = ModernHMHandler.canUseWhirlpool(
+          ctx.playerParty,
+          ctx.inventory,
+          ctx.storyFlags
+        );
+
+        if (wpCheck.canUse) {
+          const user =
+            wpCheck.userPokemon ||
+            wpCheck.compatiblePokemon ||
+            ctx.playerParty.find((p) => !p.isEgg) ||
+            ctx.playerParty[0];
+          const userName = user
+            ? user.nickname || user.speciesId.toUpperCase()
+            : ctx.playerName;
+          BattleAudio.playOverworldSound('RUSTLE');
+          ctx.openDialogue(
+            [
+              'A swirling whirlpool blocks the path!',
+              `${userName} used WHIRLPOOL to calm the churning waters!`,
+            ],
+            '🌀 WHIRLPOOL',
+            () => {
+              currentMap.collisionGrid[tileIdx] = 0;
+              ctx.storyFlags.add(`whirlpool_cleared_${facingX}_${facingY}`);
+              ctx.renderMap(currentMap);
+              ctx.saveCurrentGame();
+              ctx.showToast('🌀 The whirlpool subsided!');
+            }
+          );
+        } else {
+          ctx.openDialogue(
+            [
+              'A vicious whirlpool is spinning violently!',
+              wpCheck.missingReason ||
+                'You need HM06 WHIRLPOOL and the GLACIER BADGE from Mahogany Gym to cross.',
+            ],
+            '🌀 WHIRLPOOL'
           );
         }
         return true;
