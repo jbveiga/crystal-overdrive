@@ -229,6 +229,7 @@ export class OverworldTickerCoordinator {
       triggerCherrygroveRivalAmbush,
       triggerAzaleaRivalAmbush,
       triggerOlivineRivalConfrontation,
+      triggerCianwoodSuicuneAndEusine,
       saveCurrentGame,
       triggerWildEncounter,
       addPlayTimeDelta,
@@ -333,6 +334,18 @@ export class OverworldTickerCoordinator {
             triggerOlivineRivalConfrontation
           ) {
             triggerOlivineRivalConfrontation();
+            return;
+          }
+
+          // Cianwood City Suicune & Eusine Encounter
+          if (
+            currentMap?.id === 'cianwood_city' &&
+            coord.x === 11 &&
+            coord.y === 16 &&
+            !storyFlags.has('EVENT_FOUGHT_EUSINE') &&
+            triggerCianwoodSuicuneAndEusine
+          ) {
+            triggerCianwoodSuicuneAndEusine();
             return;
           }
 

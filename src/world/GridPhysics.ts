@@ -53,7 +53,10 @@ export type NpcSpriteType =
   | 'farfetchd'
   | 'blackbelt'
   | 'cooltrainer_f'
-  | 'cooltrainer_m';
+  | 'cooltrainer_m'
+  | 'suicune'
+  | 'eusine'
+  | 'gramps';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
@@ -114,6 +117,8 @@ export interface GridEntity {
     | 'E4_EVENT'
     | 'AMPHY_EVENT'
     | 'PHARMACY_SECRET_POTION_EVENT'
+    | 'MANIA_SHUCKLE_EVENT'
+    | 'PHOTO_STUDIO_EVENT'
     | 'ELMS_AIDE_EVENT'
     | 'SUDOWOODO_EVENT'
     | 'POLICE_RIVAL_NAMING'

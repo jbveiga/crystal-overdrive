@@ -69,6 +69,9 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   blackbelt: './assets/sprites/characters/npc_boy.png',
   cooltrainer_f: './assets/sprites/characters/cooltrainer_f.png',
   cooltrainer_m: './assets/sprites/characters/camper.png',
+  suicune: './assets/sprites/characters/suicune.png',
+  eusine: './assets/sprites/characters/eusine.png',
+  gramps: './assets/sprites/characters/gramps.png',
 };
 
 export class OverworldNpcAndItemSprites {

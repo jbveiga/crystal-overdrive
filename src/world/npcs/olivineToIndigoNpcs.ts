@@ -283,6 +283,9 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
 
 
     cianwood_city: [
+      makeNpc('cianwood_suicune', 10, 14, 'DOWN', 'suicune', '💎 SUICUNE', [
+        'SUICUNE: Gurr-oooh!',
+      ]),
       makeNpc('cianwood_youngster', 21, 37, 'DOWN', 'boy', '👦 YOUNGSTER', [
         'Cianwood City is isolated across the sea. We get goods delivered from Olivine!',
       ]),
@@ -295,9 +298,21 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('chucks_wife', 10, 46, 'DOWN', 'teacher', '👩 CHUCK’S WIFE', [
         'My husband Chuck is always doing push-ups and breaking boulders!',
       ]),
-      makeNpc('cianwood_eusine', 11, 21, 'UP', 'boy', '🎩 EUSINE', [
+      makeNpc('cianwood_eusine', 11, 21, 'UP', 'eusine', '🎩 EUSINE', [
         'EUSINE: Suicune! I caught a glimpse of its crystal silhouette leaping gracefully across the waves!',
         'Its crystal-clear aura purifies all waters… One day, I will prove myself worthy to witness its majesty!',
+      ]),
+    ],
+
+    manias_house: [
+      makeNpc('cianwood_kirk', 2, 4, 'DOWN', 'boy', '🐢 KIRK', [
+        'I, I am in shock! A guy with mean eyes and red hair barged in on me and took my prized POKéMON!',
+      ], { action: 'MANIA_SHUCKLE_EVENT' }),
+    ],
+
+    poke_seers_house: [
+      makeNpc('poke_seer', 2, 4, 'DOWN', 'gramps', '🔮 POKé SEER', [
+        'POKé SEER: …I see all. I know all… Your partner POKéMON was raised with immense affection!',
       ]),
     ],
 
@@ -358,7 +373,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     cianwood_photo_studio: [
       makeNpc('cianwood_photographer', 2, 3, 'DOWN', 'fisherman', '📸 CAMERAMAN', [
         'Say cheese! I take commemorative photos for trainers and their beloved POKéMON!',
-      ]),
+      ], { action: 'PHOTO_STUDIO_EVENT' }),
     ],
 
     cianwood_lugia_speech_house: [

@@ -24,10 +24,7 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
       npcIds: ['silver_burned'],
       handler: (targetNpc, _map, ctx) => {
         if (ctx.storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')) {
-          ctx.openDialogue(
-            ["SILVER: …Tch! Keep moving! I don't want to look at your face!"],
-            targetNpc.speaker
-          );
+          ctx.openDialogue(["SILVER: …Tch! Keep moving! I don't want to look at your face!"], targetNpc.speaker);
           return true;
         }
         ctx.triggerBurnedTowerRivalBattle();
@@ -139,13 +136,10 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
       actions: ['MAHOGANY_GYM_BLOCKER'],
       npcIds: ['mahogany_gym_blocker'],
       handler: (_targetNpc, _map, ctx) => {
-        ctx.openDialogue(
-          [
-            'TOWN RESIDENT: Gym Leader Pryce went to the Lake of Rage to investigate the strange disturbance.',
-            'The Gym is closed until the emergency at the lake and the souvenir shop is fully resolved!',
-          ],
-          'TOWN RESIDENT'
-        );
+        ctx.openDialogue([
+          'TOWN RESIDENT: Gym Leader Pryce went to the Lake of Rage to investigate the strange disturbance.',
+          'The Gym is closed until the emergency at the lake and the souvenir shop is fully resolved!',
+        ], 'TOWN RESIDENT');
         return true;
       },
     },
@@ -213,12 +207,7 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
           ],
           '⚡ ELECTRODE',
           () => {
-            const electrodePkmn = PokemonFactory.create('electrode', 23, [
-              'spark',
-              'sonicboom',
-              'screech',
-              'selfdestruct',
-            ]);
+            const electrodePkmn = PokemonFactory.create('electrode', 23, ['spark', 'sonicboom', 'screech', 'selfdestruct']);
             ctx.triggerBattle(electrodePkmn, {
               onBattleEnd: (result) => {
                 if (result.winner === 'PLAYER' || result.caught) {
@@ -469,12 +458,7 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
           ],
           '💎 SUICUNE',
           () => {
-            const suicunePkmn = PokemonFactory.create('suicune', 40, [
-              'aurorabeam',
-              'gust',
-              'rain-dance',
-              'surf',
-            ]);
+            const suicunePkmn = PokemonFactory.create('suicune', 40, ['aurorabeam', 'gust', 'rain-dance', 'surf']);
             ctx.triggerBattle(suicunePkmn, {
               onBattleEnd: (_res) => {
                 ctx.storyFlags.add('suicune_caught_or_defeated');
@@ -546,12 +530,7 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
             if (!ctx.inventory.tms.includes('TM24')) ctx.inventory.tms.push('TM24');
             ctx.addOverworldItemToInventory('master-ball');
             if (ctx.playerParty.length < 6) {
-              const dratini = PokemonFactory.create('dratini', 15, [
-                'extremespeed',
-                'thunderwave',
-                'twister',
-                'dragonrage',
-              ]);
+              const dratini = PokemonFactory.create('dratini', 15, ['extremespeed', 'thunderwave', 'twister', 'dragonrage']);
               dratini.nickname = 'DRATINI';
               ctx.playerParty.push(dratini);
               ctx.storyFlags.add('received_shrine_dratini');
@@ -696,11 +675,72 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
         }
 
         ctx.openDialogue(
-          [
-            'SAILOR: Welcome aboard the FAST SHIP S.S. AQUA!',
-            'Have your ticket ready as you board the ship at the gangway ahead!',
-          ],
+          ['SAILOR: Welcome aboard the FAST SHIP S.S. AQUA!', 'Have your ticket ready as you board the ship at the gangway ahead!'],
           targetNpc.speaker
+        );
+        return true;
+      },
+    },
+
+    // 23. Mania's House: Kirk Shuckie Gift
+    {
+      actions: ['MANIA_SHUCKLE_EVENT'],
+      npcIds: ['cianwood_kirk'],
+      handler: (targetNpc, _map, ctx) => {
+        if (ctx.storyFlags.has('received_shuckie')) {
+          ctx.openDialogue(
+            ["KIRK: Hi, " + ctx.playerName + "! How is SHUCKIE doing? It seems to really like you! Why don't you keep it?"],
+            targetNpc.speaker
+          );
+          return true;
+        }
+
+        if (ctx.playerParty && ctx.playerParty.length >= 6) {
+          ctx.openDialogue(['KIRK: Your party is full! Please make room in your party first!'], targetNpc.speaker);
+          return true;
+        }
+
+        const shuckie = PokemonFactory.create('shuckle', 20, ['constrict', 'bide', 'encore', 'safeguard']);
+        shuckie.nickname = 'SHUCKIE';
+        shuckie.heldItem = 'berry';
+        shuckie.originalTrainer = 'KIRK';
+        if (ctx.playerParty) ctx.playerParty.push(shuckie);
+
+        ctx.storyFlags.add('received_shuckie');
+        ctx.storyFlags.add('EVENT_GOT_SHUCKIE');
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        ctx.openDialogue(
+          [
+            'KIRK: I, I am in shock! A guy with mean eyes and red hair barged in on me and took my prized POKéMON!',
+            'I still have one left, but what if he comes back? You look tough. Please look after my POKéMON!',
+            `${ctx.playerName} received SHUCKIE the SHUCKLE from KIRK!`,
+            'KIRK: Its name is SHUCKIE. Treat it with lots of love!',
+          ],
+          targetNpc.speaker,
+          () => {
+            void ctx.saveCurrentGame();
+            ctx.showToast('🐢 Received SHUCKIE from Kirk!');
+          }
+        );
+        return true;
+      },
+    },
+
+    // 24. Cianwood Photo Studio: Commemorative Photo
+    {
+      actions: ['PHOTO_STUDIO_EVENT'],
+      npcIds: ['cianwood_photographer'],
+      handler: (targetNpc, _map, ctx) => {
+        ctx.storyFlags.add('photo_taken');
+        ctx.storyFlags.add('EVENT_TOOK_PHOTO_IN_CIANWOOD');
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        ctx.openDialogue(
+          ['CAMERAMAN: Say cheese! Looking great!', 'There! That is a wonderful keepsake of your journey across Johto!'],
+          targetNpc.speaker,
+          () => {
+            void ctx.saveCurrentGame();
+            ctx.showToast('📸 Commemorative photo taken at Cianwood Photo Studio!');
+          }
         );
         return true;
       },

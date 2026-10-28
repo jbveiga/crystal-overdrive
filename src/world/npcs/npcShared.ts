@@ -368,6 +368,14 @@ export function isNpcActiveForStoryFlags(
     return storyFlags.has('fake_director_defeated') && !storyFlags.has('radio_tower_liberated');
   }
 
+  // Cianwood City Suicune & Eusine
+  if (npcId === 'cianwood_suicune') {
+    return !storyFlags.has('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
+  }
+  if (npcId === 'cianwood_eusine') {
+    return !storyFlags.has('EVENT_FOUGHT_EUSINE');
+  }
+
   // Tin Tower Suicune Altar (Act 8)
   if (npcId === 'suicune_altar') {
     return storyFlags.has('has_clear_bell') && !storyFlags.has('suicune_caught_or_defeated');
