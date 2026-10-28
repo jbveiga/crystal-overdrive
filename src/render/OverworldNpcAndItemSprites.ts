@@ -67,6 +67,7 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   youngster: './assets/sprites/characters/youngster.png',
   slowpoke: './assets/sprites/characters/slowpoke.png',
   farfetchd: './assets/sprites/characters/farfetchd.png',
+  butterfree: './assets/sprites/characters/butterfree.png',
   blackbelt: './assets/sprites/characters/npc_boy.png',
   black_belt: './assets/sprites/characters/black_belt.png',
   boulder: './assets/sprites/characters/boulder.png',

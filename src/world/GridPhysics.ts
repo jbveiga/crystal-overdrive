@@ -52,6 +52,7 @@ export type NpcSpriteType =
   | 'youngster'
   | 'slowpoke'
   | 'farfetchd'
+  | 'butterfree'
   | 'blackbelt'
   | 'black_belt'
   | 'boulder'

@@ -166,6 +166,14 @@ const { ISSUE_RESOLUTIONS } = (() => {
   1. Updated \`scripts/generate-authentic-tiles.cjs\` to map \`goldenrod_magnet_train_station\` to authentic \`tileset: 'train_station'\`.
   2. Recompiled map with authentic station platform tiles, boarding gates, tracks, and reciprocal station warps.
   3. Verified collision grid: platforms are walkable \`0\` while train tracks are solid \`1\` boundary.`,
+      35: `### Resolution Details for Issue #35
+- **Commit**: c9ba254
+- **Root Cause**: \`gate_butterfree\` in \`route_34_ilex_forest_gate\` was erroneously configured with human \`spriteType: 'lass'\` in \`src/world/npcs/azaleaToIlexNpcs.ts\`.
+- **Fix**:
+  1. Extracted and formatted authentic 144x32 overworld character walk sheet in \`public/assets/sprites/characters/butterfree.png\`.
+  2. Registered \`butterfree\` in \`NpcSpriteType\` (\`src/world/GridPhysics.ts\`) and \`NPC_SHEET_PATHS\` (\`src/render/OverworldNpcAndItemSprites.ts\`).
+  3. Updated \`gate_butterfree\` to use \`spriteType: 'butterfree'\`.
+  4. Authored automated test suite asserting sprite path resolution and asset integrity in \`tests/bugfixes/githubIssue35.test.ts\`.`,
     },
   };
 })();

@@ -344,7 +344,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'SWEET_SCENT_TEACHER_EVENT' }
       ),
-      makeNpc('gate_butterfree', 4, 3, 'LEFT', 'lass', '🦋 BUTTERFREE', 
+      makeNpc('gate_butterfree', 4, 3, 'LEFT', 'butterfree', '🦋 BUTTERFREE', 
         ['BUTTERFREE: Freeh! It spreads a sweet, soothing floral scent around the gatehouse.']
       ),
     ],
