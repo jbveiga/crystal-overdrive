@@ -376,6 +376,14 @@ export function isNpcActiveForStoryFlags(
     return !storyFlags.has('EVENT_FOUGHT_EUSINE');
   }
 
+  // Olivine Lighthouse 6F & Olivine Gym Jasmine lifecycle
+  if (npcId === 'lighthouse_jasmine') {
+    return !storyFlags.has('amphy_cured');
+  }
+  if (npcId === 'leader_jasmine') {
+    return storyFlags.has('amphy_cured');
+  }
+
   // Tin Tower Suicune Altar (Act 8)
   if (npcId === 'suicune_altar') {
     return storyFlags.has('has_clear_bell') && !storyFlags.has('suicune_caught_or_defeated');

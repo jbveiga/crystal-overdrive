@@ -379,52 +379,56 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
     {
       actions: ['JASMINE_EVENT'],
       handler: (targetNpc, _map, ctx) => {
-        if (!ctx.storyFlags.has('jasmine_defeated')) {
-          if (!ctx.storyFlags.has('amphy_cured')) {
-            ctx.openDialogue(
-              ["JASMINE: …I cannot battle now. Amphy is terribly ill at the top of the LIGHTHOUSE. Please… someone find help in CIANWOOD across the sea…"],
-              targetNpc.speaker
-            );
-            return true;
-          }
-          const introPages =
-            targetNpc.challengePages && targetNpc.challengePages.length > 0
-              ? targetNpc.challengePages
-              : [
-                  'JASMINE: …Thank you for your help at the LIGHTHOUSE. But this is different. As a GYM LEADER, I will use my full power. POKéMON of steel… Clad in diamond-hard scales! Steelix, let us begin!',
-                ];
-          ctx.openDialogue(introPages, targetNpc.speaker, () => {
-            const team = ctx.buildTrainerTeamInstances(targetNpc);
-            if (team.length === 0) return;
-            ctx.triggerBattle(team[0], {
-              isTrainer: true,
-              isGymLeader: true,
-              trainerName: targetNpc.trainerName || 'Leader Jasmine',
-              trainerTeam: team,
-              onVictory: () => {
-                ctx.defeatedTrainers.add('jasmine');
-                ctx.storyFlags.add('jasmine_defeated');
-                if (!ctx.inventory.badges.includes('mineral')) ctx.inventory.badges.push('mineral');
-                if (!ctx.inventory.tms.includes('TM23')) ctx.inventory.tms.push('TM23');
-                ctx.audioManager.playSfx?.('sfx_badge_get');
-                BattleAudio.playOverworldSound('KEY_ITEM');
-                ctx.openDialogue(
-                  [
-                    'JASMINE: …You are truly strong. In accordance with LEAGUE rules, I confer upon you the MINERALBADGE!',
-                    'The MINERALBADGE raises the DEFENSE of all your POKéMON and allows them to navigate waterfalls. Take this TM23 IRON TAIL as well!',
-                  ],
-                  targetNpc.speaker,
-                  () => {
-                    ctx.saveCurrentGame();
-                    ctx.showToast('🔩 Received MINERAL BADGE & TM23 IRON TAIL from Leader Jasmine!');
-                  }
-                );
-              },
-            });
-          });
+        if (ctx.storyFlags.has('jasmine_defeated')) {
+          ctx.openDialogue(
+            ["JASMINE: …Um… I don't know how to say this, but good luck on your journey!"],
+            targetNpc.speaker
+          );
           return true;
         }
-        return false;
+        if (!ctx.storyFlags.has('amphy_cured')) {
+          ctx.openDialogue(
+            ["JASMINE: …I cannot battle now. Amphy is terribly ill at the top of the LIGHTHOUSE. Please… someone find help in CIANWOOD across the sea…"],
+            targetNpc.speaker
+          );
+          return true;
+        }
+        const introPages =
+          targetNpc.challengePages && targetNpc.challengePages.length > 0
+            ? targetNpc.challengePages
+            : [
+                'JASMINE: …Thank you for your help at the LIGHTHOUSE. But this is different. As a GYM LEADER, I will use my full power. POKéMON of steel… Clad in diamond-hard scales! Steelix, let us begin!',
+              ];
+        ctx.openDialogue(introPages, targetNpc.speaker, () => {
+          const team = ctx.buildTrainerTeamInstances(targetNpc);
+          if (team.length === 0) return;
+          ctx.triggerBattle(team[0], {
+            isTrainer: true,
+            isGymLeader: true,
+            trainerName: targetNpc.trainerName || 'Leader Jasmine',
+            trainerTeam: team,
+            onVictory: () => {
+              ctx.defeatedTrainers.add('jasmine');
+              ctx.storyFlags.add('jasmine_defeated');
+              if (!ctx.inventory.badges.includes('mineral')) ctx.inventory.badges.push('mineral');
+              if (!ctx.inventory.tms.includes('TM23')) ctx.inventory.tms.push('TM23');
+              ctx.audioManager.playSfx?.('sfx_badge_get');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              ctx.openDialogue(
+                [
+                  'JASMINE: …You are truly strong. In accordance with LEAGUE rules, I confer upon you the MINERALBADGE!',
+                  'The MINERALBADGE raises the DEFENSE of all your POKéMON and allows them to navigate waterfalls. Take this TM23 IRON TAIL as well!',
+                ],
+                targetNpc.speaker,
+                () => {
+                  ctx.saveCurrentGame();
+                  ctx.showToast('🔩 Received MINERAL BADGE & TM23 IRON TAIL from Leader Jasmine!');
+                }
+              );
+            },
+          });
+        });
+        return true;
       },
     },
 
@@ -432,6 +436,13 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
     {
       npcIds: ['olivine_gym_guide'],
       handler: (targetNpc, _map, ctx) => {
+        if (ctx.storyFlags.has('jasmine_defeated')) {
+          ctx.openDialogue(
+            ['GYM GUIDE: That was awesome! The steel-type, huh? That was a close encounter of an unknown kind!'],
+            targetNpc.speaker
+          );
+          return true;
+        }
         if (!ctx.storyFlags.has('amphy_cured')) {
           ctx.openDialogue(
             ["GYM GUIDE: Yo! CHAMP in the making! JASMINE, the GYM LEADER, is at the LIGHTHOUSE. She's looking after a sick POKéMON. A strong trainer has to be compassionate too."],

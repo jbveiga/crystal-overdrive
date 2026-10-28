@@ -132,29 +132,19 @@ export function getJohtoTownServiceInteractions(): NpcInteractionRegistration[] 
             if (!ctx.inventory.tms.includes('HM02')) ctx.inventory.tms.push('HM02');
             ctx.audioManager.playSfx?.('sfx_badge_get');
             BattleAudio.playOverworldSound('KEY_ITEM');
-            ctx.openDialogue(
-              [
-                'CHUCK’S WIFE: You defeated my husband Chuck? Amazing!',
-                'Take this HM02 FLY! It lets your Flying POKéMON carrying you to any town you’ve previously visited!',
-              ],
-              targetNpc.speaker,
-              () => {
-                ctx.saveCurrentGame();
-                ctx.showToast('🦅 Received HM02 FLY from Chuck’s Wife!');
-              }
-            );
+            ctx.openDialogue([
+              'CHUCK’S WIFE: You defeated my husband Chuck? Amazing!',
+              'Take this HM02 FLY! It lets your Flying POKéMON carrying you to any town you’ve previously visited!',
+            ], targetNpc.speaker, () => {
+              ctx.saveCurrentGame();
+              ctx.showToast('🦅 Received HM02 FLY from Chuck’s Wife!');
+            });
             return true;
           }
-          ctx.openDialogue(
-            ['CHUCK’S WIFE: Use FLY to soar through the skies across Johto anytime!'],
-            targetNpc.speaker
-          );
+          ctx.openDialogue(['CHUCK’S WIFE: Use FLY to soar through the skies across Johto anytime!'], targetNpc.speaker);
           return true;
         }
-        ctx.openDialogue(
-          ['CHUCK’S WIFE: My husband Chuck is training inside the Gym! Defeat him to earn his respect!'],
-          targetNpc.speaker
-        );
+        ctx.openDialogue(['CHUCK’S WIFE: My husband Chuck is training inside the Gym! Defeat him to earn his respect!'], targetNpc.speaker);
         return true;
       },
     },
@@ -370,43 +360,57 @@ export function getJohtoTownServiceInteractions(): NpcInteractionRegistration[] 
       actions: ['AMPHY_EVENT'],
       handler: (targetNpc, _map, ctx) => {
         if (ctx.storyFlags.has('amphy_cured')) {
-          ctx.openDialogue(
-            [
+          BattleAudio.playCry('ampharos');
+          if (targetNpc.id === 'lighthouse_jasmine') {
+            ctx.openDialogue([
               'AMPHAROS: Palu! Palulu! (Amphy is radiating brilliant light, glowing happily!)',
               'JASMINE: Amphy is all better now! I am heading back to OLIVINE GYM. Let us battle there!',
-            ],
-            targetNpc.speaker
-          );
-        } else if (ctx.storyFlags.has('has_secret_potion')) {
+            ], targetNpc.speaker);
+            return true;
+          }
+          ctx.openDialogue(['AMPHAROS: Palu! Palulu! (Amphy is radiating brilliant light, glowing happily!)'], '💡 AMPHAROS');
+          return true;
+        }
+
+        const hasSecretPotion =
+          ctx.storyFlags.has('has_secret_potion') ||
+          (ctx.inventory?.keyItems && ctx.inventory.keyItems.some((k) => k.toLowerCase().includes('secretpotion'))) ||
+          (ctx.inventory?.items && ctx.inventory.items['secretpotion']);
+
+        if (hasSecretPotion) {
           ctx.storyFlags.add('amphy_cured');
+          ctx.storyFlags.add('EVENT_JASMINE_RETURNED_TO_GYM');
+          ctx.storyFlags.delete('has_secret_potion');
+          if (ctx.inventory?.keyItems) {
+            ctx.inventory.keyItems = ctx.inventory.keyItems.filter((k) => !k.toLowerCase().includes('secretpotion'));
+          }
+          if (ctx.inventory?.items && ctx.inventory.items['secretpotion']) delete ctx.inventory.items['secretpotion'];
+
           ctx.audioManager.playSfx?.('sfx_badge_get');
           BattleAudio.playOverworldSound('KEY_ITEM');
-          ctx.openDialogue(
-            [
-              `${ctx.playerName} handed over the SECRETPOTION to JASMINE!`,
-              'JASMINE carefully gave the medicine to AMPHY…',
-              'AMPHAROS swallowed it eagerly… Suddenly, its tail began to glow brightly!',
-              'AMPHAROS: Palu! Paluluuu!',
-              `JASMINE: Oh, thank goodness! Amphy's fever has broken! Thank you so much, ${ctx.playerName}!`,
-              'I will return to the GYM in OLIVINE CITY right away. Please come challenge me there for a real GYM battle!',
-            ],
-            targetNpc.speaker,
-            () => {
-              ctx.saveCurrentGame();
-              ctx.showToast('✨ Amphy recovered! Leader Jasmine returned to Olivine Gym!');
-            }
-          );
-        } else {
-          ctx.openDialogue(
-            [
-              'JASMINE: …Amphy used to shine so brightly to guide ships across the dark sea…',
-              "It's so weak and feverish… I won't leave its side until it gets better.",
-              'I heard there is a pharmacy in CIANWOOD CITY across the sea that carries miracle medicine…',
-              'AMPHAROS: …Palu… (It looks pale and feverish…)',
-            ],
-            targetNpc.speaker
-          );
+          BattleAudio.playCry('ampharos');
+
+          ctx.openDialogue([
+            'JASMINE: …Will that medicine cure AMPHY?',
+            `${ctx.playerName} handed over the SECRETPOTION to JASMINE!`,
+            'JASMINE: …Um, please do not be offended… AMPHY will not take anything from anyone but me…',
+            'AMPHY swallowed the medicine… Suddenly, its tail began to glow brightly with radiant light!',
+            'AMPHAROS: Palu! Paluluuu!',
+            'JASMINE: …Oh, I am so relieved… This is just so wonderful… Thank you so very, very much.',
+            '…I will return to the GYM in OLIVINE CITY right away. Please come challenge me there for a real GYM battle!',
+          ], targetNpc.speaker, () => {
+            ctx.saveCurrentGame();
+            ctx.showToast('✨ Amphy recovered! Leader Jasmine returned to Olivine Gym!');
+          });
+          return true;
         }
+
+        ctx.openDialogue([
+          'JASMINE: …Amphy used to shine so brightly to guide ships across the dark sea…',
+          "It is so weak and feverish… I will not leave its side until it gets better.",
+          'I heard there is a pharmacy in CIANWOOD CITY across the sea that carries miracle medicine…',
+          'AMPHAROS: …Palu… (It looks pale and feverish…)',
+        ], targetNpc.speaker);
         return true;
       },
     },
