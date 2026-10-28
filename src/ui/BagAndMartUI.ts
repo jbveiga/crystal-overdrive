@@ -56,6 +56,7 @@ export class BagAndMartUI {
   private selectedPartyIndex: number = 0;
   private activeTeachingTM: TMDefinition | null = null;
   private speedMultiplier: SpeedMultiplier = 1;
+  private activeMartId?: string;
   private onInventoryChanged?: () => void;
   private onUseItemfinder?: () => void;
   private onUseRepel?: (steps: number, itemName: string) => void;
@@ -311,13 +312,20 @@ export class BagAndMartUI {
     this.switchTab(safeTab);
   }
 
-  public openMart(): void {
+  public openMart(martId?: string): void {
+    this.activeMartId = martId;
     BattleAudio.playMenuSound('CONFIRM');
     this.bagModal.style.display = 'flex';
     this.feedbackBanner.style.display = 'none';
 
     const titleEl = this.bagModal.querySelector('#bag-modal-title') as HTMLElement;
-    if (titleEl) titleEl.innerText = '🏪 POKé MART';
+    if (titleEl) {
+      if (martId === 'goldenrod_dept_store_3f') titleEl.innerText = '🏪 DEPT. STORE 3F (BATTLE)';
+      else if (martId === 'goldenrod_dept_store_4f') titleEl.innerText = '🏪 DEPT. STORE 4F (VITAMINS)';
+      else if (martId === 'goldenrod_dept_store_5f') titleEl.innerText = '🏪 DEPT. STORE 5F (TMS)';
+      else if (martId === 'goldenrod_dept_store_6f' || martId === 'goldenrod_dept_store_roof') titleEl.innerText = '🥤 VENDING MACHINE';
+      else titleEl.innerText = '🏪 POKé MART';
+    }
 
     const tabsBar = this.bagModal.querySelector('#bag-tabs-bar') as HTMLElement;
     if (tabsBar) tabsBar.style.display = 'none';
@@ -635,6 +643,7 @@ export class BagAndMartUI {
       showFeedback: (msg, isErr) => this.showFeedback(msg, isErr),
       onInventoryChanged: this.onInventoryChanged,
       reRender: () => this.renderMartTab(),
+      martId: this.activeMartId,
     });
   }
 

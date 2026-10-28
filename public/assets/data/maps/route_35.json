@@ -2188,6 +2188,20 @@
       "targetMapId": "route_35_national_park_gate",
       "targetX": 3,
       "targetY": 7
+    },
+    {
+      "x": 9,
+      "y": 33,
+      "targetMapId": "route_35_goldenrod_gate",
+      "targetX": 4,
+      "targetY": 0
+    },
+    {
+      "x": 10,
+      "y": 33,
+      "targetMapId": "route_35_goldenrod_gate",
+      "targetX": 5,
+      "targetY": 0
     }
   ],
   "bgEvents": [

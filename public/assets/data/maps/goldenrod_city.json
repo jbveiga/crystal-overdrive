@@ -1508,7 +1508,7 @@
     1,
     1,
     0,
-    1,
+    0,
     1,
     1,
     0,
@@ -4418,6 +4418,20 @@
       "targetMapId": "goldenrod_underground",
       "targetX": 3,
       "targetY": 2
+    },
+    {
+      "x": 19,
+      "y": 1,
+      "targetMapId": "route_35_goldenrod_gate",
+      "targetX": 4,
+      "targetY": 7
+    },
+    {
+      "x": 20,
+      "y": 1,
+      "targetMapId": "route_35_goldenrod_gate",
+      "targetX": 5,
+      "targetY": 7
     }
   ],
   "bgEvents": [

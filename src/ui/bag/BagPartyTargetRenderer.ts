@@ -270,7 +270,14 @@ export class BagPartyTargetRenderer {
     const currentCount = inventory.items[med.id] ?? 0;
     if (currentCount <= 0) return false;
 
-    if (med.id === 'potion' || med.id === 'super-potion' || med.id === 'moomoo-milk') {
+    if (
+      med.id === 'potion' ||
+      med.id === 'super-potion' ||
+      med.id === 'moomoo-milk' ||
+      med.id === 'fresh-water' ||
+      med.id === 'soda-pop' ||
+      med.id === 'lemonade'
+    ) {
       if (target.currentHp <= 0) {
         BattleAudio.playMenuSound('CANCEL');
         showFeedback(`${target.nickname} has fainted! Use a Revive first.`, true);
@@ -281,13 +288,74 @@ export class BagPartyTargetRenderer {
         showFeedback(`It won't have any effect! (${target.nickname} is already at full HP)`, true);
         return false;
       }
-      const healAmount = med.id === 'potion' ? 20 : med.id === 'super-potion' ? 50 : 100;
+      const healAmount =
+        med.id === 'potion'
+          ? 20
+          : med.id === 'super-potion' || med.id === 'fresh-water'
+          ? 50
+          : med.id === 'soda-pop'
+          ? 60
+          : med.id === 'lemonade'
+          ? 80
+          : 100;
       const before = target.currentHp;
       target.currentHp = Math.min(target.stats.hp, target.currentHp + healAmount);
       const recovered = target.currentHp - before;
       inventory.items[med.id] = currentCount - 1;
       BattleAudio.playMenuSound('HEAL');
       showFeedback(`💖 ${target.nickname}'s HP was restored by ${recovered} point(s)!`);
+    } else if (med.id === 'hp-up') {
+      target.stats.hp += 4;
+      target.currentHp += 4;
+      if (target.baseStats) target.baseStats.hp += 2;
+      target.friendship = Math.min(255, (target.friendship ?? 70) + 10);
+      inventory.items[med.id] = currentCount - 1;
+      BattleAudio.playMenuSound('HEAL');
+      showFeedback(`💖 ${target.nickname}'s base HP and friendship rose!`);
+    } else if (med.id === 'protein') {
+      target.stats.attack += 3;
+      if (target.baseStats) target.baseStats.attack += 2;
+      target.friendship = Math.min(255, (target.friendship ?? 70) + 10);
+      inventory.items[med.id] = currentCount - 1;
+      BattleAudio.playMenuSound('HEAL');
+      showFeedback(`💪 ${target.nickname}'s Attack and friendship rose!`);
+    } else if (med.id === 'iron') {
+      target.stats.defense += 3;
+      if (target.baseStats) target.baseStats.defense += 2;
+      target.friendship = Math.min(255, (target.friendship ?? 70) + 10);
+      inventory.items[med.id] = currentCount - 1;
+      BattleAudio.playMenuSound('HEAL');
+      showFeedback(`🛡️ ${target.nickname}'s Defense and friendship rose!`);
+    } else if (med.id === 'carbos') {
+      target.stats.speed += 3;
+      if (target.baseStats) target.baseStats.speed += 2;
+      target.friendship = Math.min(255, (target.friendship ?? 70) + 10);
+      inventory.items[med.id] = currentCount - 1;
+      BattleAudio.playMenuSound('HEAL');
+      showFeedback(`⚡ ${target.nickname}'s Speed and friendship rose!`);
+    } else if (med.id === 'calcium') {
+      target.stats.spAttack += 3;
+      target.stats.spDefense += 3;
+      if (target.baseStats) {
+        target.baseStats.spAttack += 2;
+        target.baseStats.spDefense += 2;
+      }
+      target.friendship = Math.min(255, (target.friendship ?? 70) + 10);
+      inventory.items[med.id] = currentCount - 1;
+      BattleAudio.playMenuSound('HEAL');
+      showFeedback(`🔮 ${target.nickname}'s Special stats and friendship rose!`);
+    } else if (
+      med.id === 'x-attack' ||
+      med.id === 'x-defend' ||
+      med.id === 'x-speed' ||
+      med.id === 'x-special' ||
+      med.id === 'dire-hit' ||
+      med.id === 'guard-spec'
+    ) {
+      target.friendship = Math.min(255, (target.friendship ?? 70) + 5);
+      inventory.items[med.id] = currentCount - 1;
+      BattleAudio.playMenuSound('HEAL');
+      showFeedback(`✨ Used ${med.name} on ${target.nickname}! Readiness and friendship rose.`);
     } else if (med.id === 'antidote') {
       if (target.status !== 'PSN' && target.status !== 'TOX') {
         BattleAudio.playMenuSound('CANCEL');

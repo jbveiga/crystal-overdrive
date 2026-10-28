@@ -14,6 +14,8 @@ import {
   MART_MEDICINE_CATALOG,
   MART_REPEL_CATALOG,
   MART_POKEBALL_CATALOG,
+  DEPT_STORE_5F_TM_CATALOG,
+  type MedicineItemDef,
   type BagInventory,
 } from './BagItemCatalogs';
 
@@ -24,6 +26,7 @@ export interface MartRendererContext {
   showFeedback: (msg: string, isError?: boolean) => void;
   onInventoryChanged?: () => void;
   reRender: () => void;
+  martId?: string;
 }
 
 export class PokeMartRenderer {
@@ -64,8 +67,152 @@ export class PokeMartRenderer {
   }
 
   public static renderMartTab(ctx: MartRendererContext): void {
-    const { container, inventory, updateHeaderDisplay, showFeedback, onInventoryChanged, reRender } = ctx;
+    const { container, inventory, updateHeaderDisplay, showFeedback, onInventoryChanged, reRender, martId } = ctx;
     container.innerHTML = '';
+
+    if (!inventory.items) {
+      inventory.items = {};
+    }
+
+    const renderMedSection = (items: MedicineItemDef[], headerTitle: string) => {
+      const header = document.createElement('div');
+      header.style.cssText =
+        "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 4px; letter-spacing: 0.5px;";
+      header.innerText = headerTitle;
+      container.appendChild(header);
+
+      for (const med of items) {
+        const ownedCount = inventory.items![med.id] ?? 0;
+        const card = document.createElement('div');
+        card.style.cssText = CARD_STYLE;
+
+        card.innerHTML = `
+          <div style="flex: 1;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${med.icon} ${med.name}</span>
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${med.badgeLabel}</span>
+              <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94A3B8;">Owned: x${ownedCount}</span>
+            </div>
+            <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${med.desc}</div>
+          </div>
+          <button class="buy-med-btn" style="
+            background: #16A34A;
+            color: white;
+            border: 1.5px solid #22C55E;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-family: 'Space Mono', monospace;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 3px 0 0 #070B14;
+          ">BUY $${med.price}</button>
+        `;
+
+        const buyMedBtn = card.querySelector('.buy-med-btn') as HTMLButtonElement;
+        buyMedBtn.addEventListener('click', () => {
+          if (inventory.money < med.price) {
+            BattleAudio.playMenuSound('CANCEL');
+            showFeedback(`Not enough money to buy ${med.name}! ($${med.price} required)`, true);
+            return;
+          }
+          BattleAudio.playMenuSound('CONFIRM');
+          inventory.money -= med.price;
+          inventory.items![med.id] = (inventory.items![med.id] ?? 0) + 1;
+          updateHeaderDisplay();
+          showFeedback(`Purchased 1x ${med.name}! (Now holding x${inventory.items![med.id]})`);
+          reRender();
+          if (onInventoryChanged) onInventoryChanged();
+        });
+
+        container.appendChild(card);
+      }
+    };
+
+    if (martId === 'goldenrod_dept_store_3f') {
+      renderMedSection(
+        MART_MEDICINE_CATALOG.filter((m) => m.deptStoreFloor === '3F'),
+        '⚔️ 3F BATTLE COLLECTION (BATTLE ENHANCERS)'
+      );
+      return;
+    }
+
+    if (martId === 'goldenrod_dept_store_4f') {
+      renderMedSection(
+        MART_MEDICINE_CATALOG.filter((m) => m.deptStoreFloor === '4F'),
+        '❤️ 4F MEDICINE BOX (PERMANENT STAT VITAMINS)'
+      );
+      return;
+    }
+
+    if (martId === 'goldenrod_dept_store_6f' || martId === 'goldenrod_dept_store_roof') {
+      renderMedSection(
+        MART_MEDICINE_CATALOG.filter((m) => m.deptStoreFloor === '6F'),
+        '🥤 VENDING MACHINE REFRESHMENTS'
+      );
+      return;
+    }
+
+    if (martId === 'goldenrod_dept_store_5f') {
+      const header = document.createElement('div');
+      header.style.cssText =
+        "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 4px; letter-spacing: 0.5px;";
+      header.innerText = '💿 5F TM CORNER (INFINITE USE)';
+      container.appendChild(header);
+
+      if (!inventory.tms) inventory.tms = [];
+
+      for (const tm of DEPT_STORE_5F_TM_CATALOG) {
+        const isOwned = inventory.tms.includes(tm.id);
+        const card = document.createElement('div');
+        card.style.cssText = CARD_STYLE;
+
+        card.innerHTML = `
+          <div style="flex: 1;">
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">💿 ${tm.id}: ${tm.name}</span>
+              <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #0284C7; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${tm.type.toUpperCase()}</span>
+            </div>
+            <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${tm.desc}</div>
+          </div>
+          <button class="buy-tm-btn" style="
+            background: ${isOwned ? '#334155' : '#16A34A'};
+            color: ${isOwned ? '#94A3B8' : 'white'};
+            border: 1.5px solid ${isOwned ? '#475569' : '#22C55E'};
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-family: 'Space Mono', monospace;
+            font-weight: 800;
+            font-size: 11px;
+            cursor: ${isOwned ? 'default' : 'pointer'};
+            white-space: nowrap;
+            box-shadow: 0 3px 0 0 #070B14;
+          " ${isOwned ? 'disabled' : ''}>${isOwned ? 'OWNED' : `BUY $${tm.price}`}</button>
+        `;
+
+        if (!isOwned) {
+          const buyBtn = card.querySelector('.buy-tm-btn') as HTMLButtonElement;
+          buyBtn.addEventListener('click', () => {
+            if (inventory.money < tm.price) {
+              BattleAudio.playMenuSound('CANCEL');
+              showFeedback(`Not enough money to buy ${tm.id}! ($${tm.price} required)`, true);
+              return;
+            }
+            BattleAudio.playMenuSound('CONFIRM');
+            inventory.money -= tm.price;
+            inventory.tms.push(tm.id);
+            updateHeaderDisplay();
+            showFeedback(`Purchased ${tm.id} ${tm.name}!`);
+            reRender();
+            if (onInventoryChanged) onInventoryChanged();
+          });
+        }
+
+        container.appendChild(card);
+      }
+      return;
+    }
 
     const currentBadges = inventory.badges.length;
 
@@ -94,64 +241,10 @@ export class PokeMartRenderer {
     `;
     container.appendChild(badgeBar);
 
-    // Medicine Section Header
-    const medHeader = document.createElement('div');
-    medHeader.style.cssText =
-      "font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 800; color: #38BDF8; margin-top: 4px; letter-spacing: 0.5px;";
-    medHeader.innerText = '🧪 MEDICINE & STATUS HEALERS';
-    container.appendChild(medHeader);
-
-    if (!inventory.items) {
-      inventory.items = {};
-    }
-
-    for (const med of MART_MEDICINE_CATALOG.filter((m) => !m.farmExclusive)) {
-      const ownedCount = inventory.items[med.id] ?? 0;
-      const card = document.createElement('div');
-      card.style.cssText = CARD_STYLE;
-
-      card.innerHTML = `
-        <div style="flex: 1;">
-          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 800; color: #F6F8F3; font-size: 14px;">${med.icon} ${med.name}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 10px; background: #059669; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800;">${med.badgeLabel}</span>
-            <span style="font-family: 'Space Mono', monospace; font-size: 11px; color: #94A3B8;">Owned: x${ownedCount}</span>
-          </div>
-          <div style="font-size: 12px; color: #94A3B8; margin-top: 4px; line-height: 1.4;">${med.desc}</div>
-        </div>
-        <button class="buy-med-btn" style="
-          background: #16A34A;
-          color: white;
-          border: 1.5px solid #22C55E;
-          border-radius: 6px;
-          padding: 8px 12px;
-          font-family: 'Space Mono', monospace;
-          font-weight: 800;
-          font-size: 11px;
-          cursor: pointer;
-          white-space: nowrap;
-          box-shadow: 0 3px 0 0 #070B14;
-        ">BUY $${med.price}</button>
-      `;
-
-      const buyMedBtn = card.querySelector('.buy-med-btn') as HTMLButtonElement;
-      buyMedBtn.addEventListener('click', () => {
-        if (inventory.money < med.price) {
-          BattleAudio.playMenuSound('CANCEL');
-          showFeedback(`Not enough money to buy ${med.name}! ($${med.price} required)`, true);
-          return;
-        }
-        BattleAudio.playMenuSound('CONFIRM');
-        inventory.money -= med.price;
-        inventory.items![med.id] = (inventory.items![med.id] ?? 0) + 1;
-        updateHeaderDisplay();
-        showFeedback(`Purchased 1x ${med.name}! (Now holding x${inventory.items![med.id]})`);
-        reRender();
-        if (onInventoryChanged) onInventoryChanged();
-      });
-
-      container.appendChild(card);
-    }
+    renderMedSection(
+      MART_MEDICINE_CATALOG.filter((m) => !m.farmExclusive),
+      '🧪 MEDICINE & STATUS HEALERS'
+    );
 
     // Field Repels Section Header
     const repelHeader = document.createElement('div');

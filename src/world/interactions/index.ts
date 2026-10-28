@@ -4,6 +4,7 @@ import { getEarlyJohtoQuestInteractions } from './EarlyJohtoQuestInteractions';
 import { getMidToLateJohtoQuestInteractions } from './MidToLateJohtoQuestInteractions';
 import { getGoldenrodAndRoute34Interactions } from './GoldenrodAndRoute34Interactions';
 import { getJohtoTownServiceInteractions } from './JohtoTownServiceInteractions';
+import { getGoldenrodExpansionInteractions } from './GoldenrodExpansionInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -13,6 +14,7 @@ export * from './IlexForestInteractions';
 export * from './MidToLateJohtoQuestInteractions';
 export * from './GoldenrodAndRoute34Interactions';
 export * from './JohtoTownServiceInteractions';
+export * from './GoldenrodExpansionInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.
@@ -24,5 +26,6 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getMidToLateJohtoQuestInteractions(),
     ...getGoldenrodAndRoute34Interactions(),
     ...getJohtoTownServiceInteractions(),
+    ...getGoldenrodExpansionInteractions(),
   ]);
 }

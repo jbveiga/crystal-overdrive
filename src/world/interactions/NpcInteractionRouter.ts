@@ -142,7 +142,7 @@ export class NpcInteractionRouter {
             ctx.playFieldRestAnimation();
           }
         } else if (targetNpc.action === 'OPEN_MART') {
-          ctx.openMart();
+          ctx.openMart(currentMap.id);
         }
       });
       return true;

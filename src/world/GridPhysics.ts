@@ -152,7 +152,14 @@ export interface GridEntity {
     | 'E4_WILL_EVENT'
     | 'E4_KOGA_EVENT'
     | 'E4_BRUNO_EVENT'
-    | 'E4_KAREN_EVENT';
+    | 'E4_KAREN_EVENT'
+    | 'VENDING_MACHINE'
+    | 'OFFICER_RANDY_KENYA'
+    | 'GAME_CORNER_COIN_CLERK'
+    | 'GAME_CORNER_TM_PRIZE'
+    | 'GAME_CORNER_MON_PRIZE'
+    | 'OLDER_HAIRCUT_BROTHER'
+    | 'YOUNGER_HAIRCUT_BROTHER';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

@@ -68,6 +68,29 @@ export class FieldObstacleDispatcher {
     facingX: number,
     facingY: number
   ): boolean {
+    // Dept Store Elevator Interaction Trigger
+    if (
+      currentMap.id.startsWith('goldenrod_dept_store_') &&
+      currentMap.id !== 'goldenrod_dept_store_roof' &&
+      (facingX === 2 || facingX === 3) &&
+      facingY === 0 &&
+      ctx.openDeptElevatorModal
+    ) {
+      ctx.openDeptElevatorModal(currentMap.id, (targetMapId) => {
+        if (targetMapId !== currentMap.id) {
+          void ctx.executeWarpTransition?.({
+            x: ctx.player.x,
+            y: ctx.player.y,
+            targetMapId,
+            targetX: targetMapId === 'goldenrod_dept_store_roof' ? 13 : 2,
+            targetY: targetMapId === 'goldenrod_dept_store_roof' ? 2 : 1,
+            direction: 'DOWN',
+          });
+        }
+      });
+      return true;
+    }
+
     // 2. Check Street Signs & Interactive Background Objects (bgEvents)
     const bgEvent = ctx.mapManager.checkBgEvent(facingX, facingY);
     if (bgEvent && bgEvent.pages.length > 0) {
@@ -330,7 +353,7 @@ export class FieldObstacleDispatcher {
             ctx.playFieldRestAnimation();
           }
         } else if (bgEvent.action === 'OPEN_MART') {
-          ctx.openMart();
+          ctx.openMart(currentMap.id);
         }
       });
       return true;

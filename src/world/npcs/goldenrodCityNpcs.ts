@@ -318,6 +318,18 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       makeNpc('slot_player', 5, 8, 'UP', 'boy', '👦 SLOT PLAYER', 
         ['7-7-7! Come on! Just one more match! The slot machines here are so addictive!']
       ),
+      makeNpc('game_corner_coin_clerk', 3, 2, 'DOWN', 'fat_man', '🎰 COIN VENDOR',
+        ['Welcome to the GOLDENROD GAME CORNER! Buy coins to play slots and claim prizes!'],
+        { action: 'GAME_CORNER_COIN_CLERK' }
+      ),
+      makeNpc('game_corner_tm_clerk', 6, 2, 'DOWN', 'girl', '🎁 TM PRIZE CLERK',
+        ['Exchange your coins for powerful TMs like THUNDER, BLIZZARD, and FIRE BLAST!'],
+        { action: 'GAME_CORNER_TM_PRIZE' }
+      ),
+      makeNpc('game_corner_mon_clerk', 9, 2, 'DOWN', 'girl', '🎁 POKéMON PRIZE CLERK',
+        ['Exchange your coins for rare POKéMON prizes like ABRA, CUBONE, and WOBBUFFET!'],
+        { action: 'GAME_CORNER_MON_PRIZE' }
+      ),
     ],
     goldenrod_name_rater: [
       makeNpc('name_rater', 2, 3, 'DOWN', 'elder', '👴 NAME RATER', 
@@ -403,6 +415,43 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
             { speciesId: 'slowpoke', level: 13, moves: ['confusion', 'tackle', 'growl'] },
           ],
         }
+      ),
+      makeNpc('super_nerd_teru', 8, 9, 'UP', 'super_nerd', '🤓 SUPER NERD TERU',
+        ['Do you calculate type advantages before every single battle?'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'super_nerd_teru',
+          trainerName: 'Super Nerd Teru',
+          visionRange: 3,
+          challengePages: ['SUPER NERD TERU: Do you consider type alignments in battle? Let me show you my electric calculation!'],
+          trainerPokemon: { speciesId: 'magnemite', level: 7, moves: ['tackle', 'thundershock'] },
+          trainerTeam: [
+            { speciesId: 'magnemite', level: 7, moves: ['tackle', 'thundershock'] },
+            { speciesId: 'voltorb', level: 11, moves: ['tackle', 'screech', 'sonicboom'] },
+            { speciesId: 'magnemite', level: 7, moves: ['tackle', 'thundershock'] },
+            { speciesId: 'magnemite', level: 9, moves: ['tackle', 'thundershock', 'supersonic'] },
+          ],
+        }
+      ),
+      makeNpc('pokemaniac_issac', 8, 27, 'RIGHT', 'super_nerd', '🤪 POKéMANIAC ISSAC',
+        ['My POKéMON just got a fresh haircut from the brothers upstairs!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'pokemaniac_issac',
+          trainerName: 'Pokémaniac Issac',
+          visionRange: 3,
+          challengePages: ['POKéMANIAC ISSAC: My POKéMON just got a haircut! I’ll show you how strong it is!'],
+          trainerPokemon: { speciesId: 'lickitung', level: 12, moves: ['lick', 'supersonic', 'cut'] },
+          trainerTeam: [{ speciesId: 'lickitung', level: 12, moves: ['lick', 'supersonic', 'cut'] }],
+        }
+      ),
+      makeNpc('older_haircut_brother', 10, 14, 'LEFT', 'boy', '✂️ OLDER HAIRCUT BROTHER',
+        ['I can groom your POKéMON with expert care for ¥500! It will adore you!'],
+        { action: 'OLDER_HAIRCUT_BROTHER' }
+      ),
+      makeNpc('younger_haircut_brother', 10, 16, 'LEFT', 'boy', '✂️ YOUNGER HAIRCUT BROTHER',
+        ['I give neat trims for ¥300! It will make your POKéMON very happy!'],
+        { action: 'YOUNGER_HAIRCUT_BROTHER' }
       ),
     ],
   };

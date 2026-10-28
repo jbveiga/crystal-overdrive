@@ -569,6 +569,7 @@ async function bootstrap() {
     triggerWildEncounter: async (wildPkmn, options) => triggerBattle(wildPkmn, options),
     addPlayTimeDelta: (dtSec) => { playTimeSeconds += dtSec; },
     isSurfEnabled: () => mapManager.isSurfEnabled(),
+    openDeptElevatorModal: (currentMapId, onSelectFloor) => deptStoreElevatorUI.open({ currentMapId, onSelectFloor: (f) => onSelectFloor(f.mapId), onClose: () => {} }),
     dayCareManager,
     playerParty,
     seenSpecies,
@@ -594,7 +595,7 @@ async function bootstrap() {
     openTownMap: (mapId, visited, roamers) => townMapUI.open(mapId, visited, roamers),
     openRuinsPuzzleModal: (callbacks) => ruinsPuzzleModalUI.open(callbacks),
     handleRuinsPuzzleSolve,
-    openMart: () => bagUI.openMart(),
+    openMart: (martId?: string) => bagUI.openMart(martId || mapManager.getCurrentMap()?.id),
     healPlayerParty: (playAnim) => healPlayerParty(playAnim),
     playHealingAnimation: (partyCount) => overworldHUD.playHealingAnimation(partyCount),
     playFieldRestAnimation: () => overworldHUD.playFieldRestAnimation(),
@@ -609,6 +610,8 @@ async function bootstrap() {
     setSurfEnabled: (enabled) => mapManager.setSurfEnabled(enabled),
     triggerBattle,
     isItemfinderActive: () => itemfinderHUD.isActive(),
+    openDeptElevatorModal: (currentMapId, onSelectFloor) => deptStoreElevatorUI.open({ currentMapId, onSelectFloor: (f) => onSelectFloor(f.mapId), onClose: () => {} }),
+    executeWarpTransition: (warp) => executeWarpTransition(warp),
   });
 
   const npcInteractionRouter = createDefaultNpcInteractionRouter();
@@ -639,7 +642,7 @@ async function bootstrap() {
     playHealingAnimation: (partyCount, onComplete) => overworldHUD.playHealingAnimation(partyCount, onComplete),
     playFieldRestAnimation: (onComplete) => overworldHUD.playFieldRestAnimation(onComplete),
     saveCurrentGame,
-    openMart: () => bagUI.openMart(),
+    openMart: (martId?: string) => bagUI.openMart(martId || mapManager.getCurrentMap()?.id),
     openPcStorage: () => boxManagementUI.open(playerParty, boxManager.getState(), { onSave: () => saveCurrentGame(), onClose: () => saveCurrentGame() }),
     openTownMap: (mapId, visited, roamers) => townMapUI.open(mapId, visited, roamers),
     addOverworldItemToInventory,
@@ -650,13 +653,7 @@ async function bootstrap() {
     openNamingModal: (_title, defaultName, onConfirm) => {
       namingModalUI.open({ onConfirm }, defaultName);
     },
-    openDeptElevatorModal: (currentMapId, onSelectFloor) => {
-      deptStoreElevatorUI.open({
-        currentMapId,
-        onSelectFloor: (floor) => onSelectFloor(floor.mapId),
-        onClose: () => {},
-      });
-    },
+    openDeptElevatorModal: (currentMapId, onSelectFloor) => deptStoreElevatorUI.open({ currentMapId, onSelectFloor: (f) => onSelectFloor(f.mapId), onClose: () => {} }),
     openRadioTowerQuizModal: (callbacks) => {
       radioTowerQuizUI.open({
         onComplete: callbacks.onComplete,

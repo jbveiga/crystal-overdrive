@@ -20,7 +20,11 @@ export type PokeballId =
   | 'timer-ball' | 'repeat-ball' | 'fast-ball' | 'dream-ball'
   | 'lure-ball' | 'level-ball' | 'heavy-ball' | 'love-ball' | 'friend-ball' | 'moon-ball';
 
-export type MedicineId = 'potion' | 'super-potion' | 'moomoo-milk' | 'antidote' | 'parlyz-heal' | 'awakening' | 'revive';
+export type MedicineId =
+  | 'potion' | 'super-potion' | 'moomoo-milk' | 'antidote' | 'parlyz-heal' | 'awakening' | 'revive'
+  | 'fresh-water' | 'soda-pop' | 'lemonade'
+  | 'hp-up' | 'protein' | 'iron' | 'carbos' | 'calcium'
+  | 'x-attack' | 'x-defend' | 'x-speed' | 'x-special' | 'dire-hit' | 'guard-spec';
 
 export interface MoveData {
   id: string;

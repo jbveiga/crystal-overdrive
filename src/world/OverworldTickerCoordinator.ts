@@ -276,6 +276,28 @@ export class OverworldTickerCoordinator {
             return;
           }
 
+          // Goldenrod Dept. Store Elevator Step Trigger
+          if (
+            currentMap?.id.startsWith('goldenrod_dept_store_') &&
+            currentMap.id !== 'goldenrod_dept_store_roof' &&
+            coord.x === 2 &&
+            coord.y === 0
+          ) {
+            ctx.openDeptElevatorModal?.(currentMap.id, (targetMapId) => {
+              if (targetMapId !== currentMap.id) {
+                void executeWarpTransition({
+                  x: player.x,
+                  y: player.y,
+                  targetMapId,
+                  targetX: targetMapId === 'goldenrod_dept_store_roof' ? 13 : 2,
+                  targetY: targetMapId === 'goldenrod_dept_store_roof' ? 2 : 1,
+                  direction: 'DOWN',
+                });
+              }
+            });
+            return;
+          }
+
           // Passerby Rival 1 Ambush (Cherrygrove City East Exit)
           if (
             currentMap?.id === 'cherrygrove_city' &&

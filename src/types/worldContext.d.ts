@@ -13,15 +13,11 @@ import type { MapManager } from '../world/MapManager';
 import type { OverworldItemManager } from '../world/OverworldItemManager';
 import type { MissionManager } from '../world/MissionManager';
 import type { RoamingManager } from '../world/RoamingManager';
-import type { DayCareManager } from '../world/DayCareManager';
-import type { KurtCraftingManager } from '../world/KurtCraftingManager';
-import type { BoxManager } from '../world/BoxManager';
-import type { BugContestManager } from '../world/BugContestManager';
-import type { StadiumArenaManager } from '../battle/StadiumArenaManager';
-import type { GameClock } from '../core/GameClock';
-import type { StoryCutsceneContext } from '../world/StoryCutscenes';
+import type { DayCareManager } from '../world/DayCareManager'; import type { KurtCraftingManager } from '../world/KurtCraftingManager';
+import type { BoxManager } from '../world/BoxManager'; import type { BugContestManager } from '../world/BugContestManager';
+import type { StadiumArenaManager } from '../battle/StadiumArenaManager'; import type { GameClock } from '../core/GameClock';
+import type { StoryCutsceneContext } from '../world/StoryCutscenes'; import type { AdjacentMapPrefetcher } from '../world/AdjacentMapPrefetcher';
 import type { OverworldHUD } from '../ui/OverworldHUD'; import type { ItemfinderHUD } from '../ui/ItemfinderHUD';
-import type { AdjacentMapPrefetcher } from '../world/AdjacentMapPrefetcher';
 
 export interface FieldObstacleContext {
   playerName: string; playerParty: PokemonInstance[]; inventory: BagInventory; storyFlags: Set<string>;
@@ -33,7 +29,7 @@ export interface FieldObstacleContext {
   showToast: (msg: string) => void; openPcStorage: () => void;
   openTownMap: (mapId: string, visited: Set<string>, roamers: any) => void;
   openRuinsPuzzleModal: (callbacks: { onSolve: (puzzleId: string) => void; onClose: () => void }) => void;
-  handleRuinsPuzzleSolve: (puzzleId: string) => void; openMart: () => void; healPlayerParty: (playAnim?: boolean) => void;
+  handleRuinsPuzzleSolve: (puzzleId: string) => void; openMart: (martId?: string) => void; healPlayerParty: (playAnim?: boolean) => void;
   playHealingAnimation: (partyCount: number) => void; playFieldRestAnimation: () => void;
   playFlashEffect: () => void; playCutSlashEffect: (x: number, y: number) => void;
   addOverworldItemToInventory: (itemId: string) => void; removeItemBall: (eventFlag: string) => void;
@@ -41,6 +37,8 @@ export interface FieldObstacleContext {
   saveCurrentGame: () => void; renderMap: (map: MapData) => void; setSurfEnabled: (enabled: boolean) => void;
   triggerBattle: (pokemon: PokemonInstance, options?: TriggerBattleOptions) => Promise<void>;
   isItemfinderActive: () => boolean;
+  openDeptElevatorModal?: (currentMapId: string, onSelectFloor: (targetMapId: string) => void) => void;
+  executeWarpTransition?: (warp: any) => void | Promise<void>;
 }
 
 export interface OverworldTransitionContext {
@@ -104,6 +102,7 @@ export interface OverworldTickerContext {
   triggerBeastsAwakeningCutscene: () => void; triggerBurnedTowerRivalBattle: () => void; triggerCherrygroveRivalAmbush: () => void;
   saveCurrentGame: () => void | Promise<void>; triggerWildEncounter: (encounter: any, options?: any) => Promise<void>;
   addPlayTimeDelta: (dtSec: number) => void; isSurfEnabled: () => boolean;
+  openDeptElevatorModal?: (currentMapId: string, onSelectFloor: (targetMapId: string) => void) => void;
 }
 
 export type NpcInteractionHandler = (
@@ -130,7 +129,7 @@ export interface NpcInteractionContext {
   showToast: (msg: string) => void; healPlayerParty: (playAnim?: boolean) => void;
   playHealingAnimation: (partyCount?: number, onComplete?: () => void) => void;
   playFieldRestAnimation: (onComplete?: () => void) => void; saveCurrentGame: () => void;
-  openMart: () => void; openPcStorage: () => void; openTownMap: (mapId: string, visited: Set<string>, roamers: any) => void;
+  openMart: (martId?: string) => void; openPcStorage: () => void; openTownMap: (mapId: string, visited: Set<string>, roamers: any) => void;
   addOverworldItemToInventory: (itemId: string) => void; renderMap?: (map: MapData) => void;
   syncMapOverworldItems?: (map: MapData) => void; setSurfEnabled?: (enabled: boolean) => void;
   openDayCareModal: () => void; openNamingModal: (title: string, defaultName: string, onConfirm: (name: string) => void) => void;

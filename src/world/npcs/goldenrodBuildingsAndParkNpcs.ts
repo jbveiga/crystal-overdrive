@@ -13,7 +13,7 @@ import { makeNpc } from './npcShared';
 export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity[]> {
   return {
     goldenrod_dept_store_1f: [
-      makeNpc('dept_elevator_1f', 2, 0, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
+      makeNpc('dept_elevator_1f', 1, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
         ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
         { action: 'DEPT_ELEVATOR' }
       ),
@@ -26,7 +26,7 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       ),
     ],
     goldenrod_dept_store_2f: [
-      makeNpc('dept_elevator_2f', 2, 0, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
+      makeNpc('dept_elevator_2f', 1, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
         ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
         { action: 'DEPT_ELEVATOR' }
       ),
@@ -36,17 +36,17 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       ),
     ],
     goldenrod_dept_store_3f: [
-      makeNpc('dept_elevator_3f', 2, 0, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
+      makeNpc('dept_elevator_3f', 1, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
         ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
         { action: 'DEPT_ELEVATOR' }
       ),
-      makeNpc('dept_clerk_3f', 13, 5, 'DOWN', 'fat_man', '🏪 3F CLERK', 
+      makeNpc('dept_clerk_3f', 6, 1, 'DOWN', 'fat_man', '🏪 3F CLERK', 
         ['Welcome to the 3F BATTLE COLLECTION! X ATTACK, X DEFEND, and DIRE HIT give you the edge in GYM battles!'],
         { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
     ],
     goldenrod_dept_store_4f: [
-      makeNpc('dept_elevator_4f', 2, 0, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
+      makeNpc('dept_elevator_4f', 1, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
         ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
         { action: 'DEPT_ELEVATOR' }
       ),
@@ -56,17 +56,23 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       ),
     ],
     goldenrod_dept_store_5f: [
-      makeNpc('dept_elevator_5f', 2, 0, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
+      makeNpc('dept_elevator_5f', 1, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
         ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
         { action: 'DEPT_ELEVATOR' }
       ),
-      makeNpc('dept_clerk_5f', 13, 5, 'DOWN', 'fat_man', '🏪 5F CLERK', 
+      makeNpc('dept_clerk_5f', 8, 5, 'UP', 'fat_man', '🏪 5F CLERK', 
         ['Welcome to the 5F TM CORNER! Teach your POKéMON game-changing moves like HEADBUTT, ROCK SMASH, and REFLECT!'],
         { talkAcrossCounter: true, action: 'OPEN_MART' }
       ),
+      makeNpc('dept_5f_receptionist', 7, 5, 'UP', 'girl', '👩 RECEPTIONIST', 
+        ['I evaluate how close you are with your POKéMON! Visit me to see if your friendship shines!']
+      ),
+      makeNpc('dept_5f_mike', 6, 3, 'DOWN', 'boy', '🔄 CAMPER MIKE', 
+        ['I love Fighting-type POKéMON! If you have a DROWZEE, I will trade you my MACHOP!']
+      ),
     ],
     goldenrod_dept_store_6f: [
-      makeNpc('dept_elevator_6f', 2, 0, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
+      makeNpc('dept_elevator_6f', 1, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
         ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
         { action: 'DEPT_ELEVATOR' }
       ),
@@ -75,15 +81,35 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
           'The rooftop vending machines dispense FRESH WATER, SODA POP, and LEMONADE! They restore more HP than regular POTIONS!',
         ]
       ),
+      makeNpc('dept_vending_6f', 10, 1, 'DOWN', 'fat_man', '🥤 VENDING MACHINE', 
+        ['VENDING MACHINE: Clang! Refreshing drinks in stock!'],
+        { action: 'VENDING_MACHINE' }
+      ),
     ],
     goldenrod_dept_store_roof: [
-      makeNpc('dept_elevator_roof', 2, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
+      makeNpc('dept_elevator_roof', 12, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT', 
         ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE elevator! Which floor would you like to visit?'],
         { action: 'DEPT_ELEVATOR' }
       ),
       makeNpc('rooftop_camper', 7, 4, 'DOWN', 'boy', '⛺ ROOFTOP CAMPER', 
         [
           'You can see the entire skyline of GOLDENROD CITY and the RADIO TOWER from up here! It’s breathtaking!',
+        ]
+      ),
+      makeNpc('dept_vending_roof', 8, 2, 'DOWN', 'fat_man', '🥤 VENDING MACHINE', 
+        ['VENDING MACHINE: Clang! Refreshing drinks in stock!'],
+        { action: 'VENDING_MACHINE' }
+      ),
+    ],
+    route_35_goldenrod_gate: [
+      makeNpc('officer_randy', 2, 3, 'RIGHT', 'officer', '👮 OFFICER RANDY', 
+        ['OFFICER RANDY: I have a favor to ask an energetic trainer!'],
+        { action: 'OFFICER_RANDY_KENYA' }
+      ),
+      makeNpc('gate_pokefan_f', 6, 4, 'LEFT', 'girl', '👩 POKéFAN', 
+        [
+          'A big tree is blocking the road on ROUTE 36! It wiggles when you talk to it.',
+          'I heard the FLORIST in GOLDENROD CITY knows how to make it budge with a SQUIRTBOTTLE!',
         ]
       ),
     ],
