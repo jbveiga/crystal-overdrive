@@ -510,64 +510,49 @@ export class OverworldWarpAndMapTransitionController {
       return;
     }
 
-    // Elite Four Chambers & Tin Tower Progression Gating
-    if (warp.targetMapId === 'wills_room' && (inventory.badges.length < 8 && !storyFlags.has('clair_defeated'))) {
-      player.isMoving = false;
-      player.progress = 0;
-      setCutsceneLocked(false);
+    // Elite Four Chambers, Hall of Fame & Tin Tower Progression Gating
+    const e4Rooms = ['wills_room', 'kogas_room', 'brunos_room', 'karens_room', 'lances_room'];
+    if (e4Rooms.includes(currentM.id) && (warp.targetMapId === 'indigo_plateau_poke_center' || (e4Rooms.includes(warp.targetMapId) && e4Rooms.indexOf(warp.targetMapId) < e4Rooms.indexOf(currentM.id)))) {
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false);
       BattleAudio.playMenuSound('CANCEL');
-      overworldHUD.openDialogue(
-        ['GUARD: You cannot challenge the ELITE FOUR until you have conquered all 8 JOHTO GYMS and earned their BADGES!'],
-        '👮 LEAGUE GUARD'
-      );
+      overworldHUD.openDialogue(['The door is sealed shut! You cannot turn back until the trial is complete!'], '🔒 SEALED DOOR');
+      return;
+    }
+
+    if (warp.targetMapId === 'wills_room' && (!checkHasAllJohtoBadges(inventory.badges, storyFlags) || !storyFlags.has('victory_road_rival_defeated'))) {
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false);
+      BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(['GUARD: You cannot challenge the ELITE FOUR until you have conquered all 8 JOHTO GYMS and proven your strength against RIVAL SILVER in VICTORY ROAD!'], '👮 LEAGUE GUARD');
       return;
     }
 
     if (warp.targetMapId === 'kogas_room' && !storyFlags.has('will_defeated')) {
-      player.isMoving = false;
-      player.progress = 0;
-      setCutsceneLocked(false);
-      BattleAudio.playMenuSound('CANCEL');
-      overworldHUD.openDialogue(
-        ['The door to the next chamber remains firmly shut! Defeat ELITE FOUR WILL to proceed!'],
-        '🔒 CHAMBER DOOR'
-      );
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false); BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(['The door ahead is firmly sealed! You must defeat ELITE FOUR WILL first!'], '🔒 CHAMBER DOOR');
       return;
     }
 
     if (warp.targetMapId === 'brunos_room' && !storyFlags.has('koga_defeated')) {
-      player.isMoving = false;
-      player.progress = 0;
-      setCutsceneLocked(false);
-      BattleAudio.playMenuSound('CANCEL');
-      overworldHUD.openDialogue(
-        ['The door to the next chamber remains firmly shut! Defeat ELITE FOUR KOGA to proceed!'],
-        '🔒 CHAMBER DOOR'
-      );
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false); BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(['The door ahead is firmly sealed! You must defeat ELITE FOUR KOGA first!'], '🔒 CHAMBER DOOR');
       return;
     }
 
     if (warp.targetMapId === 'karens_room' && !storyFlags.has('bruno_defeated')) {
-      player.isMoving = false;
-      player.progress = 0;
-      setCutsceneLocked(false);
-      BattleAudio.playMenuSound('CANCEL');
-      overworldHUD.openDialogue(
-        ['The door to the next chamber remains firmly shut! Defeat ELITE FOUR BRUNO to proceed!'],
-        '🔒 CHAMBER DOOR'
-      );
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false); BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(['The door ahead is firmly sealed! You must defeat ELITE FOUR BRUNO first!'], '🔒 CHAMBER DOOR');
       return;
     }
 
     if (warp.targetMapId === 'lances_room' && !storyFlags.has('karen_defeated')) {
-      player.isMoving = false;
-      player.progress = 0;
-      setCutsceneLocked(false);
-      BattleAudio.playMenuSound('CANCEL');
-      overworldHUD.openDialogue(
-        ['The door to the CHAMPION\'S chamber remains firmly shut! Defeat ELITE FOUR KAREN to proceed!'],
-        '🔒 CHAMBER DOOR'
-      );
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false); BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(["The door ahead is firmly sealed! You must defeat ELITE FOUR KAREN first!"], '🔒 CHAMBER DOOR');
+      return;
+    }
+
+    if (warp.targetMapId === 'hall_of_fame' && !storyFlags.has('champion_defeated')) {
+      player.isMoving = false; player.progress = 0; setCutsceneLocked(false); BattleAudio.playMenuSound('CANCEL');
+      overworldHUD.openDialogue(["The door ahead is firmly sealed! You must defeat the CHAMPION first!"], '🔒 CHAMBER DOOR');
       return;
     }
 

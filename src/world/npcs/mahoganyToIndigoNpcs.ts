@@ -290,87 +290,46 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
 
     wills_room: [
       makeNpc('e4_will', 5, 5, 'DOWN', 'psychic', '🎭 ELITE FOUR WILL', ["WILL: Welcome to the POKéMON LEAGUE! I am WILL, master of psychic power!"], {
-        action: 'E4_WILL_EVENT',
-        trainerId: 'will',
-        trainerName: 'Elite Four Will',
+        action: 'E4_WILL_EVENT', trainerId: 'will', trainerName: 'Elite Four Will',
         challengePages: ["WILL: I have trained all over the world to hone my psychic powers. Even if you defeated all 8 GYM LEADERS, you cannot break through my mind!"],
         trainerPokemon: { speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] },
-        trainerTeam: [
-          { speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] },
-          { speciesId: 'jynx', level: 41, moves: ['icepunch', 'lovelykiss', 'psychic'] },
-          { speciesId: 'exeggutor', level: 41, moves: ['reflect', 'eggbomb', 'psychic'] },
-          { speciesId: 'slowbro', level: 41, moves: ['amnesia', 'surf', 'psychic'] },
-          { speciesId: 'xatu', level: 42, moves: ['confuseray', 'psychic', 'future-sight'] },
-        ],
+        trainerTeam: [{ speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] }, { speciesId: 'jynx', level: 41, moves: ['icepunch', 'lovelykiss', 'psychic'] }, { speciesId: 'exeggutor', level: 41, moves: ['reflect', 'eggbomb', 'psychic'] }, { speciesId: 'slowbro', level: 41, moves: ['amnesia', 'surf', 'psychic'] }, { speciesId: 'xatu', level: 42, moves: ['confuseray', 'psychic', 'future-sight'] }],
       }),
     ],
 
     kogas_room: [
       makeNpc('e4_koga', 5, 5, 'DOWN', 'super_nerd', '🥷 ELITE FOUR KOGA', ["KOGA: Fwahahaha! A mere child reached me?! I am KOGA of the ELITE FOUR!"], {
-        action: 'E4_KOGA_EVENT',
-        trainerId: 'koga',
-        trainerName: 'Elite Four Koga',
+        action: 'E4_KOGA_EVENT', trainerId: 'koga', trainerName: 'Elite Four Koga',
         challengePages: ["KOGA: I have mastered ancient ninja techniques and toxic poisons! Feel the creeping dread of darkness!"],
         trainerPokemon: { speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] },
-        trainerTeam: [
-          { speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] },
-          { speciesId: 'venomoth', level: 41, moves: ['supersonic', 'gust', 'toxic'] },
-          { speciesId: 'forretress', level: 43, moves: ['spikes', 'swift', 'explosion'] },
-          { speciesId: 'muk', level: 42, moves: ['minimize', 'acid-armor', 'sludge-bomb'] },
-          { speciesId: 'crobat', level: 44, moves: ['wing-attack', 'confuseray', 'toxic'] },
-        ],
+        trainerTeam: [{ speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] }, { speciesId: 'venomoth', level: 41, moves: ['supersonic', 'gust', 'toxic'] }, { speciesId: 'forretress', level: 43, moves: ['spikes', 'swift', 'explosion'] }, { speciesId: 'muk', level: 42, moves: ['minimize', 'acid-armor', 'sludge-bomb'] }, { speciesId: 'crobat', level: 44, moves: ['wing-attack', 'confuseray', 'toxic'] }],
       }),
     ],
 
     brunos_room: [
       makeNpc('e4_bruno', 5, 5, 'DOWN', 'blackbelt', '🥋 ELITE FOUR BRUNO', ["BRUNO: I am BRUNO of the ELITE FOUR! Through rigorous training, humans and POKéMON become one!"], {
-        action: 'E4_BRUNO_EVENT',
-        trainerId: 'bruno',
-        trainerName: 'Elite Four Bruno',
+        action: 'E4_BRUNO_EVENT', trainerId: 'bruno', trainerName: 'Elite Four Bruno',
         challengePages: ["BRUNO: We have lived and trained together in the deepest mountains! Feel our iron fists!"],
         trainerPokemon: { speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] },
-        trainerTeam: [
-          { speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] },
-          { speciesId: 'hitmonlee', level: 42, moves: ['jump-kick', 'high-jump-kick', 'foresight'] },
-          { speciesId: 'hitmonchan', level: 42, moves: ['thunderpunch', 'icepunch', 'firepunch'] },
-          { speciesId: 'onix', level: 43, moves: ['rock-throw', 'earthquake', 'slam'] },
-          { speciesId: 'machamp', level: 46, moves: ['cross-chop', 'rock-slide', 'vital-throw'] },
-        ],
+        trainerTeam: [{ speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] }, { speciesId: 'hitmonlee', level: 42, moves: ['jump-kick', 'high-jump-kick', 'foresight'] }, { speciesId: 'hitmonchan', level: 42, moves: ['thunderpunch', 'icepunch', 'firepunch'] }, { speciesId: 'onix', level: 43, moves: ['rock-throw', 'earthquake', 'slam'] }, { speciesId: 'machamp', level: 46, moves: ['cross-chop', 'rock-slide', 'vital-throw'] }],
       }),
     ],
 
     karens_room: [
       makeNpc('e4_karen', 5, 5, 'DOWN', 'cooltrainer_f', '🌙 ELITE FOUR KAREN', ["KAREN: I am KAREN of the ELITE FOUR. Strong POKéMON. Weak POKéMON. That is only the selfish perception of people."], {
-        action: 'E4_KAREN_EVENT',
-        trainerId: 'karen',
-        trainerName: 'Elite Four Karen',
+        action: 'E4_KAREN_EVENT', trainerId: 'karen', trainerName: 'Elite Four Karen',
         challengePages: ["KAREN: Truly skilled trainers should try to win with their favorites. Let me show you what real bond means!"],
         trainerPokemon: { speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] },
-        trainerTeam: [
-          { speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] },
-          { speciesId: 'vileplume', level: 42, moves: ['stun-spore', 'acid', 'moonlight', 'petaldance'] },
-          { speciesId: 'gengar', level: 45, moves: ['shadowball', 'spite', 'curse', 'lick'] },
-          { speciesId: 'murkrow', level: 44, moves: ['faint-attack', 'wing-attack', 'whirlwind'] },
-          { speciesId: 'houndoom', level: 47, moves: ['flamethrower', 'crunch', 'roar'] },
-        ],
+        trainerTeam: [{ speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] }, { speciesId: 'vileplume', level: 42, moves: ['stun-spore', 'acid', 'moonlight', 'petaldance'] }, { speciesId: 'gengar', level: 45, moves: ['shadowball', 'spite', 'curse', 'lick'] }, { speciesId: 'murkrow', level: 44, moves: ['faint-attack', 'wing-attack', 'whirlwind'] }, { speciesId: 'houndoom', level: 47, moves: ['flamethrower', 'crunch', 'roar'] }],
       }),
     ],
 
     lances_room: [
       makeNpc('champion_lance', 5, 6, 'DOWN', 'cooltrainer_m', '👑 CHAMPION LANCE', ["LANCE: I have been waiting for you, trainer. I knew that you, with your valor and bond, would reach me."], {
-        action: 'CHAMPION_LANCE_EVENT',
-        trainerId: 'lance',
-        trainerName: 'Champion Lance',
+        action: 'CHAMPION_LANCE_EVENT', trainerId: 'lance', trainerName: 'Champion Lance',
         challengePages: ["LANCE: As the POKéMON LEAGUE CHAMPION, I accept your challenge! Dragon-types are invincible! Let's begin!"],
         trainerPokemon: { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
-        trainerTeam: [
-          { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
-          { speciesId: 'dragonite', level: 47, moves: ['thunderwave', 'twister', 'hyperbeam'] },
-          { speciesId: 'dragonite', level: 47, moves: ['blizzard', 'twister', 'hyperbeam'] },
-          { speciesId: 'aerodactyl', level: 46, moves: ['wing-attack', 'rock-slide', 'hyperbeam'] },
-          { speciesId: 'charizard', level: 46, moves: ['flamethrower', 'wing-attack', 'slash'] },
-          { speciesId: 'dragonite', level: 50, moves: ['outrage', 'safeguard', 'hyperbeam', 'fire-blast'] },
-        ],
+        trainerTeam: [{ speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] }, { speciesId: 'dragonite', level: 47, moves: ['thunderwave', 'twister', 'hyperbeam'] }, { speciesId: 'dragonite', level: 47, moves: ['blizzard', 'twister', 'hyperbeam'] }, { speciesId: 'aerodactyl', level: 46, moves: ['wing-attack', 'rock-slide', 'hyperbeam'] }, { speciesId: 'charizard', level: 46, moves: ['flamethrower', 'wing-attack', 'slash'] }, { speciesId: 'dragonite', level: 50, moves: ['outrage', 'safeguard', 'hyperbeam', 'fire-blast'] }],
       }),
     ],
 
@@ -425,6 +384,35 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('route_29_route_46_gate_youngster', 6, 4, 'LEFT', 'youngster', '👦 BOY', [
         'If you jump down ledges, you cannot get back up without circling around.',
       ], { action: 'ROUTE_46_GATE_YOUNGSTER' }),
+    ],
+
+    indigo_plateau_poke_center: [
+      makeNpc('indigo_plateau_nurse', 3, 7, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', [
+        'Welcome to the POKéMON LEAGUE POKéMON CENTER!',
+        'We can heal your POKéMON to perfect health before your big challenge.',
+      ], { action: 'HEAL_AND_SAVE', talkAcrossCounter: true }),
+      makeNpc('indigo_plateau_clerk', 11, 7, 'DOWN', 'clerk', '🏪 MART CLERK', [
+        'Welcome! Stock up on medicine and ULTRA BALLS before challenging the ELITE FOUR!',
+      ], { action: 'OPEN_MART', talkAcrossCounter: true }),
+      makeNpc('indigo_teleport_guy', 1, 9, 'DOWN', 'elder', '👴 TELEPORT GRAMPS', [
+        'Ah! You are challenging the ELITE FOUR? If you need to train some more, my ABRA can TELEPORT you home to NEW BARK TOWN!',
+      ], { action: 'INDIGO_TELEPORT_EVENT' }),
+      makeNpc('indigo_teleport_abra', 0, 9, 'DOWN', 'psychic', '🔮 ABRA', [
+        'ABRA: Aabra…',
+      ]),
+      makeNpc('indigo_league_guard', 14, 4, 'DOWN', 'officer', '👮 LEAGUE GUARD', [
+        'Beyond this door lie the chambers of the ELITE FOUR!',
+      ], { action: 'INDIGO_LEAGUE_GUARD' }),
+      makeNpc('indigo_cooltrainer_m', 11, 11, 'DOWN', 'cooltrainer_m', '👦 COOLTRAINER', [
+        'The ELITE FOUR use psychic, poison, fighting, and dark types. Prepare your party well!',
+      ]),
+    ],
+
+    hall_of_fame: [
+      makeNpc('hall_of_fame_lance', 4, 2, 'DOWN', 'cooltrainer_m', '👑 CHAMPION LANCE', [
+        'Welcome to the HALL OF FAME!',
+        'Step forward to the induction machine to record your victory for all eternity!',
+      ], { action: 'HALL_OF_FAME_EVENT' }),
     ],
 
     ...createRoute26And27Npcs(),
