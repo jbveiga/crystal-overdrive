@@ -10,8 +10,9 @@
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
 import { createMahoganyToIndigoNpcs } from './mahoganyToIndigoNpcs';
+import { createSeaRoutesNpcs } from './seaRoutesNpcs';
 
-export { createMahoganyToIndigoNpcs };
+export { createMahoganyToIndigoNpcs, createSeaRoutesNpcs };
 
 export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
   return {
@@ -278,63 +279,8 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
       ),
     ],
 
-    route_40: [
-      makeNpc('swimmer_simon', 12, 6, 'DOWN', 'boy', '🏊 SWIMMER SIMON', ['The ocean currents are strong!'], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'swimmer_simon',
-        trainerName: 'Swimmer Simon',
-        visionRange: 2,
-        challengePages: ['SIMON: Ready for a swim battle in the waves of Route 40?'],
-        trainerPokemon: { speciesId: 'tentacool', level: 20, moves: ['poisonsting', 'watergun', 'constrict'] },
-        trainerTeam: [
-          { speciesId: 'tentacool', level: 20, moves: ['poisonsting', 'watergun', 'constrict'] },
-          { speciesId: 'staryu', level: 20, moves: ['tackle', 'watergun', 'harden'] },
-        ],
-      }),
-      makeNpc('swimmer_elaine', 14, 5, 'DOWN', 'girl', '🏊‍♀️ SWIMMER ELAINE', ['Staryu spins smoothly through water!'], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'swimmer_elaine',
-        trainerName: 'Swimmer Elaine',
-        visionRange: 2,
-        challengePages: ['ELAINE: Swimming across to Cianwood is my morning exercise!'],
-        trainerPokemon: { speciesId: 'staryu', level: 21, moves: ['watergun', 'swift', 'recover'] },
-        trainerTeam: [{ speciesId: 'staryu', level: 21, moves: ['watergun', 'swift', 'recover'] }],
-      }),
-      makeNpc('monica_of_monday', 10, 12, 'DOWN', 'girl', '🎀 MONICA OF MONDAY', 
-        [
-          "MONICA: Hello! I'm MONICA of Monday! As a token of friendship, please take this!",
-          "It's a SHARP BEAK! It boosts the power of FLYING-type moves!",
-        ],
-        { action: 'DAY_SIBLING_EVENT' }
-      ),
-    ],
+    ...createSeaRoutesNpcs(),
 
-    route_41: [
-      makeNpc('swimmer_charlie', 12, 19, 'DOWN', 'boy', '🏊 SWIMMER CHARLIE', ['Shellder clamps tight on foes!'], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'swimmer_charlie',
-        trainerName: 'Swimmer Charlie',
-        visionRange: 2,
-        challengePages: ['CHARLIE: The whirlpools ahead are treacherous! Turn back unless you have Surf!'],
-        trainerPokemon: { speciesId: 'shellder', level: 21, moves: ['tackle', 'withdraw', 'iciclespear'] },
-        trainerTeam: [
-          { speciesId: 'shellder', level: 21, moves: ['tackle', 'withdraw', 'iciclespear'] },
-          { speciesId: 'cloyster', level: 23, moves: ['aurorabeam', 'spikycannon', 'protect'] },
-        ],
-      }),
-      makeNpc('swimmer_denise', 36, 21, 'DOWN', 'girl', '🏊‍♀️ SWIMMER DENISE', ['Dewgong swims gracefully in cold seas.'], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'swimmer_denise',
-        trainerName: 'Swimmer Denise',
-        visionRange: 2,
-        challengePages: ['DENISE: Have you seen the mysterious caverns inside the Whirl Islands?'],
-        trainerPokemon: { speciesId: 'seel', level: 22, moves: ['headbutt', 'aurorabeam', 'growl'] },
-        trainerTeam: [
-          { speciesId: 'seel', level: 22, moves: ['headbutt', 'aurorabeam', 'growl'] },
-          { speciesId: 'dewgong', level: 24, moves: ['aurorabeam', 'surf', 'rest'] },
-        ],
-      }),
-    ],
 
     cianwood_city: [
       makeNpc('cianwood_youngster', 21, 37, 'DOWN', 'boy', '👦 YOUNGSTER', [

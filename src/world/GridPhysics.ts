@@ -227,14 +227,16 @@ export class GridPhysics {
         continue;
       }
 
+      const isNpcOnWater = getTileType(npc.x, npc.y) === 3;
       const delta = this.getDirectionDelta(npc.direction);
       for (let dist = 1; dist <= npc.visionRange; dist++) {
         const tx = npc.x + delta.dx * dist;
         const ty = npc.y + delta.dy * dist;
 
-        // Vision is blocked by solid walls/trees (1), water (3), or ledges/fences (4..9)
+        // Vision is blocked by solid walls/trees (1), ledges/fences (4..9), or water (3) when trainer is on land
         const tileType = getTileType(tx, ty);
-        if (tileType === 1 || tileType === 3 || (tileType >= 4 && tileType <= 9)) {
+        const isWaterBlocked = tileType === 3 && !isNpcOnWater;
+        if (tileType === 1 || isWaterBlocked || (tileType >= 4 && tileType <= 9)) {
           break;
         }
 

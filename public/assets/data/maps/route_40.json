@@ -2181,15 +2181,23 @@
       "offset": -30
     }
   },
-  "warps": [],
+  "warps": [
+    {
+      "x": 9,
+      "y": 5,
+      "targetMapId": "route_40_battle_tower_gate",
+      "targetX": 4,
+      "targetY": 6
+    }
+  ],
   "bgEvents": [
     {
       "x": 14,
-      "y": 5,
+      "y": 10,
       "speaker": "📍 ROUTE 40 SIGN",
       "pages": [
         "ROUTE 40",
-        "Cianwood City Ahead across the sea"
+        "CIANWOOD CITY - OLIVINE CITY"
       ]
     }
   ],

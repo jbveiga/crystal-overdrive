@@ -666,9 +666,13 @@ describe('MapData & Authentic Tile Integrity', () => {
         const gx = npc.gridX ?? npc.x;
         const gy = npc.gridY ?? npc.y;
         const tileVal = mapData.collisionGrid[gy * mapData.width + gx];
+        const allowedTiles =
+          mapId === 'route_40' || mapId === 'route_41' || mapId.includes('whirl_island')
+            ? [0, 2, 3]
+            : [0, 2];
         expect(
-          [0, 2],
-          `NPC ${npc.id} in ${mapId} at (${gx}, ${gy}) must be on a walkable tile (0 or 2) but found ${tileVal}`
+          allowedTiles,
+          `NPC ${npc.id} in ${mapId} at (${gx}, ${gy}) must be on a walkable tile (${allowedTiles.join(' or ')}) but found ${tileVal}`
         ).toContain(tileVal);
       }
     }

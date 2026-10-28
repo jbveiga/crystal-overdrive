@@ -80,7 +80,8 @@ while ((mapMatch = mapSectionRegex.exec(npcDataSrc)) !== null) {
     const y = parseInt(npcMatch[3], 10);
 
     const tileVal = mapData.collisionGrid[y * mapData.width + x];
-    if (tileVal !== 0 && tileVal !== 2) {
+    const isWaterTileAllowed = (mapId === 'route_40' || mapId === 'route_41' || mapId.includes('whirl_island')) && tileVal === 3;
+    if (tileVal !== 0 && tileVal !== 2 && !isWaterTileAllowed) {
       console.error(`  ❌ NPC "${npcId}" in ${mapId} at (${x}, ${y}) is non-walkable (tile: ${tileVal})!`);
       npcWalkabilityFailures++;
       totalIssues++;
