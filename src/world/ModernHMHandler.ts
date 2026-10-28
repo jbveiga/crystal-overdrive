@@ -10,7 +10,7 @@
 import type { PokemonInstance } from '../types/game';
 import type { BagInventory } from '../ui/BagAndMartUI';
 
-export type HMFieldMoveId = 'cut' | 'flash' | 'surf' | 'strength' | 'fly' | 'whirlpool';
+export type HMFieldMoveId = 'cut' | 'flash' | 'surf' | 'strength' | 'fly' | 'whirlpool' | 'waterfall';
 
 export interface HMFieldCheckResult {
   allowed: boolean;
@@ -153,7 +153,7 @@ export class ModernHMHandler {
     if (moveId === 'fly') {
       return FLY_COMPATIBLE_SPECIES.has(normalized);
     }
-    if (moveId === 'whirlpool') {
+    if (moveId === 'whirlpool' || moveId === 'waterfall') {
       return WHIRLPOOL_COMPATIBLE_SPECIES.has(normalized);
     }
     return false;
@@ -493,16 +493,19 @@ export class ModernHMHandler {
     }
 
     if (!partyKnowsStrength) {
-      return this.makeResult(
-        false,
-        hasBadge,
-        hasHM,
-        compatiblePokemon,
-        'A POKéMON in your party must know STRENGTH in its battle moves to push boulders!'
-      );
+      return this.makeResult(false, hasBadge, hasHM, compatiblePokemon,
+        'A POKéMON in your party must know STRENGTH in its battle moves to push boulders!');
     }
 
     return this.makeResult(true, true, true, partyKnowsStrength);
+  }
+
+  public static canUseStrength(
+    party: PokemonInstance[],
+    inventory: BagInventory,
+    storyFlags: Set<string> = new Set()
+  ): HMFieldCheckResult {
+    return this.checkStrength(inventory, storyFlags, party);
   }
 
   /**
@@ -665,6 +668,75 @@ export class ModernHMHandler {
         true,
         compatiblePokemon,
         'It is a fierce whirlpool! Defeat Leader Pryce at Mahogany Gym to earn the GLACIER BADGE first.'
+      );
+    }
+
+    return this.makeResult(true, true, true, compatiblePokemon);
+  }
+
+  /**
+   * Evaluates requirements for traversing a vertical cascading waterfall (HM07 Waterfall).
+   * Requires RISING BADGE from Blackthorn Gym and HM07 Waterfall.
+   */
+  public static canUseWaterfall(
+    party: PokemonInstance[],
+    inventory: BagInventory | Partial<BagInventory>,
+    storyFlags: Set<string> = new Set()
+  ): HMFieldCheckResult {
+    const badges = (inventory.badges || []).map((b) => b.toLowerCase());
+    const tms = (inventory.tms || []).map((t) => t.toUpperCase());
+
+    const hasBadge =
+      badges.includes('rising') ||
+      badges.includes('rising_badge') ||
+      badges.includes('risingbadge') ||
+      storyFlags.has('clair_defeated') ||
+      storyFlags.has('has_rising_badge') ||
+      storyFlags.has('risingbadge');
+
+    const partyKnowsWaterfall = party.find(
+      (p) => !p.isEgg && p.moves?.some((m) => m.moveId.toLowerCase() === 'waterfall')
+    );
+
+    const hasHM =
+      tms.includes('HM07') ||
+      tms.includes('HM07_WATERFALL') ||
+      storyFlags.has('has_hm07_waterfall') ||
+      storyFlags.has('EVENT_GOT_HM07_WATERFALL') ||
+      Boolean(partyKnowsWaterfall);
+
+    const nonEggParty = party.filter((p) => !p.isEgg);
+    const compatiblePokemon =
+      partyKnowsWaterfall ||
+      nonEggParty.find((p) => this.canSpeciesUseFieldHM(p.speciesId, 'waterfall')) ||
+      nonEggParty.find((p) => p.types?.includes('Water')) ||
+      null;
+
+    if (!compatiblePokemon) {
+      return this.makeResult(
+        false, hasBadge, hasHM, null,
+        'A wall of rushing water cascades downward! You need a compatible Pokémon that knows Waterfall or can learn it.'
+      );
+    }
+
+    if (!hasBadge && !hasHM) {
+      return this.makeResult(
+        false, false, false, compatiblePokemon,
+        'A wall of rushing water cascades downward! You need HM07 WATERFALL and the RISING BADGE from Blackthorn Gym.'
+      );
+    }
+
+    if (!hasHM) {
+      return this.makeResult(
+        false, true, false, compatiblePokemon,
+        'A wall of rushing water cascades downward! Explore the Ice Path to find HM07 WATERFALL.'
+      );
+    }
+
+    if (!hasBadge) {
+      return this.makeResult(
+        false, false, true, compatiblePokemon,
+        'A wall of rushing water cascades downward! Defeat Leader Clair at Blackthorn Gym to earn the RISING BADGE first.'
       );
     }
 

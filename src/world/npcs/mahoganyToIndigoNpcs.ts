@@ -407,5 +407,19 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
         }
       ),
     ],
+
+    ice_path_b1f: [
+      makeNpc('ice_path_b1f_boulder_1', 11, 7, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder! It can be moved with STRENGTH.'], { action: 'STRENGTH_BOULDER' }),
+      makeNpc('ice_path_b1f_boulder_2', 7, 8, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder! It can be moved with STRENGTH.'], { action: 'STRENGTH_BOULDER' }),
+      makeNpc('ice_path_b1f_boulder_3', 8, 9, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder! It can be moved with STRENGTH.'], { action: 'STRENGTH_BOULDER' }),
+      makeNpc('ice_path_b1f_boulder_4', 17, 7, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder! It can be moved with STRENGTH.'], { action: 'STRENGTH_BOULDER' }),
+    ],
+
+    ice_path_b2f_mahogany_side: [
+      makeNpc('ice_path_b2f_boulder_1', 11, 4, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from the floor above!']),
+      makeNpc('ice_path_b2f_boulder_2', 4, 6, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from the floor above!']),
+      makeNpc('ice_path_b2f_boulder_3', 4, 12, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from the floor above!']),
+      makeNpc('ice_path_b2f_boulder_4', 12, 12, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from the floor above!']),
+    ],
   };
 }

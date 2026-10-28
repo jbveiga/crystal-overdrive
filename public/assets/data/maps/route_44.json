@@ -3270,7 +3270,28 @@
       "targetY": 19
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 53,
+      "y": 7,
+      "type": "SIGN",
+      "text": "ROUTE 44\nICE PATH AHEAD",
+      "speaker": "🪧 ROUTE 44 SIGN",
+      "pages": [
+        "ROUTE 44\nICE PATH AHEAD"
+      ]
+    },
+    {
+      "x": 6,
+      "y": 10,
+      "type": "SIGN",
+      "text": "ROUTE 44\nMAHOGANY TOWN - BLACKTHORN CITY",
+      "speaker": "🪧 ROUTE 44 SIGN",
+      "pages": [
+        "ROUTE 44\nMAHOGANY TOWN - BLACKTHORN CITY"
+      ]
+    }
+  ],
   "grassEncounters": [
     {
       "speciesId": "tangela",

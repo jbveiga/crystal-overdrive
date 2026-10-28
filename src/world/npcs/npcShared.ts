@@ -456,6 +456,16 @@ export function isNpcActiveForStoryFlags(
     return !storyFlags.has('lugia_defeated') && !storyFlags.has('EVENT_FOUGHT_LUGIA');
   }
 
+  // Ice Path B1F & B2F Strength Boulders
+  if (npcId.startsWith('ice_path_b1f_boulder_')) {
+    const num = npcId.split('_').pop();
+    return !storyFlags.has(`EVENT_BOULDER_IN_ICE_PATH_${num}`);
+  }
+  if (npcId.startsWith('ice_path_b2f_boulder_')) {
+    const num = npcId.split('_').pop();
+    return storyFlags.has(`EVENT_BOULDER_IN_ICE_PATH_${num}`);
+  }
+
   // Victory Road Rival & Indigo Plateau Elite Four (Act 9)
   if (npcId === 'victory_road_rival') {
     return !storyFlags.has('victory_road_rival_defeated');
