@@ -106,6 +106,66 @@ const { ISSUE_RESOLUTIONS } = (() => {
 - **Fix**:
   1. Added unified static helpers \`MapManager.isDungeonOrCaveMap(mapId)\` and \`MapManager.canTriggerWildEncounter(mapId, tileType)\` in \`src/world/MapManager.ts\`.
   2. Updated both \`src/main.ts\` and \`MapManager.rollWildEncounter()\` to use \`MapManager.canTriggerWildEncounter(mapId, tileType)\`, enabling authentic Morning/Day/Night floor and pond wild encounters throughout \`ilex_forest\`.`,
+      26: `### Resolution Details for Issue #26
+- **Root Cause**: Starter selection logic in \`src/main.ts\` and Elm's Lab table interactions had conflicting starter poke ball coordinates and event flag state checks.
+- **Fix**:
+  1. Synchronized starter ball coordinates in Elm's Lab to authentic positions: Cyndaquil (6, 3), Totodile (7, 3), Chikorita (8, 3).
+  2. Enforced single-starter selection invariant, disabling remaining balls once a starter is chosen.
+  3. Added verified unit and integration tests in \`tests/Issue26StarterReconciliation.test.ts\`.`,
+      27: `### Resolution Details for Issue #27
+- **Commit**: 642fbc3
+- **Root Cause**: \`goldenrod_underground_switch_room_entrances.json\` was compiled with incorrect block dimensions (10x18) and omitted 6 of the 9 authentic pret warps, trapping players at (23, 3) or leading to void boundaries.
+- **Fix**:
+  1. Recompiled map from authentic \`pokecrystal\` disassembly with correct \`blocksW: 15, blocksH: 18\` (width 30, height 36 step tiles).
+  2. Populated all 9 canonical warps: (22, 3), (23, 3) -> Goldenrod City (35, 31); (22, 33), (23, 33) -> Warehouse (4, 1); (17, 27) -> Switch Room (11, 8); (28, 19) -> Switch Room (4, 15); (29, 19) -> Switch Room (5, 15); (28, 29) -> Switch Room (4, 25); (29, 29) -> Switch Room (5, 25).
+  3. Added verified integration tests in \`tests/bugfixes/githubIssues27Through34.test.ts\`.`,
+      28: `### Resolution Details for Issue #28
+- **Commit**: 642fbc3
+- **Root Cause**: Route 34 Day-Care building entrance door at (12, 15) had solid collision (\`1\`) in \`route_34.json\`, preventing player entry. In addition, \`day_care.json\` exit warps lacked reciprocal threshold alignment with the Route 34 landing tile.
+- **Fix**:
+  1. Updated \`public/assets/data/maps/route_34.json\` coordinate (12, 15) to walkable \`0\` with door warp targeting \`day_care (2, 7)\`. Set step tile (12, 16) to walkable \`0\`.
+  2. Updated \`day_care.json\` front door warps at (2, 7) and (3, 7) to reciprocally return to Route 34 (12, 16).
+  3. Configured side yard warps at (0, 5) and (0, 6) to exit to Route 34 fenced yard at (13, 15).`,
+      29: `### Resolution Details for Issue #29
+- **Commit**: 642fbc3
+- **Root Cause**: Goldenrod Dept Store 1F door warp at (2, 0) targeted non-existent elevator map, causing player transition into unmapped memory.
+- **Fix**:
+  1. Created authentic 6x6 \`goldenrod_dept_store_elevator.json\` with door exit warp at (2, 5) and (3, 5) returning to Dept Store floors.
+  2. Added elevator panel bgEvent \`DEPT_ELEVATOR_PANEL\` at (4, 1) and elevator attendant NPC \`dept_elevator_attendant\` at (2, 1).
+  3. Connected all Dept Store floors (1F through 6F) door warps at (2, 0) to \`goldenrod_dept_store_elevator (2, 5)\`.`,
+      30: `### Resolution Details for Issue #30
+- **Commit**: 642fbc3
+- **Root Cause**: Receptionist \`dept_rec\` on Goldenrod Dept Store 1F was placed at (10, 2), occupying the counter collision tile and causing player collision conflicts.
+- **Fix**:
+  1. Repositioned receptionist behind the counter to coordinate (10, 1) facing \`DOWN\` with \`talkAcrossCounter: true\`.
+  2. Talking to (10, 1) from across the counter at (10, 2) cleanly opens the 6-floor store directory dialogue.`,
+      31: `### Resolution Details for Issue #31
+- **Commit**: 642fbc3
+- **Root Cause**: Camper Mike NPC was missing from Goldenrod Dept Store 5F at (7, 3), preventing the authentic in-game trade for Machop ("CHRIS").
+- **Fix**:
+  1. Added Camper Mike NPC \`dept_5f_mike\` at (7, 3) facing \`LEFT\` with action \`DEPT_STORE_TRADE_MIKE\`.
+  2. Implemented authentic Gen 2 trade workflow: player trades Drowzee for Machop (Lv. 15, Nickname "CHRIS", OT "MIKE", ID 25740, moves \`['karatechop', 'lowkick', 'leer', 'focusenergy']\`, holding Gold Berry).
+  3. Trade sets persistent event flag \`traded_machop_chris\` and updates dialog to post-trade gratitude.`,
+      32: `### Resolution Details for Issue #32
+- **Commit**: 642fbc3
+- **Root Cause**: Dept Store 6F vending machines were blocked by an out-of-place fat man NPC placed at (10, 1), and machines at (8, 1), (9, 1), and (10, 1) lacked interactive bgEvent bindings.
+- **Fix**:
+  1. Removed misplaced NPC from (10, 1).
+  2. Registered all 3 vending machines at (8, 1), (9, 1), and (10, 1) as \`bgEvents\` with action \`'VENDING_MACHINE'\`.
+  3. Vending machines dispense Fresh Water (¥200), Soda Pop (¥300), and Lemonade (¥350) with currency validation and inventory insertion.`,
+      33: `### Resolution Details for Issue #33
+- **Commit**: 642fbc3
+- **Root Cause**: Elevator UI included the Roof (ROOF) option, violating authentic Gen 2 Crystal layout where the Dept Store elevator strictly services B1F through 6F (Roof is accessed exclusively by 6F stairs).
+- **Fix**:
+  1. Updated \`DEPT_STORE_FLOORS\` in \`src/ui/DeptStoreElevatorUI.ts\` to strictly B1F through 6F (7 floors), permanently removing Roof access from elevator floor select.
+  2. Verified roof navigation remains accessible solely via authentic 6F stairs.`,
+      34: `### Resolution Details for Issue #34
+- **Commit**: 642fbc3
+- **Root Cause**: Goldenrod Magnet Train Station (\`goldenrod_magnet_train_station.json\`) was compiled using standard \`indoor\` tileset, resulting in missing train track textures, mismatched platform boundaries, and incorrect collision.
+- **Fix**:
+  1. Updated \`scripts/generate-authentic-tiles.cjs\` to map \`goldenrod_magnet_train_station\` to authentic \`tileset: 'train_station'\`.
+  2. Recompiled map with authentic station platform tiles, boarding gates, tracks, and reciprocal station warps.
+  3. Verified collision grid: platforms are walkable \`0\` while train tracks are solid \`1\` boundary.`,
     },
   };
 })();
