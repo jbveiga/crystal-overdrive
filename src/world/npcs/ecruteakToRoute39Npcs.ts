@@ -262,7 +262,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     ecruteak_itemfinder_house: [
-      makeNpc('item_man', 3, 3, 'DOWN', 'fat_man', '🔍 ITEM COLLECTOR', 
+      makeNpc('item_man', 2, 3, 'DOWN', 'fat_man', '🔍 ITEM COLLECTOR', 
         [
           "There are countless items hidden in the grass, rocks, and ruins of Johto that aren't obvious to the naked eye.",
           'Aha! I see you already have the upgraded Neo-Kanto Dowsing Machine equipped! It projects a real-time radar beam pointing straight toward buried treasures within 8 paces!',

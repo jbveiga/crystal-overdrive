@@ -1470,7 +1470,7 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'violet_nickname_speech_house',
   name: 'Nickname Speech House',
-  tileset: 'house',
+  tileset: 'traditional_house',
   blkFile: 'maps__House2.blk',
   blocksW: 4,
   blocksH: 4,
@@ -1712,8 +1712,8 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'ruins_of_alph_research_center',
   name: 'Ruins Research Center',
-  tileset: 'house',
-  blkFile: 'maps__House1.blk',
+  tileset: 'facility',
+  blkFile: 'maps__RuinsOfAlphResearchCenter.blk',
   blocksW: 4,
   blocksH: 4,
   warps: [
@@ -2918,7 +2918,7 @@ buildMapFromBlk({
   id: 'ecruteak_itemfinder_house',
   name: 'Ecruteak Itemfinder House',
   tileset: 'traditional_house',
-  blkFile: 'maps__House1.blk',
+  blkFile: 'maps__House2.blk',
   blocksW: 4,
   blocksH: 4,
   warps: [

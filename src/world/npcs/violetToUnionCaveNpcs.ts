@@ -307,7 +307,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
         ['The ruins are quiet today... We are researching ancient glyphs, but our equipment detects no active signals from the chambers.'],
         { action: 'UNOWN_DEX_EVENT' }
       ),
-      makeNpc('research_scientist2', 5, 4, 'LEFT', 'sage', '🔬 RESEARCH ASSISTANT', 
+      makeNpc('research_scientist2', 5, 2, 'LEFT', 'sage', '🔬 RESEARCH ASSISTANT', 
         ['The past and future intertwine in these ancient stones. They date back over 1,500 years!']
       ),
     ],
