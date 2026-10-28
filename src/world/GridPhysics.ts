@@ -52,6 +52,8 @@ export type NpcSpriteType =
   | 'slowpoke'
   | 'farfetchd'
   | 'blackbelt'
+  | 'black_belt'
+  | 'boulder'
   | 'cooltrainer_f'
   | 'cooltrainer_m'
   | 'suicune'
@@ -166,7 +168,11 @@ export interface GridEntity {
     | 'OLDER_HAIRCUT_BROTHER'
     | 'YOUNGER_HAIRCUT_BROTHER'
     | 'TIM_TRADE'
-    | 'PORT_SAILOR_GUARD';
+    | 'PORT_SAILOR_GUARD'
+    | 'ROUTE_42_SUICUNE_EVENT'
+    | 'ROUTE_42_GATE_OFFICER'
+    | 'STRENGTH_BOULDER'
+    | 'KIYO_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

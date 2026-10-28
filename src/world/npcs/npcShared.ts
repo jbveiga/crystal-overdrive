@@ -376,6 +376,11 @@ export function isNpcActiveForStoryFlags(
     return !storyFlags.has('EVENT_FOUGHT_EUSINE');
   }
 
+  // Route 42 Suicune
+  if (npcId === 'route_42_suicune') {
+    return !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_42');
+  }
+
   // Olivine Lighthouse 6F & Olivine Gym Jasmine lifecycle
   if (npcId === 'lighthouse_jasmine') {
     return !storyFlags.has('amphy_cured');

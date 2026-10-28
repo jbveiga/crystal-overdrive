@@ -230,6 +230,7 @@ export class OverworldTickerCoordinator {
       triggerAzaleaRivalAmbush,
       triggerOlivineRivalConfrontation,
       triggerCianwoodSuicuneAndEusine,
+      triggerRoute42Suicune,
       saveCurrentGame,
       triggerWildEncounter,
       addPlayTimeDelta,
@@ -346,6 +347,18 @@ export class OverworldTickerCoordinator {
             triggerCianwoodSuicuneAndEusine
           ) {
             triggerCianwoodSuicuneAndEusine();
+            return;
+          }
+
+          // Route 42 Suicune Sprint
+          if (
+            currentMap?.id === 'route_42' &&
+            coord.x === 24 &&
+            coord.y === 14 &&
+            !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_42') &&
+            triggerRoute42Suicune
+          ) {
+            triggerRoute42Suicune();
             return;
           }
 

@@ -3266,14 +3266,14 @@
       "x": 0,
       "y": 8,
       "targetMapId": "route_42_ecruteak_gate",
-      "targetX": 9,
+      "targetX": 8,
       "targetY": 4
     },
     {
       "x": 0,
       "y": 9,
       "targetMapId": "route_42_ecruteak_gate",
-      "targetX": 9,
+      "targetX": 8,
       "targetY": 5
     },
     {
@@ -3298,7 +3298,44 @@
       "targetY": 33
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 4,
+      "y": 10,
+      "speaker": "📍 ROUTE 42 SIGN",
+      "pages": [
+        "ROUTE 42",
+        "ECRUTEAK CITY - MAHOGANY TOWN"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 5,
+      "speaker": "🏔️ MT. MORTAR SIGN",
+      "pages": [
+        "MT.MORTAR",
+        "WATERFALL CAVE INSIDE"
+      ]
+    },
+    {
+      "x": 45,
+      "y": 9,
+      "speaker": "🏔️ MT. MORTAR SIGN",
+      "pages": [
+        "MT.MORTAR",
+        "WATERFALL CAVE INSIDE"
+      ]
+    },
+    {
+      "x": 54,
+      "y": 8,
+      "speaker": "📍 ROUTE 42 SIGN",
+      "pages": [
+        "ROUTE 42",
+        "ECRUTEAK CITY - MAHOGANY TOWN"
+      ]
+    }
+  ],
   "grassEncounters": [
     {
       "speciesId": "ekans",

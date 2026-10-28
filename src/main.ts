@@ -181,6 +181,7 @@ async function bootstrap() {
   const triggerBeastsAwakeningCutscene = () => StoryCutscenes.triggerBeastsAwakeningCutscene(getCutsceneContext());
   const triggerOlivineRivalConfrontation = () => StoryCutscenes.triggerOlivineRivalConfrontation(getCutsceneContext());
   const triggerCianwoodSuicuneAndEusine = () => StoryCutscenes.triggerCianwoodSuicuneAndEusine(getCutsceneContext());
+  const triggerRoute42Suicune = () => StoryCutscenes.triggerRoute42Suicune(getCutsceneContext());
 
   const saveCurrentGame = async () => {
     missionManager.checkStoryFlags(storyFlags);
@@ -569,6 +570,7 @@ async function bootstrap() {
     triggerCherrygroveRivalAmbush,
     triggerOlivineRivalConfrontation,
     triggerCianwoodSuicuneAndEusine,
+    triggerRoute42Suicune,
     saveCurrentGame,
     triggerWildEncounter: async (wildPkmn, options) => triggerBattle(wildPkmn, options),
     addPlayTimeDelta: (dtSec) => { playTimeSeconds += dtSec; },

@@ -512,26 +512,20 @@ export class StoryCutscenes {
     BattleAudio.playOverworldSound('KEY_ITEM');
     BattleAudio.playCry('suicune');
 
-    ctx.overworldHUD.openDialogue(
-      [
-        '🌊 A brilliant azure silhouette leaps gracefully across the breaking waves!',
-        'SUICUNE pauses atop the water, turns its majestic crystal crest toward you, and vanishes into the northern sea mist!',
-      ],
-      '🌊 SUICUNE',
-      () => {
-        ctx.storyFlags.add('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
-        ctx.audioManager.playBattleBgm('trainer');
+    ctx.overworldHUD.openDialogue([
+      '🌊 A brilliant azure silhouette leaps gracefully across the breaking waves!',
+      'SUICUNE pauses atop the water, turns its majestic crystal crest toward you, and vanishes into the northern sea mist!',
+    ], '🌊 SUICUNE', () => {
+      ctx.storyFlags.add('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
+      ctx.audioManager.playBattleBgm('trainer');
 
-        ctx.overworldHUD.openDialogue(
-          [
-            "EUSINE: Yo, " + (ctx.playerName || 'trainer') + ". Wasn't that SUICUNE just now?",
-            "I only caught a quick glimpse, but I thought I saw SUICUNE running on the waves.",
-            "SUICUNE is beautiful and grand. And it races through towns and roads at simply awesome speeds. It's wonderful…",
-            "I want to see SUICUNE up close… I've decided.",
-            "I'll battle you as a trainer to earn SUICUNE's respect! Come on, " + (ctx.playerName || 'trainer') + ". Let's battle now!",
-          ],
-          '🎩 MYSTICALMAN EUSINE',
-          () => {
+      ctx.overworldHUD.openDialogue([
+        "EUSINE: Yo, " + (ctx.playerName || 'trainer') + ". Wasn't that SUICUNE just now?",
+        "I only caught a quick glimpse, but I thought I saw SUICUNE running on the waves.",
+        "SUICUNE is beautiful and grand. And it races through towns and roads at simply awesome speeds. It's wonderful…",
+        "I want to see SUICUNE up close… I've decided.",
+        "I'll battle you as a trainer to earn SUICUNE's respect! Come on, " + (ctx.playerName || 'trainer') + ". Let's battle now!",
+      ], '🎩 MYSTICALMAN EUSINE', () => {
             const eusineTeam = [
               PokemonFactory.create('drowzee', 23, ['dreameater', 'hypnosis', 'disable', 'confusion']),
               PokemonFactory.create('haunter', 23, ['lick', 'hypnosis', 'meanlook', 'curse']),
@@ -564,6 +558,25 @@ export class StoryCutscenes {
         );
       }
     );
+  }
+
+  public static triggerRoute42Suicune(ctx: StoryCutsceneContext): void {
+    if (ctx.storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_42')) return;
+    ctx.setCutsceneLocked(true);
+    ctx.player.isMoving = false;
+    ctx.player.progress = 0;
+    BattleAudio.playOverworldSound('KEY_ITEM');
+    BattleAudio.playCry('suicune');
+
+    ctx.overworldHUD.openDialogue([
+      '💎 A brilliant azure silhouette dashes past the mountain trees at lightning speed!',
+      'SUICUNE bounds effortlessly across the water and leaps over the high mountain cliffs, disappearing to the east!',
+    ], '💎 SUICUNE', () => {
+      ctx.storyFlags.add('EVENT_SAW_SUICUNE_ON_ROUTE_42');
+      ctx.setCutsceneLocked(false);
+      void ctx.saveCurrentGame();
+      ctx.overworldHUD.showToast?.('💎 Suicune dashed across Route 42 towards the east!');
+    });
   }
 
   /**
