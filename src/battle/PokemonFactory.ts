@@ -250,7 +250,7 @@ export class PokemonFactory {
 
     // Catch rate from Gen 2 data (beasts = 3, starters = 45, route 29 common = 255)
     let catchRate = 255;
-    if (['raikou', 'entei', 'suicune'].includes(species.id)) {
+    if (['raikou', 'entei', 'suicune', 'lugia', 'hooh', 'ho-oh'].includes(species.id)) {
       catchRate = 3;
     } else if (['cyndaquil', 'totodile', 'chikorita'].includes(species.id)) {
       catchRate = 45;

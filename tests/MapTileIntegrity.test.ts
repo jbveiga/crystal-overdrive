@@ -217,7 +217,7 @@ describe('TICKET-UX-TMHM-RELEASE-MAP-INTEGRITY-01: Full Verification Suite', () 
     }
 
     it('verifies all maps have coherent grid dimensions (width * height === collisionGrid.length)', () => {
-      expect(Object.keys(maps).length).toBe(325);
+      expect(Object.keys(maps).length).toBe(334);
       for (const map of Object.values(maps)) {
         expect(map.collisionGrid.length).toBe(map.width * map.height);
         if (map.tileMap) {

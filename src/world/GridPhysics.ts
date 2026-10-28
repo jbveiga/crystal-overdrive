@@ -205,7 +205,9 @@ export interface GridEntity {
     | 'MAHOGANY_GYM_STATUE'
     | 'MAHOGANY_GYM_GUIDE'
     | 'ROUTE_46_GATE_OFFICER'
-    | 'ROUTE_46_GATE_YOUNGSTER';
+    | 'ROUTE_46_GATE_YOUNGSTER'
+    | 'TIN_TOWER_SAGE_EVENT'
+    | 'HO_OH_BOSS_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

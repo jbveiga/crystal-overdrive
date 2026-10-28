@@ -320,11 +320,18 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         ],
         { action: 'SUICUNE_TIN_TOWER_EVENT' }
       ),
-      makeNpc('tin_tower_sage', 7, 13, 'RIGHT', 'sage', '🏮 TOWER SAGE', 
+      makeNpc('tin_tower_sage', 9, 3, 'DOWN', 'sage', '🏮 TOWER SAGE', 
         [
           'Only those who carry the CLEAR BELL and RAINBOW WING may ascend the sacred staircase to the summit of TIN TOWER!',
-        ]
+        ],
+        { action: 'TIN_TOWER_SAGE_EVENT' }
       ),
+    ],
+
+    tin_tower_roof: [
+      makeNpc('ho_oh_boss', 9, 5, 'DOWN', 'lapras', '🌈 HO-OH', [
+        'HO-OH: Shaoooh!',
+      ], { action: 'HO_OH_BOSS_EVENT' }),
     ],
 
     // ==========================================

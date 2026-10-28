@@ -1106,6 +1106,13 @@
       "targetMapId": "ecruteak_city",
       "targetX": 37,
       "targetY": 7
+    },
+    {
+      "x": 10,
+      "y": 2,
+      "targetMapId": "tin_tower_2f",
+      "targetX": 10,
+      "targetY": 2
     }
   ],
   "bgEvents": [],
