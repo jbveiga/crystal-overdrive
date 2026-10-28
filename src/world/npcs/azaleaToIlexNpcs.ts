@@ -272,7 +272,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
         [
           'SLOWPOKE: ... ... ...',
           'A SLOWPOKE with its TAIL cut off… Huh? It has MAIL.',
-          "<PLAYER> read the MAIL: 'Be good and look after the house with Grandpa and SLOWPOKE. Love, Dad'",
+          "The trainer read the MAIL: 'Be good and look after the house with Grandpa and SLOWPOKE. Love, Dad'",
         ]
       ),
     ],

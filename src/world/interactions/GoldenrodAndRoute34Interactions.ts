@@ -549,7 +549,7 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
           ctx.openDialogue(
             [
               'The Bug-Catching Contest is held on Tuesday, Thursday and Saturday.',
-              'Not only do you earn a prize just for participating, you also get to keep the bug #MON you catch!',
+              'Not only do you earn a prize just for participating, you also get to keep the bug POKéMON you catch!',
             ],
             '👮 PARK OFFICER'
           );

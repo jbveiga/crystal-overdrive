@@ -464,6 +464,16 @@ function buildMapFromBlk({
     }
   }
 
+  // For route_35_national_park_gate, replace turnstile rail fixture at (2, 3) and (2, 5) with clean floor in_gate_01_01_01_01
+  if (id === 'route_35_national_park_gate') {
+    const idx1 = 3 * width + 2;
+    const idx2 = 5 * width + 2;
+    tileMap[idx1] = 'in_gate_01_01_01_01';
+    tileMap[idx2] = 'in_gate_01_01_01_01';
+    collisionGrid[idx1] = 0;
+    collisionGrid[idx2] = 0;
+  }
+
   const existingMapPath = path.join(MAPS_DIR, `${id}.json`);
   const existingMapData = fs.existsSync(existingMapPath)
     ? JSON.parse(fs.readFileSync(existingMapPath, 'utf8'))
