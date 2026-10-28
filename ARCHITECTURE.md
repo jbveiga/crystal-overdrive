@@ -87,6 +87,7 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Blackthorn Gym & Dragon's Den** | Leader Clair boss battle, 2F lava boulder puzzle, Dragon Shrine Master Elder quiz, Rising Badge, TM24 & Dratini | `src/world/interactions/BlackthornGymAndDragonDenInteractions.ts` | < 450 lines |
 | **Route 45 & 46 Mountain Ledges & Master Ball** | Route 45/46 ledges, 11 trainers, Route 29/46 Gatehouse, Prof. Elm phone summons & Master Ball | `src/world/interactions/Route45And46Interactions.ts` | < 200 lines |
 | **Tin Tower & Ho-Oh Legendary Encounter** | 10-floor Tin Tower labyrinth, Tower Sage Clear Bell & Rainbow Wing gate, Ho-Oh Lv. 60 boss battle | `src/world/interactions/TinTowerHoOhInteractions.ts` | < 200 lines |
+| **Route 27, Tohjo Falls & Route 26 Interactions** | First Step into Kanto Fisher, Sandstorm House TM37, Heal House party recovery, 12 border trainers | `src/world/interactions/Route27AndTohjoFallsInteractions.ts` | < 300 lines |
 | **East Johto Quest Interactions** | Route 42 Suicune, Gate Officer, Mt. Mortar Kiyo & Tyrogue gift, Super Nerds | `src/world/interactions/EastJohtoQuestInteractions.ts` | < 300 lines |
 | **Ilex Forest Interactions** | Farfetchd chase puzzle, Charcoal maker, Headbutt tutor, shrine | `src/world/interactions/IlexForestInteractions.ts` | < 300 lines |
 | **Kanto & Indigo Interactions** | Indigo Plateau Elite Four, Kanto Gym Leaders, Mt. Silver Red dialogue | `src/world/interactions/KantoAndLeagueInteractions.ts` | < 350 lines |
@@ -103,6 +104,7 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Olivine to Indigo NPCs** | Olivine, Lighthouse, Cianwood, Mahogany, Blackthorn, League | `src/world/npcs/olivineToIndigoNpcs.ts` | < 400 lines |
 | **Sea Routes NPCs** | Route 40, Battle Tower Gate, Route 41 & 14 Swimmers | `src/world/npcs/seaRoutesNpcs.ts` | < 300 lines |
 | **Mahogany to Indigo NPCs** | Route 42-44, Lake of Rage, Ice Path, Dragon Den, Victory Road | `src/world/npcs/mahoganyToIndigoNpcs.ts` | < 300 lines |
+| **Route 26 & 27 Border NPCs** | Route 27 Kanto border, Sandstorm House, Route 26, Heal House | `src/world/npcs/route26And27Npcs.ts` | < 300 lines |
 | **NPC Data Aggregator Facade** | Backward-compatible barrel exports, createNpcsByMap(), npcsByMap | `src/world/npcData.ts` | < 350 lines |
 | **East Johto Generated NPCs** | Object event dialogue and trainer teams for East & Early Johto | `src/world/generated-npcs/eastJohtoGeneratedNpcs.ts` | < 350 lines |
 | **Central Johto Generated NPCs** | Object event dialogue and trainer teams for Central & Goldenrod | `src/world/generated-npcs/centralJohtoGeneratedNpcs.ts` | < 350 lines |
@@ -590,6 +592,7 @@ To enable instantaneous 1-hop navigation without exploratory grep searches, over
 | **Blackthorn Gym & Dragon's Den** | `src/world/interactions/BlackthornGymAndDragonDenInteractions.ts` | Leader Clair (`CLAIR_EVENT`), Master Elder Trial (`DRAGON_ELDER_EVENT`), 2F Boulder Drop (`BLACKTHORN_BOULDER`), Den Guard (`DRAGONS_DEN_GUARD`), Gym Guide (`BLACKTHORN_GYM_GUIDE`), Statues (`BLACKTHORN_GYM_STATUE`). |
 | **Route 45 & 46 Mountain Ledges & Master Ball** | `src/world/interactions/Route45And46Interactions.ts` | Route 29/46 Gatehouse Officer (`ROUTE_46_GATE_OFFICER`), Gatehouse Youngster (`ROUTE_46_GATE_YOUNGSTER`), 11 Mountain Trail Trainers (`handleRoute45And46Trainer`), Prof. Elm Pokégear summons & Master Ball grant. |
 | **Tin Tower & Ho-Oh Legendary Encounter** | `src/world/interactions/TinTowerHoOhInteractions.ts` | Tin Tower 1F Tower Sage barrier (`TIN_TOWER_SAGE_EVENT`), Tin Tower Roof Ho-Oh Legendary Boss Battle (`HO_OH_BOSS_EVENT`). |
+| **Route 27, Tohjo Falls & Route 26 Interactions** | `src/world/interactions/Route27AndTohjoFallsInteractions.ts` | Route 27 Kanto Border Fisher (`FIRST_STEP_KANTO_FISHER`), Sandstorm House TM37 (`ROUTE27_SANDSTORM_EVENT`), Route 26 Heal House (`ROUTE26_HEAL_EVENT`), 12 Border Trainers (`handleRoute27And26Trainer`). |
 | **Johto Town Services & Lore** | `src/world/interactions/JohtoTownServiceInteractions.ts` | Day-of-Week Siblings (`DAY_SIBLING_EVENT` / Monica, Tuscany, Wesley, Arthur, Frieda, Santos, Sunny), Dance Theater Surf Gentleman (`DANCE_THEATER_SURF_GENTLEMAN`), Chuck's Wife Fly (`CHUCKS_WIFE_EVENT`), Olivine Sailor Strength (`OLIVINE_SAILOR_STRENGTH_EVENT`) & Good Rod, Moomoo Farm Sick Miltank (`moomoo_farm_cow`), Cianwood Pharmacy SecretPotion (`PHARMACY_SECRET_POTION_EVENT`), Lighthouse Amphy (`AMPHY_EVENT`), Friday Lapras (`UNION_CAVE_LAPRAS_EVENT`), Kyle Voltorb Trade (`kyles_house_kyle`), Earl's Academy (`earl_academy`), Charcoal Kiln Boss & Apprentice, Kurt's House (`kurt_house_kurt`). |
 | **NPC Shared Helpers & Models** | `src/world/npcs/npcShared.ts` | `makeNpc`, `GUIDE_GENT_TOUR_LEGS`, `DAY_SIBLINGS`, `resolveDaySiblingInteraction`, `resolveElmLabDialogue`, `isNpcActiveForStoryFlags`. |
 | **New Bark to Sprout Tower NPCs** | `src/world/npcs/newBarkToSproutTowerNpcs.ts` | `createNewBarkToSproutTowerNpcs()` (`new_bark_town` through `sprout_tower_3f`). |
@@ -601,6 +604,7 @@ To enable instantaneous 1-hop navigation without exploratory grep searches, over
 | **Olivine & Cianwood NPCs** | `src/world/npcs/olivineToIndigoNpcs.ts` | `createOlivineToIndigoNpcs()` (`olivine_city` through `cianwood_lugia_speech_house`). |
 | **Sea Routes NPCs** | `src/world/npcs/seaRoutesNpcs.ts` | `createSeaRoutesNpcs()` (`route_40`, `route_40_battle_tower_gate`, `route_41`). |
 | **Mahogany to Indigo Plateau NPCs** | `src/world/npcs/mahoganyToIndigoNpcs.ts` | `createMahoganyToIndigoNpcs()` (`lake_of_rage` through `lances_room`). |
+| **Route 26 & 27 Border NPCs** | `src/world/npcs/route26And27Npcs.ts` | `createRoute26And27Npcs()` (`route_27`, `route_27_sandstorm_house`, `route_26`, `route_26_heal_house`). |
 | **NPC Dataset Aggregator & Proxy** | `src/world/npcData.ts` | Barrel exports, `createNpcsByMap()`, `npcsByMap`, `getNpcsForMap()`, `applyMapNpcStoryMutations()`. |
 
 ### 6.2 QA Expansion Roadmap (Target Verifications)

@@ -9,6 +9,7 @@
 
 import type { GridEntity } from '../GridPhysics';
 import { makeNpc } from './npcShared';
+import { createRoute26And27Npcs } from './route26And27Npcs';
 
 export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
   return {
@@ -418,5 +419,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
         'If you jump down ledges, you cannot get back up without circling around.',
       ], { action: 'ROUTE_46_GATE_YOUNGSTER' }),
     ],
+
+    ...createRoute26And27Npcs(),
   };
 }

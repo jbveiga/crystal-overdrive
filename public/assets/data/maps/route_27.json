@@ -4364,7 +4364,16 @@
       "targetY": 15
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 25,
+      "y": 7,
+      "speaker": "🪧 TOHJO FALLS SIGN",
+      "pages": [
+        "TOHJO FALLS\nTHE LINK BETWEEN KANTO AND JOHTO"
+      ]
+    }
+  ],
   "grassEncounters": [
     {
       "speciesId": "doduo",

@@ -6513,7 +6513,16 @@
       "targetY": 7
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 8,
+      "y": 6,
+      "speaker": "🪧 ROUTE 26 SIGN",
+      "pages": [
+        "ROUTE 26\nPOKéMON LEAGUE RECEPTION GATE"
+      ]
+    }
+  ],
   "grassEncounters": [
     {
       "speciesId": "doduo",

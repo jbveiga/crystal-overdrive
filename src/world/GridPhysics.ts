@@ -16,6 +16,7 @@ export type NpcSpriteType =
   | 'kris'
   | 'silver'
   | 'fisherman'
+  | 'fisher'
   | 'bug_catcher'
   | 'teacher'
   | 'mom'
@@ -207,7 +208,10 @@ export interface GridEntity {
     | 'ROUTE_46_GATE_OFFICER'
     | 'ROUTE_46_GATE_YOUNGSTER'
     | 'TIN_TOWER_SAGE_EVENT'
-    | 'HO_OH_BOSS_EVENT';
+    | 'HO_OH_BOSS_EVENT'
+    | 'FIRST_STEP_KANTO_FISHER'
+    | 'ROUTE27_SANDSTORM_EVENT'
+    | 'ROUTE26_HEAL_EVENT';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;
