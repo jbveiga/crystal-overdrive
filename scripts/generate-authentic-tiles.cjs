@@ -284,13 +284,13 @@ function buildQuadrantBuffer(ts, quad8x8, roofGroup, waterFrameIdx = 0) {
       const tid = quad8x8[qy * 2 + qx];
       const palName = (tid >= 0x80 ? ts.pal1[tid - 0x80] : ts.pal0[tid]) || 'GRAY';
       const pal =
-        ts.isOutdoor && palName === 'ROOF'
+        (ts.tsName === 'johto' || ts.tsName === 'johto_modern') && palName === 'ROOF'
           ? ROOF_PALETTES[roofGroup] || ROOF_PALETTES.nb
           : palettes[palName] || palettes.GRAY;
       const pngTid = tid >= 0x80 ? (ts.png.height > 48 ? tid - 0x20 : tid - 0x80) : tid;
       const srcX = (pngTid % 16) * 8;
       const srcY = Math.floor(pngTid / 16) * 8;
-      const isRoofTile = ts.isOutdoor && ts.tsName !== 'kanto' && tid >= 0x0a && tid <= 0x12;
+      const isRoofTile = (ts.tsName === 'johto' || ts.tsName === 'johto_modern') && tid >= 0x0a && tid <= 0x12;
 
       for (let py = 0; py < 8; py++) {
         for (let px = 0; px < 8; px++) {
@@ -331,10 +331,14 @@ function renderQuadrant64(ts, quad8x8, roofGroup) {
       ? 'kt'
       : ts.tsName === 'johto_modern'
         ? 'jt_m'
-        : ts.isOutdoor
-          ? 'jt'
-          : `in_${ts.tsName}`;
-  const hasRoof = ts.isOutdoor && (quad8x8.some((tid) => ts.pal0[tid] === 'ROOF') || (ts.tsName !== 'kanto' && quad8x8.some((tid) => tid >= 0x0a && tid <= 0x12)));
+        : ts.tsName === 'park'
+          ? 'park'
+          : ts.isOutdoor
+            ? 'jt'
+            : `in_${ts.tsName}`;
+  const hasRoof =
+    (ts.tsName === 'johto' || ts.tsName === 'johto_modern') &&
+    (quad8x8.some((tid) => ts.pal0[tid] === 'ROOF') || quad8x8.some((tid) => tid >= 0x0a && tid <= 0x12));
   const hasWater = (ts.isOutdoor || ts.tsName === 'cave' || ts.tsName === 'forest' || ts.tsName === 'port') && quad8x8.includes(0x14);
   const suffix = hasRoof ? `_${roofGroup}` : '';
   const tileName = `${prefix}_${quad8x8.map((x) => x.toString(16).padStart(2, '0')).join('_')}${suffix}`;
@@ -472,6 +476,11 @@ function buildMapFromBlk({
     tileMap[idx2] = 'in_gate_01_01_01_01';
     collisionGrid[idx1] = 0;
     collisionGrid[idx2] = 0;
+  }
+
+  // For national_park, ensure Quick Claw Teacher bench tile at (27, 40) is walkable (0)
+  if (id === 'national_park') {
+    collisionGrid[40 * width + 27] = 0;
   }
 
   const existingMapPath = path.join(MAPS_DIR, `${id}.json`);
