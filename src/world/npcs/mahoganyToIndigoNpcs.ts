@@ -34,11 +34,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
         visionRange: 3,
         challengePages: ["BENJAMIN: The mountain trails keep my legs strong! Let's battle!"],
         trainerPokemon: { speciesId: 'diglett', level: 14, moves: ['scratch', 'growl', 'magnitude'] },
-        trainerTeam: [
-          { speciesId: 'diglett', level: 14, moves: ['scratch', 'growl', 'magnitude'] },
-          { speciesId: 'geodude', level: 14, moves: ['tackle', 'defensecurl', 'rockthrow'] },
-          { speciesId: 'dugtrio', level: 16, moves: ['scratch', 'growl', 'magnitude', 'dig'] },
-        ],
+        trainerTeam: [{ speciesId: 'diglett', level: 14, moves: ['scratch', 'growl', 'magnitude'] }, { speciesId: 'geodude', level: 14, moves: ['tackle', 'defensecurl', 'rockthrow'] }, { speciesId: 'dugtrio', level: 16, moves: ['scratch', 'growl', 'magnitude', 'dig'] }],
       }),
       makeNpc('route_42_pokemaniac_shane', 47, 8, 'DOWN', 'super_nerd', '🎒 POKéMANIAC SHANE', [
         "I'm looking for rare Pokémon inside Mt. Mortar!",
@@ -49,10 +45,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
         visionRange: 3,
         challengePages: ["SHANE: I'm looking for rare Pokémon inside Mt. Mortar! Are you tough enough?"],
         trainerPokemon: { speciesId: 'nidorina', level: 16, moves: ['growl', 'tackle', 'scratch', 'poisonsting'] },
-        trainerTeam: [
-          { speciesId: 'nidorina', level: 16, moves: ['growl', 'tackle', 'scratch', 'poisonsting'] },
-          { speciesId: 'nidorino', level: 16, moves: ['leer', 'tackle', 'hornattack', 'poisonsting'] },
-        ],
+        trainerTeam: [{ speciesId: 'nidorina', level: 16, moves: ['growl', 'tackle', 'scratch', 'poisonsting'] }, { speciesId: 'nidorino', level: 16, moves: ['leer', 'tackle', 'hornattack', 'poisonsting'] }],
       }),
       makeNpc('route_42_suicune', 26, 16, 'DOWN', 'suicune', '💎 SUICUNE', [
         'SUICUNE: Gurr-oooh!',
@@ -288,124 +281,89 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     wills_room: [
-      makeNpc('e4_will', 5, 5, 'DOWN', 'psychic', '🎭 ELITE FOUR WILL', 
-        [
-          "WILL: Welcome to the POKéMON LEAGUE! I am WILL, master of psychic power!",
+      makeNpc('e4_will', 5, 5, 'DOWN', 'psychic', '🎭 ELITE FOUR WILL', ["WILL: Welcome to the POKéMON LEAGUE! I am WILL, master of psychic power!"], {
+        action: 'E4_WILL_EVENT',
+        trainerId: 'will',
+        trainerName: 'Elite Four Will',
+        challengePages: ["WILL: I have trained all over the world to hone my psychic powers. Even if you defeated all 8 GYM LEADERS, you cannot break through my mind!"],
+        trainerPokemon: { speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] },
+        trainerTeam: [
+          { speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] },
+          { speciesId: 'jynx', level: 41, moves: ['icepunch', 'lovelykiss', 'psychic'] },
+          { speciesId: 'exeggutor', level: 41, moves: ['reflect', 'eggbomb', 'psychic'] },
+          { speciesId: 'slowbro', level: 41, moves: ['amnesia', 'surf', 'psychic'] },
+          { speciesId: 'xatu', level: 42, moves: ['confuseray', 'psychic', 'future-sight'] },
         ],
-        {
-          action: 'E4_WILL_EVENT',
-          trainerId: 'will',
-          trainerName: 'Elite Four Will',
-          challengePages: [
-            "WILL: I have trained all over the world to hone my psychic powers. Even if you defeated all 8 GYM LEADERS, you cannot break through my mind!",
-          ],
-          trainerPokemon: { speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] },
-          trainerTeam: [
-            { speciesId: 'xatu', level: 40, moves: ['confuseray', 'psychic', 'quickattack'] },
-            { speciesId: 'jynx', level: 41, moves: ['icepunch', 'lovelykiss', 'psychic'] },
-            { speciesId: 'exeggutor', level: 41, moves: ['reflect', 'eggbomb', 'psychic'] },
-            { speciesId: 'slowbro', level: 41, moves: ['amnesia', 'surf', 'psychic'] },
-            { speciesId: 'xatu', level: 42, moves: ['confuseray', 'psychic', 'future-sight'] },
-          ],
-        }
-      ),
+      }),
     ],
 
     kogas_room: [
-      makeNpc('e4_koga', 5, 5, 'DOWN', 'super_nerd', '🥷 ELITE FOUR KOGA', 
-        [
-          "KOGA: Fwahahaha! A mere child reached me?! I am KOGA of the ELITE FOUR!",
+      makeNpc('e4_koga', 5, 5, 'DOWN', 'super_nerd', '🥷 ELITE FOUR KOGA', ["KOGA: Fwahahaha! A mere child reached me?! I am KOGA of the ELITE FOUR!"], {
+        action: 'E4_KOGA_EVENT',
+        trainerId: 'koga',
+        trainerName: 'Elite Four Koga',
+        challengePages: ["KOGA: I have mastered ancient ninja techniques and toxic poisons! Feel the creeping dread of darkness!"],
+        trainerPokemon: { speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] },
+        trainerTeam: [
+          { speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] },
+          { speciesId: 'venomoth', level: 41, moves: ['supersonic', 'gust', 'toxic'] },
+          { speciesId: 'forretress', level: 43, moves: ['spikes', 'swift', 'explosion'] },
+          { speciesId: 'muk', level: 42, moves: ['minimize', 'acid-armor', 'sludge-bomb'] },
+          { speciesId: 'crobat', level: 44, moves: ['wing-attack', 'confuseray', 'toxic'] },
         ],
-        {
-          action: 'E4_KOGA_EVENT',
-          trainerId: 'koga',
-          trainerName: 'Elite Four Koga',
-          challengePages: [
-            "KOGA: I have mastered ancient ninja techniques and toxic poisons! Feel the creeping dread of darkness!",
-          ],
-          trainerPokemon: { speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] },
-          trainerTeam: [
-            { speciesId: 'ariados', level: 40, moves: ['giga-drain', 'spiderweb', 'sludge-bomb'] },
-            { speciesId: 'venomoth', level: 41, moves: ['supersonic', 'gust', 'toxic'] },
-            { speciesId: 'forretress', level: 43, moves: ['spikes', 'swift', 'explosion'] },
-            { speciesId: 'muk', level: 42, moves: ['minimize', 'acid-armor', 'sludge-bomb'] },
-            { speciesId: 'crobat', level: 44, moves: ['wing-attack', 'confuseray', 'toxic'] },
-          ],
-        }
-      ),
+      }),
     ],
 
     brunos_room: [
-      makeNpc('e4_bruno', 5, 5, 'DOWN', 'blackbelt', '🥋 ELITE FOUR BRUNO', 
-        [
-          "BRUNO: I am BRUNO of the ELITE FOUR! Through rigorous training, humans and POKéMON become one!",
+      makeNpc('e4_bruno', 5, 5, 'DOWN', 'blackbelt', '🥋 ELITE FOUR BRUNO', ["BRUNO: I am BRUNO of the ELITE FOUR! Through rigorous training, humans and POKéMON become one!"], {
+        action: 'E4_BRUNO_EVENT',
+        trainerId: 'bruno',
+        trainerName: 'Elite Four Bruno',
+        challengePages: ["BRUNO: We have lived and trained together in the deepest mountains! Feel our iron fists!"],
+        trainerPokemon: { speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] },
+        trainerTeam: [
+          { speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] },
+          { speciesId: 'hitmonlee', level: 42, moves: ['jump-kick', 'high-jump-kick', 'foresight'] },
+          { speciesId: 'hitmonchan', level: 42, moves: ['thunderpunch', 'icepunch', 'firepunch'] },
+          { speciesId: 'onix', level: 43, moves: ['rock-throw', 'earthquake', 'slam'] },
+          { speciesId: 'machamp', level: 46, moves: ['cross-chop', 'rock-slide', 'vital-throw'] },
         ],
-        {
-          action: 'E4_BRUNO_EVENT',
-          trainerId: 'bruno',
-          trainerName: 'Elite Four Bruno',
-          challengePages: [
-            "BRUNO: We have lived and trained together in the deepest mountains! Feel our iron fists!",
-          ],
-          trainerPokemon: { speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] },
-          trainerTeam: [
-            { speciesId: 'hitmontop', level: 42, moves: ['pursuit', 'quickattack', 'dig'] },
-            { speciesId: 'hitmonlee', level: 42, moves: ['jump-kick', 'high-jump-kick', 'foresight'] },
-            { speciesId: 'hitmonchan', level: 42, moves: ['thunderpunch', 'icepunch', 'firepunch'] },
-            { speciesId: 'onix', level: 43, moves: ['rock-throw', 'earthquake', 'slam'] },
-            { speciesId: 'machamp', level: 46, moves: ['cross-chop', 'rock-slide', 'vital-throw'] },
-          ],
-        }
-      ),
+      }),
     ],
 
     karens_room: [
-      makeNpc('e4_karen', 5, 5, 'DOWN', 'cooltrainer_f', '🌙 ELITE FOUR KAREN', 
-        [
-          "KAREN: I am KAREN of the ELITE FOUR. Strong POKéMON. Weak POKéMON. That is only the selfish perception of people.",
+      makeNpc('e4_karen', 5, 5, 'DOWN', 'cooltrainer_f', '🌙 ELITE FOUR KAREN', ["KAREN: I am KAREN of the ELITE FOUR. Strong POKéMON. Weak POKéMON. That is only the selfish perception of people."], {
+        action: 'E4_KAREN_EVENT',
+        trainerId: 'karen',
+        trainerName: 'Elite Four Karen',
+        challengePages: ["KAREN: Truly skilled trainers should try to win with their favorites. Let me show you what real bond means!"],
+        trainerPokemon: { speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] },
+        trainerTeam: [
+          { speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] },
+          { speciesId: 'vileplume', level: 42, moves: ['stun-spore', 'acid', 'moonlight', 'petaldance'] },
+          { speciesId: 'gengar', level: 45, moves: ['shadowball', 'spite', 'curse', 'lick'] },
+          { speciesId: 'murkrow', level: 44, moves: ['faint-attack', 'wing-attack', 'whirlwind'] },
+          { speciesId: 'houndoom', level: 47, moves: ['flamethrower', 'crunch', 'roar'] },
         ],
-        {
-          action: 'E4_KAREN_EVENT',
-          trainerId: 'karen',
-          trainerName: 'Elite Four Karen',
-          challengePages: [
-            "KAREN: Truly skilled trainers should try to win with their favorites. Let me show you what real bond means!",
-          ],
-          trainerPokemon: { speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] },
-          trainerTeam: [
-            { speciesId: 'umbreon', level: 42, moves: ['confuseray', 'feint-attack', 'sand-attack'] },
-            { speciesId: 'vileplume', level: 42, moves: ['stun-spore', 'acid', 'moonlight', 'petaldance'] },
-            { speciesId: 'gengar', level: 45, moves: ['shadowball', 'spite', 'curse', 'lick'] },
-            { speciesId: 'murkrow', level: 44, moves: ['faint-attack', 'wing-attack', 'whirlwind'] },
-            { speciesId: 'houndoom', level: 47, moves: ['flamethrower', 'crunch', 'roar'] },
-          ],
-        }
-      ),
+      }),
     ],
 
     lances_room: [
-      makeNpc('champion_lance', 5, 6, 'DOWN', 'cooltrainer_m', '👑 CHAMPION LANCE', 
-        [
-          "LANCE: I have been waiting for you, trainer. I knew that you, with your valor and bond, would reach me.",
+      makeNpc('champion_lance', 5, 6, 'DOWN', 'cooltrainer_m', '👑 CHAMPION LANCE', ["LANCE: I have been waiting for you, trainer. I knew that you, with your valor and bond, would reach me."], {
+        action: 'CHAMPION_LANCE_EVENT',
+        trainerId: 'lance',
+        trainerName: 'Champion Lance',
+        challengePages: ["LANCE: As the POKéMON LEAGUE CHAMPION, I accept your challenge! Dragon-types are invincible! Let's begin!"],
+        trainerPokemon: { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
+        trainerTeam: [
+          { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
+          { speciesId: 'dragonite', level: 47, moves: ['thunderwave', 'twister', 'hyperbeam'] },
+          { speciesId: 'dragonite', level: 47, moves: ['blizzard', 'twister', 'hyperbeam'] },
+          { speciesId: 'aerodactyl', level: 46, moves: ['wing-attack', 'rock-slide', 'hyperbeam'] },
+          { speciesId: 'charizard', level: 46, moves: ['flamethrower', 'wing-attack', 'slash'] },
+          { speciesId: 'dragonite', level: 50, moves: ['outrage', 'safeguard', 'hyperbeam', 'fire-blast'] },
         ],
-        {
-          action: 'CHAMPION_LANCE_EVENT',
-          trainerId: 'lance',
-          trainerName: 'Champion Lance',
-          challengePages: [
-            "LANCE: As the POKéMON LEAGUE CHAMPION, I accept your challenge! Dragon-types are invincible! Let's begin!",
-          ],
-          trainerPokemon: { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
-          trainerTeam: [
-            { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
-            { speciesId: 'dragonite', level: 47, moves: ['thunderwave', 'twister', 'hyperbeam'] },
-            { speciesId: 'dragonite', level: 47, moves: ['blizzard', 'twister', 'hyperbeam'] },
-            { speciesId: 'aerodactyl', level: 46, moves: ['wing-attack', 'rock-slide', 'hyperbeam'] },
-            { speciesId: 'charizard', level: 46, moves: ['flamethrower', 'wing-attack', 'slash'] },
-            { speciesId: 'dragonite', level: 50, moves: ['outrage', 'safeguard', 'hyperbeam', 'fire-blast'] },
-          ],
-        }
-      ),
+      }),
     ],
 
     ice_path_b1f: [
@@ -432,6 +390,33 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('blackthorn_gym_1f_boulder_1', 7, 6, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from 2F, bridging the lava!']),
       makeNpc('blackthorn_gym_1f_boulder_2', 3, 7, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from 2F, bridging the lava!']),
       makeNpc('blackthorn_gym_1f_boulder_3', 4, 14, 'DOWN', 'boulder', '🪨 BOULDER', ['A giant boulder that fell from 2F, bridging the lava!']),
+    ],
+
+    route_45: [
+      makeNpc('route_45_hiker_erik', 10, 16, 'RIGHT', 'fat_man', '⛰️ HIKER ERIK', ['ERIK: Whew! Beaten by an energetic youngster!'], { action: 'TRAINER_BATTLE', trainerId: 'hiker_erik', trainerName: 'Hiker Erik', visionRange: 2, challengePages: ['ERIK: My legs are built on these mountain trails! Be ready!'], trainerPokemon: { speciesId: 'machop', level: 24, moves: ['lowkick', 'karatechop', 'leer'] }, trainerTeam: [{ speciesId: 'machop', level: 24, moves: ['lowkick', 'karatechop', 'leer'] }, { speciesId: 'graveler', level: 27, moves: ['rockthrow', 'defensecurl', 'magnitude'] }, { speciesId: 'machop', level: 27, moves: ['lowkick', 'karatechop', 'seismictoss'] }] }),
+      makeNpc('route_45_hiker_michael', 15, 65, 'RIGHT', 'fat_man', '⛰️ HIKER MICHAEL', ['MICHAEL: My rocks crumbled against your skill!'], { action: 'TRAINER_BATTLE', trainerId: 'hiker_michael', trainerName: 'Hiker Michael', visionRange: 2, challengePages: ['MICHAEL: No matter how tough the path, rock POKéMON can climb it!'], trainerPokemon: { speciesId: 'geodude', level: 25, moves: ['rockthrow', 'defensecurl', 'magnitude'] }, trainerTeam: [{ speciesId: 'geodude', level: 25, moves: ['rockthrow', 'defensecurl', 'magnitude'] }, { speciesId: 'graveler', level: 25, moves: ['rockthrow', 'defensecurl', 'magnitude'] }, { speciesId: 'golem', level: 25, moves: ['rockthrow', 'magnitude', 'rollout'] }] }),
+      makeNpc('route_45_hiker_parry', 5, 28, 'UP', 'fat_man', '⛰️ HIKER PARRY', ['PARRY: Even iron will break against true power!'], { action: 'TRAINER_BATTLE', trainerId: 'hiker_parry', trainerName: 'Hiker Parry', visionRange: 2, challengePages: ['PARRY: My team can smash through any boulder!'], trainerPokemon: { speciesId: 'onix', level: 35, moves: ['slam', 'rockthrow', 'screech', 'rage'] }, trainerTeam: [{ speciesId: 'onix', level: 35, moves: ['slam', 'rockthrow', 'screech', 'rage'] }, { speciesId: 'swinub', level: 33, moves: ['tackle', 'powdersnow', 'endure', 'takedown'] }] }),
+      makeNpc('route_45_hiker_timothy', 9, 65, 'LEFT', 'fat_man', '⛰️ HIKER TIMOTHY', ['TIMOTHY: You dug right through my defenses!'], { action: 'TRAINER_BATTLE', trainerId: 'hiker_timothy', trainerName: 'Hiker Timothy', visionRange: 2, challengePages: ['TIMOTHY: The best treasures are buried in the mountain soil!'], trainerPokemon: { speciesId: 'diglett', level: 27, moves: ['slash', 'dig', 'mudslap', 'growl'] }, trainerTeam: [{ speciesId: 'diglett', level: 27, moves: ['slash', 'dig', 'mudslap', 'growl'] }, { speciesId: 'dugtrio', level: 27, moves: ['slash', 'dig', 'mudslap', 'growl'] }] }),
+      makeNpc('route_45_blackbelt_kenji', 11, 50, 'DOWN', 'blackbelt', '🥋 BLACKBELT KENJI', ['KENJI: My training still has a long way to go!'], { action: 'TRAINER_BATTLE', trainerId: 'blackbelt_kenji', trainerName: 'Blackbelt Kenji', visionRange: 2, challengePages: ['KENJI: I train my body day and night under roaring mountain waterfalls!'], trainerPokemon: { speciesId: 'onix', level: 27, moves: ['slam', 'bind', 'rockthrow'] }, trainerTeam: [{ speciesId: 'onix', level: 27, moves: ['slam', 'bind', 'rockthrow'] }, { speciesId: 'hitmonlee', level: 30, moves: ['jumpkick', 'rollingkick', 'meditate'] }, { speciesId: 'machoke', level: 32, moves: ['karatechop', 'lowkick', 'focusenergy'] }] }),
+      makeNpc('route_45_cooltrainer_m_ryan', 17, 18, 'LEFT', 'cooltrainer_m', '⚡ COOLTRAINER♂ RYAN', ['RYAN: Impressive! You have genuine speed and skill!'], { action: 'TRAINER_BATTLE', trainerId: 'cooltrainer_m_ryan', trainerName: 'Cooltrainer Ryan', visionRange: 3, challengePages: ["RYAN: I've conquered every peak in Johto! Can you withstand my speed?"], trainerPokemon: { speciesId: 'pidgeot', level: 25, moves: ['wingattack', 'quickattack', 'whirlwind'] }, trainerTeam: [{ speciesId: 'pidgeot', level: 25, moves: ['wingattack', 'quickattack', 'whirlwind'] }, { speciesId: 'electabuzz', level: 27, moves: ['thunderpunch', 'quickattack', 'lightscreen', 'swift'] }] }),
+      makeNpc('route_45_cooltrainer_f_kelly', 5, 36, 'DOWN', 'cooltrainer_f', '🌺 COOLTRAINER♀ KELLY', ['KELLY: You battle with extraordinary composure!'], { action: 'TRAINER_BATTLE', trainerId: 'cooltrainer_f_kelly', trainerName: 'Cooltrainer Kelly', visionRange: 3, challengePages: ["KELLY: Battling in the high altitude sharpens our senses! Let's go!"], trainerPokemon: { speciesId: 'marill', level: 27, moves: ['bubblebeam', 'rollout', 'defensecurl', 'tailwhip'] }, trainerTeam: [{ speciesId: 'marill', level: 27, moves: ['bubblebeam', 'rollout', 'defensecurl', 'tailwhip'] }, { speciesId: 'wartortle', level: 24, moves: ['watergun', 'bite', 'withdraw', 'rapidspin'] }, { speciesId: 'wartortle', level: 24, moves: ['watergun', 'bite', 'withdraw', 'rapidspin'] }] }),
+      makeNpc('route_45_camper_quentin', 4, 70, 'DOWN', 'camper', '⛺ CAMPER QUENTIN', ['QUENTIN: Even wild instincts weren\'t enough!'], { action: 'TRAINER_BATTLE', trainerId: 'camper_quentin', trainerName: 'Camper Quentin', visionRange: 2, challengePages: ['QUENTIN: Camping up here teaches you pure wilderness survival!'], trainerPokemon: { speciesId: 'fearow', level: 30, moves: ['drillpeck', 'furyattack', 'leer', 'pursuit'] }, trainerTeam: [{ speciesId: 'fearow', level: 30, moves: ['drillpeck', 'furyattack', 'leer', 'pursuit'] }, { speciesId: 'primeape', level: 30, moves: ['karatechop', 'rage', 'seismictoss'] }, { speciesId: 'tauros', level: 30, moves: ['hornattack', 'tailwhip', 'rage', 'pursuit'] }] }),
+    ],
+
+    route_46: [
+      makeNpc('route_46_hiker_bailey', 12, 19, 'LEFT', 'fat_man', '⛰️ HIKER BAILEY', ['BAILEY: All five of my Geodude... tumbled down!'], { action: 'TRAINER_BATTLE', trainerId: 'hiker_bailey', trainerName: 'Hiker Bailey', visionRange: 2, challengePages: ["BAILEY: You'll never get through my unbreakable wall of Geodude!"], trainerPokemon: { speciesId: 'geodude', level: 13, moves: ['tackle', 'defensecurl', 'rockthrow'] }, trainerTeam: [{ speciesId: 'geodude', level: 13, moves: ['tackle', 'defensecurl', 'rockthrow'] }, { speciesId: 'geodude', level: 13, moves: ['tackle', 'defensecurl', 'rockthrow'] }, { speciesId: 'geodude', level: 13, moves: ['tackle', 'defensecurl', 'rockthrow'] }, { speciesId: 'geodude', level: 13, moves: ['tackle', 'defensecurl', 'rockthrow'] }, { speciesId: 'geodude', level: 13, moves: ['tackle', 'defensecurl', 'rockthrow'] }] }),
+      makeNpc('route_46_camper_ted', 4, 14, 'UP', 'camper', '⛺ CAMPER TED', ['TED: Mankey lost its temper!'], { action: 'TRAINER_BATTLE', trainerId: 'camper_ted', trainerName: 'Camper Ted', visionRange: 2, challengePages: ['TED: Mankey and I are practicing our mountain sprint!'], trainerPokemon: { speciesId: 'mankey', level: 17, moves: ['scratch', 'lowkick', 'karatechop', 'furyswipes'] }, trainerTeam: [{ speciesId: 'mankey', level: 17, moves: ['scratch', 'lowkick', 'karatechop', 'furyswipes'] }] }),
+      makeNpc('route_46_picnicker_erin', 2, 13, 'DOWN', 'picnicker', '🧺 PICNICKER ERIN', ['ERIN: Oh no, my Ponyta was outpaced!'], { action: 'TRAINER_BATTLE', trainerId: 'picnicker_erin', trainerName: 'Picnicker Erin', visionRange: 2, challengePages: ['ERIN: My Ponyta can leap right over these mountain ledges!'], trainerPokemon: { speciesId: 'ponyta', level: 16, moves: ['tackle', 'ember', 'growl', 'tailwhip'] }, trainerTeam: [{ speciesId: 'ponyta', level: 16, moves: ['tackle', 'ember', 'growl', 'tailwhip'] }, { speciesId: 'ponyta', level: 16, moves: ['tackle', 'ember', 'growl', 'tailwhip'] }] }),
+    ],
+
+    route_29_route_46_gate: [
+      makeNpc('route_29_route_46_gate_officer', 0, 4, 'RIGHT', 'officer', '👮 OFFICER', [
+        'ROUTE 45 and 46 can only be traversed one-way downhill from BLACKTHORN CITY.',
+        'Ledges prevent climbing back up!',
+      ], { action: 'ROUTE_46_GATE_OFFICER' }),
+      makeNpc('route_29_route_46_gate_youngster', 6, 4, 'LEFT', 'youngster', '👦 BOY', [
+        'If you jump down ledges, you cannot get back up without circling around.',
+      ], { action: 'ROUTE_46_GATE_YOUNGSTER' }),
     ],
   };
 }

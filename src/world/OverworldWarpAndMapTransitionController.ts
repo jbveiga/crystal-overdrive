@@ -593,6 +593,24 @@ export class OverworldWarpAndMapTransitionController {
               saveCurrentGame();
             }
           );
+        } else if (
+          storyFlags.has('has_rising_badge') &&
+          !storyFlags.has('ELM_CALLED_MASTER_BALL')
+        ) {
+          storyFlags.add('ELM_CALLED_MASTER_BALL');
+          BattleAudio.playOverworldSound('PHONE_RING');
+          overworldHUD.openDialogue(
+            [
+              '📻 *BEEP! BEEP! Your POKéGEAR is ringing!*',
+              'PROF. ELM: Hello! GOLD? I heard from CLAIR in BLACKTHORN CITY!',
+              'You conquered the DRAGON DEN and earned all 8 JOHTO BADGES!',
+              'Please come see me at the LAB in NEW BARK TOWN. I have something special for you!',
+            ],
+            '📻 PROF. ELM (POKéGEAR)',
+            () => {
+              saveCurrentGame();
+            }
+          );
         }
       });
   }

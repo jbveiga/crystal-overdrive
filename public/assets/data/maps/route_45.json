@@ -5422,7 +5422,18 @@
     }
   },
   "warps": [],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 10,
+      "y": 4,
+      "type": "SIGN",
+      "text": "ROUTE 45\nMOUNTAIN RD. AHEAD",
+      "speaker": "🪧 ROUTE 45 SIGN",
+      "pages": [
+        "ROUTE 45\nMOUNTAIN RD. AHEAD"
+      ]
+    }
+  ],
   "grassEncounters": [
     {
       "speciesId": "geodude",

@@ -662,7 +662,7 @@ export function resolveElmLabDialogue(
   playerName: string,
   storyFlags: ReadonlySet<string>,
   party: ReadonlyArray<{ speciesId: string; isEgg?: boolean }> = []
-): { pages: string[]; action: 'PROMPT_STARTER' | 'PROMPT_POLICE' | 'DELIVER_MYSTERY_EGG' | 'HEAL_AND_SAVE' } {
+): { pages: string[]; action: 'PROMPT_STARTER' | 'PROMPT_POLICE' | 'DELIVER_MYSTERY_EGG' | 'HEAL_AND_SAVE' | 'GIVE_MASTER_BALL' } {
   const hasStarter = storyFlags.has('starter_chosen') || party.some((p) => !p.isEgg);
 
   if (!hasStarter) {
@@ -672,6 +672,28 @@ export function resolveElmLabDialogue(
         `PROF. ELM: Hi, ${playerName}! I've been waiting for you!`,
         'I want you to run an errand for me! MR. POKéMON beyond CHERRYGROVE CITY on ROUTE 30 sent word of a rare discovery.',
         "I'd like you to go examine it for me. Choose one of the POKéMON in the BALLS on that table to accompany you!",
+      ],
+    };
+  }
+
+  if (storyFlags.has('has_rising_badge')) {
+    if (!storyFlags.has('EVENT_GOT_MASTER_BALL_FROM_ELM')) {
+      return {
+        action: 'GIVE_MASTER_BALL',
+        pages: [
+          `PROF. ELM: Hi, ${playerName}! Thanks to you, my research is going great!`,
+          "Take this as a token of my appreciation! It's the ultimate POKé BALL that catches any wild POKéMON without fail!",
+          `${playerName} received the MASTER BALL!`,
+          'PROF. ELM: The POKéMON LEAGUE is waiting! Head east from NEW BARK TOWN across ROUTE 27 and TOHJO FALLS towards KANTO!',
+        ],
+      };
+    }
+    return {
+      action: 'HEAL_AND_SAVE',
+      pages: [
+        `PROF. ELM: Hi, ${playerName}! Have you used the MASTER BALL yet?`,
+        'Head east across the water from NEW BARK TOWN to reach ROUTE 27 and TOHJO FALLS—the gateway to the INDIGO PLATEAU!',
+        "Let me heal your POKéMON and save your journey's progress!",
       ],
     };
   }

@@ -203,7 +203,9 @@ export interface GridEntity {
     | 'WHIRLPOOL_OBSTACLE_EVENT'
     | 'WHIRL_ISLAND_LORE_EVENT'
     | 'MAHOGANY_GYM_STATUE'
-    | 'MAHOGANY_GYM_GUIDE';
+    | 'MAHOGANY_GYM_GUIDE'
+    | 'ROUTE_46_GATE_OFFICER'
+    | 'ROUTE_46_GATE_YOUNGSTER';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

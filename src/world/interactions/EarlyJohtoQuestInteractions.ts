@@ -430,6 +430,19 @@ export function getEarlyJohtoQuestInteractions(): NpcInteractionRegistration[] {
           return true;
         }
 
+        if (elmDialogue.action === 'GIVE_MASTER_BALL') {
+          ctx.storyFlags.add('EVENT_GOT_MASTER_BALL_FROM_ELM');
+          ctx.inventory.balls['master-ball'] = (ctx.inventory.balls['master-ball'] || 0) + 1;
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          ctx.audioManager?.playSfx?.('sfx_badge_get');
+          ctx.openDialogue(elmDialogue.pages, '🔬 PROF. ELM', () => {
+            ctx.healPlayerParty(false);
+            ctx.saveCurrentGame();
+            ctx.showToast('🟣 Received the MASTER BALL from Prof. Elm!');
+          });
+          return true;
+        }
+
         if (elmDialogue.action === 'HEAL_AND_SAVE') {
           ctx.openDialogue(elmDialogue.pages, '🔬 PROF. ELM', () => {
             ctx.healPlayerParty(false);

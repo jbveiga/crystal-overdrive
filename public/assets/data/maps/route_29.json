@@ -3265,7 +3265,15 @@
       "offset": 20
     }
   },
-  "warps": [],
+  "warps": [
+    {
+      "x": 27,
+      "y": 1,
+      "targetMapId": "route_29_route_46_gate",
+      "targetX": 4,
+      "targetY": 7
+    }
+  ],
   "bgEvents": [
     {
       "x": 51,

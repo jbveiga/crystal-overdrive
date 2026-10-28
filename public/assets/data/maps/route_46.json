@@ -2181,8 +2181,34 @@
       "offset": -72
     }
   },
-  "warps": [],
-  "bgEvents": [],
+  "warps": [
+    {
+      "x": 7,
+      "y": 33,
+      "targetMapId": "route_29_route_46_gate",
+      "targetX": 4,
+      "targetY": 1
+    },
+    {
+      "x": 8,
+      "y": 33,
+      "targetMapId": "route_29_route_46_gate",
+      "targetX": 5,
+      "targetY": 1
+    }
+  ],
+  "bgEvents": [
+    {
+      "x": 9,
+      "y": 27,
+      "type": "SIGN",
+      "text": "ROUTE 46\nMOUNTAIN RD. AHEAD",
+      "speaker": "🪧 ROUTE 46 SIGN",
+      "pages": [
+        "ROUTE 46\nMOUNTAIN RD. AHEAD"
+      ]
+    }
+  ],
   "grassEncounters": [
     {
       "speciesId": "geodude",
