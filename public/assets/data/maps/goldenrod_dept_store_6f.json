@@ -410,8 +410,43 @@
       "targetMapId": "goldenrod_dept_store_roof",
       "targetX": 13,
       "targetY": 2
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "targetMapId": "goldenrod_dept_store_elevator",
+      "targetX": 1,
+      "targetY": 5
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 8,
+      "y": 1,
+      "speaker": "🥤 VENDING MACHINE",
+      "action": "VENDING_MACHINE",
+      "pages": [
+        "VENDING MACHINE: Clang! Refreshing drinks in stock!"
+      ]
+    },
+    {
+      "x": 9,
+      "y": 1,
+      "speaker": "🥤 VENDING MACHINE",
+      "action": "VENDING_MACHINE",
+      "pages": [
+        "VENDING MACHINE: Clang! Refreshing drinks in stock!"
+      ]
+    },
+    {
+      "x": 10,
+      "y": 1,
+      "speaker": "🥤 VENDING MACHINE",
+      "action": "VENDING_MACHINE",
+      "pages": [
+        "VENDING MACHINE: Clang! Refreshing drinks in stock!"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

@@ -211,7 +211,9 @@ export interface GridEntity {
     | 'HO_OH_BOSS_EVENT'
     | 'FIRST_STEP_KANTO_FISHER'
     | 'ROUTE27_SANDSTORM_EVENT'
-    | 'ROUTE26_HEAL_EVENT';
+    | 'ROUTE26_HEAL_EVENT'
+    | 'DEPT_STORE_TRADE_MIKE'
+    | 'DEPT_ELEVATOR_PANEL';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

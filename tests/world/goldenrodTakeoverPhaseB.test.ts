@@ -62,13 +62,13 @@ describe('TICKET-STORY-TEAM-ROCKET-GOLDENROD-TAKEOVER-01: Phase B Verification S
       });
     });
 
-    it('verifies goldenrod_underground_switch_room_entrances.json (30x18) dimensions and reciprocal warps', () => {
+    it('verifies goldenrod_underground_switch_room_entrances.json (30x36) dimensions and reciprocal warps', () => {
       const sr: MapData = JSON.parse(
         fs.readFileSync(path.join(mapsDir, 'goldenrod_underground_switch_room_entrances.json'), 'utf8')
       );
       expect(sr.id).toBe('goldenrod_underground_switch_room_entrances');
       expect(sr.width).toBe(30);
-      expect(sr.height).toBe(18);
+      expect(sr.height).toBe(36);
 
       // Reciprocal warp back to goldenrod_underground
       const toUg = sr.warps.find((w) => w.targetMapId === 'goldenrod_underground');

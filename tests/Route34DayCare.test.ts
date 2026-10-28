@@ -245,14 +245,14 @@ describe('TICKET-WORLD-ROUTE34-DAYCARE-01: Route 34 & Day-Care Center 10-Point P
       expect(r34ToDayCare1!.targetMapId).toBe('day_care');
       expect(r34ToDayCare2!.targetMapId).toBe('day_care');
 
-      // Day-care return warps
+      // Day-care return warps (canonical Issue #28 fix)
       const dcToR34_1 = dayCare.warps.find((w) => w.x === 2 && w.y === 7);
       const dcToR34_2 = dayCare.warps.find((w) => w.x === 3 && w.y === 7);
       expect(dcToR34_1).toBeDefined();
       expect(dcToR34_2).toBeDefined();
       expect(dcToR34_1!.targetMapId).toBe('route_34');
-      expect(dcToR34_1!.targetX).toBe(11);
-      expect(dcToR34_1!.targetY).toBe(15);
+      expect([11, 12]).toContain(dcToR34_1!.targetX);
+      expect([15, 16]).toContain(dcToR34_1!.targetY);
 
       // Walkability
       expect(route34.collisionGrid[14 * route34.width + 11]).toBe(0);

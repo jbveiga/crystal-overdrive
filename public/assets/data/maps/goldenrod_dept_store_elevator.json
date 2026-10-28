@@ -1,0 +1,61 @@
+{
+  "id": "goldenrod_dept_store_elevator",
+  "name": "Dept Store Elevator",
+  "width": 6,
+  "height": 6,
+  "tileSize": 64,
+  "groundLayer": [
+    1, 1, 1, 1, 1, 1,
+    1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1
+  ],
+  "objectLayer": [],
+  "collisionGrid": [
+    1, 1, 1, 1, 1, 1,
+    1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 1
+  ],
+  "tileMap": [
+    "in_mart_0e_0f_1c_1d", "in_mart_0e_0f_1c_1d", "in_mart_0e_0f_1c_1d", "in_mart_11_0a_49_49", "in_mart_0e_0f_1c_1d", "in_mart_0e_0f_1c_1d",
+    "in_mart_0e_0f_1c_1d", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_0e_0f_1c_1d",
+    "in_mart_0e_0f_1c_1d", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_0e_0f_1c_1d",
+    "in_mart_0e_0f_1c_1d", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_0e_0f_1c_1d",
+    "in_mart_0e_0f_1c_1d", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_0e_0f_1c_1d",
+    "in_mart_0e_0f_1c_1d", "in_mart_0b_0b_1b_1b", "in_mart_0b_0b_1b_1b", "in_mart_01_01_01_01", "in_mart_01_01_01_01", "in_mart_0e_0f_1c_1d"
+  ],
+  "connections": {},
+  "warps": [
+    {
+      "x": 1,
+      "y": 5,
+      "targetMapId": "goldenrod_dept_store_1f",
+      "targetX": 2,
+      "targetY": 1
+    },
+    {
+      "x": 2,
+      "y": 5,
+      "targetMapId": "goldenrod_dept_store_1f",
+      "targetX": 2,
+      "targetY": 1
+    }
+  ],
+  "bgEvents": [
+    {
+      "x": 4,
+      "y": 1,
+      "speaker": "🛗 ELEVATOR PANEL",
+      "action": "DEPT_ELEVATOR_PANEL",
+      "pages": [
+        "Which floor would you like to visit?"
+      ]
+    }
+  ],
+  "grassEncounters": []
+}

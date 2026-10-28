@@ -227,47 +227,54 @@ export function getGoldenrodExpansionInteractions(): NpcInteractionRegistration[
       },
     },
 
-    // 5. Dept. Store 5F Camper Mike Trade (Drowzee for Machop "MUSCLE")
+    // 5. Dept. Store 5F Camper Mike Trade (Drowzee for Machop "CHRIS")
     {
+      actions: ['DEPT_STORE_TRADE_MIKE'],
       npcIds: ['dept_5f_mike'],
       handler: (targetNpc, _map, ctx) => {
-        if (ctx.storyFlags.has('EVENT_TRADED_MIKE_MACHOP')) {
+        if (
+          ctx.storyFlags.has('traded_machop_chris') ||
+          ctx.storyFlags.has('EVENT_TRADED_MACHOP_CHRIS') ||
+          ctx.storyFlags.has('EVENT_TRADED_MIKE_MACHOP')
+        ) {
           ctx.openDialogue(
-            ["CAMPER MIKE: How is MUSCLE doing? That MACHOP will make short work of WHITNEY's MILTANK!"],
+            ["MIKE: How is that MACHOP I traded you doing? My DROWZEE is getting so strong!"],
             targetNpc.speaker
           );
           return true;
         }
 
-        const drowzeeIdx = ctx.playerParty.findIndex((p) => p.speciesId === 'drowzee');
+        const drowzeeIdx = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'drowzee');
         if (drowzeeIdx === -1) {
           ctx.openDialogue(
             [
-              "CAMPER MIKE: I'm looking for a DROWZEE! You can catch one right outside south of Goldenrod on ROUTE 34.",
-              "If you bring me a DROWZEE, I'll trade you my prized MACHOP!",
+              "MIKE: Hi! I'm looking for a DROWZEE! Would you trade one for my MACHOP?",
             ],
             targetNpc.speaker
           );
           return true;
         }
 
-        const drowzee = ctx.playerParty[drowzeeIdx];
-        const machop = PokemonFactory.create('machop', drowzee.level, ['lowkick', 'leer', 'focusenergy', 'karatechop']);
-        machop.nickname = 'MUSCLE';
+        const machop = PokemonFactory.create('machop', 15, ['karatechop', 'lowkick', 'leer', 'focusenergy']);
+        machop.nickname = 'CHRIS';
         machop.heldItem = 'gold-berry';
         machop.originalTrainer = 'MIKE';
+        machop.otId = '25740';
         ctx.playerParty[drowzeeIdx] = machop;
+        ctx.storyFlags.add('traded_machop_chris');
+        ctx.storyFlags.add('EVENT_TRADED_MACHOP_CHRIS');
         ctx.storyFlags.add('EVENT_TRADED_MIKE_MACHOP');
         BattleAudio.playOverworldSound('KEY_ITEM');
         ctx.openDialogue(
           [
-            'CAMPER MIKE: Whoa! Thank you so much for the DROWZEE!',
-            'Take good care of MUSCLE! It has tremendous Fighting power!',
+            'MIKE: Whoa! Thank you so much for the DROWZEE!',
+            `${ctx.playerName} traded DROWZEE for MIKE's MACHOP (CHRIS)!`,
+            'MIKE: Take good care of CHRIS! It has tremendous Fighting power!',
           ],
           targetNpc.speaker,
           () => {
-            ctx.saveCurrentGame();
-            ctx.showToast('🔄 Traded DROWZEE for MIKE’s MACHOP (MUSCLE)!');
+            ctx.saveCurrentGame?.();
+            ctx.showToast?.('🔄 Traded DROWZEE for MIKE’s MACHOP (CHRIS)!');
           }
         );
         return true;

@@ -2328,7 +2328,7 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'goldenrod_magnet_train_station',
   name: 'Goldenrod Magnet Train Station',
-  tileset: 'gate',
+  tileset: 'train_station',
   blkFile: 'maps__GoldenrodMagnetTrainStation.blk',
   blocksW: 10,
   blocksH: 9,
@@ -2360,11 +2360,17 @@ buildMapFromBlk({
   tileset: 'underground',
   blkFile: 'maps__GoldenrodUndergroundSwitchRoomEntrances.blk',
   blocksW: 15,
-  blocksH: 9,
+  blocksH: 18,
   warps: [
     { x: 23, y: 3, targetMapId: 'goldenrod_underground', targetX: 18, targetY: 6 },
     { x: 22, y: 10, targetMapId: 'goldenrod_underground_warehouse', targetX: 1, targetY: 1 },
     { x: 23, y: 10, targetMapId: 'goldenrod_underground_warehouse', targetX: 2, targetY: 1 },
+    { x: 5, y: 25, targetMapId: 'goldenrod_underground', targetX: 3, targetY: 34 },
+    { x: 4, y: 29, targetMapId: 'goldenrod_city', targetX: 11, targetY: 30 },
+    { x: 5, y: 29, targetMapId: 'goldenrod_city', targetX: 11, targetY: 30 },
+    { x: 21, y: 25, targetMapId: 'goldenrod_underground', targetX: 3, targetY: 2 },
+    { x: 20, y: 29, targetMapId: 'goldenrod_city', targetX: 9, targetY: 6 },
+    { x: 21, y: 29, targetMapId: 'goldenrod_city', targetX: 9, targetY: 6 },
   ],
   bgEvents: [
     { x: 16, y: 1, speaker: '🔌 SWITCH 1', pages: ['A wall switch labeled SWITCH 1.'] },

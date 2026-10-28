@@ -26,15 +26,6 @@ export interface DeptStoreFloor {
 
 export const DEPT_STORE_FLOORS: DeptStoreFloor[] = [
   {
-    id: 'roof',
-    name: 'ROOFTOP LOOKOUT',
-    shortName: 'ROOF',
-    tagline: 'Scenic Skyline & Rooftop Bargains',
-    mapId: 'goldenrod_dept_store_roof',
-    stockSummary: ['Fresh Water (₽200)', 'Soda Pop (₽300)', 'Lemonade (₽350)'],
-    description: 'Breathtaking panoramic overlook across Goldenrod City and the Radio Tower. Refreshing vending machines available.',
-  },
-  {
     id: '6f',
     name: '6F: TRANQUIL SQUARE',
     shortName: '6F',
@@ -87,6 +78,15 @@ export const DEPT_STORE_FLOORS: DeptStoreFloor[] = [
     mapId: 'goldenrod_dept_store_1f',
     stockSummary: ['Directory Services', 'City Information', 'Lost & Found'],
     description: 'Welcome to the largest shopping center in Johto. Our receptionists are ready to guide you to all six shopping tiers.',
+  },
+  {
+    id: 'b1f',
+    name: 'B1F: WAREHOUSE VAULT',
+    shortName: 'B1F',
+    tagline: 'Subterranean Storage Depot',
+    mapId: 'goldenrod_underground_warehouse',
+    stockSummary: ['Storage Crates', 'Underground Passage'],
+    description: 'Subterranean storage depot beneath the department store connected directly to the Goldenrod Underground.',
   },
 ];
 

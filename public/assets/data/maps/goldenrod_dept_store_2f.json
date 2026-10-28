@@ -410,6 +410,13 @@
       "targetMapId": "goldenrod_dept_store_3f",
       "targetX": 12,
       "targetY": 1
+    },
+    {
+      "x": 2,
+      "y": 0,
+      "targetMapId": "goldenrod_dept_store_elevator",
+      "targetX": 1,
+      "targetY": 5
     }
   ],
   "bgEvents": [],

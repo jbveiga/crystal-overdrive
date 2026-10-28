@@ -212,36 +212,15 @@ export class FieldObstacleDispatcher {
         bgEvent.speaker?.includes('STATUE') ||
         (bgEvent.pages && bgEvent.pages.some((p) => p.includes('GYM STATUE') || p.includes('POKéMON GYM')))
       ) {
-        if (currentMap.id === 'violet_gym') {
-          const statuePages = [
-            'VIOLET CITY POKéMON GYM',
-            'LEADER: FALKNER',
-            ctx.storyFlags.has('falkner_defeated')
-              ? `WINNING TRAINERS: SILVER, ${ctx.playerName}`
-              : 'WINNING TRAINERS: SILVER',
-          ];
-          ctx.openDialogue(statuePages, bgEvent.speaker);
-          return true;
-        }
-        if (currentMap.id === 'azalea_gym') {
-          const statuePages = [
-            'AZALEA TOWN POKéMON GYM',
-            'LEADER: BUGSY',
-            ctx.storyFlags.has('bugsy_defeated')
-              ? `WINNING TRAINERS: SILVER, ${ctx.playerName}`
-              : 'WINNING TRAINERS: SILVER',
-          ];
-          ctx.openDialogue(statuePages, bgEvent.speaker);
-          return true;
-        }
-        if (currentMap.id === 'mahogany_gym' || bgEvent.action === 'MAHOGANY_GYM_STATUE') {
-          const statuePages = [
-            'MAHOGANY TOWN POKéMON GYM\nLEADER: PRYCE',
-            ctx.storyFlags.has('pryce_defeated')
-              ? `WINNING TRAINERS: SILVER, ${ctx.playerName}`
-              : 'WINNING TRAINERS: SILVER',
-          ];
-          ctx.openDialogue(statuePages, bgEvent.speaker);
+        const gymLeaders: Record<string, { city: string; leader: string; flag: string }> = {
+          violet_gym: { city: 'VIOLET CITY', leader: 'FALKNER', flag: 'falkner_defeated' },
+          azalea_gym: { city: 'AZALEA TOWN', leader: 'BUGSY', flag: 'bugsy_defeated' },
+          mahogany_gym: { city: 'MAHOGANY TOWN', leader: 'PRYCE', flag: 'pryce_defeated' },
+        };
+        const gym = gymLeaders[currentMap.id] || (bgEvent.action === 'MAHOGANY_GYM_STATUE' ? gymLeaders.mahogany_gym : undefined);
+        if (gym) {
+          const winner = ctx.storyFlags.has(gym.flag) ? `WINNING TRAINERS: SILVER, ${ctx.playerName}` : 'WINNING TRAINERS: SILVER';
+          ctx.openDialogue([`${gym.city} POKéMON GYM`, `LEADER: ${gym.leader}`, winner], bgEvent.speaker);
           return true;
         }
       }
@@ -322,6 +301,31 @@ export class FieldObstacleDispatcher {
           );
           return true;
         }
+      }
+
+      // Vending Machine bgEvent (Issue #32)
+      if (bgEvent.action === 'VENDING_MACHINE' || bgEvent.speaker?.includes('VENDING MACHINE')) {
+        ctx.openDialogue(
+          bgEvent.pages.length > 0 ? bgEvent.pages : ['VENDING MACHINE: Clang! Refreshing drinks in stock!'],
+          bgEvent.speaker || '🥤 VENDING MACHINE',
+          () => ctx.openMart('goldenrod_dept_store_6f')
+        );
+        return true;
+      }
+
+      // Dept Store Elevator Panel bgEvent (Issue #29 & #33)
+      if (bgEvent.action === 'DEPT_ELEVATOR_PANEL' || bgEvent.action === 'DEPT_ELEVATOR') {
+        const curMap = ctx.mapManager.getCurrentMap();
+        ctx.openDeptElevatorModal(curMap?.id || 'goldenrod_dept_store_1f', (targetMapId) => {
+          if (targetMapId === curMap?.id) {
+            ctx.openDialogue(['You are already on this floor!'], bgEvent.speaker);
+            return;
+          }
+          ctx.executeWarpTransition?.({
+            x: ctx.player.x, y: ctx.player.y, targetMapId, targetX: 2, targetY: 1, direction: 'DOWN',
+          });
+        });
+        return true;
       }
 
       ctx.openDialogue(bgEvent.pages, bgEvent.speaker, () => {

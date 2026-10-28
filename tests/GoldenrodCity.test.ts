@@ -469,7 +469,7 @@ describe('TICKET-WORLD-GOLDENROD-CITY-01: Goldenrod City Metropolis 10-Point Pac
     it('contains all 7 department store levels with valid target map IDs', () => {
       expect(DEPT_STORE_FLOORS.length).toBe(7);
 
-      const expectedFloors = ['roof', '6f', '5f', '4f', '3f', '2f', '1f'];
+      const expectedFloors = ['6f', '5f', '4f', '3f', '2f', '1f', 'b1f'];
       expect(DEPT_STORE_FLOORS.map((f) => f.id)).toEqual(expectedFloors);
 
       DEPT_STORE_FLOORS.forEach((floor) => {
@@ -492,8 +492,8 @@ describe('TICKET-WORLD-GOLDENROD-CITY-01: Goldenrod City Metropolis 10-Point Pac
 
       expect(ui.isOpen()).toBe(true);
 
-      // Select floor index 2 (5F: TM Corner)
-      (ui as any).selectedIndex = 2;
+      // Select floor index 1 (5F: TM Corner)
+      (ui as any).selectedIndex = 1;
       (ui as any).confirmFloor();
 
       expect(selectedFloorId).toBe('5f');

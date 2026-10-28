@@ -358,7 +358,7 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
 
     // 9. Goldenrod Dept. Store Elevator
     {
-      actions: ['DEPT_ELEVATOR'],
+      actions: ['DEPT_ELEVATOR', 'DEPT_ELEVATOR_PANEL'],
       idPrefixes: ['dept_elevator'],
       handler: (targetNpc, _map, ctx) => {
         const currentM = ctx.mapManager.getCurrentMap();

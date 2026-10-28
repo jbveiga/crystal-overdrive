@@ -366,7 +366,7 @@ describe('TICKET-WORLD-GOLDENROD-EXPANSION-AND-GATE-FIXES-01: Full Verification 
       expect(mockContext.inventory!.tms).toContain('TM50');
     });
 
-    it('handles Dept. Store 5F Camper Mike trading Drowzee for Machop MUSCLE', () => {
+    it('handles Dept. Store 5F Camper Mike trading Drowzee for Machop CHRIS', () => {
       const mikeHandler = findHandler('dept_5f_mike')!;
       mockContext.playerParty!.push(PokemonFactory.create('drowzee', 12));
 
@@ -374,11 +374,11 @@ describe('TICKET-WORLD-GOLDENROD-EXPANSION-AND-GATE-FIXES-01: Full Verification 
       expect(handled).toBe(true);
       expect(mockContext.storyFlags!.has('EVENT_TRADED_MIKE_MACHOP')).toBe(true);
 
-      const muscle = mockContext.playerParty!.find((p) => p.nickname === 'MUSCLE');
-      expect(muscle).toBeDefined();
-      expect(muscle?.speciesId).toBe('machop');
-      expect(muscle?.originalTrainer).toBe('MIKE');
-      expect(muscle?.heldItem).toBe('gold-berry');
+      const machop = mockContext.playerParty!.find((p) => p.nickname === 'CHRIS' || p.nickname === 'MUSCLE');
+      expect(machop).toBeDefined();
+      expect(machop?.speciesId).toBe('machop');
+      expect(machop?.originalTrainer).toBe('MIKE');
+      expect(machop?.heldItem).toBe('gold-berry');
     });
 
     it('handles Sunday Happiness Lady rewarding TM27 Return for high friendship', () => {
