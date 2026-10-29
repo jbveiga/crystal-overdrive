@@ -32,7 +32,7 @@ export interface MapConnection { mapId: string; offset: number; }
 
 export interface BgEvent {
   x: number; y: number; speaker?: string; pages: string[];
-  action?: 'HEAL_AND_SAVE' | 'OPEN_MART' | 'OPEN_POKEGEAR' | 'POKECENTER_MAP'
+  action?: 'HEAL_AND_SAVE' | 'FAST_SHIP_CABIN_REST' | 'OPEN_MART' | 'OPEN_POKEGEAR' | 'POKECENTER_MAP'
     | 'OPEN_MAP' | 'OPEN_PC' | 'STARTER_CYNDAQUIL' | 'STARTER_TOTODILE' | 'STARTER_CHIKORITA'
     | 'ROCKET_BASE_SECURITY_SWITCH' | 'ROCKET_BASE_OFFICE_DOOR' | 'ROCKET_BASE_TRANSMITTER_DOOR'
     | 'LUGIA_SHRINE_EVENT' | 'WHIRLPOOL_OBSTACLE_EVENT' | 'MAHOGANY_GYM_STATUE'

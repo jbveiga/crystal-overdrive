@@ -440,23 +440,29 @@ export function isNpcActiveForStoryFlags(
   }
 
   // Victory Road Rival & Indigo Plateau Elite Four (Act 9)
-  if (npcId === 'victory_road_rival') {
-    return true;
+  if (npcId === 'victory_road_rival') return true;
+  if (npcId === 'e4_will') return !storyFlags.has('will_defeated');
+  if (npcId === 'e4_koga') return !storyFlags.has('koga_defeated');
+  if (npcId === 'e4_bruno') return !storyFlags.has('bruno_defeated');
+  if (npcId === 'e4_karen') return !storyFlags.has('karen_defeated');
+  if (npcId === 'champion_lance') return !storyFlags.has('champion_defeated');
+
+  // Fast Ship S.S. Aqua Lost Granddaughter & Grandpa Lifecycle
+  const fastShipArrived =
+    storyFlags.has('granddaughter_found') ||
+    storyFlags.has('granddaughter_returned') ||
+    storyFlags.has('fast_ship_arrived_vermilion');
+  if (
+    npcId === 'fast_ship_cabins_se_sse_captains_cabin_gentleman_cabin' ||
+    npcId === 'fast_ship_cabins_se_sse_captains_cabin_twin_cabin'
+  ) {
+    return fastShipArrived;
   }
-  if (npcId === 'e4_will') {
-    return !storyFlags.has('will_defeated');
-  }
-  if (npcId === 'e4_koga') {
-    return !storyFlags.has('koga_defeated');
-  }
-  if (npcId === 'e4_bruno') {
-    return !storyFlags.has('bruno_defeated');
-  }
-  if (npcId === 'e4_karen') {
-    return !storyFlags.has('karen_defeated');
-  }
-  if (npcId === 'champion_lance') {
-    return !storyFlags.has('champion_defeated');
+  if (
+    npcId === 'fast_ship_cabins_se_sse_captains_cabin_twin_2' ||
+    npcId === 'fast_ship_1f_gentleman_3'
+  ) {
+    return !fastShipArrived;
   }
 
   return true;

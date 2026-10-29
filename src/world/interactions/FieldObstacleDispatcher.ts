@@ -342,7 +342,7 @@ export class FieldObstacleDispatcher {
           BattleAudio.playOverworldSound('FANFARE');
           ctx.showToast('🎓 Blackboard studied! Received Status Cure Kit!');
           ctx.saveCurrentGame();
-        } else if (bgEvent.action === 'HEAL_AND_SAVE') {
+        } else if (bgEvent.action === 'HEAL_AND_SAVE' || bgEvent.action === 'FAST_SHIP_CABIN_REST') {
           ctx.healPlayerParty(false);
           ctx.saveCurrentGame();
           if (currentMap.id.endsWith('_poke_center')) {

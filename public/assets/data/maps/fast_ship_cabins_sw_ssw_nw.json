@@ -817,6 +817,21 @@
       "targetY": 15
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 2,
+      "y": 1,
+      "speaker": "🛏️ CABIN BED",
+      "pages": ["A comfortable ship cabin bed. Time for a quick rest!"],
+      "action": "FAST_SHIP_CABIN_REST"
+    },
+    {
+      "x": 3,
+      "y": 1,
+      "speaker": "🛏️ CABIN BED",
+      "pages": ["A comfortable ship cabin bed. Time for a quick rest!"],
+      "action": "FAST_SHIP_CABIN_REST"
+    }
+  ],
   "grassEncounters": []
 }

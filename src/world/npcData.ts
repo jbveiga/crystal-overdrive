@@ -20,6 +20,7 @@ import { createGoldenrodCityNpcs } from './npcs/goldenrodCityNpcs';
 import { createGoldenrodBuildingsAndParkNpcs } from './npcs/goldenrodBuildingsAndParkNpcs';
 import { createEcruteakToRoute39Npcs } from './npcs/ecruteakToRoute39Npcs';
 import { createOlivineToIndigoNpcs } from './npcs/olivineToIndigoNpcs';
+import { createKantoVermilionNpcs } from './npcs/kantoVermilionNpcs';
 
 // Re-export shared entities, types, and functions for 100% backward compatibility
 export {
@@ -46,6 +47,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ...createGoldenrodBuildingsAndParkNpcs(),
     ...createEcruteakToRoute39Npcs(),
     ...createOlivineToIndigoNpcs(),
+    ...createKantoVermilionNpcs(),
   };
 
   const DEFAULT_LORE = [

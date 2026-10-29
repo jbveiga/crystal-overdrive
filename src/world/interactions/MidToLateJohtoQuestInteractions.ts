@@ -534,7 +534,10 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
       npcIds: ['port_sailor_guard'],
       handler: (targetNpc, _map, ctx) => {
         const hasTicket =
+          Boolean(ctx.inventory.items?.['ss-ticket']) ||
+          Boolean(ctx.inventory.items?.['ss_ticket']) ||
           ctx.storyFlags.has('has_ss_ticket') ||
+          ctx.storyFlags.has('hall_of_fame_inducted') ||
           ctx.storyFlags.has('EVENT_GOT_SS_TICKET') ||
           (ctx.inventory.keyItems || []).includes('ss_ticket') ||
           (ctx.inventory.keyItems || []).includes('S.S. TICKET');

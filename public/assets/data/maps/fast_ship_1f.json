@@ -1817,6 +1817,13 @@
       "targetMapId": "fast_ship_b1f",
       "targetX": 31,
       "targetY": 13
+    },
+    {
+      "x": 25,
+      "y": 1,
+      "targetMapId": "vermilion_port",
+      "targetX": 7,
+      "targetY": 18
     }
   ],
   "bgEvents": [],
