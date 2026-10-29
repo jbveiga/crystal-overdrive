@@ -54,9 +54,9 @@ export function createKantoVermilionNpcs(): Record<string, GridEntity[]> {
     vermilion_port: [
       makeNpc(
         'vermilion_port_sailor',
-        7,
-        17,
-        'UP',
+        8,
+        11,
+        'LEFT',
         'fisherman',
         '⚓ SAILOR',
         [
@@ -83,9 +83,9 @@ export function createKantoVermilionNpcs(): Record<string, GridEntity[]> {
     fast_ship_1f: [
       makeNpc(
         'fast_ship_1f_sailor_0',
-        25,
+        24,
         2,
-        'DOWN',
+        'RIGHT',
         'fisherman',
         '⚓ SAILOR',
         [

@@ -14,6 +14,7 @@ import { OverworldItemManager } from '../OverworldItemManager';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 import { BattleAudio } from '../../audio/BattleAudio';
 import { handleLugiaShrineOrBoss } from './WhirlIslandsInteractions';
+import { handleFastShipCabinRest } from './FastShipAndVermilionInteractions';
 
 export class FieldObstacleDispatcher {
   /**
@@ -342,7 +343,9 @@ export class FieldObstacleDispatcher {
           BattleAudio.playOverworldSound('FANFARE');
           ctx.showToast('🎓 Blackboard studied! Received Status Cure Kit!');
           ctx.saveCurrentGame();
-        } else if (bgEvent.action === 'HEAL_AND_SAVE' || bgEvent.action === 'FAST_SHIP_CABIN_REST') {
+        } else if (bgEvent.action === 'FAST_SHIP_CABIN_REST') {
+          handleFastShipCabinRest(bgEvent as any, currentMap, ctx as any);
+        } else if (bgEvent.action === 'HEAL_AND_SAVE') {
           ctx.healPlayerParty(false);
           ctx.saveCurrentGame();
           if (currentMap.id.endsWith('_poke_center')) {

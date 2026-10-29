@@ -14,6 +14,7 @@ import { OverworldItemManager } from './OverworldItemManager';
 import { applyMapNpcStoryMutations } from './npcData';
 import { BattleAudio } from '../audio/BattleAudio';
 import { checkHasAllJohtoBadges } from './interactions/VictoryRoadGateInteractions';
+import { evaluateFastShipWarp } from './interactions/FastShipAndVermilionInteractions';
 import type { OverworldTransitionContext } from '../types/gameContext';
 
 export class OverworldWarpAndMapTransitionController {
@@ -570,6 +571,18 @@ export class OverworldWarpAndMapTransitionController {
         ['WISE SAGE: Tin Tower is forbidden to all unless they bear the sacred CLEAR BELL!'],
         '🏮 WISE SAGE'
       );
+      return;
+    }
+
+    const fastShipGate = evaluateFastShipWarp(currentM.id, warp, storyFlags, inventory);
+    if (fastShipGate.blocked) {
+      player.isMoving = false;
+      player.progress = 0;
+      setCutsceneLocked(false);
+      BattleAudio.playMenuSound('CANCEL');
+      if (fastShipGate.blockedMessages) {
+        overworldHUD.openDialogue(fastShipGate.blockedMessages, fastShipGate.blockedSpeaker);
+      }
       return;
     }
 

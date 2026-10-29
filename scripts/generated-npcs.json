@@ -5362,9 +5362,9 @@
   "vermilion_port": [
     {
       "id": "vermilion_port_sailor_0",
-      "x": 7,
-      "y": 17,
-      "dir": "UP",
+      "x": 8,
+      "y": 11,
+      "dir": "LEFT",
       "sprite": "fisherman",
       "speaker": "SAILOR"
     },
@@ -5388,9 +5388,9 @@
   "fast_ship_1f": [
     {
       "id": "fast_ship_1f_sailor_0",
-      "x": 25,
+      "x": 24,
       "y": 2,
-      "dir": "DOWN",
+      "dir": "RIGHT",
       "sprite": "fisherman",
       "speaker": "SAILOR"
     },
@@ -6136,9 +6136,9 @@
   "olivine_port": [
     {
       "id": "olivine_port_sailor_0",
-      "x": 7,
-      "y": 23,
-      "dir": "UP",
+      "x": 6,
+      "y": 14,
+      "dir": "DOWN",
       "sprite": "fisherman",
       "speaker": "SAILOR"
     },

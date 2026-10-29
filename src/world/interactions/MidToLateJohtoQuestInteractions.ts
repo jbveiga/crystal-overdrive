@@ -10,6 +10,7 @@
 import type { NpcInteractionRegistration } from '../../types/gameContext';
 import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';
+import { handlePortSailorGuard } from './FastShipAndVermilionInteractions';
 
 /**
  * MidToLateJohtoQuestInteractions — Burned Tower, Lake of Rage, Rocket Base, Radio Tower, Tin Tower, Dragon's Den & Victory Road
@@ -528,39 +529,6 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
       },
     },
 
-    // 22. Olivine Port Sailor Guard Ticket Barrier
-    {
-      actions: ['PORT_SAILOR_GUARD'],
-      npcIds: ['port_sailor_guard'],
-      handler: (targetNpc, _map, ctx) => {
-        const hasTicket =
-          Boolean(ctx.inventory.items?.['ss-ticket']) ||
-          Boolean(ctx.inventory.items?.['ss_ticket']) ||
-          ctx.storyFlags.has('has_ss_ticket') ||
-          ctx.storyFlags.has('hall_of_fame_inducted') ||
-          ctx.storyFlags.has('EVENT_GOT_SS_TICKET') ||
-          (ctx.inventory.keyItems || []).includes('ss_ticket') ||
-          (ctx.inventory.keyItems || []).includes('S.S. TICKET');
-
-        if (!hasTicket) {
-          ctx.openDialogue(
-            [
-              "SAILOR: We don't want you to fall into the sea, so you're not allowed onto the pier without an S.S. TICKET!",
-              'Only certified trainers who have conquered the JOHTO LEAGUE receive a ticket from PROF. ELM.',
-            ],
-            targetNpc.speaker
-          );
-          return true;
-        }
-
-        ctx.openDialogue(
-          ['SAILOR: Welcome aboard the FAST SHIP S.S. AQUA!', 'Have your ticket ready as you board the ship at the gangway ahead!'],
-          targetNpc.speaker
-        );
-        return true;
-      },
-    },
-
     // 23. Mania's House: Kirk Shuckie Gift
     {
       actions: ['MANIA_SHUCKLE_EVENT'],
@@ -623,6 +591,13 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
         );
         return true;
       },
+    },
+
+    // 25. Olivine Port Sailor Ticket Guard (Cross-compatibility registration)
+    {
+      actions: ['PORT_SAILOR_GUARD'],
+      npcIds: ['port_sailor_guard', 'olivine_port_sailor_0'],
+      handler: handlePortSailorGuard,
     },
   ];
 }

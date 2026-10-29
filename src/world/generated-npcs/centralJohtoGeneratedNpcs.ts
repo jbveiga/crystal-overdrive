@@ -215,12 +215,12 @@ export const CENTRAL_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("vermilion_port_passage_teacher_0",17,1,"LEFT","teacher","TEACHER",undefined),
   ],
   "vermilion_port": [
-    n("vermilion_port_sailor_0",7,17,"UP","fisherman","SAILOR",undefined),
+    n("vermilion_port_sailor_0",8,11,"LEFT","fisherman","SAILOR",undefined),
     n("vermilion_port_sailor_1",6,11,"RIGHT","fisherman","SAILOR",undefined),
     n("vermilion_port_super_nerd_2",11,11,"LEFT","fat_man","SUPER NERD",undefined),
   ],
   "fast_ship_1f": [
-    n("fast_ship_1f_sailor_0",25,2,"DOWN","fisherman","SAILOR",undefined),
+    n("fast_ship_1f_sailor_0",24,2,"RIGHT","fisherman","SAILOR",undefined),
     n("fast_ship_1f_sailor_1",14,7,"RIGHT","fisherman","SAILOR",undefined),
     n("fast_ship_1f_sailor_2",22,17,"LEFT","fisherman","SAILOR",undefined),
     n("fast_ship_1f_gentleman_3",19,6,"RIGHT","fat_man","GENTLEMAN",undefined),
@@ -265,7 +265,7 @@ export const CENTRAL_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("olivine_port_passage_pokefan_m_0",17,1,"LEFT","fat_man","POKEFAN M",undefined),
   ],
   "olivine_port": [
-    n("olivine_port_sailor_0",7,23,"UP","fisherman","SAILOR",undefined),
+    n("olivine_port_sailor_0",6,14,"DOWN","fisherman","SAILOR",undefined),
     n("olivine_port_sailor_1",7,15,"UP","fisherman","SAILOR",undefined),
     n("olivine_port_sailor_2",6,15,"RIGHT","fisherman","SAILOR",undefined),
     n("olivine_port_fishing_guru_3",4,14,"UP","fisherman",D15,undefined),
