@@ -152,40 +152,6 @@ export const WEST_AND_NORTH_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]>
     n("celadon_cafe_fisher_3",1,2,"RIGHT","fisherman","FISHER",undefined),
     n("celadon_cafe_teacher_4",4,3,"LEFT","teacher","TEACHER",undefined),
   ],
-  "saffron_city": [
-    n(undefined,7,14,"LEFT","girl",undefined,undefined),
-    n(undefined,19,30,"LEFT","fat_man",undefined,undefined),
-    n(undefined,32,7,"LEFT","boy",undefined,undefined),
-    n(undefined,20,24,"LEFT","girl",undefined,undefined),
-    n(undefined,27,12,"DOWN","fisherman",undefined,undefined),
-    n(undefined,15,19,"UP","boy",undefined,undefined),
-    n(undefined,35,22,"DOWN","boy",undefined,undefined),
-    n(undefined,19,8,"DOWN","girl",undefined,undefined),
-  ],
-  "saffron_gym": [
-    n(undefined,9,8,"DOWN","girl","🏆 LEADER SABRINA",undefined, {"action":"SABRINA_EVENT","trainerId":"sabrina","trainerName":"Leader Sabrina","team":[{"speciesId":"espeon","level":46,"moves":["sandattack","quickattack","swift","psychic"]},{"speciesId":"mrmime","level":46,"moves":["barrier","reflect","batonpass","psychic"]},{"speciesId":"alakazam","level":48,"moves":["recover","futuresight","psychic","reflect"]}]}),
-    n(undefined,17,16,"DOWN","teacher","⚔️ REBECCA",undefined, {"trainerName":"Medium Rebecca","vision":3,"team":[{"speciesId":"drowzee","level":35},{"speciesId":"hypno","level":35}]}),
-    n(undefined,3,16,"DOWN","boy","⚔️ FRANKLIN",undefined, {"trainerName":"Psychic T Franklin","vision":3,"team":[{"speciesId":"kadabra","level":37}]}),
-    n(undefined,3,4,"DOWN","teacher","⚔️ DORIS",undefined, {"trainerName":"Medium Doris","vision":2,"team":[{"speciesId":"slowpoke","level":34},{"speciesId":"slowbro","level":36}]}),
-    n(undefined,17,4,"DOWN","boy","⚔️ JARED",undefined, {"trainerName":"Psychic T Jared","vision":2,"team":[{"speciesId":"mrmime","level":32},{"speciesId":"exeggcute","level":32},{"speciesId":"exeggcute","level":35}]}),
-    n(undefined,9,14,"DOWN","boy",D6,undefined),
-  ],
-  "fighting_dojo": [
-    n(undefined,4,4,"DOWN","fat_man",undefined,undefined),
-  ],
-  "silph_co_1f": [
-    n(undefined,4,2,"DOWN","teacher",undefined,undefined),
-    n(undefined,13,1,"DOWN","fat_man",undefined,undefined),
-  ],
-  "mr_psychics_house": [
-    n(undefined,5,3,"LEFT","fisherman",undefined,undefined),
-  ],
-  "saffron_magnet_train_station": [
-    n(undefined,9,9,"DOWN","fat_man",undefined,undefined),
-    n(undefined,10,14,"DOWN","boy",D6,undefined),
-    n(undefined,5,11,"RIGHT","teacher",undefined,undefined),
-    n(undefined,5,10,"UP","girl",undefined,undefined),
-  ],
   "saffron_poke_center": [
     n(undefined,3,1,"DOWN","teacher",D2,[D3,D4], {"action":"HEAL_AND_SAVE","counter":true}),
     n(undefined,7,2,"DOWN","teacher",undefined,undefined),
@@ -196,10 +162,6 @@ export const WEST_AND_NORTH_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]>
     n(undefined,1,3,"RIGHT","boy","🏪 CLERK",[D1], {"action":"OPEN_MART","counter":true}),
     n(undefined,7,2,"DOWN","boy",undefined,undefined),
     n(undefined,7,6,"LEFT","girl",undefined,undefined),
-  ],
-  "copycats_house_1f": [
-    n(undefined,2,3,"DOWN","fat_man",undefined,undefined),
-    n(undefined,5,4,"LEFT","teacher",undefined,undefined),
   ],
   "route_16_gate": [
     n(undefined,5,2,"DOWN","fat_man",undefined,undefined),

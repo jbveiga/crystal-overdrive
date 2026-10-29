@@ -174,9 +174,6 @@ export const CENTRAL_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     t("route_6_pokefan_m_1",9,12,"RIGHT","fat_man","⚔️ REX",["Rex: That was a great battle!"],"route_6_rex","Pokefanm Rex",2,["REX: Let's battle!"],[m("phanpy",35)]),
     t("route_6_pokefan_m_2",10,12,"LEFT","fat_man","⚔️ ALLAN",["Allan: That was a great battle!"],"route_6_allan","Pokefanm Allan",2,["ALLAN: Let's battle!"],[m("teddiursa",35)]),
   ],
-  "route_6_saffron_gate": [
-    n("route_6_saffron_gate_officer_0",0,4,"RIGHT","fat_man","OFFICER",undefined),
-  ],
   "vermilion_city": [
     n("vermilion_city_teacher_0",18,9,"DOWN","teacher","TEACHER",undefined),
     n("vermilion_city_gramps_1",23,6,"RIGHT","fat_man","GRAMPS",undefined),

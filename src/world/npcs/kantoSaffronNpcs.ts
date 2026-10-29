@@ -283,7 +283,7 @@ export function createKantoSaffronNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'COPYCAT_EVENT' }
       ),
-      makeNpc('copycats_doduo', 6, 3, 'LEFT', 'bird_keeper', '🐦 DODUO', [
+      makeNpc('copycats_doduo', 6, 3, 'LEFT', 'farfetchd', '🐦 DODUO', [
         'DODUO: Giga giga!',
       ]),
       makeNpc('copycats_doll', 1, 4, 'DOWN', 'girl', '🧸 CLEFAIRY DOLL', [
@@ -354,7 +354,7 @@ export function createKantoSaffronNpcs(): Record<string, GridEntity[]> {
       makeNpc('saffron_station_guide', 10, 14, 'DOWN', 'fat_man', '🏆 GYM GUIDE', [
         "The MAGNET TRAIN connects SAFFRON CITY with GOLDENROD CITY in JOHTO! It's marvelously fast!",
       ]),
-      makeNpc('saffron_station_passenger', 5, 11, 'RIGHT', 'teacher', '👩 COMMUTER', [
+      makeNpc('saffron_station_passenger', 11, 11, 'LEFT', 'teacher', '👩 COMMUTER', [
         'I commute between JOHTO and KANTO for work. The MAGNET TRAIN makes the trip a breeze!',
       ]),
     ],

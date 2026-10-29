@@ -250,6 +250,10 @@ export function handleCopycatInteraction(
           [`${ctx.playerName} received the MAGNET TRAIN PASS from COPYCAT!`],
           copycatNpc.speaker || '👧 COPYCAT',
           () => {
+            const curMap = ctx.mapManager.getCurrentMap();
+            if (curMap) {
+              ctx.renderMap?.(curMap);
+            }
             ctx.saveCurrentGame?.();
             ctx.showToast?.('🚄 Returned Clefairy Doll & received the MAGNET TRAIN PASS!');
           }

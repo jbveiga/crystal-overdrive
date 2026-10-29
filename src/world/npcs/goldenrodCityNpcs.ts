@@ -373,7 +373,8 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
         [
           'The MAGNET TRAIN reaches speeds over 340 mph between GOLDENROD and SAFFRON CITY!',
           'Only authorized travelers with a RAIL PASS may board the train.',
-        ]
+        ],
+        { action: 'MAGNET_TRAIN_CONDUCTOR' }
       ),
       makeNpc('train_passenger', 5, 14, 'RIGHT', 'boy', '👦 PASSENGER', 
         ['I can’t wait to ride the bullet train all the way to KANTO!']

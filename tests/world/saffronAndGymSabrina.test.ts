@@ -14,6 +14,7 @@ import {
   getSaffronAndRoute6Interactions,
 } from '../../src/world/interactions/SaffronAndRoute6Interactions';
 import { OverworldItemManager } from '../../src/world/OverworldItemManager';
+import { getNpcsForMap, isNpcActiveForStoryFlags } from '../../src/world/npcData';
 import type { NpcInteractionContext } from '../../src/types/worldContext';
 
 describe('TICKET-WORLD-SAFFRON-AND-GYM-SABRINA-01: Saffron City, Saffron Gym & Route 6 Verification', () => {
@@ -373,6 +374,61 @@ describe('TICKET-WORLD-SAFFRON-AND-GYM-SABRINA-01: Saffron City, Saffron Gym & R
         direction: 'DOWN',
       });
     });
+
+    it('asserts BFS path exists from arrival platform (9, 6) to south lobby exits (8..9, 17) in both stations avoiding solid tiles and NPCs', () => {
+      function canReachExit(map: MapData, startX: number, startY: number, npcs: Array<{ x: number; y: number }>): boolean {
+        const npcBlocked = new Set(npcs.map((n) => `${n.x},${n.y}`));
+        const visited = new Set<string>();
+        const queue: Array<[number, number]> = [[startX, startY]];
+        visited.add(`${startX},${startY}`);
+
+        while (queue.length > 0) {
+          const [cx, cy] = queue.shift()!;
+          if ((cx === 8 || cx === 9) && cy === 17) {
+            return true;
+          }
+
+          const neighbors: Array<[number, number]> = [
+            [cx + 1, cy],
+            [cx - 1, cy],
+            [cx, cy + 1],
+            [cx, cy - 1],
+          ];
+
+          for (const [nx, ny] of neighbors) {
+            if (nx < 0 || nx >= map.width || ny < 0 || ny >= map.height) continue;
+            const key = `${nx},${ny}`;
+            if (visited.has(key)) continue;
+            const collision = map.collisionGrid[ny * map.width + nx];
+            if (collision === 1) continue;
+            if (npcBlocked.has(key)) continue;
+            visited.add(key);
+            queue.push([nx, ny]);
+          }
+        }
+        return false;
+      }
+
+      const saffronNpcs = getNpcsForMap('saffron_magnet_train_station', new Set());
+      const goldenrodNpcs = getNpcsForMap('goldenrod_magnet_train_station', new Set());
+
+      expect(canReachExit(saffronStation, 9, 6, saffronNpcs)).toBe(true);
+      expect(canReachExit(goldenrodStation, 9, 6, goldenrodNpcs)).toBe(true);
+    });
+
+    it('verifies copycats_doll lifecycle gating and doduo farfetchd sprite', () => {
+      // Inactive before doll returned
+      expect(isNpcActiveForStoryFlags('copycats_doll', new Set())).toBe(false);
+      // Active after doll returned
+      expect(isNpcActiveForStoryFlags('copycats_doll', new Set(['got_magnet_train_pass']))).toBe(true);
+      expect(isNpcActiveForStoryFlags('copycats_doll', new Set(['copycat_doll_returned']))).toBe(true);
+
+      // Verify Doduo uses farfetchd bird sprite rather than human trainer
+      const npcs = createKantoSaffronNpcs();
+      const doduo = npcs.copycats_house_2f.find((n) => n.id === 'copycats_doduo');
+      expect(doduo).toBeDefined();
+      expect(doduo?.spriteType).toBe('farfetchd');
+    });
   });
 
   describe('6. Saffron Landmarks: Silph Co., Mr. Psychic & Fighting Dojo', () => {
@@ -514,6 +570,25 @@ describe('TICKET-WORLD-SAFFRON-AND-GYM-SABRINA-01: Saffron City, Saffron Gym & R
       expect(actions).toContain('SILPH_CO_GUARD');
       expect(actions).toContain('MR_PSYCHIC');
       expect(actions).toContain('ROUTE_6_TRAINER');
+    });
+
+    it('verifies absence of duplicate phantom NPCs in mr_psychics_house, saffron_gym, and saffron_magnet_train_station', () => {
+      // Mr. Psychic's House: strictly 1 NPC (mr_psychic)
+      const mrPsychicNpcs = getNpcsForMap('mr_psychics_house', new Set());
+      expect(mrPsychicNpcs.length).toBe(1);
+      expect(mrPsychicNpcs[0].id).toBe('mr_psychic');
+
+      // Saffron Gym: strictly 1 Gym Guide at (9, 16) and 1 Leader Sabrina
+      const gymNpcs = getNpcsForMap('saffron_gym', new Set());
+      const guides = gymNpcs.filter((n) => n.action === 'SAFFRON_GYM_GUIDE');
+      expect(guides.length).toBe(1);
+      expect(guides[0].x).toBe(9);
+      expect(guides[0].y).toBe(16);
+
+      // Saffron Magnet Train Station: no phantom girl blocking turnstile at (5, 10)
+      const stationNpcs = getNpcsForMap('saffron_magnet_train_station', new Set());
+      const turnstileBlocker = stationNpcs.find((n) => n.x === 5 && n.y === 10);
+      expect(turnstileBlocker).toBeUndefined();
     });
   });
 });
