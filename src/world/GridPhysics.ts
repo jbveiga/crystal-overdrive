@@ -265,7 +265,14 @@ export interface GridEntity {
     | 'CERULEAN_GYM_MACHINE_PART'
     | 'LAVENDER_RADIO_TOWER_DIRECTOR'
     | 'ROUTE_5_CLEANSE_TAG_GRANDMA'
-    | 'ROUTE_25_TRAINER';
+    | 'ROUTE_25_TRAINER'
+    | 'FUCHSIA_GYM_DECOY'
+    | 'FUCHSIA_GYM_GUIDE'
+    | 'FUCHSIA_GYM_STATUE'
+    | 'ROUTE_16_RECLUSE'
+    | 'WARDEN_GRANDDAUGHTER'
+    | 'BIKER_TRAINER'
+    | 'BIRD_KEEPER_TRAINER';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

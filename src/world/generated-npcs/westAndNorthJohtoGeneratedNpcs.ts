@@ -62,43 +62,8 @@ export const WEST_AND_NORTH_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]>
   "route_16_gate": [
     n(undefined,5,2,"DOWN","fat_man",undefined,undefined),
   ],
-  "route_16_fuchsia_speech_house": [
-    n(undefined,2,3,"DOWN","fat_man",undefined,undefined),
-  ],
-  "route_17": [
-    n(undefined,4,17,"DOWN","boy","⚔️ RILEY",undefined, {"trainerName":"Biker Riley","vision":4,"team":[{"speciesId":"weezing","level":34}]}),
-    n(undefined,9,68,"DOWN","boy","⚔️ JOEL",undefined, {"trainerName":"Biker Joel","vision":1,"team":[{"speciesId":"magmar","level":32},{"speciesId":"magmar","level":32}]}),
-    n(undefined,3,53,"DOWN","boy","⚔️ GLENN",undefined, {"trainerName":"Biker Glenn","vision":3,"team":[{"speciesId":"koffing","level":28},{"speciesId":"magmar","level":30},{"speciesId":"weezing","level":32}]}),
-    n(undefined,6,79,"RIGHT","boy","⚔️ CHARLES",undefined, {"trainerName":"Biker Charles","vision":4,"team":[{"speciesId":"koffing","level":30},{"speciesId":"charmeleon","level":30},{"speciesId":"weezing","level":30}]}),
-  ],
   "route_17_route_18_gate": [
     n(undefined,5,2,"DOWN","fat_man",undefined,undefined),
-  ],
-  "route_18": [
-    n(undefined,9,12,"DOWN","boy","⚔️ BORIS",undefined, {"trainerName":"Bird Keeper Boris","vision":3,"team":[{"speciesId":"doduo","level":30},{"speciesId":"doduo","level":28},{"speciesId":"dodrio","level":32}]}),
-    n(undefined,13,6,"DOWN","boy","⚔️ BOB",undefined, {"trainerName":"Bird Keeper Bob","vision":3,"team":[{"speciesId":"noctowl","level":34}]}),
-  ],
-  "fuchsia_city": [
-    n(undefined,23,18,"DOWN","boy",undefined,undefined),
-    n(undefined,13,8,"DOWN","fat_man",undefined,undefined),
-    n(undefined,16,14,"DOWN","teacher",undefined,undefined),
-  ],
-  "fuchsia_gym": [
-    n(undefined,1,10,"DOWN","girl","🏆 LEADER JANINE",undefined, {"action":"JANINE_EVENT","trainerId":"janine","trainerName":"Leader Janine","team":[{"speciesId":"crobat","level":36,"moves":["screech","supersonic","confuseray","wingattack"]},{"speciesId":"weezing","level":36,"moves":["smog","sludgebomb","toxic","explosion"]},{"speciesId":"weezing","level":36,"moves":["smog","sludgebomb","toxic","explosion"]},{"speciesId":"ariados","level":33,"moves":["scaryface","gigadrain","stringshot","nightshade"]},{"speciesId":"venomoth","level":39,"moves":["foresight","doubleteam","gust","psychic"]}]}),
-    n(undefined,7,15,"DOWN","boy",D6,undefined),
-  ],
-  "fuchsia_poke_center": [
-    n(undefined,3,1,"DOWN","teacher",D2,[D3,D4], {"action":"HEAL_AND_SAVE","counter":true}),
-    n(undefined,8,4,"LEFT","boy",undefined,undefined),
-    n(undefined,1,4,"LEFT","girl",undefined,undefined),
-  ],
-  "fuchsia_mart": [
-    n(undefined,1,3,"RIGHT","boy","🏪 CLERK",[D1], {"action":"OPEN_MART","counter":true}),
-    n(undefined,3,2,"LEFT","fisherman",undefined,undefined),
-    n(undefined,7,6,"LEFT","girl",undefined,undefined),
-  ],
-  "safari_zone_wardens_home": [
-    n(undefined,2,4,"RIGHT","girl",undefined,undefined),
   ],
   "route_19_fuchsia_gate": [
     n(undefined,0,4,"RIGHT","fat_man",undefined,undefined),

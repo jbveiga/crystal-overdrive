@@ -24,6 +24,7 @@ import { getVermilionGymInteractions } from './VermilionGymInteractions';
 import { getSaffronAndRoute6Interactions } from './SaffronAndRoute6Interactions';
 import { getCeladonAndGymErikaInteractions } from './CeladonAndGymErikaInteractions';
 import { getCeruleanPowerPlantAndMistyInteractions } from './CeruleanPowerPlantAndMistyInteractions';
+import { getCyclingRoadAndFuchsiaJanineInteractions } from './CyclingRoadAndFuchsiaJanineInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -53,6 +54,7 @@ export * from './VermilionGymInteractions';
 export * from './SaffronAndRoute6Interactions';
 export * from './CeladonAndGymErikaInteractions';
 export * from './CeruleanPowerPlantAndMistyInteractions';
+export * from './CyclingRoadAndFuchsiaJanineInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.
@@ -83,5 +85,6 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getSaffronAndRoute6Interactions(),
     ...getCeladonAndGymErikaInteractions(),
     ...getCeruleanPowerPlantAndMistyInteractions(),
+    ...getCyclingRoadAndFuchsiaJanineInteractions(),
   ]);
 }

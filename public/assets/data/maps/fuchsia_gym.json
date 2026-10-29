@@ -568,6 +568,25 @@
       "targetY": 28
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 3,
+      "y": 15,
+      "speaker": "🏛️ GYM STATUE",
+      "action": "FUCHSIA_GYM_STATUE",
+      "pages": [
+        "FUCHSIA CITY POKéMON GYM\nLEADER: JANINE\nWINNING TRAINERS:\nKOGA"
+      ]
+    },
+    {
+      "x": 6,
+      "y": 15,
+      "speaker": "🏛️ GYM STATUE",
+      "action": "FUCHSIA_GYM_STATUE",
+      "pages": [
+        "FUCHSIA CITY POKéMON GYM\nLEADER: JANINE\nWINNING TRAINERS:\nKOGA"
+      ]
+    }
+  ],
   "grassEncounters": []
 }
