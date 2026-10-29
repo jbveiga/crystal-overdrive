@@ -250,7 +250,7 @@ export function handleRoute24RocketGrunt(
         trainerName: 'Rocket Grunt',
         trainerTeam: instances,
         onBattleEnd: (res?: any) => {
-          if (res && res.winner && res.winner !== 'PLAYER') return; ctx.storyFlags.add('EVENT_DEFEATED_ROUTE24_GRUNT');
+          if (res?.fled || (res?.winner && res.winner !== 'PLAYER')) return; ctx.storyFlags.add('EVENT_DEFEATED_ROUTE24_GRUNT');
           ctx.storyFlags.add('route_24_grunt_defeated');
           ctx.defeatedTrainers.add(gruntNpc.trainerId || gruntNpc.id);
 
@@ -363,7 +363,7 @@ export function handleMistyInteraction(
         trainerName: 'Leader Misty',
         trainerTeam: instances,
         onBattleEnd: (res?: any) => {
-          if (res && res.winner && res.winner !== 'PLAYER') return; if (!ctx.inventory.badges) ctx.inventory.badges = [];
+          if (res?.fled || (res?.winner && res.winner !== 'PLAYER')) return; if (!ctx.inventory.badges) ctx.inventory.badges = [];
           if (!ctx.inventory.badges.includes('cascade')) {
             ctx.inventory.badges.push('cascade');
           }
@@ -421,7 +421,7 @@ export function handleCeruleanGymTrainer(
         trainerName: trainerNpc.trainerName || trainerNpc.speaker,
         trainerTeam: instances,
         onBattleEnd: (res?: any) => {
-          if (res && res.winner && res.winner !== 'PLAYER') return; ctx.defeatedTrainers.add(trainerId);
+          if (res?.fled || (res?.winner && res.winner !== 'PLAYER')) return; ctx.defeatedTrainers.add(trainerId);
           BattleAudio.playOverworldSound('FANFARE');
           ctx.saveCurrentGame();
         },

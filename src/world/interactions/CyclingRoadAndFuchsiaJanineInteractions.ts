@@ -117,7 +117,7 @@ export function handleJanineInteraction(
         trainerTeam: instances,
         onVictory: () => onBattleWon(),
         onBattleEnd: (res?: any) => {
-          if (res && res.winner && res.winner !== 'PLAYER') return;
+          if (res?.fled || (res?.winner && res.winner !== 'PLAYER')) return;
           onBattleWon();
         },
       });
@@ -191,7 +191,7 @@ export function handleFuchsiaGymDecoy(
         trainerTeam: instances,
         onVictory: () => onDefeat(),
         onBattleEnd: (res?: any) => {
-          if (res && res.winner && res.winner !== 'PLAYER') return;
+          if (res?.fled || (res?.winner && res.winner !== 'PLAYER')) return;
           onDefeat();
         },
       });
@@ -336,7 +336,7 @@ export function handleBikerTrainer(
         trainerTeam: instances,
         onVictory: () => onDefeat(),
         onBattleEnd: (res?: any) => {
-          if (res && res.winner && res.winner !== 'PLAYER') return;
+          if (res?.fled || (res?.winner && res.winner !== 'PLAYER')) return;
           onDefeat();
         },
       });
@@ -389,7 +389,7 @@ export function handleBirdKeeperTrainer(
         trainerTeam: instances,
         onVictory: () => onDefeat(),
         onBattleEnd: (res?: any) => {
-          if (res && res.winner && res.winner !== 'PLAYER') return;
+          if (res?.fled || (res?.winner && res.winner !== 'PLAYER')) return;
           onDefeat();
         },
       });
