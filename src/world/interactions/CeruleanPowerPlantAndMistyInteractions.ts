@@ -249,8 +249,8 @@ export function handleRoute24RocketGrunt(
         isTrainer: true,
         trainerName: 'Rocket Grunt',
         trainerTeam: instances,
-        onBattleEnd: () => {
-          ctx.storyFlags.add('EVENT_DEFEATED_ROUTE24_GRUNT');
+        onBattleEnd: (res?: any) => {
+          if (res && res.winner && res.winner !== 'PLAYER') return; ctx.storyFlags.add('EVENT_DEFEATED_ROUTE24_GRUNT');
           ctx.storyFlags.add('route_24_grunt_defeated');
           ctx.defeatedTrainers.add(gruntNpc.trainerId || gruntNpc.id);
 
@@ -362,8 +362,8 @@ export function handleMistyInteraction(
         isGymLeader: true,
         trainerName: 'Leader Misty',
         trainerTeam: instances,
-        onBattleEnd: () => {
-          if (!ctx.inventory.badges) ctx.inventory.badges = [];
+        onBattleEnd: (res?: any) => {
+          if (res && res.winner && res.winner !== 'PLAYER') return; if (!ctx.inventory.badges) ctx.inventory.badges = [];
           if (!ctx.inventory.badges.includes('cascade')) {
             ctx.inventory.badges.push('cascade');
           }
@@ -420,8 +420,8 @@ export function handleCeruleanGymTrainer(
         isTrainer: true,
         trainerName: trainerNpc.trainerName || trainerNpc.speaker,
         trainerTeam: instances,
-        onBattleEnd: () => {
-          ctx.defeatedTrainers.add(trainerId);
+        onBattleEnd: (res?: any) => {
+          if (res && res.winner && res.winner !== 'PLAYER') return; ctx.defeatedTrainers.add(trainerId);
           BattleAudio.playOverworldSound('FANFARE');
           ctx.saveCurrentGame();
         },
@@ -612,7 +612,8 @@ export function handleSleepingSnorlaxAwakening(
       snorlaxPkmn.heldItem = 'leftovers';
 
       ctx.triggerBattle(snorlaxPkmn, {
-        onBattleEnd: () => {
+        onBattleEnd: (res?: any) => {
+          if (res?.fled || (res?.winner && res.winner !== 'PLAYER' && !res.caught)) return;
           ctx.storyFlags.add('snorlax_cleared');
           ctx.storyFlags.add('EVENT_FOUGHT_SNORLAX');
 

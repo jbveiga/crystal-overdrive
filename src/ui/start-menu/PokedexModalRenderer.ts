@@ -130,9 +130,13 @@ export class PokedexModalRenderer {
           <input
             id="dex-search-input"
             type="text"
+            inputmode="text"
+            autocapitalize="none"
+            autocomplete="off"
+            spellcheck="false"
             placeholder="QUERY INDEX BY NAME, ID, OR TYPE..."
             value="${this.dexSearchQuery}"
-            style="width: 100%; background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px 10px; font-family: 'Space Mono', monospace; font-size: 11px; color: #F6F8F3; outline: none; box-sizing: border-box;"
+            style="width: 100%; background: #080E1D; border: 1px solid #22324F; border-radius: 6px; padding: 6px 10px; font-family: 'Space Mono', monospace; font-size: 16px; color: #F6F8F3; outline: none; box-sizing: border-box;"
           />
         </div>
 

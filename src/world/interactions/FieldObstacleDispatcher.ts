@@ -313,6 +313,14 @@ export class FieldObstacleDispatcher {
         return true;
       }
 
+      if (bgEvent.action === 'FAST_SHIP_CABIN_REST') { handleFastShipCabinRest(bgEvent as any, currentMap, ctx as any); return true; }
+      if (bgEvent.action?.startsWith('VERMILION_GYM_TRASH_CAN_')) { handleVermilionGymTrashCan(parseInt(bgEvent.action.replace('VERMILION_GYM_TRASH_CAN_', ''), 10), ctx as any); return true; }
+      if (bgEvent.action === 'CELADON_CAFE_TRASH') { handleCeladonCafeTrashCan(ctx as any); return true; }
+      if (bgEvent.action === 'CELADON_GYM_STATUE') { handleCeladonGymGuideAndStatues({ id: 'celadon_gym_statue', x: facingX, y: facingY, action: 'CELADON_GYM_STATUE' } as any, ctx as any); return true; }
+      if (bgEvent.action === 'CERULEAN_GYM_MACHINE_PART') { handleCeruleanGymMachinePart(ctx as any, facingX, facingY); return true; }
+      if (bgEvent.action === 'CERULEAN_GYM_STATUE') { handleCeruleanGymGuideAndStatues({ id: 'cerulean_gym_statue', x: facingX, y: facingY, action: 'CERULEAN_GYM_STATUE' } as any, ctx as any); return true; }
+      if (bgEvent.action === 'FUCHSIA_GYM_STATUE') { handleFuchsiaGymGuideAndStatues({ id: 'fuchsia_gym_statue', x: facingX, y: facingY, action: 'FUCHSIA_GYM_STATUE' } as any, ctx as any); return true; }
+
       ctx.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
         if (
           currentMap.id === 'earls_pokemon_academy' &&
@@ -327,12 +335,7 @@ export class FieldObstacleDispatcher {
           BattleAudio.playOverworldSound('FANFARE');
           ctx.showToast('🎓 Blackboard studied! Received Status Cure Kit!');
           ctx.saveCurrentGame();
-        } else if (bgEvent.action === 'FAST_SHIP_CABIN_REST') {
-          handleFastShipCabinRest(bgEvent as any, currentMap, ctx as any);
-        } else if (bgEvent.action?.startsWith('VERMILION_GYM_TRASH_CAN_')) {
-          const canIdx = parseInt(bgEvent.action.replace('VERMILION_GYM_TRASH_CAN_', ''), 10);
-          handleVermilionGymTrashCan(canIdx, ctx as any);
-        } else if (bgEvent.action === 'CELADON_CAFE_TRASH') return handleCeladonCafeTrashCan(ctx as any); else if (bgEvent.action === 'CELADON_GYM_STATUE') return handleCeladonGymGuideAndStatues({ id: 'celadon_gym_statue', x: facingX, y: facingY, action: 'CELADON_GYM_STATUE' } as any, ctx as any); else if (bgEvent.action === 'CERULEAN_GYM_MACHINE_PART') return handleCeruleanGymMachinePart(ctx as any, facingX, facingY); else if (bgEvent.action === 'CERULEAN_GYM_STATUE') return handleCeruleanGymGuideAndStatues({ id: 'cerulean_gym_statue', x: facingX, y: facingY, action: 'CERULEAN_GYM_STATUE' } as any, ctx as any); else if (bgEvent.action === 'FUCHSIA_GYM_STATUE') return handleFuchsiaGymGuideAndStatues({ id: 'fuchsia_gym_statue', x: facingX, y: facingY, action: 'FUCHSIA_GYM_STATUE' } as any, ctx as any); else if (bgEvent.action === 'HEAL_AND_SAVE') {
+        } else if (bgEvent.action === 'HEAL_AND_SAVE') {
           ctx.healPlayerParty(false);
           ctx.saveCurrentGame();
           if (currentMap.id.endsWith('_poke_center')) {

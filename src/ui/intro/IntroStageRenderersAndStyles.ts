@@ -91,6 +91,7 @@ export function renderSpotlightDais(withPokemon: boolean): string {
             ">✨ MARILL!</div>
             <img src="./assets/sprites/pokemon/marill_front.png"
                  alt="Marill"
+                 onerror="this.onerror=null;"
                  style="width: 56px; height: 56px; image-rendering: pixelated; object-fit: contain; background: transparent; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));" />
           </div>
         `

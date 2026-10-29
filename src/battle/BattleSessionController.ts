@@ -30,7 +30,17 @@ export class BattleSessionController {
     initialOpponentPokemon: PokemonInstance,
     options: TriggerBattleOptions = {}
   ): Promise<void> {
-    let opponentPokemon = initialOpponentPokemon;
+    // Defensively normalize if an array of PokemonInstance is passed as lead
+    const isArrayLead = Array.isArray(initialOpponentPokemon);
+    const normalizedTrainerTeam = options.trainerTeam ?? (isArrayLead ? (initialOpponentPokemon as unknown as PokemonInstance[]) : undefined);
+    let opponentPokemon = isArrayLead ? (initialOpponentPokemon as unknown as PokemonInstance[])[0] : initialOpponentPokemon;
+    if (isArrayLead && options.isTrainer === undefined) {
+      options.isTrainer = true;
+    }
+    if (normalizedTrainerTeam && !options.trainerTeam) {
+      options.trainerTeam = normalizedTrainerTeam;
+    }
+
     const remainingTrainerParty: PokemonInstance[] =
       options.doubleConfig?.isDoubleBattle
         ? []

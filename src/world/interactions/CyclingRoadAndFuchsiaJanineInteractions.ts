@@ -116,7 +116,10 @@ export function handleJanineInteraction(
         trainerName: 'Leader Janine',
         trainerTeam: instances,
         onVictory: () => onBattleWon(),
-        onBattleEnd: () => onBattleWon(),
+        onBattleEnd: (res?: any) => {
+          if (res && res.winner && res.winner !== 'PLAYER') return;
+          onBattleWon();
+        },
       });
     }
   );
@@ -187,7 +190,10 @@ export function handleFuchsiaGymDecoy(
         trainerName: trainerNpc.trainerName || 'Gym Decoy',
         trainerTeam: instances,
         onVictory: () => onDefeat(),
-        onBattleEnd: () => onDefeat(),
+        onBattleEnd: (res?: any) => {
+          if (res && res.winner && res.winner !== 'PLAYER') return;
+          onDefeat();
+        },
       });
     }
   );
@@ -329,7 +335,10 @@ export function handleBikerTrainer(
         trainerName: trainerNpc.trainerName || 'Biker',
         trainerTeam: instances,
         onVictory: () => onDefeat(),
-        onBattleEnd: () => onDefeat(),
+        onBattleEnd: (res?: any) => {
+          if (res && res.winner && res.winner !== 'PLAYER') return;
+          onDefeat();
+        },
       });
     }
   );
@@ -379,7 +388,10 @@ export function handleBirdKeeperTrainer(
         trainerName: trainerNpc.trainerName || 'Bird Keeper',
         trainerTeam: instances,
         onVictory: () => onDefeat(),
-        onBattleEnd: () => onDefeat(),
+        onBattleEnd: (res?: any) => {
+          if (res && res.winner && res.winner !== 'PLAYER') return;
+          onDefeat();
+        },
       });
     }
   );

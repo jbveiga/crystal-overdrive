@@ -7,8 +7,9 @@ import type { StoryCutsceneContext } from '../world/StoryCutscenes';
 
 export class BattleController {
   public static buildTrainerTeamInstances(trainer: GridEntity): PokemonInstance[] {
-    if (trainer.trainerTeam && trainer.trainerTeam.length > 0) {
-      return trainer.trainerTeam.map((spec) => {
+    const multiTeam = trainer.trainerTeam || (trainer as any).team;
+    if (multiTeam && multiTeam.length > 0) {
+      return multiTeam.map((spec: any) => {
         const pkmn = PokemonFactory.create(spec.speciesId, spec.level, spec.moves);
         if (spec.heldItem) pkmn.heldItem = spec.heldItem;
         return pkmn;
@@ -49,7 +50,12 @@ export class BattleController {
     trainer: GridEntity,
     ctx: StoryCutsceneContext
   ): Promise<void> {
-    if (!trainer.trainerId || !trainer.trainerPokemon) return;
+    const hasRoster = Boolean(
+      trainer.trainerPokemon ||
+      (trainer.trainerTeam && trainer.trainerTeam.length > 0) ||
+      ((trainer as any).team && (trainer as any).team.length > 0)
+    );
+    if (!trainer.trainerId || !hasRoster) return;
     ctx.setCutsceneLocked(true);
     ctx.defeatedTrainers.add(trainer.trainerId);
     ctx.player.isMoving = false;

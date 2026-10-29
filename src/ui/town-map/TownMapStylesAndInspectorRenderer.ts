@@ -412,6 +412,18 @@ export function renderInspectorCard({
       }
 
       ${
+        activeRoamers.length > 0 && !activeRoamers.some((r) => r.isAwakened)
+          ? `
+        <div id="town-map-roamer-radar-dormant" style="background: #141E33; border: 1px dashed #22324F; border-radius: 6px; padding: 10px 12px;">
+          <div style="font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #64748B;">
+            BEAST RADAR FREQUENCY // DORMANT [NO BIO-SIGNALS DETECTED IN JOHTO]
+          </div>
+        </div>
+      `
+          : ''
+      }
+
+      ${
         activeRoamers.some((r) => r.isAwakened)
           ? `
         <div id="town-map-roamer-radar" style="background: #141E33; border: 1px solid #22324F; border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">

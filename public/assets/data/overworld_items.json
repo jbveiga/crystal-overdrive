@@ -1529,7 +1529,7 @@
       "mapId": "ice_path_b1f",
       "region": "johto",
       "x": 17,
-      "y": 30,
+      "y": 27,
       "itemId": "max_potion",
       "eventFlag": "EVENT_ICE_PATH_B1F_HIDDEN_MAX_POTION"
     },
@@ -1537,8 +1537,8 @@
       "id": "ice_path_b2f_blackthorn_side_hidden_2_10_ice_heal",
       "mapId": "ice_path_b2f_blackthorn_side",
       "region": "johto",
-      "x": 2,
-      "y": 10,
+      "x": 3,
+      "y": 7,
       "itemId": "ice_heal",
       "eventFlag": "EVENT_ICE_PATH_B2F_BLACKTHORN_SIDE_HIDDEN_ICE_HEAL"
     },
@@ -2797,7 +2797,7 @@
           "mapId": "ice_path_b1f",
           "region": "johto",
           "x": 17,
-          "y": 30,
+          "y": 27,
           "itemId": "max_potion",
           "eventFlag": "EVENT_ICE_PATH_B1F_HIDDEN_MAX_POTION"
         }
@@ -2823,8 +2823,8 @@
           "id": "ice_path_b2f_blackthorn_side_hidden_2_10_ice_heal",
           "mapId": "ice_path_b2f_blackthorn_side",
           "region": "johto",
-          "x": 2,
-          "y": 10,
+          "x": 3,
+          "y": 7,
           "itemId": "ice_heal",
           "eventFlag": "EVENT_ICE_PATH_B2F_BLACKTHORN_SIDE_HIDDEN_ICE_HEAL"
         }

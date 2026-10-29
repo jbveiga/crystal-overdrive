@@ -541,47 +541,21 @@ async function bootstrap() {
     }
   });
 
-  const getTickerContext = (): OverworldTickerContext & { dayCareManager: any; playerParty: any[]; seenSpecies: Set<string>; defeatedTrainers: Set<string>; overworldRenderer: any; } => ({
-    getGameState: () => gameState,
-    isCutsceneLocked: () => isCutsceneLocked,
-    isDialogueOpen: () => overworldHUD.isDialogueOpen(),
-    isMenuOpen: () => startMenuUI.isOpen(),
-    isAnyModalOpen: isAnyOverworldModalOpen,
-    player,
-    mapManager,
-    overworldItemManager,
-    gameClock,
-    storyFlags,
-    visitedMaps,
-    roamingManager,
-    missionManager,
-    itemfinderHUD,
-    overworldHUD,
-    audioManager,
-    overworldRenderer,
-    getActiveMapNpcs,
-    populateWorldNpcs,
-    handleMapTransition,
-    executeWarpTransition,
-    runTrainerSightSequence,
-    triggerSlowpokeWellGruntIntercept,
-    triggerBeastsAwakeningCutscene,
-    triggerBurnedTowerRivalBattle,
-    triggerCherrygroveRivalAmbush,
-    triggerOlivineRivalConfrontation,
-    triggerCianwoodSuicuneAndEusine,
-    triggerRoute42Suicune,
-    saveCurrentGame,
-    triggerWildEncounter: async (wildPkmn, options) => triggerBattle(wildPkmn, options),
-    addPlayTimeDelta: (dtSec) => { playTimeSeconds += dtSec; },
-    isSurfEnabled: () => mapManager.isSurfEnabled(),
+  // Pre-allocated reusable ticker context for 0 allocations per frame in hot loop (Pillar 7 Gate 1)
+  const cachedTickerContext: OverworldTickerContext & { dayCareManager: any; playerParty: any[]; seenSpecies: Set<string>; defeatedTrainers: Set<string>; overworldRenderer: any; triggerBattle?: any; } = {
+    getGameState: () => gameState, isCutsceneLocked: () => isCutsceneLocked, isDialogueOpen: () => overworldHUD.isDialogueOpen(), isMenuOpen: () => startMenuUI.isOpen(), isAnyModalOpen: isAnyOverworldModalOpen,
+    player, mapManager, overworldItemManager, gameClock, storyFlags, visitedMaps, roamingManager, missionManager, itemfinderHUD, overworldHUD, audioManager, overworldRenderer,
+    getActiveMapNpcs, populateWorldNpcs, handleMapTransition, executeWarpTransition, runTrainerSightSequence, triggerSlowpokeWellGruntIntercept, triggerBeastsAwakeningCutscene, triggerBurnedTowerRivalBattle,
+    triggerCherrygroveRivalAmbush, triggerOlivineRivalConfrontation, triggerCianwoodSuicuneAndEusine, triggerRoute42Suicune, saveCurrentGame,
+    triggerWildEncounter: async (wildPkmn, options) => triggerBattle(wildPkmn, options), triggerBattle: async (oppPkmn: any, options?: any) => triggerBattle(oppPkmn, options),
+    addPlayTimeDelta: (dtSec) => { playTimeSeconds += dtSec; }, isSurfEnabled: () => mapManager.isSurfEnabled(),
     openDeptElevatorModal: (currentMapId, onSelectFloor) => deptStoreElevatorUI.open({ currentMapId, onSelectFloor: (f) => onSelectFloor(f.mapId), onClose: () => {} }),
-    dayCareManager,
-    inventory,
-    playerParty,
-    seenSpecies,
-    defeatedTrainers,
-  });
+    dayCareManager, inventory, playerParty, seenSpecies, defeatedTrainers,
+  };
+  const getTickerContext = (): typeof cachedTickerContext => {
+    cachedTickerContext.player = player; cachedTickerContext.inventory = inventory; cachedTickerContext.playerParty = playerParty;
+    return cachedTickerContext;
+  };
 
   const getFieldObstacleContext = (): FieldObstacleContext => ({
     playerName,

@@ -219,6 +219,11 @@ export function handleCeladonCutTree(
       '🌳 CUTTABLE TREE',
       () => {
         ctx.storyFlags.add('celadon_cut_tree_cleared');
+        if (ctx.npcsByMap && ctx.npcsByMap.celadon_city) {
+          ctx.npcsByMap.celadon_city = ctx.npcsByMap.celadon_city.filter(
+            (n) => n.id !== 'celadon_city_cut_tree' && !(n.x === x && n.y === y)
+          );
+        }
         const curMap = ctx.mapManager.getCurrentMap();
         if (curMap) {
           curMap.collisionGrid[y * curMap.width + x] = 0;

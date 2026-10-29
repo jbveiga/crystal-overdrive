@@ -474,6 +474,11 @@ export function handleVermilionCutTree(
       '🌳 CUTTABLE TREE',
       () => {
         ctx.storyFlags.add('vermilion_cut_tree_cleared');
+        if (ctx.npcsByMap && ctx.npcsByMap.vermilion_city) {
+          ctx.npcsByMap.vermilion_city = ctx.npcsByMap.vermilion_city.filter(
+            (n) => n.id !== 'vermilion_city_cut_tree' && !(n.x === x && n.y === y)
+          );
+        }
         const curMap = ctx.mapManager.getCurrentMap();
         if (curMap) {
           curMap.collisionGrid[y * curMap.width + x] = 0;

@@ -243,7 +243,7 @@ export class OverworldCutsceneAndPokegearModals {
         justify-content: center;
         box-shadow: 0 0 18px ${accentColor}55;
       ">
-        <img src="./assets/sprites/pokemon/${speciesId}_front.png" alt="${speciesLabel}" style="width: 68px; height: 68px; image-rendering: pixelated; object-fit: contain;" />
+        <img src="./assets/sprites/pokemon/${speciesId}_front.png" alt="${speciesLabel}" onerror="this.onerror=null;this.src='./assets/sprites/pokemon/marill_front.png';" style="width: 68px; height: 68px; image-rendering: pixelated; object-fit: contain;" />
       </div>
       <div style="font-size: 15px; font-weight: 700; text-align: center; line-height: 1.45;">
         It's <strong>${speciesLabel}</strong>, a <strong>${typeLabel}</strong> POKéMON!<br/>

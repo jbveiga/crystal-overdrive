@@ -109,7 +109,10 @@ export const handlePasswordGruntF: NpcInteractionHandler = (_targetNpc, _map, ct
         PokemonFactory.create('arbok', 24, ['bite', 'poisonsting', 'glare']),
         PokemonFactory.create('gloom', 24, ['absorb', 'poisonpowder', 'acid']),
       ];
-      ctx.triggerBattle(gruntTeam as any, {
+      ctx.triggerBattle(gruntTeam[0], {
+        isTrainer: true,
+        trainerName: 'Rocket Grunt',
+        trainerTeam: gruntTeam,
         onBattleEnd: (result) => {
           if (result.winner === 'PLAYER') {
             ctx.storyFlags.add('EVENT_LEARNED_SLOWPOKETAIL');
@@ -159,7 +162,10 @@ export const handlePasswordGruntM: NpcInteractionHandler = (_targetNpc, _map, ct
         PokemonFactory.create('drowzee', 24, ['pound', 'hypnosis', 'confusion']),
         PokemonFactory.create('raticate', 24, ['hyperfang', 'quickattack', 'bite']),
       ];
-      ctx.triggerBattle(gruntTeam as any, {
+      ctx.triggerBattle(gruntTeam[0], {
+        isTrainer: true,
+        trainerName: 'Rocket Grunt',
+        trainerTeam: gruntTeam,
         onBattleEnd: (result) => {
           if (result.winner === 'PLAYER') {
             ctx.storyFlags.add('EVENT_LEARNED_RATICATETAIL');
@@ -254,7 +260,10 @@ export const handleExecutivePetrel: NpcInteractionHandler = (_targetNpc, current
         PokemonFactory.create('koffing', 22, ['tackle', 'smog', 'sludge', 'smokescreen']),
         PokemonFactory.create('raticate', 24, ['hyperfang', 'quickattack', 'scaryface', 'pursuit']),
       ];
-      ctx.triggerBattle(petrelTeam as any, {
+      ctx.triggerBattle(petrelTeam[0], {
+        isTrainer: true,
+        trainerName: 'Executive Petrel',
+        trainerTeam: petrelTeam,
         onBattleEnd: (result) => {
           if (result.winner === 'PLAYER') {
             ctx.storyFlags.add('EVENT_BEAT_ROCKET_EXECUTIVEM_4');
@@ -380,7 +389,10 @@ export const handleMahoganyExecutiveAriana: NpcInteractionHandler = (_targetNpc,
         PokemonFactory.create('gloom', 25, ['absorb', 'poisonpowder', 'stunspore', 'sweetscent']),
         PokemonFactory.create('murkrow', 27, ['peck', 'pursuit', 'haze', 'nightshade']),
       ];
-      ctx.triggerBattle(arianaTeam as any, {
+      ctx.triggerBattle(arianaTeam[0], {
+        isTrainer: true,
+        trainerName: 'Executive Ariana',
+        trainerTeam: arianaTeam,
         onBattleEnd: (result) => {
           if (result.winner === 'PLAYER') {
             ctx.storyFlags.add('EVENT_BEAT_ROCKET_EXECUTIVEF_2');

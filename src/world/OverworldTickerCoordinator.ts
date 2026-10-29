@@ -493,7 +493,10 @@ export class OverworldTickerCoordinator {
                     PokemonFactory.create('drowzee', 20, ['pound', 'hypnosis']),
                     PokemonFactory.create('zubat', 20, ['leechlife', 'bite']),
                   ];
-                  (ctx as any).triggerBattle?.(grunt, {
+                  (ctx as any).triggerBattle?.(grunt[0], {
+                    isTrainer: true,
+                    trainerName: 'Rocket Grunt',
+                    trainerTeam: grunt,
                     onBattleEnd: () => void saveCurrentGame(),
                   });
                 }

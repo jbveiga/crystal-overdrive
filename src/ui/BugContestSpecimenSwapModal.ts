@@ -121,7 +121,7 @@ export class BugContestSpecimenSwapModal {
                 src="./assets/sprites/pokemon/${pkmn.speciesId.toLowerCase()}_front.png"
                 alt="${pkmn.nickname || pkmn.speciesId}"
                 style="width: 64px; height: 64px; image-rendering: pixelated;"
-                onerror="this.onerror=null;this.src='./assets/sprites/pokemon/10_front.png';"
+                onerror="this.onerror=null;this.src='./assets/sprites/pokemon/caterpie_front.png';"
               />
             </div>
 

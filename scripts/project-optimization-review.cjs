@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const ROOT_DIR = path.resolve(__dirname, '..');
 
 console.log('===========================================================');
 console.log('🔍 CRYSTAL OVERDRIVE — PERIODIC OPTIMIZATION & HEALTH REVIEW');
@@ -120,7 +121,7 @@ if (brokenWarps === 0) {
 // 4. Run Automated Test Suite (Vitest)
 console.log('4️⃣  Running Automated Test Suite (npm test)...');
 try {
-  const testOutput = execSync('npx vitest run', { stdio: 'pipe' }).toString();
+  const testOutput = execSync('npx vitest run', { stdio: 'pipe', cwd: ROOT_DIR }).toString();
   const passMatch = testOutput.match(/Tests\s+([0-9]+)\s+passed/);
   console.log(`  ✅ Test Suite Cleared: ${passMatch ? passMatch[0] : 'All tests passed'}.\n`);
 } catch (err) {
