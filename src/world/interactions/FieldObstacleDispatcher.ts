@@ -15,6 +15,7 @@ import { PokemonFactory } from '../../battle/PokemonFactory';
 import { BattleAudio } from '../../audio/BattleAudio';
 import { handleLugiaShrineOrBoss } from './WhirlIslandsInteractions';
 import { handleFastShipCabinRest } from './FastShipAndVermilionInteractions';
+import { handleVermilionGymTrashCan } from './VermilionGymInteractions';
 
 export class FieldObstacleDispatcher {
   /**
@@ -30,18 +31,12 @@ export class FieldObstacleDispatcher {
       return 'in_forest_05_05_05_05';
     }
     if (map.tileMap) {
-      const neighbors = [
-        { x: tileX, y: tileY + 1 }, { x: tileX, y: tileY - 1 },
-        { x: tileX - 1, y: tileY }, { x: tileX + 1, y: tileY },
-      ];
+      const neighbors = [{ x: tileX, y: tileY + 1 }, { x: tileX, y: tileY - 1 }, { x: tileX - 1, y: tileY }, { x: tileX + 1, y: tileY }];
       for (const n of neighbors) {
         if (n.x >= 0 && n.x < map.width && n.y >= 0 && n.y < map.height) {
           const idx = n.y * map.width + n.x;
-          if (map.collisionGrid[idx] === 0 && map.tileMap[idx]) {
-            const t = map.tileMap[idx];
-            if (!t.includes('tree') && !t.includes('cut')) {
-              return t;
-            }
+          if (map.collisionGrid[idx] === 0 && map.tileMap[idx] && !map.tileMap[idx].includes('tree') && !map.tileMap[idx].includes('cut')) {
+            return map.tileMap[idx];
           }
         }
       }
@@ -102,29 +97,18 @@ export class FieldObstacleDispatcher {
       ) {
         if (ctx.storyFlags.has('starter_chosen') || ctx.playerParty.length > 0) {
           const tableSpecies: 'cyndaquil' | 'totodile' | 'chikorita' =
-            bgEvent.action === 'STARTER_CYNDAQUIL'
-              ? 'cyndaquil'
-              : bgEvent.action === 'STARTER_TOTODILE'
-              ? 'totodile'
-              : 'chikorita';
+            bgEvent.action === 'STARTER_CYNDAQUIL' ? 'cyndaquil' : bgEvent.action === 'STARTER_TOTODILE' ? 'totodile' : 'chikorita';
           const tableName = tableSpecies.toUpperCase();
           const chosenSpecies = ctx.detectChosenStarterSpecies();
 
           // A. The spot of the ball the player took
           if (chosenSpecies === tableSpecies) {
-            ctx.openDialogue(
-              [`It's an empty spot. You already chose ${tableName}!`],
-              bgEvent.speaker
-            );
+            ctx.openDialogue([`It's an empty spot. You already chose ${tableName}!`], bgEvent.speaker);
             return true;
           }
 
           // B. The spot of the ball the Rival stole after Elm's emergency call
-          const counterPickMap: Record<string, string> = {
-            cyndaquil: 'totodile',
-            totodile: 'chikorita',
-            chikorita: 'cyndaquil',
-          };
+          const counterPickMap: Record<string, string> = { cyndaquil: 'totodile', totodile: 'chikorita', chikorita: 'cyndaquil' };
           const rivalStolen = chosenSpecies ? counterPickMap[chosenSpecies] : null;
           if (ctx.storyFlags.has('ELM_CALLED_ABOUT_THEFT') && rivalStolen === tableSpecies) {
             ctx.openDialogue(['The POKé BALL was stolen from the table!'], bgEvent.speaker);
@@ -132,12 +116,8 @@ export class FieldObstacleDispatcher {
           }
 
           // C. A ball still sitting on the table
-          const tableType =
-            tableSpecies === 'cyndaquil' ? 'FIRE' : tableSpecies === 'totodile' ? 'WATER' : 'GRASS';
-          ctx.openDialogue(
-            [`It's ${tableName}, a ${tableType} POKéMON!`, 'PROF. ELM: You already chose your partner!'],
-            bgEvent.speaker
-          );
+          const tableType = tableSpecies === 'cyndaquil' ? 'FIRE' : tableSpecies === 'totodile' ? 'WATER' : 'GRASS';
+          ctx.openDialogue([`It's ${tableName}, a ${tableType} POKéMON!`, 'PROF. ELM: You already chose your partner!'], bgEvent.speaker);
           return true;
         }
 
@@ -217,6 +197,7 @@ export class FieldObstacleDispatcher {
           violet_gym: { city: 'VIOLET CITY', leader: 'FALKNER', flag: 'falkner_defeated' },
           azalea_gym: { city: 'AZALEA TOWN', leader: 'BUGSY', flag: 'bugsy_defeated' },
           mahogany_gym: { city: 'MAHOGANY TOWN', leader: 'PRYCE', flag: 'pryce_defeated' },
+          vermilion_gym: { city: 'VERMILION CITY', leader: 'LT. SURGE', flag: 'surge_defeated' },
         };
         const gym = gymLeaders[currentMap.id] || (bgEvent.action === 'MAHOGANY_GYM_STATUE' ? gymLeaders.mahogany_gym : undefined);
         if (gym) {
@@ -345,6 +326,9 @@ export class FieldObstacleDispatcher {
           ctx.saveCurrentGame();
         } else if (bgEvent.action === 'FAST_SHIP_CABIN_REST') {
           handleFastShipCabinRest(bgEvent as any, currentMap, ctx as any);
+        } else if (bgEvent.action?.startsWith('VERMILION_GYM_TRASH_CAN_')) {
+          const canIdx = parseInt(bgEvent.action.replace('VERMILION_GYM_TRASH_CAN_', ''), 10);
+          handleVermilionGymTrashCan(canIdx, ctx as any);
         } else if (bgEvent.action === 'HEAL_AND_SAVE') {
           ctx.healPlayerParty(false);
           ctx.saveCurrentGame();
@@ -581,6 +565,10 @@ export class FieldObstacleDispatcher {
                 ctx.storyFlags.add('ilex_tree_cut');
                 ctx.storyFlags.add('cut_used_in_ilex');
                 ctx.missionManager.checkStoryFlags(ctx.storyFlags);
+              }
+              if (currentMap.id === 'vermilion_city' && facingX === 10 && facingY === 20) {
+                currentMap.collisionGrid[20 * currentMap.width + 10] = 0;
+                ctx.storyFlags.add('vermilion_cut_tree_cleared');
               }
               ctx.renderMap(currentMap);
               ctx.syncMapOverworldItems(currentMap);

@@ -568,6 +568,164 @@
       "targetY": 20
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 1,
+      "y": 7,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_0",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 7,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_1",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 5,
+      "y": 7,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_2",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 7,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_3",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 9,
+      "y": 7,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_4",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 1,
+      "y": 9,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_5",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_6",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 5,
+      "y": 9,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_7",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 9,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_8",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 9,
+      "y": 9,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_9",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 1,
+      "y": 11,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_10",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 11,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_11",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 5,
+      "y": 11,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_12",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 7,
+      "y": 11,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_13",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 9,
+      "y": 11,
+      "type": "sign",
+      "action": "VERMILION_GYM_TRASH_CAN_14",
+      "pages": [
+        "VERMILION_GYM_TRASH_CAN"
+      ]
+    },
+    {
+      "x": 3,
+      "y": 15,
+      "type": "sign",
+      "action": "VERMILION_GYM_STATUE",
+      "pages": [
+        "VERMILION CITY POKéMON GYM",
+        "LEADER: LT. SURGE",
+        "WINNING TRAINERS:\nRED"
+      ]
+    },
+    {
+      "x": 6,
+      "y": 15,
+      "type": "sign",
+      "action": "VERMILION_GYM_STATUE",
+      "pages": [
+        "VERMILION CITY POKéMON GYM",
+        "LEADER: LT. SURGE",
+        "WINNING TRAINERS:\nRED"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

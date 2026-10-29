@@ -97,6 +97,7 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Field Obstacle Dispatcher (Interactions)** | Cut trees, Rock Smash boulders, Headbutt trees, fruit trees router | `src/world/interactions/FieldObstacleDispatcher.ts` | < 600 lines |
 | **Field Obstacle Dispatcher (World)** | Core world collision and interaction dispatch for field obstacles | `src/world/FieldObstacleDispatcher.ts` | < 200 lines |
 | **Fast Ship & Vermilion Interactions** | S.S. Aqua voyage, lost granddaughter quest, cabin rest, Vermilion City lore & Snorlax | `src/world/interactions/FastShipAndVermilionInteractions.ts` | < 300 lines |
+| **Vermilion Gym & Fan Club Interactions** | Lt. Surge battle, electric trash can puzzle, Fan Club Chairman & Clefairy doll | `src/world/interactions/VermilionGymInteractions.ts` | < 400 lines |
 | **Default Interaction Router Wiring** | Default NPC interaction router factory and registration wiring | `src/world/interactions/defaultInteractionRouter.ts` | < 50 lines |
 | **Interactions Index Barrel** | Aggregated export barrel for all interaction handlers and routers | `src/world/interactions/index.ts` | < 100 lines |
 | **NPC Shared Helpers** | NPC builders, Guide Gent tour legs, Day-of-Week siblings logic | `src/world/npcs/npcShared.ts` | < 650 lines |

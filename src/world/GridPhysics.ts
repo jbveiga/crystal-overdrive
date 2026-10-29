@@ -60,6 +60,7 @@ export type NpcSpriteType =
   | 'cooltrainer_m'
   | 'suicune'
   | 'eusine'
+  | 'fruit_tree'
   | 'gramps';
 
 export interface TrainerPokemonSpec {
@@ -228,6 +229,14 @@ export interface GridEntity {
     | 'ROUTE27_SANDSTORM_EVENT'
     | 'ROUTE26_HEAL_EVENT'
     | 'DEPT_STORE_TRADE_MIKE'
+    | 'VERMILION_CUT_TREE'
+    | 'VERMILION_GYM_GUIDE'
+    | 'VERMILION_GYM_TRAINER'
+    | 'VERMILION_GYM_SURGE'
+    | 'FAN_CLUB_CHAIRMAN'
+    | 'FAN_CLUB_CLEFAIRY_GUY'
+    | 'FAN_CLUB_SEEL_FAN'
+    | 'VERMILION_GYM_STATUE'
     | 'DEPT_ELEVATOR_PANEL';
   trainerId?: string;
   trainerName?: string;

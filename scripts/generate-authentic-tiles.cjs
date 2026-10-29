@@ -5179,7 +5179,20 @@ buildMapFromBlk({
   blocksH: 18,
   roofGroup: 've',
   connections: {"NORTH":{"mapId":"route_6","offset":10},"EAST":{"mapId":"route_11","offset":0}},
-  warps: [{"x":5,"y":5,"targetMapId":"vermilion_fishing_house","targetX":2,"targetY":7},{"x":9,"y":5,"targetMapId":"vermilion_poke_center","targetX":3,"targetY":7},{"x":13,"y":13,"targetMapId":"vermilion_magnet_train_house","targetX":2,"targetY":7},{"x":21,"y":13,"targetMapId":"vermilion_mart","targetX":3,"targetY":7},{"x":21,"y":17,"targetMapId":"vermilion_digletts_house","targetX":2,"targetY":7},{"x":10,"y":19,"targetMapId":"vermilion_gym","targetX":4,"targetY":17},{"x":19,"y":31,"targetMapId":"vermilion_port_passage","targetX":15,"targetY":0},{"x":20,"y":31,"targetMapId":"vermilion_port_passage","targetX":16,"targetY":0},{"x":34,"y":7,"targetMapId":"digletts_cave","targetX":3,"targetY":33}],
+  warps: [{"x":5,"y":5,"targetMapId":"vermilion_fishing_house","targetX":2,"targetY":7},{"x":9,"y":5,"targetMapId":"vermilion_poke_center","targetX":3,"targetY":7},{"x":7,"y":13,"targetMapId":"pokemon_fan_club","targetX":2,"targetY":7},{"x":13,"y":13,"targetMapId":"vermilion_magnet_train_house","targetX":2,"targetY":7},{"x":21,"y":13,"targetMapId":"vermilion_mart","targetX":3,"targetY":7},{"x":21,"y":17,"targetMapId":"vermilion_digletts_house","targetX":2,"targetY":7},{"x":10,"y":19,"targetMapId":"vermilion_gym","targetX":4,"targetY":17},{"x":19,"y":31,"targetMapId":"vermilion_port_passage","targetX":15,"targetY":0},{"x":20,"y":31,"targetMapId":"vermilion_port_passage","targetX":16,"targetY":0},{"x":34,"y":7,"targetMapId":"digletts_cave","targetX":3,"targetY":33}],
+  bgEvents: [],
+  grassEncounters: [],
+});
+
+buildMapFromBlk({
+  id: 'pokemon_fan_club',
+  name: "Pokémon Fan Club",
+  tileset: 'house',
+  blkFile: 'maps__PokemonFanClub.blk',
+  blocksW: 5,
+  blocksH: 4,
+  connections: {},
+  warps: [{"x":2,"y":7,"targetMapId":"vermilion_city","targetX":7,"targetY":13},{"x":3,"y":7,"targetMapId":"vermilion_city","targetX":7,"targetY":13}],
   bgEvents: [],
   grassEncounters: [],
 });
@@ -5193,7 +5206,25 @@ buildMapFromBlk({
   blocksH: 9,
   connections: {},
   warps: [{"x":4,"y":17,"targetMapId":"vermilion_city","targetX":10,"targetY":19},{"x":5,"y":17,"targetMapId":"vermilion_city","targetX":10,"targetY":19}],
-  bgEvents: [],
+  bgEvents: [
+    { x: 1, y: 7, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_0', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 3, y: 7, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_1', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 5, y: 7, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_2', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 7, y: 7, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_3', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 9, y: 7, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_4', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 1, y: 9, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_5', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 3, y: 9, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_6', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 5, y: 9, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_7', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 7, y: 9, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_8', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 9, y: 9, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_9', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 1, y: 11, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_10', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 3, y: 11, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_11', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 5, y: 11, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_12', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 7, y: 11, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_13', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 9, y: 11, type: 'sign', action: 'VERMILION_GYM_TRASH_CAN_14', pages: ['VERMILION_GYM_TRASH_CAN'] },
+    { x: 3, y: 15, type: 'sign', action: 'VERMILION_GYM_STATUE', pages: ['VERMILION CITY POKéMON GYM', 'LEADER: LT. SURGE', 'WINNING TRAINERS:\nRED'] },
+    { x: 6, y: 15, type: 'sign', action: 'VERMILION_GYM_STATUE', pages: ['VERMILION CITY POKéMON GYM', 'LEADER: LT. SURGE', 'WINNING TRAINERS:\nRED'] },
+  ],
   grassEncounters: [],
 });
 

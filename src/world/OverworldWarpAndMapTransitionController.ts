@@ -46,24 +46,25 @@ export class OverworldWarpAndMapTransitionController {
     if (!map) return;
     if (map.id === 'ilex_forest' && ctx.storyFlags.has('ilex_tree_cut')) {
       map.collisionGrid[25 * map.width + 8] = 0;
-      if (map.tileMap) {
-        map.tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05';
-      }
+      if (map.tileMap) map.tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05';
     }
     if (map.id === 'team_rocket_base_b3f' && ctx.storyFlags.has('EVENT_OPENED_DOOR_TO_GIOVANNIS_OFFICE')) {
-      map.collisionGrid[9 * map.width + 10] = 0;
-      map.collisionGrid[9 * map.width + 11] = 0;
+      map.collisionGrid[9 * map.width + 10] = 0; map.collisionGrid[9 * map.width + 11] = 0;
     }
     if (map.id === 'team_rocket_base_b2f' && ctx.storyFlags.has('EVENT_OPENED_DOOR_TO_ROCKET_HIDEOUT_TRANSMITTER')) {
-      map.collisionGrid[12 * map.width + 14] = 0;
-      map.collisionGrid[12 * map.width + 15] = 0;
+      map.collisionGrid[12 * map.width + 14] = 0; map.collisionGrid[12 * map.width + 15] = 0;
     }
     if (map.id === 'route_41') {
       const whirlpoolCoords = [[12, 17], [36, 19], [12, 37], [36, 45]];
       for (const [wx, wy] of whirlpoolCoords) {
-        const isCleared = ctx.storyFlags.has(`whirlpool_cleared_${wx}_${wy}`);
-        map.collisionGrid[wy * map.width + wx] = isCleared ? 0 : 1;
+        map.collisionGrid[wy * map.width + wx] = ctx.storyFlags.has(`whirlpool_cleared_${wx}_${wy}`) ? 0 : 1;
       }
+    }
+    if (map.id === 'vermilion_gym') {
+      const open = ctx.storyFlags.has('vermilion_gym_barrier_open') || ctx.storyFlags.has('surge_defeated');
+      map.collisionGrid[4 * map.width + 4] = open ? 0 : 1; map.collisionGrid[4 * map.width + 5] = open ? 0 : 1;
+    } else if (map.id === 'vermilion_city') {
+      map.collisionGrid[20 * map.width + 10] = ctx.storyFlags.has('vermilion_cut_tree_cleared') ? 0 : 1;
     }
   }
 

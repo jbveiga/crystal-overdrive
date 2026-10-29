@@ -20,6 +20,7 @@ import { getVictoryRoadGateInteractions } from './VictoryRoadGateInteractions';
 import { getVictoryRoadInteractions } from './VictoryRoadInteractions';
 import { getEliteFourAndChampionInteractions } from './EliteFourAndChampionInteractions';
 import { getFastShipAndVermilionInteractions } from './FastShipAndVermilionInteractions';
+import { getVermilionGymInteractions } from './VermilionGymInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -45,6 +46,7 @@ export * from './VictoryRoadGateInteractions';
 export * from './VictoryRoadInteractions';
 export * from './EliteFourAndChampionInteractions';
 export * from './FastShipAndVermilionInteractions';
+export * from './VermilionGymInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.
@@ -71,5 +73,6 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getVictoryRoadInteractions(),
     ...getEliteFourAndChampionInteractions(),
     ...getFastShipAndVermilionInteractions(),
+    ...getVermilionGymInteractions(),
   ]);
 }
