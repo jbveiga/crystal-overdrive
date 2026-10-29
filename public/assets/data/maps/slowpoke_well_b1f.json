@@ -1104,8 +1104,8 @@
       "x": 7,
       "y": 11,
       "targetMapId": "slowpoke_well_b2f",
-      "targetX": 3,
-      "targetY": 3
+      "targetX": 9,
+      "targetY": 11
     }
   ],
   "bgEvents": [
@@ -1113,7 +1113,7 @@
       "x": 17,
       "y": 14,
       "pages": [
-        "SLOWPOKE WELL B1F — Water reservoir for AZALEA TOWN. Watch your step!"
+        "SLOWPOKE WELL B1F \u2014 Water reservoir for AZALEA TOWN. Watch your step!"
       ]
     },
     {

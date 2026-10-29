@@ -40,6 +40,12 @@ export interface MoveData {
   inflictsStatus?: StatusCondition;
   secondaryStatus?: { status: StatusCondition; chance: number };
   statChanges?: { target: 'self' | 'foe'; stat: StatId; stages: number };
+  healFraction?: number;
+  drainFraction?: number;
+  recoilFraction?: number;
+  fixedDamage?: number | 'level' | 'half_current_hp';
+  isWeatherHeal?: boolean;
+  isRest?: boolean;
 }
 
 export interface EffectivenessBadge {

@@ -89,6 +89,7 @@ export interface GridEntity {
   isJumping?: boolean;
   progress: number;
   isPlayer: boolean;
+  turnDelayTimer?: number;
   worldOffsetX?: number;
   worldOffsetY?: number;
   spriteType?: NpcSpriteType;
@@ -433,9 +434,28 @@ export class GridPhysics {
   ): void {
     if (dt <= 0) return;
 
-    // 1. If currently idle, check if we should start moving or hop a one-way ledge
+    // 1. If currently idle, check if we should turn in place or start moving / hop ledge
     if (!entity.isMoving) {
-      if (heldDirection) {
+      if (!heldDirection) {
+        entity.turnDelayTimer = 0;
+      } else {
+        // If player changes direction while idle, enter a brief turn-in-place window (80ms)
+        // so quick directional taps rotate in place without stepping off the tile,
+        // while large single-step dt values (>80ms) consume the turn delay and continue moving.
+        if (entity.isPlayer && entity.direction !== heldDirection && dt < 0.04) {
+          entity.direction = heldDirection;
+          entity.turnDelayTimer = 0.08 - dt;
+          return;
+        }
+
+        if (entity.isPlayer && entity.turnDelayTimer !== undefined && entity.turnDelayTimer > 0) {
+          if (dt < 0.04 && dt <= entity.turnDelayTimer) {
+            entity.turnDelayTimer -= dt;
+            return;
+          }
+          entity.turnDelayTimer = 0;
+        }
+
         entity.direction = heldDirection;
         const delta = this.getDirectionDelta(heldDirection);
         const nextX = entity.x + delta.dx;

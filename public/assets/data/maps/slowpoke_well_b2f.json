@@ -1094,13 +1094,6 @@
   "connections": {},
   "warps": [
     {
-      "x": 3,
-      "y": 3,
-      "targetMapId": "slowpoke_well_b1f",
-      "targetX": 7,
-      "targetY": 11
-    },
-    {
       "x": 9,
       "y": 11,
       "targetMapId": "slowpoke_well_b1f",
@@ -1113,7 +1106,7 @@
       "x": 3,
       "y": 2,
       "pages": [
-        "SLOWPOKE WELL B2F — Deep subterranean lake. SURF and STRENGTH required to explore the far caverns."
+        "SLOWPOKE WELL B2F \u2014 Deep subterranean lake. SURF and STRENGTH required to explore the far caverns."
       ]
     },
     {

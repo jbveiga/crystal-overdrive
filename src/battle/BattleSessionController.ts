@@ -85,10 +85,17 @@ export class BattleSessionController {
     ctx.battleRenderer.setSpeedMultiplier(ctx.gameClock.battleSpeed);
     ctx.battleHUD.updateSpeedDisplay(ctx.gameClock.battleSpeed);
 
-    const caughtSpeciesIds = new Set<string>([
-      ...ctx.playerParty.map((p) => p.speciesId),
-      ...ctx.playerBox.map((p) => p.speciesId),
-    ]);
+    const caughtSpeciesIds = new Set<string>();
+    for (const p of ctx.playerParty) {
+      for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
+        caughtSpeciesIds.add(id);
+      }
+    }
+    for (const p of ctx.playerBox) {
+      for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
+        caughtSpeciesIds.add(id);
+      }
+    }
 
     await ctx.battleRenderer.startBattle(activePlayerPokemon, opponentPokemon);
 

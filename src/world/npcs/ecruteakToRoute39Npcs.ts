@@ -146,7 +146,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('medium_grace', 3, 13, 'RIGHT', 'girl', '🔮 MEDIUM GRACE', 
+      makeNpc('medium_grace', 2, 12, 'RIGHT', 'girl', '🔮 MEDIUM GRACE', 
         ['The spirits illuminate only those who tread with steady resolve.'],
         {
           action: 'TRAINER_BATTLE',
@@ -161,7 +161,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('sage_jeffrey', 6, 5, 'LEFT', 'sage', '🙏 SAGE JEFFREY', 
+      makeNpc('sage_jeffrey', 7, 5, 'LEFT', 'sage', '🙏 SAGE JEFFREY', 
         ['Beyond this misty bridge awaits LEADER MORTY himself!'],
         {
           action: 'TRAINER_BATTLE',

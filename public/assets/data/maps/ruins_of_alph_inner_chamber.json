@@ -1694,13 +1694,6 @@
   "connections": {},
   "warps": [
     {
-      "x": 4,
-      "y": 3,
-      "targetMapId": "ruins_of_alph_outside",
-      "targetX": 10,
-      "targetY": 13
-    },
-    {
       "x": 10,
       "y": 13,
       "targetMapId": "ruins_of_alph_outside",
@@ -1712,7 +1705,7 @@
     {
       "x": 10,
       "y": 2,
-      "speaker": "🏛️ ANCIENT RUINS PILLAR",
+      "speaker": "\ud83c\udfdb\ufe0f ANCIENT RUINS PILLAR",
       "pages": [
         "There is a strange presence here... Ancient symbols are carved into the pillars."
       ]

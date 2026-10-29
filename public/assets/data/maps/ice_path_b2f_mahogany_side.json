@@ -1106,34 +1106,6 @@
       "targetMapId": "ice_path_b3f",
       "targetX": 3,
       "targetY": 5
-    },
-    {
-      "x": 11,
-      "y": 4,
-      "targetMapId": "ice_path_b1f",
-      "targetX": 11,
-      "targetY": 2
-    },
-    {
-      "x": 4,
-      "y": 6,
-      "targetMapId": "ice_path_b1f",
-      "targetX": 4,
-      "targetY": 7
-    },
-    {
-      "x": 4,
-      "y": 12,
-      "targetMapId": "ice_path_b1f",
-      "targetX": 5,
-      "targetY": 12
-    },
-    {
-      "x": 12,
-      "y": 12,
-      "targetMapId": "ice_path_b1f",
-      "targetX": 12,
-      "targetY": 13
     }
   ],
   "bgEvents": [],

@@ -197,6 +197,8 @@ export class OverworldTickerCoordinator {
       // Active NPCs on this map retrieved via memoized cache (zero per-frame array allocation)
       const activeNpcs = currentMap ? getActiveMapNpcs(currentMap.id) : this.emptyNpcs;
       const heldDir = isCutsceneLocked() ? null : overworldHUD.getHeldDirection();
+      const prevPlayerDir = player.direction;
+      const wasPlayerMoving = player.isMoving;
 
       GridPhysics.updateEntity(
         player,
@@ -318,27 +320,12 @@ export class OverworldTickerCoordinator {
             }
           }
 
-          // Burned Tower 1F Rival Ambush
-          if (
-            currentMap?.id === 'burned_tower_1f' &&
-            coord.x === 10 &&
-            coord.y === 10 &&
-            !storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')
-          ) {
-            triggerBurnedTowerRivalBattle();
-            return;
+          // Burned Tower 1F Rival Ambush & B1F Beasts Awakening Cutscene
+          if (currentMap?.id === 'burned_tower_1f' && Math.abs(coord.x - 10) + Math.abs(coord.y - 10) <= 1 && !storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')) {
+            triggerBurnedTowerRivalBattle(); return;
           }
-
-          // Burned Tower B1F Beasts Awakening Cutscene
-          if (
-            currentMap?.id === 'burned_tower_b1f' &&
-            coord.y <= 6 &&
-            coord.x >= 8 &&
-            coord.x <= 12 &&
-            !storyFlags.has('beasts_awakened')
-          ) {
-            triggerBeastsAwakeningCutscene();
-            return;
+          if (currentMap?.id === 'burned_tower_b1f' && coord.y <= 6 && coord.x >= 8 && coord.x <= 12 && !storyFlags.has('beasts_awakened')) {
+            triggerBeastsAwakeningCutscene(); return;
           }
 
           // Goldenrod Gym Whitney Cry Step Trigger
@@ -685,6 +672,11 @@ export class OverworldTickerCoordinator {
           this.handlePlayerBump();
         }
       );
+
+      // Refresh Itemfinder Radar if player rotated in place without stepping
+      if (!wasPlayerMoving && !player.isMoving && player.direction !== prevPlayerDir && itemfinderHUD.isActive()) {
+        this.refreshItemfinderRadar(false, { itemfinderHUD, mapManager, overworldItemManager, storyFlags, player });
+      }
 
       // Directional Doorway Threshold
       if (!player.isMoving && !isCutsceneLocked() && heldDir && currentMap) {

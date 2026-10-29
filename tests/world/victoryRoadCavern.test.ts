@@ -28,7 +28,7 @@ describe('TICKET-WORLD-VICTORY-ROAD-CAVERN-02: Victory Road 3-Tier Cavern & Riva
   });
 
   it('2. all warps in victory_road.json match valid coordinates and reciprocal connections', () => {
-    expect(vrMap.warps.length).toBe(10);
+    expect(vrMap.warps.length).toBe(9);
 
     // South entrance from Victory Road Gate
     const southWarp = vrMap.warps.find((w) => w.x === 9 && w.y === 67);

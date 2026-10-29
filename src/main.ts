@@ -141,7 +141,20 @@ async function bootstrap() {
   const getActiveMapNpcs = (mapId: string): GridEntity[] => activeNpcCache.getActiveNpcs(mapId, npcsByMap[mapId], storyFlags, isNpcActiveForStoryFlags);
   const detectChosenStarterSpecies = () => OverworldTrainerSightAndTourController.detectChosenStarterSpecies(storyFlags, playerParty, playerBox, seenSpecies);
   const healPlayerParty = (playSound: boolean = true) => OverworldTrainerSightAndTourController.healParty(playerParty, playSound);
-  const getCaughtSpeciesSet = () => new Set([...playerParty.map((p) => p.speciesId), ...boxManager.flatten().map((p) => p.speciesId)]);
+  const getCaughtSpeciesSet = () => {
+    const allIds = new Set<string>();
+    for (const p of playerParty) {
+      for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
+        allIds.add(id);
+      }
+    }
+    for (const p of boxManager.flatten()) {
+      for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
+        allIds.add(id);
+      }
+    }
+    return allIds;
+  };
 
   const buildTrainerTeamInstances = (trainer: GridEntity) => OverworldTrainerSightAndTourController.buildTrainerTeamInstances(trainer);
   const handleTrainerDefeatRewards = (trainer: GridEntity) => OverworldTrainerSightAndTourController.handleTrainerDefeatRewards(trainer, getTrainerSightContext());

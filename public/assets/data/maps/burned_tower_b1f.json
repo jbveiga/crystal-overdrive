@@ -1094,20 +1094,20 @@
   "connections": {},
   "warps": [
     {
-      "x": 10,
-      "y": 9,
+      "x": 7,
+      "y": 15,
       "targetMapId": "burned_tower_1f",
-      "targetX": 10,
-      "targetY": 9
+      "targetX": 7,
+      "targetY": 15
     }
   ],
   "bgEvents": [
     {
       "x": 10,
       "y": 3,
-      "speaker": "⚡ RAIKOU, ENTEI & SUICUNE",
+      "speaker": "\u26a1 RAIKOU, ENTEI & SUICUNE",
       "pages": [
-        "Three legendary beasts stand frozen like statues…",
+        "Three legendary beasts stand frozen like statues\u2026",
         "As you approach, their eyes gleam with divine energy!",
         "With a mighty roar, they awaken and leap into the skies of Johto!"
       ]

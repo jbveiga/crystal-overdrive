@@ -49,7 +49,7 @@ const ECRUTEAK_GYM_SAFE_COORDS: [number, number][] = [
   // Branch towards Sage Jeffrey (6, 5) and Morty's platform
   [4, 7], [5, 7], [6, 7],
   [6, 6],
-  [6, 5], [5, 5],   // Sage Jeffrey area
+  [7, 5], [6, 5], [5, 5],   // Sage Jeffrey area
   [4, 5],
 
   // Approach to Leader Morty's altar (y: 3-4)

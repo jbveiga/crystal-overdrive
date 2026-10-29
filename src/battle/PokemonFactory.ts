@@ -40,6 +40,29 @@ export class PokemonFactory {
   /**
    * Formats a species ID into its canonical Gen 2 display name (e.g. NIDORAN♂ and NIDORAN♀)
    */
+  /**
+   * Resolves the full evolutionary lineage of a species (current species and all ancestral pre-evolutions)
+   * using Showdown Dex data. Guarantees that evolving never loses Pokédex caught status for prior stages.
+   */
+  public static getSpeciesLineageIds(speciesId: string): string[] {
+    const lineage = new Set<string>();
+    let currentId: string | undefined = speciesId.toLowerCase().trim();
+    while (currentId) {
+      lineage.add(currentId);
+      try {
+        const spec = Dex.species.get(currentId);
+        if (spec && spec.prevo) {
+          currentId = spec.prevo.toLowerCase().trim();
+        } else {
+          currentId = undefined;
+        }
+      } catch {
+        currentId = undefined;
+      }
+    }
+    return Array.from(lineage);
+  }
+
   public static formatSpeciesName(speciesId: string, fallbackName?: string): string {
     const id = speciesId.toLowerCase().trim();
     if (id === 'nidoran-m' || id === 'nidoranm') return 'NIDORAN♂';
@@ -117,6 +140,74 @@ export class PokemonFactory {
       statChanges = { target: 'self', stat: 'def', stages: 1 };
     } else if (dexMove.id === 'growth') {
       statChanges = { target: 'self', stat: 'spa', stages: 1 };
+    } else if (dexMove.id === 'swordsdance') {
+      statChanges = { target: 'self', stat: 'atk', stages: 2 };
+    } else if (dexMove.id === 'agility') {
+      statChanges = { target: 'self', stat: 'spe', stages: 2 };
+    } else if (dexMove.id === 'screech') {
+      statChanges = { target: 'foe', stat: 'def', stages: -2 };
+    } else if (dexMove.id === 'scaryface') {
+      statChanges = { target: 'foe', stat: 'spe', stages: -2 };
+    }
+
+    // Dynamically hydrate stat boosts & status conditions from @pkmn/dex for all remaining moves
+    if (!statChanges && dexMove.boosts) {
+      const statMap: Record<string, 'atk' | 'def' | 'spa' | 'spd' | 'spe' | 'acc' | 'eva'> = {
+        atk: 'atk', def: 'def', spa: 'spa', spd: 'spd', spe: 'spe', accuracy: 'acc', evasion: 'eva',
+      };
+      for (const [k, v] of Object.entries(dexMove.boosts)) {
+        if (typeof v === 'number' && v !== 0 && statMap[k]) {
+          const isSelf = dexMove.target === 'self' || v > 0;
+          statChanges = { target: isSelf ? 'self' : 'foe', stat: statMap[k], stages: v };
+          break;
+        }
+      }
+    }
+    if (!inflictsStatus && dexMove.status) {
+      const statusMap: Record<string, StatusCondition> = {
+        par: 'PAR', slp: 'SLP', psn: 'PSN', tox: 'PSN', brn: 'BRN', frz: 'FRZ',
+      };
+      if (statusMap[dexMove.status]) {
+        inflictsStatus = statusMap[dexMove.status];
+      }
+    }
+
+    // Canonical healing, drain, recoil, and fixed damage
+    let healFraction: number | undefined = undefined;
+    let isWeatherHeal = false;
+    let isRest = false;
+    let drainFraction: number | undefined = undefined;
+    let recoilFraction: number | undefined = undefined;
+    let fixedDamage: MoveData['fixedDamage'] = undefined;
+
+    if (dexMove.id === 'synthesis' || dexMove.id === 'morningsun' || dexMove.id === 'moonlight') {
+      healFraction = 0.5;
+      isWeatherHeal = true;
+    } else if (dexMove.id === 'recover' || dexMove.id === 'softboiled' || dexMove.id === 'milkdrink') {
+      healFraction = 0.5;
+    } else if (dexMove.id === 'rest') {
+      healFraction = 1.0;
+      isRest = true;
+    }
+
+    if (dexMove.id === 'gigadrain' || dexMove.id === 'megadrain' || dexMove.id === 'absorb' || dexMove.id === 'leechlife' || dexMove.id === 'dreameater') {
+      drainFraction = 0.5;
+    }
+
+    if (dexMove.id === 'doubleedge' || dexMove.id === 'takedown' || dexMove.id === 'submission') {
+      recoilFraction = 0.25;
+    } else if (dexMove.id === 'struggle') {
+      recoilFraction = 0.25;
+    }
+
+    if (dexMove.id === 'nightshade' || dexMove.id === 'seismictoss') {
+      fixedDamage = 'level';
+    } else if (dexMove.id === 'dragonrage') {
+      fixedDamage = 40;
+    } else if (dexMove.id === 'sonicboom') {
+      fixedDamage = 20;
+    } else if (dexMove.id === 'superfang') {
+      fixedDamage = 'half_current_hp';
     }
 
     const moveObj: MoveData = {
@@ -133,6 +224,12 @@ export class PokemonFactory {
       inflictsStatus,
       secondaryStatus,
       statChanges,
+      healFraction,
+      isWeatherHeal,
+      isRest,
+      drainFraction,
+      recoilFraction,
+      fixedDamage,
     };
     PokemonFactory.moveDataCache.set(moveId, moveObj);
     return moveObj;

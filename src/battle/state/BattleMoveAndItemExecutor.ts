@@ -187,7 +187,8 @@ export function executeMove({
   }
 
   // 4. Accuracy & Evasion Check (Self-targeting status moves and Swift never miss)
-  if (move.statChanges?.target !== 'self' && move.id !== 'swift') {
+  const isSelfStatus = move.category === 'Status' && (move.statChanges?.target === 'self' || move.healFraction !== undefined || move.isRest);
+  if (!isSelfStatus && move.id !== 'swift') {
     const accStage = attacker.statStages?.acc ?? 0;
     const evaStage = defender.statStages?.eva ?? 0;
     const accMult = DamageCalculator.getAccEvaStageMultiplier(accStage);
@@ -251,6 +252,57 @@ export function executeMove({
     return;
   }
 
+  // 6b. Self-Healing & Rest Moves (Synthesis, Morning Sun, Moonlight, Recover, Soft-Boiled, Milk Drink, Rest)
+  if (move.healFraction !== undefined || move.isRest) {
+    if (move.isRest) {
+      if (attacker.currentHp >= attacker.stats.hp) {
+        events.push({ type: 'MESSAGE', text: 'But it failed!' });
+        return;
+      }
+      attacker.currentHp = attacker.stats.hp;
+      attacker.status = 'SLP';
+      attacker.sleepTurns = 2;
+      events.push({ type: 'STATUS', targetId: attacker.uid, status: 'SLP' });
+      events.push({
+        type: 'HEAL',
+        targetId: attacker.uid,
+        healedAmount: attacker.stats.hp,
+        remainingHp: attacker.currentHp,
+      });
+      events.push({ type: 'MESSAGE', text: `${attacker.nickname} went to sleep and became healthy!` });
+      return;
+    }
+
+    if (attacker.currentHp >= attacker.stats.hp) {
+      events.push({ type: 'MESSAGE', text: `${attacker.nickname}'s HP is full!` });
+      return;
+    }
+
+    let healMult = move.healFraction ?? 0.5;
+    if (move.isWeatherHeal) {
+      if (weather === 'SUN') healMult = 2 / 3;
+      else if (weather === 'RAIN' || weather === 'SANDSTORM') healMult = 1 / 4;
+      else healMult = 1 / 2;
+    }
+
+    const healAmount = Math.max(1, Math.floor(attacker.stats.hp * healMult));
+    const prevHp = attacker.currentHp;
+    attacker.currentHp = Math.min(attacker.stats.hp, attacker.currentHp + healAmount);
+    const actualHealed = attacker.currentHp - prevHp;
+
+    events.push({
+      type: 'HEAL',
+      targetId: attacker.uid,
+      healedAmount: actualHealed,
+      remainingHp: attacker.currentHp,
+    });
+    events.push({
+      type: 'MESSAGE',
+      text: `${attacker.nickname}'s HP was restored!`,
+    });
+    return;
+  }
+
   // 7. Status move check (e.g. Thunder Wave, Hypnosis, Poison Powder)
   if (move.inflictsStatus) {
     const typeMult = EffectivenessHelper.calculateMultiplier(move.type, defender.types);
@@ -291,6 +343,12 @@ export function executeMove({
     return;
   }
 
+  // 7b. Guard against unhandled pure Status moves falling through to damage calculation
+  if (move.category === 'Status' && move.power <= 0) {
+    events.push({ type: 'MESSAGE', text: 'But nothing happened!' });
+    return;
+  }
+
   // 8. Calculate & Apply Direct Damage (including TM49 Fury Cutter consecutive streak doubling, Weather & Spread modifiers)
   let effectiveMove = move;
   if (move.id === 'furycutter') {
@@ -309,7 +367,24 @@ export function executeMove({
     };
   }
 
-  const result = DamageCalculator.calculate(attacker, defender, effectiveMove);
+  let result = DamageCalculator.calculate(attacker, defender, effectiveMove);
+
+  // Fixed Damage Overrides (Night Shade, Seismic Toss, Dragon Rage, Sonic Boom, Super Fang)
+  if (move.fixedDamage !== undefined) {
+    let fixVal = 0;
+    if (move.fixedDamage === 'level') {
+      fixVal = attacker.level || 50;
+    } else if (move.fixedDamage === 'half_current_hp') {
+      fixVal = Math.max(1, Math.floor(defender.currentHp / 2));
+    } else if (typeof move.fixedDamage === 'number') {
+      fixVal = move.fixedDamage;
+    }
+    result = {
+      damage: fixVal,
+      effectiveness: 1,
+      isCritical: false,
+    };
+  }
 
   defender.currentHp = Math.max(0, defender.currentHp - result.damage);
 
@@ -332,6 +407,42 @@ export function executeMove({
     events.push({ type: 'MESSAGE', text: "It's not very effective..." });
   } else if (result.effectiveness === 0) {
     events.push({ type: 'MESSAGE', text: `It doesn't affect ${defender.nickname}...` });
+  }
+
+  // Drain Effect (Absorb, Mega Drain, Giga Drain, Leech Life, Dream Eater)
+  if (move.drainFraction && result.damage > 0 && attacker.currentHp < attacker.stats.hp) {
+    const drainHeal = Math.max(1, Math.floor(result.damage * move.drainFraction));
+    const prevAttackerHp = attacker.currentHp;
+    attacker.currentHp = Math.min(attacker.stats.hp, attacker.currentHp + drainHeal);
+    const actualDrained = attacker.currentHp - prevAttackerHp;
+    events.push({
+      type: 'HEAL',
+      targetId: attacker.uid,
+      healedAmount: actualDrained,
+      remainingHp: attacker.currentHp,
+    });
+    events.push({
+      type: 'MESSAGE',
+      text: `${attacker.nickname} sucked energy from ${defender.nickname}!`,
+    });
+  }
+
+  // Recoil Effect (Double-Edge, Take Down, Submission, Struggle)
+  if (move.recoilFraction && result.damage > 0 && attacker.currentHp > 0) {
+    const recoilDamage = Math.max(1, Math.floor(result.damage * move.recoilFraction));
+    attacker.currentHp = Math.max(0, attacker.currentHp - recoilDamage);
+    events.push({
+      type: 'DAMAGE',
+      targetId: attacker.uid,
+      damage: recoilDamage,
+      remainingHp: attacker.currentHp,
+      effectiveness: 1,
+      isCritical: false,
+    });
+    events.push({
+      type: 'MESSAGE',
+      text: `${attacker.nickname} is hit with recoil!`,
+    });
   }
 
   // 9. Secondary Stat Stage Effect on Damaging Moves (e.g. TM31 Mud-Slap accuracy drop)

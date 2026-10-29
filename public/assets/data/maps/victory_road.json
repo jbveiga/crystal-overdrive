@@ -4390,13 +4390,6 @@
       "targetY": 27
     },
     {
-      "x": 0,
-      "y": 27,
-      "targetMapId": "victory_road",
-      "targetX": 0,
-      "targetY": 11
-    },
-    {
       "x": 13,
       "y": 5,
       "targetMapId": "route_23",
