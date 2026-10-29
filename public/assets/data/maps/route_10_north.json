@@ -1108,6 +1108,13 @@
       "targetMapId": "route_10_poke_center",
       "targetX": 3,
       "targetY": 7
+    },
+    {
+      "x": 3,
+      "y": 9,
+      "targetMapId": "power_plant",
+      "targetX": 2,
+      "targetY": 17
     }
   ],
   "bgEvents": [],

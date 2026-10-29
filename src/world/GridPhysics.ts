@@ -254,7 +254,18 @@ export interface GridEntity {
     | 'CELADON_GYM_STATUE'
     | 'CELADON_MANSION_STORYTELLER'
     | 'CELADON_CAFE_TRASH'
-    | 'ROUTE_8_TRAINER';
+    | 'ROUTE_8_TRAINER'
+    | 'POWER_PLANT_MANAGER'
+    | 'CERULEAN_GYM_ROCKET_GRUNT'
+    | 'ROUTE_24_ROCKET_GRUNT'
+    | 'ROUTE_25_MISTY_DATE'
+    | 'CERULEAN_GYM_GUIDE'
+    | 'CERULEAN_GYM_TRAINER'
+    | 'CERULEAN_GYM_STATUE'
+    | 'CERULEAN_GYM_MACHINE_PART'
+    | 'LAVENDER_RADIO_TOWER_DIRECTOR'
+    | 'ROUTE_5_CLEANSE_TAG_GRANDMA'
+    | 'ROUTE_25_TRAINER';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

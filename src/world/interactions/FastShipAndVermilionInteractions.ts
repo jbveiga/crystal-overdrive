@@ -302,18 +302,13 @@ export const handleVermilionPortSailor: NpcInteractionHandler = (targetNpc, _map
   return true;
 };
 
+import { handleSleepingSnorlaxAwakening } from './CeruleanPowerPlantAndMistyInteractions';
+
 /**
  * 8. Sleeping Snorlax Diglett's Cave Obstacle
  */
 export const handleSleepingSnorlax: NpcInteractionHandler = (targetNpc, _map, ctx) => {
-  ctx.openDialogue(
-    [
-      'SNORLAX is snoring peacefully in front of the cave entrance...',
-      'It is fast asleep and completely unresponsive! A POKéGEAR broadcast might wake it up.',
-    ],
-    targetNpc.speaker || '💤 SNORLAX'
-  );
-  return true;
+  return handleSleepingSnorlaxAwakening(targetNpc, ctx);
 };
 
 export interface FastShipWarpEvaluation {

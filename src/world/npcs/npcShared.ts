@@ -385,6 +385,16 @@ export function isNpcActiveForStoryFlags(
   if (npcId === 'vermilion_city_cut_tree') return !storyFlags.has('vermilion_cut_tree_cleared');
   if (npcId === 'celadon_city_cut_tree') return !storyFlags.has('celadon_cut_tree_cleared');
 
+  // Kanto Snorlax & Cerulean Questline NPCs
+  if (npcId === 'vermilion_city_snorlax') return !storyFlags.has('snorlax_cleared') && !storyFlags.has('EVENT_FOUGHT_SNORLAX');
+  if (npcId === 'cerulean_gym_rocket_grunt') return !storyFlags.has('EVENT_MET_ROCKET_GRUNT_AT_CERULEAN_GYM');
+  if (npcId === 'route_24_rocket_grunt') return storyFlags.has('EVENT_MET_ROCKET_GRUNT_AT_CERULEAN_GYM') && !storyFlags.has('EVENT_DEFEATED_ROUTE24_GRUNT');
+  if (npcId === 'route_25_misty' || npcId === 'route_25_misty_date') return !storyFlags.has('EVENT_MET_MISTY_AT_CERULEAN_CAPE');
+  if (npcId === 'cerulean_gym_misty') return storyFlags.has('EVENT_MET_MISTY_AT_CERULEAN_CAPE');
+  if (npcId === 'cerulean_gym_swimmer_diana' || npcId === 'cerulean_gym_swimmer_briana' || npcId === 'cerulean_gym_swimmer_parker') {
+    return storyFlags.has('EVENT_MET_MISTY_AT_CERULEAN_CAPE');
+  }
+
   return true;
 }
 

@@ -16,10 +16,8 @@ import { BattleAudio } from '../../audio/BattleAudio';
 import { handleLugiaShrineOrBoss } from './WhirlIslandsInteractions';
 import { handleFastShipCabinRest } from './FastShipAndVermilionInteractions';
 import { handleVermilionGymTrashCan } from './VermilionGymInteractions';
-import {
-  handleCeladonCafeTrashCan,
-  handleCeladonGymGuideAndStatues,
-} from './CeladonAndGymErikaInteractions';
+import { handleCeladonCafeTrashCan, handleCeladonGymGuideAndStatues } from './CeladonAndGymErikaInteractions';
+import { handleCeruleanGymMachinePart, handleCeruleanGymGuideAndStatues } from './CeruleanPowerPlantAndMistyInteractions';
 
 export class FieldObstacleDispatcher {
   /**
@@ -333,11 +331,7 @@ export class FieldObstacleDispatcher {
         } else if (bgEvent.action?.startsWith('VERMILION_GYM_TRASH_CAN_')) {
           const canIdx = parseInt(bgEvent.action.replace('VERMILION_GYM_TRASH_CAN_', ''), 10);
           handleVermilionGymTrashCan(canIdx, ctx as any);
-        } else if (bgEvent.action === 'CELADON_CAFE_TRASH') {
-          return handleCeladonCafeTrashCan(ctx as any);
-        } else if (bgEvent.action === 'CELADON_GYM_STATUE') {
-          return handleCeladonGymGuideAndStatues({ id: 'celadon_gym_statue', x: facingX, y: facingY, action: 'CELADON_GYM_STATUE' } as any, ctx as any);
-        } else if (bgEvent.action === 'HEAL_AND_SAVE') {
+        } else if (bgEvent.action === 'CELADON_CAFE_TRASH') return handleCeladonCafeTrashCan(ctx as any); else if (bgEvent.action === 'CELADON_GYM_STATUE') return handleCeladonGymGuideAndStatues({ id: 'celadon_gym_statue', x: facingX, y: facingY, action: 'CELADON_GYM_STATUE' } as any, ctx as any); else if (bgEvent.action === 'CERULEAN_GYM_MACHINE_PART') return handleCeruleanGymMachinePart(ctx as any, facingX, facingY); else if (bgEvent.action === 'CERULEAN_GYM_STATUE') return handleCeruleanGymGuideAndStatues({ id: 'cerulean_gym_statue', x: facingX, y: facingY, action: 'CERULEAN_GYM_STATUE' } as any, ctx as any); else if (bgEvent.action === 'HEAL_AND_SAVE') {
           ctx.healPlayerParty(false);
           ctx.saveCurrentGame();
           if (currentMap.id.endsWith('_poke_center')) {
@@ -414,6 +408,10 @@ export class FieldObstacleDispatcher {
         }
       );
       return true;
+    }
+
+    if (currentMap.id === 'cerulean_gym' && ((facingX === 4 && facingY === 8) || (facingX === 3 && facingY === 8))) {
+      return handleCeruleanGymMachinePart(ctx as any, facingX, facingY);
     }
 
     // 2b. Check Overworld Visible Item Balls (Sprint 12 — Facing Adjacent Interaction)

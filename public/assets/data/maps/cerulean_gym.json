@@ -508,6 +508,27 @@
       "targetY": 24
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 3,
+      "y": 8,
+      "action": "CERULEAN_GYM_MACHINE_PART"
+    },
+    {
+      "x": 4,
+      "y": 8,
+      "action": "CERULEAN_GYM_MACHINE_PART"
+    },
+    {
+      "x": 2,
+      "y": 13,
+      "action": "CERULEAN_GYM_STATUE"
+    },
+    {
+      "x": 6,
+      "y": 13,
+      "action": "CERULEAN_GYM_STATUE"
+    }
+  ],
   "grassEncounters": []
 }

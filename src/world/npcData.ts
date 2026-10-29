@@ -23,6 +23,7 @@ import { createOlivineToIndigoNpcs } from './npcs/olivineToIndigoNpcs';
 import { createKantoVermilionNpcs } from './npcs/kantoVermilionNpcs';
 import { createKantoSaffronNpcs } from './npcs/kantoSaffronNpcs';
 import { createKantoCeladonNpcs } from './npcs/kantoCeladonNpcs';
+import { createKantoCeruleanNpcs } from './npcs/kantoCeruleanNpcs';
 
 // Re-export shared entities, types, and functions for 100% backward compatibility
 export {
@@ -52,6 +53,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ...createKantoVermilionNpcs(),
     ...createKantoSaffronNpcs(),
     ...createKantoCeladonNpcs(),
+    ...createKantoCeruleanNpcs(),
   };
 
   const DEFAULT_LORE = [

@@ -1464,8 +1464,8 @@
     1,
     1,
     1,
-    1,
-    1,
+    0,
+    0,
     1,
     1,
     1,
@@ -4447,6 +4447,27 @@
       "targetMapId": "route_8_saffron_gate",
       "targetX": 0,
       "targetY": 5
+    },
+    {
+      "x": 18,
+      "y": 3,
+      "targetMapId": "route_5_saffron_gate",
+      "targetX": 4,
+      "targetY": 6
+    },
+    {
+      "x": 16,
+      "y": 0,
+      "targetMapId": "route_5_saffron_gate",
+      "targetX": 4,
+      "targetY": 7
+    },
+    {
+      "x": 17,
+      "y": 0,
+      "targetMapId": "route_5_saffron_gate",
+      "targetX": 5,
+      "targetY": 7
     }
   ],
   "bgEvents": [],

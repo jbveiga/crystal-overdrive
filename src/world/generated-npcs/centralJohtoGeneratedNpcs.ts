@@ -108,67 +108,6 @@ export const CENTRAL_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     t("route_4_youngster_0",17,9,"DOWN","boy","⚔️ HANK",["Hank: That was a great battle!"],"route_4_hank","Bird Keeper Hank",3,["HANK: Let's battle!"],[m("pidgey",12),m("pidgeot",34)]),
     t("route_4_lass_1",9,7,"LEFT","girl","⚔️ HOPE",["Hope: That was a great battle!"],"route_4_hope","Picnicker Hope",4,["HOPE: Let's battle!"],[m("flaaffy",34)]),
   ],
-  "cerulean_city": [
-    n("cerulean_city_cooltrainer_m_0",15,23,"DOWN","boy",D5,[D9]),
-    n("cerulean_city_super_nerd_1",23,15,"DOWN","fat_man","SUPER NERD",[D8]),
-    n("cerulean_city_cooltrainer_f_2",21,24,"LEFT","girl",D7,[D4]),
-    n("cerulean_city_fisher_3",30,26,"LEFT","fisherman","FISHER",[D4]),
-    n("cerulean_city_youngster_4",6,12,"DOWN","boy","YOUNGSTER",[D2]),
-  ],
-  "cerulean_gym": [
-    n("cerulean_gym_rocket_0",4,10,"DOWN","boy","ROCKET",[D9]),
-    n("cerulean_gym_misty_1",5,3,"DOWN","girl","🏆 LEADER MISTY",[D8], {"action":"MISTY_EVENT","trainerId":"misty","trainerName":"Leader Misty","team":[{"speciesId":"golduck","level":42,"moves":["surf","disable","psychup","psychic"]},{"speciesId":"quagsire","level":42,"moves":["surf","amnesia","earthquake","raindance"]},{"speciesId":"lapras","level":44,"moves":["surf","perishsong","blizzard","raindance"]},{"speciesId":"starmie","level":47,"moves":["surf","confuseray","recover","icebeam"]}]}),
-    t("cerulean_gym_swimmer_girl_2",4,7,"RIGHT","girl","⚔️ DIANA",["Diana: That was a great battle!"],"cerulean_gym_diana","Swimmerf Diana",3,["DIANA: Let's battle!"],[m("golduck",37)]),
-    t("cerulean_gym_swimmer_girl_3",0,9,"RIGHT","girl","⚔️ BRIANA",["Briana: That was a great battle!"],"cerulean_gym_briana","Swimmerf Briana",1,["BRIANA: Let's battle!"],[m("seaking",35),m("seaking",35)]),
-    n("cerulean_gym_gym_guide_4",7,13,"DOWN","boy",D10,[D1]),
-  ],
-  "cerulean_poke_center": [
-    n("cerulean_poke_center_nurse_0",3,1,"DOWN","teacher",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
-    n("cerulean_poke_center_super_nerd_1",8,4,"LEFT","fat_man","SUPER NERD",[D6]),
-    n("cerulean_poke_center_gym_guide_2",1,5,"DOWN","boy",D10,[D9]),
-  ],
-  "cerulean_mart": [
-    n("cerulean_mart_clerk_0",1,3,"RIGHT","boy","🏪 CLERK",[D14], {"action":"OPEN_MART","counter":true}),
-    n("cerulean_mart_cooltrainer_m_1",1,6,"DOWN","boy",D5,[D9]),
-    n("cerulean_mart_cooltrainer_f_2",7,2,"LEFT","girl",D7,[D4]),
-  ],
-  "cerulean_police_station": [
-    n("cerulean_police_station_fishing_guru_0",5,1,"UP","fisherman",D15,[D1]),
-    n("cerulean_police_station_pokefan_f_1",5,4,"LEFT","teacher","POKEFAN F",[D2]),
-  ],
-  "cerulean_trade_house": [
-    n("cerulean_trade_house_granny_0",2,4,"RIGHT","teacher","GRANNY",[D1]),
-    n("cerulean_trade_house_gramps_1",1,2,"DOWN","fat_man","GRAMPS",[D2]),
-  ],
-  "cerulean_badge_house": [
-    n("cerulean_badge_house_pokefan_m_0",2,3,"RIGHT","fat_man","POKEFAN M",[D4]),
-  ],
-  "route_25": [
-    t("route_25_youngster_0",12,8,"DOWN","boy","⚔️ DUDLEY",["Dudley: That was a great battle!"],"route_25_dudley","Schoolboy Dudley",3,["DUDLEY: Let's battle!"],[m("oddish",35)]),
-    t("route_25_lass_1",16,11,"UP","girl","⚔️ ELLEN",["Ellen: That was a great battle!"],"route_25_ellen","Lass Ellen",3,["ELLEN: Let's battle!"],[m("wigglytuff",30),m("granbull",34)]),
-    t("route_25_youngster_2",21,8,"DOWN","boy","⚔️ JOE",["Joe: That was a great battle!"],"route_25_joe","Schoolboy Joe",1,["JOE: Let's battle!"],[m("tangela",33),m("vaporeon",33)]),
-    t("route_25_lass_3",22,6,"RIGHT","girl","⚔️ LAURA",["Laura: That was a great battle!"],"route_25_laura","Lass Laura",3,["LAURA: Let's battle!"],[m("gloom",28),m("pidgeotto",31),m("bellossom",31)]),
-    t("route_25_youngster_4",25,4,"DOWN","boy","⚔️ LLOYD",["Lloyd: That was a great battle!"],"route_25_lloyd","Camper Lloyd",2,["LLOYD: Let's battle!"],[m("nidoking",34)]),
-    t("route_25_lass_5",28,11,"UP","girl","⚔️ SHANNON",["Shannon: That was a great battle!"],"route_25_shannon","Lass Shannon",1,["SHANNON: Let's battle!"],[m("paras",29),m("paras",29),m("parasect",32)]),
-    t("route_25_super_nerd_6",31,7,"DOWN","fat_man","⚔️ PAT",["Pat: That was a great battle!"],"route_25_pat","Super Nerd Pat",1,["PAT: Let's battle!"],[m("porygon",36)]),
-    n("route_25_cooltrainer_m_7",37,8,"LEFT","boy",D5,[D2]),
-  ],
-  "bills_house": [
-    n("bills_house_gramps_0",2,3,"UP","fat_man","GRAMPS",[D4]),
-  ],
-  "route_5": [
-    n("route_5_pokefan_m_0",17,16,"DOWN","fat_man","POKEFAN M",undefined),
-  ],
-  "route_5_underground_entrance": [
-    n("route_5_underground_entrance_teacher_0",2,2,"DOWN","teacher","TEACHER",undefined),
-  ],
-  "route_5_saffron_gate": [
-    n("route_5_saffron_gate_officer_0",0,4,"RIGHT","fat_man","OFFICER",undefined),
-  ],
-  "route_5_cleanse_tag_house": [
-    n("route_5_cleanse_tag_house_granny_0",2,5,"DOWN","teacher","GRANNY",undefined),
-    n("route_5_cleanse_tag_house_teacher_1",5,3,"LEFT","teacher","TEACHER",undefined),
-  ],
   "route_6": [
     n("route_6_pokefan_m_0",17,4,"DOWN","fat_man","POKEFAN M",undefined),
     t("route_6_pokefan_m_1",9,12,"RIGHT","fat_man","⚔️ REX",["Rex: That was a great battle!"],"route_6_rex","Pokefanm Rex",2,["REX: Let's battle!"],[m("phanpy",35)]),

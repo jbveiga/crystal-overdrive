@@ -1140,6 +1140,13 @@
       "targetMapId": "soul_house",
       "targetX": 4,
       "targetY": 7
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "targetMapId": "lavender_radio_tower_1f",
+      "targetX": 2,
+      "targetY": 7
     }
   ],
   "bgEvents": [],

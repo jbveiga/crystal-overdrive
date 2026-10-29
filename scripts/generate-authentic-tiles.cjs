@@ -4947,7 +4947,12 @@ buildMapFromBlk({
   blocksH: 8,
   connections: {},
   warps: [{"x":4,"y":15,"targetMapId":"cerulean_city","targetX":30,"targetY":23},{"x":5,"y":15,"targetMapId":"cerulean_city","targetX":30,"targetY":23}],
-  bgEvents: [],
+  bgEvents: [
+    {"x":3,"y":8,"action":"CERULEAN_GYM_MACHINE_PART"},
+    {"x":4,"y":8,"action":"CERULEAN_GYM_MACHINE_PART"},
+    {"x":2,"y":13,"action":"CERULEAN_GYM_STATUE"},
+    {"x":6,"y":13,"action":"CERULEAN_GYM_STATUE"}
+  ],
   grassEncounters: [],
 });
 
@@ -5099,7 +5104,12 @@ buildMapFromBlk({
   blocksW: 5,
   blocksH: 4,
   connections: {},
-  warps: [{"x":4,"y":0,"targetMapId":"route_5","targetX":8,"targetY":17},{"x":5,"y":0,"targetMapId":"route_5","targetX":9,"targetY":17}],
+  warps: [
+    {"x":4,"y":0,"targetMapId":"route_5","targetX":8,"targetY":17},
+    {"x":5,"y":0,"targetMapId":"route_5","targetX":9,"targetY":17},
+    {"x":4,"y":7,"targetMapId":"saffron_city","targetX":18,"targetY":4},
+    {"x":5,"y":7,"targetMapId":"saffron_city","targetX":18,"targetY":4}
+  ],
   bgEvents: [],
   grassEncounters: [],
 });
@@ -5460,9 +5470,28 @@ buildMapFromBlk({
   blocksH: 9,
   roofGroup: 'ce',
   connections: {"NORTH":{"mapId":"route_9","offset":-40},"SOUTH":{"mapId":"route_10_south","offset":0}},
-  warps: [{"x":11,"y":1,"targetMapId":"route_10_poke_center","targetX":3,"targetY":7}],
+  warps: [
+    {"x":11,"y":1,"targetMapId":"route_10_poke_center","targetX":3,"targetY":7},
+    {"x":3,"y":9,"targetMapId":"power_plant","targetX":2,"targetY":17}
+  ],
   bgEvents: [],
   grassEncounters: [{"speciesId":"spearow","minLevel":15,"maxLevel":15,"weight":30},{"speciesId":"voltorb","minLevel":17,"maxLevel":17,"weight":30},{"speciesId":"raticate","minLevel":15,"maxLevel":15,"weight":20},{"speciesId":"fearow","minLevel":15,"maxLevel":15,"weight":10},{"speciesId":"marowak","minLevel":15,"maxLevel":15,"weight":5},{"speciesId":"electabuzz","minLevel":18,"maxLevel":18,"weight":5}],
+});
+
+buildMapFromBlk({
+  id: 'power_plant',
+  name: "Power Plant",
+  tileset: 'facility',
+  blkFile: 'maps__PowerPlant.blk',
+  blocksW: 10,
+  blocksH: 9,
+  connections: {},
+  warps: [
+    {"x":2,"y":17,"targetMapId":"route_10_north","targetX":3,"targetY":10},
+    {"x":3,"y":17,"targetMapId":"route_10_north","targetX":3,"targetY":10}
+  ],
+  bgEvents: [],
+  grassEncounters: [],
 });
 
 buildMapFromBlk({
@@ -5527,7 +5556,30 @@ buildMapFromBlk({
   blocksH: 9,
   roofGroup: 'la',
   connections: {"NORTH":{"mapId":"route_10_south","offset":0},"WEST":{"mapId":"route_8","offset":0}},
-  warps: [{"x":5,"y":5,"targetMapId":"lavender_poke_center","targetX":3,"targetY":7},{"x":3,"y":13,"targetMapId":"lavender_speech_house","targetX":2,"targetY":7},{"x":7,"y":13,"targetMapId":"lavender_name_rater","targetX":2,"targetY":7},{"x":1,"y":5,"targetMapId":"lavender_mart","targetX":3,"targetY":7},{"x":13,"y":11,"targetMapId":"soul_house","targetX":4,"targetY":7}],
+  warps: [
+    {"x":5,"y":5,"targetMapId":"lavender_poke_center","targetX":3,"targetY":7},
+    {"x":3,"y":13,"targetMapId":"lavender_speech_house","targetX":2,"targetY":7},
+    {"x":7,"y":13,"targetMapId":"lavender_name_rater","targetX":2,"targetY":7},
+    {"x":1,"y":5,"targetMapId":"lavender_mart","targetX":3,"targetY":7},
+    {"x":13,"y":11,"targetMapId":"soul_house","targetX":4,"targetY":7},
+    {"x":14,"y":5,"targetMapId":"lavender_radio_tower_1f","targetX":2,"targetY":7}
+  ],
+  bgEvents: [],
+  grassEncounters: [],
+});
+
+buildMapFromBlk({
+  id: 'lavender_radio_tower_1f',
+  name: "Lavender Radio Tower 1F",
+  tileset: 'radio_tower',
+  blkFile: 'maps__RadioTower1F.blk',
+  blocksW: 9,
+  blocksH: 4,
+  connections: {},
+  warps: [
+    {"x":2,"y":7,"targetMapId":"lavender_town","targetX":14,"targetY":6},
+    {"x":3,"y":7,"targetMapId":"lavender_town","targetX":14,"targetY":6}
+  ],
   bgEvents: [],
   grassEncounters: [],
 });
@@ -5939,7 +5991,10 @@ buildMapFromBlk({
     {"x":0,"y":18,"targetMapId":"route_7_saffron_gate","targetX":9,"targetY":4},
     {"x":0,"y":19,"targetMapId":"route_7_saffron_gate","targetX":9,"targetY":5},
     {"x":39,"y":18,"targetMapId":"route_8_saffron_gate","targetX":0,"targetY":4},
-    {"x":39,"y":19,"targetMapId":"route_8_saffron_gate","targetX":0,"targetY":5}
+    {"x":39,"y":19,"targetMapId":"route_8_saffron_gate","targetX":0,"targetY":5},
+    {"x":18,"y":3,"targetMapId":"route_5_saffron_gate","targetX":4,"targetY":6},
+    {"x":16,"y":0,"targetMapId":"route_5_saffron_gate","targetX":4,"targetY":7},
+    {"x":17,"y":0,"targetMapId":"route_5_saffron_gate","targetX":5,"targetY":7}
   ],
   bgEvents: [],
   grassEncounters: [],

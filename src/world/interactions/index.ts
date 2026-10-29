@@ -23,6 +23,7 @@ import { getFastShipAndVermilionInteractions } from './FastShipAndVermilionInter
 import { getVermilionGymInteractions } from './VermilionGymInteractions';
 import { getSaffronAndRoute6Interactions } from './SaffronAndRoute6Interactions';
 import { getCeladonAndGymErikaInteractions } from './CeladonAndGymErikaInteractions';
+import { getCeruleanPowerPlantAndMistyInteractions } from './CeruleanPowerPlantAndMistyInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -51,6 +52,7 @@ export * from './FastShipAndVermilionInteractions';
 export * from './VermilionGymInteractions';
 export * from './SaffronAndRoute6Interactions';
 export * from './CeladonAndGymErikaInteractions';
+export * from './CeruleanPowerPlantAndMistyInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.
@@ -80,5 +82,6 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getVermilionGymInteractions(),
     ...getSaffronAndRoute6Interactions(),
     ...getCeladonAndGymErikaInteractions(),
+    ...getCeruleanPowerPlantAndMistyInteractions(),
   ]);
 }

@@ -100,6 +100,7 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Vermilion Gym & Fan Club Interactions** | Lt. Surge battle, electric trash can puzzle, Fan Club Chairman & Clefairy doll | `src/world/interactions/VermilionGymInteractions.ts` | < 400 lines |
 | **Saffron & Route 6 Interactions** | Sabrina battle, teleporters, Copycat doll exchange, Magnet Train transit, Silph Co & Mr. Psychic | `src/world/interactions/SaffronAndRoute6Interactions.ts` | < 400 lines |
 | **Celadon & Route 8 Interactions** | Erika battle, Rainbow Badge, Cut tree, Cafe Leftovers, Mansion Storyteller TM03, Route 8 trainers | `src/world/interactions/CeladonAndGymErikaInteractions.ts` | < 500 lines |
+| **Cerulean, Power Plant & Misty Interactions** | Power Plant crisis, Machine Part quest, Route 24 Grunt, Misty date, Cascade Badge, EXPN Card, Snorlax | `src/world/interactions/CeruleanPowerPlantAndMistyInteractions.ts` | < 500 lines |
 | **Default Interaction Router Wiring** | Default NPC interaction router factory and registration wiring | `src/world/interactions/defaultInteractionRouter.ts` | < 50 lines |
 | **Interactions Index Barrel** | Aggregated export barrel for all interaction handlers and routers | `src/world/interactions/index.ts` | < 100 lines |
 | **NPC Shared Helpers** | NPC builders, Guide Gent tour legs, Day-of-Week siblings logic | `src/world/npcs/npcShared.ts` | < 650 lines |
@@ -116,6 +117,7 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Kanto Vermilion & Fast Ship NPCs** | Vermilion City, Vermilion Port, Passage, and S.S. Aqua Fast Ship 1F/Cabins | `src/world/npcs/kantoVermilionNpcs.ts` | < 300 lines |
 | **Kanto Saffron & Route 6 NPCs** | Saffron City, Saffron Gym, Copycat, Silph Co, Mr. Psychic, Fighting Dojo, Magnet Train, Route 6 | `src/world/npcs/kantoSaffronNpcs.ts` | < 400 lines |
 | **Kanto Celadon & Route 8 NPCs** | Celadon City, Celadon Gym, Cafe, Mansion, Dept Store 1F-6F, Elevator, Route 8 & Gates | `src/world/npcs/kantoCeladonNpcs.ts` | < 350 lines |
+| **Kanto Cerulean, Power Plant & Cape NPCs** | Power Plant Manager & staff, Cerulean Gym, Swimmers, Misty, Route 24/25, Radio Tower 1F, Route 5 | `src/world/npcs/kantoCeruleanNpcs.ts` | < 350 lines |
 | **NPC Data Aggregator Facade** | Backward-compatible barrel exports, createNpcsByMap(), npcsByMap | `src/world/npcData.ts` | < 350 lines |
 | **East Johto Generated NPCs** | Object event dialogue and trainer teams for East & Early Johto | `src/world/generated-npcs/eastJohtoGeneratedNpcs.ts` | < 350 lines |
 | **Central Johto Generated NPCs** | Object event dialogue and trainer teams for Central & Goldenrod | `src/world/generated-npcs/centralJohtoGeneratedNpcs.ts` | < 350 lines |
