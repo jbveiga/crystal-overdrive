@@ -266,6 +266,20 @@
       "targetMapId": "route_6",
       "targetX": 6,
       "targetY": 1
+    },
+    {
+      "x": 4,
+      "y": 0,
+      "targetMapId": "saffron_city",
+      "targetX": 16,
+      "targetY": 33
+    },
+    {
+      "x": 5,
+      "y": 0,
+      "targetMapId": "saffron_city",
+      "targetX": 17,
+      "targetY": 33
     }
   ],
   "bgEvents": [],

@@ -4405,6 +4405,20 @@
       "targetMapId": "copycats_house_1f",
       "targetX": 2,
       "targetY": 7
+    },
+    {
+      "x": 16,
+      "y": 33,
+      "targetMapId": "route_6_saffron_gate",
+      "targetX": 4,
+      "targetY": 0
+    },
+    {
+      "x": 17,
+      "y": 33,
+      "targetMapId": "route_6_saffron_gate",
+      "targetX": 5,
+      "targetY": 0
     }
   ],
   "bgEvents": [],

@@ -5165,7 +5165,7 @@ buildMapFromBlk({
   blocksW: 5,
   blocksH: 4,
   connections: {},
-  warps: [{"x":4,"y":7,"targetMapId":"route_6","targetX":6,"targetY":1},{"x":5,"y":7,"targetMapId":"route_6","targetX":6,"targetY":1}],
+  warps: [{"x":4,"y":7,"targetMapId":"route_6","targetX":6,"targetY":1},{"x":5,"y":7,"targetMapId":"route_6","targetX":6,"targetY":1},{"x":4,"y":0,"targetMapId":"saffron_city","targetX":16,"targetY":33},{"x":5,"y":0,"targetMapId":"saffron_city","targetX":17,"targetY":33}],
   bgEvents: [],
   grassEncounters: [],
 });
@@ -5904,7 +5904,7 @@ buildMapFromBlk({
   blocksH: 18,
   roofGroup: 'sa',
   connections: {"NORTH":{"mapId":"route_5","offset":10},"SOUTH":{"mapId":"route_6","offset":10},"WEST":{"mapId":"route_7","offset":18},"EAST":{"mapId":"route_8","offset":18}},
-  warps: [{"x":26,"y":3,"targetMapId":"fighting_dojo","targetX":4,"targetY":11},{"x":34,"y":3,"targetMapId":"saffron_gym","targetX":8,"targetY":17},{"x":25,"y":11,"targetMapId":"saffron_mart","targetX":3,"targetY":7},{"x":9,"y":29,"targetMapId":"saffron_poke_center","targetX":3,"targetY":7},{"x":27,"y":29,"targetMapId":"mr_psychics_house","targetX":2,"targetY":7},{"x":8,"y":3,"targetMapId":"saffron_magnet_train_station","targetX":9,"targetY":17},{"x":18,"y":21,"targetMapId":"silph_co_1f","targetX":2,"targetY":7},{"x":9,"y":11,"targetMapId":"copycats_house_1f","targetX":2,"targetY":7}],
+  warps: [{"x":26,"y":3,"targetMapId":"fighting_dojo","targetX":4,"targetY":11},{"x":34,"y":3,"targetMapId":"saffron_gym","targetX":8,"targetY":17},{"x":25,"y":11,"targetMapId":"saffron_mart","targetX":3,"targetY":7},{"x":9,"y":29,"targetMapId":"saffron_poke_center","targetX":3,"targetY":7},{"x":27,"y":29,"targetMapId":"mr_psychics_house","targetX":2,"targetY":7},{"x":8,"y":3,"targetMapId":"saffron_magnet_train_station","targetX":9,"targetY":17},{"x":18,"y":21,"targetMapId":"silph_co_1f","targetX":2,"targetY":7},{"x":9,"y":11,"targetMapId":"copycats_house_1f","targetX":2,"targetY":7},{"x":16,"y":33,"targetMapId":"route_6_saffron_gate","targetX":4,"targetY":0},{"x":17,"y":33,"targetMapId":"route_6_saffron_gate","targetX":5,"targetY":0}],
   bgEvents: [],
   grassEncounters: [],
 });

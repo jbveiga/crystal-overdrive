@@ -237,7 +237,16 @@ export interface GridEntity {
     | 'FAN_CLUB_CLEFAIRY_GUY'
     | 'FAN_CLUB_SEEL_FAN'
     | 'VERMILION_GYM_STATUE'
-    | 'DEPT_ELEVATOR_PANEL';
+    | 'DEPT_ELEVATOR_PANEL'
+    | 'SAFFRON_GYM_GUIDE'
+    | 'SAFFRON_GYM_TRAINER'
+    | 'SAFFRON_GYM_STATUE'
+    | 'COPYCAT_EVENT'
+    | 'MAGNET_TRAIN_CONDUCTOR'
+    | 'SILPH_CO_GUARD'
+    | 'MR_PSYCHIC'
+    | 'ROUTE_6_TRAINER'
+    | 'FIGHTING_DOJO_DISCIPLE';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;

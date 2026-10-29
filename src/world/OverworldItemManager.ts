@@ -71,7 +71,11 @@ export class OverworldItemManager {
   public getActiveItemBalls(mapId: string, externalFlags?: Set<string>): OverworldItemBall[] {
     const list = this.data.byMap[mapId]?.itemBalls || [];
     const flagSet = externalFlags || this.collectedFlags;
-    return list.filter((item) => !flagSet.has(item.eventFlag));
+    return list.filter(
+      (item) =>
+        !flagSet.has(item.eventFlag) &&
+        !(item.mapId === 'fighting_dojo' && flagSet.has('fighting_dojo_focus_band_collected'))
+    );
   }
 
   public getItemsForMap(mapId: string, externalFlags?: Set<string>): OverworldItemBall[] {
@@ -92,9 +96,12 @@ export class OverworldItemManager {
    * Checks if an uncollected item ball exists at (x, y) on mapId
    */
   public checkItemBall(mapId: string, x: number, y: number, externalFlags?: Set<string>): OverworldItemBall | null {
-    const item = this.data.byMap[mapId]?.itemBalls.find((b) => b.x === x && b.y === y);
+    let item = this.data.byMap[mapId]?.itemBalls.find((b) => b.x === x && b.y === y);
+    if (!item && mapId === 'fighting_dojo' && x === 4 && y === 1) {
+      item = this.data.byMap[mapId]?.itemBalls.find((b) => b.itemId === 'focus_band' || b.id.includes('focus_band'));
+    }
     const flagSet = externalFlags || this.collectedFlags;
-    if (item && !flagSet.has(item.eventFlag)) {
+    if (item && !flagSet.has(item.eventFlag) && !(mapId === 'fighting_dojo' && flagSet.has('fighting_dojo_focus_band_collected'))) {
       return item;
     }
     return null;
