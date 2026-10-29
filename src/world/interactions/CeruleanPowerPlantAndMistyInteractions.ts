@@ -12,10 +12,16 @@
 import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 import type { GridEntity } from '../GridPhysics';
-import type {
-  NpcInteractionContext,
-  NpcInteractionRegistration,
-} from '../../types/worldContext';
+import type { NpcInteractionContext, NpcInteractionRegistration } from '../../types/worldContext';
+
+function resolveTrainerInstances(npc: GridEntity, ctx: NpcInteractionContext, fallback: any[]): any[] {
+  let team = ctx.buildTrainerTeamInstances ? ctx.buildTrainerTeamInstances(npc) : [];
+  if (!team || team.length === 0) {
+    const raw = npc.trainerTeam || (npc as any).team || fallback;
+    team = (raw || []).map((m: any) => PokemonFactory.create(m.speciesId, m.level, m.moves));
+  }
+  return team;
+}
 
 /**
  * Handles Power Plant Manager interaction, theft briefing, part return, and power restoration.
@@ -224,11 +230,6 @@ export function handleRoute24RocketGrunt(
     return true;
   }
 
-  const team = gruntNpc.team ||
-    gruntNpc.trainerTeam || [
-      { speciesId: 'golbat', level: 30, moves: ['wingattack', 'confuseray', 'bite', 'leechlife'] },
-    ];
-
   ctx.openDialogue(
     [
       'Hey, kid! Me am a TEAM ROCKET member kind of guy!',
@@ -240,9 +241,14 @@ export function handleRoute24RocketGrunt(
     ],
     '🚀 ROCKET GRUNT',
     () => {
-      ctx.triggerBattle(team[0] as any, {
+      const instances = resolveTrainerInstances(gruntNpc, ctx, [
+        { speciesId: 'golbat', level: 30, moves: ['wingattack', 'confuseray', 'bite', 'leechlife'] },
+      ]);
+      if (instances.length === 0) return;
+      ctx.triggerBattle(instances[0], {
         isTrainer: true,
         trainerName: 'Rocket Grunt',
+        trainerTeam: instances,
         onBattleEnd: () => {
           ctx.storyFlags.add('EVENT_DEFEATED_ROUTE24_GRUNT');
           ctx.storyFlags.add('route_24_grunt_defeated');
@@ -336,13 +342,6 @@ export function handleMistyInteraction(
     return true;
   }
 
-  const team = mistyNpc.team || [
-    { speciesId: 'golduck', level: 42, moves: ['surf', 'disable', 'psychup', 'psychic'] },
-    { speciesId: 'quagsire', level: 42, moves: ['surf', 'amnesia', 'earthquake', 'raindance'] },
-    { speciesId: 'lapras', level: 44, moves: ['surf', 'blizzard', 'bodyslam', 'raindance'] },
-    { speciesId: 'starmie', level: 47, moves: ['surf', 'recover', 'confuseray', 'icebeam'] },
-  ];
-
   ctx.openDialogue(
     [
       'MISTY: I was expecting you, you pest!',
@@ -351,10 +350,18 @@ export function handleMistyInteraction(
     ],
     '🏆 LEADER MISTY',
     () => {
-      ctx.triggerBattle(team[0] as any, {
+      const instances = resolveTrainerInstances(mistyNpc, ctx, [
+        { speciesId: 'golduck', level: 42, moves: ['surf', 'disable', 'psychup', 'psychic'] },
+        { speciesId: 'quagsire', level: 42, moves: ['surf', 'amnesia', 'earthquake', 'raindance'] },
+        { speciesId: 'lapras', level: 44, moves: ['surf', 'blizzard', 'bodyslam', 'raindance'] },
+        { speciesId: 'starmie', level: 47, moves: ['surf', 'recover', 'confuseray', 'icebeam'] },
+      ]);
+      if (instances.length === 0) return;
+      ctx.triggerBattle(instances[0], {
         isTrainer: true,
         isGymLeader: true,
         trainerName: 'Leader Misty',
+        trainerTeam: instances,
         onBattleEnd: () => {
           if (!ctx.inventory.badges) ctx.inventory.badges = [];
           if (!ctx.inventory.badges.includes('cascade')) {
@@ -401,17 +408,18 @@ export function handleCeruleanGymTrainer(
     return true;
   }
 
-  const team = trainerNpc.team || trainerNpc.trainerTeam || [
-    { speciesId: 'golduck', level: 37, moves: ['surf', 'disable', 'confusion', 'screech'] },
-  ];
-
   ctx.openDialogue(
     trainerNpc.challengePages || ["Let's battle in the water!"],
     trainerNpc.speaker || 'TRAINER',
     () => {
-      ctx.triggerBattle(team[0] as any, {
+      const instances = resolveTrainerInstances(trainerNpc, ctx, [
+        { speciesId: 'golduck', level: 37, moves: ['surf', 'disable', 'confusion', 'screech'] },
+      ]);
+      if (instances.length === 0) return;
+      ctx.triggerBattle(instances[0], {
         isTrainer: true,
         trainerName: trainerNpc.trainerName || trainerNpc.speaker,
+        trainerTeam: instances,
         onBattleEnd: () => {
           ctx.defeatedTrainers.add(trainerId);
           BattleAudio.playOverworldSound('FANFARE');

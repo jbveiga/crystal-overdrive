@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { MapData } from '../../src/types/game';
 import { createKantoCeruleanNpcs } from '../../src/world/npcs/kantoCeruleanNpcs';
+import { PokemonFactory } from '../../src/battle/PokemonFactory';
 import {
   handlePowerPlantManager,
   handleCeruleanGymMachinePart,
@@ -110,6 +111,12 @@ describe('TICKET-WORLD-POWER-PLANT-CERULEAN-MISTY-01: Cerulean City, Power Plant
         if (opts.onBattleEnd) opts.onBattleEnd();
         if (opts.onVictory) opts.onVictory();
       },
+      buildTrainerTeamInstances: (entity: any) => {
+        const source = entity.trainerTeam || entity.team || [];
+        return source.map((spec: any) =>
+          PokemonFactory.create(spec.speciesId, spec.level, spec.moves)
+        );
+      },
       saveCurrentGame: () => {},
       showToast: () => {},
       renderMap: () => {},
@@ -213,7 +220,9 @@ describe('TICKET-WORLD-POWER-PLANT-CERULEAN-MISTY-01: Cerulean City, Power Plant
 
       handleRoute24RocketGrunt(grunt, mockContext);
       expect(triggeredBattles.length).toBe(1);
+      expect(triggeredBattles[0].opts.trainerTeam).toBeDefined();
       expect(triggeredBattles[0].oppPokemon.speciesId).toBe('golbat');
+      expect(typeof triggeredBattles[0].oppPokemon.stats).toBe('object');
       expect(mockContext.storyFlags.has('EVENT_DEFEATED_ROUTE24_GRUNT')).toBe(true);
       expect(openedDialogues[1].pages[1]).toContain('hide it I did in GYM of the CERULEAN');
     });
@@ -280,6 +289,11 @@ describe('TICKET-WORLD-POWER-PLANT-CERULEAN-MISTY-01: Cerulean City, Power Plant
       expect(triggeredBattles.length).toBe(1);
       expect(triggeredBattles[0].opts.isGymLeader).toBe(true);
       expect(triggeredBattles[0].opts.trainerName).toBe('Leader Misty');
+      expect(triggeredBattles[0].opts.trainerTeam).toBeDefined();
+      expect(triggeredBattles[0].opts.trainerTeam.length).toBe(4);
+      expect(triggeredBattles[0].oppPokemon.speciesId).toBe('golduck');
+      expect(typeof triggeredBattles[0].oppPokemon.stats).toBe('object');
+      expect(triggeredBattles[0].oppPokemon.stats.hp).toBeGreaterThan(0);
       expect(mockContext.inventory.badges).toContain('cascade');
       expect(mockContext.storyFlags.has('misty_defeated')).toBe(true);
     });
@@ -290,6 +304,8 @@ describe('TICKET-WORLD-POWER-PLANT-CERULEAN-MISTY-01: Cerulean City, Power Plant
 
       handleCeruleanGymTrainer(diana, mockContext);
       expect(triggeredBattles.length).toBe(1);
+      expect(triggeredBattles[0].opts.trainerTeam).toBeDefined();
+      expect(typeof triggeredBattles[0].oppPokemon.stats).toBe('object');
       expect(mockContext.defeatedTrainers.has('cerulean_gym_diana')).toBe(true);
     });
   });

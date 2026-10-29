@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { MapData } from '../../src/types/game';
 import { createKantoFuchsiaNpcs } from '../../src/world/npcs/kantoFuchsiaNpcs';
+import { PokemonFactory } from '../../src/battle/PokemonFactory';
 import {
   handleJanineInteraction,
   handleFuchsiaGymDecoy,
@@ -129,16 +130,12 @@ describe('TICKET-WORLD-CYCLING-ROAD-FUCHSIA-JANINE-01: Cycling Road, Fuchsia Cit
           options.onBattleEnd({ outcome: 'VICTORY' });
         }
       },
-      buildTrainerTeamInstances: (_trainer: any) => [
-        {
-          nickname: 'LEAD',
-          speciesId: 'crobat',
-          level: 36,
-          currentHp: 110,
-          maxHp: 110,
-          moves: [],
-        } as any,
-      ],
+      buildTrainerTeamInstances: (entity: any) => {
+        const source = entity.trainerTeam || entity.team || [];
+        return source.map((spec: any) =>
+          PokemonFactory.create(spec.speciesId, spec.level, spec.moves)
+        );
+      },
       handleTrainerDefeatRewards: () => {},
       getOppositeDirection: () => 'UP',
       launchStadiumChallenge: () => {},
@@ -280,6 +277,11 @@ describe('TICKET-WORLD-CYCLING-ROAD-FUCHSIA-JANINE-01: Cycling Road, Fuchsia Cit
       expect(triggeredBattles.length).toBe(1);
       expect(triggeredBattles[0].options.isGymLeader).toBe(true);
       expect(triggeredBattles[0].options.trainerName).toBe('Leader Janine');
+      expect(triggeredBattles[0].options.trainerTeam).toBeDefined();
+      expect(triggeredBattles[0].options.trainerTeam.length).toBe(5);
+      expect(triggeredBattles[0].pokemon.speciesId).toBe('crobat');
+      expect(typeof triggeredBattles[0].pokemon.stats).toBe('object');
+      expect(triggeredBattles[0].pokemon.stats.hp).toBeGreaterThan(0);
 
       // State transitions
       expect(mockContext.storyFlags.has('janine_defeated')).toBe(true);
@@ -321,6 +323,11 @@ describe('TICKET-WORLD-CYCLING-ROAD-FUCHSIA-JANINE-01: Cycling Road, Fuchsia Cit
         handleFuchsiaGymDecoy(npc!, mockContext);
         expect(openedDialogues[0].speaker).toBe('🏆 LEADER JANINE');
         expect(triggeredBattles.length).toBe(1);
+        expect(triggeredBattles[0].options.trainerTeam).toBeDefined();
+        expect(typeof triggeredBattles[0].pokemon.stats).toBe('object');
+        if (decoy.id === 'fuchsia_gym_linda' || decoy.id === 'fuchsia_gym_alice') {
+          expect(triggeredBattles[0].options.trainerTeam.length).toBe(3);
+        }
         expect(mockContext.defeatedTrainers.has(decoy.id)).toBe(true);
 
         // 2nd interaction: revealed identity
@@ -410,6 +417,8 @@ describe('TICKET-WORLD-CYCLING-ROAD-FUCHSIA-JANINE-01: Cycling Road, Fuchsia Cit
         handleBikerTrainer(npc!, mockContext);
 
         expect(triggeredBattles.length).toBe(1);
+        expect(triggeredBattles[0].options.trainerTeam).toBeDefined();
+        expect(typeof triggeredBattles[0].pokemon.stats).toBe('object');
         expect(mockContext.defeatedTrainers.has(bikerId)).toBe(true);
 
         // Repeat interaction shows defeat dialogue
@@ -437,6 +446,8 @@ describe('TICKET-WORLD-CYCLING-ROAD-FUCHSIA-JANINE-01: Cycling Road, Fuchsia Cit
         handleBirdKeeperTrainer(npc!, mockContext);
 
         expect(triggeredBattles.length).toBe(1);
+        expect(triggeredBattles[0].options.trainerTeam).toBeDefined();
+        expect(typeof triggeredBattles[0].pokemon.stats).toBe('object');
         expect(mockContext.defeatedTrainers.has(bkId)).toBe(true);
 
         // Repeat interaction shows defeat dialogue

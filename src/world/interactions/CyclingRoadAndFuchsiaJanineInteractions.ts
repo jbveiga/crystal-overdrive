@@ -10,11 +10,25 @@
  */
 
 import { BattleAudio } from '../../audio/BattleAudio';
+import { PokemonFactory } from '../../battle/PokemonFactory';
 import type { GridEntity } from '../GridPhysics';
 import type {
   NpcInteractionContext,
   NpcInteractionRegistration,
 } from '../../types/worldContext';
+
+function resolveTrainerInstances(
+  npc: GridEntity,
+  ctx: NpcInteractionContext,
+  fallback: any[]
+): any[] {
+  let team = ctx.buildTrainerTeamInstances ? ctx.buildTrainerTeamInstances(npc) : [];
+  if (!team || team.length === 0) {
+    const raw = npc.trainerTeam || (npc as any).team || fallback;
+    team = (raw || []).map((m: any) => PokemonFactory.create(m.speciesId, m.level, m.moves));
+  }
+  return team;
+}
 
 /**
  * Handles Janine boss interaction, pre-battle ninja monologue, boss battle,
@@ -35,14 +49,6 @@ export function handleJanineInteraction(
     return true;
   }
 
-  const team = janineNpc.team || [
-    { speciesId: 'crobat', level: 36, moves: ['confuseray', 'screech', 'leechlife', 'wingattack'] },
-    { speciesId: 'weezing', level: 36, moves: ['sludgebomb', 'smog', 'toxic', 'explosion'] },
-    { speciesId: 'weezing', level: 36, moves: ['sludgebomb', 'smog', 'toxic', 'explosion'] },
-    { speciesId: 'ariados', level: 33, moves: ['scaryface', 'gigadrain', 'stringshot', 'nightshade'] },
-    { speciesId: 'venomoth', level: 39, moves: ['gust', 'supersonic', 'toxic', 'psychic'] },
-  ];
-
   ctx.openDialogue(
     janineNpc.pages || [
       "Fufufufu... I'm JANINE, the real GYM LEADER!",
@@ -51,7 +57,14 @@ export function handleJanineInteraction(
     ],
     janineNpc.speaker || '🏆 LEADER JANINE',
     () => {
-      const leadMon = (ctx.buildTrainerTeamInstances ? ctx.buildTrainerTeamInstances(janineNpc)[0] : team[0]) as any;
+      const instances = resolveTrainerInstances(janineNpc, ctx, [
+        { speciesId: 'crobat', level: 36, moves: ['confuseray', 'screech', 'leechlife', 'wingattack'] },
+        { speciesId: 'weezing', level: 36, moves: ['sludgebomb', 'smog', 'toxic', 'explosion'] },
+        { speciesId: 'weezing', level: 36, moves: ['sludgebomb', 'smog', 'toxic', 'explosion'] },
+        { speciesId: 'ariados', level: 33, moves: ['scaryface', 'gigadrain', 'stringshot', 'nightshade'] },
+        { speciesId: 'venomoth', level: 39, moves: ['gust', 'supersonic', 'toxic', 'psychic'] },
+      ]);
+      if (instances.length === 0) return;
 
       let awarded = false;
       const onBattleWon = () => {
@@ -97,10 +110,11 @@ export function handleJanineInteraction(
         );
       };
 
-      ctx.triggerBattle(leadMon, {
+      ctx.triggerBattle(instances[0], {
         isTrainer: true,
         isGymLeader: true,
         trainerName: 'Leader Janine',
+        trainerTeam: instances,
         onVictory: () => onBattleWon(),
         onBattleEnd: () => onBattleWon(),
       });
@@ -140,13 +154,12 @@ export function handleFuchsiaGymDecoy(
     return true;
   }
 
-  const team = trainerNpc.team || trainerNpc.trainerTeam || [{ speciesId: 'gloom', level: 30 }];
-
   ctx.openDialogue(
     trainerNpc.pages || ["Fufufu! I'm JANINE, the GYM LEADER! ...Gotcha! I'm just a decoy!"],
     trainerNpc.speaker || '🏆 LEADER JANINE',
     () => {
-      const leadMon = (ctx.buildTrainerTeamInstances ? ctx.buildTrainerTeamInstances(trainerNpc)[0] : team[0]) as any;
+      const instances = resolveTrainerInstances(trainerNpc, ctx, [{ speciesId: 'gloom', level: 30 }]);
+      if (instances.length === 0) return;
 
       let awarded = false;
       const onDefeat = () => {
@@ -169,9 +182,10 @@ export function handleFuchsiaGymDecoy(
         });
       };
 
-      ctx.triggerBattle(leadMon, {
+      ctx.triggerBattle(instances[0], {
         isTrainer: true,
         trainerName: trainerNpc.trainerName || 'Gym Decoy',
+        trainerTeam: instances,
         onVictory: () => onDefeat(),
         onBattleEnd: () => onDefeat(),
       });
@@ -288,13 +302,12 @@ export function handleBikerTrainer(
     return true;
   }
 
-  const team = trainerNpc.team || trainerNpc.trainerTeam || [{ speciesId: 'weezing', level: 34 }];
-
   ctx.openDialogue(
     trainerNpc.pages || ["Let's ride and battle!"],
     trainerNpc.speaker || '🏍️ BIKER',
     () => {
-      const leadMon = (ctx.buildTrainerTeamInstances ? ctx.buildTrainerTeamInstances(trainerNpc)[0] : team[0]) as any;
+      const instances = resolveTrainerInstances(trainerNpc, ctx, [{ speciesId: 'weezing', level: 34 }]);
+      if (instances.length === 0) return;
 
       let awarded = false;
       const onDefeat = () => {
@@ -311,9 +324,10 @@ export function handleBikerTrainer(
         );
       };
 
-      ctx.triggerBattle(leadMon, {
+      ctx.triggerBattle(instances[0], {
         isTrainer: true,
         trainerName: trainerNpc.trainerName || 'Biker',
+        trainerTeam: instances,
         onVictory: () => onDefeat(),
         onBattleEnd: () => onDefeat(),
       });
@@ -338,13 +352,12 @@ export function handleBirdKeeperTrainer(
     return true;
   }
 
-  const team = trainerNpc.team || trainerNpc.trainerTeam || [{ speciesId: 'noctowl', level: 34 }];
-
   ctx.openDialogue(
     trainerNpc.pages || ['My birds rule the skies!'],
     trainerNpc.speaker || '🦅 BIRD KEEPER',
     () => {
-      const leadMon = (ctx.buildTrainerTeamInstances ? ctx.buildTrainerTeamInstances(trainerNpc)[0] : team[0]) as any;
+      const instances = resolveTrainerInstances(trainerNpc, ctx, [{ speciesId: 'noctowl', level: 34 }]);
+      if (instances.length === 0) return;
 
       let awarded = false;
       const onDefeat = () => {
@@ -361,9 +374,10 @@ export function handleBirdKeeperTrainer(
         );
       };
 
-      ctx.triggerBattle(leadMon, {
+      ctx.triggerBattle(instances[0], {
         isTrainer: true,
         trainerName: trainerNpc.trainerName || 'Bird Keeper',
+        trainerTeam: instances,
         onVictory: () => onDefeat(),
         onBattleEnd: () => onDefeat(),
       });
