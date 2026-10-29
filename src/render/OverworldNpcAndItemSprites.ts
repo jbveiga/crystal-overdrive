@@ -77,6 +77,7 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   suicune: './assets/sprites/characters/suicune.png',
   eusine: './assets/sprites/characters/eusine.png',
   gramps: './assets/sprites/characters/gramps.png',
+  kimono_girl: './assets/sprites/characters/kimono_girl.png',
 };
 
 export class OverworldNpcAndItemSprites {

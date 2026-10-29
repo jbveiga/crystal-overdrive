@@ -320,10 +320,10 @@ export class BagAndMartUI {
 
     const titleEl = this.bagModal.querySelector('#bag-modal-title') as HTMLElement;
     if (titleEl) {
-      if (martId === 'goldenrod_dept_store_3f') titleEl.innerText = '🏪 DEPT. STORE 3F (BATTLE)';
-      else if (martId === 'goldenrod_dept_store_4f') titleEl.innerText = '🏪 DEPT. STORE 4F (VITAMINS)';
-      else if (martId === 'goldenrod_dept_store_5f') titleEl.innerText = '🏪 DEPT. STORE 5F (TMS)';
-      else if (martId === 'goldenrod_dept_store_6f' || martId === 'goldenrod_dept_store_roof') titleEl.innerText = '🥤 VENDING MACHINE';
+      if (martId === 'goldenrod_dept_store_3f' || martId === 'celadon_dept_store_3f') titleEl.innerText = '🏪 DEPT. STORE 3F (TMS)';
+      else if (martId === 'goldenrod_dept_store_4f' || martId === 'celadon_dept_store_4f') titleEl.innerText = '🏪 DEPT. STORE 4F (GIFTS)';
+      else if (martId === 'goldenrod_dept_store_5f' || martId === 'celadon_dept_store_5f') titleEl.innerText = '🏪 DEPT. STORE 5F (STONES & VITAMINS)';
+      else if (martId === 'goldenrod_dept_store_6f' || martId === 'goldenrod_dept_store_roof' || martId === 'celadon_dept_store_6f') titleEl.innerText = '🥤 VENDING MACHINE';
       else titleEl.innerText = '🏪 POKé MART';
     }
 

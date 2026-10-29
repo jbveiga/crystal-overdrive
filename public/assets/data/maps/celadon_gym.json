@@ -568,6 +568,29 @@
       "targetY": 30
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 3,
+      "y": 15,
+      "speaker": "🏆 GYM STATUE",
+      "action": "CELADON_GYM_STATUE",
+      "pages": [
+        "CELADON CITY POKéMON GYM",
+        "LEADER: ERIKA",
+        "WINNING TRAINERS: RED"
+      ]
+    },
+    {
+      "x": 6,
+      "y": 15,
+      "speaker": "🏆 GYM STATUE",
+      "action": "CELADON_GYM_STATUE",
+      "pages": [
+        "CELADON CITY POKéMON GYM",
+        "LEADER: ERIKA",
+        "WINNING TRAINERS: RED"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

@@ -22,6 +22,7 @@ import { getEliteFourAndChampionInteractions } from './EliteFourAndChampionInter
 import { getFastShipAndVermilionInteractions } from './FastShipAndVermilionInteractions';
 import { getVermilionGymInteractions } from './VermilionGymInteractions';
 import { getSaffronAndRoute6Interactions } from './SaffronAndRoute6Interactions';
+import { getCeladonAndGymErikaInteractions } from './CeladonAndGymErikaInteractions';
 
 export * from './NpcInteractionRouter';
 export * from './FieldObstacleDispatcher';
@@ -49,6 +50,7 @@ export * from './EliteFourAndChampionInteractions';
 export * from './FastShipAndVermilionInteractions';
 export * from './VermilionGymInteractions';
 export * from './SaffronAndRoute6Interactions';
+export * from './CeladonAndGymErikaInteractions';
 
 /**
  * Creates and initializes the default NpcInteractionRouter with all Johto & Kanto interactions.
@@ -77,5 +79,6 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getFastShipAndVermilionInteractions(),
     ...getVermilionGymInteractions(),
     ...getSaffronAndRoute6Interactions(),
+    ...getCeladonAndGymErikaInteractions(),
   ]);
 }

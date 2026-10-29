@@ -26,8 +26,10 @@ export const makeNpc = (
     trainerName?: string;
     visionRange?: number;
     challengePages?: string[];
+    defeatPages?: string[];
     trainerPokemon?: GridEntity['trainerPokemon'];
     trainerTeam?: GridEntity['trainerTeam'];
+    team?: GridEntity['trainerTeam'];
   } = {}
 ): GridEntity => ({
   id, x, y, originX: x, originY: y, originDirection: direction,
@@ -36,8 +38,9 @@ export const makeNpc = (
   spriteType, speaker, pages,
   wanders: opts.wanders ?? false, talkAcrossCounter: opts.talkAcrossCounter ?? false,
   action: opts.action, trainerId: opts.trainerId, trainerName: opts.trainerName,
-  visionRange: opts.visionRange, challengePages: opts.challengePages,
-  trainerPokemon: opts.trainerPokemon, trainerTeam: opts.trainerTeam,
+  visionRange: opts.visionRange, challengePages: opts.challengePages, defeatPages: opts.defeatPages,
+  trainerPokemon: opts.trainerPokemon, trainerTeam: opts.trainerTeam || opts.team,
+  team: opts.team || opts.trainerTeam,
 });
 
 export interface GuideGentTourLegDef {
@@ -201,36 +204,26 @@ export function isNpcActiveForStoryFlags(
     storyFlags.has('EVENT_GUIDE_GENT_IN_HIS_HOUSE');
 
   // Guide Gent (Mission S02): Outside in Cherrygrove City BEFORE Map Card; inside his house AFTER Map Card
-  if (npcId === 'cg_guide_gent') {
-    return !hasMapCard;
-  }
-  if (npcId === 'house_guide_gent') {
-    return hasMapCard;
-  }
+  if (npcId === 'cg_guide_gent') return !hasMapCard;
+  if (npcId === 'house_guide_gent') return hasMapCard;
 
   // New Bark Town Rival peeking into Elm's Lab window: only before receiving Mystery Egg
-  if (npcId === 'nbt_rival') {
-    return (
+  if (npcId === 'nbt_rival') return (
       !storyFlags.has('HAS_MYSTERY_EGG') &&
       !storyFlags.has('mystery_egg_received') &&
       !storyFlags.has('rival_1_defeated') &&
       !storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') &&
       !storyFlags.has('EVENT_RIVAL_NAMED')
     );
-  }
 
   // Mr. Pokémon's House: Prof. Oak departs after granting the Pokédex
-  if (npcId === 'prof_oak_npc') {
-    return !storyFlags.has('HAS_MYSTERY_EGG') && !storyFlags.has('HAS_POKEDEX');
-  }
+  if (npcId === 'prof_oak_npc') return !storyFlags.has('HAS_MYSTERY_EGG') && !storyFlags.has('HAS_POKEDEX');
 
   // Prof. Elm's Lab Police Officer: Strictly present ONLY after Cherrygrove Rival battle and BEFORE naming Rival
-  if (npcId === 'lab_police_officer') {
-    return (
+  if (npcId === 'lab_police_officer') return (
       storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED') &&
       !storyFlags.has('EVENT_RIVAL_NAMED')
     );
-  }
 
   // Kurt (Mission M03): Strictly in one place at one time:
   // 1) Before EVENT_KURT_LEFT_FOR_WELL -> inside Kurt's House (kurt_house_kurt)
@@ -242,23 +235,13 @@ export function isNpcActiveForStoryFlags(
     storyFlags.has('EVENT_CLEARED_SLOWPOKE_WELL');
   const kurtInWell = storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') && !isWellCleared;
 
-  if (npcId === 'azalea_kurt') {
-    return false;
-  }
-  if (npcId === 'kurt_house_kurt') {
-    return !kurtInWell;
-  }
-  if (npcId === 'well_kurt') {
-    return kurtInWell;
-  }
+  if (npcId === 'azalea_kurt') return false;
+  if (npcId === 'kurt_house_kurt') return !kurtInWell;
+  if (npcId === 'well_kurt') return kurtInWell;
 
   // Azalea Town & Slowpoke Well Rocket Siege lifecycle
-  if (npcId === 'azalea_well_grunt') {
-    return !storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') && !isWellCleared;
-  }
-  if (npcId === 'azalea_gym_grunt') {
-    return !isWellCleared;
-  }
+  if (npcId === 'azalea_well_grunt') return !storyFlags.has('EVENT_KURT_LEFT_FOR_WELL') && !isWellCleared;
+  if (npcId === 'azalea_gym_grunt') return !isWellCleared;
   if (
     npcId === 'rocket_grunt_1' ||
     npcId === 'rocket_grunt_2' ||
@@ -267,50 +250,34 @@ export function isNpcActiveForStoryFlags(
   ) {
     return !isWellCleared;
   }
-  if (npcId === 'azalea_slowpoke' || npcId === 'azalea_slowpoke_2') {
-    return isWellCleared;
-  }
+  if (npcId === 'azalea_slowpoke' || npcId === 'azalea_slowpoke_2') return isWellCleared;
 
   // Charcoal Kiln & Ilex Forest Farfetch'd lifecycle
   const isFarfetchdReturned =
     storyFlags.has('has_hm01_cut') || storyFlags.has('EVENT_GOT_HM01_CUT');
-  if (npcId === 'kiln_apprentice' || npcId === 'kiln_farfetchd') {
-    return (
+  if (npcId === 'kiln_apprentice' || npcId === 'kiln_farfetchd') return (
       isFarfetchdReturned ||
       storyFlags.has('EVENT_HERDED_FARFETCHD') ||
       storyFlags.has('forest_farfetchd_herded')
     );
-  }
-  if (npcId === 'forest_farfetchd') {
-    return !isFarfetchdReturned;
-  }
+  if (npcId === 'forest_farfetchd') return !isFarfetchdReturned;
 
   // Route 36 Sudowoodo
-  if (npcId === 'sudowoodo') {
-    return !storyFlags.has('sudowoodo_cleared') && !storyFlags.has('EVENT_FOUGHT_SUDOWOODO');
-  }
+  if (npcId === 'sudowoodo') return !storyFlags.has('sudowoodo_cleared') && !storyFlags.has('EVENT_FOUGHT_SUDOWOODO');
 
   // Phase 11: Lake of Rage, Mahogany Town, and Team Rocket Base
-  if (npcId === 'lake_of_rage_red_gyarados') {
-    return !storyFlags.has('red_gyarados_subdued') && !storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS');
-  }
-  if (npcId === 'lake_of_rage_lance') {
-    return (
+  if (npcId === 'lake_of_rage_red_gyarados') return !storyFlags.has('red_gyarados_subdued') && !storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS');
+  if (npcId === 'lake_of_rage_lance') return (
       (storyFlags.has('red_gyarados_subdued') || storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS')) &&
       !storyFlags.has('lance_lake_talked') &&
       !storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE')
     );
-  }
-  if (npcId === 'mahogany_gym_blocker') {
-    return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
-  }
-  if (npcId === 'mahogany_mart_lance') {
-    return (
+  if (npcId === 'mahogany_gym_blocker') return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
+  if (npcId === 'mahogany_mart_lance') return (
       (storyFlags.has('lance_lake_talked') || storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE')) &&
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
-  }
   if (
     npcId === 'mahogany_town_rocket_1' ||
     npcId === 'mahogany_mart_rocket' ||
@@ -318,103 +285,63 @@ export function isNpcActiveForStoryFlags(
   ) {
     return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
   }
-  if (npcId === 'team_rocket_base_b2f_lance') {
-    return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
-  }
-  if (npcId === 'team_rocket_base_b2f_ariana') {
-    return (
+  if (npcId === 'team_rocket_base_b2f_lance') return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
+  if (npcId === 'team_rocket_base_b2f_ariana') return (
       !storyFlags.has('EVENT_BEAT_ROCKET_EXECUTIVEF_2') &&
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
-  }
   if (npcId.startsWith('b3f_electrode_') || npcId.startsWith('b2f_electrode_')) {
     if (storyFlags.has('rocket_base_generator_cleared') || storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')) return false;
     return !storyFlags.has(npcId + '_cleared');
   }
-  if (npcId === 'team_rocket_base_b3f_petrel') {
-    return (
+  if (npcId === 'team_rocket_base_b3f_petrel') return (
       !storyFlags.has('EVENT_BEAT_ROCKET_EXECUTIVEM_4') &&
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
-  }
-  if (npcId === 'team_rocket_base_b3f_murkrow') {
-    return (
+  if (npcId === 'team_rocket_base_b3f_murkrow') return (
       storyFlags.has('EVENT_BEAT_ROCKET_EXECUTIVEM_4') &&
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
-  }
-  if (npcId === 'team_rocket_base_b3f_grunt_f') {
-    return (
+  if (npcId === 'team_rocket_base_b3f_grunt_f') return (
       !storyFlags.has('EVENT_LEARNED_SLOWPOKETAIL') &&
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
-  }
-  if (npcId === 'team_rocket_base_b3f_grunt_m') {
-    return (
+  if (npcId === 'team_rocket_base_b3f_grunt_m') return (
       !storyFlags.has('EVENT_LEARNED_RATICATETAIL') &&
       !storyFlags.has('EVENT_LEARNED_RATICATE_TAIL') &&
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
-  }
-  if (npcId === 'route_43_gate_rocket_1' || npcId === 'route_43_gate_rocket_2') {
-    return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
-  }
+  if (npcId === 'route_43_gate_rocket_1' || npcId === 'route_43_gate_rocket_2') return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
 
   // Radio Tower & Underground Takeover (Act 7)
-  if (npcId === 'petrel_radio_5f') {
-    return storyFlags.has('pryce_defeated') && !storyFlags.has('fake_director_defeated');
-  }
-  if (npcId === 'executive_proton_radio_4f') {
-    return storyFlags.has('card_key_obtained') && !storyFlags.has('proton_defeated') && !storyFlags.has('radio_tower_liberated');
-  }
-  if (npcId === 'executive_ariana_radio_5f') {
-    return storyFlags.has('card_key_obtained') && !storyFlags.has('ariana_defeated') && !storyFlags.has('radio_tower_liberated');
-  }
-  if (npcId === 'archer_radio_5f') {
-    return storyFlags.has('card_key_obtained') && !storyFlags.has('radio_tower_liberated');
-  }
-  if (npcId === 'liberated_director_radio_5f' || npcId === 'radio_director') {
-    return !storyFlags.has('pryce_defeated') || storyFlags.has('radio_tower_liberated');
-  }
-  if (npcId === 'true_director' || npcId === 'real_director_warehouse') {
-    return storyFlags.has('fake_director_defeated') && !storyFlags.has('radio_tower_liberated');
-  }
+  if (npcId === 'petrel_radio_5f') return storyFlags.has('pryce_defeated') && !storyFlags.has('fake_director_defeated');
+  if (npcId === 'executive_proton_radio_4f') return storyFlags.has('card_key_obtained') && !storyFlags.has('proton_defeated') && !storyFlags.has('radio_tower_liberated');
+  if (npcId === 'executive_ariana_radio_5f') return storyFlags.has('card_key_obtained') && !storyFlags.has('ariana_defeated') && !storyFlags.has('radio_tower_liberated');
+  if (npcId === 'archer_radio_5f') return storyFlags.has('card_key_obtained') && !storyFlags.has('radio_tower_liberated');
+  if (npcId === 'liberated_director_radio_5f' || npcId === 'radio_director') return !storyFlags.has('pryce_defeated') || storyFlags.has('radio_tower_liberated');
+  if (npcId === 'true_director' || npcId === 'real_director_warehouse') return storyFlags.has('fake_director_defeated') && !storyFlags.has('radio_tower_liberated');
 
   // Cianwood City Suicune & Eusine
-  if (npcId === 'cianwood_suicune') {
-    return !storyFlags.has('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
-  }
-  if (npcId === 'cianwood_eusine') {
-    return !storyFlags.has('EVENT_FOUGHT_EUSINE');
-  }
+  if (npcId === 'cianwood_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
+  if (npcId === 'cianwood_eusine') return !storyFlags.has('EVENT_FOUGHT_EUSINE');
 
   // Route 42 Suicune
-  if (npcId === 'route_42_suicune') {
-    return !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_42');
-  }
+  if (npcId === 'route_42_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_42');
 
   // Olivine Lighthouse 6F & Olivine Gym Jasmine lifecycle
-  if (npcId === 'lighthouse_jasmine') {
-    return !storyFlags.has('amphy_cured');
-  }
-  if (npcId === 'leader_jasmine') {
-    return storyFlags.has('amphy_cured');
-  }
+  if (npcId === 'lighthouse_jasmine') return !storyFlags.has('amphy_cured');
+  if (npcId === 'leader_jasmine') return storyFlags.has('amphy_cured');
 
   // Tin Tower Suicune Altar (Act 8)
-  if (npcId === 'suicune_altar') {
-    return storyFlags.has('has_clear_bell') && !storyFlags.has('suicune_caught_or_defeated');
-  }
+  if (npcId === 'suicune_altar') return storyFlags.has('has_clear_bell') && !storyFlags.has('suicune_caught_or_defeated');
 
   // Whirl Islands Lugia Chamber (Act 8 / Post-Radio Tower)
-  if (npcId === 'whirl_island_lugia') {
-    return !storyFlags.has('lugia_defeated') && !storyFlags.has('EVENT_FOUGHT_LUGIA');
-  }
+  if (npcId === 'whirl_island_lugia') return !storyFlags.has('lugia_defeated') && !storyFlags.has('EVENT_FOUGHT_LUGIA');
 
   // Ice Path B1F & B2F Strength Boulders
   if (npcId.startsWith('ice_path_b1f_boulder_')) {
@@ -435,9 +362,7 @@ export function isNpcActiveForStoryFlags(
     const num = npcId.split('_').pop();
     return storyFlags.has(`EVENT_BOULDER_IN_BLACKTHORN_GYM_${num}`);
   }
-  if (npcId === 'dragon_shrine_clair_3') {
-    return storyFlags.has('dragon_elder_quiz_passed');
-  }
+  if (npcId === 'dragon_shrine_clair_3') return storyFlags.has('dragon_elder_quiz_passed');
 
   // Victory Road Rival & Indigo Plateau Elite Four (Act 9)
   if (npcId === 'victory_road_rival') return true;
@@ -454,9 +379,11 @@ export function isNpcActiveForStoryFlags(
     storyFlags.has('fast_ship_arrived_vermilion');
   if (npcId === 'fast_ship_cabins_se_sse_captains_cabin_gentleman_cabin' || npcId === 'fast_ship_cabins_se_sse_captains_cabin_twin_cabin') return fastShipArrived;
   if (npcId === 'fast_ship_cabins_se_sse_captains_cabin_twin_2' || npcId === 'fast_ship_1f_gentleman_3') return !fastShipArrived;
-  if (npcId === 'copycats_doll') {
-    return storyFlags.has('got_magnet_train_pass') || storyFlags.has('copycat_doll_returned') || storyFlags.has('EVENT_RETURNED_LOST_ITEM_TO_COPYCAT');
-  }
+  if (npcId === 'copycats_doll') return storyFlags.has('got_magnet_train_pass') || storyFlags.has('copycat_doll_returned') || storyFlags.has('EVENT_RETURNED_LOST_ITEM_TO_COPYCAT');
+
+  // Kanto Cut Trees
+  if (npcId === 'vermilion_city_cut_tree') return !storyFlags.has('vermilion_cut_tree_cleared');
+  if (npcId === 'celadon_city_cut_tree') return !storyFlags.has('celadon_cut_tree_cleared');
 
   return true;
 }

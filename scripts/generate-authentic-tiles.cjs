@@ -5619,7 +5619,12 @@ buildMapFromBlk({
   blocksW: 5,
   blocksH: 4,
   connections: {},
-  warps: [{"x":9,"y":4,"targetMapId":"route_8","targetX":4,"targetY":4},{"x":9,"y":5,"targetMapId":"route_8","targetX":4,"targetY":5}],
+  warps: [
+    {"x":9,"y":4,"targetMapId":"route_8","targetX":4,"targetY":4},
+    {"x":9,"y":5,"targetMapId":"route_8","targetX":4,"targetY":5},
+    {"x":0,"y":4,"targetMapId":"saffron_city","targetX":39,"targetY":18},
+    {"x":0,"y":5,"targetMapId":"saffron_city","targetX":39,"targetY":19}
+  ],
   bgEvents: [],
   grassEncounters: [],
 });
@@ -5646,7 +5651,12 @@ buildMapFromBlk({
   blocksW: 5,
   blocksH: 4,
   connections: {},
-  warps: [{"x":0,"y":4,"targetMapId":"route_7","targetX":15,"targetY":6},{"x":0,"y":5,"targetMapId":"route_7","targetX":15,"targetY":7}],
+  warps: [
+    {"x":0,"y":4,"targetMapId":"route_7","targetX":15,"targetY":6},
+    {"x":0,"y":5,"targetMapId":"route_7","targetX":15,"targetY":7},
+    {"x":9,"y":4,"targetMapId":"saffron_city","targetX":0,"targetY":18},
+    {"x":9,"y":5,"targetMapId":"saffron_city","targetX":0,"targetY":19}
+  ],
   bgEvents: [],
   grassEncounters: [],
 });
@@ -5674,7 +5684,10 @@ buildMapFromBlk({
   blocksH: 9,
   connections: {},
   warps: [{"x":4,"y":17,"targetMapId":"celadon_city","targetX":10,"targetY":29},{"x":5,"y":17,"targetMapId":"celadon_city","targetX":10,"targetY":29}],
-  bgEvents: [],
+  bgEvents: [
+    {"x":3,"y":15,"speaker":"🏆 GYM STATUE","action":"CELADON_GYM_STATUE","pages":["CELADON CITY POKéMON GYM","LEADER: ERIKA","WINNING TRAINERS: RED"]},
+    {"x":6,"y":15,"speaker":"🏆 GYM STATUE","action":"CELADON_GYM_STATUE","pages":["CELADON CITY POKéMON GYM","LEADER: ERIKA","WINNING TRAINERS: RED"]}
+  ],
   grassEncounters: [],
 });
 
@@ -5777,8 +5790,13 @@ buildMapFromBlk({
   blocksW: 2,
   blocksH: 2,
   connections: {},
-  warps: [],
-  bgEvents: [],
+  warps: [
+    {"x":1,"y":3,"targetMapId":"celadon_dept_store_1f","targetX":2,"targetY":1},
+    {"x":2,"y":3,"targetMapId":"celadon_dept_store_1f","targetX":2,"targetY":1}
+  ],
+  bgEvents: [
+    {"x":3,"y":0,"speaker":"🛗 ELEVATOR PANEL","action":"DEPT_ELEVATOR_PANEL","pages":["Which floor would you like to visit?"]}
+  ],
   grassEncounters: [],
 });
 
@@ -5882,7 +5900,10 @@ buildMapFromBlk({
   blocksH: 4,
   connections: {},
   warps: [{"x":6,"y":7,"targetMapId":"celadon_city","targetX":25,"targetY":29},{"x":7,"y":7,"targetMapId":"celadon_city","targetX":25,"targetY":29}],
-  bgEvents: [],
+  bgEvents: [
+    {"x":7,"y":1,"speaker":"🗑️ TRASH CAN","action":"CELADON_CAFE_TRASH","pages":["Found LEFTOVERS inside the trash can!"]},
+    {"x":8,"y":1,"speaker":"🗑️ TRASH CAN","action":"CELADON_CAFE_TRASH","pages":["Found LEFTOVERS inside the trash can!"]}
+  ],
   grassEncounters: [],
 });
 // >>> phase14 specs end
@@ -5904,7 +5925,22 @@ buildMapFromBlk({
   blocksH: 18,
   roofGroup: 'sa',
   connections: {"NORTH":{"mapId":"route_5","offset":10},"SOUTH":{"mapId":"route_6","offset":10},"WEST":{"mapId":"route_7","offset":18},"EAST":{"mapId":"route_8","offset":18}},
-  warps: [{"x":26,"y":3,"targetMapId":"fighting_dojo","targetX":4,"targetY":11},{"x":34,"y":3,"targetMapId":"saffron_gym","targetX":8,"targetY":17},{"x":25,"y":11,"targetMapId":"saffron_mart","targetX":3,"targetY":7},{"x":9,"y":29,"targetMapId":"saffron_poke_center","targetX":3,"targetY":7},{"x":27,"y":29,"targetMapId":"mr_psychics_house","targetX":2,"targetY":7},{"x":8,"y":3,"targetMapId":"saffron_magnet_train_station","targetX":9,"targetY":17},{"x":18,"y":21,"targetMapId":"silph_co_1f","targetX":2,"targetY":7},{"x":9,"y":11,"targetMapId":"copycats_house_1f","targetX":2,"targetY":7},{"x":16,"y":33,"targetMapId":"route_6_saffron_gate","targetX":4,"targetY":0},{"x":17,"y":33,"targetMapId":"route_6_saffron_gate","targetX":5,"targetY":0}],
+  warps: [
+    {"x":26,"y":3,"targetMapId":"fighting_dojo","targetX":4,"targetY":11},
+    {"x":34,"y":3,"targetMapId":"saffron_gym","targetX":8,"targetY":17},
+    {"x":25,"y":11,"targetMapId":"saffron_mart","targetX":3,"targetY":7},
+    {"x":9,"y":29,"targetMapId":"saffron_poke_center","targetX":3,"targetY":7},
+    {"x":27,"y":29,"targetMapId":"mr_psychics_house","targetX":2,"targetY":7},
+    {"x":8,"y":3,"targetMapId":"saffron_magnet_train_station","targetX":9,"targetY":17},
+    {"x":18,"y":21,"targetMapId":"silph_co_1f","targetX":2,"targetY":7},
+    {"x":9,"y":11,"targetMapId":"copycats_house_1f","targetX":2,"targetY":7},
+    {"x":16,"y":33,"targetMapId":"route_6_saffron_gate","targetX":4,"targetY":0},
+    {"x":17,"y":33,"targetMapId":"route_6_saffron_gate","targetX":5,"targetY":0},
+    {"x":0,"y":18,"targetMapId":"route_7_saffron_gate","targetX":9,"targetY":4},
+    {"x":0,"y":19,"targetMapId":"route_7_saffron_gate","targetX":9,"targetY":5},
+    {"x":39,"y":18,"targetMapId":"route_8_saffron_gate","targetX":0,"targetY":4},
+    {"x":39,"y":19,"targetMapId":"route_8_saffron_gate","targetX":0,"targetY":5}
+  ],
   bgEvents: [],
   grassEncounters: [],
 });

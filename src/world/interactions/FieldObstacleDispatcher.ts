@@ -16,6 +16,10 @@ import { BattleAudio } from '../../audio/BattleAudio';
 import { handleLugiaShrineOrBoss } from './WhirlIslandsInteractions';
 import { handleFastShipCabinRest } from './FastShipAndVermilionInteractions';
 import { handleVermilionGymTrashCan } from './VermilionGymInteractions';
+import {
+  handleCeladonCafeTrashCan,
+  handleCeladonGymGuideAndStatues,
+} from './CeladonAndGymErikaInteractions';
 
 export class FieldObstacleDispatcher {
   /**
@@ -329,6 +333,10 @@ export class FieldObstacleDispatcher {
         } else if (bgEvent.action?.startsWith('VERMILION_GYM_TRASH_CAN_')) {
           const canIdx = parseInt(bgEvent.action.replace('VERMILION_GYM_TRASH_CAN_', ''), 10);
           handleVermilionGymTrashCan(canIdx, ctx as any);
+        } else if (bgEvent.action === 'CELADON_CAFE_TRASH') {
+          return handleCeladonCafeTrashCan(ctx as any);
+        } else if (bgEvent.action === 'CELADON_GYM_STATUE') {
+          return handleCeladonGymGuideAndStatues({ id: 'celadon_gym_statue', x: facingX, y: facingY, action: 'CELADON_GYM_STATUE' } as any, ctx as any);
         } else if (bgEvent.action === 'HEAL_AND_SAVE') {
           ctx.healPlayerParty(false);
           ctx.saveCurrentGame();
@@ -566,10 +574,8 @@ export class FieldObstacleDispatcher {
                 ctx.storyFlags.add('cut_used_in_ilex');
                 ctx.missionManager.checkStoryFlags(ctx.storyFlags);
               }
-              if (currentMap.id === 'vermilion_city' && facingX === 10 && facingY === 20) {
-                currentMap.collisionGrid[20 * currentMap.width + 10] = 0;
-                ctx.storyFlags.add('vermilion_cut_tree_cleared');
-              }
+              if (currentMap.id === 'vermilion_city' && facingX === 10 && facingY === 20) { currentMap.collisionGrid[20 * currentMap.width + 10] = 0; ctx.storyFlags.add('vermilion_cut_tree_cleared'); }
+              if (currentMap.id === 'celadon_city' && facingX === 10 && facingY === 31) { currentMap.collisionGrid[31 * currentMap.width + 10] = 0; ctx.storyFlags.add('celadon_cut_tree_cleared'); }
               ctx.renderMap(currentMap);
               ctx.syncMapOverworldItems(currentMap);
               ctx.saveCurrentGame();

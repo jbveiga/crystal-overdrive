@@ -65,6 +65,8 @@ export class OverworldWarpAndMapTransitionController {
       map.collisionGrid[4 * map.width + 4] = open ? 0 : 1; map.collisionGrid[4 * map.width + 5] = open ? 0 : 1;
     } else if (map.id === 'vermilion_city') {
       map.collisionGrid[20 * map.width + 10] = ctx.storyFlags.has('vermilion_cut_tree_cleared') ? 0 : 1;
+    } else if (map.id === 'celadon_city') {
+      map.collisionGrid[31 * map.width + 10] = ctx.storyFlags.has('celadon_cut_tree_cleared') ? 0 : 1;
     }
   }
 

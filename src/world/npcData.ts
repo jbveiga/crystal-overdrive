@@ -22,6 +22,7 @@ import { createEcruteakToRoute39Npcs } from './npcs/ecruteakToRoute39Npcs';
 import { createOlivineToIndigoNpcs } from './npcs/olivineToIndigoNpcs';
 import { createKantoVermilionNpcs } from './npcs/kantoVermilionNpcs';
 import { createKantoSaffronNpcs } from './npcs/kantoSaffronNpcs';
+import { createKantoCeladonNpcs } from './npcs/kantoCeladonNpcs';
 
 // Re-export shared entities, types, and functions for 100% backward compatibility
 export {
@@ -50,6 +51,7 @@ export function createNpcsByMap(): Record<string, GridEntity[]> {
     ...createOlivineToIndigoNpcs(),
     ...createKantoVermilionNpcs(),
     ...createKantoSaffronNpcs(),
+    ...createKantoCeladonNpcs(),
   };
 
   const DEFAULT_LORE = [

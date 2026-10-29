@@ -60,7 +60,32 @@
     "in_mart_01_01_01_01"
   ],
   "connections": {},
-  "warps": [],
-  "bgEvents": [],
+  "warps": [
+    {
+      "x": 1,
+      "y": 3,
+      "targetMapId": "celadon_dept_store_1f",
+      "targetX": 2,
+      "targetY": 1
+    },
+    {
+      "x": 2,
+      "y": 3,
+      "targetMapId": "celadon_dept_store_1f",
+      "targetX": 2,
+      "targetY": 1
+    }
+  ],
+  "bgEvents": [
+    {
+      "x": 3,
+      "y": 0,
+      "speaker": "🛗 ELEVATOR PANEL",
+      "action": "DEPT_ELEVATOR_PANEL",
+      "pages": [
+        "Which floor would you like to visit?"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

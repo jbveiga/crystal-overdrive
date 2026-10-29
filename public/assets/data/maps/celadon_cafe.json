@@ -316,6 +316,25 @@
       "targetY": 30
     }
   ],
-  "bgEvents": [],
+  "bgEvents": [
+    {
+      "x": 7,
+      "y": 1,
+      "speaker": "🗑️ TRASH CAN",
+      "action": "CELADON_CAFE_TRASH",
+      "pages": [
+        "Found LEFTOVERS inside the trash can!"
+      ]
+    },
+    {
+      "x": 8,
+      "y": 1,
+      "speaker": "🗑️ TRASH CAN",
+      "action": "CELADON_CAFE_TRASH",
+      "pages": [
+        "Found LEFTOVERS inside the trash can!"
+      ]
+    }
+  ],
   "grassEncounters": []
 }

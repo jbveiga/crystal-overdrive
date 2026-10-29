@@ -90,6 +90,63 @@ export const DEPT_STORE_FLOORS: DeptStoreFloor[] = [
   },
 ];
 
+export const CELADON_DEPT_STORE_FLOORS: DeptStoreFloor[] = [
+  {
+    id: '6f',
+    name: '6F: ROOFTOP SQUARE',
+    shortName: '6F',
+    tagline: 'Vending Machines & Panoramic Vista',
+    mapId: 'celadon_dept_store_6f',
+    stockSummary: ['Fresh Water (₽200)', 'Soda Pop (₽300)', 'Lemonade (₽350)'],
+    description: 'Bask in the open-air rooftop garden while enjoying chilled beverages from the automated vending machines.',
+  },
+  {
+    id: '5f',
+    name: '5F: DRUG STORE & EVOLUTION',
+    shortName: '5F',
+    tagline: 'Evolution Stones & Performance Vitamins',
+    mapId: 'celadon_dept_store_5f',
+    stockSummary: ['Fire Stone (₽2100)', 'Water Stone (₽2100)', 'Thunder Stone (₽2100)', 'Leaf Stone (₽2100)', 'Vitamins (₽9800)'],
+    description: 'High-grade elemental stones and nutritional tonics to permanently empower your Pokémon team.',
+  },
+  {
+    id: '4f',
+    name: '4F: WISE MAN GIFTS',
+    shortName: '4F',
+    tagline: 'Souvenirs, Dolls & Express Mail',
+    mapId: 'celadon_dept_store_4f',
+    stockSummary: ['Poké Doll (₽1000)', 'Lovely Mail (₽50)', 'Surf Mail (₽50)'],
+    description: 'Delightful gifts and stationery favored by collectors and travelers across Kanto.',
+  },
+  {
+    id: '3f',
+    name: '3F: TM SHOP',
+    shortName: '3F',
+    tagline: 'Infinite Tactical Technical Machines',
+    mapId: 'celadon_dept_store_3f',
+    stockSummary: ['TM10 Hidden Power (₽3000)', 'TM11 Sunny Day (₽2000)', 'TM17 Protect (₽3000)', 'TM18 Rain Dance (₽2000)', 'TM37 Sandstorm (₽2000)'],
+    description: 'Master weather manipulation and tactical shielding with reusable Technical Machines.',
+  },
+  {
+    id: '2f',
+    name: "2F: TRAINER'S MARKET",
+    shortName: '2F',
+    tagline: 'General Provisions & High-Grade Balls',
+    mapId: 'celadon_dept_store_2f',
+    stockSummary: ['Great Ball (₽600)', 'Ultra Ball (₽1200)', 'Hyper Potion (₽1200)', 'Full Heal (₽600)', 'Revive (₽1500)'],
+    description: 'Fully stocked with tournament-grade balls, potent restoratives, and travel essentials.',
+  },
+  {
+    id: '1f',
+    name: '1F: SERVICE COUNTER',
+    shortName: '1F',
+    tagline: 'Information Desk & Main Lobby',
+    mapId: 'celadon_dept_store_1f',
+    stockSummary: ['Directory Services', 'City Information', 'Floor Guide'],
+    description: 'Welcome to the Celadon Department Store, the premier retail shopping hub of Kanto.',
+  },
+];
+
 export interface DeptStoreElevatorCallbacks {
   currentMapId: string;
   onSelectFloor: (floor: DeptStoreFloor) => void;
@@ -103,6 +160,7 @@ export class DeptStoreElevatorUI {
   private callbacks: DeptStoreElevatorCallbacks | null = null;
   private modalElement: HTMLElement | null = null;
   private boundKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+  private floors: DeptStoreFloor[] = DEPT_STORE_FLOORS;
 
   constructor(containerId: string = 'modal-container') {
     this.containerId = containerId;
@@ -133,9 +191,12 @@ export class DeptStoreElevatorUI {
   public open(callbacks: DeptStoreElevatorCallbacks): void {
     this.callbacks = callbacks;
     this.active = true;
+    this.floors = callbacks.currentMapId.includes('celadon')
+      ? CELADON_DEPT_STORE_FLOORS
+      : DEPT_STORE_FLOORS;
 
     // Default cursor to current floor if matching
-    const matchingIdx = DEPT_STORE_FLOORS.findIndex((f) => f.mapId === callbacks.currentMapId);
+    const matchingIdx = this.floors.findIndex((f) => f.mapId === callbacks.currentMapId);
     this.selectedIndex = matchingIdx >= 0 ? matchingIdx : 0;
 
     this.render();
@@ -168,12 +229,12 @@ export class DeptStoreElevatorUI {
       } else if (key === 'arrowup' || key === 'w') {
         e.stopPropagation();
         e.preventDefault();
-        this.selectedIndex = (this.selectedIndex - 1 + DEPT_STORE_FLOORS.length) % DEPT_STORE_FLOORS.length;
+        this.selectedIndex = (this.selectedIndex - 1 + this.floors.length) % this.floors.length;
         this.render();
       } else if (key === 'arrowdown' || key === 's') {
         e.stopPropagation();
         e.preventDefault();
-        this.selectedIndex = (this.selectedIndex + 1) % DEPT_STORE_FLOORS.length;
+        this.selectedIndex = (this.selectedIndex + 1) % this.floors.length;
         this.render();
       } else if (key === 'enter' || key === ' ' || key === 'a' || key === 'z') {
         e.stopPropagation();
@@ -185,7 +246,7 @@ export class DeptStoreElevatorUI {
   }
 
   private confirmFloor(): void {
-    const floor = DEPT_STORE_FLOORS[this.selectedIndex];
+    const floor = this.floors[this.selectedIndex];
     if (!floor || !this.callbacks) return;
     const cb = this.callbacks.onSelectFloor;
     this.close();
@@ -291,7 +352,7 @@ export class DeptStoreElevatorUI {
     card.appendChild(header);
 
     // 2. Main Floor Selector Body
-    const currentFloor = DEPT_STORE_FLOORS[this.selectedIndex];
+    const currentFloor = this.floors[this.selectedIndex];
 
     if (isMobile) {
       // Mobile Viewport: Horizontal scroll rail chips + Body card + Sticky travel button
@@ -305,7 +366,7 @@ export class DeptStoreElevatorUI {
         -webkit-overflow-scrolling: touch;
       `;
 
-      DEPT_STORE_FLOORS.forEach((floor, idx) => {
+      this.floors.forEach((floor, idx) => {
         const isSelected = idx === this.selectedIndex;
         const chip = document.createElement('button');
         chip.id = `elevator-chip-${floor.id}`;
@@ -411,7 +472,7 @@ export class DeptStoreElevatorUI {
         padding: 12px;
       `;
 
-      DEPT_STORE_FLOORS.forEach((floor, idx) => {
+      this.floors.forEach((floor, idx) => {
         const isSelected = idx === this.selectedIndex;
         const btn = document.createElement('button');
         btn.id = `elevator-floor-btn-${floor.id}`;

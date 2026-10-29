@@ -61,7 +61,8 @@ export type NpcSpriteType =
   | 'suicune'
   | 'eusine'
   | 'fruit_tree'
-  | 'gramps';
+  | 'gramps'
+  | 'kimono_girl';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
@@ -246,13 +247,22 @@ export interface GridEntity {
     | 'SILPH_CO_GUARD'
     | 'MR_PSYCHIC'
     | 'ROUTE_6_TRAINER'
-    | 'FIGHTING_DOJO_DISCIPLE';
+    | 'FIGHTING_DOJO_DISCIPLE'
+    | 'CELADON_CUT_TREE'
+    | 'CELADON_GYM_GUIDE'
+    | 'CELADON_GYM_TRAINER'
+    | 'CELADON_GYM_STATUE'
+    | 'CELADON_MANSION_STORYTELLER'
+    | 'CELADON_CAFE_TRASH'
+    | 'ROUTE_8_TRAINER';
   trainerId?: string;
   trainerName?: string;
   visionRange?: number;
   challengePages?: string[];
+  defeatPages?: string[];
   trainerPokemon?: TrainerPokemonSpec;
   trainerTeam?: TrainerPokemonSpec[];
+  team?: TrainerPokemonSpec[];
 }
 
 export type CollisionCheck = (x: number, y: number) => boolean;

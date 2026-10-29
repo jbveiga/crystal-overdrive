@@ -146,7 +146,11 @@ export class PokeMartRenderer {
       return;
     }
 
-    if (martId === 'goldenrod_dept_store_6f' || martId === 'goldenrod_dept_store_roof') {
+    if (
+      martId === 'goldenrod_dept_store_6f' ||
+      martId === 'goldenrod_dept_store_roof' ||
+      martId === 'celadon_dept_store_6f'
+    ) {
       renderMedSection(
         MART_MEDICINE_CATALOG.filter((m) => m.deptStoreFloor === '6F'),
         '🥤 VENDING MACHINE REFRESHMENTS'
