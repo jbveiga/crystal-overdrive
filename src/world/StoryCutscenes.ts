@@ -355,7 +355,15 @@ export class StoryCutscenes {
     ctx.setCutsceneLocked(true);
     ctx.player.isMoving = false;
     ctx.player.progress = 0;
-    ctx.player.direction = 'UP';
+    const dx = 10 - ctx.player.x;
+    const dy = 10 - ctx.player.y;
+    ctx.player.direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'RIGHT' : 'LEFT') : (dy < 0 ? 'UP' : 'DOWN');
+    const silverPre = (ctx.npcsByMap['burned_tower_1f'] || []).find((n) => n.id === 'silver_burned');
+    if (silverPre) {
+      silverPre.direction = ctx.player.direction === 'RIGHT' ? 'LEFT' : ctx.player.direction === 'LEFT' ? 'RIGHT' : 'DOWN';
+    }
+    const rName = (ctx.rivalName || 'SILVER').toUpperCase();
+    const rSpeaker = `❓ RIVAL ${rName}`;
 
     let starterSpeciesId: 'croconaw' | 'bayleef' | 'quilava' = 'croconaw';
     let starterMoves = ['watergun', 'bite', 'rage', 'scaryface'];
@@ -387,16 +395,22 @@ export class StoryCutscenes {
     ctx.audioManager.playBattleBgm('trainer');
     ctx.overworldHUD.openDialogue(
       [
-        'SILVER: …Hmph! You followed me all the way to ECRUTEAK?',
+        `${rName}: …Hmph! You followed me all the way to ECRUTEAK?`,
         "Don't tell me you're chasing myths about legendary beasts too! Weaklings need legends. I only need supreme power!",
         "Get out of my way! I'll show you what real strength looks like!",
       ],
-      '❓ RIVAL SILVER',
+      rSpeaker,
       () => {
         ctx.triggerBattle(rivalTeam[0], {
           isTrainer: true,
           trainerName: ctx.rivalName || 'Rival Silver',
           trainerTeam: rivalTeam,
+          onBattleEnd: (res: any) => {
+            if (res !== 'VICTORY') {
+              ctx.setCutsceneLocked(false);
+              ctx.audioManager.restoreOverworldBgm();
+            }
+          },
           onVictory: () => {
             ctx.storyFlags.add('EVENT_BEAT_BURNED_TOWER_SILVER');
             ctx.defeatedTrainers.add('silver_burned');
@@ -404,11 +418,11 @@ export class StoryCutscenes {
             BattleAudio.playOverworldSound('KEY_ITEM');
             ctx.overworldHUD.openDialogue(
               [
-                "SILVER: …Tch! Why can't I beat you?!",
+                `${rName}: …Tch! Why can't I beat you?!`,
                 'I am training as hard as anyone, but my POKéMON are still lacking something…',
                 "…Whatever! I don't need useless legends anyway! Get lost!",
               ],
-              '❓ RIVAL SILVER',
+              rSpeaker,
               () => {
                 ctx.setCutsceneLocked(false);
                 ctx.audioManager.restoreOverworldBgm();
@@ -470,6 +484,7 @@ export class StoryCutscenes {
     ctx.setCutsceneLocked(true);
     ctx.player.isMoving = false;
     ctx.player.progress = 0;
+    ctx.player.direction = 'UP';
     BattleAudio.playOverworldSound('KEY_ITEM');
 
     ctx.overworldHUD.openDialogue(

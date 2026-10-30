@@ -199,6 +199,7 @@ export class FieldObstacleDispatcher {
         const gymLeaders: Record<string, { city: string; leader: string; flag: string }> = {
           violet_gym: { city: 'VIOLET CITY', leader: 'FALKNER', flag: 'falkner_defeated' },
           azalea_gym: { city: 'AZALEA TOWN', leader: 'BUGSY', flag: 'bugsy_defeated' },
+          ecruteak_gym: { city: 'ECRUTEAK CITY', leader: 'MORTY', flag: 'morty_defeated' },
           mahogany_gym: { city: 'MAHOGANY TOWN', leader: 'PRYCE', flag: 'pryce_defeated' },
           vermilion_gym: { city: 'VERMILION CITY', leader: 'LT. SURGE', flag: 'surge_defeated' },
         };

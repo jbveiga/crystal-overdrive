@@ -311,6 +311,7 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
               isGymLeader: true,
               trainerName: targetNpc.trainerName || 'Leader Morty',
               trainerTeam: team,
+              onBattleEnd: (res: any) => { if (res !== 'VICTORY') ctx.audioManager.restoreOverworldBgm?.(); },
               onVictory: () => {
                 ctx.defeatedTrainers.add('morty');
                 ctx.storyFlags.add('morty_defeated');
@@ -326,6 +327,7 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
                   ],
                   targetNpc.speaker,
                   () => {
+                    ctx.audioManager.restoreOverworldBgm?.();
                     ctx.saveCurrentGame();
                     ctx.showToast('👻 Received FOG BADGE & TM30 SHADOW BALL from Leader Morty!');
                   }

@@ -196,9 +196,13 @@ export class OverworldTickerCoordinator {
     if (getGameState() === 'OVERWORLD') {
       // Active NPCs on this map retrieved via memoized cache (zero per-frame array allocation)
       const activeNpcs = currentMap ? getActiveMapNpcs(currentMap.id) : this.emptyNpcs;
-      const heldDir = isCutsceneLocked() ? null : overworldHUD.getHeldDirection();
       const prevPlayerDir = player.direction;
       const wasPlayerMoving = player.isMoving;
+      if (!isCutsceneLocked() && !player.isMoving) {
+        const touchTurn = overworldHUD.consumePendingTouchTurnDirection?.();
+        if (touchTurn) player.direction = touchTurn;
+      }
+      const heldDir = isCutsceneLocked() ? null : overworldHUD.getHeldDirection();
 
       GridPhysics.updateEntity(
         player,
@@ -226,6 +230,18 @@ export class OverworldTickerCoordinator {
             }
 
             void executeWarpTransition(warp);
+            return;
+          }
+
+          // Ecruteak Gym Invisible Floor Pitfall Maze
+          if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15 && !isEcruteakGymSafeTile(coord.x, coord.y)) {
+            BattleAudio.playOverworldSound('CAVE_WARP');
+            const rx = ECRUTEAK_GYM_RESPAWN.x, ry = ECRUTEAK_GYM_RESPAWN.y;
+            player.isMoving = false; player.progress = 0;
+            player.x = rx; player.y = ry; player.renderX = rx; player.renderY = ry;
+            player.gridX = rx; player.gridY = ry; player.targetX = rx; player.targetY = ry;
+            player.direction = ECRUTEAK_GYM_RESPAWN.direction;
+            overworldHUD.showToast('Whoa! Stepped off the invisible path! Returned to entrance.');
             return;
           }
 
@@ -512,18 +528,6 @@ export class OverworldTickerCoordinator {
               '🔴 RIVAL SILVER',
               () => void saveCurrentGame()
             );
-            return;
-          }
-
-          // Ecruteak Gym Invisible Floor Pitfall Maze
-          if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15 && !isEcruteakGymSafeTile(coord.x, coord.y)) {
-            BattleAudio.playOverworldSound('CAVE_WARP');
-            const rx = ECRUTEAK_GYM_RESPAWN.x, ry = ECRUTEAK_GYM_RESPAWN.y;
-            player.isMoving = false; player.progress = 0;
-            player.x = rx; player.y = ry; player.renderX = rx; player.renderY = ry;
-            player.gridX = rx; player.gridY = ry; player.targetX = rx; player.targetY = ry;
-            player.direction = ECRUTEAK_GYM_RESPAWN.direction;
-            overworldHUD.showToast('Whoa! Stepped off the invisible path! Returned to entrance.');
             return;
           }
 

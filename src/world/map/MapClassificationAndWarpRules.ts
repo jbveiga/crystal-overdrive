@@ -100,7 +100,7 @@ export function isOutdoorMap(mapId: string): boolean {
  * Checks whether a map ID represents a cave, well, tunnel, or subterranean interior.
  */
 export function isCaveMap(mapId: string): boolean {
-  return /cave|well|tunnel|whirl_island|ice_path|dragons_den|rock_tunnel|digletts_cave|mount_moon|victory_road|silver_cave|tohjo_falls/i.test(
+  return /cave|well|tunnel|burned_tower_b1f|whirl_island|ice_path|dragons_den|rock_tunnel|digletts_cave|mount_moon|victory_road|silver_cave|tohjo_falls/i.test(
     mapId
   );
 }
@@ -148,7 +148,7 @@ export function getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): 
   if (warp.y <= 1) {
     return 'UP';
   }
-  if (warp.y >= currentMap.height - 2) {
+  if (warp.y >= currentMap.height - 2 || (warp.y >= currentMap.height - 3 && isOutdoorMap(warp.targetMapId))) {
     return 'DOWN';
   }
   if (warp.x <= 1) {
@@ -166,7 +166,7 @@ export function getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): 
  */
 export function isCarpetWarp(warp: WarpEvent, currentMap: MapData): boolean {
   if (isOutdoorMap(currentMap.id)) return false;
-  return warp.y >= currentMap.height - 2;
+  return warp.y >= currentMap.height - 2 || (warp.y >= currentMap.height - 3 && isOutdoorMap(warp.targetMapId));
 }
 
 /**

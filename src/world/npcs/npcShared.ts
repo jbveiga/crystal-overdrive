@@ -326,14 +326,31 @@ export function isNpcActiveForStoryFlags(
   if (npcId === 'liberated_director_radio_5f' || npcId === 'radio_director') return !storyFlags.has('pryce_defeated') || storyFlags.has('radio_tower_liberated');
   if (npcId === 'true_director' || npcId === 'real_director_warehouse') return storyFlags.has('fake_director_defeated') && !storyFlags.has('radio_tower_liberated');
 
-  // Burned Tower Story NPCs & Legendary Beasts Lifecycle
+  // Burned Tower 1F Rival Silver: despawn once defeated or beasts awaken
+  if (npcId === 'silver_burned') {
+    return (
+      !storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER') &&
+      !storyFlags.has('beasts_awakened') &&
+      !storyFlags.has('EVENT_RELEASED_THE_BEASTS')
+    );
+  }
+
+  // Ecruteak Gym Leader Morty: away at Burned Tower until beasts awaken (when active story flags are tracked)
+  if (npcId === 'morty' && storyFlags.size > 0) {
+    return (
+      storyFlags.has('beasts_awakened') ||
+      storyFlags.has('EVENT_RELEASED_THE_BEASTS') ||
+      storyFlags.has('morty_defeated')
+    );
+  }
+
+  // Burned Tower B1F Legendary Beasts & 1F Morty/Eusine: despawn once beasts awaken
   if (
     npcId === 'beasts' ||
     npcId === 'burned_raikou' ||
     npcId === 'burned_entei' ||
     npcId === 'morty_burned' ||
-    npcId === 'eusine' ||
-    npcId === 'silver_burned'
+    npcId === 'eusine'
   ) {
     return !storyFlags.has('beasts_awakened') && !storyFlags.has('EVENT_RELEASED_THE_BEASTS');
   }

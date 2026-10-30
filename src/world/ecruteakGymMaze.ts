@@ -37,13 +37,13 @@ const ECRUTEAK_GYM_SAFE_COORDS: [number, number][] = [
 
   // Branch across to Sage Ping (7, 9)
   [4, 12], [5, 12], [6, 12], [7, 12],
-  [7, 11],
-  [7, 10],
+  [6, 11], [7, 11],
+  [6, 10], [7, 10],
   [7, 9], [6, 9],   // Sage Ping encounter area
 
   // Branch towards Medium Martha (2, 7)
   [5, 9], [4, 9], [3, 9], [2, 9],
-  [2, 8],
+  [3, 8], [2, 8],
   [2, 7], [3, 7],   // Medium Martha encounter area
 
   // Branch towards Sage Jeffrey (6, 5) and Morty's platform

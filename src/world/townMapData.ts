@@ -242,7 +242,7 @@ export const JOHTO_LANDMARKS: Record<string, TownMapLandmark> = {
     gridX: 6,
     gridY: 3,
     type: 'dungeon',
-    wildSpecies: ['rattata', 'koffing', 'zubat'],
+    wildSpecies: ['rattata', 'koffing', 'zubat', 'magmar'],
   },
   tin_tower: {
     id: 'tin_tower',

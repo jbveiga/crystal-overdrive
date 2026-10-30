@@ -35,7 +35,10 @@ export class OverworldTouchAndKeyController {
   private isGamepadVisible: boolean = false;
   private activeDirection: Direction | null = null;
   private touchDirection: Direction | null = null;
+  private pendingTouchTurnDirection: Direction | null = null;
+  private touchTurnUntilMs: number = 0;
   private heldKeys: Set<string> = new Set();
+  public static readonly TOUCH_TURN_HOLD_DELAY_MS = 145;
 
   constructor(opts: TouchAndKeyControllerOptions) {
     this.opts = opts;
@@ -116,7 +119,20 @@ export class OverworldTouchAndKeyController {
 
   public getHeldDirection(): Direction | null {
     if (this.opts.isDialogueOpen() || this.opts.isModalOpen?.() || this.opts.isPokegearOpen?.()) return null;
+    if (this.touchDirection && this.heldKeys.size === 0 && performance.now() < this.touchTurnUntilMs) {
+      return null;
+    }
     return this.activeDirection;
+  }
+
+  public consumePendingTouchTurnDirection(): Direction | null {
+    if (this.opts.isDialogueOpen() || this.opts.isModalOpen?.() || this.opts.isPokegearOpen?.()) {
+      this.pendingTouchTurnDirection = null;
+      return null;
+    }
+    const dir = this.pendingTouchTurnDirection;
+    this.pendingTouchTurnDirection = null;
+    return dir;
   }
 
   public clearActiveDirection(): void {
@@ -205,6 +221,10 @@ export class OverworldTouchAndKeyController {
     };
 
     const updateTouchDir = (dir: Direction | null) => {
+      if (dir !== null && dir !== this.touchDirection) {
+        this.pendingTouchTurnDirection = dir;
+        this.touchTurnUntilMs = performance.now() + OverworldTouchAndKeyController.TOUCH_TURN_HOLD_DELAY_MS;
+      }
       this.touchDirection = dir;
       if (dir === null) resetJoystickKnob();
       highlightDpadSegment(dir);

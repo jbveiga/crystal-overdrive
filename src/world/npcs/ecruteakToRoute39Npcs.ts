@@ -117,7 +117,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('medium_martha', 2, 7, 'RIGHT', 'girl', '🔮 MEDIUM MARTHA', 
+      makeNpc('medium_martha', 2, 7, 'RIGHT', 'granny', '🔮 MEDIUM MARTHA',
         ['I communicate with wandering spirits in the mist!'],
         {
           action: 'TRAINER_BATTLE',
@@ -125,14 +125,16 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           trainerName: 'Medium Martha',
           visionRange: 3,
           challengePages: ['MEDIUM MARTHA: Can you find the invisible path through our gym?'],
-          trainerPokemon: { speciesId: 'gastly', level: 20, moves: ['lick', 'spite', 'nightshade'] },
+          defeatPages: ['MEDIUM MARTHA: You saw right through our ghostly veil!'],
+          trainerPokemon: { speciesId: 'gastly', level: 18, moves: ['lick', 'spite', 'nightshade'] },
           trainerTeam: [
-            { speciesId: 'gastly', level: 20, moves: ['lick', 'spite', 'nightshade'] },
+            { speciesId: 'gastly', level: 18, moves: ['lick', 'spite', 'nightshade'] },
             { speciesId: 'haunter', level: 20, moves: ['spite', 'curse', 'nightshade'] },
+            { speciesId: 'gastly', level: 20, moves: ['hypnosis', 'lick', 'curse'] },
           ],
         }
       ),
-      makeNpc('sage_ping', 7, 9, 'LEFT', 'sage', '🙏 SAGE PING', 
+      makeNpc('sage_ping', 7, 9, 'LEFT', 'sage', '🙏 SAGE PING',
         ['Our gym floor hides an abyss beneath invisible glass tiles!'],
         {
           action: 'TRAINER_BATTLE',
@@ -140,13 +142,18 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           trainerName: 'Sage Ping',
           visionRange: 3,
           challengePages: ['SAGE PING: Step carefully, challenger! Fear makes the spirit falter!'],
-          trainerPokemon: { speciesId: 'haunter', level: 22, moves: ['nightshade', 'curse', 'hypnosis'] },
+          defeatPages: ['SAGE PING: Ah! Your spirit remained unclouded!'],
+          trainerPokemon: { speciesId: 'gastly', level: 16, moves: ['nightshade', 'curse', 'hypnosis'] },
           trainerTeam: [
-            { speciesId: 'haunter', level: 22, moves: ['nightshade', 'curse', 'hypnosis'] },
+            { speciesId: 'gastly', level: 16, moves: ['lick', 'spite', 'hypnosis'] },
+            { speciesId: 'gastly', level: 16, moves: ['lick', 'curse', 'nightshade'] },
+            { speciesId: 'gastly', level: 16, moves: ['hypnosis', 'spite', 'nightshade'] },
+            { speciesId: 'gastly', level: 16, moves: ['lick', 'spite', 'curse'] },
+            { speciesId: 'gastly', level: 16, moves: ['nightshade', 'curse', 'hypnosis'] },
           ],
         }
       ),
-      makeNpc('medium_grace', 2, 12, 'RIGHT', 'girl', '🔮 MEDIUM GRACE', 
+      makeNpc('medium_grace', 2, 12, 'RIGHT', 'granny', '🔮 MEDIUM GRACE',
         ['The spirits illuminate only those who tread with steady resolve.'],
         {
           action: 'TRAINER_BATTLE',
@@ -154,14 +161,15 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           trainerName: 'Medium Grace',
           visionRange: 3,
           challengePages: ['MEDIUM GRACE: You shall vanish into the shadow realm!'],
-          trainerPokemon: { speciesId: 'gastly', level: 20, moves: ['hypnosis', 'lick', 'dreameater'] },
+          defeatPages: ['MEDIUM GRACE: What an extraordinary spiritual bond!'],
+          trainerPokemon: { speciesId: 'haunter', level: 20, moves: ['hypnosis', 'lick', 'dreameater'] },
           trainerTeam: [
-            { speciesId: 'gastly', level: 20, moves: ['hypnosis', 'lick', 'dreameater'] },
+            { speciesId: 'haunter', level: 20, moves: ['hypnosis', 'lick', 'dreameater'] },
             { speciesId: 'haunter', level: 20, moves: ['nightshade', 'curse', 'confuseray'] },
           ],
         }
       ),
-      makeNpc('sage_jeffrey', 7, 5, 'LEFT', 'sage', '🙏 SAGE JEFFREY', 
+      makeNpc('sage_jeffrey', 7, 5, 'LEFT', 'sage', '🙏 SAGE JEFFREY',
         ['Beyond this misty bridge awaits LEADER MORTY himself!'],
         {
           action: 'TRAINER_BATTLE',
@@ -169,6 +177,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           trainerName: 'Sage Jeffrey',
           visionRange: 3,
           challengePages: ['SAGE JEFFREY: Prove that your heart does not harbor fear!'],
+          defeatPages: ['SAGE JEFFREY: Go forth! LEADER MORTY awaits on the altar!'],
           trainerPokemon: { speciesId: 'haunter', level: 22, moves: ['nightshade', 'hypnosis', 'dreameater'] },
           trainerTeam: [
             { speciesId: 'haunter', level: 22, moves: ['nightshade', 'hypnosis', 'dreameater'] },
@@ -283,6 +292,38 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           'Three nameless POKéMON perished here, but were revived by the rainbow phoenix into legends.',
           'Until the spirits show themselves, I meditate here in solemn contemplation.',
         ]
+      ),
+      makeNpc('firebreather_ned', 15, 4, 'DOWN', 'fisherman', '🔥 FIREBREATHER NED',
+        ['My soul burns hotter than the flames that scorched this tower!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'firebreather_ned',
+          trainerName: 'Firebreather Ned',
+          visionRange: 2,
+          challengePages: ['FIREBREATHER NED: My soul is on fire! Let me show you my scorching flames!'],
+          defeatPages: ['FIREBREATHER NED: Whew… Your team cooled my flames right down!'],
+          trainerPokemon: { speciesId: 'koffing', level: 15, moves: ['tackle', 'smog', 'poisongas'] },
+          trainerTeam: [
+            { speciesId: 'koffing', level: 15, moves: ['tackle', 'smog', 'poisongas'] },
+            { speciesId: 'growlithe', level: 13, moves: ['ember', 'roar', 'bite'] },
+            { speciesId: 'koffing', level: 15, moves: ['tackle', 'smog', 'sludge'] },
+          ],
+        }
+      ),
+      makeNpc('firebreather_richard', 4, 12, 'RIGHT', 'fisherman', '🔥 FIREBREATHER RICHARD',
+        ['I practice fire-breathing amid these ancient charred beams!'],
+        {
+          action: 'TRAINER_BATTLE',
+          trainerId: 'firebreather_richard',
+          trainerName: 'Firebreather Richard',
+          visionRange: 2,
+          challengePages: ['FIREBREATHER RICHARD: Hey! Watch me breathe fire in the ruins!'],
+          defeatPages: ['FIREBREATHER RICHARD: Cough, cough… Too much smoke!'],
+          trainerPokemon: { speciesId: 'charmeleon', level: 17, moves: ['ember', 'scratch', 'rage', 'smokescreen'] },
+          trainerTeam: [
+            { speciesId: 'charmeleon', level: 17, moves: ['ember', 'scratch', 'rage', 'smokescreen'] },
+          ],
+        }
       ),
       makeNpc('silver_burned', 10, 10, 'DOWN', 'silver', '❓ RIVAL SILVER', 
         [

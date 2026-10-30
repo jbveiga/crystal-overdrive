@@ -689,4 +689,8 @@ export class OverworldHUD {
   public getHeldDirection(): Direction | null {
     return this.touchAndKeyController.getHeldDirection();
   }
+
+  public consumePendingTouchTurnDirection(): Direction | null {
+    return this.touchAndKeyController.consumePendingTouchTurnDirection();
+  }
 }

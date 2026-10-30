@@ -434,12 +434,8 @@ export class OverworldWarpAndMapTransitionController {
       player.progress = 0;
       setCutsceneLocked(false);
       BattleAudio.playMenuSound('CANCEL');
-      overworldHUD.openDialogue(
-        [
-          "SILVER: Hey, hold it right there! You're not going down that hole before me!",
-        ],
-        '❓ RIVAL SILVER'
-      );
+      const rName = ((ctx as any).getRivalName?.() || 'SILVER').toUpperCase();
+      overworldHUD.openDialogue([`${rName}: Hey, hold it right there! You're not going down that hole before me!`], `❓ RIVAL ${rName}`);
       return;
     }
 

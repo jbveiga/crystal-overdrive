@@ -1260,6 +1260,27 @@
       "maxLevel": 16,
       "weight": 1,
       "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "magmar",
+      "minLevel": 14,
+      "maxLevel": 16,
+      "weight": 10,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "magmar",
+      "minLevel": 14,
+      "maxLevel": 16,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "magmar",
+      "minLevel": 14,
+      "maxLevel": 16,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
     }
   ]
 }
