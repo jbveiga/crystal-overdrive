@@ -96,7 +96,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     ecruteak_gym: [
-      makeNpc('morty', 4, 3, 'DOWN', 'sage', '👻 LEADER MORTY', 
+      makeNpc('morty', 4, 3, 'DOWN', 'morty', '👻 LEADER MORTY', 
         [
           'MORTY: The FOGBADGE is proof of your extraordinary spiritual bond with your partners.',
           'Continue on your journey with courage and quiet contemplation.',
@@ -175,7 +175,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('ecruteak_gym_guide', 2, 16, 'UP', 'fat_man', '🥊 GYM GUIDE', 
+      makeNpc('ecruteak_gym_guide', 2, 16, 'DOWN', 'fat_man', '🥊 GYM GUIDE', 
         [
           'Yo! CHAMP in the making!',
           'MORTY uses GHOST-type POKéMON! NORMAL and FIGHTING moves cannot damage them at all!',

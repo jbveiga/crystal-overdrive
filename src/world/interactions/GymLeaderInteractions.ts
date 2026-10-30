@@ -273,14 +273,11 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
       npcIds: ['ecruteak_gym_guide'],
       handler: (targetNpc, _map, ctx) => {
         if (!ctx.storyFlags.has('beasts_awakened')) {
-          ctx.openDialogue(
-            [
-              'Yo! CHAMP in the making!',
-              'LEADER MORTY is not here right now! He went to the BURNED TOWER in the northwest of town.',
-              'The rumors say the ancient legendary beasts have stirred beneath the charred beams!',
-            ],
-            targetNpc.speaker
-          );
+          ctx.openDialogue(['Yo! CHAMP in the making!', 'LEADER MORTY is not here right now! He went to the BURNED TOWER in the northwest of town.', 'The rumors say the ancient legendary beasts have stirred beneath the charred beams!'], targetNpc.speaker);
+          return true;
+        }
+        if (ctx.storyFlags.has('morty_defeated')) {
+          ctx.openDialogue([`Whoa, ${ctx.playerName || 'CHAMP'}! You conquered the invisible floor and defeated MORTY!`, 'With the FOGBADGE in hand, your POKéMON can now use HM03 SURF to cross any body of water!'], targetNpc.speaker);
           return true;
         }
         return false;
@@ -317,6 +314,7 @@ export function getGymLeaderInteractions(): NpcInteractionRegistration[] {
               onVictory: () => {
                 ctx.defeatedTrainers.add('morty');
                 ctx.storyFlags.add('morty_defeated');
+                ctx.missionManager.checkStoryFlags(ctx.storyFlags);
                 if (!ctx.inventory.badges.includes('fog')) ctx.inventory.badges.push('fog');
                 if (!ctx.inventory.tms.includes('TM30')) ctx.inventory.tms.push('TM30');
                 ctx.audioManager.playSfx?.('sfx_badge_get');

@@ -31,7 +31,7 @@ const ECRUTEAK_GYM_SAFE_COORDS: [number, number][] = [
   [4, 15], [5, 15],
 
   // Path from landing up and left to Medium Grace (3, 12)
-  [4, 14],
+  [4, 14], [5, 14],
   [4, 13], [3, 13],
   [3, 12], [2, 12], // Medium Grace encounter area
 

@@ -517,8 +517,11 @@ export class OverworldTickerCoordinator {
 
           // Ecruteak Gym Invisible Floor Pitfall Maze
           if (currentMap?.id === 'ecruteak_gym' && coord.y >= 4 && coord.y <= 15 && !isEcruteakGymSafeTile(coord.x, coord.y)) {
-            BattleAudio.playOverworldSound('BUMP');
-            player.x = ECRUTEAK_GYM_RESPAWN.x; player.y = ECRUTEAK_GYM_RESPAWN.y;
+            BattleAudio.playOverworldSound('CAVE_WARP');
+            const rx = ECRUTEAK_GYM_RESPAWN.x, ry = ECRUTEAK_GYM_RESPAWN.y;
+            player.isMoving = false; player.progress = 0;
+            player.x = rx; player.y = ry; player.renderX = rx; player.renderY = ry;
+            player.gridX = rx; player.gridY = ry; player.targetX = rx; player.targetY = ry;
             player.direction = ECRUTEAK_GYM_RESPAWN.direction;
             overworldHUD.showToast('Whoa! Stepped off the invisible path! Returned to entrance.');
             return;
