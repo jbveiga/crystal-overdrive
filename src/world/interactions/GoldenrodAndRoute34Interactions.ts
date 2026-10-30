@@ -229,6 +229,8 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
         }
         const eevee = PokemonFactory.create('eevee', 20);
         ctx.playerParty.push(eevee);
+        ctx.seenSpecies?.add('eevee');
+        ctx.caughtSpecies?.add('eevee');
         ctx.storyFlags.add('HAS_BILLS_EEVEE');
         ctx.storyFlags.add('EVENT_GOT_EEVEE');
         BattleAudio.playOverworldSound('FANFARE');

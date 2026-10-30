@@ -36,6 +36,8 @@ export function handleKarateKingKiyo(targetNpc: GridEntity, _map: MapData, ctx: 
 
     const tyrogue = PokemonFactory.create('tyrogue', 10, ['tackle', 'foresight', 'dizzypunch']);
     ctx.playerParty.push(tyrogue);
+    ctx.seenSpecies?.add('tyrogue');
+    ctx.caughtSpecies?.add('tyrogue');
     ctx.storyFlags.add('received_kiyo_tyrogue');
     ctx.storyFlags.add('EVENT_GOT_TYROGUE_FROM_KIYO');
     ctx.audioManager.playSfx?.('sfx_badge_get');
@@ -100,6 +102,8 @@ export function handleKarateKingKiyo(targetNpc: GridEntity, _map: MapData, ctx: 
 
         const tyrogue = PokemonFactory.create('tyrogue', 10, ['tackle', 'foresight', 'dizzypunch']);
         ctx.playerParty.push(tyrogue);
+        ctx.seenSpecies?.add('tyrogue');
+        ctx.caughtSpecies?.add('tyrogue');
         ctx.storyFlags.add('received_kiyo_tyrogue');
         ctx.storyFlags.add('EVENT_GOT_TYROGUE_FROM_KIYO');
         ctx.audioManager.playSfx?.('sfx_badge_get');

@@ -122,13 +122,19 @@ export function getGoldenrodExpansionInteractions(): NpcInteractionRegistration[
 
         if (!ctx.inventory.items) ctx.inventory.items = {};
         ctx.inventory.items['flower-mail'] = (ctx.inventory.items['flower-mail'] || 0) + 1;
+        const kenya = PokemonFactory.create('spearow', 10, ['peck', 'growl', 'leer', 'furyattack']);
+        kenya.nickname = 'KENYA';
+        kenya.heldItem = 'flower-mail';
+        kenya.originalTrainer = 'RANDY';
         if (ctx.playerParty.length < 6) {
-          const kenya = PokemonFactory.create('spearow', 10, ['peck', 'growl', 'leer', 'furyattack']);
-          kenya.nickname = 'KENYA';
-          kenya.heldItem = 'flower-mail';
-          kenya.originalTrainer = 'RANDY';
           ctx.playerParty.push(kenya);
+        } else if (ctx.boxManager) {
+          ctx.boxManager.deposit(kenya);
+        } else if (ctx.playerBox) {
+          ctx.playerBox.push(kenya);
         }
+        ctx.seenSpecies?.add('spearow');
+        ctx.caughtSpecies?.add('spearow');
         ctx.storyFlags.add('EVENT_GOT_KENYA');
         BattleAudio.playOverworldSound('KEY_ITEM');
         ctx.openDialogue(
@@ -472,7 +478,11 @@ export function getGoldenrodExpansionInteractions(): NpcInteractionRegistration[
           ctx.playerParty.push(mon);
         } else if (ctx.boxManager) {
           ctx.boxManager.deposit(mon);
+        } else if (ctx.playerBox) {
+          ctx.playerBox.push(mon);
         }
+        ctx.seenSpecies?.add(prize.speciesId);
+        ctx.caughtSpecies?.add(prize.speciesId);
 
         const monName = prize.name;
         const monLvl = prize.level;

@@ -611,7 +611,7 @@ async function bootstrap() {
   const npcInteractionRouter = createDefaultNpcInteractionRouter();
 
   const getNpcInteractionContext = (): NpcInteractionContext => ({
-    playerName,
+    playerName, seenSpecies, caughtSpecies, playerBox,
     getRivalName: () => rivalName,
     setRivalName: (name: string) => { rivalName = name; },
     playerParty,

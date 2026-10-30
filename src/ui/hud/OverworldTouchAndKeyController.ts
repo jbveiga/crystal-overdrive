@@ -311,7 +311,7 @@ export class OverworldTouchAndKeyController {
 
       if (this.opts.isModalOpen?.()) return;
 
-      if (e.code === 'KeyD' || e.code === 'KeyR') {
+      if (e.code === 'KeyR') {
         if (!e.repeat && this.opts.isVisible() && !this.opts.isDialogueOpen() && this.opts.onRadarToggle) {
           e.preventDefault();
           const active = this.opts.onRadarToggle();

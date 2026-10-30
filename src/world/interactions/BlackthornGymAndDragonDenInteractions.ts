@@ -173,6 +173,8 @@ export const handleDragonMasterElder: NpcInteractionHandler = (targetNpc: GridEn
 
     const dratini = PokemonFactory.create('dratini', 15, ['extremespeed', 'wrap', 'leer', 'thunderwave']);
     ctx.playerParty.push(dratini);
+    ctx.seenSpecies?.add('dratini');
+    ctx.caughtSpecies?.add('dratini');
     ctx.storyFlags.add('gift_dratini_extremespeed');
     ctx.storyFlags.add('EVENT_GOT_DRATINI');
     BattleAudio.playOverworldSound('KEY_ITEM');
@@ -229,6 +231,8 @@ export const handleDragonMasterElder: NpcInteractionHandler = (targetNpc: GridEn
       if (ctx.playerParty.length < 6) {
         const dratini = PokemonFactory.create('dratini', 15, ['extremespeed', 'wrap', 'leer', 'thunderwave']);
         ctx.playerParty.push(dratini);
+        ctx.seenSpecies?.add('dratini');
+        ctx.caughtSpecies?.add('dratini');
         ctx.storyFlags.add('gift_dratini_extremespeed');
         ctx.storyFlags.add('EVENT_GOT_DRATINI');
       }

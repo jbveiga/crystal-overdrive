@@ -443,6 +443,10 @@ export function executeMove({
       type: 'MESSAGE',
       text: `${attacker.nickname} is hit with recoil!`,
     });
+    if (attacker.currentHp === 0) {
+      events.push({ type: 'FAINT', targetId: attacker.uid });
+      events.push({ type: 'MESSAGE', text: `${attacker.nickname} fainted!` });
+    }
   }
 
   // 9. Secondary Stat Stage Effect on Damaging Moves (e.g. TM31 Mud-Slap accuracy drop)

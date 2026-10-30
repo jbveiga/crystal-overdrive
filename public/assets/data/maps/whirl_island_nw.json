@@ -573,6 +573,13 @@
       "targetMapId": "whirl_island_sw",
       "targetX": 3,
       "targetY": 15
+    },
+    {
+      "x": 7,
+      "y": 15,
+      "targetMapId": "whirl_island_sw",
+      "targetX": 3,
+      "targetY": 15
     }
   ],
   "bgEvents": [],

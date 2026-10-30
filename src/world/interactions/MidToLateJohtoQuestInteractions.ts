@@ -406,12 +406,18 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
             if (!ctx.inventory.badges.includes('rising')) ctx.inventory.badges.push('rising');
             if (!ctx.inventory.tms.includes('TM24')) ctx.inventory.tms.push('TM24');
             ctx.addOverworldItemToInventory('master-ball');
+            const dratini = PokemonFactory.create('dratini', 15, ['extremespeed', 'thunderwave', 'twister', 'dragonrage']);
+            dratini.nickname = 'DRATINI';
             if (ctx.playerParty.length < 6) {
-              const dratini = PokemonFactory.create('dratini', 15, ['extremespeed', 'thunderwave', 'twister', 'dragonrage']);
-              dratini.nickname = 'DRATINI';
               ctx.playerParty.push(dratini);
-              ctx.storyFlags.add('received_shrine_dratini');
+            } else if (ctx.boxManager) {
+              ctx.boxManager.deposit(dratini);
+            } else if (ctx.playerBox) {
+              ctx.playerBox.push(dratini);
             }
+            ctx.seenSpecies?.add('dratini');
+            ctx.caughtSpecies?.add('dratini');
+            ctx.storyFlags.add('received_shrine_dratini');
             ctx.missionManager.checkStoryFlags(ctx.storyFlags);
             ctx.missionManager.completeMission('M10');
             ctx.audioManager.playSfx?.('sfx_badge_get');
@@ -551,7 +557,15 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
         shuckie.nickname = 'SHUCKIE';
         shuckie.heldItem = 'berry';
         shuckie.originalTrainer = 'KIRK';
-        if (ctx.playerParty) ctx.playerParty.push(shuckie);
+        if (ctx.playerParty && ctx.playerParty.length < 6) {
+          ctx.playerParty.push(shuckie);
+        } else if (ctx.boxManager) {
+          ctx.boxManager.deposit(shuckie);
+        } else if (ctx.playerBox) {
+          ctx.playerBox.push(shuckie);
+        }
+        ctx.seenSpecies?.add('shuckle');
+        ctx.caughtSpecies?.add('shuckle');
 
         ctx.storyFlags.add('received_shuckie');
         ctx.storyFlags.add('EVENT_GOT_SHUCKIE');

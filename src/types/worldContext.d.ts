@@ -115,7 +115,7 @@ export interface NpcInteractionRegistration {
 }
 
 export interface NpcInteractionContext {
-  playerName: string; playerParty: PokemonInstance[]; inventory: BagInventory; storyFlags: Set<string>;
+  playerName: string; seenSpecies?: Set<string>; caughtSpecies?: Set<string>; playerBox?: PokemonInstance[]; playerParty: PokemonInstance[]; inventory: BagInventory; storyFlags: Set<string>;
   defeatedTrainers: Set<string>; player: GridEntity; npcsByMap: Record<string, GridEntity[]>;
   mapManager: MapManager; gameClock: GameClock;
   getRivalName?: () => string; setRivalName?: (name: string) => void;
