@@ -19,6 +19,7 @@ import type { MapManager } from './MapManager';
 import type { RoamingManager } from './RoamingManager';
 import type { MissionManager } from './MissionManager';
 import { GUIDE_GENT_TOUR_LEGS, makeNpc, createNpcsByMap } from './npcData';
+import { OverworldTrainerSightAndTourController } from './OverworldTrainerSightAndTourController';
 import { eventBus } from '../core/EventBus';
 
 export interface StoryCutsceneContext {

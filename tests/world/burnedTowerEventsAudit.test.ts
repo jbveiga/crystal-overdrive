@@ -1,10 +1,17 @@
+// Mock minimal browser globals for PixiJS environment hydration in node
+if (typeof navigator === 'undefined') {
+  Object.defineProperty(globalThis, 'navigator', {
+    value: { userAgent: 'node', maxTouchPoints: 0 },
+    configurable: true,
+    writable: true,
+  });
+}
 import { describe, it, expect, vi } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import { createNpcsByMap } from '../../src/world/npcData';
 import { isNpcActiveForStoryFlags } from '../../src/world/npcs/npcShared';
 import { StoryCutscenes } from '../../src/world/StoryCutscenes';
-import { NPC_SHEET_PATHS } from '../../src/render/OverworldNpcAndItemSprites';
 import { RoamingManager } from '../../src/world/RoamingManager';
 
 describe('TICKET-BUGFIX-BURNED-TOWER-01: Burned Tower Events & Three Beasts Awakening Audit', () => {
@@ -12,7 +19,8 @@ describe('TICKET-BUGFIX-BURNED-TOWER-01: Burned Tower Events & Three Beasts Awak
   // 1. All Three Legendary Beasts & Authentic Sprites
   // =========================================================================
   describe('1. Legendary Beasts & NPC Sprite Assignments', () => {
-    it('registers raikou, entei, morty, and eusine in NPC_SHEET_PATHS', () => {
+    it('registers raikou, entei, morty, and eusine in NPC_SHEET_PATHS', async () => {
+      const { NPC_SHEET_PATHS } = await import('../../src/render/OverworldNpcAndItemSprites');
       expect(NPC_SHEET_PATHS.raikou).toBe('./assets/sprites/characters/raikou.png');
       expect(NPC_SHEET_PATHS.entei).toBe('./assets/sprites/characters/entei.png');
       expect(NPC_SHEET_PATHS.suicune).toBe('./assets/sprites/characters/suicune.png');

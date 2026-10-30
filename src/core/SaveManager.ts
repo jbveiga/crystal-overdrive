@@ -663,6 +663,7 @@ export class SaveManager {
     defeatedTrainers: Set<string>;
     storyFlags: Set<string>;
     seenSpecies: Set<string>;
+    caughtSpecies?: Set<string>;
     overworldItemManager: any;
     gameOptions: GameOptions;
     missionManager: any;

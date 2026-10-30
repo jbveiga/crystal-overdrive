@@ -383,6 +383,7 @@ export function executeMove({
       damage: fixVal,
       effectiveness: 1,
       isCritical: false,
+      isStab: false,
     };
   }
 

@@ -24,7 +24,8 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
       actions: ['RIVAL_BURNED_TOWER_BATTLE'],
       npcIds: ['silver_burned'],
       handler: (targetNpc, _map, ctx) => {
-        const speaker = ctx.rivalName ? `❓ RIVAL ${ctx.rivalName.toUpperCase()}` : targetNpc.speaker;
+        const rName = ctx.getRivalName?.();
+        const speaker = rName ? `❓ RIVAL ${rName.toUpperCase()}` : targetNpc.speaker;
         if (ctx.storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')) {
           ctx.openDialogue(["SILVER: …Tch! Keep moving! I don't want to look at your face!"], speaker);
           return true;

@@ -9,7 +9,8 @@
 
 import type { Direction, PokemonInstance, PokeballId } from '../types/game';
 import type { BagInventory } from '../ui/BagAndMartUI';
-import type { GridEntity } from './GridPhysics';
+import { GridPhysics, type GridEntity } from './GridPhysics';
+import { GUIDE_GENT_TOUR_LEGS } from './npcData';
 import { BattleAudio } from '../audio/BattleAudio';
 import { BattleController } from '../battle/BattleController';
 import { PokemonFactory } from '../battle/PokemonFactory';
