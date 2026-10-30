@@ -222,4 +222,129 @@ describe('TICKET-BUGFIX-BURNED-TOWER-01: Burned Tower Events & Three Beasts Awak
       expect(restoreBgmIdx).toBeLessThan(source.indexOf('public static triggerOlivineRivalConfrontation'));
     });
   });
+
+  // =========================================================================
+  // 6. Visual Sprite Position Synchronization (renderX/renderY & gridX/gridY)
+  // =========================================================================
+  describe('6. Visual Sprite Coordinate Synchronization & Chasm Drop', () => {
+    it('updates renderX, renderY, gridX, gridY, targetX, and targetY on Raikou, Entei, and Suicune during awakening', () => {
+      const roamingManager = new RoamingManager();
+      const storyFlags = new Set<string>();
+      const raikouObj: any = { id: 'burned_raikou', x: 8, y: 3, renderX: 8, renderY: 3, gridX: 8, gridY: 3, targetX: 8, targetY: 3 };
+      const suicuneObj: any = { id: 'beasts', x: 10, y: 3, renderX: 10, renderY: 3, gridX: 10, gridY: 3, targetX: 10, targetY: 3 };
+      const enteiObj: any = { id: 'burned_entei', x: 12, y: 3, renderX: 12, renderY: 3, gridX: 12, gridY: 3, targetX: 12, targetY: 3 };
+
+      let dialogueCompleteCb: (() => void) | undefined;
+      const mockContext: any = {
+        player: { x: 10, y: 6, direction: 'UP' },
+        storyFlags,
+        defeatedTrainers: new Set<string>(),
+        playerParty: [],
+        audioManager: { playBattleBgm: vi.fn(), restoreOverworldBgm: vi.fn(), playMapBgm: vi.fn(), playSfx: vi.fn() },
+        overworldRenderer: {} as any,
+        overworldHUD: {
+          openDialogue: (_pages: string[], _speaker?: string, onComplete?: () => void) => {
+            dialogueCompleteCb = onComplete;
+          },
+          updatePokegear: vi.fn(),
+          showToast: vi.fn(),
+        },
+        npcsByMap: {
+          burned_tower_b1f: [raikouObj, suicuneObj, enteiObj],
+        },
+        gameClock: { playerSpeed: 1, battleSpeed: 1 },
+        mapManager: {} as any,
+        roamingManager,
+        triggerBattle: vi.fn(),
+        buildTrainerTeamInstances: vi.fn(),
+        handleTrainerDefeatRewards: vi.fn(),
+        saveCurrentGame: vi.fn(),
+        setCutsceneLocked: vi.fn(),
+      };
+
+      vi.useFakeTimers();
+      StoryCutscenes.triggerBeastsAwakeningCutscene(mockContext);
+      if (dialogueCompleteCb) dialogueCompleteCb();
+
+      // Immediately after first dialogue closes, Raikou leaps to (6, 8)
+      expect(raikouObj.renderX).toBe(6);
+      expect(raikouObj.renderY).toBe(8);
+
+      vi.advanceTimersByTime(400);
+      expect(enteiObj.renderX).toBe(14);
+      expect(enteiObj.renderY).toBe(8);
+
+      vi.advanceTimersByTime(400);
+      expect(suicuneObj.renderX).toBe(10);
+      expect(suicuneObj.renderY).toBe(4);
+
+      vi.advanceTimersByTime(500);
+      // Complete second dialogue -> Suicune moves past player to (10, 8)
+      if (dialogueCompleteCb) dialogueCompleteCb();
+      expect(suicuneObj.renderX).toBe(10);
+      expect(suicuneObj.renderY).toBe(8);
+
+      vi.useRealTimers();
+    });
+
+    it('updates Silver renderX/renderY and triggers chasm warp drop into B1F when player stands on a chasm tile', () => {
+      const silverObj: any = { id: 'silver_burned', x: 10, y: 10, renderX: 10, renderY: 10, gridX: 10, gridY: 10, targetX: 10, targetY: 10 };
+      const executeWarpMock = vi.fn();
+      let dialogueCompleteCb: (() => void) | undefined;
+      let battleVictoryCb: (() => void) | undefined;
+
+      const mockContext: any = {
+        player: { x: 10, y: 11, direction: 'UP' },
+        storyFlags: new Set<string>(),
+        defeatedTrainers: new Set<string>(),
+        playerParty: [],
+        audioManager: { playBattleBgm: vi.fn(), restoreOverworldBgm: vi.fn(), playSfx: vi.fn() },
+        overworldHUD: {
+          openDialogue: (_pages: string[], _speaker?: string, onComplete?: () => void) => {
+            dialogueCompleteCb = onComplete;
+          },
+          showToast: vi.fn(),
+        },
+        npcsByMap: { burned_tower_1f: [silverObj] },
+        mapManager: {
+          checkWarp: ({ x, y }: { x: number; y: number }) =>
+            x === 10 && y === 11 ? { x: 10, y: 11, targetMapId: 'burned_tower_b1f', targetX: 10, targetY: 9 } : null,
+        },
+        executeWarpTransition: executeWarpMock,
+        triggerBattle: (_opp: any, opts: any) => {
+          battleVictoryCb = opts.onVictory;
+        },
+        saveCurrentGame: vi.fn(),
+        setCutsceneLocked: vi.fn(),
+      };
+
+      StoryCutscenes.triggerBurnedTowerRivalBattle(mockContext);
+      if (dialogueCompleteCb) dialogueCompleteCb();
+      if (battleVictoryCb) battleVictoryCb();
+      if (dialogueCompleteCb) dialogueCompleteCb();
+
+      expect(silverObj.x).toBe(8);
+      expect(silverObj.renderX).toBe(8);
+      expect(silverObj.renderY).toBe(10);
+      expect(executeWarpMock).toHaveBeenCalledWith({
+        x: 10,
+        y: 11,
+        targetMapId: 'burned_tower_b1f',
+        targetX: 10,
+        targetY: 9,
+      });
+    });
+
+    it('ensures burned_raikou and burned_entei have BEASTS_AWAKENING action and exterior void tiles on B1F are solid (1)', () => {
+      const npcs = createNpcsByMap();
+      const b1fNpcs = npcs.burned_tower_b1f;
+      expect(b1fNpcs.find((n) => n.id === 'burned_raikou')?.action).toBe('BEASTS_AWAKENING');
+      expect(b1fNpcs.find((n) => n.id === 'burned_entei')?.action).toBe('BEASTS_AWAKENING');
+
+      const b1fMapPath = path.resolve(__dirname, '../../public/assets/data/maps/burned_tower_b1f.json');
+      const b1fMap = JSON.parse(fs.readFileSync(b1fMapPath, 'utf8'));
+      expect(b1fMap.collisionGrid[0]).toBe(1);
+      expect(b1fMap.collisionGrid[(b1fMap.height - 1) * b1fMap.width]).toBe(1);
+    });
+  });
 });

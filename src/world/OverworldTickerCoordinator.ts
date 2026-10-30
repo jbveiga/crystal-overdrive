@@ -213,7 +213,7 @@ export class OverworldTickerCoordinator {
           if (currentMap?.id === 'burned_tower_1f' && Math.abs(coord.x - 10) + Math.abs(coord.y - 10) <= 2 && !storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')) {
             triggerBurnedTowerRivalBattle(); return;
           }
-          if (currentMap?.id === 'burned_tower_b1f' && coord.y <= 6 && coord.x >= 8 && coord.x <= 12 && !storyFlags.has('beasts_awakened')) {
+          if (currentMap?.id === 'burned_tower_b1f' && coord.y <= 6 && coord.x >= 7 && coord.x <= 12 && !storyFlags.has('beasts_awakened')) {
             triggerBeastsAwakeningCutscene(); return;
           }
 

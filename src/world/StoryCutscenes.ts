@@ -36,6 +36,7 @@ export interface StoryCutsceneContext {
   mapManager: MapManager;
   roamingManager: RoamingManager;
   missionManager?: MissionManager;
+  executeWarpTransition?: (warp: any) => Promise<void> | void;
   triggerBattle: (
     initialOpponentPokemon: PokemonInstance,
     options?: {
@@ -413,11 +414,17 @@ export class StoryCutscenes {
                 const mapNpcs = ctx.npcsByMap['burned_tower_1f'] || [];
                 const silverNpc = mapNpcs.find((n) => n.id === 'silver_burned');
                 if (silverNpc) {
-                  silverNpc.x = 8;
-                  silverNpc.y = 10;
+                  silverNpc.x = 8; silverNpc.y = 10;
+                  silverNpc.renderX = 8; silverNpc.renderY = 10;
+                  silverNpc.gridX = 8; silverNpc.gridY = 10;
+                  silverNpc.targetX = 8; silverNpc.targetY = 10;
                 }
                 ctx.saveCurrentGame();
                 ctx.overworldHUD.showToast('Rival Silver stepped aside from the Burned Tower hole!');
+                const warp = ctx.mapManager?.checkWarp?.({ x: ctx.player.x, y: ctx.player.y });
+                if (warp && warp.targetMapId === 'burned_tower_b1f' && ctx.executeWarpTransition) {
+                  void ctx.executeWarpTransition(warp);
+                }
               }
             );
           },
@@ -474,18 +481,18 @@ export class StoryCutscenes {
         BattleAudio.playCry('raikou');
         const b1fNpcs = ctx.npcsByMap['burned_tower_b1f'] || [];
         const raikou = b1fNpcs.find((n) => n.id === 'burned_raikou');
-        if (raikou) { raikou.x = 6; raikou.y = 8; }
+        if (raikou) { raikou.x = 6; raikou.y = 8; raikou.renderX = 6; raikou.renderY = 8; raikou.gridX = 6; raikou.gridY = 8; raikou.targetX = 6; raikou.targetY = 8; }
 
         setTimeout(() => {
           BattleAudio.playCry('entei');
           const entei = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'burned_entei');
-          if (entei) { entei.x = 14; entei.y = 8; }
+          if (entei) { entei.x = 14; entei.y = 8; entei.renderX = 14; entei.renderY = 8; entei.gridX = 14; entei.gridY = 8; entei.targetX = 14; entei.targetY = 8; }
         }, 350);
 
         setTimeout(() => {
           BattleAudio.playCry('suicune');
           const suicune = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'beasts');
-          if (suicune) { suicune.x = 10; suicune.y = 4; suicune.direction = 'DOWN'; }
+          if (suicune) { suicune.x = 10; suicune.y = 4; suicune.renderX = 10; suicune.renderY = 4; suicune.gridX = 10; suicune.gridY = 4; suicune.targetX = 10; suicune.targetY = 4; suicune.direction = 'DOWN'; }
         }, 700);
 
         setTimeout(() => {
@@ -497,7 +504,7 @@ export class StoryCutscenes {
             '⚡ MYTHICAL AWAKENING',
             () => {
               const suicune = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'beasts');
-              if (suicune) { suicune.x = 10; suicune.y = 8; suicune.direction = 'DOWN'; }
+              if (suicune) { suicune.x = 10; suicune.y = 8; suicune.renderX = 10; suicune.renderY = 8; suicune.gridX = 10; suicune.gridY = 8; suicune.targetX = 10; suicune.targetY = 8; suicune.direction = 'DOWN'; }
               BattleAudio.playOverworldSound('RUSTLE');
 
               setTimeout(() => {

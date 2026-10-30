@@ -292,7 +292,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         {
           action: 'RIVAL_BURNED_TOWER_BATTLE',
           trainerId: 'silver_burned',
-          trainerName: 'Passerby Silver',
+          trainerName: 'Rival Silver',
           challengePages: [
             'SILVER: …Hmph! You followed me all the way to ECRUTEAK?',
             "Don't tell me you're chasing myths about legendary beasts too! Weaklings need legends. I only need supreme power!",
@@ -303,7 +303,8 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
     ],
     burned_tower_b1f: [
       makeNpc('burned_raikou', 8, 3, 'DOWN', 'raikou', '⚡ RAIKOU',
-        ['RAIKOU stands petrified like a statue atop the stone pedestal…']
+        ['RAIKOU stands petrified like a statue atop the stone pedestal…'],
+        { action: 'BEASTS_AWAKENING' }
       ),
       makeNpc('beasts', 10, 3, 'DOWN', 'suicune', '💎 SUICUNE', 
         [
@@ -316,7 +317,8 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         }
       ),
       makeNpc('burned_entei', 12, 3, 'DOWN', 'entei', '🔥 ENTEI',
-        ['ENTEI stands petrified like a statue atop the stone pedestal…']
+        ['ENTEI stands petrified like a statue atop the stone pedestal…'],
+        { action: 'BEASTS_AWAKENING' }
       ),
     ],
     tin_tower_1f: [

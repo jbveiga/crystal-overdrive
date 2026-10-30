@@ -24,8 +24,9 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
       actions: ['RIVAL_BURNED_TOWER_BATTLE'],
       npcIds: ['silver_burned'],
       handler: (targetNpc, _map, ctx) => {
+        const speaker = ctx.rivalName ? `❓ RIVAL ${ctx.rivalName.toUpperCase()}` : targetNpc.speaker;
         if (ctx.storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')) {
-          ctx.openDialogue(["SILVER: …Tch! Keep moving! I don't want to look at your face!"], targetNpc.speaker);
+          ctx.openDialogue(["SILVER: …Tch! Keep moving! I don't want to look at your face!"], speaker);
           return true;
         }
         ctx.triggerBurnedTowerRivalBattle();
@@ -36,7 +37,7 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
     // 2. Burned Tower B1F Beasts Awakening
     {
       actions: ['BEASTS_AWAKENING'],
-      npcIds: ['beasts'],
+      npcIds: ['beasts', 'burned_raikou', 'burned_entei'],
       handler: (_targetNpc, _map, ctx) => {
         ctx.triggerBeastsAwakeningCutscene();
         return true;
