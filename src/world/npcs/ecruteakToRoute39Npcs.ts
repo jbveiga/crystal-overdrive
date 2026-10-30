@@ -117,7 +117,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('medium_martha', 2, 7, 'RIGHT', 'granny', '🔮 MEDIUM MARTHA',
+      makeNpc('medium_martha', 2, 7, 'RIGHT', 'girl', '🔮 MEDIUM MARTHA',
         ['I communicate with wandering spirits in the mist!'],
         {
           action: 'TRAINER_BATTLE',
@@ -153,7 +153,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('medium_grace', 2, 12, 'RIGHT', 'granny', '🔮 MEDIUM GRACE',
+      makeNpc('medium_grace', 2, 12, 'RIGHT', 'girl', '🔮 MEDIUM GRACE',
         ['The spirits illuminate only those who tread with steady resolve.'],
         {
           action: 'TRAINER_BATTLE',

@@ -133,7 +133,7 @@ try {
 // 5. Production Build & Chunk Size Audit
 console.log('5️⃣  Auditing Production Bundle & Code Splitting (npm run build)...');
 try {
-  const buildOutput = execSync('npm run build', { stdio: 'pipe' }).toString();
+  const buildOutput = execSync('npm run build', { stdio: 'pipe', cwd: ROOT_DIR }).toString();
   console.log('  ✅ Production Build Succeeded with Clean Code Splitting:');
   const lines = buildOutput.split('\n');
   lines
