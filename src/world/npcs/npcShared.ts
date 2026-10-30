@@ -326,6 +326,18 @@ export function isNpcActiveForStoryFlags(
   if (npcId === 'liberated_director_radio_5f' || npcId === 'radio_director') return !storyFlags.has('pryce_defeated') || storyFlags.has('radio_tower_liberated');
   if (npcId === 'true_director' || npcId === 'real_director_warehouse') return storyFlags.has('fake_director_defeated') && !storyFlags.has('radio_tower_liberated');
 
+  // Burned Tower Story NPCs & Legendary Beasts Lifecycle
+  if (
+    npcId === 'beasts' ||
+    npcId === 'burned_raikou' ||
+    npcId === 'burned_entei' ||
+    npcId === 'morty_burned' ||
+    npcId === 'eusine' ||
+    npcId === 'silver_burned'
+  ) {
+    return !storyFlags.has('beasts_awakened') && !storyFlags.has('EVENT_RELEASED_THE_BEASTS');
+  }
+
   // Cianwood City Suicune & Eusine
   if (npcId === 'cianwood_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
   if (npcId === 'cianwood_eusine') return !storyFlags.has('EVENT_FOUGHT_EUSINE');

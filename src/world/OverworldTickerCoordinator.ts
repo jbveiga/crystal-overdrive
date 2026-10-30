@@ -209,6 +209,14 @@ export class OverworldTickerCoordinator {
         (_entity, coord, tileType) => {
           handleMapTransition(player);
 
+          // Burned Tower 1F Rival Ambush & B1F Beasts Awakening Cutscene (Preempts Chasm Warps)
+          if (currentMap?.id === 'burned_tower_1f' && Math.abs(coord.x - 10) + Math.abs(coord.y - 10) <= 2 && !storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')) {
+            triggerBurnedTowerRivalBattle(); return;
+          }
+          if (currentMap?.id === 'burned_tower_b1f' && coord.y <= 6 && coord.x >= 8 && coord.x <= 12 && !storyFlags.has('beasts_awakened')) {
+            triggerBeastsAwakeningCutscene(); return;
+          }
+
           // Check Building Door Warps with smooth fade & Safe Warp Interceptor
           const warp = mapManager.checkWarp(coord);
           if (warp) {
@@ -320,13 +328,6 @@ export class OverworldTickerCoordinator {
             }
           }
 
-          // Burned Tower 1F Rival Ambush & B1F Beasts Awakening Cutscene
-          if (currentMap?.id === 'burned_tower_1f' && Math.abs(coord.x - 10) + Math.abs(coord.y - 10) <= 1 && !storyFlags.has('EVENT_BEAT_BURNED_TOWER_SILVER')) {
-            triggerBurnedTowerRivalBattle(); return;
-          }
-          if (currentMap?.id === 'burned_tower_b1f' && coord.y <= 6 && coord.x >= 8 && coord.x <= 12 && !storyFlags.has('beasts_awakened')) {
-            triggerBeastsAwakeningCutscene(); return;
-          }
 
           // Goldenrod Gym Whitney Cry Step Trigger
           if (

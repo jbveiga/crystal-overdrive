@@ -182,7 +182,7 @@ async function bootstrap() {
 
   const getCutsceneContext = (): StoryCutsceneContext => ({
     player, storyFlags, defeatedTrainers, playerParty, rivalName, playerName, audioManager, overworldRenderer,
-    overworldHUD, npcsByMap, gameClock, mapManager, roamingManager, triggerBattle, buildTrainerTeamInstances,
+    overworldHUD, npcsByMap, gameClock, mapManager, roamingManager, missionManager, triggerBattle, buildTrainerTeamInstances,
     handleTrainerDefeatRewards, saveCurrentGame,
     setCutsceneLocked: (locked) => { isCutsceneLocked = locked; },
   });

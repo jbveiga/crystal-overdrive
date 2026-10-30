@@ -17,6 +17,7 @@ import type { OverworldHUD } from '../ui/OverworldHUD';
 import type { OverworldRenderer } from '../render/OverworldRenderer';
 import type { MapManager } from './MapManager';
 import type { RoamingManager } from './RoamingManager';
+import type { MissionManager } from './MissionManager';
 import { GUIDE_GENT_TOUR_LEGS, makeNpc, createNpcsByMap } from './npcData';
 import { eventBus } from '../core/EventBus';
 
@@ -34,6 +35,7 @@ export interface StoryCutsceneContext {
   gameClock: { playerSpeed: number; battleSpeed: number };
   mapManager: MapManager;
   roamingManager: RoamingManager;
+  missionManager?: MissionManager;
   triggerBattle: (
     initialOpponentPokemon: PokemonInstance,
     options?: {
@@ -407,6 +409,7 @@ export class StoryCutscenes {
               '❓ RIVAL SILVER',
               () => {
                 ctx.setCutsceneLocked(false);
+                ctx.audioManager.restoreOverworldBgm();
                 const mapNpcs = ctx.npcsByMap['burned_tower_1f'] || [];
                 const silverNpc = mapNpcs.find((n) => n.id === 'silver_burned');
                 if (silverNpc) {
@@ -459,7 +462,6 @@ export class StoryCutscenes {
     ctx.setCutsceneLocked(true);
     ctx.player.isMoving = false;
     ctx.player.progress = 0;
-
     BattleAudio.playOverworldSound('KEY_ITEM');
 
     ctx.overworldHUD.openDialogue(
@@ -470,36 +472,75 @@ export class StoryCutscenes {
       '⚡ LEGENDARY BEASTS',
       () => {
         BattleAudio.playCry('raikou');
-        setTimeout(() => BattleAudio.playCry('entei'), 400);
-        setTimeout(() => BattleAudio.playCry('suicune'), 800);
+        const b1fNpcs = ctx.npcsByMap['burned_tower_b1f'] || [];
+        const raikou = b1fNpcs.find((n) => n.id === 'burned_raikou');
+        if (raikou) { raikou.x = 6; raikou.y = 8; }
+
+        setTimeout(() => {
+          BattleAudio.playCry('entei');
+          const entei = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'burned_entei');
+          if (entei) { entei.x = 14; entei.y = 8; }
+        }, 350);
+
+        setTimeout(() => {
+          BattleAudio.playCry('suicune');
+          const suicune = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'beasts');
+          if (suicune) { suicune.x = 10; suicune.y = 4; suicune.direction = 'DOWN'; }
+        }, 700);
 
         setTimeout(() => {
           ctx.overworldHUD.openDialogue(
             [
-              'RAIKOU and ENTEI roar fiercely and leap into the ceiling shafts, scattering across the Johto skies!',
+              'RAIKOU and ENTEI roar fiercely and leap into the cavern shafts, scattering across the Johto skies!',
               'SUICUNE slowly steps down from its pedestal… It locks its crystal-clear gaze directly into your eyes.',
-              'With a swift, graceful leap across the subterranean pool, SUICUNE vanishes into the mist!',
-              '🎩 EUSINE rushes down the ladder: "Did you see that?! That was SUICUNE! It acknowledged you before it departed!"',
-              'EUSINE: "I have dedicated my life to pursuing SUICUNE. I will find it across Johto!"',
-              'LEADER MORTY has returned to the ECRUTEAK GYM to await your challenge.',
             ],
             '⚡ MYTHICAL AWAKENING',
             () => {
-              ctx.storyFlags.add('beasts_awakened');
-              ctx.storyFlags.add('EVENT_RELEASED_THE_BEASTS');
-              ctx.roamingManager.awakenBeasts();
-              eventBus.emit('roamer:updated', { roamers: ctx.roamingManager.getAllRoamers() });
-              ctx.overworldHUD.updatePokegear(ctx.roamingManager.getAllRoamers());
-              ctx.setCutsceneLocked(false);
-              ctx.saveCurrentGame();
-              ctx.overworldHUD.showToast('⚡ Raikou & Entei are now roaming Johto! Ecruteak Gym is open!');
+              const suicune = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'beasts');
+              if (suicune) { suicune.x = 10; suicune.y = 8; suicune.direction = 'DOWN'; }
+              BattleAudio.playOverworldSound('RUSTLE');
+
+              setTimeout(() => {
+                ctx.overworldHUD.openDialogue(
+                  [
+                    'With a swift, graceful leap across the subterranean pool, SUICUNE vanishes into the mist!',
+                    '🎩 EUSINE rushes down the ladder: "Did you see that?! That was SUICUNE! It acknowledged you before it departed!"',
+                    'EUSINE: "I have dedicated my life to pursuing SUICUNE. I will find it across Johto!"',
+                    'LEADER MORTY has returned to the ECRUTEAK GYM to await your challenge.',
+                  ],
+                  '⚡ MYTHICAL AWAKENING',
+                  () => {
+                    ctx.storyFlags.add('beasts_awakened');
+                    ctx.storyFlags.add('EVENT_RELEASED_THE_BEASTS');
+                    ctx.storyFlags.add('burned_tower_beasts_awakened');
+                    ctx.missionManager?.checkStoryFlags(ctx.storyFlags);
+
+                    if (ctx.npcsByMap['burned_tower_b1f']) {
+                      ctx.npcsByMap['burned_tower_b1f'] = ctx.npcsByMap['burned_tower_b1f'].filter(
+                        (n) => n.id !== 'beasts' && n.id !== 'burned_raikou' && n.id !== 'burned_entei'
+                      );
+                    }
+                    if (ctx.npcsByMap['burned_tower_1f']) {
+                      ctx.npcsByMap['burned_tower_1f'] = ctx.npcsByMap['burned_tower_1f'].filter(
+                        (n) => n.id !== 'morty_burned' && n.id !== 'eusine' && n.id !== 'silver_burned'
+                      );
+                    }
+
+                    ctx.roamingManager.awakenBeasts();
+                    eventBus.emit('roamer:updated', { roamers: ctx.roamingManager.getAllRoamers() });
+                    ctx.overworldHUD.updatePokegear(ctx.roamingManager.getAllRoamers());
+                    ctx.setCutsceneLocked(false);
+                    void ctx.saveCurrentGame();
+                    ctx.overworldHUD.showToast('⚡ Raikou & Entei are now roaming Johto! Ecruteak Gym is open!');
+                  }
+                );
+              }, 400);
             }
           );
-        }, 1200);
+        }, 1100);
       }
     );
   }
-
   /**
    * Cianwood City Suicune Beach Sighting & Mysticalman Eusine Battle
    */
@@ -583,162 +624,6 @@ export class StoryCutscenes {
    * Authentic Gen 2 Cherrygrove City Guide Gent Scripted Walking Tour
    */
   public static async runGuideGentWalkingTour(guide: GridEntity, ctx: StoryCutsceneContext): Promise<void> {
-    ctx.setCutsceneLocked(true);
-    ctx.player.isMoving = false;
-    ctx.player.progress = 0;
-
-    if (ctx.player.x === 31 && ctx.player.y === 6) {
-      ctx.player.x = 32;
-      ctx.player.y = 7;
-      ctx.player.direction = 'UP';
-    }
-
-    const walkLegSteps = async (steps: Direction[], isFinalDespawn: boolean = false) => {
-      const stepMs = (GridPhysics.BASE_TRAVERSAL_TIME * 1000) / ctx.gameClock.playerSpeed;
-      for (let s = 0; s < steps.length; s++) {
-        const stepDir = steps[s];
-        const prevGuideX = guide.x;
-        const prevGuideY = guide.y;
-        const prevGuideDir = guide.direction;
-
-        const nextGuideX = guide.x + (stepDir === 'LEFT' ? -1 : stepDir === 'RIGHT' ? 1 : 0);
-        const nextGuideY = guide.y + (stepDir === 'UP' ? -1 : stepDir === 'DOWN' ? 1 : 0);
-
-        guide.direction = stepDir;
-        guide.targetX = nextGuideX;
-        guide.targetY = nextGuideY;
-        guide.isMoving = true;
-        guide.progress = 0;
-
-        let playerTargetX = ctx.player.x;
-        let playerTargetY = ctx.player.y;
-        let playerStepDir = ctx.player.direction;
-
-        if (!isFinalDespawn) {
-          playerTargetX = prevGuideX;
-          playerTargetY = prevGuideY;
-          playerStepDir = prevGuideDir;
-          ctx.player.direction = playerStepDir;
-          ctx.player.targetX = playerTargetX;
-          ctx.player.targetY = playerTargetY;
-          ctx.player.isMoving = true;
-          ctx.player.progress = 0;
-        }
-
-        const startGuideX = guide.x;
-        const startGuideY = guide.y;
-        const startPlayerX = ctx.player.x;
-        const startPlayerY = ctx.player.y;
-
-        await new Promise<void>((resolve) => {
-          const t0 = performance.now();
-          const animate = (now: number) => {
-            const p = Math.min(1, (now - t0) / stepMs);
-            guide.progress = p;
-            guide.renderX = startGuideX + (nextGuideX - startGuideX) * p;
-            guide.renderY = startGuideY + (nextGuideY - startGuideY) * p;
-
-            if (!isFinalDespawn) {
-              ctx.player.progress = p;
-              ctx.player.renderX = startPlayerX + (playerTargetX - startPlayerX) * p;
-              ctx.player.renderY = startPlayerY + (playerTargetY - startPlayerY) * p;
-            }
-
-            if (p < 1) {
-              requestAnimationFrame(animate);
-            } else {
-              guide.x = nextGuideX;
-              guide.y = nextGuideY;
-              guide.gridX = nextGuideX;
-              guide.gridY = nextGuideY;
-              guide.renderX = nextGuideX;
-              guide.renderY = nextGuideY;
-              guide.isMoving = false;
-              guide.progress = 0;
-
-              if (!isFinalDespawn) {
-                ctx.player.x = playerTargetX;
-                ctx.player.y = playerTargetY;
-                ctx.player.gridX = playerTargetX;
-                ctx.player.gridY = playerTargetY;
-                ctx.player.renderX = playerTargetX;
-                ctx.player.renderY = playerTargetY;
-                ctx.player.isMoving = false;
-                ctx.player.progress = 0;
-              }
-              resolve();
-            }
-          };
-          requestAnimationFrame(animate);
-        });
-      }
-    };
-
-    // Leg 1: (32, 6) -> Pokemon Center
-    await walkLegSteps(GUIDE_GENT_TOUR_LEGS[0].steps);
-    guide.direction = GUIDE_GENT_TOUR_LEGS[0].guideEnd.direction;
-    ctx.player.direction = GUIDE_GENT_TOUR_LEGS[0].playerEnd.direction;
-    ctx.overworldHUD.openDialogue(
-      GUIDE_GENT_TOUR_LEGS[0].dialoguePages || [],
-      '👴 GUIDE GENT',
-      async () => {
-        // Leg 2: -> Poke Mart
-        await walkLegSteps(GUIDE_GENT_TOUR_LEGS[1].steps);
-        guide.direction = GUIDE_GENT_TOUR_LEGS[1].guideEnd.direction;
-        ctx.player.direction = GUIDE_GENT_TOUR_LEGS[1].playerEnd.direction;
-        ctx.overworldHUD.openDialogue(
-          GUIDE_GENT_TOUR_LEGS[1].dialoguePages || [],
-          '👴 GUIDE GENT',
-          async () => {
-            // Leg 3: -> Route 30
-            await walkLegSteps(GUIDE_GENT_TOUR_LEGS[2].steps);
-            guide.direction = GUIDE_GENT_TOUR_LEGS[2].guideEnd.direction;
-            ctx.player.direction = GUIDE_GENT_TOUR_LEGS[2].playerEnd.direction;
-            ctx.overworldHUD.openDialogue(
-              GUIDE_GENT_TOUR_LEGS[2].dialoguePages || [],
-              '👴 GUIDE GENT',
-              async () => {
-                // Leg 4: -> The Sea
-                await walkLegSteps(GUIDE_GENT_TOUR_LEGS[3].steps);
-                guide.direction = GUIDE_GENT_TOUR_LEGS[3].guideEnd.direction;
-                ctx.player.direction = GUIDE_GENT_TOUR_LEGS[3].playerEnd.direction;
-                ctx.overworldHUD.openDialogue(
-                  GUIDE_GENT_TOUR_LEGS[3].dialoguePages || [],
-                  '👴 GUIDE GENT',
-                  async () => {
-                    // Leg 5: -> House Porch
-                    await walkLegSteps(GUIDE_GENT_TOUR_LEGS[4].steps);
-                    guide.direction = GUIDE_GENT_TOUR_LEGS[4].guideEnd.direction;
-                    ctx.player.direction = GUIDE_GENT_TOUR_LEGS[4].playerEnd.direction;
-                    ctx.overworldHUD.openDialogue(
-                      GUIDE_GENT_TOUR_LEGS[4].dialoguePages || [],
-                      '👴 GUIDE GENT',
-                      async () => {
-                        BattleAudio.playOverworldSound('KEY_ITEM');
-                        ctx.storyFlags.add('has_map_card');
-                        ctx.storyFlags.add('GUIDE_GENT_TOUR_COMPLETED');
-                        ctx.saveCurrentGame();
-                        ctx.overworldHUD.showToast('🗺️ Received MAP CARD! Town Map unlocked in Pokégear!');
-
-                        // Leg 6: Guide Gent enters house & despawns
-                        await walkLegSteps(GUIDE_GENT_TOUR_LEGS[5].steps, true);
-                        BattleAudio.playOverworldSound('DOOR_ENTER');
-
-                        if (ctx.npcsByMap.cherrygrove_city) {
-                          ctx.npcsByMap.cherrygrove_city = ctx.npcsByMap.cherrygrove_city.filter(
-                            (n) => n.id !== 'cg_guide_gent'
-                          );
-                        }
-                        ctx.setCutsceneLocked(false);
-                      }
-                    );
-                  }
-                );
-              }
-            );
-          }
-        );
-      }
-    );
+    return OverworldTrainerSightAndTourController.runGuideGentWalkingTour(guide, ctx);
   }
 }

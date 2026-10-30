@@ -270,14 +270,14 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     burned_tower_1f: [
-      makeNpc('eusine', 10, 12, 'DOWN', 'silver', '🎩 EUSINE', 
+      makeNpc('eusine', 10, 12, 'DOWN', 'eusine', '🎩 EUSINE', 
         [
           "I'm EUSINE! I’ve spent my entire life pursuing the legendary SUICUNE across the world!",
           'It is said to represent the north wind and pure water!',
           'Morty and I have been investigating the mysterious aura pulsating beneath this floor.',
         ]
       ),
-      makeNpc('morty_burned', 12, 12, 'LEFT', 'sage', '👻 MORTY', 
+      makeNpc('morty_burned', 12, 12, 'LEFT', 'morty', '👻 MORTY', 
         [
           'ECRUTEAK GYM LEADER MORTY: The BURNED TOWER burned down 150 years ago in a lightning storm.',
           'Three nameless POKéMON perished here, but were revived by the rainbow phoenix into legends.',
@@ -302,7 +302,10 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     burned_tower_b1f: [
-      makeNpc('beasts', 10, 3, 'DOWN', 'fat_man', '⚡ LEGENDARY BEASTS', 
+      makeNpc('burned_raikou', 8, 3, 'DOWN', 'raikou', '⚡ RAIKOU',
+        ['RAIKOU stands petrified like a statue atop the stone pedestal…']
+      ),
+      makeNpc('beasts', 10, 3, 'DOWN', 'suicune', '💎 SUICUNE', 
         [
           'Three majestic beasts stand petrified in stone: RAIKOU, ENTEI, and SUICUNE!',
           'As you approach, their eyes glow with ancient celestial energy!',
@@ -311,6 +314,9 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         {
           action: 'BEASTS_AWAKENING',
         }
+      ),
+      makeNpc('burned_entei', 12, 3, 'DOWN', 'entei', '🔥 ENTEI',
+        ['ENTEI stands petrified like a statue atop the stone pedestal…']
       ),
     ],
     tin_tower_1f: [
