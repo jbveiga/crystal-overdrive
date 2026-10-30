@@ -69,7 +69,7 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   slowpoke: './assets/sprites/characters/slowpoke.png',
   farfetchd: './assets/sprites/characters/farfetchd.png',
   butterfree: './assets/sprites/characters/butterfree.png',
-  blackbelt: './assets/sprites/characters/npc_boy.png',
+  blackbelt: './assets/sprites/characters/black_belt.png',
   black_belt: './assets/sprites/characters/black_belt.png',
   boulder: './assets/sprites/characters/boulder.png',
   cooltrainer_f: './assets/sprites/characters/cooltrainer_f.png',
@@ -80,6 +80,7 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   morty: './assets/sprites/characters/morty.png',
   eusine: './assets/sprites/characters/eusine.png',
   gramps: './assets/sprites/characters/gramps.png',
+  granny: './assets/sprites/characters/granny.png',
   kimono_girl: './assets/sprites/characters/kimono_girl.png',
 };
 

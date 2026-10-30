@@ -193,7 +193,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     dance_theater: [
-      makeNpc('kimono_naoko', 2, 5, 'DOWN', 'girl', '👘 KIMONO NAOKO', 
+      makeNpc('kimono_naoko', 2, 5, 'DOWN', 'kimono_girl', '👘 KIMONO NAOKO', 
         ['My FLAREON’s flame burns bright!'],
         {
           action: 'TRAINER_BATTLE',
@@ -207,7 +207,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('kimono_sayo', 4, 5, 'DOWN', 'girl', '👘 KIMONO SAYO', 
+      makeNpc('kimono_sayo', 4, 5, 'DOWN', 'kimono_girl', '👘 KIMONO SAYO', 
         ['My ESPEON sees the dance of the sun!'],
         {
           action: 'TRAINER_BATTLE',
@@ -221,7 +221,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('kimono_zuki', 6, 5, 'DOWN', 'girl', '👘 KIMONO ZUKI', 
+      makeNpc('kimono_zuki', 6, 5, 'DOWN', 'kimono_girl', '👘 KIMONO ZUKI', 
         ['My UMBREON dances beneath the moon!'],
         {
           action: 'TRAINER_BATTLE',
@@ -235,7 +235,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('kimono_kuni', 8, 5, 'DOWN', 'girl', '👘 KIMONO KUNI', 
+      makeNpc('kimono_kuni', 8, 5, 'DOWN', 'kimono_girl', '👘 KIMONO KUNI', 
         ['My VAPOREON melts into pure water!'],
         {
           action: 'TRAINER_BATTLE',
@@ -249,7 +249,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('kimono_miki', 10, 4, 'DOWN', 'girl', '👘 KIMONO MIKI', 
+      makeNpc('kimono_miki', 10, 4, 'DOWN', 'kimono_girl', '👘 KIMONO MIKI', 
         ['My JOLTEON strikes like a crack of lightning!'],
         {
           action: 'TRAINER_BATTLE',
@@ -263,7 +263,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('surf_gentleman', 9, 10, 'UP', 'fat_man', '🎩 ADMIRER', 
+      makeNpc('surf_gentleman', 9, 10, 'UP', 'gentleman', '🎩 ADMIRER', 
         [
           'Bravo! Magnificent! You defeated all five KIMONO GIRLS with peerless grace!',
           'Take this HM03 SURF! With the FOGBADGE, your POKéMON can carry you across oceans and lakes!',
@@ -293,7 +293,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           'Until the spirits show themselves, I meditate here in solemn contemplation.',
         ]
       ),
-      makeNpc('firebreather_ned', 15, 4, 'DOWN', 'fisherman', '🔥 FIREBREATHER NED',
+      makeNpc('firebreather_ned', 15, 4, 'DOWN', 'firebreather', '🔥 FIREBREATHER NED',
         ['My soul burns hotter than the flames that scorched this tower!'],
         {
           action: 'TRAINER_BATTLE',
@@ -310,7 +310,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('firebreather_richard', 4, 12, 'RIGHT', 'fisherman', '🔥 FIREBREATHER RICHARD',
+      makeNpc('firebreather_richard', 4, 12, 'RIGHT', 'firebreather', '🔥 FIREBREATHER RICHARD',
         ['I practice fire-breathing amid these ancient charred beams!'],
         {
           action: 'TRAINER_BATTLE',

@@ -65,6 +65,7 @@ export type NpcSpriteType =
   | 'eusine'
   | 'fruit_tree'
   | 'gramps'
+  | 'granny'
   | 'kimono_girl';
 
 export interface TrainerPokemonSpec {

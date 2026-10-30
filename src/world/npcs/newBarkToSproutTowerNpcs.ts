@@ -72,13 +72,13 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       makeNpc('r29_fisher', 25, 3, 'UP', 'fisherman', '🎣 FISHER', [
         'I wanted to take a break, so I saved to record my progress.',
       ]),
-      makeNpc('r29_gate_officer', 27, 1, 'DOWN', 'teacher', '👮 GATE OFFICER', [
+      makeNpc('r29_gate_officer', 26, 2, 'DOWN', 'officer', '👮 GATE OFFICER', [
         'OFFICER: Hold on, rookie!',
         'The mountain path leading up to ROUTE 46 is steep and rugged.',
         "You can't climb up those jagged cliff ledges, and the mountain Pokémon up there are fierce!",
         'Get some more training under your belt before heading into the northern ridges!',
       ]),
-      makeNpc('tuscany_of_tuesday', 29, 12, 'DOWN', 'girl', '🎀 TUSCANY OF TUESDAY', 
+      makeNpc('tuscany_of_tuesday', 29, 12, 'DOWN', 'lass', '🎀 TUSCANY OF TUESDAY', 
         [
           "TUSCANY: Yahoo! I'm TUSCANY of Tuesday! Nice to meet you!",
           "Take this PINK BOW! It strengthens NORMAL-type moves!",

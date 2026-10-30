@@ -142,7 +142,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'LANCE_LAKE_EVENT' }
       ),
-      makeNpc('wesley_of_wednesday', 8, 18, 'DOWN', 'boy', '🥋 WESLEY OF WEDNESDAY', 
+      makeNpc('wesley_of_wednesday', 8, 18, 'DOWN', 'black_belt', '🥋 WESLEY OF WEDNESDAY', 
         [
           "WESLEY: Yo! I'm WESLEY of Wednesday! You must train diligently!",
           "Here's a BLACK BELT! It boosts the power of FIGHTING-type moves!",
@@ -159,7 +159,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('mahogany_rage_candy_bar_salesman', 19, 8, 'DOWN', 'pokefan_m', '🍬 RAGECANDYBAR SALESMAN', [
         'While visiting MAHOGANY TOWN, try a delicious RAGECANDYBAR!',
       ], { action: 'MAHOGANY_RAGECANDYBAR_SALESMAN' }),
-      makeNpc('mahogany_town_rocket_1', 15, 13, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
+      makeNpc('mahogany_town_rocket_1', 16, 13, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
         "TEAM ROCKET: What are you looking at? Mind your own business, brat!",
       ]),
     ],
@@ -236,7 +236,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     blackthorn_city: [
-      makeNpc('santos_of_saturday', 16, 16, 'DOWN', 'boy', '🏖️ SANTOS OF SATURDAY', 
+      makeNpc('santos_of_saturday', 16, 16, 'DOWN', 'pokefan_m', '🏖️ SANTOS OF SATURDAY', 
         [
           "SANTOS: It's Saturday! I'm SANTOS of Saturday! Good to see you, trainer!",
           "Take this SOFT SAND! It boosts the power of GROUND-type moves!",
@@ -394,7 +394,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('indigo_plateau_clerk', 11, 7, 'DOWN', 'clerk', '🏪 MART CLERK', [
         'Welcome! Stock up on medicine and ULTRA BALLS before challenging the ELITE FOUR!',
       ], { action: 'OPEN_MART', talkAcrossCounter: true }),
-      makeNpc('indigo_teleport_guy', 1, 9, 'DOWN', 'elder', '👴 TELEPORT GRAMPS', [
+      makeNpc('indigo_teleport_guy', 1, 9, 'DOWN', 'gramps', '👴 TELEPORT GRAMPS', [
         'Ah! You are challenging the ELITE FOUR? If you need to train some more, my ABRA can TELEPORT you home to NEW BARK TOWN!',
       ], { action: 'INDIGO_TELEPORT_EVENT' }),
       makeNpc('indigo_teleport_abra', 0, 9, 'DOWN', 'psychic', '🔮 ABRA', [
