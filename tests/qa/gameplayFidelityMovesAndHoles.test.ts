@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import { PokemonFactory } from '../../src/battle/PokemonFactory';
+import { EvolutionManager } from '../../src/world/EvolutionManager';
 import { executeMove } from '../../src/battle/state/BattleMoveAndItemExecutor';
 import { isEcruteakGymSafeTile, ECRUTEAK_GYM_SAFE_SET } from '../../src/world/ecruteakGymMaze';
 import { GridPhysics, GridEntity } from '../../src/world/GridPhysics';
@@ -160,44 +161,45 @@ describe('TICKET-GAMEPLAY-FIDELITY-01: Moves, Evolutions, Holes, Ecruteak Gym & 
   });
 
   // =========================================================================
-  // 2. Pre-Evolution Lineage & Pokédex Caught Persistence
+  // 2. Strict Evolution History for Pokédex Caught Registration
   // =========================================================================
-  describe('2. Evolution & Lineage Caught Status Persistence', () => {
-    it('resolves full pre-evolution chain for multi-stage evolutions', () => {
-      const typhlosionLineage = PokemonFactory.getSpeciesLineageIds('typhlosion');
-      expect(typhlosionLineage).toContain('typhlosion');
-      expect(typhlosionLineage).toContain('quilava');
-      expect(typhlosionLineage).toContain('cyndaquil');
+  describe('2. Strict Evolution History for Pokédex Caught Registration', () => {
+    it('registers pre-evolutions as caught ONLY when actually evolved through EvolutionManager', () => {
+      // 1. Player catches a Geodude
+      const geodude = PokemonFactory.create('geodude', 10);
+      expect(PokemonFactory.getOwnedAndEvolvedSpeciesIds(geodude)).toEqual(['geodude']);
 
-      const butterfreeLineage = PokemonFactory.getSpeciesLineageIds('butterfree');
-      expect(butterfreeLineage).toEqual(['butterfree', 'metapod', 'caterpie']);
+      // 2. Player evolves Geodude into Graveler
+      EvolutionManager.executeEvolution(geodude, 'graveler');
+      expect(geodude.speciesId).toBe('graveler');
+      expect(geodude.previousSpeciesIds).toEqual(['geodude']);
+      expect(new Set(PokemonFactory.getOwnedAndEvolvedSpeciesIds(geodude))).toEqual(new Set(['geodude', 'graveler']));
 
-      const singleStage = PokemonFactory.getSpeciesLineageIds('miltank');
-      expect(singleStage).toEqual(['miltank']);
+      // 3. Player evolves Graveler into Golem
+      EvolutionManager.executeEvolution(geodude, 'golem');
+      expect(geodude.speciesId).toBe('golem');
+      expect(geodude.previousSpeciesIds).toEqual(['geodude', 'graveler']);
+      const allOwned = new Set(PokemonFactory.getOwnedAndEvolvedSpeciesIds(geodude));
+      expect(allOwned.has('geodude')).toBe(true);
+      expect(allOwned.has('graveler')).toBe(true);
+      expect(allOwned.has('golem')).toBe(true);
     });
 
-    it('ensures evolved party members preserve pre-evolution in caught species calculations', () => {
-      const evolvedTeam = [
-        PokemonFactory.create('feraligatr', 36),
-        PokemonFactory.create('ampharos', 32),
-      ];
+    it('does NOT register pre-evolution chain if player directly catches an evolved Pokémon (e.g. wild Golem)', () => {
+      // Player catches an already-evolved Golem in the wild
+      const wildGolem = PokemonFactory.create('golem', 45);
 
-      // Simulated getCaughtSpeciesSet calculation from main.ts
-      const caughtSet = new Set<string>();
-      for (const p of evolvedTeam) {
-        for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
-          caughtSet.add(id);
-        }
-      }
+      // Verify wild Golem has no prior evolution history under the player
+      expect(wildGolem.previousSpeciesIds).toBeUndefined();
 
-      // Check all stages are marked caught
-      expect(caughtSet.has('feraligatr')).toBe(true);
-      expect(caughtSet.has('croconaw')).toBe(true);
-      expect(caughtSet.has('totodile')).toBe(true);
+      const registeredCaught = PokemonFactory.getOwnedAndEvolvedSpeciesIds(wildGolem);
+      expect(registeredCaught).toEqual(['golem']);
 
-      expect(caughtSet.has('ampharos')).toBe(true);
-      expect(caughtSet.has('flaaffy')).toBe(true);
-      expect(caughtSet.has('mareep')).toBe(true);
+      // Explicitly assert that Geodude and Graveler are NOT marked as caught
+      const caughtSet = new Set(registeredCaught);
+      expect(caughtSet.has('golem')).toBe(true);
+      expect(caughtSet.has('geodude')).toBe(false);
+      expect(caughtSet.has('graveler')).toBe(false);
     });
   });
 

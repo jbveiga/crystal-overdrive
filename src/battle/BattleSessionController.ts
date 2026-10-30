@@ -87,12 +87,12 @@ export class BattleSessionController {
 
     const caughtSpeciesIds = new Set<string>();
     for (const p of ctx.playerParty) {
-      for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
+      for (const id of PokemonFactory.getOwnedAndEvolvedSpeciesIds(p)) {
         caughtSpeciesIds.add(id);
       }
     }
     for (const p of ctx.playerBox) {
-      for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
+      for (const id of PokemonFactory.getOwnedAndEvolvedSpeciesIds(p)) {
         caughtSpeciesIds.add(id);
       }
     }

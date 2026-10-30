@@ -58,6 +58,7 @@ export interface SaveData {
   defeatedTrainers: string[];
   storyFlags?: string[];
   seenSpecies?: string[];
+  caughtSpecies?: string[];
   options?: GameOptions;
   missions?: Record<string, SerializedMissionState>;
   collectedItems?: string[];
@@ -558,7 +559,7 @@ export class SaveManager {
       };
       defeatedTrainers: Set<string>;
       storyFlags: Set<string>;
-      seenSpecies: Set<string>;
+      seenSpecies: Set<string>; caughtSpecies?: Set<string>;
       overworldItemManager: any;
       missionManager: any;
       gameClock: any;
@@ -591,6 +592,7 @@ export class SaveManager {
     existingSave.defeatedTrainers?.forEach((t) => state.defeatedTrainers.add(t));
     existingSave.storyFlags?.forEach((f) => state.storyFlags.add(f));
     existingSave.seenSpecies?.forEach((s) => state.seenSpecies.add(s));
+    if (state.caughtSpecies) existingSave.caughtSpecies?.forEach((s) => state.caughtSpecies!.add(s));
     state.playerParty.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
     state.playerBox.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
 
@@ -683,6 +685,7 @@ export class SaveManager {
       defeatedTrainers,
       storyFlags,
       seenSpecies,
+      caughtSpecies,
       overworldItemManager,
       gameOptions,
       missionManager,
@@ -733,6 +736,7 @@ export class SaveManager {
       harvestedFruitTrees: overworldItemManager.getHarvestedTreeIds(),
       fruitTreePicks: overworldItemManager.getFruitTreePicksRecord(),
       seenSpecies: Array.from(seenSpecies),
+      caughtSpecies: caughtSpecies ? Array.from(caughtSpecies) : undefined,
       options: normalizedOpts,
       missions: missionManager.serialize(),
       dayCare: dayCareManager?.getState(),

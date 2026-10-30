@@ -91,6 +91,7 @@ export interface PokemonInstance {
   ivs?: Partial<BaseStats>;
   evs?: Partial<BaseStats>;
   nature?: string;
+  previousSpeciesIds?: string[];
 }
 
 export type OddEggCandidate = 'pichu' | 'cleffa' | 'igglybuff' | 'tyrogue' | 'smoochum' | 'elekid' | 'magby';

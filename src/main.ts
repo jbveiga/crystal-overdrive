@@ -75,7 +75,7 @@ async function bootstrap() {
   let isCutsceneLocked = false, playTimeSeconds = 0, playerName = 'CHRIS', rivalName = 'SILVER';
   let playerGender: PlayerGender = 'BOY', initialMapId = 'players_house_2f', initialPlayerX = 7, initialPlayerY = 1, initialPlayerDir: Direction = 'DOWN';
   let playerParty: PokemonInstance[] = [], playerBox: PokemonInstance[] = [];
-  const defeatedTrainers = new Set<string>(), storyFlags = new TrackedStoryFlagSet(), seenSpecies = new Set<string>(), activeNpcCache = new ActiveNpcCache();
+  const defeatedTrainers = new Set<string>(), storyFlags = new TrackedStoryFlagSet(), seenSpecies = new Set<string>(), caughtSpecies = new Set<string>(), activeNpcCache = new ActiveNpcCache();
   const audioManager = new AudioManager(), gameClock = new GameClock(), saveManager = new SaveManager();
   const existingSave = await saveManager.loadGame();
 
@@ -102,7 +102,7 @@ async function bootstrap() {
     const playTimeBox = { val: playTimeSeconds }, playerNameBox = { val: playerName }, playerGenderBox = { val: playerGender }, rivalNameBox = { val: rivalName };
     const loc = SaveManager.hydrateGameState(existingSave, {
       playTimeSeconds: playTimeBox, playerName: playerNameBox, playerGender: playerGenderBox, rivalName: rivalNameBox,
-      playerParty, playerBox, gameOptions, inventory, defeatedTrainers, storyFlags, seenSpecies, overworldItemManager,
+      playerParty, playerBox, gameOptions, inventory, defeatedTrainers, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
       missionManager, gameClock, roamingManager,
     });
     playTimeSeconds = playTimeBox.val; playerName = playerNameBox.val; playerGender = playerGenderBox.val; rivalName = rivalNameBox.val;
@@ -142,14 +142,14 @@ async function bootstrap() {
   const detectChosenStarterSpecies = () => OverworldTrainerSightAndTourController.detectChosenStarterSpecies(storyFlags, playerParty, playerBox, seenSpecies);
   const healPlayerParty = (playSound: boolean = true) => OverworldTrainerSightAndTourController.healParty(playerParty, playSound);
   const getCaughtSpeciesSet = () => {
-    const allIds = new Set<string>();
+    const allIds = new Set<string>(caughtSpecies);
     for (const p of playerParty) {
-      for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
+      for (const id of PokemonFactory.getOwnedAndEvolvedSpeciesIds(p)) {
         allIds.add(id);
       }
     }
     for (const p of boxManager.flatten()) {
-      for (const id of PokemonFactory.getSpeciesLineageIds(p.speciesId)) {
+      for (const id of PokemonFactory.getOwnedAndEvolvedSpeciesIds(p)) {
         allIds.add(id);
       }
     }
@@ -217,7 +217,7 @@ async function bootstrap() {
       player: { x: player.x, y: player.y, direction: player.direction },
       mapId: mapManager.getCurrentMap()?.id || 'new_bark_town',
       gameClock, inventory, playerParty, boxManager, roamingManager,
-      defeatedTrainers, storyFlags, seenSpecies, overworldItemManager,
+      defeatedTrainers, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
       gameOptions, missionManager, dayCareManager, kurtCraftingManager, bugContestManager,
     });
     await saveManager.saveGame(saveData);
@@ -472,7 +472,7 @@ async function bootstrap() {
       inventory.badges = [];
       defeatedTrainers.clear();
       storyFlags.clear();
-      seenSpecies.clear();
+      seenSpecies.clear(); caughtSpecies.clear();
       rivalName = 'SILVER';
       boxManager.getState().boxes.forEach((b) => b.pokemon.fill(null));
       boxManager.changeBox(0);

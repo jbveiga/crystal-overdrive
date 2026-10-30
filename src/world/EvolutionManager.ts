@@ -310,6 +310,15 @@ export class EvolutionManager {
 
     const newNickname = wasDefaultName ? targetSpecies.name : pokemon.nickname;
 
+    // Record prior evolutionary stage in instance history
+    const priorSpeciesId = pokemon.speciesId.toLowerCase().trim();
+    if (!pokemon.previousSpeciesIds) {
+      pokemon.previousSpeciesIds = [];
+    }
+    if (!pokemon.previousSpeciesIds.includes(priorSpeciesId)) {
+      pokemon.previousSpeciesIds.push(priorSpeciesId);
+    }
+
     // Apply transformation
     pokemon.speciesId = targetSpecies.id;
     pokemon.nickname = newNickname;

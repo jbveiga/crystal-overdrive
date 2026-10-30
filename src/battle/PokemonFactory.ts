@@ -44,6 +44,26 @@ export class PokemonFactory {
    * Resolves the full evolutionary lineage of a species (current species and all ancestral pre-evolutions)
    * using Showdown Dex data. Guarantees that evolving never loses Pokédex caught status for prior stages.
    */
+  /**
+   * Returns all species IDs that this specific instance has ever belonged to (its current species
+   * and any previous stages recorded in previousSpeciesIds during actual evolution events).
+   * Does NOT grant pre-evolutions for Pokémon caught directly in their evolved forms (e.g. wild Golem).
+   */
+  public static getOwnedAndEvolvedSpeciesIds(pokemon: PokemonInstance): string[] {
+    const ids = new Set<string>();
+    if (pokemon.speciesId) {
+      ids.add(pokemon.speciesId.toLowerCase().trim());
+    }
+    if (pokemon.previousSpeciesIds) {
+      for (const prevId of pokemon.previousSpeciesIds) {
+        if (prevId) {
+          ids.add(prevId.toLowerCase().trim());
+        }
+      }
+    }
+    return Array.from(ids);
+  }
+
   public static getSpeciesLineageIds(speciesId: string): string[] {
     const lineage = new Set<string>();
     let currentId: string | undefined = speciesId.toLowerCase().trim();
