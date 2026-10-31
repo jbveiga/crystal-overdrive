@@ -693,39 +693,25 @@ export class OverworldNpcAndItemSprites {
 
   public static enqueueBaselineCharacterSprites(
     manifest: AssetManifestQueue,
-    onLoaded: (type: 'gold' | 'kris' | 'boy', frames: CharacterFrames) => void
+    onLoaded: (type: 'gold' | 'kris' | 'boy' | 'lapras', frames: CharacterFrames) => void
   ): void {
-    manifest.enqueue({
-      id: 'character_sprite:gold',
-      label: 'Loading Gold sprite sheet',
-      category: 'CHARACTER_SPRITE',
-      execute: async () => {
-        const tex = await Assets.load<Texture>('./assets/sprites/characters/gold_walk.png');
-        tex.source.scaleMode = 'nearest';
-        onLoaded('gold', OverworldNpcAndItemSprites.extractCharacterFrames(tex));
-      },
-    });
-
-    manifest.enqueue({
-      id: 'character_sprite:kris',
-      label: 'Loading Kris sprite sheet',
-      category: 'CHARACTER_SPRITE',
-      execute: async () => {
-        const tex = await Assets.load<Texture>('./assets/sprites/characters/kris_walk.png');
-        tex.source.scaleMode = 'nearest';
-        onLoaded('kris', OverworldNpcAndItemSprites.extractCharacterFrames(tex));
-      },
-    });
-
-    manifest.enqueue({
-      id: 'character_sprite:npc_boy',
-      label: 'Loading default boy NPC sprite sheet',
-      category: 'CHARACTER_SPRITE',
-      execute: async () => {
-        const tex = await Assets.load<Texture>(NPC_SHEET_PATHS.boy);
-        tex.source.scaleMode = 'nearest';
-        onLoaded('boy', OverworldNpcAndItemSprites.extractCharacterFrames(tex));
-      },
-    });
+    const entries: Array<{ id: string; type: 'gold' | 'kris' | 'boy' | 'lapras'; path: string }> = [
+      { id: 'character_sprite:gold', type: 'gold', path: './assets/sprites/characters/gold_walk.png' },
+      { id: 'character_sprite:kris', type: 'kris', path: './assets/sprites/characters/kris_walk.png' },
+      { id: 'character_sprite:npc_boy', type: 'boy', path: NPC_SHEET_PATHS.boy },
+      { id: 'character_sprite:lapras', type: 'lapras', path: NPC_SHEET_PATHS.lapras },
+    ];
+    for (const entry of entries) {
+      manifest.enqueue({
+        id: entry.id,
+        label: `Loading ${entry.type} sprite sheet`,
+        category: 'CHARACTER_SPRITE',
+        execute: async () => {
+          const tex = await Assets.load<Texture>(entry.path);
+          tex.source.scaleMode = 'nearest';
+          onLoaded(entry.type, OverworldNpcAndItemSprites.extractCharacterFrames(tex));
+        },
+      });
+    }
   }
 }

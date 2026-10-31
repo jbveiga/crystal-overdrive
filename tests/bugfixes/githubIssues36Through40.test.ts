@@ -103,4 +103,22 @@ describe('GitHub Issues #36–#40 & Pokémon Crystal Roaming Beasts Verification
     expect(moomoo).toBeDefined();
     expect(moomoo?.spriteType).toBe('miltank');
   });
+
+  it('Issue #41: switches player overworld sprite to Surfing Lapras mount when on water tiles (collision=3) such as Olivine City (8, 27)', async () => {
+    const { OverworldRenderer } = await import('../../src/render/OverworldRenderer');
+    const olivinePath = path.resolve(__dirname, '../../public/assets/data/maps/olivine_city.json');
+    const olivineMap = JSON.parse(fs.readFileSync(olivinePath, 'utf8'));
+
+    // Coordinate (8, 27) in olivine_city is a water tile (collision = 3)
+    expect(olivineMap.collisionGrid[27 * olivineMap.width + 8]).toBe(3);
+
+    const renderer: any = Object.create(OverworldRenderer.prototype);
+    renderer.currentRenderedMap = olivineMap;
+
+    const surfingPlayer: any = { renderX: 8, renderY: 27, isJumping: false };
+    const landPlayer: any = { renderX: 8, renderY: 20, isJumping: false };
+
+    expect(renderer.isEntityOnWater(surfingPlayer)).toBe(true);
+    expect(renderer.isEntityOnWater(landPlayer)).toBe(false);
+  });
 });

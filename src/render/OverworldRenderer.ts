@@ -163,15 +163,10 @@ export class OverworldRenderer {
     }
 
     OverworldNpcAndItemSprites.enqueueBaselineCharacterSprites(manifest, (type, frames) => {
-      if (type === 'gold') {
-        this.goldFrames = frames;
-        this.playerFrames = frames;
-      } else if (type === 'kris') {
-        this.krisFrames = frames;
-        this.npcFrames.set('kris', frames);
-      } else if (type === 'boy') {
-        this.npcFrames.set('boy', frames);
-      }
+      if (type === 'gold') { this.goldFrames = frames; this.playerFrames = frames; }
+      else if (type === 'kris') { this.krisFrames = frames; this.npcFrames.set('kris', frames); }
+      else if (type === 'boy') { this.npcFrames.set('boy', frames); }
+      else if (type === 'lapras') { this.npcFrames.set('lapras', frames); }
     });
 
     manifest.enqueue({
@@ -633,10 +628,17 @@ export class OverworldRenderer {
   private isEntityOnTallGrass(entity: GridEntity): boolean {
     const map = this.currentRenderedMap;
     if (!map || entity.isJumping) return false;
-    const tx = Math.round(entity.renderX);
-    const ty = Math.round(entity.renderY);
+    const tx = Math.round(entity.renderX), ty = Math.round(entity.renderY);
     if (tx < 0 || tx >= map.width || ty < 0 || ty >= map.height) return false;
     return map.collisionGrid[ty * map.width + tx] === 2;
+  }
+
+  public isEntityOnWater(entity: GridEntity): boolean {
+    const map = this.currentRenderedMap;
+    if (!map || entity.isJumping) return false;
+    const tx = Math.round(entity.renderX), ty = Math.round(entity.renderY);
+    if (tx < 0 || tx >= map.width || ty < 0 || ty >= map.height) return false;
+    return map.collisionGrid[ty * map.width + tx] === 3;
   }
 
   public update(player: GridEntity, npcs: GridEntity[] = [], dtWorld: number = 0): void {
@@ -659,8 +661,10 @@ export class OverworldRenderer {
     }
 
     this.playerSprite.position.set(playerPxX, playerPxY - jumpArcOffset);
+    const activePlayerFrames =
+      (this.isEntityOnWater(player) && this.npcFrames.get('lapras')) || this.playerFrames;
     const playerTex = OverworldNpcAndItemSprites.getFrameForEntity(
-      this.playerFrames,
+      activePlayerFrames,
       player.direction,
       player.isMoving,
       player.progress

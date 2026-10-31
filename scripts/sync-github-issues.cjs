@@ -202,6 +202,12 @@ const { ISSUE_RESOLUTIONS } = (() => {
 - **Root Cause**: \`moomoo_miltank\` in \`route_39_barn\` previously used a human/placeholder sprite mapping before \`miltank.png\` was dedicated in \`NPC_SHEET_PATHS\`.
 - **Fix**:
   1. Assigned \`spriteType: 'miltank'\` to \`moomoo_miltank\` in \`src/world/npcs/ecruteakToRoute39Npcs.ts\` and mapped \`NPC_SHEET_PATHS.miltank\` to the dedicated 144x32 \`public/assets/sprites/characters/miltank.png\` sprite sheet.`,
+      41: `### Resolution Details for Issue #41
+- **Root Cause**: \`OverworldRenderer.update()\` in \`src/render/OverworldRenderer.ts\` always rendered \`this.playerSprite\` using the walking trainer sprite (\`this.playerFrames\`), even when the player was surfing on water tiles (\`collisionGrid === 3\`, such as \`olivine_city\` at \`8, 27\`), making the player appear to walk upright on top of water.
+- **Fix**:
+  1. Preloaded the 144x32 Surfing Lapras sprite sheet (\`NPC_SHEET_PATHS.lapras\`) in \`OverworldNpcAndItemSprites.enqueueBaselineCharacterSprites\`.
+  2. Added \`OverworldRenderer.isEntityOnWater(entity)\` to detect when an entity is positioned on a water tile (\`collisionGrid[ty * width + tx] === 3\`).
+  3. Updated \`OverworldRenderer.update()\` to automatically switch the player's overworld sprite to the Surfing Lapras mount (\`lapras\`) whenever surfing on water tiles and revert back to the walking trainer sprite on land.`,
     },
   };
 })();
