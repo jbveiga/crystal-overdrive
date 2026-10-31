@@ -208,6 +208,27 @@ const { ISSUE_RESOLUTIONS } = (() => {
   1. Preloaded the 144x32 Surfing Lapras sprite sheet (\`NPC_SHEET_PATHS.lapras\`) in \`OverworldNpcAndItemSprites.enqueueBaselineCharacterSprites\`.
   2. Added \`OverworldRenderer.isEntityOnWater(entity)\` to detect when an entity is positioned on a water tile (\`collisionGrid[ty * width + tx] === 3\`).
   3. Updated \`OverworldRenderer.update()\` to automatically switch the player's overworld sprite to the Surfing Lapras mount (\`lapras\`) whenever surfing on water tiles and revert back to the walking trainer sprite on land.`,
+      42: `### Resolution Details for Issue #42
+- **Root Cause**: \`public/assets/sprites/characters/miltank.png\` was previously populated with a duplicate of \`slowpoke.png\`, causing the 4 Miltanks in the Route 39 pasture (\`route_39_miltank_1..4\`) to render with Slowpoke's overworld sprite.
+- **Fix**:
+  1. Generated an authentic 144x32 9-frame RGBA Miltank overworld sprite sheet at \`public/assets/sprites/characters/miltank.png\` (featuring Miltank's signature pink coat, horns, floppy dark ears, and cream belly with transparent background).
+  2. Added automated regression verification in \`tests/bugfixes/githubIssues36Through40.test.ts\` confirming \`miltank.png\` is distinct from \`slowpoke.png\`.`,
+      43: `### Resolution Details for Issue #43
+- **Root Cause**: \`moomoo_miltank\` in \`route_39_barn\` referenced \`public/assets/sprites/characters/miltank.png\`, which had been populated with Slowpoke's sprite data.
+- **Fix**:
+  1. Replaced \`public/assets/sprites/characters/miltank.png\` with the authentic 144x32 RGBA Miltank overworld sprite sheet so Moomoo in Route 39 Barn and the Route 39 pasture Miltanks render accurately.`,
+      44: `### Resolution Details for Issue #44
+- **Root Cause**: \`public/assets/sprites/characters/lapras.png\` had two defects from its 2-bit GBC conversion of \`gfx/sprites/surf.png\`:
+  1. Its 6 source frames (\`0: Down stand\`, \`1: Up stand\`, \`2: Side stand\`, \`3: Down step\`, \`4: Up step\`, \`5: Side step\`) were mapped to the wrong 9-frame indices (\`upStand\` at index 1 was mapped to \`Down\`, \`sideStand\` at index 2 was mapped to \`Up\`, and \`downWalk1/2\` at indices 3–4 were mapped to \`Side\`), causing the Lapras sprite to appear to spin between directions when surfing or facing UP/LEFT/RIGHT.
+  2. Its GBC palette was inverted, rendering an opaque dark square background (\`rgba(24, 24, 24, 255)\`) around Lapras on water.
+- **Fix**:
+  1. Rebuilt \`public/assets/sprites/characters/lapras.png\` from canonical \`pokecrystal\` \`gfx/sprites/surf.png\` with the proper 9-frame directional mapping (\`0: Down stand\`, \`1: Up stand\`, \`2: Side stand\`, \`3–4: Down swim\`, \`5–6: Up swim\`, \`7–8: Side swim\`), ocean-blue body palette, and 100% transparent background.
+  2. Added pixel-level and directional frame verification in \`tests/bugfixes/githubIssues36Through40.test.ts\`.`,
+      45: `### Resolution Details for Issue #45
+- **Root Cause**: In \`src/ui/styles/evolutionStyles.ts\`, \`.nk-evo-celebration-card\` (\`#evo-celebration-card\`) was styled with \`position: absolute; right: 24px; top: 50%; transform: translateY(-50%); z-index: 5;\`. On mobile and narrow viewports (such as \`443x864\`), this positioned the "EVOLUTION COMPLETE" stat card directly on top of the central \`.nk-evo-sprite-pedestal\`, covering the newly evolved Pokémon sprite during the \`TRIUMPH\` phase.
+- **Fix**:
+  1. Changed \`.nk-evo-celebration-card\` in \`src/ui/styles/evolutionStyles.ts\` from \`position: absolute\` to in-flow \`position: relative\` inside \`.nk-evo-arena\`.
+  2. Added responsive flex layout rules for \`.nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-arena\` (side-by-side row on desktop \`>= 768px\`, and clean vertical column stacking with compact pedestal sizing on mobile \`<= 767px\`), ensuring the evolved Pokémon sprite and celebration card never overlap.`,
     },
   };
 })();

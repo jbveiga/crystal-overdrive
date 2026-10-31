@@ -270,13 +270,22 @@ export function injectNeoKantoEvolutionStyles(): void {
       border: 1px dashed #334155;
     }
 
+    .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-arena {
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 28px;
+    }
+
     .nk-evo-celebration-card {
-      position: absolute;
-      right: 24px;
-      top: 50%;
-      transform: translateY(-50%);
+      position: relative;
+      right: auto;
+      top: auto;
+      transform: none;
       width: 280px;
-      background: rgba(19, 28, 49, 0.92);
+      max-width: 100%;
+      flex-shrink: 0;
+      background: rgba(19, 28, 49, 0.94);
       border: 2px solid #334155;
       box-shadow: 4px 4px 0px #050811;
       padding: 16px;
@@ -440,7 +449,7 @@ export function injectNeoKantoEvolutionStyles(): void {
     }
 
     @keyframes nkEvoCaretBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-    @keyframes nkEvoCardSlideIn { 0% { opacity: 0; transform: translateY(-40%) translateX(20px); } 100% { opacity: 1; transform: translateY(-50%) translateX(0); } }
+    @keyframes nkEvoCardSlideIn { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
     @keyframes nkEvoTriumphFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
     @keyframes nkEvoFlashStrobe { 0% { opacity: 0.55; } 100% { opacity: 0.98; } }
     @keyframes nkEvoBasePulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.7) drop-shadow(0 0 16px #FFFFFF); } }
@@ -452,6 +461,27 @@ export function injectNeoKantoEvolutionStyles(): void {
       .nk-evo-stage {
         padding: 12px;
         max-height: none;
+      }
+      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-arena {
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+      }
+      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite-pedestal {
+        width: 200px;
+        height: 185px;
+      }
+      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite {
+        width: 140px;
+        height: 140px;
+      }
+      .nk-evo-celebration-card {
+        width: min(100%, 340px);
+        padding: 12px;
+        gap: 8px;
+      }
+      .nk-evo-celebration-top {
+        margin-bottom: 4px;
       }
       .nk-evo-stat-grid {
         grid-template-columns: repeat(3, 1fr);

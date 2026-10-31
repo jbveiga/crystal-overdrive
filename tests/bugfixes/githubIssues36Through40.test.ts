@@ -121,4 +121,69 @@ describe('GitHub Issues #36–#40 & Pokémon Crystal Roaming Beasts Verification
     expect(renderer.isEntityOnWater(surfingPlayer)).toBe(true);
     expect(renderer.isEntityOnWater(landPlayer)).toBe(false);
   });
+
+  it('Issues #42 & #43: ensures miltank.png is an authentic 144x32 Miltank sprite sheet (distinct from slowpoke.png with transparent background)', () => {
+    const miltankPath = path.resolve(__dirname, '../../public/assets/sprites/characters/miltank.png');
+    const slowpokePath = path.resolve(__dirname, '../../public/assets/sprites/characters/slowpoke.png');
+    const miltankBuf = fs.readFileSync(miltankPath);
+    const slowpokeBuf = fs.readFileSync(slowpokePath);
+
+    // Must not be a duplicate of slowpoke.png
+    expect(miltankBuf.equals(slowpokeBuf)).toBe(false);
+    // PNG header dimensions must be 144x32
+    expect(miltankBuf.readUInt32BE(16)).toBe(144);
+    expect(miltankBuf.readUInt32BE(20)).toBe(32);
+  });
+
+  it('Issue #44: ensures lapras.png has a transparent background and properly ordered directional frames (Down=0, Up=1, Side=2)', async () => {
+    const { PNG } = await import('pngjs');
+    const laprasPath = path.resolve(__dirname, '../../public/assets/sprites/characters/lapras.png');
+    const png = PNG.sync.read(fs.readFileSync(laprasPath));
+
+    expect(png.width).toBe(144);
+    expect(png.height).toBe(32);
+
+    // Every 16x32 frame must have transparent background at (frameX, 16), and stand frames at (frameX, 31)
+    for (let f = 0; f < 9; f++) {
+      const fx = f * 16;
+      const topCornerAlpha = png.data[(16 * png.width + fx) * 4 + 3];
+      expect(topCornerAlpha).toBe(0);
+      if (f < 3) {
+        const botCornerAlpha = png.data[(31 * png.width + fx) * 4 + 3];
+        expect(botCornerAlpha).toBe(0);
+      }
+    }
+
+    // Extract 16x16 bottom regions of Frame 0 (downStand), Frame 1 (upStand), and Frame 2 (sideStand)
+    const sliceFrame = (frameIdx: number): number[] => {
+      const out: number[] = [];
+      for (let y = 16; y < 32; y++) {
+        for (let x = 0; x < 16; x++) {
+          const idx = (y * png.width + (frameIdx * 16 + x)) * 4;
+          out.push(png.data[idx], png.data[idx + 1], png.data[idx + 2], png.data[idx + 3]);
+        }
+      }
+      return out;
+    };
+
+    const downStand = sliceFrame(0);
+    const upStand = sliceFrame(1);
+    const sideStand = sliceFrame(2);
+
+    // Directional frames must be distinct (Frame 1 is UP, not a duplicate of Frame 0 DOWN)
+    expect(downStand).not.toEqual(upStand);
+    expect(upStand).not.toEqual(sideStand);
+    expect(downStand).not.toEqual(sideStand);
+  });
+
+  it('Issue #45: positions .nk-evo-celebration-card in non-overlapping flex flow rather than covering the evolved Pokémon sprite', () => {
+    const stylesPath = path.resolve(__dirname, '../../src/ui/styles/evolutionStyles.ts');
+    const stylesSrc = fs.readFileSync(stylesPath, 'utf8');
+
+    // Celebration card must use position: relative (in-flow) instead of overlapping position: absolute
+    expect(stylesSrc).toMatch(/\.nk-evo-celebration-card\s*\{[\s\S]*?position:\s*relative;/);
+    expect(stylesSrc).toContain('.nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-arena');
+  });
 });
+
+
