@@ -270,20 +270,29 @@ export function renderTacticalNodes({
         nodeStyle = `left: ${leftPct}%; top: ${topPct}%; width: ${size}px; height: ${size}px; min-width: ${isMobile ? '24px' : 'auto'}; min-height: ${isMobile ? '24px' : 'auto'}; background: #1E293B; border: 1.5px solid ${isVisitedLm ? '#FFD028' : '#475569'}; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.6);`;
       }
 
-      let labelPosStyle = `left: ${leftPct}%; top: calc(${topPct}% + ${Math.round(size / 2) + 3}px); transform: translateX(-50%);`;
-      if (lm.id === 'goldenrod_city' || lm.id === 'olivine_city') {
-        labelPosStyle = `left: calc(${leftPct}% - ${Math.round(size / 2) + 4}px); top: ${topPct}%; transform: translate(-100%, -50%);`;
-      } else if (lm.id === 'violet_city' || lm.id === 'blackthorn_city') {
-        labelPosStyle = `left: calc(${leftPct}% + ${Math.round(size / 2) + 4}px); top: ${topPct}%; transform: translateY(-50%);`;
+      const anchor = resolveTownMapLabelAnchor(lm.id, isPlayerHere);
+      const half = Math.round(size / 2) + 4;
+      let labelPosStyle = `left: ${leftPct}%; top: calc(${topPct}% + ${half}px); transform: translateX(-50%);`;
+      if (anchor === 'TOP') {
+        labelPosStyle = `left: ${leftPct}%; top: calc(${topPct}% - ${half}px); transform: translate(-50%, -100%);`;
+      } else if (anchor === 'LEFT') {
+        labelPosStyle = `left: calc(${leftPct}% - ${half}px); top: ${topPct}%; transform: translate(-100%, -50%);`;
+      } else if (anchor === 'RIGHT') {
+        labelPosStyle = `left: calc(${leftPct}% + ${half}px); top: ${topPct}%; transform: translateY(-50%);`;
       }
+
+      const showLabel =
+        isSelected ||
+        isCityOrTown ||
+        (activeFilter !== 'ALL' && matchesFilter);
 
       return `
         <div class="town-map-node ${isSelected ? 'selected' : ''} ${isDimmed ? 'dimmed' : ''}" data-landmark-id="${lm.id}" style="${nodeStyle}" title="${lm.name}">
           ${badgeHtml}
         </div>
         ${
-          isCityOrTown || isSelected || (matchesFilter && lm.type !== 'route')
-            ? `<div style="position: absolute; ${labelPosStyle} font-size: 9px; font-weight: 800; font-family: 'Space Mono', monospace; color: #F6F8F3; background: rgba(13, 19, 34, 0.92); padding: 1px 5px; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 3px; white-space: nowrap; pointer-events: none; z-index: 22; text-shadow: 0 1px 2px #000; box-shadow: 0 2px 4px rgba(0,0,0,0.5); opacity: ${isDimmed ? '0.22' : '1'}; transition: opacity 0.15s ease;">${lm.name.replace(/ City| Town/g, '')}</div>`
+          showLabel
+            ? `<div class="town-map-label" data-label-for="${lm.id}" data-label-anchor="${anchor}" style="position: absolute; ${labelPosStyle} font-size: 9px; font-weight: 800; font-family: 'Space Mono', monospace; color: #F6F8F3; background: rgba(13, 19, 34, 0.92); padding: 1px 5px; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 3px; white-space: nowrap; pointer-events: none; z-index: ${isSelected ? 32 : 22}; text-shadow: 0 1px 2px #000; box-shadow: 0 2px 4px rgba(0,0,0,0.5); opacity: ${isDimmed ? '0.22' : '1'}; transition: opacity 0.15s ease;">${lm.name.replace(/ City| Town/g, '')}</div>`
             : ''
         }
         ${
@@ -501,4 +510,45 @@ export function renderInspectorCard({
       </div>
     </div>
   `;
+}
+
+
+export type TownMapLabelAnchor = 'TOP' | 'BOTTOM' | 'LEFT' | 'RIGHT';
+
+const LANDMARK_LABEL_ANCHORS: Record<string, TownMapLabelAnchor> = {
+  new_bark_town: 'LEFT',
+  tohjo_falls: 'BOTTOM',
+  cherrygrove_city: 'BOTTOM',
+  violet_city: 'RIGHT',
+  sprout_tower: 'TOP',
+  ruins_of_alph: 'LEFT',
+  union_cave: 'RIGHT',
+  azalea_town: 'BOTTOM',
+  slowpoke_well: 'RIGHT',
+  ilex_forest: 'LEFT',
+  goldenrod_city: 'LEFT',
+  national_park: 'LEFT',
+  ecruteak_city: 'BOTTOM',
+  burned_tower: 'LEFT',
+  tin_tower: 'TOP',
+  olivine_city: 'LEFT',
+  whirl_islands: 'LEFT',
+  cianwood_city: 'LEFT',
+  mount_mortar: 'TOP',
+  mahogany_town: 'BOTTOM',
+  lake_of_rage: 'TOP',
+  ice_path: 'TOP',
+  blackthorn_city: 'RIGHT',
+  dragons_den: 'TOP',
+  dark_cave: 'RIGHT',
+  victory_road: 'LEFT',
+  indigo_plateau: 'TOP',
+};
+
+export function resolveTownMapLabelAnchor(landmarkId: string, isPlayerHere: boolean = false): TownMapLabelAnchor {
+  const preferred = LANDMARK_LABEL_ANCHORS[landmarkId] || 'BOTTOM';
+  if (isPlayerHere && preferred === 'TOP') {
+    return 'BOTTOM';
+  }
+  return preferred;
 }

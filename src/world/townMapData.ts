@@ -416,7 +416,7 @@ export const JOHTO_LANDMARKS: Record<string, TownMapLandmark> = {
   },
   whirl_islands: {
     id: 'whirl_islands', name: 'Whirl Islands', subtitle: 'Subterranean Maze Home of Silver Wing & Lugia',
-    gridX: 2, gridY: 8, type: 'dungeon',
+    gridX: 1, gridY: 7, type: 'dungeon',
     wildSpecies: ['zubat', 'golbat', 'seel', 'dewgong', 'krabby', 'kingler', 'lugia'],
   },
   mount_mortar: {
