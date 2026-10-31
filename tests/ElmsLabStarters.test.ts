@@ -89,7 +89,7 @@ describe('TICKET-NARRATIVE-ELMS-TABLE-POKEBALLS-01', () => {
       const sm = new SaveManager();
       await sm.saveGame(makeSave(['TM54', 'HM05', 'TM70'], ['sprout_tower_cleared']));
       const loaded = await sm.loadGame();
-      expect(loaded?.inventory.tms).toEqual(['TM54', 'HM05']);
+      expect(loaded?.inventory.tms).toEqual(['HM05', 'TM54']);
     });
 
     it('converts a lone legacy TM70 into HM05 when Sprout Tower was cleared', async () => {
