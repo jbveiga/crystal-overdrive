@@ -549,7 +549,7 @@ async function bootstrap() {
       if (missionLogUI.isOpen()) { missionLogUI.handleKeyDown(e); return; }
       if (startMenuUI.isOpen()) { startMenuUI.handleKeyDown(e); return; }
       if (!isAnyOverworldModalOpen() && !overworldHUD.isDialogueOpen() && !isCutsceneLocked && !e.repeat) {
-        if (startMenuUI.triggerShortcut(e.code, false)) e.preventDefault();
+        if (startMenuUI.handleOverworldShortcutKey(e.code, e.shiftKey)) e.preventDefault();
       }
     }
   });

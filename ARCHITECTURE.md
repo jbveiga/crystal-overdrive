@@ -184,6 +184,7 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 ---
 | `src/core/SaveStateReconciler.ts` | `core` | Save state hydration and save snapshot builder |
 | `src/ui/bag/BagTMCatalog.ts` | `ui` | Gen 2 TM01-TM50 and HM01-HM07 metadata catalog |
+| `src/ui/start-menu/StartMenuDomSetup.ts` | `ui` | Start Menu Neo-Kanto stylesheet injection, modal container creation, and drawer header HTML builder |
 
 ## 1. Executive Overview & Core Architectural Pillars
 
