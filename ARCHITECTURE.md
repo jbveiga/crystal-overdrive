@@ -48,10 +48,12 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Battle Pokeball & Switch VFX** | Parabolic Pokeball toss, switch recall, faint collapse, capture shake | `src/render/BattlePokeballAndSwitchAnimations.ts` | < 450 lines |
 | **Grid Physics & Motion** | 1x/2x/3x speed, tile collisions, ledges, trainer vision, zero-alloc loop | `src/world/GridPhysics.ts` | < 550 lines |
 | **Map Engine Facade** | Binary .blk maps, streaming, collision queries, encounter rolling | `src/world/MapManager.ts` | < 750 lines |
-| **Map Classification & Warp Rules** | Outdoor/cave/dungeon classification, carpet warps, transition contexts | `src/world/map/MapClassificationAndWarpRules.ts` | < 350 lines |
+| **Map Classification & Warp Rules** | Outdoor/cave/dungeon classification, carpet warps, transition contexts | `src/world/map/TwoPointWarpLinkRegistry.ts` | Bidirectional 2-point entrance/exit link mapping and property-preserving player teleportation |
+| `src/world/map/MapClassificationAndWarpRules.ts` | < 350 lines |
 | **Predictive Neighbor & Warp Prefetcher** | Background 1-hop cardinal & warp target preloading, NPC/sprite/tile warmup | `src/world/AdjacentMapPrefetcher.ts` | < 350 lines |
 | **Active NPC Cache** | High-speed cached NPC state mapping, talker registry, and lookup | `src/world/ActiveNpcCache.ts` | < 200 lines |
-| **Overworld Warp & Map Transition** | Async tile texture hydration, reciprocal warps, story mutations, black veil sync | `src/world/OverworldWarpAndMapTransitionController.ts` | < 650 lines |
+| **Overworld Warp & Map Transition** | Async tile texture hydration, reciprocal warps, story mutations, black veil sync | `src/world/OverworldWarpProgressionGuards.ts` | Story flag, gym lock, badge checkpoint, Elite Four, and Fast Ship door warp guards |
+| `src/world/OverworldWarpAndMapTransitionController.ts` | < 650 lines |
 | **Trainer Sight & Walking Tour** | Line-of-sight trigger, rewards, stadium duels, Guide Gent tour | `src/world/OverworldTrainerSightAndTourController.ts` | < 550 lines |
 | **Overworld Ticker & Itemfinder** | Zero-alloc ticker hot paths, player bump, neighbor NPC wander, radar sonar | `src/world/OverworldItemfinderAndNpcStepper.ts` | Itemfinder radar sweeps, step-triggered Rocket/Mahogany events, and NPC wandering step helpers |
 | `src/world/OverworldTickerCoordinator.ts` | < 600 lines |

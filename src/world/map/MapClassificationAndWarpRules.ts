@@ -144,6 +144,15 @@ export function getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): 
   if (isOutdoorMap(currentMap.id)) return null;
   if (warp.direction) return warp.direction;
 
+  // Check lateral West/East doorway thresholds first when not on the top/bottom 2-tile rows
+  // Fixes Issue #50: horizontal gatehouses (10x8) have bottom-lane warps at (0, 5) and (9, 5) where y === height - 3
+  if (warp.x <= 1 && warp.y > 1 && warp.y < currentMap.height - 2) {
+    return 'LEFT';
+  }
+  if (warp.x >= currentMap.width - 2 && warp.y > 1 && warp.y < currentMap.height - 2) {
+    return 'RIGHT';
+  }
+
   // Check cardinal boundary edge thresholds on indoor/gate maps
   if (warp.y <= 1) {
     return 'UP';
@@ -157,6 +166,7 @@ export function getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): 
   if (warp.x >= currentMap.width - 2) {
     return 'RIGHT';
   }
+
   return null;
 }
 
@@ -166,8 +176,12 @@ export function getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): 
  */
 export function isCarpetWarp(warp: WarpEvent, currentMap: MapData): boolean {
   if (isOutdoorMap(currentMap.id)) return false;
+  if ((warp.x <= 1 || warp.x >= currentMap.width - 2) && warp.y > 1 && warp.y < currentMap.height - 2) {
+    return false;
+  }
   return warp.y >= currentMap.height - 2 || (warp.y >= currentMap.height - 3 && isOutdoorMap(warp.targetMapId));
 }
+
 
 /**
  * Resolves canonical building/cave/stair transition configuration adhering to pret/pokecrystal:
