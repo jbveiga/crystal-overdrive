@@ -181,10 +181,30 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Radio Tower Quiz Modal UI** | Goldenrod Radio Tower 5-question trivia quiz, answer cards, Radio Card award | `src/ui/RadioTowerQuizUI.ts` | < 550 lines |
 | **Test Source Inspector Helper** | Reusable file inspection, recursive TS search, line counters | `tests/helpers/SourceInspector.ts` | < 100 lines |
 | **Test Mock DOM Environment** | Lightweight in-memory DOM element/document mock & container reset | `tests/helpers/MockDomEnv.ts` | < 300 lines |
+| **Save State Reconciler** | Save state hydration and save snapshot builder | `src/core/SaveStateReconciler.ts` | < 450 lines |
+| **Bag TM Catalog** | Gen 2 TM01-TM50 and HM01-HM07 metadata catalog | `src/ui/bag/BagTMCatalog.ts` | < 350 lines |
+| **Start Menu DOM Setup** | Start Menu Neo-Kanto stylesheet injection, modal container creation, and drawer header HTML builder | `src/ui/start-menu/StartMenuDomSetup.ts` | < 250 lines |
+| **Chiptune Patterns Catalog** | Authentic 8-bit chiptune synthesizer track patterns and note sequences | `src/audio/ChiptunePatternsCatalog.ts` | < 350 lines |
+| **Itemfinder & Weather Audio** | Itemfinder sonar pings, status cue synthesis, and weather audio generators | `src/audio/battle/ItemfinderAndWeatherAudio.ts` | < 300 lines |
+| **Pokemon EXP & Badge Scaling** | Level caps, badge scaling tables, and party EXP distribution calculator | `src/battle/PokemonExpAndBadgeScaling.ts` | < 250 lines |
+| **Battle Item & Residual Executor** | End-of-turn status/weather residuals and in-battle medicine/item effects | `src/battle/state/BattleItemAndResidualExecutor.ts` | < 250 lines |
+| **Double Battle Round Executor** | Simultaneous 2v2 turn order, spread moves, and partner targeting | `src/battle/state/DoubleBattleRoundExecutor.ts` | < 250 lines |
+| **Overworld Item Ball & Tree Sprites** | Overworld item ball, fruit tree, and interactive field sprite renderers | `src/render/OverworldItemBallAndTreeSprites.ts` | < 300 lines |
+| **Overworld Tile Layer Renderer** | Metatile ground/top layer rendering, water animation, and border stitching | `src/render/OverworldTileLayerRenderer.ts` | < 350 lines |
+| **Guide Gent Tour Controller** | Cherrygrove City Guide Gent walking tour choreography and Map Card reward | `src/world/GuideGentTourController.ts` | < 250 lines |
+| **Modern HM Field Checks** | Badge and party compatibility checks for field HM moves | `src/world/ModernHMFieldChecks.ts` | < 250 lines |
+| **Suicune & Beasts Cutscenes** | Burned Tower Beasts awakening, Cianwood Eusine, and Route 42 Suicune cutscenes | `src/world/SuicuneAndBeastsCutscenes.ts` | < 300 lines |
+| **Azalea & Ruins Quest Interactions** | Azalea Town Kurt, Slowpoke Well, and Ruins of Alph research interactions | `src/world/interactions/AzaleaAndRuinsQuestInteractions.ts` | < 350 lines |
+| **Field Cut, Rock & Water Dispatcher** | Overworld item ball pickups, hidden items, fruit trees, Cut, Whirlpool, and Surf | `src/world/interactions/FieldCutRockAndWaterDispatcher.ts` | < 400 lines |
+| **Goldenrod Underground Interactions** | Goldenrod Underground warehouse, bargain merchants, haircut brothers, and switches | `src/world/interactions/GoldenrodUndergroundInteractions.ts` | < 350 lines |
+| **Lavender & Snorlax Interactions** | Kanto Radio Tower EXPN Card, Vermilion Snorlax Poke Flute awakening, and Digletts Cave | `src/world/interactions/LavenderAndSnorlaxInteractions.ts` | < 300 lines |
+| **Olivine & Victory Road Quest Interactions** | Olivine Lighthouse Jasmine/Amphy, Cianwood Pharmacy SecretPotion, and Victory Road quests | `src/world/interactions/OlivineAndVictoryRoadQuestInteractions.ts` | < 350 lines |
+| **Route 36 & National Park Interactions** | Sudowoodo SquirtBottle ambush, Bug-Catching Contest officers, and National Park NPCs | `src/world/interactions/Route36AndNationalParkInteractions.ts` | < 350 lines |
+| **Violet & Azalea Service Interactions** | Violet/Azalea Poké Mart, Pokémon Center, Earl's Academy, and Kurts house services | `src/world/interactions/VioletAndAzaleaServiceInteractions.ts` | < 350 lines |
+| **Map Encounter & Spatial Lookup** | Wild grass/water/cave encounter rolling, time-of-day weights, and coordinate queries | `src/world/map/MapEncounterAndSpatialLookup.ts` | < 300 lines |
+| **Day Siblings & Elm Dialogue** | Day-of-week siblings gifts, Elm Lab dialogue state, and starter helpers | `src/world/npcs/daySiblingsAndElmDialogue.ts` | < 300 lines |
+
 ---
-| `src/core/SaveStateReconciler.ts` | `core` | Save state hydration and save snapshot builder |
-| `src/ui/bag/BagTMCatalog.ts` | `ui` | Gen 2 TM01-TM50 and HM01-HM07 metadata catalog |
-| `src/ui/start-menu/StartMenuDomSetup.ts` | `ui` | Start Menu Neo-Kanto stylesheet injection, modal container creation, and drawer header HTML builder |
 
 ## 1. Executive Overview & Core Architectural Pillars
 

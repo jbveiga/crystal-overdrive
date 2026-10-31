@@ -19,15 +19,14 @@ import type {
   OddEggCandidate,
 } from '../types/game';
 
-export interface PartyExpAward {
-  pokemon: PokemonInstance;
-  expAwarded: number;
-  isCapped: boolean;
-  isActiveBattler: boolean;
-  leveledUp: boolean;
-  newLevel: number;
-  levelCap: number;
-}
+import {
+  type PartyExpAward,
+  LEVEL_CAPS_BY_BADGE,
+  GYM_ACE_LEVELS_BY_BADGE,
+  PokemonExpAndBadgeScaling,
+} from './PokemonExpAndBadgeScaling';
+
+export type { PartyExpAward };
 
 export class PokemonFactory {
   private static learnsetCache = new Map<string, Record<string, string[]>>();
@@ -462,109 +461,26 @@ export class PokemonFactory {
     };
   }
 
-  /**
-   * Classic EXP Yield formula: (BaseEXP * DefeatedLevel * TrainerBonus) / 7
-   */
   public static calculateExpGain(defeated: PokemonInstance, isTrainer: boolean = false): number {
-    const baseExpSum =
-      defeated.baseStats.hp +
-      defeated.baseStats.attack +
-      defeated.baseStats.defense +
-      defeated.baseStats.spAttack +
-      defeated.baseStats.spDefense +
-      defeated.baseStats.speed;
-    const baseYield = Math.max(45, Math.floor(baseExpSum * 0.25));
-    const trainerMult = isTrainer ? 1.5 : 1.0;
-    return Math.max(12, Math.floor((baseYield * defeated.level * trainerMult) / 5));
+    return PokemonExpAndBadgeScaling.calculateExpGain(defeated, isTrainer);
   }
 
-  /**
-   * Soft Level Caps by Badge Count for Unbound-style Capped Exp. Share:
-   * Badge 0: Lv. 15 (Falkner Ace Lv. 13)
-   * Badge 1: Lv. 18 (Bugsy Ace Lv. 16)
-   * Badge 2: Lv. 22 (Whitney Ace Lv. 20)
-   * Badge 3: Lv. 27 (Morty Ace Lv. 25)
-   * Badge 4: Lv. 32 (Chuck Ace Lv. 30)
-   * Badge 5: Lv. 37 (Jasmine Ace Lv. 35)
-   * Badge 6: Lv. 37 (Pryce Ace Lv. 35)
-   * Badge 7: Lv. 42 (Clair Ace Lv. 40)
-   * Badge 8: Lv. 52 (Lance Ace Lv. 50)
-   * 16 Badges: Lv. 85 (Red Ace Lv. 81)
-   */
-  public static readonly LEVEL_CAPS_BY_BADGE: Record<number, number> = {
-    0: 15,
-    1: 18,
-    2: 22,
-    3: 27,
-    4: 32,
-    5: 37,
-    6: 37,
-    7: 42,
-    8: 52,
-    16: 85,
-  };
+  public static readonly LEVEL_CAPS_BY_BADGE: Record<number, number> = LEVEL_CAPS_BY_BADGE;
 
-  public static readonly GYM_ACE_LEVELS_BY_BADGE: Record<number, number> = {
-    0: 13,
-    1: 16,
-    2: 20,
-    3: 25,
-    4: 30,
-    5: 35,
-    6: 35,
-    7: 40,
-    8: 50,
-    16: 81,
-  };
+  public static readonly GYM_ACE_LEVELS_BY_BADGE: Record<number, number> = GYM_ACE_LEVELS_BY_BADGE;
 
   public static getLevelCapForBadges(badgeCount: number): number {
-    const safeCount = Math.max(0, Math.floor(badgeCount || 0));
-    if (safeCount >= 16) return 85;
-    if (safeCount >= 9) return 85;
-    return this.LEVEL_CAPS_BY_BADGE[safeCount] ?? 52;
+    return PokemonExpAndBadgeScaling.getLevelCapForBadges(badgeCount);
   }
 
   public static getGymAceLevelForBadges(badgeCount: number): number {
-    const safeCount = Math.max(0, Math.floor(badgeCount || 0));
-    if (safeCount >= 16) return 81;
-    if (safeCount >= 9) return 81;
-    return this.GYM_ACE_LEVELS_BY_BADGE[safeCount] ?? 50;
+    return PokemonExpAndBadgeScaling.getGymAceLevelForBadges(badgeCount);
   }
 
-  /**
-   * Returns the canonical Gen 2 obedience level cap for traded/outsider Pokémon based on earned badges:
-   * - Zephyr Badge (1 badge): Lv. 20
-   * - Hive Badge (2 badges): Lv. 30
-   * - Fog Badge (4 badges): Lv. 50
-   * - Storm Badge (5 badges): Lv. 70
-   * - Rising Badge (8+ badges): Lv. 100
-   */
   public static getObedienceCapForBadges(badgesOrCount: string[] | number): number {
-    if (Array.isArray(badgesOrCount)) {
-      const set = new Set(badgesOrCount.map((b) => b.toLowerCase()));
-      if (set.has('rising') || set.size >= 8) return 100;
-      if (set.has('storm') || set.size >= 5) return 70;
-      if (set.has('fog') || set.size >= 4) return 50;
-      if (set.has('hive') || set.has('hive_badge') || set.size >= 2) return 30;
-      if (set.has('zephyr') || set.has('zephyr_badge') || set.size >= 1) return 20;
-      return 10;
-    }
-    const count = Math.max(0, Math.floor(badgesOrCount || 0));
-    if (count >= 8) return 100;
-    if (count >= 5) return 70;
-    if (count >= 4) return 50;
-    if (count >= 2) return 30;
-    if (count >= 1) return 20;
-    return 10;
+    return PokemonExpAndBadgeScaling.getObedienceCapForBadges(badgesOrCount);
   }
 
-  /**
-   * Returns Gen 2 badge stat multipliers (+12.5% per corresponding Johto Gym Badge):
-   * - Zephyr Badge: Attack x1.125
-   * - Hive / Mineral Badge: Defense x1.125
-   * - Plain Badge: Speed x1.125
-   * - Fog / Glacier Badge: Special x1.125
-   */
   public static createMoveInstance(moveId: string): {
     moveId: string;
     currentPp: number;
@@ -578,45 +494,10 @@ export class PokemonFactory {
     };
   }
 
-  public static getBadgeStatMultipliers(badges: string[] = []): {
-    attack: number;
-    defense: number;
-    speed: number;
-    special: number;
-    atk: number;
-    def: number;
-    spe: number;
-    spc: number;
-  } {
-    const set = new Set((badges || []).map((b) => b.toLowerCase()));
-    const attack = set.has('zephyr') || set.has('zephyr_badge') ? 1.125 : 1.0;
-    const defense =
-      set.has('hive') || set.has('hive_badge') || set.has('mineral') || set.has('mineral_badge')
-        ? 1.125
-        : 1.0;
-    const speed = set.has('plain') || set.has('plain_badge') ? 1.125 : 1.0;
-    const special =
-      set.has('fog') || set.has('fog_badge') || set.has('glacier') || set.has('glacier_badge')
-        ? 1.125
-        : 1.0;
-    return {
-      attack,
-      defense,
-      speed,
-      special,
-      atk: attack,
-      def: defense,
-      spe: speed,
-      spc: special,
-    };
+  public static getBadgeStatMultipliers(badges: string[] = []) {
+    return PokemonExpAndBadgeScaling.getBadgeStatMultipliers(badges);
   }
 
-  /**
-   * Distributes battle EXP across the party according to Unbound Exp. Share mode ('OFF' | 'ALL' | 'CAPPED').
-   * - OFF: Only the active battler gains 100% EXP.
-   * - ALL: Active battler gains 100% EXP; conscious non-egg bench members gain 50% split EXP.
-   * - CAPPED: Same as ALL, except any Pokémon at or above the current level cap has its EXP clamped to 1 EXP.
-   */
   public static distributePartyExp(
     party: PokemonInstance[],
     activeBattler: PokemonInstance,
@@ -625,114 +506,25 @@ export class PokemonFactory {
     badgeCount: number = 0,
     explicitLevelCap?: number
   ): PartyExpAward[] {
-    const levelCap =
-      typeof explicitLevelCap === 'number' ? explicitLevelCap : this.getLevelCapForBadges(badgeCount);
-    const awards: PartyExpAward[] = [];
-
-    for (const member of party) {
-      if (member.isEgg || member.currentHp <= 0) continue;
-
-      const isActiveBattler = member === activeBattler || member.uid === activeBattler.uid;
-      if (mode === 'OFF' && !isActiveBattler) {
-        continue;
-      }
-
-      const rawShare = isActiveBattler ? baseExpGained : Math.max(1, Math.floor(baseExpGained * 0.5));
-      const isCapped = mode === 'CAPPED' && member.level >= levelCap;
-      const expAwarded = isCapped ? 1 : rawShare;
-
-      const levelResult = this.gainExp(member, expAwarded);
-      awards.push({
-        pokemon: member,
-        expAwarded,
-        isCapped,
-        isActiveBattler,
-        leveledUp: levelResult.leveledUp,
-        newLevel: levelResult.newLevel,
-        levelCap,
-      });
-    }
-
-    return awards;
+    return PokemonExpAndBadgeScaling.distributePartyExp(
+      party,
+      activeBattler,
+      baseExpGained,
+      mode,
+      badgeCount,
+      explicitLevelCap
+    );
   }
 
-  /**
-   * Formats a single consolidated Pokémon Unbound-style Exp. Share summary line for all
-   * benched party recipients (`!award.isActiveBattler`). Returns `null` if no bench Pokémon gained EXP.
-   */
   public static formatBenchExpShareSummary(awards: PartyExpAward[]): string | null {
-    const benchAwards = awards.filter((a) => !a.isActiveBattler && a.expAwarded > 0);
-    if (benchAwards.length === 0) return null;
-
-    const uncappedBench = benchAwards.find((a) => !a.isCapped);
-    if (!uncappedBench) {
-      const cap = benchAwards[0].levelCap;
-      return `🧢 The rest of your party is at the level cap (Lv. ${cap}) and received 1 EXP. Point via Exp. Share!`;
-    }
-    return `✨ The rest of your party received ${uncappedBench.expAwarded} EXP. Points via Exp. Share!`;
+    return PokemonExpAndBadgeScaling.formatBenchExpShareSummary(awards);
   }
 
-  /**
-   * Awards EXP to a Pokémon and recalculates stats if it levels up
-   */
   public static gainExp(pokemon: PokemonInstance, amount: number): { leveledUp: boolean; newLevel: number } {
-    if (pokemon.exp === undefined) {
-      pokemon.exp = pokemon.level * pokemon.level * pokemon.level;
-    }
-    if (pokemon.nextLevelExp === undefined) {
-      pokemon.nextLevelExp = (pokemon.level + 1) * (pokemon.level + 1) * (pokemon.level + 1);
-    }
-
-    pokemon.exp += amount;
-    let leveledUp = false;
-    const iv = 15;
-
-    while (pokemon.exp >= pokemon.nextLevelExp && pokemon.level < 100) {
-      pokemon.level++;
-      leveledUp = true;
-      pokemon.nextLevelExp = (pokemon.level + 1) * (pokemon.level + 1) * (pokemon.level + 1);
-
-      const oldMaxHp = pokemon.stats.hp;
-      const newMaxHp = Math.floor(((2 * pokemon.baseStats.hp + iv) * pokemon.level) / 100) + pokemon.level + 10;
-      const hpDiff = Math.max(1, newMaxHp - oldMaxHp);
-
-      pokemon.stats = {
-        hp: newMaxHp,
-        attack: Math.floor(((2 * pokemon.baseStats.attack + iv) * pokemon.level) / 100) + 5,
-        defense: Math.floor(((2 * pokemon.baseStats.defense + iv) * pokemon.level) / 100) + 5,
-        spAttack: Math.floor(((2 * pokemon.baseStats.spAttack + iv) * pokemon.level) / 100) + 5,
-        spDefense: Math.floor(((2 * pokemon.baseStats.spDefense + iv) * pokemon.level) / 100) + 5,
-        speed: Math.floor(((2 * pokemon.baseStats.speed + iv) * pokemon.level) / 100) + 5,
-      };
-      pokemon.currentHp = Math.min(newMaxHp, pokemon.currentHp + hpDiff);
-    }
-
-    return { leveledUp, newLevel: pokemon.level };
+    return PokemonExpAndBadgeScaling.gainExp(pokemon, amount);
   }
 
-  /**
-   * Retrieves moves learned by species at the specified level in Gen 2 (Ticket 6.4)
-   */
   public static async getLearnableMovesAtLevel(speciesId: string, level: number): Promise<string[]> {
-    try {
-      const learnsetData = await Dex.forGen(2).learnsets.get(speciesId);
-      if (!learnsetData || !learnsetData.learnset) return [];
-
-      const result: string[] = [];
-      const targetTag = `2L${level}`;
-
-      for (const [moveId, sources] of Object.entries(learnsetData.learnset)) {
-        if (Array.isArray(sources)) {
-          for (const src of sources) {
-            if (src === targetTag) {
-              result.push(moveId);
-            }
-          }
-        }
-      }
-      return result;
-    } catch {
-      return [];
-    }
+    return PokemonExpAndBadgeScaling.getLearnableMovesAtLevel(speciesId, level);
   }
 }

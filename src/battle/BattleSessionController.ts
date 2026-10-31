@@ -487,6 +487,9 @@ export class BattleSessionController {
           ctx.setGameState('OVERWORLD');
 
           await ctx.respawnAtLastPokecenter();
+          if (options.onBattleEnd) {
+            await options.onBattleEnd(result);
+          }
           return;
         }
 

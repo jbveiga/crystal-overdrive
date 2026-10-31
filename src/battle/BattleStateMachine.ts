@@ -18,6 +18,7 @@ import {
   executeMove as executeCombatMove,
   applyBattleItemEffect as executeBattleItemEffect,
 } from './state/BattleMoveAndItemExecutor';
+import { executeDoubleRoundForBattleState } from './state/DoubleBattleRoundExecutor';
 
 export { SPREAD_MOVE_IDS } from './state/BattleMoveAndItemExecutor';
 
@@ -453,172 +454,14 @@ export class BattleStateMachine {
     playerAction: BattleAction,
     events: BattleEvent[]
   ): BattleTurnResult {
-    interface QueuedCombatTurn {
-      attacker: PokemonInstance;
-      isPlayerSide: boolean;
-      move: MoveData;
-      preferredTargetSlot: 0 | 1;
-    }
-
-    const queue: QueuedCombatTurn[] = [];
-    const announcedFaints = new Set<string>();
-
-    // 1. Player Slot 1
-    if (this.playerPokemon.currentHp > 0) {
-      const mId = playerAction.moveId || this.playerPokemon.moves[0]?.moveId || 'tackle';
-      queue.push({
-        attacker: this.playerPokemon,
-        isPlayerSide: true,
-        move: PokemonFactory.getMoveData(mId),
-        preferredTargetSlot: playerAction.targetSlot ?? 0,
-      });
-    }
-
-    // 2. Player Partner Slot 2
-    if (this.playerPartner && this.playerPartner.currentHp > 0) {
-      const pMoveId =
-        playerAction.partnerMoveId || this.playerPartner.moves[0]?.moveId || 'tackle';
-      queue.push({
-        attacker: this.playerPartner,
-        isPlayerSide: true,
-        move: PokemonFactory.getMoveData(pMoveId),
-        preferredTargetSlot: playerAction.partnerTargetSlot ?? 1,
-      });
-    }
-
-    // 3. Enemy Slot 1
-    if (this.enemyPokemon.currentHp > 0 && this.enemyPokemon.moves.length > 0) {
-      const eMoveId =
-        this.enemyPokemon.moves[Math.floor(Math.random() * this.enemyPokemon.moves.length)].moveId;
-      queue.push({
-        attacker: this.enemyPokemon,
-        isPlayerSide: false,
-        move: PokemonFactory.getMoveData(eMoveId),
-        preferredTargetSlot: 0,
-      });
-    }
-
-    // 4. Enemy Partner Slot 2
-    if (this.enemyPartner && this.enemyPartner.currentHp > 0 && this.enemyPartner.moves.length > 0) {
-      const epMoveId =
-        this.enemyPartner.moves[Math.floor(Math.random() * this.enemyPartner.moves.length)].moveId;
-      queue.push({
-        attacker: this.enemyPartner,
-        isPlayerSide: false,
-        move: PokemonFactory.getMoveData(epMoveId),
-        preferredTargetSlot: this.playerPartner && this.playerPartner.currentHp > 0 ? 1 : 0,
-      });
-    }
-
-    // Sort by Move Priority (desc), then Effective Speed (desc)
-    queue.sort((a, b) => {
-      const pA = a.move.priority ?? 0;
-      const pB = b.move.priority ?? 0;
-      if (pA !== pB) return pB - pA;
-      const sA = this.getEffectiveSpeed(a.attacker);
-      const sB = this.getEffectiveSpeed(b.attacker);
-      return sB - sA;
-    });
-
-    const recordAnyNewFaints = (): BattleTurnResult | null => {
-      const allCombatants = [
-        this.playerPokemon,
-        this.playerPartner,
-        this.enemyPokemon,
-        this.enemyPartner,
-      ].filter((p): p is PokemonInstance => Boolean(p));
-
-      for (const c of allCombatants) {
-        if (c.currentHp <= 0 && !announcedFaints.has(c.uid)) {
-          c.currentHp = 0;
-          announcedFaints.add(c.uid);
-          events.push({ type: 'FAINT', targetId: c.uid });
-          events.push({ type: 'MESSAGE', text: `${c.nickname} fainted!` });
-        }
-      }
-
-      const enemyAlive =
-        this.enemyPokemon.currentHp > 0 ||
-        Boolean(this.enemyPartner && this.enemyPartner.currentHp > 0);
-      if (!enemyAlive) {
-        this.isBattleOver = true;
-        return {
-          turnNumber: this.turnCount,
-          events,
-          isBattleOver: true,
-          winner: 'PLAYER',
-        };
-      }
-
-      const playerAlive =
-        this.playerPokemon.currentHp > 0 ||
-        Boolean(this.playerPartner && this.playerPartner.currentHp > 0);
-      if (!playerAlive) {
-        this.isBattleOver = true;
-        return {
-          turnNumber: this.turnCount,
-          events,
-          isBattleOver: true,
-          winner: 'ENEMY',
-        };
-      }
-
-      return null;
-    };
-
-    for (const item of queue) {
-      if (item.attacker.currentHp <= 0) continue;
-
-      const opponents = item.isPlayerSide
-        ? [this.enemyPokemon, this.enemyPartner].filter(
-            (p): p is PokemonInstance => Boolean(p && p.currentHp > 0)
-          )
-        : [this.playerPokemon, this.playerPartner].filter(
-            (p): p is PokemonInstance => Boolean(p && p.currentHp > 0)
-          );
-
-      if (opponents.length === 0) break;
-
-      const isSpread =
-        SPREAD_MOVE_IDS.has(item.move.id) &&
-        item.move.category !== 'Status' &&
-        opponents.length > 1;
-
-      if (isSpread) {
-        events.push({
-          type: 'MESSAGE',
-          text: `🌊 ${item.attacker.nickname}'s ${item.move.name} sweeps across both opponents!`,
-        });
-        for (const opp of opponents) {
-          if (opp.currentHp <= 0) continue;
-          this.executeMove(item.attacker, opp, item.move, events, 0.75);
-        }
-      } else {
-        const slot0Candidate = item.isPlayerSide ? this.enemyPokemon : this.playerPokemon;
-        const slot1Candidate = item.isPlayerSide ? this.enemyPartner : this.playerPartner;
-        let target =
-          item.preferredTargetSlot === 1 && slot1Candidate && slot1Candidate.currentHp > 0
-            ? slot1Candidate
-            : slot0Candidate && slot0Candidate.currentHp > 0
-            ? slot0Candidate
-            : opponents[0];
-
-        this.executeMove(item.attacker, target, item.move, events, 1.0);
-      }
-
-      const outcome = recordAnyNewFaints();
-      if (outcome) return outcome;
-    }
-
-    this.applyEndOfTurnResiduals(events);
-    const residualOutcome = recordAnyNewFaints();
-    if (residualOutcome) return residualOutcome;
-
-    return {
-      turnNumber: this.turnCount,
+    return executeDoubleRoundForBattleState(
+      this,
+      playerAction,
       events,
-      isBattleOver: false,
-    };
+      (attacker, defender, move, evts, mult) =>
+        this.executeMove(attacker, defender, move, evts, mult),
+      (evts) => this.applyEndOfTurnResiduals(evts)
+    );
   }
 
   private checkFaints(events: BattleEvent[]): BattleTurnResult | null {

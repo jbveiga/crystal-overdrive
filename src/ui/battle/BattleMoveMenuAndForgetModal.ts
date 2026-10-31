@@ -50,7 +50,19 @@ export class BattleMoveMenuAndForgetModal {
     const activeBattler = ctx.getOrderingCombatant();
     const moveSlot = activeBattler?.moves[index];
     if (!moveSlot) return;
-    const moveData = PokemonFactory.getMoveData(moveSlot.moveId);
+
+    const hasAnyPp = activeBattler.moves.some((m) => m.currentPp > 0);
+    if (moveSlot.currentPp <= 0 && hasAnyPp) {
+      BattleAudio.playMenuSound('CANCEL');
+      const tooltip = ctx.fightMenu.querySelector('#battle-move-tooltip') as HTMLElement | null;
+      if (tooltip) {
+        tooltip.innerHTML = `<span style="color: #ef4444; font-weight: 800;">⚠️ There's no PP left for this move!</span>`;
+      }
+      return;
+    }
+
+    const chosenMoveId = moveSlot.currentPp <= 0 ? 'struggle' : moveSlot.moveId;
+    const moveData = PokemonFactory.getMoveData(chosenMoveId);
     if (moveSlot.currentPp > 0) {
       moveSlot.currentPp--;
     }
@@ -230,21 +242,27 @@ export class BattleMoveMenuAndForgetModal {
     }
     ctx.fightMenu.appendChild(tooltipBar);
 
+    const hasAnyPp = activeBattler.moves.some((m) => m.currentPp > 0);
     activeBattler.moves.forEach((moveSlot, idx) => {
       const moveData = PokemonFactory.getMoveData(moveSlot.moveId);
       const badge = EffectivenessHelper.evaluate(moveData, activeTargetFoe);
       const pill = EffectivenessHelper.getPillStyle(badge.multiplier, moveData.category === 'Status');
+      const isOutOfPp = moveSlot.currentPp <= 0;
 
       const btn = document.createElement('button');
       btn.id = `move-btn-${idx}`;
       btn.className = 'battle-move-btn';
+      if (isOutOfPp && hasAnyPp) {
+        btn.setAttribute('aria-disabled', 'true');
+      }
       btn.style.cssText = `
         background: #141E33;
         color: white;
-        border: 1.5px solid #22324F;
+        border: 1.5px solid ${isOutOfPp ? '#7f1d1d' : '#22324F'};
         border-radius: 8px;
         padding: 9px 12px;
-        cursor: pointer;
+        cursor: ${isOutOfPp && hasAnyPp ? 'not-allowed' : 'pointer'};
+        opacity: ${isOutOfPp && hasAnyPp ? '0.55' : '1'};
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -275,7 +293,7 @@ export class BattleMoveMenuAndForgetModal {
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 6px; gap: 6px;">
           <div style="display: flex; align-items: center; gap: 6px;">
             <span style="font-size: 10px; font-weight: 800; background: ${typeColor}; color: white; padding: 2px 6px; border-radius: 4px;">${moveData.type.toUpperCase()}</span>
-            <span style="font-size: 11px; font-weight: 700; color: #cbd5e1;">PP ${moveSlot.currentPp}/${moveSlot.maxPp}</span>
+            <span style="font-size: 11px; font-weight: 700; color: ${isOutOfPp ? '#ef4444' : '#cbd5e1'};">PP ${moveSlot.currentPp}/${moveSlot.maxPp}</span>
             <span class="move-pwr-acc" style="font-size: 10px; font-weight: 700; color: #94a3b8;">PWR ${pwrStr}</span>
             <span class="move-pwr-acc" style="font-size: 10px; font-weight: 700; color: #94a3b8;">ACC ${accStr}</span>
           </div>

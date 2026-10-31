@@ -21,12 +21,7 @@ import {
   type CharacterFrames,
 } from './OverworldNpcAndItemSprites';
 import { OverworldParticleAndVfxPool } from './OverworldParticleAndVfxPool';
-
-const BASELINE_TILES = [
-  'grass', 'tall_grass', 'tree_tall_0', 'tree_short_0', 'path', 'water',
-  'water_edge', 'flower_0', 'flower_red', 'flower_yellow', 'roof', 'wall',
-  'door', 'fence_horizontal', 'jt_1e_1f_2e_2f', 'jt_2e_2f_3e_3f',
-];
+import { BASELINE_TILES, OverworldTileLayerRenderer } from './OverworldTileLayerRenderer';
 
 export { ANIMATED_WATER_TILES, NPC_SHEET_PATHS, type CharacterFrames };
 
@@ -261,82 +256,22 @@ export class OverworldRenderer {
   }
 
   private getConnectedMaps(currentMap: MapData, lookupMap?: (mapId: string) => MapData | undefined): MapData[] {
-    if (!lookupMap || !currentMap.connections) return [];
-    const maps: MapData[] = [];
-    const conns = currentMap.connections;
-    for (const dir of ['WEST', 'EAST', 'NORTH', 'SOUTH'] as const) {
-      const c = conns[dir];
-      if (c) { const m = lookupMap(c.mapId); if (m) maps.push(m); }
-    }
-    return maps;
+    return OverworldTileLayerRenderer.getConnectedMaps(currentMap, lookupMap);
   }
 
   private renderMapChunk(map: MapData, offsetTileX: number, offsetTileY: number, isNight: boolean = false): void {
-    const isOutdoor = Object.keys(map.connections || {}).length > 0;
-    const grassTex = this.tileTextures.get('grass') || Texture.WHITE;
-    if (!map.tileMap || map.tileMap.length !== map.width * map.height) return;
-
-    for (let y = 0; y < map.height; y++) {
-      for (let x = 0; x < map.width; x++) {
-        const index = y * map.width + x;
-        const tileName = map.tileMap[index];
-        const px = (x + offsetTileX) * this.tileSize;
-        const py = (y + offsetTileY) * this.tileSize;
-
-        const isOpaqueTile =
-          tileName === 'water' ||
-          tileName.startsWith('jt_') ||
-          tileName.startsWith('in_') ||
-          tileName.startsWith('kt_');
-
-        if (!isOpaqueTile && isOutdoor) {
-          const baseSprite = new Sprite(grassTex);
-          baseSprite.position.set(px, py);
-          baseSprite.width = this.tileSize;
-          baseSprite.height = this.tileSize;
-          this.mapContainer.addChild(baseSprite);
-        }
-
-        const waterFrames = this.waterAnimFrames.get(tileName);
-        const resolvedTex = waterFrames
-          ? waterFrames[this.waterAnimState.step]
-          : this.tileTextures.get(tileName);
-
-        const tex = resolvedTex || (isOutdoor ? grassTex : Texture.WHITE);
-        const featureSprite = new Sprite(tex);
-        featureSprite.position.set(px, py);
-        featureSprite.width = this.tileSize;
-        featureSprite.height = this.tileSize;
-        this.mapContainer.addChild(featureSprite);
-
-        if (waterFrames) {
-          this.animatedWaterSprites.push({ sprite: featureSprite, frames: waterFrames });
-        }
-
-        if (
-          isNight &&
-          (tileName.includes('10_11') || tileName.includes('11_12') || tileName.includes('18_19'))
-        ) {
-          const glow = new Graphics();
-          glow.rect(px + 8, py + 12, this.tileSize - 16, this.tileSize - 24).fill({
-            color: 0xfde047,
-            alpha: 0.22,
-          });
-          this.mapContainer.addChild(glow);
-        }
-
-        if (map.overlayMap && map.overlayMap[index]) {
-          const overlayTex = this.tileTextures.get(map.overlayMap[index]!);
-          if (overlayTex) {
-            const overlaySprite = new Sprite(overlayTex);
-            overlaySprite.position.set(px, py);
-            overlaySprite.width = this.tileSize;
-            overlaySprite.height = this.tileSize;
-            this.mapContainer.addChild(overlaySprite);
-          }
-        }
-      }
-    }
+    OverworldTileLayerRenderer.renderMapChunk({
+      map,
+      offsetTileX,
+      offsetTileY,
+      isNight,
+      tileSize: this.tileSize,
+      tileTextures: this.tileTextures,
+      waterAnimFrames: this.waterAnimFrames,
+      waterAnimStep: this.waterAnimState.step,
+      mapContainer: this.mapContainer,
+      animatedWaterSprites: this.animatedWaterSprites,
+    });
   }
 
   public async ensureMapTilesLoaded(
@@ -418,55 +353,12 @@ export class OverworldRenderer {
 
   public evictDistantTileTextures(currentMap: MapData, lookupMap?: (mapId: string) => MapData | undefined): number {
     this.evictDistantNpcSprites();
-    const activeTileNames = new Set<string>(BASELINE_TILES);
-
-    const mapsToScan: MapData[] = [currentMap, ...this.getConnectedMaps(currentMap, lookupMap)];
-    if (lookupMap && currentMap.warps) {
-      for (let i = 0; i < currentMap.warps.length; i++) {
-        const wm = lookupMap(currentMap.warps[i].targetMapId);
-        if (wm) mapsToScan.push(wm);
-      }
-    }
-    for (let mIdx = 0; mIdx < mapsToScan.length; mIdx++) {
-      const m = mapsToScan[mIdx];
-      if (m.tileMap) {
-        for (let i = 0; i < m.tileMap.length; i++) {
-          if (m.tileMap[i]) activeTileNames.add(m.tileMap[i]);
-        }
-      }
-      if (m.overlayMap) {
-        for (let i = 0; i < m.overlayMap.length; i++) {
-          if (m.overlayMap[i]) activeTileNames.add(m.overlayMap[i]!);
-        }
-      }
-    }
-
-    let evictedCount = 0;
-    const toEvict: string[] = [];
-    for (const tileName of this.tileTextures.keys()) {
-      if (!activeTileNames.has(tileName)) toEvict.push(tileName);
-    }
-
-    for (let i = 0; i < toEvict.length; i++) {
-      const name = toEvict[i];
-      const tex = this.tileTextures.get(name);
-      if (tex) {
-        tex.destroy(true);
-        this.tileTextures.delete(name);
-        Assets.unload(`./assets/tiles/${name}.png`).catch(() => {});
-        evictedCount++;
-      }
-      if (this.waterAnimFrames.has(name)) {
-        const frames = this.waterAnimFrames.get(name)!;
-        frames[1].destroy(true);
-        frames[2].destroy(true);
-        this.waterAnimFrames.delete(name);
-        Assets.unload(`./assets/tiles/${name}__w1.png`).catch(() => {});
-        Assets.unload(`./assets/tiles/${name}__w2.png`).catch(() => {});
-      }
-    }
-
-    return evictedCount;
+    return OverworldTileLayerRenderer.evictDistantTileTextures({
+      currentMap,
+      lookupMap,
+      tileTextures: this.tileTextures,
+      waterAnimFrames: this.waterAnimFrames,
+    });
   }
 
   public spawnMapNpcs(npcs?: GridEntity[], lookupMap?: (mapId: string) => MapData | undefined): void {
@@ -577,52 +469,12 @@ export class OverworldRenderer {
       return;
     }
 
-    const tallGrassTex = this.tileTextures.get('tall_grass') || grassTex;
-    const pathTex = this.tileTextures.get('path') || grassTex;
-    const waterTex = this.tileTextures.get('water') || Texture.WHITE;
-    const treeTallTex = this.tileTextures.get('tree_tall_0') || Texture.WHITE;
-    const treeShortTex = this.tileTextures.get('tree_short_0') || treeTallTex;
-    const roofTex = this.tileTextures.get('roof') || treeTallTex;
-    const wallTex = this.tileTextures.get('wall') || treeTallTex;
-    const doorTex = this.tileTextures.get('door') || pathTex;
-    const flowerTex = this.tileTextures.get('flower_0') || grassTex;
-
-    for (let y = 0; y < map.height; y++) {
-      for (let x = 0; x < map.width; x++) {
-        const index = y * map.width + x;
-        const collision = map.collisionGrid[index];
-        const px = x * this.tileSize;
-        const py = y * this.tileSize;
-
-        const baseSprite = new Sprite(grassTex);
-        baseSprite.position.set(px, py);
-        baseSprite.width = this.tileSize;
-        baseSprite.height = this.tileSize;
-        this.mapContainer.addChild(baseSprite);
-
-        let featureTex: Texture | null = null;
-        if (collision === 1) {
-          featureTex = treeTallTex;
-          if (map.id === 'new_bark_town' || map.id === 'cherrygrove_city') {
-            if (y >= 2 && y <= 3 && ((x >= 2 && x <= 3) || (x >= 11 && x <= 13))) featureTex = roofTex;
-            else if (y === 4 && ((x >= 2 && x <= 3) || (x >= 11 && x <= 13))) featureTex = wallTex;
-            else if ((x === 5 || x === 6) && (y === 5 || y === 6)) featureTex = treeShortTex;
-          }
-        } else if (collision === 2) featureTex = tallGrassTex;
-        else if (collision === 3) featureTex = waterTex;
-        else if (map.warps.some((w) => w.x === x && w.y === y)) featureTex = doorTex;
-        else if ((map.id === 'route_29' && (y === 4 || y === 5)) || (map.id === 'new_bark_town' && (y === 6 || y === 7 || x === 8))) featureTex = pathTex;
-        else if ((x + y * 7) % 11 === 0) featureTex = flowerTex;
-
-        if (featureTex) {
-          const s = new Sprite(featureTex);
-          s.position.set(px, py);
-          s.width = this.tileSize;
-          s.height = this.tileSize;
-          this.mapContainer.addChild(s);
-        }
-      }
-    }
+    OverworldTileLayerRenderer.renderFallbackProceduralMap({
+      map,
+      tileSize: this.tileSize,
+      tileTextures: this.tileTextures,
+      mapContainer: this.mapContainer,
+    });
   }
 
   private isEntityOnTallGrass(entity: GridEntity): boolean {

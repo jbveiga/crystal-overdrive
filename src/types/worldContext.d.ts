@@ -99,16 +99,14 @@ export interface OverworldTickerContext {
   getActiveMapNpcs: (mapId: string) => GridEntity[]; populateWorldNpcs: (map: MapData | null) => GridEntity[];
   handleMapTransition: (entity: GridEntity) => void; executeWarpTransition: (warp: any) => Promise<void>;
   runTrainerSightSequence: (trainer: GridEntity) => Promise<void>; triggerSlowpokeWellGruntIntercept: (grunt: GridEntity) => Promise<void>;
-  triggerBeastsAwakeningCutscene: () => void; triggerBurnedTowerRivalBattle: () => void; triggerCherrygroveRivalAmbush: () => void;
+  triggerBeastsAwakeningCutscene: () => void; triggerBurnedTowerRivalBattle: () => void; triggerCherrygroveRivalAmbush: () => void; triggerAzaleaRivalAmbush: () => void;
   saveCurrentGame: () => void | Promise<void>; triggerWildEncounter: (encounter: any, options?: any) => Promise<void>;
-  addPlayTimeDelta: (dtSec: number) => void; isSurfEnabled: () => boolean;
-  openDeptElevatorModal?: (currentMapId: string, onSelectFloor: (targetMapId: string) => void) => void;
+  addPlayTimeDelta: (dtSec: number) => void; isSurfEnabled: () => boolean; openDeptElevatorModal?: (currentMapId: string, onSelectFloor: (targetMapId: string) => void) => void;
   triggerOlivineRivalConfrontation?: () => void; triggerCianwoodSuicuneAndEusine?: () => void; triggerRoute42Suicune?: () => void; triggerBattle?: (opponentPokemon: PokemonInstance, options?: TriggerBattleOptions) => Promise<void>; inventory?: BagInventory;
+  buildTrainerTeamInstances?: (entity: GridEntity) => PokemonInstance[]; npcsByMap?: Record<string, GridEntity[]>; setCutsceneLocked?: (locked: boolean) => void;
 }
 
-export type NpcInteractionHandler = (
-  targetNpc: GridEntity, currentMap: MapData, ctx: NpcInteractionContext
-) => boolean | void | Promise<boolean | void>;
+export type NpcInteractionHandler = (targetNpc: GridEntity, currentMap: MapData, ctx: NpcInteractionContext) => boolean | void | Promise<boolean | void>;
 
 export interface NpcInteractionRegistration {
   actions?: string[]; npcIds?: string[]; idPrefixes?: string[]; handler: NpcInteractionHandler;

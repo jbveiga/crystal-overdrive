@@ -384,7 +384,6 @@ export class OverworldHUD {
           <div style="background: rgba(18, 22, 28, 0.8); backdrop-filter: blur(4px); border-radius: 6px; padding: 6px 12px; font-size: 12px; color: #94a3b8;">
             Move: <strong>WASD / Arrows</strong> | Talk / Read Signs: <strong>Space / Enter / Z</strong> | Speed: <strong>Shift</strong>
           </div>
-          <button id="interact-btn" style="pointer-events: auto; background: #0284c7; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 6px; padding: 7px 14px; font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);">💬 TALK / READ (Space)</button>
         </div>
       </div>
     `;
@@ -412,7 +411,6 @@ export class OverworldHUD {
     }
 
     const startMenuBtn = this.startMenuButton;
-    const interactBtn = this.rootElement.querySelector('#interact-btn') as HTMLButtonElement;
     const pokegearModal = this.rootElement.querySelector('#pokegear-modal') as HTMLDivElement;
     const closePokegearBtn = this.rootElement.querySelector('#close-pokegear-btn') as HTMLButtonElement;
     const roamerStatusList = this.rootElement.querySelector('#roamer-status-list') as HTMLDivElement;
@@ -433,11 +431,6 @@ export class OverworldHUD {
     });
 
     this.dialogueBox.addEventListener('click', () => this.advanceDialogue());
-
-    interactBtn.addEventListener('click', () => {
-      if (this.dialogueActive) this.advanceDialogue();
-      else this.options.onInteract?.();
-    });
 
     closePokegearBtn.addEventListener('click', () => {
       pokegearModal.style.display = 'none';

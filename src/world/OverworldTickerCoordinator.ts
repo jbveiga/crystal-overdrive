@@ -189,7 +189,8 @@ export class OverworldTickerCoordinator {
             storyFlags.has('HAS_MYSTERY_EGG') &&
             !storyFlags.has('EVENT_RIVAL_CHERRYGROVE_DEFEATED')
           ) {
-            triggerCherrygroveRivalAmbush();
+            player.isMoving = false; player.progress = 0;
+            triggerCherrygroveRivalAmbush?.();
             return;
           }
 
@@ -201,7 +202,8 @@ export class OverworldTickerCoordinator {
             (storyFlags.has('slowpoke_well_cleared') || storyFlags.has('bugsy_defeated')) &&
             !storyFlags.has('azalea_rival_defeated')
           ) {
-            triggerAzaleaRivalAmbush();
+            player.isMoving = false; player.progress = 0;
+            triggerAzaleaRivalAmbush?.();
             return;
           }
 

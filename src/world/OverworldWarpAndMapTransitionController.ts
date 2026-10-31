@@ -506,6 +506,7 @@ export class OverworldWarpAndMapTransitionController {
     healPlayerParty: (playAnim?: boolean) => void
   ): Promise<void> {
     const { mapManager, player, overworldRenderer, overworldHUD, playerParty, saveCurrentGame } = ctx;
+    ctx.setCutsceneLocked(false);
     const lookupMap = (id: string) => mapManager.getMap(id);
     const respawnMapId = mapManager.getMap(lastVisitedPokecenter.mapId) ? lastVisitedPokecenter.mapId : 'new_bark_town';
     const respawnMap = mapManager.setCurrentMap(respawnMapId);

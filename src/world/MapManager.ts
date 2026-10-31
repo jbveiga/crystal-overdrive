@@ -18,6 +18,7 @@ import {
   isCarpetWarp,
   resolveWarpTransition,
 } from './map/MapClassificationAndWarpRules';
+import { MapEncounterAndSpatialLookup } from './map/MapEncounterAndSpatialLookup';
 
 export interface WildEncounterResult {
   speciesId: string;
@@ -384,40 +385,13 @@ export class MapManager {
    * Checks if coordinate has an interactive sign or background event (including across connected map borders)
    */
   checkBgEvent(x: number, y: number): BgEvent | undefined {
-    if (!this.currentMap) return undefined;
-    if (x < 0 && this.currentMap.connections.WEST) {
-      const conn = this.currentMap.connections.WEST;
-      const westMap = this.maps.get(conn.mapId);
-      if (westMap) {
-        return this.getSpatialBgEvents(westMap).get(`${x + westMap.width},${y - conn.offset}`);
-      }
-      return undefined;
-    }
-    if (x >= this.currentMap.width && this.currentMap.connections.EAST) {
-      const conn = this.currentMap.connections.EAST;
-      const eastMap = this.maps.get(conn.mapId);
-      if (eastMap) {
-        return this.getSpatialBgEvents(eastMap).get(`${x - this.currentMap.width},${y - conn.offset}`);
-      }
-      return undefined;
-    }
-    if (y < 0 && this.currentMap.connections.NORTH) {
-      const conn = this.currentMap.connections.NORTH;
-      const northMap = this.maps.get(conn.mapId);
-      if (northMap) {
-        return this.getSpatialBgEvents(northMap).get(`${x - conn.offset},${y + northMap.height}`);
-      }
-      return undefined;
-    }
-    if (y >= this.currentMap.height && this.currentMap.connections.SOUTH) {
-      const conn = this.currentMap.connections.SOUTH;
-      const southMap = this.maps.get(conn.mapId);
-      if (southMap) {
-        return this.getSpatialBgEvents(southMap).get(`${x - conn.offset},${y - this.currentMap.height}`);
-      }
-      return undefined;
-    }
-    return this.getSpatialBgEvents(this.currentMap).get(`${x},${y}`);
+    return MapEncounterAndSpatialLookup.checkBgEventAcrossConnections({
+      currentMap: this.currentMap,
+      maps: this.maps,
+      getSpatialBgEvents: (m) => this.getSpatialBgEvents(m),
+      x,
+      y,
+    });
   }
 
   /**
@@ -512,157 +486,34 @@ export class MapManager {
     rng: () => number = Math.random,
     timeOfDay?: 'MORNING' | 'DAY' | 'NIGHT'
   ): WildEncounterResult | null {
-    if (!this.currentMap) {
-      return null;
-    }
-
-    const isWaterTile = tileType === 3;
-    const isCaveOrRuins = MapManager.isDungeonOrCaveMap(this.currentMap.id);
-    if (!MapManager.canTriggerWildEncounter(this.currentMap.id, tileType)) {
-      return null;
-    }
-
-    // Active Repel suppresses wild encounters completely
-    if (this.repelStepsRemaining > 0) {
-      return null;
-    }
-
-    // Guaranteed 4-step grace buffer after a battle or route transition
-    if (this.graceStepsRemaining > 0) {
-      this.graceStepsRemaining--;
-      return null;
-    }
-
-    if (this.pacingEnabled) {
-      this.stepsSinceGraceEnd++;
-    }
-
-    const threshold = this.getEncounterProbabilityForStep(
-      this.stepsSinceGraceEnd,
-      isCaveOrRuins || isWaterTile
-    );
-    const encounterRoll = rng();
-    if (encounterRoll > threshold) {
-      return null;
-    }
-
-    const finalizeEncounter = (result: WildEncounterResult): WildEncounterResult => {
-      if (this.pacingEnabled) {
-        this.graceStepsRemaining = MapManager.GRACE_STEPS_DEFAULT;
-        this.stepsSinceGraceEnd = 0;
-      }
-      return result;
-    };
-
-    // If an active roaming beast is present on this route, 25% chance of encountering it
-    if (activeRoamerSpeciesId) {
-      const roamerRoll = rng();
-      if (roamerRoll < 0.25) {
-        return finalizeEncounter({
-          speciesId: activeRoamerSpeciesId,
-          level: 40,
-          isRoamer: true,
-        });
-      }
-    }
-
-    let slots = isWaterTile
-      ? this.currentMap.waterEncounters
-      : this.currentMap.grassEncounters;
-    if (!slots || slots.length === 0) {
-      return null;
-    }
-
-    if (timeOfDay) {
-      const timeFiltered = slots.filter(
-        (s) => !s.timeOfDay || s.timeOfDay === 'ANY' || s.timeOfDay === timeOfDay
-      );
-      if (timeFiltered.length > 0) {
-        slots = timeFiltered;
-      }
-    }
-
-    // Weighted random selection
-    const totalWeight = slots.reduce((sum, s) => sum + s.weight, 0);
-    let chosenWeight = rng() * totalWeight;
-
-    for (const slot of slots) {
-      if (chosenWeight < slot.weight) {
-        const level = Math.floor(rng() * (slot.maxLevel - slot.minLevel + 1)) + slot.minLevel;
-        return finalizeEncounter({
-          speciesId: slot.speciesId,
-          level,
-          isRoamer: false,
-        });
-      }
-      chosenWeight -= slot.weight;
-    }
-
-    const last = slots[slots.length - 1];
-    return finalizeEncounter({
-      speciesId: last.speciesId,
-      level: last.minLevel,
-      isRoamer: false,
+    return MapEncounterAndSpatialLookup.rollWildEncounter({
+      currentMap: this.currentMap,
+      tileType,
+      activeRoamerSpeciesId,
+      rng,
+      timeOfDay,
+      repelStepsRemaining: this.repelStepsRemaining,
+      graceStepsRemaining: this.graceStepsRemaining,
+      stepsSinceGraceEnd: this.stepsSinceGraceEnd,
+      pacingEnabled: this.pacingEnabled,
+      graceStepsDefault: MapManager.GRACE_STEPS_DEFAULT,
+      getEncounterProbabilityForStep: (step, isCave) =>
+        this.getEncounterProbabilityForStep(step, isCave),
+      setGraceAndStepState: (grace, steps) => {
+        this.graceStepsRemaining = grace;
+        this.stepsSinceGraceEnd = steps;
+      },
     });
   }
 
   private checkConnectionWalkable(x: number, y: number): boolean {
-    if (!this.currentMap) return false;
-
-    const isWalkableTile = (tile: number): boolean => {
-      if (tile === 3) return this.surfEnabled;
-      return tile === 0 || tile === 2;
-    };
-
-    // Check West
-    if (x < 0 && this.currentMap.connections.WEST) {
-      const conn = this.currentMap.connections.WEST;
-      const targetMap = this.maps.get(conn.mapId);
-      if (!targetMap) return false;
-      const targetX = targetMap.width - 1;
-      const targetY = y - conn.offset;
-      if (targetY < 0 || targetY >= targetMap.height) return false;
-      const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
-      return isWalkableTile(tileType);
-    }
-
-    // Check East
-    if (x >= this.currentMap.width && this.currentMap.connections.EAST) {
-      const conn = this.currentMap.connections.EAST;
-      const targetMap = this.maps.get(conn.mapId);
-      if (!targetMap) return false;
-      const targetX = 0;
-      const targetY = y - conn.offset;
-      if (targetY < 0 || targetY >= targetMap.height) return false;
-      const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
-      return isWalkableTile(tileType);
-    }
-
-    // Check North
-    if (y < 0 && this.currentMap.connections.NORTH) {
-      const conn = this.currentMap.connections.NORTH;
-      const targetMap = this.maps.get(conn.mapId);
-      if (!targetMap) return false;
-      const targetX = x - conn.offset;
-      const targetY = targetMap.height - 1;
-      if (targetX < 0 || targetX >= targetMap.width) return false;
-      const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
-      return isWalkableTile(tileType);
-    }
-
-    // Check South
-    if (y >= this.currentMap.height && this.currentMap.connections.SOUTH) {
-      const conn = this.currentMap.connections.SOUTH;
-      const targetMap = this.maps.get(conn.mapId);
-      if (!targetMap) return false;
-      const targetX = x - conn.offset;
-      const targetY = 0;
-      if (targetX < 0 || targetX >= targetMap.width) return false;
-      const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
-      return isWalkableTile(tileType);
-    }
-
-    return false;
+    return MapEncounterAndSpatialLookup.checkConnectionWalkable({
+      currentMap: this.currentMap,
+      maps: this.maps,
+      surfEnabled: this.surfEnabled,
+      x,
+      y,
+    });
   }
 
   public static isOutdoorMap(mapId: string): boolean {

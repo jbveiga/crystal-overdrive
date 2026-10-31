@@ -2253,6 +2253,14 @@
   ],
   "bgEvents": [
     {
+      "x": 16,
+      "y": 8,
+      "speaker": "🪧 MYSTERY CHAMBER",
+      "pages": [
+        "MYSTERY STONE PANEL CHAMBER"
+      ]
+    },
+    {
       "x": 12,
       "y": 16,
       "speaker": "🪧 RUINS OF ALPH",
