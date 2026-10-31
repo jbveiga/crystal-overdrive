@@ -18,6 +18,7 @@ import { evaluateFastShipWarp } from './interactions/FastShipAndVermilionInterac
 import type { OverworldTransitionContext } from '../types/gameContext';
 import { evaluateWarpProgressionGuards } from './OverworldWarpProgressionGuards';
 import { TwoPointWarpLinkRegistry } from './map/TwoPointWarpLinkRegistry';
+import { resolveCurrentLandmark } from './map/townMapResolvers';
 
 export class OverworldWarpAndMapTransitionController {
   private static worldNpcsScratch: GridEntity[] = [];
@@ -276,6 +277,8 @@ export class OverworldWarpAndMapTransitionController {
 
     if (nextMapId) {
       visitedMaps.add(nextMapId);
+      const landmark = resolveCurrentLandmark(nextMapId);
+      if (landmark) visitedMaps.add(landmark.id);
       missionManager.registerMapEntry(nextMapId, storyFlags);
       this.resetMapNpcsToOrigin(ctx, nextMapId);
       const nextMapObj = mapManager.getMap(nextMapId);
@@ -389,6 +392,8 @@ export class OverworldWarpAndMapTransitionController {
         await this.ensureMapAndNeighborsLoaded(ctx, transitionConfig.targetMapId);
         const targetMap = mapManager.setCurrentMap(transitionConfig.targetMapId);
         visitedMaps.add(targetMap.id);
+        const landmark = resolveCurrentLandmark(targetMap.id);
+        if (landmark) visitedMaps.add(landmark.id);
         missionManager.registerMapEntry(targetMap.id, storyFlags);
         this.resetMapNpcsToOrigin(ctx, targetMap.id);
         if (targetMap.id.endsWith('_poke_center')) {

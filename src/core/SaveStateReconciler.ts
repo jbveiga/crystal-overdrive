@@ -49,6 +49,7 @@ export class SaveStateReconciler {
         badges: string[];
       };
       defeatedTrainers: Set<string>;
+      visitedMaps?: Set<string>;
       storyFlags: Set<string>;
       seenSpecies: Set<string>; caughtSpecies?: Set<string>;
       overworldItemManager: any;
@@ -99,6 +100,35 @@ export class SaveStateReconciler {
     state.missionManager.reconcileStarterState(state.playerParty, state.storyFlags);
 
     const initialMapId = existingSave.player.mapId || 'new_bark_town';
+    if (state.visitedMaps) {
+      if (Array.isArray(existingSave.visitedMaps)) {
+        existingSave.visitedMaps.forEach((m) => state.visitedMaps!.add(m));
+      }
+      state.visitedMaps.add(initialMapId);
+      state.visitedMaps.add('new_bark_town');
+      const badges = state.inventory.badges || [];
+      if (badges.includes('zephyr') || state.storyFlags.has('sprout_tower_cleared')) {
+        ['cherrygrove_city', 'route_29', 'route_30', 'route_31', 'violet_city'].forEach((m) => state.visitedMaps!.add(m));
+      }
+      if (badges.includes('hive') || state.storyFlags.has('slowpoke_well_cleared')) {
+        ['route_32', 'route_33', 'azalea_town'].forEach((m) => state.visitedMaps!.add(m));
+      }
+      if (badges.includes('plain')) {
+        ['route_34', 'goldenrod_city'].forEach((m) => state.visitedMaps!.add(m));
+      }
+      if (badges.includes('fog')) {
+        ['route_35', 'route_36', 'route_37', 'ecruteak_city'].forEach((m) => state.visitedMaps!.add(m));
+      }
+      if (badges.includes('storm') || badges.includes('mineral')) {
+        ['route_38', 'route_39', 'olivine_city', 'route_40', 'route_41', 'cianwood_city'].forEach((m) => state.visitedMaps!.add(m));
+      }
+      if (badges.includes('glacier')) {
+        ['route_42', 'route_43', 'mahogany_town', 'lake_of_rage'].forEach((m) => state.visitedMaps!.add(m));
+      }
+      if (badges.includes('rising')) {
+        ['route_44', 'route_45', 'blackthorn_city'].forEach((m) => state.visitedMaps!.add(m));
+      }
+    }
     const initialPlayerX = existingSave.player.x ?? 7;
     const initialPlayerY = existingSave.player.y ?? 1;
     const initialPlayerDir = existingSave.player.direction || 'DOWN';
@@ -152,6 +182,7 @@ export class SaveStateReconciler {
     boxManager: any;
     roamingManager: any;
     defeatedTrainers: Set<string>;
+    visitedMaps?: Set<string>;
     storyFlags: Set<string>;
     seenSpecies: Set<string>;
     caughtSpecies?: Set<string>;
@@ -175,6 +206,7 @@ export class SaveStateReconciler {
       boxManager,
       roamingManager,
       defeatedTrainers,
+      visitedMaps,
       storyFlags,
       seenSpecies,
       caughtSpecies,
@@ -222,6 +254,7 @@ export class SaveStateReconciler {
       },
       roamers: roamingManager.getAllRoamers(),
       defeatedTrainers: Array.from(defeatedTrainers),
+      visitedMaps: visitedMaps ? Array.from(visitedMaps) : [mapId],
       storyFlags: Array.from(storyFlags),
       collectedItems: overworldItemManager.getCollectedFlags(),
       collectedItemFlags: overworldItemManager.getCollectedFlags(),

@@ -59,6 +59,7 @@ export interface SaveData {
   };
   roamers: RoamerState[];
   defeatedTrainers: string[];
+  visitedMaps?: string[];
   storyFlags?: string[];
   seenSpecies?: string[];
   caughtSpecies?: string[];

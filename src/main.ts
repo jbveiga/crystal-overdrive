@@ -76,6 +76,7 @@ async function bootstrap() {
   let playerGender: PlayerGender = 'BOY', initialMapId = 'players_house_2f', initialPlayerX = 7, initialPlayerY = 1, initialPlayerDir: Direction = 'DOWN';
   let playerParty: PokemonInstance[] = [], playerBox: PokemonInstance[] = [];
   const defeatedTrainers = new Set<string>(), storyFlags = new TrackedStoryFlagSet(), seenSpecies = new Set<string>(), caughtSpecies = new Set<string>(), activeNpcCache = new ActiveNpcCache();
+  const visitedMaps = new Set<string>([initialMapId]);
   const audioManager = new AudioManager(), gameClock = new GameClock(), saveManager = new SaveManager();
   const existingSave = await saveManager.loadGame();
 
@@ -104,10 +105,11 @@ async function bootstrap() {
   };
 
   const hydrateFromSaveData = (saveData: any) => {
+    visitedMaps.clear();
     const playTimeBox = { val: playTimeSeconds }, playerNameBox = { val: playerName }, playerGenderBox = { val: playerGender }, rivalNameBox = { val: rivalName };
     const loc = SaveManager.hydrateGameState(saveData, {
       playTimeSeconds: playTimeBox, playerName: playerNameBox, playerGender: playerGenderBox, rivalName: rivalNameBox,
-      playerParty, playerBox, gameOptions, inventory, defeatedTrainers, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
+      playerParty, playerBox, gameOptions, inventory, defeatedTrainers, visitedMaps, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
       missionManager, gameClock, roamingManager,
     });
     playTimeSeconds = playTimeBox.val; playerName = playerNameBox.val; playerGender = playerGenderBox.val; rivalName = rivalNameBox.val;
@@ -134,7 +136,6 @@ async function bootstrap() {
   let setBattleSpeed!: (speed: SpeedMultiplier) => SpeedMultiplier, cyclePlayerSpeed!: () => SpeedMultiplier;
   let setTextSpeed!: (speed: GameOptions['textSpeed']) => GameOptions['textSpeed'], cycleTextSpeed!: () => GameOptions['textSpeed'];
 
-  const visitedMaps = new Set<string>([initialMapId]);
   const npcsByMap: Record<string, GridEntity[]> = createNpcsByMap();
   filterInitialMapNpcs(npcsByMap, storyFlags);
   applyStoryRecoveryFlags(storyFlags, defeatedTrainers, inventory);
@@ -220,7 +221,7 @@ async function bootstrap() {
       player: { x: player.x, y: player.y, direction: player.direction },
       mapId: mapManager.getCurrentMap()?.id || 'new_bark_town',
       gameClock, inventory, playerParty, boxManager, roamingManager,
-      defeatedTrainers, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
+      defeatedTrainers, visitedMaps, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
       gameOptions, missionManager, dayCareManager, kurtCraftingManager, bugContestManager,
     });
     await saveManager.saveGame(saveData);
@@ -456,7 +457,7 @@ async function bootstrap() {
       const fresh = SaveManager.createFreshSaveData(name, gender);
       playTimeSeconds = 0; playerParty.length = 0; playerBox.length = 0;
       Object.assign(inventory, { balls: fresh.inventory.balls, items: fresh.inventory.items || {}, tms: [...fresh.inventory.tms], berries: {}, keyItems: [], money: fresh.player.money, badges: [] });
-      defeatedTrainers.clear(); storyFlags.clear(); seenSpecies.clear(); caughtSpecies.clear();
+      defeatedTrainers.clear(); visitedMaps.clear(); visitedMaps.add('players_house_2f'); storyFlags.clear(); seenSpecies.clear(); caughtSpecies.clear();
       rivalName = 'SILVER';
       boxManager.getState().boxes.forEach((b) => b.pokemon.fill(null)); boxManager.changeBox(0);
       overworldItemManager.setCollectedFlags([]); overworldItemManager.setFruitTreePicks({});
