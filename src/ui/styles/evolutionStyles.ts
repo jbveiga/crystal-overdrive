@@ -458,47 +458,18 @@ export function injectNeoKantoEvolutionStyles(): void {
     @keyframes nkEvoRingSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
     @media (max-width: 767px) {
-      .nk-evo-stage {
-        padding: 12px;
-        max-height: none;
-      }
-      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-arena {
-        flex-direction: column;
-        justify-content: center;
-        gap: 10px;
-      }
-      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite-pedestal {
-        width: 200px;
-        height: 185px;
-      }
-      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite {
-        width: 140px;
-        height: 140px;
-      }
-      .nk-evo-celebration-card {
-        width: min(100%, 340px);
-        padding: 12px;
-        gap: 8px;
-      }
-      .nk-evo-celebration-top {
-        margin-bottom: 4px;
-      }
-      .nk-evo-stat-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      .nk-evo-console-plate {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 12px 14px;
-      }
-      .nk-evo-dialogue-text {
-        font-size: 13px;
-      }
-      .nk-evo-confirm-btn {
-        width: 100%;
-        text-align: center;
-      }
+      .nk-evo-stage { padding: 12px; max-height: none; }
+      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-arena { flex-direction: column; justify-content: center; gap: 10px; }
+      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite-pedestal { width: 200px; height: 185px; }
+      .nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-sprite { width: 140px; height: 140px; }
+      .nk-evo-celebration-card { width: min(100%, 340px); padding: 12px; gap: 8px; }
+      .nk-evo-celebration-top { margin-bottom: 4px; }
+      .nk-evo-stat-grid { grid-template-columns: repeat(3, 1fr); }
+      .nk-evo-console-plate { flex-direction: column; align-items: stretch; padding: 12px 14px; }
+      .nk-evo-dialogue-text { font-size: 13px; }
+      .nk-evo-confirm-btn { width: 100%; text-align: center; }
     }
   `;
   document.body.appendChild(style);
 }
+

@@ -88,10 +88,29 @@ export function getEncounterRateLabel(mode: EncounterRateMode): string {
   return '⚖️ NORMAL (6.25% Cap)';
 }
 
+export function getEncounterRateBg(mode: EncounterRateMode): string {
+  if (mode === 'RELAXED') return '#059669';
+  if (mode === 'CLASSIC') return '#d97706';
+  return '#0284c7';
+}
+
+export function getEncounterRateBorder(mode: EncounterRateMode): string {
+  if (mode === 'RELAXED') return '#34d399';
+  if (mode === 'CLASSIC') return '#fbbf24';
+  return '#38bdf8';
+}
+
+export function getGbcPaletteBg(mode: GbcPaletteMode): string {
+  if (mode === 'POCKET') return '#3f6212';
+  if (mode === 'DMG') return '#365314';
+  if (mode === 'NIGHT') return '#581c87';
+  return '#1e3a8a';
+}
+
 export function buildSettingsModalHtml(
   stateProvider: StartMenuStateProvider,
   speedMultiplier: SpeedMultiplier,
-  activeSettingsTab: 'ALL' | 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS'
+  activeSettingsTab: 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS'
 ): string {
   const isMuted = stateProvider.isMuted ? stateProvider.isMuted() : false;
     const currentSpeed = stateProvider.getSpeedMultiplier
@@ -138,9 +157,10 @@ export function buildSettingsModalHtml(
       : 'MID';
 
     const rowStyle = S.row;
-    const groupCardStyle = S.card;
     const subLabelStyle = S.sub;
     const titleLabelStyle = S.title;
+    const catRow = (cat: 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS') =>
+      `${rowStyle} display: ${activeSettingsTab === cat ? 'flex' : 'none'};`;
 
     return `
       <div style="position: sticky; top: 0; background: #0D1322; z-index: 3; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #22324F; padding-bottom: 10px; flex-shrink: 0;">
@@ -153,7 +173,6 @@ export function buildSettingsModalHtml(
 
       <!-- Segmented Category Tabs -->
       <div id="settings-category-tabs" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; flex-shrink: 0;">
-        <button id="settings-tab-all" data-settings-tab="ALL" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 60px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${activeSettingsTab === 'ALL' ? '#1E3A8A' : '#141E33'}; color: ${activeSettingsTab === 'ALL' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${activeSettingsTab === 'ALL' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ ALL ]</button>
         <button id="settings-tab-audio" data-settings-tab="AUDIO" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 60px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${activeSettingsTab === 'AUDIO' ? '#1E3A8A' : '#141E33'}; color: ${activeSettingsTab === 'AUDIO' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${activeSettingsTab === 'AUDIO' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ AUDIO ]</button>
         <button id="settings-tab-gameplay" data-settings-tab="GAMEPLAY" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 70px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${activeSettingsTab === 'GAMEPLAY' ? '#1E3A8A' : '#141E33'}; color: ${activeSettingsTab === 'GAMEPLAY' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${activeSettingsTab === 'GAMEPLAY' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ GAMEPLAY ]</button>
         <button id="settings-tab-graphics" data-settings-tab="GRAPHICS" class="neo-kanto-tactile-btn" style="flex: 1; min-width: 70px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; padding: 7px 8px; border-radius: 6px; cursor: pointer; background: ${activeSettingsTab === 'GRAPHICS' ? '#1E3A8A' : '#141E33'}; color: ${activeSettingsTab === 'GRAPHICS' ? '#FFFFFF' : '#94A3B8'}; border: 1.5px solid ${activeSettingsTab === 'GRAPHICS' ? '#38BDF8' : '#22324F'}; box-shadow: 0 3px 0 0 #070B14;">[ GRAPHICS ]</button>
@@ -162,7 +181,7 @@ export function buildSettingsModalHtml(
 
       <div id="settings-scroll-body" style="display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding-right: 2px;">
         <!-- Sound Toggle -->
-        <div data-settings-category="AUDIO" style="${rowStyle}">
+        <div data-settings-category="AUDIO" style="${catRow('AUDIO')}">
           <div>
             <div style="${titleLabelStyle}">AUDIO & SOUND</div>
             <div style="${subLabelStyle}">Background music & battle SFX</div>
@@ -176,7 +195,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- BGM Volume Slider -->
-        <div data-settings-category="AUDIO" style="${rowStyle}">
+        <div data-settings-category="AUDIO" style="${catRow('AUDIO')}">
           <div>
             <div style="${titleLabelStyle}">BGM VOLUME</div>
             <div style="${subLabelStyle}">Music playback level (<span id="settings-bgm-val">${Math.round(bgmVolume * 100)}%</span>)</div>
@@ -185,7 +204,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- SFX Volume Slider -->
-        <div data-settings-category="AUDIO" style="${rowStyle}">
+        <div data-settings-category="AUDIO" style="${catRow('AUDIO')}">
           <div>
             <div style="${titleLabelStyle}">SFX VOLUME</div>
             <div style="${subLabelStyle}">Sound effects & cries (<span id="settings-sfx-val">${Math.round(soundVolume * 100)}%</span>)</div>
@@ -194,7 +213,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- 8-Bit Chiptune APU Mode Toggle -->
-        <div data-settings-category="AUDIO" style="${rowStyle}">
+        <div data-settings-category="AUDIO" style="${catRow('AUDIO')}">
           <div>
             <div style="${titleLabelStyle}">BGM SYNTHESIS MODE</div>
             <div style="${subLabelStyle}">4-channel Game Boy APU vs Studio BGM</div>
@@ -208,7 +227,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- Low-HP Warning Alarm Beep Toggle -->
-        <div data-settings-category="AUDIO" style="${rowStyle}">
+        <div data-settings-category="AUDIO" style="${catRow('AUDIO')}">
           <div>
             <div style="${titleLabelStyle}">LOW-HP WARNING BEEP</div>
             <div style="${subLabelStyle}">Two-tone battle alarm when HP ≤ 20%</div>
@@ -222,7 +241,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- Speed Multiplier Cycle -->
-        <div data-settings-category="GAMEPLAY" style="${rowStyle}">
+        <div data-settings-category="GAMEPLAY" style="${catRow('GAMEPLAY')}">
           <div>
             <div style="${titleLabelStyle}">GAME SPEED</div>
             <div style="${subLabelStyle}">Overworld traversal & dialogue</div>
@@ -235,131 +254,36 @@ export function buildSettingsModalHtml(
           ">⚡ SPEED: ${currentSpeed}x</button>
         </div>
 
-        <!-- Battle Speed Group Card -->
-        <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
-          <div style="${S.cardHeader}">
-            <div>
-              <div style="${titleLabelStyle}">BATTLE SPEED</div>
-              <div style="${subLabelStyle}">Combat animations, HP/EXP bars & battle text pacing</div>
-            </div>
-            <button id="settings-battle-speed-btn" class="neo-kanto-tactile-btn" style="
-              background: ${getBattleSpeedBg(battleSpeed)};
-              color: #ffffff;
-              border: 1.5px solid ${getBattleSpeedBorder(battleSpeed)};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 7px 12px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-              min-width: 130px;
-            ">⚔️ BATTLE: ${battleSpeed}x</button>
+        <!-- Battle Speed Cycle -->
+        <div data-settings-category="GAMEPLAY" style="${catRow('GAMEPLAY')}">
+          <div>
+            <div style="${titleLabelStyle}">BATTLE SPEED</div>
+            <div style="${subLabelStyle}">Combat animations, HP/EXP bars & battle text pacing</div>
           </div>
-          <div id="settings-battle-speed-segmented-group" style="${S.rowGroup}">
-            <button id="settings-battle-speed-1x-btn" data-battle-speed-choice="1" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${battleSpeed === 1 ? '#2563eb' : '#080E1D'};
-              color: ${battleSpeed === 1 ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${battleSpeed === 1 ? '#60a5fa' : '#22324F'};
-              ${S.segBtn}
-            ">[ 1x NORMAL ]</button>
-            <button id="settings-battle-speed-2x-btn" data-battle-speed-choice="2" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${battleSpeed === 2 ? '#d97706' : '#080E1D'};
-              color: ${battleSpeed === 2 ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${battleSpeed === 2 ? '#f59e0b' : '#22324F'};
-              ${S.segBtn}
-            ">[ 2x FAST ]</button>
-            <button id="settings-battle-speed-3x-btn" data-battle-speed-choice="3" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${battleSpeed === 3 ? '#dc2626' : '#080E1D'};
-              color: ${battleSpeed === 3 ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${battleSpeed === 3 ? '#ef4444' : '#22324F'};
-              ${S.segBtn}
-            ">[ 3x TURBO ]</button>
-          </div>
+          <button id="settings-battle-speed-btn" class="neo-kanto-tactile-btn" style="
+            background: ${getBattleSpeedBg(battleSpeed)};
+            color: #ffffff;
+            border: 1.5px solid ${getBattleSpeedBorder(battleSpeed)};
+            ${S.btnBase}
+          ">⚔️ BATTLE: ${battleSpeed}x</button>
         </div>
 
-        <!-- Text Speed Group Card -->
-        <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
-          <div style="${S.cardHeader}">
-            <div>
-              <div style="${titleLabelStyle}">TEXT SPEED</div>
-              <div style="${subLabelStyle}">Overworld & battle dialogue typewriter cadence</div>
-            </div>
-            <button id="settings-text-speed-btn" class="neo-kanto-tactile-btn" style="
-              background: ${getTextSpeedBg(textSpeed)};
-              color: #ffffff;
-              border: 1.5px solid ${getTextSpeedBorder(textSpeed)};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 7px 12px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-              min-width: 130px;
-            ">💬 TEXT: ${getTextSpeedLabel(textSpeed)}</button>
+        <!-- Text Speed Cycle -->
+        <div data-settings-category="GAMEPLAY" style="${catRow('GAMEPLAY')}">
+          <div>
+            <div style="${titleLabelStyle}">TEXT SPEED</div>
+            <div style="${subLabelStyle}">Overworld & battle dialogue typewriter cadence</div>
           </div>
-          <div id="settings-text-speed-segmented-group" style="${S.rowGroup}">
-            <button id="settings-text-slow-btn" data-text-speed-choice="SLOW" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${textSpeed === 'SLOW' ? '#475569' : '#080E1D'};
-              color: ${textSpeed === 'SLOW' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${textSpeed === 'SLOW' ? '#94a3b8' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 6px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ SLOW ]</button>
-            <button id="settings-text-mid-btn" data-text-speed-choice="MID" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${textSpeed === 'MID' ? '#0284c7' : '#080E1D'};
-              color: ${textSpeed === 'MID' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${textSpeed === 'MID' ? '#38bdf8' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 6px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ NORMAL ]</button>
-            <button id="settings-text-fast-btn" data-text-speed-choice="FAST" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${textSpeed === 'FAST' ? '#059669' : '#080E1D'};
-              color: ${textSpeed === 'FAST' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${textSpeed === 'FAST' ? '#34d399' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 6px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ FAST ]</button>
-            <button id="settings-text-instant-btn" data-text-speed-choice="INSTANT" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${textSpeed === 'INSTANT' ? '#7c3aed' : '#080E1D'};
-              color: ${textSpeed === 'INSTANT' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${textSpeed === 'INSTANT' ? '#c084fc' : '#22324F'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 6px 6px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-            ">[ INSTANT ]</button>
-          </div>
+          <button id="settings-text-speed-btn" class="neo-kanto-tactile-btn" style="
+            background: ${getTextSpeedBg(textSpeed)};
+            color: #ffffff;
+            border: 1.5px solid ${getTextSpeedBorder(textSpeed)};
+            ${S.btnBase}
+          ">💬 TEXT: ${getTextSpeedLabel(textSpeed)}</button>
         </div>
 
         <!-- Battle Animations Toggle -->
-        <div data-settings-category="GAMEPLAY" style="${rowStyle}">
+        <div data-settings-category="GAMEPLAY" style="${catRow('GAMEPLAY')}">
           <div>
             <div style="${titleLabelStyle}">BATTLE ANIMATIONS</div>
             <div style="${subLabelStyle}">Move VFX & combat battle scene effects</div>
@@ -373,7 +297,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- Battle Style Toggle -->
-        <div data-settings-category="GAMEPLAY" style="${rowStyle}">
+        <div data-settings-category="GAMEPLAY" style="${catRow('GAMEPLAY')}">
           <div>
             <div style="${titleLabelStyle}">BATTLE STYLE</div>
             <div style="${subLabelStyle}">Prompt switch on enemy faint (SHIFT vs SET)</div>
@@ -387,7 +311,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- Touch Controls Toggle -->
-        <div data-settings-category="CONTROLS" style="${rowStyle}">
+        <div data-settings-category="CONTROLS" style="${catRow('CONTROLS')}">
           <div>
             <div style="${titleLabelStyle}">TOUCH CONTROLS</div>
             <div style="${subLabelStyle}">On-screen virtual D-Pad & A/B</div>
@@ -401,7 +325,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- Touch Control Style Toggle (D-Pad vs Analog Joystick) -->
-        <div data-settings-category="CONTROLS" style="${rowStyle}">
+        <div data-settings-category="CONTROLS" style="${catRow('CONTROLS')}">
           <div>
             <div style="${titleLabelStyle}">CONTROL STYLE</div>
             <div style="${subLabelStyle}">D-Pad buttons or analog joystick</div>
@@ -415,7 +339,7 @@ export function buildSettingsModalHtml(
         </div>
 
         <!-- CRT Scanlines Toggle -->
-        <div data-settings-category="GRAPHICS" style="${rowStyle}">
+        <div data-settings-category="GRAPHICS" style="${catRow('GRAPHICS')}">
           <div>
             <div style="${titleLabelStyle}">CRT SCANLINE OVERLAY</div>
             <div style="${subLabelStyle}">Retro CRT horizontal scanlines & bezel vignette</div>
@@ -428,153 +352,50 @@ export function buildSettingsModalHtml(
           ">${isCrtScanlines ? '📺 CRT: ON' : '📺 CRT: OFF'}</button>
         </div>
 
-        <!-- GBC Color Palette Group Card -->
-        <div data-settings-category="GRAPHICS" style="${groupCardStyle}">
-          <div style="${S.cardHeader}">
-            <div>
-              <div style="${titleLabelStyle}">GBC COLOR PALETTE</div>
-              <div id="settings-palette-desc" style="${subLabelStyle}">${GBC_PALETTE_SPECS[gbcPalette]?.description || 'Authentic Game Boy Color palette'}</div>
-            </div>
-            <button id="settings-palette-btn" class="neo-kanto-tactile-btn" style="
-              background: #141E33;
-              color: #ffffff;
-              border: 1.5px solid ${GBC_PALETTE_SPECS[gbcPalette]?.accentColor || '#38bdf8'};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 7px 12px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-              min-width: 130px;
-            ">${GBC_PALETTE_SPECS[gbcPalette]?.label || '🎨 VIBRANT GBC'}</button>
+        <!-- GBC Color Palette Cycle -->
+        <div data-settings-category="GRAPHICS" style="${catRow('GRAPHICS')}">
+          <div>
+            <div style="${titleLabelStyle}">GBC COLOR PALETTE</div>
+            <div id="settings-palette-desc" style="${subLabelStyle}">${GBC_PALETTE_SPECS[gbcPalette]?.description || 'Authentic Game Boy Color palette'}</div>
           </div>
-          <div id="settings-palette-segmented-group" style="${S.rowGroup}">
-            <button id="settings-palette-vibrant-btn" data-palette-choice="VIBRANT" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${gbcPalette === 'VIBRANT' ? '#1e3a8a' : '#080E1D'};
-              color: ${gbcPalette === 'VIBRANT' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${gbcPalette === 'VIBRANT' ? '#38bdf8' : '#22324F'};
-              ${S.segBtn}
-            ">[ VIBRANT ]</button>
-            <button id="settings-palette-pocket-btn" data-palette-choice="POCKET" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${gbcPalette === 'POCKET' ? '#3f6212' : '#080E1D'};
-              color: ${gbcPalette === 'POCKET' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${gbcPalette === 'POCKET' ? '#a3e635' : '#22324F'};
-              ${S.segBtn}
-            ">[ POCKET ]</button>
-            <button id="settings-palette-dmg-btn" data-palette-choice="DMG" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${gbcPalette === 'DMG' ? '#365314' : '#080E1D'};
-              color: ${gbcPalette === 'DMG' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${gbcPalette === 'DMG' ? '#84cc16' : '#22324F'};
-              ${S.segBtn}
-            ">[ DMG-01 ]</button>
-            <button id="settings-palette-night-btn" data-palette-choice="NIGHT" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${gbcPalette === 'NIGHT' ? '#581c87' : '#080E1D'};
-              color: ${gbcPalette === 'NIGHT' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${gbcPalette === 'NIGHT' ? '#c084fc' : '#22324F'};
-              ${S.segBtn}
-            ">[ MIDNIGHT ]</button>
-          </div>
+          <button id="settings-palette-btn" class="neo-kanto-tactile-btn" style="
+            background: ${getGbcPaletteBg(gbcPalette)};
+            color: #ffffff;
+            border: 1.5px solid ${GBC_PALETTE_SPECS[gbcPalette]?.accentColor || '#38bdf8'};
+            ${S.btnBase}
+          ">${GBC_PALETTE_SPECS[gbcPalette]?.label || '🎨 VIBRANT GBC'}</button>
         </div>
 
-        <!-- Unbound-Style Exp. Share Mode Toggle (OFF | ALL | CAPPED) -->
-        <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
-          <div style="${S.cardHeader}">
-            <div>
-              <div style="${titleLabelStyle}">EXP. SHARE MODE</div>
-              <div style="${subLabelStyle}">Party EXP distribution & level caps</div>
-            </div>
-            <button id="settings-exp-share-btn" class="neo-kanto-tactile-btn" style="
-              background: ${getExpShareButtonBg(expShareMode)};
-              color: #ffffff;
-              border: 1.5px solid ${getExpShareButtonBorder(expShareMode)};
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 7px 12px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-              min-width: 130px;
-            ">${getExpShareButtonLabel(expShareMode, currentLevelCap)}</button>
+        <!-- Unbound-Style Exp. Share Mode Cycle (OFF | ALL | CAPPED) -->
+        <div data-settings-category="GAMEPLAY" style="${catRow('GAMEPLAY')}">
+          <div>
+            <div style="${titleLabelStyle}">EXP. SHARE MODE</div>
+            <div style="${subLabelStyle}">Party EXP distribution & level caps</div>
           </div>
-          <div id="settings-exp-segmented-group" style="${S.rowGroup}">
-            <button id="settings-exp-off-btn" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${expShareMode === 'OFF' ? '#475569' : '#080E1D'};
-              color: ${expShareMode === 'OFF' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${expShareMode === 'OFF' ? '#cbd5e1' : '#22324F'};
-              ${S.segBtn}
-            ">[ OFF ]</button>
-            <button id="settings-exp-all-btn" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${expShareMode === 'ALL' ? '#059669' : '#080E1D'};
-              color: ${expShareMode === 'ALL' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${expShareMode === 'ALL' ? '#34d399' : '#22324F'};
-              ${S.segBtn}
-            ">[ ALL ]</button>
-            <button id="settings-exp-capped-btn" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${expShareMode === 'CAPPED' ? '#7c3aed' : '#080E1D'};
-              color: ${expShareMode === 'CAPPED' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${expShareMode === 'CAPPED' ? '#c084fc' : '#22324F'};
-              ${S.segBtn}
-            ">[ 🧢 CAPPED ]</button>
-          </div>
+          <button id="settings-exp-share-btn" class="neo-kanto-tactile-btn" style="
+            background: ${getExpShareButtonBg(expShareMode)};
+            color: #ffffff;
+            border: 1.5px solid ${getExpShareButtonBorder(expShareMode)};
+            ${S.btnBase}
+          ">${getExpShareButtonLabel(expShareMode, currentLevelCap)}</button>
         </div>
 
-        <!-- Wild Encounter Rate Cap Toggle (RELAXED 4.0% | NORMAL 6.25% | CLASSIC 10.0%) -->
-        <div data-settings-category="GAMEPLAY" style="${groupCardStyle}">
-          <div style="${S.cardHeader}">
-            <div>
-              <div style="${titleLabelStyle}">WILD ENCOUNTER RATE</div>
-              <div style="${subLabelStyle}">4-step grace buffer + step probability cap</div>
-            </div>
-            <button id="settings-encounter-rate-btn" class="neo-kanto-tactile-btn" style="
-              background: #0284c7;
-              color: #ffffff;
-              border: 1.5px solid #38bdf8;
-              box-shadow: 0 3px 0 0 #070B14;
-              border-radius: 6px;
-              padding: 7px 12px;
-              font-family: 'Space Mono', monospace;
-              font-size: 11px;
-              font-weight: 800;
-              cursor: pointer;
-              min-width: 130px;
-            ">${getEncounterRateLabel(encounterRateMode)}</button>
+        <!-- Wild Encounter Rate Cap Cycle (RELAXED 4.0% | NORMAL 6.25% | CLASSIC 10.0%) -->
+        <div data-settings-category="GAMEPLAY" style="${catRow('GAMEPLAY')}">
+          <div>
+            <div style="${titleLabelStyle}">WILD ENCOUNTER RATE</div>
+            <div style="${subLabelStyle}">4-step grace buffer + step probability cap</div>
           </div>
-          <div id="settings-encounter-segmented-group" style="${S.rowGroup}">
-            <button id="settings-enc-relaxed-btn" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${encounterRateMode === 'RELAXED' ? '#059669' : '#080E1D'};
-              color: ${encounterRateMode === 'RELAXED' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${encounterRateMode === 'RELAXED' ? '#34d399' : '#22324F'};
-              ${S.segBtn}
-            ">[ RELAXED 4% ]</button>
-            <button id="settings-enc-normal-btn" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${encounterRateMode === 'NORMAL' ? '#0284c7' : '#080E1D'};
-              color: ${encounterRateMode === 'NORMAL' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${encounterRateMode === 'NORMAL' ? '#38bdf8' : '#22324F'};
-              ${S.segBtn}
-            ">[ NORMAL 6.25% ]</button>
-            <button id="settings-enc-classic-btn" class="neo-kanto-tactile-btn" style="
-              flex: 1;
-              background: ${encounterRateMode === 'CLASSIC' ? '#d97706' : '#080E1D'};
-              color: ${encounterRateMode === 'CLASSIC' ? '#ffffff' : '#94a3b8'};
-              border: 1.5px solid ${encounterRateMode === 'CLASSIC' ? '#fbbf24' : '#22324F'};
-              ${S.segBtn}
-            ">[ CLASSIC 10% ]</button>
-          </div>
+          <button id="settings-encounter-rate-btn" class="neo-kanto-tactile-btn" style="
+            background: ${getEncounterRateBg(encounterRateMode)};
+            color: #ffffff;
+            border: 1.5px solid ${getEncounterRateBorder(encounterRateMode)};
+            ${S.btnBase}
+          ">${getEncounterRateLabel(encounterRateMode)}</button>
         </div>
 
         <!-- Auto-HM Mode Single Toggle -->
-        <div data-settings-category="GAMEPLAY" style="${rowStyle}">
+        <div data-settings-category="GAMEPLAY" style="${catRow('GAMEPLAY')}">
           <div>
             <div style="${titleLabelStyle}">AUTO-HM MODE</div>
             <div style="${subLabelStyle}">Use Surf, Cut & Strength automatically</div>

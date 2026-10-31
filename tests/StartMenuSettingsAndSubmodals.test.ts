@@ -130,13 +130,14 @@ describe('StartMenuUI — Settings, Drawer & Submodals', () => {
     const tabGraphics = doc.getElementById('settings-tab-graphics');
     const tabControls = doc.getElementById('settings-tab-controls');
 
-    expect(tabAll).not.toBeNull();
+    // ALL tab is removed to keep settings navigation clean and unambiguous
+    expect(tabAll).toBeNull();
     expect(tabAudio).not.toBeNull();
     expect(tabGameplay).not.toBeNull();
     expect(tabGraphics).not.toBeNull();
     expect(tabControls).not.toBeNull();
 
-    // Default tab is ALL: all rows are visible
+    // Default tab is AUDIO: audio rows are visible and other categories are hidden
     const audioRows = settingsModal?.querySelectorAll('[data-settings-category="AUDIO"]') || [];
     const gameplayRows = settingsModal?.querySelectorAll('[data-settings-category="GAMEPLAY"]') || [];
     const graphicsRows = settingsModal?.querySelectorAll('[data-settings-category="GRAPHICS"]') || [];
@@ -147,8 +148,6 @@ describe('StartMenuUI — Settings, Drawer & Submodals', () => {
     expect(graphicsRows.length).toBeGreaterThan(0);
     expect(controlsRows.length).toBeGreaterThan(0);
 
-    // Filter to AUDIO
-    tabAudio?.click();
     for (const row of audioRows) {
       expect(row.style.display).not.toBe('none');
     }
@@ -186,13 +185,13 @@ describe('StartMenuUI — Settings, Drawer & Submodals', () => {
       expect(row.style.display).toBe('none');
     }
 
-    // Restore ALL
-    tabAll?.click();
+    // Return to AUDIO
+    tabAudio?.click();
     for (const row of audioRows) {
       expect(row.style.display).not.toBe('none');
     }
     for (const row of gameplayRows) {
-      expect(row.style.display).not.toBe('none');
+      expect(row.style.display).toBe('none');
     }
 
     // 4. Bug-Catching Contest Leaderboard Modal
@@ -327,49 +326,33 @@ describe('StartMenuUI — Settings, Drawer & Submodals', () => {
     const settingsModal = doc.getElementById('settings-modal');
     expect(settingsModal).not.toBeNull();
 
-    // Verify Battle Speed controls
+    // Verify Battle Speed single-button cycle control (no redundant segmented sub-row)
     const battleSpeedHeaderBtn = settingsModal?.querySelector('#settings-battle-speed-btn');
-    const battleSpeed1xBtn = settingsModal?.querySelector('#settings-battle-speed-1x-btn');
-    const battleSpeed2xBtn = settingsModal?.querySelector('#settings-battle-speed-2x-btn');
-    const battleSpeed3xBtn = settingsModal?.querySelector('#settings-battle-speed-3x-btn');
+    const battleSpeedSegmentedGroup = settingsModal?.querySelector('#settings-battle-speed-segmented-group');
 
     expect(battleSpeedHeaderBtn).toBeDefined();
-    expect(battleSpeed1xBtn).toBeDefined();
-    expect(battleSpeed2xBtn).toBeDefined();
-    expect(battleSpeed3xBtn).toBeDefined();
-
+    expect(battleSpeedHeaderBtn).not.toBeNull();
+    expect(battleSpeedSegmentedGroup).toBeNull();
     expect(battleSpeedHeaderBtn?.innerText).toContain('1x');
 
-    // Click 2x segmented button
-    battleSpeed2xBtn?.click();
-    expect(onSetBattleSpeed).toHaveBeenCalledWith(2);
-
-    // Click header cycle button
+    // Click cycle button -> 2x
     battleSpeedHeaderBtn?.click();
     expect(onCycleBattleSpeed).toHaveBeenCalled();
+    expect(battleSpeedHeaderBtn?.innerText).toContain('2x');
 
-    // Verify Text Speed controls
+    // Verify Text Speed single-button cycle control (no redundant segmented sub-row)
     const textSpeedHeaderBtn = settingsModal?.querySelector('#settings-text-speed-btn');
-    const textSlowBtn = settingsModal?.querySelector('#settings-text-slow-btn');
-    const textMidBtn = settingsModal?.querySelector('#settings-text-mid-btn');
-    const textFastBtn = settingsModal?.querySelector('#settings-text-fast-btn');
-    const textInstantBtn = settingsModal?.querySelector('#settings-text-instant-btn');
+    const textSpeedSegmentedGroup = settingsModal?.querySelector('#settings-text-speed-segmented-group');
 
     expect(textSpeedHeaderBtn).toBeDefined();
-    expect(textSlowBtn).toBeDefined();
-    expect(textMidBtn).toBeDefined();
-    expect(textFastBtn).toBeDefined();
-    expect(textInstantBtn).toBeDefined();
-
+    expect(textSpeedHeaderBtn).not.toBeNull();
+    expect(textSpeedSegmentedGroup).toBeNull();
     expect(textSpeedHeaderBtn?.innerText).toContain('NORMAL');
 
-    // Click INSTANT segmented button
-    textInstantBtn?.click();
-    expect(onSetTextSpeed).toHaveBeenCalledWith('INSTANT');
-
-    // Click header cycle button
+    // Click cycle button -> FAST
     textSpeedHeaderBtn?.click();
     expect(onCycleTextSpeed).toHaveBeenCalled();
+    expect(textSpeedHeaderBtn?.innerText).toContain('FAST');
   });
 });
 

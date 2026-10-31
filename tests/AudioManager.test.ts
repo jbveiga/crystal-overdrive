@@ -144,15 +144,34 @@ describe('AudioManager & Chiptune Audio Engine', () => {
     expect(audioManager.getChiptuneSynthesizer().isPlaying()).toBe(false);
   });
 
-  it('verifies ChiptuneSynthesizer 4-channel patterns (Pulse 1, Pulse 2, Wave, Noise)', () => {
+  it('verifies ChiptuneSynthesizer 4-channel multi-bar Gen 2 patterns (Pulse 1, Pulse 2, Wave, Noise)', () => {
     const synth = new ChiptuneSynthesizer();
-    const pattern = synth.getPatternForTrack('bgm_gym_leader_battle');
-    expect(pattern.bpm).toBeGreaterThan(120);
-    expect(pattern.steps.length).toBeGreaterThan(0);
-    expect(pattern.steps.some((s) => Boolean(s.pulse1))).toBe(true);
-    expect(pattern.steps.some((s) => Boolean(s.pulse2))).toBe(true);
-    expect(pattern.steps.some((s) => Boolean(s.wave))).toBe(true);
-    expect(pattern.steps.some((s) => Boolean(s.noise))).toBe(true);
+    const allTracks = [
+      'bgm_new_bark_town',
+      'bgm_route_29',
+      'bgm_cherrygrove_city',
+      'bgm_violet_city',
+      'bgm_sprout_tower',
+      'bgm_goldenrod_city',
+      'bgm_ecruteak_city',
+      'bgm_national_park',
+      'bgm_gym',
+      'bgm_elms_lab',
+      'bgm_wild_battle',
+      'bgm_trainer_battle',
+      'bgm_gym_leader_battle',
+      'bgm_evolution',
+      'bgm_game_corner',
+    ];
+    for (const trackId of allTracks) {
+      const pattern = synth.getPatternForTrack(trackId);
+      expect(pattern.bpm).toBeGreaterThanOrEqual(110);
+      expect(pattern.steps.length).toBeGreaterThanOrEqual(32);
+      expect(pattern.steps.some((s) => Boolean(s.pulse1))).toBe(true);
+      expect(pattern.steps.some((s) => Boolean(s.pulse2))).toBe(true);
+      expect(pattern.steps.some((s) => Boolean(s.wave))).toBe(true);
+      expect(pattern.steps.some((s) => Boolean(s.noise))).toBe(true);
+    }
 
     synth.playTrack('bgm_wild_battle');
     expect(synth.isPlaying()).toBe(true);

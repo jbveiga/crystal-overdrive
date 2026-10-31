@@ -66,7 +66,7 @@ export class BattleHUD {
   private selectedSlot2Target: 0 | 1 = 1;
 
   private callbacks?: BattleHUDCallbacks;
-  private activeBagTab: BattleBagTab = 'ALL';
+  private activeBagTab: BattleBagTab = 'MEDICINE';
   private selectedBagTargetIndex: number = 0;
   private playerParty: PokemonInstance[] = [];
   private caughtSpeciesIds: Set<string> = new Set();

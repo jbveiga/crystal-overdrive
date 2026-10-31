@@ -110,7 +110,7 @@ export class StartMenuUI {
   private cursorIndex: number = 0;
   private speedMultiplier: SpeedMultiplier = 1;
   private menuItems: Array<{ id: string; label: string; icon: string; shortcut: string; action: () => void }> = [];
-  private activeSettingsTab: 'ALL' | 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS' = 'ALL';
+  private activeSettingsTab: 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS' = 'AUDIO';
 
   // Sub-modal delegated renderers
   private pokedexRenderer!: PokedexModalRenderer;
@@ -708,7 +708,7 @@ export class StartMenuUI {
 
   public openSettings(): void {
     BattleAudio.playMenuSound('CONFIRM');
-    this.activeSettingsTab = 'ALL';
+    this.activeSettingsTab = 'AUDIO';
     this.menuPanel.style.display = 'none';
     this.settingsModal.style.display = 'flex';
     this.renderSettingsContent();

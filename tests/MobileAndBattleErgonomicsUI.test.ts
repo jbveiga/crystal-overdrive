@@ -271,22 +271,18 @@ describe('Mobile & Battle Ergonomics UI Enhancements', () => {
       (mockDoc.querySelector('#start-opt-settings') as MockElement).click();
 
       const cycleBtn = mockDoc.querySelector('#settings-exp-share-btn') as MockElement;
-      const offBtn = mockDoc.querySelector('#settings-exp-off-btn') as MockElement;
-      const allBtn = mockDoc.querySelector('#settings-exp-all-btn') as MockElement;
-      const cappedBtn = mockDoc.querySelector('#settings-exp-capped-btn') as MockElement;
+      const expSegGroup = mockDoc.querySelector('#settings-exp-segmented-group');
 
       expect(cycleBtn).not.toBeNull();
-      expect(offBtn).not.toBeNull();
-      expect(allBtn).not.toBeNull();
-      expect(cappedBtn).not.toBeNull();
+      expect(expSegGroup).toBeNull();
 
-      offBtn.click();
+      cycleBtn.click();
       expect(currentExpMode).toBe('OFF');
 
-      allBtn.click();
+      cycleBtn.click();
       expect(currentExpMode).toBe('ALL');
 
-      cappedBtn.click();
+      cycleBtn.click();
       expect(currentExpMode).toBe('CAPPED');
 
       // Test ItemfinderHUD capsule
@@ -403,5 +399,27 @@ describe('Mobile & Battle Ergonomics UI Enhancements', () => {
         vi.useRealTimers();
       }
     });
+
+    it('renders Battle Bag menu with only MEDICINE and BALLS tabs (no ALL tab)', () => {
+      const hud = makeHud();
+      (hud as any).itemsInventory = { potion: 3 };
+      (hud as any).ballsInventory = { 'poke-ball': 5 };
+
+      hud.showBagMenu();
+      const bagMenu = (hud as any).bagMenu as MockElement;
+      expect(bagMenu.querySelector('.battle-bag-tab-all')).toBeNull();
+      expect(bagMenu.querySelector('.battle-bag-tab-medicine')).not.toBeNull();
+      expect(bagMenu.querySelector('.battle-bag-tab-balls')).not.toBeNull();
+
+      // Default tab is MEDICINE: Potion is shown, Poké Ball is not mixed in
+      expect(bagMenu.querySelectorAll('.battle-bag-item-btn').length).toBe(1);
+      expect(bagMenu.querySelectorAll('.battle-bag-ball-btn').length).toBe(0);
+
+      // Switching to BALLS tab shows Poké Ball only
+      hud.showBagMenu('BALLS');
+      expect(bagMenu.querySelectorAll('.battle-bag-item-btn').length).toBe(0);
+      expect(bagMenu.querySelectorAll('.battle-bag-ball-btn').length).toBe(1);
+    });
   });
 });
+

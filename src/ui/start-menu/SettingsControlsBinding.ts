@@ -29,6 +29,9 @@ import {
   getExpShareButtonBg,
   getExpShareButtonBorder,
   getEncounterRateLabel,
+  getEncounterRateBg,
+  getEncounterRateBorder,
+  getGbcPaletteBg,
 } from './SettingsModalRenderer';
 
 export function bindSettingsEventListeners(params: {
@@ -38,8 +41,8 @@ export function bindSettingsEventListeners(params: {
   callbacks: StartMenuCallbacks;
   getSpeedMultiplier: () => SpeedMultiplier;
   setSpeedMultiplier: (speed: SpeedMultiplier) => void;
-  getActiveSettingsTab: () => 'ALL' | 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS';
-  setActiveSettingsTab: (tab: 'ALL' | 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS') => void;
+  getActiveSettingsTab: () => 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS';
+  setActiveSettingsTab: (tab: 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS') => void;
   reRenderSettingsContent: () => void;
 }): void {
   const {
@@ -47,11 +50,7 @@ export function bindSettingsEventListeners(params: {
     menuPanel,
     stateProvider,
     callbacks,
-    getSpeedMultiplier,
-    setSpeedMultiplier,
-    getActiveSettingsTab,
     setActiveSettingsTab,
-    reRenderSettingsContent,
   } = params;
 
   const currentBadges = stateProvider.getBadges ? stateProvider.getBadges().length : 0;
@@ -83,7 +82,7 @@ export function bindSettingsEventListeners(params: {
     : 'MID';
 
     // Hook up category tab filtering
-    const filterCategory = (tab: 'ALL' | 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS') => {
+    const filterCategory = (tab: 'AUDIO' | 'GAMEPLAY' | 'GRAPHICS' | 'CONTROLS') => {
       setActiveSettingsTab(tab);
       const tabBtns = settingsModal.querySelectorAll('[data-settings-tab]');
       for (let i = 0; i < tabBtns.length; i++) {
@@ -99,7 +98,7 @@ export function bindSettingsEventListeners(params: {
       for (let i = 0; i < rows.length; i++) {
         const r = rows[i] as HTMLElement;
         const cat = r.getAttribute('data-settings-category');
-        if (tab === 'ALL' || cat === tab) {
+        if (cat === tab) {
           r.style.display = 'flex';
         } else {
           r.style.display = 'none';
@@ -107,8 +106,6 @@ export function bindSettingsEventListeners(params: {
       }
     };
 
-    const tabAll = settingsModal.querySelector('#settings-tab-all');
-    tabAll?.addEventListener('click', () => { BattleAudio.playMenuSound('CURSOR'); filterCategory('ALL'); });
     const tabAudio = settingsModal.querySelector('#settings-tab-audio');
     tabAudio?.addEventListener('click', () => { BattleAudio.playMenuSound('CURSOR'); filterCategory('AUDIO'); });
     const tabGameplay = settingsModal.querySelector('#settings-tab-gameplay');
@@ -133,18 +130,8 @@ export function bindSettingsEventListeners(params: {
     const crtBtn = settingsModal.querySelector('#settings-crt-btn') as HTMLButtonElement;
     const paletteBtn = settingsModal.querySelector('#settings-palette-btn') as HTMLButtonElement | null;
     const paletteDesc = settingsModal.querySelector('#settings-palette-desc') as HTMLElement | null;
-    const paletteVibrantBtn = settingsModal.querySelector('#settings-palette-vibrant-btn') as HTMLButtonElement | null;
-    const palettePocketBtn = settingsModal.querySelector('#settings-palette-pocket-btn') as HTMLButtonElement | null;
-    const paletteDmgBtn = settingsModal.querySelector('#settings-palette-dmg-btn') as HTMLButtonElement | null;
-    const paletteNightBtn = settingsModal.querySelector('#settings-palette-night-btn') as HTMLButtonElement | null;
-    const expShareBtn = settingsModal.querySelector('#settings-exp-share-btn') as HTMLButtonElement;
-    const expOffBtn = settingsModal.querySelector('#settings-exp-off-btn') as HTMLButtonElement;
-    const expAllBtn = settingsModal.querySelector('#settings-exp-all-btn') as HTMLButtonElement;
-    const expCappedBtn = settingsModal.querySelector('#settings-exp-capped-btn') as HTMLButtonElement;
-    const encRateBtn = settingsModal.querySelector('#settings-encounter-rate-btn') as HTMLButtonElement;
-    const encRelaxedBtn = settingsModal.querySelector('#settings-enc-relaxed-btn') as HTMLButtonElement;
-    const encNormalBtn = settingsModal.querySelector('#settings-enc-normal-btn') as HTMLButtonElement;
-    const encClassicBtn = settingsModal.querySelector('#settings-enc-classic-btn') as HTMLButtonElement;
+    const expShareBtn = settingsModal.querySelector('#settings-exp-share-btn') as HTMLButtonElement | null;
+    const encRateBtn = settingsModal.querySelector('#settings-encounter-rate-btn') as HTMLButtonElement | null;
     const autoHmBtn = settingsModal.querySelector('#settings-autohm-btn') as HTMLButtonElement;
     const closeBtn = settingsModal.querySelector('#close-settings-btn') as HTMLButtonElement;
     const closeXBtn = settingsModal.querySelector('#close-settings-x-btn') as HTMLButtonElement;
@@ -187,33 +174,21 @@ export function bindSettingsEventListeners(params: {
     }
 
     let activePalette: GbcPaletteMode = stateProvider.getGbcPalette ? stateProvider.getGbcPalette() : 'VIBRANT';
-    const syncPaletteButtons = (pal: GbcPaletteMode) => {
+    const syncPaletteButton = (pal: GbcPaletteMode) => {
       activePalette = pal;
       const spec = GBC_PALETTE_SPECS[pal];
       if (paletteBtn && spec) {
         paletteBtn.innerText = spec.label;
+        paletteBtn.style.background = getGbcPaletteBg(pal);
         paletteBtn.style.borderColor = spec.accentColor;
       }
       if (paletteDesc && spec) paletteDesc.innerText = spec.description;
-      const choices: Array<{ el: HTMLButtonElement | null; mode: GbcPaletteMode; bg: string; border: string }> = [
-        { el: paletteVibrantBtn, mode: 'VIBRANT', bg: '#1e3a8a', border: '#38bdf8' },
-        { el: palettePocketBtn, mode: 'POCKET', bg: '#3f6212', border: '#a3e635' },
-        { el: paletteDmgBtn, mode: 'DMG', bg: '#365314', border: '#84cc16' },
-        { el: paletteNightBtn, mode: 'NIGHT', bg: '#581c87', border: '#c084fc' },
-      ];
-      for (const c of choices) {
-        if (!c.el) continue;
-        const isSel = pal === c.mode;
-        c.el.style.background = isSel ? c.bg : '#080E1D';
-        c.el.style.color = isSel ? '#ffffff' : '#94a3b8';
-        c.el.style.borderColor = isSel ? c.border : '#22324F';
-      }
     };
 
     const applyPalette = (pal: GbcPaletteMode) => {
       BattleAudio.playMenuSound('CONFIRM');
       callbacks.onSetGbcPalette?.(pal);
-      syncPaletteButtons(pal);
+      syncPaletteButton(pal);
     };
 
     paletteBtn?.addEventListener('click', () => {
@@ -221,29 +196,15 @@ export function bindSettingsEventListeners(params: {
       const nextPal = modes[(modes.indexOf(activePalette) + 1) % modes.length];
       applyPalette(nextPal);
     });
-    paletteVibrantBtn?.addEventListener('click', () => applyPalette('VIBRANT'));
-    palettePocketBtn?.addEventListener('click', () => applyPalette('POCKET'));
-    paletteDmgBtn?.addEventListener('click', () => applyPalette('DMG'));
-    paletteNightBtn?.addEventListener('click', () => applyPalette('NIGHT'));
 
     let activeExpMode: ExpShareMode = expShareMode;
-    const syncExpShareButtons = (mode: ExpShareMode) => {
+    const syncExpShareButton = (mode: ExpShareMode) => {
       activeExpMode = mode;
-      expShareBtn.innerText = getExpShareButtonLabel(mode, currentLevelCap);
-      expShareBtn.style.background = getExpShareButtonBg(mode);
-      expShareBtn.style.borderColor = getExpShareButtonBorder(mode);
-
-      expOffBtn.style.background = mode === 'OFF' ? '#475569' : '#0f172a';
-      expOffBtn.style.color = mode === 'OFF' ? '#ffffff' : '#94a3b8';
-      expOffBtn.style.borderColor = mode === 'OFF' ? '#cbd5e1' : 'rgba(255,255,255,0.12)';
-
-      expAllBtn.style.background = mode === 'ALL' ? '#059669' : '#0f172a';
-      expAllBtn.style.color = mode === 'ALL' ? '#ffffff' : '#94a3b8';
-      expAllBtn.style.borderColor = mode === 'ALL' ? '#34d399' : 'rgba(255,255,255,0.12)';
-
-      expCappedBtn.style.background = mode === 'CAPPED' ? '#7c3aed' : '#0f172a';
-      expCappedBtn.style.color = mode === 'CAPPED' ? '#ffffff' : '#94a3b8';
-      expCappedBtn.style.borderColor = mode === 'CAPPED' ? '#c084fc' : 'rgba(255,255,255,0.12)';
+      if (expShareBtn) {
+        expShareBtn.innerText = getExpShareButtonLabel(mode, currentLevelCap);
+        expShareBtn.style.background = getExpShareButtonBg(mode);
+        expShareBtn.style.borderColor = getExpShareButtonBorder(mode);
+      }
     };
 
     const applyExpMode = (nextMode: ExpShareMode) => {
@@ -251,14 +212,14 @@ export function bindSettingsEventListeners(params: {
       if (callbacks.onSetExpShareMode) {
         callbacks.onSetExpShareMode(nextMode);
       }
-      syncExpShareButtons(nextMode);
+      syncExpShareButton(nextMode);
     };
 
-    expShareBtn.addEventListener('click', () => {
+    expShareBtn?.addEventListener('click', () => {
       if (callbacks.onCycleExpShareMode) {
         const cycled = callbacks.onCycleExpShareMode();
         BattleAudio.playMenuSound('CONFIRM');
-        syncExpShareButtons(cycled);
+        syncExpShareButton(cycled);
       } else {
         const order: ExpShareMode[] = ['OFF', 'ALL', 'CAPPED'];
         const nextMode = order[(order.indexOf(activeExpMode) + 1) % order.length];
@@ -266,25 +227,14 @@ export function bindSettingsEventListeners(params: {
       }
     });
 
-    expOffBtn.addEventListener('click', () => applyExpMode('OFF'));
-    expAllBtn.addEventListener('click', () => applyExpMode('ALL'));
-    expCappedBtn.addEventListener('click', () => applyExpMode('CAPPED'));
-
     let activeEncMode: EncounterRateMode = encounterRateMode;
-    const syncEncounterButtons = (mode: EncounterRateMode) => {
+    const syncEncounterButton = (mode: EncounterRateMode) => {
       activeEncMode = mode;
-      encRateBtn.innerText = getEncounterRateLabel(mode);
-      encRelaxedBtn.style.background = mode === 'RELAXED' ? '#059669' : '#0f172a';
-      encRelaxedBtn.style.color = mode === 'RELAXED' ? '#ffffff' : '#94a3b8';
-      encRelaxedBtn.style.borderColor = mode === 'RELAXED' ? '#34d399' : 'rgba(255,255,255,0.12)';
-
-      encNormalBtn.style.background = mode === 'NORMAL' ? '#0284c7' : '#0f172a';
-      encNormalBtn.style.color = mode === 'NORMAL' ? '#ffffff' : '#94a3b8';
-      encNormalBtn.style.borderColor = mode === 'NORMAL' ? '#38bdf8' : 'rgba(255,255,255,0.12)';
-
-      encClassicBtn.style.background = mode === 'CLASSIC' ? '#d97706' : '#0f172a';
-      encClassicBtn.style.color = mode === 'CLASSIC' ? '#ffffff' : '#94a3b8';
-      encClassicBtn.style.borderColor = mode === 'CLASSIC' ? '#fbbf24' : 'rgba(255,255,255,0.12)';
+      if (encRateBtn) {
+        encRateBtn.innerText = getEncounterRateLabel(mode);
+        encRateBtn.style.background = getEncounterRateBg(mode);
+        encRateBtn.style.borderColor = getEncounterRateBorder(mode);
+      }
     };
 
     const applyEncMode = (nextMode: EncounterRateMode) => {
@@ -292,17 +242,14 @@ export function bindSettingsEventListeners(params: {
       if (callbacks.onSetEncounterRateMode) {
         callbacks.onSetEncounterRateMode(nextMode);
       }
-      syncEncounterButtons(nextMode);
+      syncEncounterButton(nextMode);
     };
 
-    encRateBtn.addEventListener('click', () => {
+    encRateBtn?.addEventListener('click', () => {
       const order: EncounterRateMode[] = ['RELAXED', 'NORMAL', 'CLASSIC'];
       const nextMode = order[(order.indexOf(activeEncMode) + 1) % order.length];
       applyEncMode(nextMode);
     });
-    encRelaxedBtn.addEventListener('click', () => applyEncMode('RELAXED'));
-    encNormalBtn.addEventListener('click', () => applyEncMode('NORMAL'));
-    encClassicBtn.addEventListener('click', () => applyEncMode('CLASSIC'));
 
     let activeAutoHm = isAutoHm;
     const applyAutoHm = (enabled: boolean) => {
@@ -384,29 +331,14 @@ export function bindSettingsEventListeners(params: {
     });
 
     const battleSpeedBtn = settingsModal.querySelector('#settings-battle-speed-btn') as HTMLButtonElement | null;
-    const battleSpeed1xBtn = settingsModal.querySelector('#settings-battle-speed-1x-btn') as HTMLButtonElement | null;
-    const battleSpeed2xBtn = settingsModal.querySelector('#settings-battle-speed-2x-btn') as HTMLButtonElement | null;
-    const battleSpeed3xBtn = settingsModal.querySelector('#settings-battle-speed-3x-btn') as HTMLButtonElement | null;
 
     let activeBattleSpeed: SpeedMultiplier = battleSpeed;
-    const syncBattleSpeedButtons = (spd: SpeedMultiplier) => {
+    const syncBattleSpeedButton = (spd: SpeedMultiplier) => {
       activeBattleSpeed = spd;
       if (battleSpeedBtn) {
         battleSpeedBtn.innerText = `⚔️ BATTLE: ${spd}x`;
         battleSpeedBtn.style.background = getBattleSpeedBg(spd);
         battleSpeedBtn.style.borderColor = getBattleSpeedBorder(spd);
-      }
-      const choices: Array<{ el: HTMLButtonElement | null; val: SpeedMultiplier }> = [
-        { el: battleSpeed1xBtn, val: 1 },
-        { el: battleSpeed2xBtn, val: 2 },
-        { el: battleSpeed3xBtn, val: 3 },
-      ];
-      for (const { el, val } of choices) {
-        if (!el) continue;
-        const isSel = spd === val;
-        el.style.background = isSel ? getBattleSpeedBg(val) : '#080E1D';
-        el.style.color = isSel ? '#ffffff' : '#94a3b8';
-        el.style.borderColor = isSel ? getBattleSpeedBorder(val) : '#22324F';
       }
     };
 
@@ -415,50 +347,29 @@ export function bindSettingsEventListeners(params: {
       if (callbacks.onSetBattleSpeed) {
         callbacks.onSetBattleSpeed(spd);
       }
-      syncBattleSpeedButtons(spd);
+      syncBattleSpeedButton(spd);
     };
 
     battleSpeedBtn?.addEventListener('click', () => {
       if (callbacks.onCycleBattleSpeed) {
         const nextSpeed = callbacks.onCycleBattleSpeed();
         BattleAudio.playMenuSound('CONFIRM');
-        syncBattleSpeedButtons(nextSpeed);
+        syncBattleSpeedButton(nextSpeed);
       } else {
         const nextSpeed: SpeedMultiplier = activeBattleSpeed === 1 ? 2 : activeBattleSpeed === 2 ? 3 : 1;
         applyBattleSpeed(nextSpeed);
       }
     });
 
-    battleSpeed1xBtn?.addEventListener('click', () => applyBattleSpeed(1));
-    battleSpeed2xBtn?.addEventListener('click', () => applyBattleSpeed(2));
-    battleSpeed3xBtn?.addEventListener('click', () => applyBattleSpeed(3));
-
     const textSpeedBtn = settingsModal.querySelector('#settings-text-speed-btn') as HTMLButtonElement | null;
-    const textSlowBtn = settingsModal.querySelector('#settings-text-slow-btn') as HTMLButtonElement | null;
-    const textMidBtn = settingsModal.querySelector('#settings-text-mid-btn') as HTMLButtonElement | null;
-    const textFastBtn = settingsModal.querySelector('#settings-text-fast-btn') as HTMLButtonElement | null;
-    const textInstantBtn = settingsModal.querySelector('#settings-text-instant-btn') as HTMLButtonElement | null;
 
     let activeTextSpeed: 'SLOW' | 'MID' | 'FAST' | 'INSTANT' = textSpeed;
-    const syncTextSpeedButtons = (ts: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
+    const syncTextSpeedButton = (ts: 'SLOW' | 'MID' | 'FAST' | 'INSTANT') => {
       activeTextSpeed = ts;
       if (textSpeedBtn) {
         textSpeedBtn.innerText = `💬 TEXT: ${getTextSpeedLabel(ts)}`;
         textSpeedBtn.style.background = getTextSpeedBg(ts);
         textSpeedBtn.style.borderColor = getTextSpeedBorder(ts);
-      }
-      const choices: Array<{ el: HTMLButtonElement | null; val: 'SLOW' | 'MID' | 'FAST' | 'INSTANT' }> = [
-        { el: textSlowBtn, val: 'SLOW' },
-        { el: textMidBtn, val: 'MID' },
-        { el: textFastBtn, val: 'FAST' },
-        { el: textInstantBtn, val: 'INSTANT' },
-      ];
-      for (const { el, val } of choices) {
-        if (!el) continue;
-        const isSel = ts === val;
-        el.style.background = isSel ? getTextSpeedBg(val) : '#080E1D';
-        el.style.color = isSel ? '#ffffff' : '#94a3b8';
-        el.style.borderColor = isSel ? getTextSpeedBorder(val) : '#22324F';
       }
     };
 
@@ -467,25 +378,20 @@ export function bindSettingsEventListeners(params: {
       if (callbacks.onSetTextSpeed) {
         callbacks.onSetTextSpeed(ts);
       }
-      syncTextSpeedButtons(ts);
+      syncTextSpeedButton(ts);
     };
 
     textSpeedBtn?.addEventListener('click', () => {
       if (callbacks.onCycleTextSpeed) {
         const nextTs = callbacks.onCycleTextSpeed();
         BattleAudio.playMenuSound('CONFIRM');
-        syncTextSpeedButtons(nextTs);
+        syncTextSpeedButton(nextTs);
       } else {
         const speeds: Array<'SLOW' | 'MID' | 'FAST' | 'INSTANT'> = ['SLOW', 'MID', 'FAST', 'INSTANT'];
         const nextTs = speeds[(speeds.indexOf(activeTextSpeed) + 1) % speeds.length];
         applyTextSpeed(nextTs);
       }
     });
-
-    textSlowBtn?.addEventListener('click', () => applyTextSpeed('SLOW'));
-    textMidBtn?.addEventListener('click', () => applyTextSpeed('MID'));
-    textFastBtn?.addEventListener('click', () => applyTextSpeed('FAST'));
-    textInstantBtn?.addEventListener('click', () => applyTextSpeed('INSTANT'));
 
     gamepadBtn.addEventListener('click', () => {
       if (callbacks.onToggleGamepad) {

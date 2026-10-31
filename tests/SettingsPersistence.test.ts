@@ -306,15 +306,15 @@ describe('TICKET-USER-SETTINGS-PERSISTENCE-01: User Settings Persistence Invaria
     speedBtn.click();
     expect(gameOptions.playerSpeedDefault).toBe(4);
 
-    // 7. Battle Speed 3x button
-    const battleSpeed3x = modal.querySelector('#settings-battle-speed-3x-btn') as MockElement;
-    battleSpeed3x.click();
-    expect(gameOptions.battleSpeedMultiplier).toBe(3);
+    // 7. Battle Speed cycle button (1x -> 2x)
+    const battleSpeedBtn = modal.querySelector('#settings-battle-speed-btn') as MockElement;
+    battleSpeedBtn.click();
+    expect(gameOptions.battleSpeedMultiplier).toBe(2);
 
-    // 8. Text Speed Instant button
-    const textInstantBtn = modal.querySelector('#settings-text-instant-btn') as MockElement;
-    textInstantBtn.click();
-    expect(gameOptions.textSpeed).toBe('INSTANT');
+    // 8. Text Speed cycle button (MID -> FAST)
+    const textSpeedBtn = modal.querySelector('#settings-text-speed-btn') as MockElement;
+    textSpeedBtn.click();
+    expect(gameOptions.textSpeed).toBe('FAST');
 
     // 9. Battle Animations button
     const battleAnimBtn = modal.querySelector('#settings-battle-anim-btn') as MockElement;
@@ -341,20 +341,20 @@ describe('TICKET-USER-SETTINGS-PERSISTENCE-01: User Settings Persistence Invaria
     crtBtn.click();
     expect(gameOptions.crtScanlines).toBe(true);
 
-    // 14. GBC Palette button (DMG)
-    const paletteDmgBtn = modal.querySelector('#settings-palette-dmg-btn') as MockElement;
-    paletteDmgBtn.click();
-    expect(gameOptions.gbcPalette).toBe('DMG');
+    // 14. GBC Palette cycle button (VIBRANT -> POCKET)
+    const paletteBtn = modal.querySelector('#settings-palette-btn') as MockElement;
+    paletteBtn.click();
+    expect(gameOptions.gbcPalette).toBe('POCKET');
 
-    // 15. Exp. Share All button
-    const expAllBtn = modal.querySelector('#settings-exp-all-btn') as MockElement;
-    expAllBtn.click();
-    expect(gameOptions.expShare).toBe('ALL');
+    // 15. Exp. Share cycle button (CAPPED -> OFF)
+    const expShareBtn = modal.querySelector('#settings-exp-share-btn') as MockElement;
+    expShareBtn.click();
+    expect(gameOptions.expShare).toBe('OFF');
 
-    // 16. Encounter Rate Relaxed button
-    const encRelaxedBtn = modal.querySelector('#settings-enc-relaxed-btn') as MockElement;
-    encRelaxedBtn.click();
-    expect(gameOptions.encounterRateMode).toBe('RELAXED');
+    // 16. Encounter Rate cycle button (NORMAL -> CLASSIC)
+    const encRateBtn = modal.querySelector('#settings-encounter-rate-btn') as MockElement;
+    encRateBtn.click();
+    expect(gameOptions.encounterRateMode).toBe('CLASSIC');
 
     // 17. Auto-HM Mode toggle
     const autoHmBtn = modal.querySelector('#settings-autohm-btn') as MockElement;

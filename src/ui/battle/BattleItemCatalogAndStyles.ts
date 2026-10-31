@@ -9,7 +9,7 @@
 
 import type { PokemonType, StatId, MoveData } from '../../types/game';
 
-export type BattleBagTab = 'ALL' | 'MEDICINE' | 'BALLS';
+export type BattleBagTab = 'MEDICINE' | 'BALLS';
 
 export interface BattleUsableItemMeta {
   id: string;

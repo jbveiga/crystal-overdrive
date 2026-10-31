@@ -200,7 +200,6 @@ export class BattleBagAndPartySubModal {
     const tabsLeft = document.createElement('div');
     tabsLeft.style.cssText = 'display: flex; gap: 6px;';
     const tabDefs: Array<{ id: BattleBagTab; label: string }> = [
-      { id: 'ALL', label: '🎒 ALL' },
       { id: 'MEDICINE', label: '🧪 MEDICINE & ITEMS' },
       { id: 'BALLS', label: '🔴 POKé BALLS' },
     ];
@@ -273,7 +272,7 @@ export class BattleBagAndPartySubModal {
     let renderedCount = 0;
 
     // 2. Render Medicine, Heals, Revives & Battle Items
-    if (ctx.activeBagTab === 'ALL' || ctx.activeBagTab === 'MEDICINE') {
+    if (ctx.activeBagTab === 'MEDICINE') {
       for (const item of BATTLE_ITEM_CATALOG) {
         const count = this.getOwnedMedicineCount(ctx.itemsInventory, ctx.berriesInventory, item.id);
         if (count <= 0) continue;
@@ -364,7 +363,7 @@ export class BattleBagAndPartySubModal {
     }
 
     // 3. Render Pokéballs
-    if (ctx.activeBagTab === 'ALL' || ctx.activeBagTab === 'BALLS') {
+    if (ctx.activeBagTab === 'BALLS') {
       const allBallMeta: Array<{ id: PokeballId; name: string; desc: string; color: string }> = [
         { id: 'quick-ball', name: 'Quick Ball', desc: '5.0x catch rate on Turn 1', color: '#0284c7' },
         { id: 'fast-ball', name: 'Fast Ball', desc: '4.0x if Base Speed ≥ 100', color: '#ea580c' },
