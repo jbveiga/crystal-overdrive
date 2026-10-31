@@ -253,6 +253,7 @@ async function bootstrap() {
   const executeWarpTransition = (warp: WarpEvent) => TC.executeWarpTransition(getTransitionContext(), warp);
   const handleRuinsPuzzleSolve = (puzzleId: string) => TC.handleRuinsPuzzleSolve(getTransitionContext(), puzzleId);
 
+  // Pre-loads critical maps (standalone or from ./assets/data/world_maps.json)
   const criticalBootMapIds = Array.from(new Set([initialMapId, 'new_bark_town', 'players_house_2f', 'players_house_1f']));
   const bootMapManifest = new AssetManifestQueue();
   for (const mapId of criticalBootMapIds) {
