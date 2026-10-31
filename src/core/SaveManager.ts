@@ -26,6 +26,8 @@ import type { DayCareState } from '../world/DayCareManager';
 import { deduplicateAndSortTms } from '../ui/bag/BagItemCatalogs';
 import type { KurtCraftingOrder } from '../world/KurtCraftingManager';
 import type { BugContestLeaderboardEntry } from '../world/BugContestManager';
+import { SaveStateReconciler } from './SaveStateReconciler';
+
 export interface SaveData {
   version: number;
   timestamp: number;
@@ -134,6 +136,7 @@ export class SaveManager {
       });
     }
   }
+
   /**
    * Returns canonical default GameOptions (Ticket 4.1 & TICKET-KEY-ITEMS-UNBOUND-01).
    */
@@ -145,6 +148,7 @@ export class SaveManager {
       crtScanlines: false, gbcPalette: 'VIBRANT', lowHpBeepEnabled: true, chiptuneMode: false,
     };
   }
+
   /**
    * Defensively normalizes user options against canonical defaults.
    */
@@ -173,6 +177,7 @@ export class SaveManager {
       lowHpBeepEnabled: b(r.lowHpBeepEnabled, def.lowHpBeepEnabled!), chiptuneMode: b(r.chiptuneMode, def.chiptuneMode!),
     };
   }
+
   /**
    * Returns a fresh, pristine SaveData structure for a new game adventure (Ticket 4.3).
    */
@@ -231,6 +236,7 @@ export class SaveManager {
       options: SaveManager.getDefaultOptions(),
     };
   }
+
   /**
    * Formats total elapsed seconds into canonical `"HH:MM:ss"` (e.g. `0` -> `"00:00:00"`, `65` -> `"00:01:05"`, `3665` -> `"01:01:05"`).
    */
@@ -241,6 +247,7 @@ export class SaveManager {
     const secs = safeSeconds % 60;
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
+
   /**
    * Resolves a human-readable location title from a `mapId`.
    */
@@ -254,6 +261,7 @@ export class SaveManager {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   }
+
   /**
    * Reconciles legacy save states where the player already owns a starter (or party Pokémon)
    * from an earlier game version but lacks 'starter_chosen' / 'starter_<species>' in storyFlags.
@@ -261,6 +269,7 @@ export class SaveManager {
   public static reconcileStarterFlags(save: SaveData): void {
     if (!save) return;
     save.storyFlags = Array.isArray(save.storyFlags) ? save.storyFlags : [];
+
     // 1. Gather all candidate Pokémon from party, box, and storage boxes
     const candidatePkmn: Array<{ speciesId?: string; isEgg?: boolean }> = [];
     if (Array.isArray(save.party)) {
@@ -282,10 +291,12 @@ export class SaveManager {
         }
       }
     }
+
     const nonEggPkmn = candidatePkmn.filter((p) => Boolean(p && !p.isEgg && p.speciesId));
     if (nonEggPkmn.length === 0 && (!Array.isArray(save.party) || save.party.length === 0)) {
       return;
     }
+
     // 2. Check for starter lineage
     let baseStarter: 'cyndaquil' | 'totodile' | 'chikorita' | undefined;
     for (const p of nonEggPkmn) {
@@ -532,211 +543,11 @@ export class SaveManager {
     }
   }
 
-  public static hydrateGameState(
-    existingSave: SaveData,
-    state: {
-      playTimeSeconds: { val: number };
-      playerName: { val: string };
-      playerGender: { val: PlayerGender };
-      rivalName: { val: string };
-      playerParty: PokemonInstance[];
-      playerBox: PokemonInstance[];
-      gameOptions: GameOptions;
-      inventory: {
-        balls: Partial<Record<PokeballId, number>>;
-        items?: Partial<Record<MedicineId, number>>;
-        berries?: Partial<Record<string, number>>;
-        keyItems?: string[];
-        tms: string[];
-        money: number;
-        badges: string[];
-      };
-      defeatedTrainers: Set<string>;
-      storyFlags: Set<string>;
-      seenSpecies: Set<string>; caughtSpecies?: Set<string>;
-      overworldItemManager: any;
-      missionManager: any;
-      gameClock: any;
-      roamingManager: any;
-    }
-  ): {
-    mapId: string;
-    x: number;
-    y: number;
-    direction: Direction;
-    lastVisitedPokecenter: { mapId: string; x: number; y: number };
-  } {
-    state.playTimeSeconds.val = existingSave.playTimeSeconds || 0;
-    state.playerName.val = existingSave.player.name || 'GOLD';
-    state.playerGender.val = existingSave.player.gender || 'BOY';
-    state.rivalName.val = existingSave.player.rivalName || existingSave.rivalName || 'SILVER';
-    const validParty = (existingSave.party || []).filter((p) => p && typeof p === 'object');
-    const validBox = (existingSave.box || []).filter((p) => p && typeof p === 'object');
-    state.playerParty.splice(0, state.playerParty.length, ...validParty);
-    state.playerBox.splice(0, state.playerBox.length, ...validBox);
-    const normalizedOpts = SaveManager.normalizeOptions(existingSave.options, existingSave.player);
-    Object.assign(state.gameOptions, normalizedOpts);
-    state.inventory.balls = existingSave.inventory?.balls || {};
-    state.inventory.items = existingSave.inventory?.items || {};
-    state.inventory.berries = existingSave.inventory?.berries || {};
-    if (existingSave.inventory?.keyItems) state.inventory.keyItems = existingSave.inventory.keyItems;
-    state.inventory.tms = existingSave.inventory?.tms || [];
-    state.inventory.money = existingSave.player.money ?? 3000;
-    state.inventory.badges = existingSave.player.badges || [];
-    existingSave.defeatedTrainers?.forEach((t) => state.defeatedTrainers.add(t));
-    existingSave.storyFlags?.forEach((f) => state.storyFlags.add(f));
-    existingSave.seenSpecies?.forEach((s) => state.seenSpecies.add(s));
-    if (state.caughtSpecies) existingSave.caughtSpecies?.forEach((s) => state.caughtSpecies!.add(s));
-    state.playerParty.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
-    state.playerBox.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
-
-    state.overworldItemManager.setCollectedFlags([
-      ...(existingSave.collectedItems || []),
-      ...(existingSave.collectedItemFlags || []),
-      ...Array.from(state.storyFlags),
-    ]);
-    state.overworldItemManager.setFruitTreePicks(
-      existingSave.fruitTreePicks || existingSave.harvestedFruitTrees || {}
-    );
-    state.missionManager.deserialize(existingSave.missions);
-    state.missionManager.reconcileStarterState(state.playerParty, state.storyFlags);
-
-    const initialMapId = existingSave.player.mapId || 'new_bark_town';
-    const initialPlayerX = existingSave.player.x ?? 7;
-    const initialPlayerY = existingSave.player.y ?? 1;
-    const initialPlayerDir = existingSave.player.direction || 'DOWN';
-    let lastVisitedPokecenter = { mapId: 'new_bark_town', x: 13, y: 6 };
-    if (initialMapId.endsWith('_poke_center')) {
-      lastVisitedPokecenter = { mapId: initialMapId, x: 3, y: 3 };
-    }
-
-    state.gameClock.playerSpeed = normalizedOpts.playerSpeedDefault;
-    state.gameClock.battleSpeed = normalizedOpts.battleSpeedMultiplier ?? 1;
-    state.gameOptions.playerSpeedDefault = state.gameClock.playerSpeed;
-    state.gameOptions.battleSpeedMultiplier = state.gameClock.battleSpeed;
-
-    if (
-      existingSave.storyFlags?.includes('beasts_awakened') ||
-      state.storyFlags.has('beasts_awakened') ||
-      state.inventory.badges.length >= 4
-    ) {
-      state.roamingManager.awakenBeasts();
-    } else {
-      state.roamingManager.sleepBeasts();
-    }
-
-    return {
-      mapId: initialMapId,
-      x: initialPlayerX,
-      y: initialPlayerY,
-      direction: initialPlayerDir,
-      lastVisitedPokecenter,
-    };
+  public static hydrateGameState(params: Parameters<typeof SaveStateReconciler.hydrateGameState>[0]): ReturnType<typeof SaveStateReconciler.hydrateGameState> {
+    return SaveStateReconciler.hydrateGameState(params);
   }
 
-  public static createSaveSnapshot(params: {
-    playTimeSeconds: number;
-    playerName: string;
-    playerGender: PlayerGender;
-    rivalName: string;
-    player: { x: number; y: number; direction: Direction };
-    mapId: string;
-    gameClock: { playerSpeed: SpeedMultiplier; battleSpeed: SpeedMultiplier };
-    inventory: {
-      balls: Partial<Record<PokeballId, number>>;
-      items?: Partial<Record<MedicineId, number>>;
-      berries?: Partial<Record<string, number>>;
-      keyItems?: string[];
-      tms: string[];
-      money: number;
-      badges: string[];
-    };
-    playerParty: PokemonInstance[];
-    boxManager: any;
-    roamingManager: any;
-    defeatedTrainers: Set<string>;
-    storyFlags: Set<string>;
-    seenSpecies: Set<string>;
-    caughtSpecies?: Set<string>;
-    overworldItemManager: any;
-    gameOptions: GameOptions;
-    missionManager: any;
-    dayCareManager: any;
-    kurtCraftingManager: any;
-    bugContestManager: any;
-  }): SaveData {
-    const {
-      playTimeSeconds,
-      playerName,
-      playerGender,
-      rivalName,
-      player,
-      mapId,
-      gameClock,
-      inventory,
-      playerParty,
-      boxManager,
-      roamingManager,
-      defeatedTrainers,
-      storyFlags,
-      seenSpecies,
-      caughtSpecies,
-      overworldItemManager,
-      gameOptions,
-      missionManager,
-      dayCareManager,
-      kurtCraftingManager,
-      bugContestManager,
-    } = params;
-
-    const normalizedOpts = SaveManager.normalizeOptions({
-      ...gameOptions,
-      playerSpeedDefault: gameClock.playerSpeed,
-      battleSpeedMultiplier: gameClock.battleSpeed,
-    });
-
-    return {
-      version: 1,
-      timestamp: Date.now(),
-      playTimeSeconds: Math.floor(playTimeSeconds),
-      player: {
-        name: playerName,
-        gender: playerGender,
-        mapId,
-        x: player.x,
-        y: player.y,
-        direction: player.direction,
-        speedMultiplier: normalizedOpts.playerSpeedDefault,
-        battleSpeedMultiplier: normalizedOpts.battleSpeedMultiplier,
-        badges: inventory.badges,
-        money: inventory.money,
-        rivalName,
-      },
-      rivalName,
-      party: playerParty,
-      box: boxManager.flatten(),
-      storage: boxManager.getState(),
-      inventory: {
-        balls: inventory.balls,
-        items: inventory.items,
-        berries: inventory.berries,
-        tms: inventory.tms,
-        keyItems: inventory.keyItems,
-      },
-      roamers: roamingManager.getAllRoamers(),
-      defeatedTrainers: Array.from(defeatedTrainers),
-      storyFlags: Array.from(storyFlags),
-      collectedItems: overworldItemManager.getCollectedFlags(),
-      collectedItemFlags: overworldItemManager.getCollectedFlags(),
-      harvestedFruitTrees: overworldItemManager.getHarvestedTreeIds(),
-      fruitTreePicks: overworldItemManager.getFruitTreePicksRecord(),
-      seenSpecies: Array.from(seenSpecies),
-      caughtSpecies: caughtSpecies ? Array.from(caughtSpecies) : undefined,
-      options: normalizedOpts,
-      missions: missionManager.serialize(),
-      dayCare: dayCareManager?.getState(),
-      kurtCraftingOrder: kurtCraftingManager?.activeOrder,
-      bugContestRecords: bugContestManager?.serializeRecords(),
-    };
+  public static createSaveSnapshot(params: Parameters<typeof SaveStateReconciler.createSaveSnapshot>[0]): SaveData {
+    return SaveStateReconciler.createSaveSnapshot(params);
   }
 }

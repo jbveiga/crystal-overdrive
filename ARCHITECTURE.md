@@ -53,7 +53,8 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Active NPC Cache** | High-speed cached NPC state mapping, talker registry, and lookup | `src/world/ActiveNpcCache.ts` | < 200 lines |
 | **Overworld Warp & Map Transition** | Async tile texture hydration, reciprocal warps, story mutations, black veil sync | `src/world/OverworldWarpAndMapTransitionController.ts` | < 650 lines |
 | **Trainer Sight & Walking Tour** | Line-of-sight trigger, rewards, stadium duels, Guide Gent tour | `src/world/OverworldTrainerSightAndTourController.ts` | < 550 lines |
-| **Overworld Ticker & Itemfinder** | Zero-alloc ticker hot paths, player bump, neighbor NPC wander, radar sonar | `src/world/OverworldTickerCoordinator.ts` | < 600 lines |
+| **Overworld Ticker & Itemfinder** | Zero-alloc ticker hot paths, player bump, neighbor NPC wander, radar sonar | `src/world/OverworldItemfinderAndNpcStepper.ts` | Itemfinder radar sweeps, step-triggered Rocket/Mahogany events, and NPC wandering step helpers |
+| `src/world/OverworldTickerCoordinator.ts` | < 600 lines |
 | **Roaming Beast Engine** | Markov beast adjacency graph, Entei/Raikou/Suicune roamer hops | `src/world/RoamingManager.ts` | < 300 lines |
 | **Story Cutscenes Machine** | Elm starter choice, Red Gyarados Lake of Rage, Sudowoodo cutscenes | `src/world/StoryCutscenes.ts` | < 650 lines |
 | **Ecruteak Gym Maze Logic** | Invisible tile floor paths, pitfall warps, and puzzle validation | `src/world/ecruteakGymMaze.ts` | < 150 lines |

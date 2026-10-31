@@ -258,3 +258,57 @@ export function injectRuinsPuzzleStyles(): void {
   style.textContent = RUINS_PUZZLE_CSS;
   document.head.appendChild(style);
 }
+
+export const RUINS_PUZZLE_INFO: Record<string, { title: string; inscription: string; sprite: string }> = {
+  kabuto: {
+    title: 'RUINS OF ALPH — KABUTO PANEL',
+    inscription: '"A POKéMON that hid on the sea floor. Eyes on its back scanned the area."',
+    sprite: './assets/sprites/pokemon/kabuto_front.png',
+  },
+  omanyte: {
+    title: 'RUINS OF ALPH — OMANYTE PANEL',
+    inscription: '"A prehistoric POKéMON that swam by twisting its 10 tentacles. It lived in ancient seas."',
+    sprite: './assets/sprites/pokemon/omanyte_front.png',
+  },
+  aerodactyl: {
+    title: 'RUINS OF ALPH — AERODACTYL PANEL',
+    inscription: '"A ferocious prehistoric POKéMON that soared through the skies. It attacked with saw-like teeth."',
+    sprite: './assets/sprites/pokemon/aerodactyl_front.png',
+  },
+  ho_oh: {
+    title: 'RUINS OF ALPH — HO-OH PANEL',
+    inscription: '"A legendary rainbow POKéMON said to fly continuously on magnificent wings."',
+    sprite: './assets/sprites/pokemon/ho_oh_front.png',
+  },
+};
+
+export function renderRuinsBoardTilesHtml(tiles: number[], puzzleId: string): string {
+  const spriteUrl = (RUINS_PUZZLE_INFO[puzzleId] || RUINS_PUZZLE_INFO.kabuto).sprite;
+  return tiles
+    .map((pieceVal, slotIdx) => {
+      if (pieceVal === 15) {
+        return `<div class="ruins-tile ruins-tile-blank" data-slot="${slotIdx}" aria-label="Empty slot"></div>`;
+      }
+      const origRow = Math.floor(pieceVal / 4);
+      const origCol = pieceVal % 4;
+      const posX = (origCol / 3) * 100;
+      const posY = (origRow / 3) * 100;
+      return `
+        <button
+          type="button"
+          class="ruins-tile ruins-tile-piece"
+          data-slot="${slotIdx}"
+          data-piece="${pieceVal}"
+          aria-label="Tile piece ${pieceVal + 1}"
+          style="
+            background-image: url('${spriteUrl}');
+            background-size: 400% 400%;
+            background-position: ${posX}% ${posY}%;
+          "
+        >
+          <span class="ruins-tile-tag">${pieceVal + 1}</span>
+        </button>
+      `;
+    })
+    .join('');
+}
