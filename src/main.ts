@@ -225,8 +225,9 @@ async function bootstrap() {
       gameOptions, missionManager, dayCareManager, kurtCraftingManager, bugContestManager,
     });
     await saveManager.saveGame(saveData);
-    console.log('💾 Game state successfully saved to IndexedDB.');
+    console.log('💾 Game saved.');
   };
+  const syncStorageAndSave = (_p: any, s?: any) => { if (s) boxManager.setState(s); void saveCurrentGame(); };
 
   const getTransitionContext = (): OverworldTransitionContext => ({
     mapManager, overworldRenderer, overworldItemManager, missionManager, storyFlags, defeatedTrainers,
@@ -246,14 +247,11 @@ async function bootstrap() {
   const TC = OverworldWarpAndMapTransitionController;
   const ensureMapAndNeighborsLoaded = (targetId: string) => TC.ensureMapAndNeighborsLoaded(getTransitionContext(), targetId);
   const resetMapNpcsToOrigin = (mapId: string) => TC.resetMapNpcsToOrigin(getTransitionContext(), mapId);
-  const applyMapStoryMutations = (map: MapData | null) => TC.applyMapStoryMutations(getTransitionContext(), map);
-  const syncMapOverworldItems = (map: MapData | null) => TC.syncMapOverworldItems(getTransitionContext(), map);
-  const populateWorldNpcs = (map: MapData | null) => TC.populateWorldNpcs(getTransitionContext(), map);
-  const handleMapTransition = (entity: GridEntity) => TC.handleMapTransition(getTransitionContext(), entity);
-  const executeWarpTransition = (warp: WarpEvent) => TC.executeWarpTransition(getTransitionContext(), warp);
-  const handleRuinsPuzzleSolve = (puzzleId: string) => TC.handleRuinsPuzzleSolve(getTransitionContext(), puzzleId);
+  const applyMapStoryMutations = (map: MapData | null) => TC.applyMapStoryMutations(getTransitionContext(), map), syncMapOverworldItems = (map: MapData | null) => TC.syncMapOverworldItems(getTransitionContext(), map);
+  const populateWorldNpcs = (map: MapData | null) => TC.populateWorldNpcs(getTransitionContext(), map), handleMapTransition = (entity: GridEntity) => TC.handleMapTransition(getTransitionContext(), entity);
+  const executeWarpTransition = (warp: WarpEvent) => TC.executeWarpTransition(getTransitionContext(), warp), handleRuinsPuzzleSolve = (puzzleId: string) => TC.handleRuinsPuzzleSolve(getTransitionContext(), puzzleId);
 
-  // Pre-loads critical maps (standalone or from ./assets/data/world_maps.json)
+  // Pre-loads critical maps (standalone/from ./assets/data/world_maps.json)
   const criticalBootMapIds = Array.from(new Set([initialMapId, 'new_bark_town', 'players_house_2f', 'players_house_1f']));
   const bootMapManifest = new AssetManifestQueue();
   for (const mapId of criticalBootMapIds) {
@@ -579,7 +577,7 @@ async function bootstrap() {
     openStarterChoiceModal: (speciesId, name, type, onConfirm, onCancel) => overworldHUD.openStarterChoiceModal(speciesId, name, type, onConfirm, onCancel),
     openDialogue: (pages, speaker, onComplete) => overworldHUD.openDialogue(pages, speaker, onComplete),
     showToast: (msg) => overworldHUD.showToast(msg),
-    openPcStorage: () => boxManagementUI.open(playerParty, boxManager.getState(), { onSave: () => saveCurrentGame(), onClose: () => saveCurrentGame() }),
+    openPcStorage: () => boxManagementUI.open(playerParty, boxManager.getState(), { onSave: syncStorageAndSave, onClose: syncStorageAndSave }),
     openTownMap: (mapId, visited, roamers) => townMapUI.open(mapId, visited, roamers),
     openRuinsPuzzleModal: (callbacks) => ruinsPuzzleModalUI.open(callbacks),
     handleRuinsPuzzleSolve,
@@ -618,7 +616,7 @@ async function bootstrap() {
     playFieldRestAnimation: (onComplete) => overworldHUD.playFieldRestAnimation(onComplete),
     saveCurrentGame,
     openMart: (martId?: string) => bagUI.openMart(martId || mapManager.getCurrentMap()?.id),
-    openPcStorage: () => boxManagementUI.open(playerParty, boxManager.getState(), { onSave: () => saveCurrentGame(), onClose: () => saveCurrentGame() }),
+    openPcStorage: () => boxManagementUI.open(playerParty, boxManager.getState(), { onSave: syncStorageAndSave, onClose: syncStorageAndSave }),
     openTownMap: (mapId, visited, roamers) => townMapUI.open(mapId, visited, roamers),
     addOverworldItemToInventory,
     renderMap: (map) => overworldRenderer.renderMap(map, lookupMap),

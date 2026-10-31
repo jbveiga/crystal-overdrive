@@ -269,6 +269,12 @@ export class BoxManager {
     return this.state;
   }
 
+  public setState(newState: PokemonStorageState): void {
+    if (newState) {
+      this.state = newState;
+    }
+  }
+
   public getCurrentBoxIndex(): number {
     return this.state.currentBoxIndex;
   }
