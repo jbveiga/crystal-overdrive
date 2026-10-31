@@ -98,6 +98,11 @@ async function bootstrap() {
   const overworldItemManager = new OverworldItemManager(), boxManager = new BoxManager(existingSave?.storage, existingSave?.box);
   let lastVisitedPokecenter = { mapId: 'new_bark_town', x: 13, y: 6 };
 
+  const player: GridEntity = {
+    id: 'player', x: initialPlayerX, y: initialPlayerY, targetX: initialPlayerX, targetY: initialPlayerY,
+    renderX: initialPlayerX, renderY: initialPlayerY, direction: initialPlayerDir, isMoving: false, progress: 0, isPlayer: true,
+  };
+
   const hydrateFromSaveData = (saveData: any) => {
     const playTimeBox = { val: playTimeSeconds }, playerNameBox = { val: playerName }, playerGenderBox = { val: playerGender }, rivalNameBox = { val: rivalName };
     const loc = SaveManager.hydrateGameState(saveData, {
@@ -107,7 +112,7 @@ async function bootstrap() {
     });
     playTimeSeconds = playTimeBox.val; playerName = playerNameBox.val; playerGender = playerGenderBox.val; rivalName = rivalNameBox.val;
     initialMapId = loc.mapId; initialPlayerX = loc.x; initialPlayerY = loc.y; initialPlayerDir = loc.direction; lastVisitedPokecenter = loc.lastVisitedPokecenter;
-    if (player) { Object.assign(player, { x: initialPlayerX, y: initialPlayerY, targetX: initialPlayerX, targetY: initialPlayerY, renderX: initialPlayerX, renderY: initialPlayerY, direction: initialPlayerDir }); }
+    Object.assign(player, { x: initialPlayerX, y: initialPlayerY, targetX: initialPlayerX, targetY: initialPlayerY, renderX: initialPlayerX, renderY: initialPlayerY, direction: initialPlayerDir });
   };
 
   if (existingSave) {
@@ -128,11 +133,6 @@ async function bootstrap() {
   let adjacentMapPrefetcher: AdjacentMapPrefetcher | null = null;
   let setBattleSpeed!: (speed: SpeedMultiplier) => SpeedMultiplier, cyclePlayerSpeed!: () => SpeedMultiplier;
   let setTextSpeed!: (speed: GameOptions['textSpeed']) => GameOptions['textSpeed'], cycleTextSpeed!: () => GameOptions['textSpeed'];
-
-  const player: GridEntity = {
-    id: 'player', x: initialPlayerX, y: initialPlayerY, targetX: initialPlayerX, targetY: initialPlayerY,
-    renderX: initialPlayerX, renderY: initialPlayerY, direction: initialPlayerDir, isMoving: false, progress: 0, isPlayer: true,
-  };
 
   const visitedMaps = new Set<string>([initialMapId]);
   const npcsByMap: Record<string, GridEntity[]> = createNpcsByMap();
