@@ -453,12 +453,12 @@ export class GridPhysics {
       if (!heldDirection) {
         entity.turnDelayTimer = 0;
       } else {
-        // If player changes direction while idle, enter a brief turn-in-place window (80ms)
+        // If player changes direction while idle, enter a brief turn-in-place window (55ms)
         // so quick directional taps rotate in place without stepping off the tile,
-        // while large single-step dt values (>80ms) consume the turn delay and continue moving.
+        // while large single-step dt values (>55ms) consume the turn delay and continue moving.
         if (entity.isPlayer && entity.direction !== heldDirection && dt < 0.04) {
           entity.direction = heldDirection;
-          entity.turnDelayTimer = 0.08 - dt;
+          entity.turnDelayTimer = 0.055 - dt;
           return;
         }
 

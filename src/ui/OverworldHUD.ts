@@ -685,4 +685,8 @@ export class OverworldHUD {
   public consumePendingTouchTurnDirection(): Direction | null {
     return this.touchAndKeyController.consumePendingTouchTurnDirection();
   }
+
+  public setPlayerDirection(dir: Direction): void {
+    this.touchAndKeyController.setPlayerDirection(dir);
+  }
 }

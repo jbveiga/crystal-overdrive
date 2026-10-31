@@ -200,8 +200,12 @@ export class OverworldTickerCoordinator {
       const wasPlayerMoving = player.isMoving;
       if (!isCutsceneLocked() && !player.isMoving) {
         const touchTurn = overworldHUD.consumePendingTouchTurnDirection?.();
-        if (touchTurn) player.direction = touchTurn;
+        if (touchTurn && touchTurn !== player.direction) {
+          player.direction = touchTurn;
+          player.turnDelayTimer = 0;
+        }
       }
+      overworldHUD.setPlayerDirection?.(player.direction);
       const heldDir = isCutsceneLocked() ? null : overworldHUD.getHeldDirection();
 
       GridPhysics.updateEntity(
@@ -740,6 +744,7 @@ export class OverworldTickerCoordinator {
       }
 
       // Render active & connected map NPCs after any border/warp transitions
+      overworldHUD.setPlayerDirection?.(player.direction);
       const mapAfterMove = mapManager.getCurrentMap();
       const npcsToRender = populateWorldNpcs(mapAfterMove);
       overworldRenderer?.update?.(player, npcsToRender, dtWorld);

@@ -23,6 +23,7 @@ export interface TouchAndKeyControllerOptions {
   advanceDialogue?: () => void;
   isVisible: () => boolean;
   onGamepadVisibilityChanged?: () => void;
+  getPlayerDirection?: () => Direction;
 }
 
 export class OverworldTouchAndKeyController {
@@ -35,13 +36,18 @@ export class OverworldTouchAndKeyController {
   private isGamepadVisible: boolean = false;
   private activeDirection: Direction | null = null;
   private touchDirection: Direction | null = null;
+  private currentPlayerDirection: Direction = 'DOWN';
   private pendingTouchTurnDirection: Direction | null = null;
+  private pendingTouchStepDirection: Direction | null = null;
   private touchTurnUntilMs: number = 0;
   private heldKeys: Set<string> = new Set();
-  public static readonly TOUCH_TURN_HOLD_DELAY_MS = 145;
+  public static readonly TOUCH_TURN_HOLD_DELAY_MS = 90;
 
   constructor(opts: TouchAndKeyControllerOptions) {
     this.opts = opts;
+    if (opts.getPlayerDirection) {
+      this.currentPlayerDirection = opts.getPlayerDirection();
+    }
     this.isGamepadVisible =
       typeof window !== 'undefined' &&
       ('ontouchstart' in window || (typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0));
@@ -117,12 +123,32 @@ export class OverworldTouchAndKeyController {
     return next;
   }
 
+  public setPlayerDirection(dir: Direction): void {
+    this.currentPlayerDirection = dir;
+  }
+
+  public getPlayerDirection(): Direction {
+    return this.opts.getPlayerDirection?.() ?? this.currentPlayerDirection;
+  }
+
   public getHeldDirection(): Direction | null {
-    if (this.opts.isDialogueOpen() || this.opts.isModalOpen?.() || this.opts.isPokegearOpen?.()) return null;
+    if (this.opts.isDialogueOpen() || this.opts.isModalOpen?.() || this.opts.isPokegearOpen?.()) {
+      this.pendingTouchStepDirection = null;
+      return null;
+    }
     if (this.touchDirection && this.heldKeys.size === 0 && performance.now() < this.touchTurnUntilMs) {
       return null;
     }
-    return this.activeDirection;
+    if (this.activeDirection) {
+      this.pendingTouchStepDirection = null;
+      return this.activeDirection;
+    }
+    if (this.pendingTouchStepDirection) {
+      const stepDir = this.pendingTouchStepDirection;
+      this.pendingTouchStepDirection = null;
+      return stepDir;
+    }
+    return null;
   }
 
   public consumePendingTouchTurnDirection(): Direction | null {
@@ -137,6 +163,7 @@ export class OverworldTouchAndKeyController {
 
   public clearActiveDirection(): void {
     this.activeDirection = null;
+    this.pendingTouchStepDirection = null;
   }
 
   public computeActiveDirection(): void {
@@ -222,8 +249,17 @@ export class OverworldTouchAndKeyController {
 
     const updateTouchDir = (dir: Direction | null) => {
       if (dir !== null && dir !== this.touchDirection) {
-        this.pendingTouchTurnDirection = dir;
-        this.touchTurnUntilMs = performance.now() + OverworldTouchAndKeyController.TOUCH_TURN_HOLD_DELAY_MS;
+        const currentFacing = this.getPlayerDirection();
+        if (dir === currentFacing) {
+          this.pendingTouchTurnDirection = null;
+          this.touchTurnUntilMs = 0;
+          this.pendingTouchStepDirection = dir;
+        } else {
+          this.pendingTouchTurnDirection = dir;
+          this.touchTurnUntilMs = performance.now() + OverworldTouchAndKeyController.TOUCH_TURN_HOLD_DELAY_MS;
+          this.currentPlayerDirection = dir;
+          this.pendingTouchStepDirection = null;
+        }
       }
       this.touchDirection = dir;
       if (dir === null) resetJoystickKnob();

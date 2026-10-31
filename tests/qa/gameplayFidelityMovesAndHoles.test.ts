@@ -6,6 +6,7 @@ import { EvolutionManager } from '../../src/world/EvolutionManager';
 import { executeMove } from '../../src/battle/state/BattleMoveAndItemExecutor';
 import { isEcruteakGymSafeTile, ECRUTEAK_GYM_SAFE_SET } from '../../src/world/ecruteakGymMaze';
 import { GridPhysics, GridEntity } from '../../src/world/GridPhysics';
+import { OverworldTouchAndKeyController } from '../../src/ui/hud/OverworldTouchAndKeyController';
 
 describe('TICKET-GAMEPLAY-FIDELITY-01: Moves, Evolutions, Holes, Ecruteak Gym & Turn-in-Place', () => {
   const repoRoot = path.resolve(__dirname, '../..');
@@ -356,10 +357,10 @@ describe('TICKET-GAMEPLAY-FIDELITY-01: Moves, Evolutions, Holes, Ecruteak Gym & 
       expect(player.isMoving).toBe(false);
       expect(player.x).toBe(10);
       expect(player.y).toBe(10);
-      expect(player.turnDelayTimer).toBeGreaterThan(0);
+      expect(player.turnDelayTimer).toBeCloseTo(0.055 - 0.016, 4);
     });
 
-    it('starts stepping forward when direction is held beyond tap threshold', () => {
+    it('starts stepping forward when direction is held beyond shortened tap threshold (55ms)', () => {
       const player: GridEntity = {
         id: 'player',
         x: 10,
@@ -386,6 +387,106 @@ describe('TICKET-GAMEPLAY-FIDELITY-01: Moves, Evolutions, Holes, Ecruteak Gym & 
       expect(player.isMoving).toBe(true);
       expect(player.targetX).toBe(11);
       expect(player.targetY).toBe(10);
+    });
+
+    it('only triggers touch turn delay when clicking a direction different from current facing direction, and immediately steps on current direction click', () => {
+      expect(OverworldTouchAndKeyController.TOUCH_TURN_HOLD_DELAY_MS).toBe(90);
+
+      let playerDir: 'UP' | 'DOWN' | 'LEFT' | 'RIGHT' = 'DOWN';
+      const fakeRoot = {
+        querySelector: (sel: string) => {
+          if (sel === '#virtual-dpad-base') {
+            const listeners: Record<string, ((e: any) => void)[]> = {};
+            return {
+              getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }),
+              addEventListener: (type: string, cb: (e: any) => void) => {
+                (listeners[type] ||= []).push(cb);
+              },
+              dispatch: (type: string, e: any) => {
+                (listeners[type] || []).forEach((cb) => cb(e));
+              },
+            };
+          }
+          if (sel === '#virtual-btn-a' || sel === '#virtual-btn-b') {
+            return { addEventListener: () => {} };
+          }
+          return { style: {} };
+        },
+      } as unknown as HTMLElement;
+
+      const dpadMap = new Map<string, ((e: any) => void)[]>();
+      const dpadBaseMock = {
+        getBoundingClientRect: () => ({ left: 0, top: 0, width: 100, height: 100 }),
+        addEventListener: (type: string, cb: (e: any) => void) => {
+          const arr = dpadMap.get(type) || [];
+          arr.push(cb);
+          dpadMap.set(type, arr);
+        },
+      };
+
+      const rootWithDpad = {
+        querySelector: (sel: string) => {
+          if (sel === '#virtual-dpad-base') return dpadBaseMock;
+          if (sel === '#virtual-btn-a' || sel === '#virtual-btn-b') {
+            return { addEventListener: () => {} };
+          }
+          return { style: {} };
+        },
+      } as unknown as HTMLElement;
+
+      const origWindow = (globalThis as any).window;
+      (globalThis as any).window = {
+        addEventListener: () => {},
+      };
+
+      try {
+        const controller = new OverworldTouchAndKeyController({
+          rootElement: rootWithDpad,
+          isDialogueOpen: () => false,
+          isVisible: () => true,
+          getPlayerDirection: () => playerDir,
+        });
+        controller.initDOM();
+
+        const triggerTouchStart = (clientX: number, clientY: number) => {
+          (dpadMap.get('touchstart') || []).forEach((cb) =>
+            cb({ preventDefault: () => {}, touches: [{ clientX, clientY }] })
+          );
+        };
+        const triggerTouchEnd = () => {
+          (dpadMap.get('touchend') || []).forEach((cb) => cb({ preventDefault: () => {} }));
+        };
+
+        // 1. Player is already facing DOWN (center is 50,50; DOWN is 50,90).
+        // Clicking DOWN must NOT queue a turn-in-place or wait for turn delay — it returns 'DOWN' immediately!
+        triggerTouchStart(50, 90);
+        expect(controller.consumePendingTouchTurnDirection()).toBeNull();
+        expect(controller.getHeldDirection()).toBe('DOWN');
+        triggerTouchEnd();
+
+        // 2. Even a rapid single click + release on the already-faced direction (DOWN) before the next tick steps once!
+        triggerTouchStart(50, 90);
+        triggerTouchEnd();
+        expect(controller.consumePendingTouchTurnDirection()).toBeNull();
+        expect(controller.getHeldDirection()).toBe('DOWN');
+        expect(controller.getHeldDirection()).toBeNull();
+
+        // 3. Clicking RIGHT (90,50) when facing DOWN changes direction first and applies the 90ms turn delay.
+        triggerTouchStart(90, 50);
+        expect(controller.consumePendingTouchTurnDirection()).toBe('RIGHT');
+        expect(controller.getHeldDirection()).toBeNull();
+        playerDir = 'RIGHT';
+        triggerTouchEnd();
+
+        // 4. Now that player is facing RIGHT, clicking RIGHT again immediately moves RIGHT without delay!
+        triggerTouchStart(90, 50);
+        expect(controller.consumePendingTouchTurnDirection()).toBeNull();
+        expect(controller.getHeldDirection()).toBe('RIGHT');
+        triggerTouchEnd();
+      } finally {
+        (globalThis as any).window = origWindow;
+      }
+      void fakeRoot;
     });
   });
 });
