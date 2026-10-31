@@ -320,11 +320,15 @@ export function isNpcActiveForStoryFlags(
 
   // Radio Tower & Underground Takeover (Act 7)
   if (npcId === 'petrel_radio_5f') return storyFlags.has('pryce_defeated') && !storyFlags.has('fake_director_defeated');
-  if (npcId === 'executive_proton_radio_4f') return storyFlags.has('card_key_obtained') && !storyFlags.has('proton_defeated') && !storyFlags.has('radio_tower_liberated');
+  if (npcId === 'executive_proton_radio_4f') return storyFlags.has('card_key_obtained') && !storyFlags.has('radio_tower_proton_defeated') && !storyFlags.has('radio_tower_liberated');
   if (npcId === 'executive_ariana_radio_5f') return storyFlags.has('card_key_obtained') && !storyFlags.has('ariana_defeated') && !storyFlags.has('radio_tower_liberated');
   if (npcId === 'archer_radio_5f') return storyFlags.has('card_key_obtained') && !storyFlags.has('radio_tower_liberated');
-  if (npcId === 'liberated_director_radio_5f' || npcId === 'radio_director') return !storyFlags.has('pryce_defeated') || storyFlags.has('radio_tower_liberated');
+  if (npcId === 'liberated_director_radio_5f' || npcId === 'radio_director') return !storyFlags.has('fake_director_defeated') || storyFlags.has('radio_tower_liberated');
   if (npcId === 'true_director' || npcId === 'real_director_warehouse') return storyFlags.has('fake_director_defeated') && !storyFlags.has('radio_tower_liberated');
+
+  // Bill Lifecycle: In Ecruteak Poke Center until spoken to, then returns home to Goldenrod City
+  if (npcId === 'bill_cameo') return !storyFlags.has('EVENT_MET_BILL_IN_ECRUTEAK') && !storyFlags.has('met_bill_ecruteak');
+  if (npcId === 'goldenrod_bill') return storyFlags.has('EVENT_MET_BILL_IN_ECRUTEAK') || storyFlags.has('met_bill_ecruteak');
 
   // Burned Tower 1F Rival Silver: despawn once defeated or beasts awaken
   if (npcId === 'silver_burned') {
@@ -395,11 +399,11 @@ export function isNpcActiveForStoryFlags(
 
   // Victory Road Rival & Indigo Plateau Elite Four (Act 9)
   if (npcId === 'victory_road_rival') return true;
-  if (npcId === 'e4_will') return !storyFlags.has('will_defeated');
-  if (npcId === 'e4_koga') return !storyFlags.has('koga_defeated');
-  if (npcId === 'e4_bruno') return !storyFlags.has('bruno_defeated');
-  if (npcId === 'e4_karen') return !storyFlags.has('karen_defeated');
-  if (npcId === 'champion_lance') return !storyFlags.has('champion_defeated');
+  if (npcId === 'e4_will') return true;
+  if (npcId === 'e4_koga') return true;
+  if (npcId === 'e4_bruno') return true;
+  if (npcId === 'e4_karen') return true;
+  if (npcId === 'champion_lance') return true;
 
   // Fast Ship S.S. Aqua & Copycat lifecycle
   const fastShipArrived =

@@ -160,7 +160,7 @@ export const handleCardKeyShutter: NpcInteractionHandler = (targetNpc, map, ctx)
  * 5. Executive Proton (4F)
  */
 export const handleExecutiveProton: NpcInteractionHandler = (targetNpc, _map, ctx) => {
-  if (ctx.storyFlags.has('proton_defeated')) {
+  if (ctx.storyFlags.has('radio_tower_proton_defeated')) {
     ctx.openDialogue(['PROTON: Tch! We will never surrender!'], targetNpc.speaker);
     return true;
   }
@@ -181,6 +181,7 @@ export const handleExecutiveProton: NpcInteractionHandler = (targetNpc, _map, ct
       trainerTeam: team,
       onVictory: () => {
         ctx.defeatedTrainers.add('proton_radio');
+        ctx.storyFlags.add('radio_tower_proton_defeated');
         ctx.storyFlags.add('proton_defeated');
         ctx.openDialogue(
           [

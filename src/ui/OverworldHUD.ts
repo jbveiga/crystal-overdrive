@@ -67,6 +67,7 @@ export class OverworldHUD {
   private dialoguePageIndex: number = 0;
   private dialogueCharIndex: number = 0;
   private dialogueTypeTimer?: ReturnType<typeof setInterval>;
+  private roamerAlertTimer?: ReturnType<typeof setTimeout>;
   private dialogueOnComplete?: () => void;
   private dialogueOnPageChange?: (pageIndex: number) => void;
   private dialogueActive: boolean = false;
@@ -295,19 +296,8 @@ export class OverworldHUD {
         <div id="roamer-status-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
       </div>
 
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
-        <div id="roamer-alert-banner" style="
-          display: none;
-          background: linear-gradient(135deg, rgba(220, 38, 38, 0.92), rgba(185, 28, 28, 0.92));
-          border: 1px solid #fca5a5;
-          border-radius: 8px;
-          padding: 10px 20px;
-          color: white;
-          font-weight: 700;
-          font-size: 15px;
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-          box-shadow: 0 4px 16px rgba(220, 38, 38, 0.5);
-        ">⚡ A powerful aura is present on this route!</div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none;">
+        <div id="roamer-alert-banner" style="display: none; position: fixed; top: calc(48px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); max-width: min(420px, calc(100vw - 32px)); z-index: 44; pointer-events: none; background: linear-gradient(135deg, rgba(220, 38, 38, 0.92), rgba(185, 28, 28, 0.92)); border: 1px solid #fca5a5; border-radius: 8px; padding: 6px 14px; color: white; font-weight: 700; font-size: 13px; text-align: center; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); box-shadow: 0 4px 16px rgba(220, 38, 38, 0.5);">⚡ A powerful aura is present on this route!</div>
       </div>
 
       <div id="overworld-toast-banner" style="
@@ -665,17 +655,19 @@ export class OverworldHUD {
   }
 
   public showRoamerAlert(speciesId: string, _mapId: string): void {
-    if (this.roamerAlertBanner) {
-      const beastName = speciesId.toUpperCase();
-      this.roamerAlertBanner.innerText = `⚡ ${beastName} is roaming nearby! A powerful aura is present!`;
-      this.roamerAlertBanner.style.display = 'block';
-    }
+    if (!this.roamerAlertBanner) return;
+    if (this.roamerAlertTimer) clearTimeout(this.roamerAlertTimer);
+    this.roamerAlertBanner.innerText = `⚡ ${speciesId.toUpperCase()} is roaming nearby! A powerful aura is present!`;
+    this.roamerAlertBanner.style.display = 'block';
+    this.roamerAlertTimer = setTimeout(() => {
+      if (this.roamerAlertBanner) this.roamerAlertBanner.style.display = 'none';
+      this.roamerAlertTimer = undefined;
+    }, 2500);
   }
 
   public hideRoamerAlert(): void {
-    if (this.roamerAlertBanner) {
-      this.roamerAlertBanner.style.display = 'none';
-    }
+    if (this.roamerAlertTimer) { clearTimeout(this.roamerAlertTimer); this.roamerAlertTimer = undefined; }
+    if (this.roamerAlertBanner) this.roamerAlertBanner.style.display = 'none';
   }
 
   public openPokegear(): void {

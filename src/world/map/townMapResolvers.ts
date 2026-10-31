@@ -44,8 +44,13 @@ export function resolveCurrentLandmark(mapId: string): TownMapLandmark | null {
     return JOHTO_LANDMARKS.route_30;
   }
 
-  // Route 31 (Gate & Dark Cave West)
-  if (clean.startsWith('route_31') || clean.includes('dark_cave_violet')) {
+  // Dark Cave (West, South & East exits)
+  if (clean.startsWith('dark_cave') || clean.includes('dark_cave')) {
+    return JOHTO_LANDMARKS.dark_cave;
+  }
+
+  // Route 31 (Gate & road)
+  if (clean.startsWith('route_31')) {
     return JOHTO_LANDMARKS.route_31;
   }
 
@@ -163,8 +168,13 @@ export function resolveCurrentLandmark(mapId: string): TownMapLandmark | null {
     return JOHTO_LANDMARKS.route_40;
   }
 
-  // Route 41 & Whirl Islands chambers
-  if (clean.startsWith('route_41') || clean.startsWith('whirl_island')) {
+  // Whirl Islands subterranean chambers
+  if (clean.startsWith('whirl_island')) {
+    return JOHTO_LANDMARKS.whirl_islands;
+  }
+
+  // Route 41
+  if (clean.startsWith('route_41')) {
     return JOHTO_LANDMARKS.route_41;
   }
 
@@ -178,12 +188,16 @@ export function resolveCurrentLandmark(mapId: string): TownMapLandmark | null {
     return JOHTO_LANDMARKS.cianwood_city;
   }
 
-  // Route 42 & Mount Mortar
+  // Mount Mortar multi-tiered cavern
   if (
-    clean.startsWith('route_42') ||
     clean.startsWith('mount_mortar') ||
     clean.startsWith('mt_mortar')
   ) {
+    return JOHTO_LANDMARKS.mount_mortar;
+  }
+
+  // Route 42
+  if (clean.startsWith('route_42')) {
     return JOHTO_LANDMARKS.route_42;
   }
 
@@ -221,11 +235,10 @@ export function resolveCurrentLandmark(mapId: string): TownMapLandmark | null {
     return JOHTO_LANDMARKS.dragons_den;
   }
 
-  // Blackthorn City, Move Deleter & Dark Cave East
+  // Blackthorn City & Move Deleter
   if (
     clean.startsWith('blackthorn') ||
-    clean.includes('move_deleter') ||
-    clean.includes('dark_cave_blackthorn')
+    clean.includes('move_deleter')
   ) {
     return JOHTO_LANDMARKS.blackthorn_city;
   }
@@ -234,21 +247,27 @@ export function resolveCurrentLandmark(mapId: string): TownMapLandmark | null {
   if (clean.startsWith('route_45')) return JOHTO_LANDMARKS.route_45;
   if (clean.startsWith('route_46')) return JOHTO_LANDMARKS.route_46;
 
-  // Indigo Plateau, Victory Road, Tohjo Falls, Silver Cave, and League Chambers
+  // Route 27 & Tohjo Falls
+  if (clean.includes('tohjo_falls')) return JOHTO_LANDMARKS.tohjo_falls;
+  if (clean.startsWith('route_27')) return JOHTO_LANDMARKS.route_27;
+
+  // Route 26
+  if (clean.startsWith('route_26')) return JOHTO_LANDMARKS.route_26;
+
+  // Victory Road
+  if (clean.startsWith('victory_road')) return JOHTO_LANDMARKS.victory_road;
+
+  // Indigo Plateau, League Chambers & Hall of Fame
   if (
     clean.startsWith('indigo_plateau') ||
-    clean.startsWith('victory_road') ||
     clean.includes('wills_room') ||
     clean.includes('kogas_room') ||
     clean.includes('brunos_room') ||
     clean.includes('karens_room') ||
     clean.includes('lances_room') ||
     clean.includes('hall_of_fame') ||
-    clean.startsWith('route_26') ||
-    clean.startsWith('route_27') ||
     clean.startsWith('route_28') ||
-    clean.startsWith('silver_cave') ||
-    clean.includes('tohjo_falls')
+    clean.startsWith('silver_cave')
   ) {
     return JOHTO_LANDMARKS.indigo_plateau;
   }

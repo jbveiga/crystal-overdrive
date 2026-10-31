@@ -18,7 +18,7 @@ import { getIlexForestInteractions } from './IlexForestInteractions';
 
 export function completeSlowpokeWellProtonVictory(ctx: NpcInteractionContext): void {
   ctx.defeatedTrainers.add('executive_proton');
-  ctx.storyFlags.add('proton_defeated');
+  ctx.storyFlags.add('slowpoke_well_proton_defeated');
   ctx.storyFlags.add('slowpoke_well_cleared');
   if (ctx.npcsByMap.slowpoke_well_b1f) {
     ctx.npcsByMap.slowpoke_well_b1f = ctx.npcsByMap.slowpoke_well_b1f.filter(
@@ -32,6 +32,7 @@ export function completeSlowpokeWellProtonVictory(ctx: NpcInteractionContext): v
   }
   if (!ctx.inventory.items) ctx.inventory.items = {};
   ctx.inventory.items['lure-ball'] = (ctx.inventory.items['lure-ball'] || 0) + 1;
+  ctx.inventory.items['lure_ball'] = (ctx.inventory.items['lure_ball'] || 0) + 1;
   BattleAudio.playOverworldSound('FANFARE');
   ctx.openDialogue(
     [

@@ -363,7 +363,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     tin_tower_1f: [
-      makeNpc('suicune_altar', 9, 9, 'DOWN', 'lapras', '💎 SUICUNE', 
+      makeNpc('suicune_altar', 9, 9, 'DOWN', 'suicune', '💎 SUICUNE', 
         [
           "SUICUNE: Gurr-oooh! The crystal beast radiates pure, divine luminescence!",
         ],
@@ -378,7 +378,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
     ],
 
     tin_tower_roof: [
-      makeNpc('ho_oh_boss', 9, 5, 'DOWN', 'lapras', '🌈 HO-OH', [
+      makeNpc('ho_oh_boss', 9, 5, 'DOWN', 'ho_oh', '🌈 HO-OH', [
         'HO-OH: Shaoooh!',
       ], { action: 'HO_OH_BOSS_EVENT' }),
     ],
@@ -528,14 +528,14 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           trainerTeam: [{ speciesId: 'meowth', level: 16, moves: ['scratch', 'growl', 'bite', 'payday'], heldItem: 'berry' }],
         }
       ),
-      makeNpc('route_39_miltank_1', 3, 12, 'DOWN', 'slowpoke', '🐮 MILTANK', ['MILTANK: Mooo!']),
-      makeNpc('route_39_miltank_2', 6, 11, 'DOWN', 'slowpoke', '🐮 MILTANK', ['MILTANK: Mooo!']),
-      makeNpc('route_39_miltank_3', 4, 15, 'DOWN', 'slowpoke', '🐮 MILTANK', ['MILTANK: Mooo!']),
-      makeNpc('route_39_miltank_4', 8, 13, 'DOWN', 'slowpoke', '🐮 MILTANK', ['MILTANK: Mooo!']),
+      makeNpc('route_39_miltank_1', 3, 12, 'DOWN', 'miltank', '🐮 MILTANK', ['MILTANK: Mooo!']),
+      makeNpc('route_39_miltank_2', 6, 11, 'DOWN', 'miltank', '🐮 MILTANK', ['MILTANK: Mooo!']),
+      makeNpc('route_39_miltank_3', 4, 15, 'DOWN', 'miltank', '🐮 MILTANK', ['MILTANK: Mooo!']),
+      makeNpc('route_39_miltank_4', 8, 13, 'DOWN', 'miltank', '🐮 MILTANK', ['MILTANK: Mooo!']),
     ],
 
     route_39_barn: [
-      makeNpc('moomoo_miltank', 3, 3, 'DOWN', 'fat_man', '🐮 MILTANK', [
+      makeNpc('moomoo_miltank', 3, 3, 'DOWN', 'miltank', '🐮 MILTANK', [
         'MILTANK: Mooo! (It looks healthy and full of life!)',
       ]),
       makeNpc('barn_twin_1', 2, 3, 'RIGHT', 'girl', '👧 TWIN LULU', [

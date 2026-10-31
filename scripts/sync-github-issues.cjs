@@ -174,6 +174,34 @@ const { ISSUE_RESOLUTIONS } = (() => {
   2. Registered \`butterfree\` in \`NpcSpriteType\` (\`src/world/GridPhysics.ts\`) and \`NPC_SHEET_PATHS\` (\`src/render/OverworldNpcAndItemSprites.ts\`).
   3. Updated \`gate_butterfree\` to use \`spriteType: 'butterfree'\`.
   4. Authored automated test suite asserting sprite path resolution and asset integrity in \`tests/bugfixes/githubIssue35.test.ts\`.`,
+      36: `### Resolution Details for Issue #36
+- **Root Cause**: On \`route_40.json\` (\`width: 20\`), rows \`y = 0\` and \`y = 1\` at \`x = 8..11\` directly behind the Battle Tower Gatehouse roof (\`y = 2..3\`) contained walkable path, fence, and carpet tiles (\`jt_06_06_06_06\`, \`jt_5a_5a_59_59\`, \`jt_40_40_40_40\`) visually leading into the solid northern border trees.
+- **Fix**:
+  1. Replaced \`x = 8..11, y = 0\` with \`jt_1e_1f_2e_2f\` (\`collision: 1\`) and \`x = 8..11, y = 1\` with \`jt_2e_2f_3e_3f\` (\`collision: 1\`) in \`public/assets/data/maps/route_40.json\` and \`public/assets/data/world_maps.json\`, forming a seamless solid northern tree line behind the gatehouse roof.
+  2. Added automated verification in \`tests/bugfixes/githubIssues36Through40.test.ts\`.`,
+      37: `### Resolution Details for Issue #37
+- **Root Cause**: Swimmer trainers on \`route_40\` (\`swimmerm_simon\`, \`swimmerm_randall\`, \`swimmerf_elaine\`, \`swimmerf_paula\`) and \`route_41\` in \`src/world/npcs/seaRoutesNpcs.ts\` were assigned land-walking \`boy\` and \`girl\` sprites instead of water-swimming sprites.
+- **Fix**:
+  1. Generated authentic 144x32 overworld swimmer sprite sheets \`public/assets/sprites/characters/swimmer_m.png\` and \`public/assets/sprites/characters/swimmer_f.png\`.
+  2. Registered \`swimmer_m\` and \`swimmer_f\` in \`NpcSpriteType\` (\`src/world/GridPhysics.ts\`) and \`NPC_SHEET_PATHS\` (\`src/render/OverworldNpcAndItemSprites.ts\`).
+  3. Assigned \`swimmer_m\` and \`swimmer_f\` to all male and female Swimmer trainers on \`route_40\` and \`route_41\`.`,
+      38: `### Resolution Details for Issue #38
+- **Root Cause**:
+  1. \`RoamingManager.onPlayerRouteChange\` previously allowed roamers to land on towns and indoor/non-graph maps (including \`olivine_lighthouse_1f\`) on the 10% Direct Converge roll, and \`executeWarpTransition\` did not hide \`roamerAlertBanner\` when entering indoor warps.
+  2. \`roamerAlertBanner\` in \`src/ui/OverworldHUD.ts\` was positioned across the vertical center of the screen without auto-dismissing.
+- **Fix**:
+  1. Updated \`src/world/RoamingManager.ts\` to enforce Pokémon Crystal roaming rules: only **Raikou** and **Entei** roam randomly at **Level 40** across **Johto grass routes** (\`JOHTO_GRASS_ROUTES\`: \`route_29\`–\`route_39\`, \`route_42\`–\`route_46\`) after awakening in \`burned_tower_b1f\` (Suicune follows its scripted storyline and does not roam randomly).
+  2. Updated \`OverworldWarpAndMapTransitionController.executeWarpTransition\` to immediately hide any active roamer alert when warping indoors.
+  3. Repositioned \`#roamer-alert-banner\` in \`src/ui/OverworldHUD.ts\` to a compact, non-blocking top HUD toast (\`top: 48px\`, \`pointer-events: none\`) that auto-dismisses after 2.5 seconds.`,
+      39: `### Resolution Details for Issue #39
+- **Root Cause**: \`NPC_SHEET_PATHS.miltank\` in \`src/render/OverworldNpcAndItemSprites.ts\` was mapped to \`'./assets/sprites/characters/slowpoke.png'\`, causing the Route 39 pasture Miltanks (\`route_39_miltank_1..4\`) to render with Slowpoke's overworld sprite.
+- **Fix**:
+  1. Generated an authentic 144x32 Gen 2 Miltank overworld sprite sheet at \`public/assets/sprites/characters/miltank.png\`.
+  2. Updated \`NPC_SHEET_PATHS.miltank\` in \`src/render/OverworldNpcAndItemSprites.ts\` to \`'./assets/sprites/characters/miltank.png'\`.`,
+      40: `### Resolution Details for Issue #40
+- **Root Cause**: \`moomoo_miltank\` in \`route_39_barn\` previously used a human/placeholder sprite mapping before \`miltank.png\` was dedicated in \`NPC_SHEET_PATHS\`.
+- **Fix**:
+  1. Assigned \`spriteType: 'miltank'\` to \`moomoo_miltank\` in \`src/world/npcs/ecruteakToRoute39Npcs.ts\` and mapped \`NPC_SHEET_PATHS.miltank\` to the dedicated 144x32 \`public/assets/sprites/characters/miltank.png\` sprite sheet.`,
     },
   };
 })();

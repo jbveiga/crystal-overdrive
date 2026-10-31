@@ -72,6 +72,7 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getMahoganyTownAndLakeInteractions(),
     ...getMahoganyRocketHideoutInteractions(),
     ...getWhirlIslandsInteractions(),
+    ...getMahoganyGymInteractions(),
     ...getRoute44AndIcePathInteractions(),
     ...getBlackthornGymAndDragonDenInteractions(),
     ...getRoute45And46Interactions(),

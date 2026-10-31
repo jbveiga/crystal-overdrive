@@ -32,7 +32,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
       makeNpc('route_40_standing_youngster', 16, 9, 'DOWN', 'youngster', '👦 YOUNGSTER', [
         'Have you gone to the BATTLE TOWER? I think a lot of tough trainers have gathered there already.',
       ]),
-      makeNpc('swimmerm_simon', 14, 15, 'RIGHT', 'boy', '🏊 SWIMMER SIMON', [
+      makeNpc('swimmerm_simon', 14, 15, 'RIGHT', 'swimmer_m', '🏊 SWIMMER SIMON', [
         'CIANWOOD CITY is a good distance away from here.',
       ], {
         action: 'TRAINER_BATTLE',
@@ -46,7 +46,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'tentacool', level: 20, moves: ['poisonsting', 'supersonic', 'constrict', 'acid'] },
         ],
       }),
-      makeNpc('swimmerm_randall', 18, 30, 'LEFT', 'boy', '🏊 SWIMMER RANDALL', [
+      makeNpc('swimmerm_randall', 18, 30, 'LEFT', 'swimmer_m', '🏊 SWIMMER RANDALL', [
         'Swimming exercises your entire body. It’s healthy.',
       ], {
         action: 'TRAINER_BATTLE',
@@ -54,14 +54,14 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
         trainerName: 'Swimmer Randall',
         visionRange: 5,
         challengePages: ["RANDALL: Hey, you're young and fit! Don't ride your POKéMON! Swim!"],
-        trainerPokemon: { speciesId: 'shellder', level: 18, moves: ['tackle', 'withdraw', 'iciclespear'] },
+        trainerPokemon: { speciesId: 'shellder', level: 18, moves: ['tackle', 'withdraw', 'aurorabeam'] },
         trainerTeam: [
-          { speciesId: 'shellder', level: 18, moves: ['tackle', 'withdraw', 'iciclespear'] },
+          { speciesId: 'shellder', level: 18, moves: ['tackle', 'withdraw', 'aurorabeam'] },
           { speciesId: 'wartortle', level: 20, moves: ['tackle', 'tailwhip', 'bubble', 'watergun'] },
-          { speciesId: 'shellder', level: 18, moves: ['tackle', 'withdraw', 'iciclespear'] },
+          { speciesId: 'shellder', level: 18, moves: ['tackle', 'withdraw', 'aurorabeam'] },
         ],
       }),
-      makeNpc('swimmerf_elaine', 3, 19, 'RIGHT', 'girl', '🏊‍♀️ SWIMMER ELAINE', [
+      makeNpc('swimmerf_elaine', 3, 19, 'RIGHT', 'swimmer_f', '🏊‍♀️ SWIMMER ELAINE', [
         "I'd say I'm a better swimmer than you. Yeah!",
       ], {
         action: 'TRAINER_BATTLE',
@@ -74,7 +74,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'staryu', level: 21, moves: ['tackle', 'watergun', 'recover', 'swift'] },
         ],
       }),
-      makeNpc('swimmerf_paula', 10, 25, 'DOWN', 'girl', '🏊‍♀️ SWIMMER PAULA', [
+      makeNpc('swimmerf_paula', 10, 25, 'DOWN', 'swimmer_f', '🏊‍♀️ SWIMMER PAULA', [
         'While I float like this, the waves carry me along.',
       ], {
         action: 'TRAINER_BATTLE',
@@ -85,7 +85,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
         trainerPokemon: { speciesId: 'staryu', level: 19, moves: ['watergun', 'swift', 'recover', 'tackle'] },
         trainerTeam: [
           { speciesId: 'staryu', level: 19, moves: ['watergun', 'swift', 'recover', 'tackle'] },
-          { speciesId: 'shellder', level: 19, moves: ['tackle', 'withdraw', 'iciclespear'] },
+          { speciesId: 'shellder', level: 19, moves: ['tackle', 'withdraw', 'aurorabeam'] },
         ],
       }),
     ],
@@ -97,7 +97,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
     ],
 
     route_41: [
-      makeNpc('swimmerm_charlie', 32, 6, 'DOWN', 'boy', '🏊 SWIMMER CHARLIE', [
+      makeNpc('swimmerm_charlie', 32, 6, 'DOWN', 'swimmer_m', '🏊 SWIMMER CHARLIE', [
         'Isn’t it relaxing just floating like this?',
       ], {
         action: 'TRAINER_BATTLE',
@@ -105,14 +105,14 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
         trainerName: 'Swimmer Charlie',
         visionRange: 3,
         challengePages: ["CHARLIE: The water's warm here. I'm loose and limber. Sure, I'll take you on!"],
-        trainerPokemon: { speciesId: 'shellder', level: 21, moves: ['tackle', 'withdraw', 'iciclespear', 'aurorabeam'] },
+        trainerPokemon: { speciesId: 'shellder', level: 21, moves: ['tackle', 'withdraw', 'supersonic', 'aurorabeam'] },
         trainerTeam: [
-          { speciesId: 'shellder', level: 21, moves: ['tackle', 'withdraw', 'iciclespear', 'aurorabeam'] },
+          { speciesId: 'shellder', level: 21, moves: ['tackle', 'withdraw', 'supersonic', 'aurorabeam'] },
           { speciesId: 'tentacool', level: 19, moves: ['poisonsting', 'supersonic', 'constrict', 'acid'] },
           { speciesId: 'tentacruel', level: 19, moves: ['poisonsting', 'supersonic', 'constrict', 'acid'] },
         ],
       }),
-      makeNpc('swimmerm_george', 46, 8, 'DOWN', 'boy', '🏊 SWIMMER GEORGE', [
+      makeNpc('swimmerm_george', 46, 8, 'DOWN', 'swimmer_m', '🏊 SWIMMER GEORGE', [
         "It's so far to CIANWOOD. But it's no easy return trip to OLIVINE either. What should I do?",
       ], {
         action: 'TRAINER_BATTLE',
@@ -130,7 +130,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'remoraid', level: 19, moves: ['watergun', 'lockon', 'psybeam', 'aurorabeam'] },
         ],
       }),
-      makeNpc('swimmerm_berke', 20, 26, 'DOWN', 'boy', '🏊 SWIMMER BERKE', [
+      makeNpc('swimmerm_berke', 20, 26, 'DOWN', 'swimmer_m', '🏊 SWIMMER BERKE', [
         'It was a dark and stormy night… I saw this giant POKéMON flying from the islands. It was scattering feathers from its silver wings.',
       ], {
         action: 'TRAINER_BATTLE',
@@ -143,7 +143,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'qwilfish', level: 23, moves: ['spikes', 'pinmissile', 'poisonsting', 'watergun'] },
         ],
       }),
-      makeNpc('swimmerm_kirk', 32, 30, 'DOWN', 'boy', '🏊 SWIMMER KIRK', [
+      makeNpc('swimmerm_kirk', 32, 30, 'DOWN', 'swimmer_m', '🏊 SWIMMER KIRK', [
         'The currents keep me from reaching that island.',
       ], {
         action: 'TRAINER_BATTLE',
@@ -157,7 +157,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'gyarados', level: 20, moves: ['bite', 'dragonrage', 'leer', 'twister'] },
         ],
       }),
-      makeNpc('swimmerm_mathew', 19, 46, 'DOWN', 'boy', '🏊 SWIMMER MATHEW', [
+      makeNpc('swimmerm_mathew', 19, 46, 'DOWN', 'swimmer_m', '🏊 SWIMMER MATHEW', [
         "A secret about WHIRL ISLANDS… It's pitch-black inside!",
       ], {
         action: 'TRAINER_BATTLE',
@@ -170,7 +170,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'krabby', level: 23, moves: ['bubble', 'vicegrip', 'leer', 'harden'] },
         ],
       }),
-      makeNpc('swimmerf_kaylee', 17, 4, 'DOWN', 'girl', '🏊‍♀️ SWIMMER KAYLEE', [
+      makeNpc('swimmerf_kaylee', 17, 4, 'DOWN', 'swimmer_f', '🏊‍♀️ SWIMMER KAYLEE', [
         'There is supposed to be a big POKéMON deep beneath WHIRL ISLANDS. I wonder what it could be?',
       ], {
         action: 'TRAINER_BATTLE',
@@ -185,7 +185,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'seaking', level: 20, moves: ['peck', 'tailwhip', 'supersonic', 'hornattack'] },
         ],
       }),
-      makeNpc('swimmerf_susie', 23, 19, 'UP', 'girl', '🏊‍♀️ SWIMMER SUSIE', [
+      makeNpc('swimmerf_susie', 23, 19, 'UP', 'swimmer_f', '🏊‍♀️ SWIMMER SUSIE', [
         'Wasn’t there a hit song about a boy riding a LAPRAS?',
       ], {
         action: 'TRAINER_BATTLE',
@@ -199,7 +199,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'goldeen', level: 22, moves: ['peck', 'tailwhip', 'supersonic', 'hornattack'] },
         ],
       }),
-      makeNpc('swimmerf_denise', 27, 34, 'LEFT', 'girl', '🏊‍♀️ SWIMMER DENISE', [
+      makeNpc('swimmerf_denise', 27, 34, 'LEFT', 'swimmer_f', '🏊‍♀️ SWIMMER DENISE', [
         'A sunburn is the worst for skin. But I don’t use a sunblock. I won’t pollute the water.',
       ], {
         action: 'TRAINER_BATTLE',
@@ -212,7 +212,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'seel', level: 22, moves: ['headbutt', 'growl', 'aurorabeam', 'rest'] },
         ],
       }),
-      makeNpc('swimmerf_kara', 44, 28, 'RIGHT', 'girl', '🏊‍♀️ SWIMMER KARA', [
+      makeNpc('swimmerf_kara', 44, 28, 'RIGHT', 'swimmer_f', '🏊‍♀️ SWIMMER KARA', [
         'I heard roars from deep inside the ISLANDS.',
       ], {
         action: 'TRAINER_BATTLE',
@@ -226,7 +226,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
           { speciesId: 'starmie', level: 20, moves: ['watergun', 'swift', 'recover', 'rapidspin'] },
         ],
       }),
-      makeNpc('swimmerf_wendy', 9, 50, 'DOWN', 'girl', '🏊‍♀️ SWIMMER WENDY', [
+      makeNpc('swimmerf_wendy', 9, 50, 'DOWN', 'swimmer_f', '🏊‍♀️ SWIMMER WENDY', [
         'The clusters of STARYU light up at the same time. It’s so beautiful, it’s scary.',
       ], {
         action: 'TRAINER_BATTLE',
@@ -248,7 +248,7 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
         9,
         9,
         'DOWN',
-        'lapras',
+        'lugia',
         '🌊 LUGIA',
         ['Gyaoooon!'],
         { action: 'LUGIA_BOSS_EVENT' }

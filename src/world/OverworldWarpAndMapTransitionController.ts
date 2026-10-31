@@ -608,12 +608,8 @@ export class OverworldWarpAndMapTransitionController {
           });
         }
         player.direction = transitionConfig.landingFacing;
-        player.x = transitionConfig.landingX;
-        player.y = transitionConfig.landingY;
-        player.targetX = transitionConfig.landingX;
-        player.targetY = transitionConfig.landingY;
-        player.renderX = transitionConfig.landingX;
-        player.renderY = transitionConfig.landingY;
+        player.x = player.targetX = player.renderX = transitionConfig.landingX;
+        player.y = player.targetY = player.renderY = transitionConfig.landingY;
 
         // Strictly await 100% texture hydration while transition veil is 100% black (BUGFIX-ASYNC-TILE-TEXTURE-FADE-SYNC-01)
         await overworldRenderer.ensureMapTilesLoaded(targetMap, lookupMap);
@@ -624,6 +620,9 @@ export class OverworldWarpAndMapTransitionController {
         activeNpcCache.evictMapsNotIn(mapManager.getProtectedMapIds(targetMap.id));
         this.syncMapOverworldItems(ctx, targetMap);
         overworldHUD.updateRouteName(targetMap.name);
+        const roamerOnTarget = ctx.roamingManager?.getActiveRoamerOnRoute(targetMap.id);
+        if (roamerOnTarget) overworldHUD.showRoamerAlert(roamerOnTarget.speciesId, targetMap.id);
+        else overworldHUD.hideRoamerAlert();
         audioManager.playMapBgm(targetMap.id, 0.8);
         void ctx.adjacentMapPrefetcher?.prefetchAroundMap(targetMap.id);
       }, transitionConfig.fadeDurationMs)

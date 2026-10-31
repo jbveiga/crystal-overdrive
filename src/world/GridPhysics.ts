@@ -66,7 +66,17 @@ export type NpcSpriteType =
   | 'fruit_tree'
   | 'gramps'
   | 'granny'
-  | 'kimono_girl';
+  | 'kimono_girl'
+  | 'clair'
+  | 'pryce'
+  | 'ho_oh'
+  | 'miltank'
+  | 'gyarados'
+  | 'electrode'
+  | 'voltorb'
+  | 'lugia'
+  | 'swimmer_m'
+  | 'swimmer_f';
 
 export interface TrainerPokemonSpec {
   speciesId: string;

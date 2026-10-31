@@ -337,30 +337,32 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
           ],
           '💎 SUICUNE',
           () => {
-            const suicunePkmn = PokemonFactory.create('suicune', 40, ['aurorabeam', 'gust', 'rain-dance', 'surf']);
+            const suicunePkmn = PokemonFactory.create('suicune', 40, ['aurorabeam', 'gust', 'raindance', 'surf']);
             ctx.triggerBattle(suicunePkmn, {
               onBattleEnd: (_res) => {
-                ctx.storyFlags.add('suicune_caught_or_defeated');
-                ctx.storyFlags.add('suicune_altar_reached');
-                ctx.storyFlags.add('wise_trio_cleared');
-                ctx.missionManager.checkStoryFlags(ctx.storyFlags);
-                ctx.missionManager.completeMission('M11');
-                const curMap = ctx.mapManager.getCurrentMap();
-                if (curMap) {
-                  ctx.renderMap?.(curMap);
-                  ctx.syncMapOverworldItems?.(curMap);
-                }
-                ctx.saveCurrentGame();
-                ctx.openDialogue(
-                  [
-                    'SUICUNE bowed with divine elegance before bounding toward the endless horizons!',
-                    'EUSINE: Staggering! The crystal beast recognized your heroic bond and valor!',
-                  ],
-                  '🎩 EUSINE',
-                  () => {
-                    ctx.showToast('💎 Cleared the Suicune Trial at Tin Tower!');
+                if (_res.winner === 'PLAYER' || _res.caught) {
+                  ctx.storyFlags.add('suicune_caught_or_defeated');
+                  ctx.storyFlags.add('suicune_altar_reached');
+                  ctx.storyFlags.add('wise_trio_cleared');
+                  ctx.missionManager.checkStoryFlags(ctx.storyFlags);
+                  ctx.missionManager.completeMission('M11');
+                  const curMap = ctx.mapManager.getCurrentMap();
+                  if (curMap) {
+                    ctx.renderMap?.(curMap);
+                    ctx.syncMapOverworldItems?.(curMap);
                   }
-                );
+                  ctx.saveCurrentGame();
+                  ctx.openDialogue(
+                    [
+                      'SUICUNE bowed with divine elegance before bounding toward the endless horizons!',
+                      'EUSINE: Staggering! The crystal beast recognized your heroic bond and valor!',
+                    ],
+                    '🎩 EUSINE',
+                    () => {
+                      ctx.showToast('💎 Cleared the Suicune Trial at Tin Tower!');
+                    }
+                  );
+                }
               },
             });
           }

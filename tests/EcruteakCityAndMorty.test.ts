@@ -132,11 +132,12 @@ describe('Phase 9: Ecruteak City, Burned Tower & Gym Leader Morty Suite', () => 
 
       expect(raikou?.isAwakened).toBe(true);
       expect(entei?.isAwakened).toBe(true);
-      expect(suicune?.isAwakened).toBe(true);
+      expect(raikou?.pokemon.level).toBe(40);
+      expect(entei?.pokemon.level).toBe(40);
+      expect(suicune).toBeUndefined();
 
       expect(raikou?.currentMapId).not.toBe('burned_tower');
       expect(entei?.currentMapId).not.toBe('burned_tower');
-      expect(suicune?.currentMapId).not.toBe('burned_tower');
     });
   });
 

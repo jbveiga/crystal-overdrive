@@ -150,6 +150,11 @@ export function handleRoute42SuicuneInteraction(targetNpc: GridEntity, _map: Map
 }
 
 export function handleMortarSuperNerds(targetNpc: GridEntity, _map: MapData, ctx: NpcInteractionContext): boolean {
+  const trainerId = targetNpc.trainerId || targetNpc.id;
+  if (ctx?.defeatedTrainers && !ctx.defeatedTrainers.has(trainerId)) {
+    return false;
+  }
+
   if (targetNpc.id === 'mount_mortar_1f_inside_markus') {
     ctx.openDialogue(
       ['MARKUS: HUGH and I were researching the ancient geology of Mt. Mortar, but we took a wrong turn.'],

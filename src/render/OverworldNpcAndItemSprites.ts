@@ -82,6 +82,16 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   gramps: './assets/sprites/characters/gramps.png',
   granny: './assets/sprites/characters/granny.png',
   kimono_girl: './assets/sprites/characters/kimono_girl.png',
+  clair: './assets/sprites/characters/cooltrainer_f.png',
+  pryce: './assets/sprites/characters/elder.png',
+  ho_oh: './assets/sprites/characters/lapras.png',
+  miltank: './assets/sprites/characters/miltank.png',
+  gyarados: './assets/sprites/characters/lapras.png',
+  electrode: './assets/sprites/characters/pokefan_m.png',
+  voltorb: './assets/sprites/characters/pokefan_m.png',
+  lugia: './assets/sprites/characters/lapras.png',
+  swimmer_m: './assets/sprites/characters/swimmer_m.png',
+  swimmer_f: './assets/sprites/characters/swimmer_f.png',
 };
 
 export class OverworldNpcAndItemSprites {
