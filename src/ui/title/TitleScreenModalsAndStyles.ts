@@ -229,32 +229,14 @@ export function renderMainMenu({
   const saveDataFocused = cursorIndex === 3;
   const saveDataBtn = document.createElement('div');
   saveDataBtn.id = 'title-opt-save-data';
-  saveDataBtn.style.cssText = `
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 18px;
-    border-radius: 12px;
-    background: ${
-      saveDataFocused
-        ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))'
-        : 'rgba(15, 23, 42, 0.82)'
-    };
-    border: 2px solid ${saveDataFocused ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)'};
-    box-shadow: ${saveDataFocused ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'};
-    cursor: pointer;
-    transition: all 0.15s ease;
-  `;
+  saveDataBtn.style.cssText = `display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-radius: 12px; background: ${saveDataFocused ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))' : 'rgba(15, 23, 42, 0.82)'}; border: 2px solid ${saveDataFocused ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)'}; box-shadow: ${saveDataFocused ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'}; cursor: pointer; transition: all 0.15s ease;`;
   saveDataBtn.innerHTML = `
     <span style="font-size: 16px; font-weight: 900; color: #f8fafc; letter-spacing: 1px;">
       ${saveDataFocused ? '▶ ' : ''}SAVE DATA
     </span>
     <span style="font-size: 12px; font-weight: 700; color: #94a3b8;">Import / Export Cross-Device Save</span>
   `;
-  saveDataBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    onSelectOption(3);
-  });
+  saveDataBtn.addEventListener('click', (e) => { e.stopPropagation(); onSelectOption(3); });
   menuElement.appendChild(saveDataBtn);
 }
 
@@ -685,10 +667,7 @@ export function renderSaveDataModal({
   };
 
   const closeBtn = saveModalElement.querySelector('#title-close-save-modal-btn');
-  closeBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    onClose();
-  });
+  closeBtn?.addEventListener('click', (e) => { e.stopPropagation(); onClose(); });
 
   const exportBtn = saveModalElement.querySelector('#title-export-save-btn');
   const exportTextarea = saveModalElement.querySelector('#title-save-export-textarea') as HTMLTextAreaElement | null;
@@ -735,9 +714,7 @@ export function renderSaveDataModal({
     if (!file || typeof FileReader === 'undefined') return;
     const reader = new FileReader();
     reader.onload = () => {
-      if (importTextarea && typeof reader.result === 'string') {
-        importTextarea.value = reader.result;
-      }
+      if (importTextarea && typeof reader.result === 'string') importTextarea.value = reader.result;
     };
     reader.readAsText(file);
   });

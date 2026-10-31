@@ -107,10 +107,7 @@ async function bootstrap() {
     });
     playTimeSeconds = playTimeBox.val; playerName = playerNameBox.val; playerGender = playerGenderBox.val; rivalName = rivalNameBox.val;
     initialMapId = loc.mapId; initialPlayerX = loc.x; initialPlayerY = loc.y; initialPlayerDir = loc.direction; lastVisitedPokecenter = loc.lastVisitedPokecenter;
-    if (player) {
-      player.x = initialPlayerX; player.y = initialPlayerY; player.targetX = initialPlayerX; player.targetY = initialPlayerY;
-      player.renderX = initialPlayerX; player.renderY = initialPlayerY; player.direction = initialPlayerDir;
-    }
+    if (player) { Object.assign(player, { x: initialPlayerX, y: initialPlayerY, targetX: initialPlayerX, targetY: initialPlayerY, renderX: initialPlayerX, renderY: initialPlayerY, direction: initialPlayerDir }); }
   };
 
   if (existingSave) {
@@ -195,27 +192,25 @@ async function bootstrap() {
     setCutsceneLocked: (locked) => { isCutsceneLocked = locked; },
   });
 
-  const triggerSlowpokeWellGruntIntercept = async (grunt: GridEntity) => StoryCutscenes.triggerSlowpokeWellGruntIntercept(grunt, getCutsceneContext());
-  const triggerAzaleaRivalAmbush = () => StoryCutscenes.triggerAzaleaRivalAmbush(getCutsceneContext());
-  const triggerCherrygroveRivalAmbush = () => StoryCutscenes.triggerCherrygroveRivalAmbush(getCutsceneContext());
-  const triggerBurnedTowerRivalBattle = () => StoryCutscenes.triggerBurnedTowerRivalBattle(getCutsceneContext());
-  const triggerBeastsAwakeningCutscene = () => StoryCutscenes.triggerBeastsAwakeningCutscene(getCutsceneContext());
-  const triggerOlivineRivalConfrontation = () => StoryCutscenes.triggerOlivineRivalConfrontation(getCutsceneContext());
-  const triggerCianwoodSuicuneAndEusine = () => StoryCutscenes.triggerCianwoodSuicuneAndEusine(getCutsceneContext());
-  const triggerRoute42Suicune = () => StoryCutscenes.triggerRoute42Suicune(getCutsceneContext());
+  const SC = StoryCutscenes;
+  const triggerSlowpokeWellGruntIntercept = async (grunt: GridEntity) => SC.triggerSlowpokeWellGruntIntercept(grunt, getCutsceneContext());
+  const triggerAzaleaRivalAmbush = () => SC.triggerAzaleaRivalAmbush(getCutsceneContext());
+  const triggerCherrygroveRivalAmbush = () => SC.triggerCherrygroveRivalAmbush(getCutsceneContext());
+  const triggerBurnedTowerRivalBattle = () => SC.triggerBurnedTowerRivalBattle(getCutsceneContext());
+  const triggerBeastsAwakeningCutscene = () => SC.triggerBeastsAwakeningCutscene(getCutsceneContext());
+  const triggerOlivineRivalConfrontation = () => SC.triggerOlivineRivalConfrontation(getCutsceneContext());
+  const triggerCianwoodSuicuneAndEusine = () => SC.triggerCianwoodSuicuneAndEusine(getCutsceneContext());
+  const triggerRoute42Suicune = () => SC.triggerRoute42Suicune(getCutsceneContext());
 
   const saveCurrentGame = async () => {
     missionManager.checkStoryFlags(storyFlags);
-    gameOptions.playerSpeedDefault = gameClock.playerSpeed;
-    gameOptions.battleSpeedMultiplier = gameClock.battleSpeed;
-    gameOptions.muted = audioManager.isMuted();
-    gameOptions.bgmVolume = audioManager.getBgmVolume();
-    gameOptions.soundVolume = audioManager.getSfxVolume();
-    gameOptions.chiptuneMode = audioManager.isChiptuneMode();
-    gameOptions.lowHpBeepEnabled = BattleAudio.lowHpBeepEnabled;
-    gameOptions.crtScanlines = displayThemeManager.isCrtEnabled();
-    gameOptions.gbcPalette = displayThemeManager.getPalette();
-    gameOptions.encounterRateMode = mapManager.getEncounterRateMode();
+    Object.assign(gameOptions, {
+      playerSpeedDefault: gameClock.playerSpeed, battleSpeedMultiplier: gameClock.battleSpeed,
+      muted: audioManager.isMuted(), bgmVolume: audioManager.getBgmVolume(), soundVolume: audioManager.getSfxVolume(),
+      chiptuneMode: audioManager.isChiptuneMode(), lowHpBeepEnabled: BattleAudio.lowHpBeepEnabled,
+      crtScanlines: displayThemeManager.isCrtEnabled(), gbcPalette: displayThemeManager.getPalette(),
+      encounterRateMode: mapManager.getEncounterRateMode(),
+    });
     if (overworldHUD) {
       gameOptions.touchControlStyle = overworldHUD.getTouchControlStyle();
       gameOptions.gamepadActive = overworldHUD.isGamepadActive();
@@ -247,15 +242,15 @@ async function bootstrap() {
     },
   });
 
-  // Maps stream asynchronously on-demand via mapManager.ensureMapLoaded (fallback: './assets/data/world_maps.json').
-  const ensureMapAndNeighborsLoaded = (targetId: string) => OverworldWarpAndMapTransitionController.ensureMapAndNeighborsLoaded(getTransitionContext(), targetId);
-  const resetMapNpcsToOrigin = (mapId: string) => OverworldWarpAndMapTransitionController.resetMapNpcsToOrigin(getTransitionContext(), mapId);
-  const applyMapStoryMutations = (map: MapData | null) => OverworldWarpAndMapTransitionController.applyMapStoryMutations(getTransitionContext(), map);
-  const syncMapOverworldItems = (map: MapData | null) => OverworldWarpAndMapTransitionController.syncMapOverworldItems(getTransitionContext(), map);
-  const populateWorldNpcs = (map: MapData | null) => OverworldWarpAndMapTransitionController.populateWorldNpcs(getTransitionContext(), map);
-  const handleMapTransition = (entity: GridEntity) => OverworldWarpAndMapTransitionController.handleMapTransition(getTransitionContext(), entity);
-  const executeWarpTransition = (warp: WarpEvent) => OverworldWarpAndMapTransitionController.executeWarpTransition(getTransitionContext(), warp);
-  const handleRuinsPuzzleSolve = (puzzleId: string) => OverworldWarpAndMapTransitionController.handleRuinsPuzzleSolve(getTransitionContext(), puzzleId);
+  const TC = OverworldWarpAndMapTransitionController;
+  const ensureMapAndNeighborsLoaded = (targetId: string) => TC.ensureMapAndNeighborsLoaded(getTransitionContext(), targetId);
+  const resetMapNpcsToOrigin = (mapId: string) => TC.resetMapNpcsToOrigin(getTransitionContext(), mapId);
+  const applyMapStoryMutations = (map: MapData | null) => TC.applyMapStoryMutations(getTransitionContext(), map);
+  const syncMapOverworldItems = (map: MapData | null) => TC.syncMapOverworldItems(getTransitionContext(), map);
+  const populateWorldNpcs = (map: MapData | null) => TC.populateWorldNpcs(getTransitionContext(), map);
+  const handleMapTransition = (entity: GridEntity) => TC.handleMapTransition(getTransitionContext(), entity);
+  const executeWarpTransition = (warp: WarpEvent) => TC.executeWarpTransition(getTransitionContext(), warp);
+  const handleRuinsPuzzleSolve = (puzzleId: string) => TC.handleRuinsPuzzleSolve(getTransitionContext(), puzzleId);
 
   const criticalBootMapIds = Array.from(new Set([initialMapId, 'new_bark_town', 'players_house_2f', 'players_house_1f']));
   const bootMapManifest = new AssetManifestQueue();
@@ -320,19 +315,13 @@ async function bootstrap() {
   bugContestHUD = new BugContestHUDWidget('overworld-hud-container');
 
   setBattleSpeed = (speed: SpeedMultiplier): SpeedMultiplier => {
-    gameClock.battleSpeed = speed;
-    gameOptions.battleSpeedMultiplier = speed;
+    gameClock.battleSpeed = speed; gameOptions.battleSpeedMultiplier = speed;
     if (battleRenderer) battleRenderer.setSpeedMultiplier(speed);
     if (battleHUD) battleHUD.setSpeedMultiplier(speed);
     void saveCurrentGame();
     return speed;
   };
-
-  cycleBattleSpeed = (): SpeedMultiplier => {
-    const nextSpeed: SpeedMultiplier = gameClock.battleSpeed === 1 ? 2 : gameClock.battleSpeed === 2 ? 3 : 1;
-    return setBattleSpeed(nextSpeed);
-  };
-
+  cycleBattleSpeed = (): SpeedMultiplier => setBattleSpeed(gameClock.battleSpeed === 1 ? 2 : gameClock.battleSpeed === 2 ? 3 : 1);
   setTextSpeed = (speed: GameOptions['textSpeed']): GameOptions['textSpeed'] => {
     gameOptions.textSpeed = speed;
     if (overworldHUD) overworldHUD.setTextSpeed(speed);
@@ -340,12 +329,9 @@ async function bootstrap() {
     void saveCurrentGame();
     return speed;
   };
-
   cycleTextSpeed = (): GameOptions['textSpeed'] => {
     const speeds: Array<GameOptions['textSpeed']> = ['SLOW', 'MID', 'FAST', 'INSTANT'];
-    const current = gameOptions.textSpeed ?? 'MID';
-    const nextIdx = (speeds.indexOf(current) + 1) % speeds.length;
-    return setTextSpeed(speeds[nextIdx]);
+    return setTextSpeed(speeds[(speeds.indexOf(gameOptions.textSpeed ?? 'MID') + 1) % speeds.length]);
   };
 
   cyclePlayerSpeed = (): SpeedMultiplier => {
@@ -468,29 +454,14 @@ async function bootstrap() {
       playerGender = gender;
       overworldRenderer.setPlayerGender(gender);
       const fresh = SaveManager.createFreshSaveData(name, gender);
-      playTimeSeconds = 0;
-      playerParty.length = 0;
-      playerBox.length = 0;
-      inventory.balls = fresh.inventory.balls;
-      inventory.items = fresh.inventory.items || {};
-      inventory.tms = [...fresh.inventory.tms];
-      inventory.berries = {};
-      inventory.keyItems = [];
-      inventory.money = fresh.player.money;
-      inventory.badges = [];
-      defeatedTrainers.clear();
-      storyFlags.clear();
-      seenSpecies.clear(); caughtSpecies.clear();
+      playTimeSeconds = 0; playerParty.length = 0; playerBox.length = 0;
+      Object.assign(inventory, { balls: fresh.inventory.balls, items: fresh.inventory.items || {}, tms: [...fresh.inventory.tms], berries: {}, keyItems: [], money: fresh.player.money, badges: [] });
+      defeatedTrainers.clear(); storyFlags.clear(); seenSpecies.clear(); caughtSpecies.clear();
       rivalName = 'SILVER';
-      boxManager.getState().boxes.forEach((b) => b.pokemon.fill(null));
-      boxManager.changeBox(0);
-      playerBox.length = 0;
-      overworldItemManager.setCollectedFlags([]);
-      overworldItemManager.setFruitTreePicks({});
-      Object.assign(npcsByMap, createNpcsByMap());
-      filterInitialMapNpcs(npcsByMap, storyFlags);
-      activeNpcCache.invalidateAll();
-      roamingManager.sleepBeasts();
+      boxManager.getState().boxes.forEach((b) => b.pokemon.fill(null)); boxManager.changeBox(0);
+      overworldItemManager.setCollectedFlags([]); overworldItemManager.setFruitTreePicks({});
+      Object.assign(npcsByMap, createNpcsByMap()); filterInitialMapNpcs(npcsByMap, storyFlags);
+      activeNpcCache.invalidateAll(); roamingManager.sleepBeasts();
       missionManager.deserialize(new MissionManager().serialize());
 
       gameClock.playerSpeed = gameOptions.playerSpeedDefault;
@@ -533,24 +504,19 @@ async function bootstrap() {
       }
     },
     onNewGame: async () => { titleScreenUI.hide(); introSequenceUI.start(); },
-    onExportSave: async () => {
-      return await saveManager.exportSaveJson();
-    },
+    onExportSave: async () => saveManager.exportSaveJson(),
     onImportSave: async (raw: string) => {
       const ok = await saveManager.importSaveJson(raw);
       if (ok) {
-        const updatedSave = await saveManager.loadGame();
-        if (updatedSave) {
-          hydrateFromSaveData(updatedSave);
-        }
+        const u = await saveManager.loadGame();
+        if (u) hydrateFromSaveData(u);
         titleScreenUI.setSavePreview(await saveManager.getSavePreview());
       }
       return ok;
     },
     onOptionsChanged: (opts) => {
       Object.assign(gameOptions, opts);
-      audioManager.setBgmVolume(opts.bgmVolume);
-      audioManager.setSfxVolume(opts.soundVolume);
+      audioManager.setBgmVolume(opts.bgmVolume); audioManager.setSfxVolume(opts.soundVolume);
       gameClock.playerSpeed = opts.playerSpeedDefault;
       if (opts.battleSpeedMultiplier) setBattleSpeed(opts.battleSpeedMultiplier);
       if (opts.textSpeed) setTextSpeed(opts.textSpeed);
@@ -560,9 +526,7 @@ async function bootstrap() {
       if (opts.lowHpBeepEnabled !== undefined) BattleAudio.setLowHpBeepEnabled(opts.lowHpBeepEnabled);
       if (opts.chiptuneMode !== undefined) audioManager.setChiptuneMode(opts.chiptuneMode);
       overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
-      bagUI.setSpeedMultiplier(gameClock.playerSpeed);
-      partyUI.setSpeedMultiplier(gameClock.playerSpeed);
-      startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
+      bagUI.setSpeedMultiplier(gameClock.playerSpeed); partyUI.setSpeedMultiplier(gameClock.playerSpeed); startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
       void saveCurrentGame();
     },
   });
@@ -639,24 +603,11 @@ async function bootstrap() {
   const npcInteractionRouter = createDefaultNpcInteractionRouter();
 
   const getNpcInteractionContext = (): NpcInteractionContext => ({
-    playerName, seenSpecies, caughtSpecies, playerBox,
+    playerName, seenSpecies, caughtSpecies, playerBox, playerParty, inventory, storyFlags, defeatedTrainers,
+    player, npcsByMap, mapManager, gameClock, audioManager, missionManager, bugContestManager, dayCareManager,
+    kurtCraftingManager, boxManager, lastVisitedPokecenter,
     getRivalName: () => rivalName,
     setRivalName: (name: string) => { rivalName = name; },
-    playerParty,
-    inventory,
-    storyFlags,
-    defeatedTrainers,
-    player,
-    npcsByMap,
-    mapManager,
-    gameClock,
-    audioManager,
-    missionManager,
-    bugContestManager,
-    dayCareManager,
-    kurtCraftingManager,
-    boxManager,
-    lastVisitedPokecenter,
     setLastVisitedPokecenter: (loc) => { lastVisitedPokecenter = loc; },
     openDialogue: (pages, speaker, onComplete) => overworldHUD.openDialogue(pages, speaker, onComplete),
     showToast: (msg) => overworldHUD.showToast(msg),
@@ -672,9 +623,7 @@ async function bootstrap() {
     syncMapOverworldItems,
     setSurfEnabled: (enabled) => mapManager.setSurfEnabled(enabled),
     openDayCareModal: () => modalRegistry.openDayCareModal(),
-    openNamingModal: (_title, defaultName, onConfirm) => {
-      namingModalUI.open({ onConfirm }, defaultName);
-    },
+    openNamingModal: (_title, defaultName, onConfirm) => { namingModalUI.open({ onConfirm }, defaultName); },
     openDeptElevatorModal: (currentMapId, onSelectFloor) => deptStoreElevatorUI.open({ currentMapId, onSelectFloor: (f) => onSelectFloor(f.mapId), onClose: () => {} }),
     openRadioTowerQuizModal: (callbacks) => {
       radioTowerQuizUI.open({
@@ -701,11 +650,11 @@ async function bootstrap() {
     getOppositeDirection: (dir) => OverworldTrainerSightAndTourController.getOppositeDirection(dir),
     launchStadiumChallenge,
     runGuideGentWalkingTour,
-    triggerBeastsAwakeningCutscene: () => triggerBeastsAwakeningCutscene(),
-    triggerBurnedTowerRivalBattle: () => triggerBurnedTowerRivalBattle(),
-    triggerAzaleaRivalAmbush: () => triggerAzaleaRivalAmbush(),
-    triggerCherrygroveRivalAmbush: () => triggerCherrygroveRivalAmbush(),
-    triggerSlowpokeWellGruntIntercept: (grunt) => triggerSlowpokeWellGruntIntercept(grunt),
+    triggerBeastsAwakeningCutscene,
+    triggerBurnedTowerRivalBattle,
+    triggerAzaleaRivalAmbush,
+    triggerCherrygroveRivalAmbush,
+    triggerSlowpokeWellGruntIntercept,
     setCutsceneLocked: (locked) => { isCutsceneLocked = locked; },
     getCutsceneContext,
   });
