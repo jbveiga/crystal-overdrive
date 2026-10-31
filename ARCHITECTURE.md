@@ -182,6 +182,8 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Test Source Inspector Helper** | Reusable file inspection, recursive TS search, line counters | `tests/helpers/SourceInspector.ts` | < 100 lines |
 | **Test Mock DOM Environment** | Lightweight in-memory DOM element/document mock & container reset | `tests/helpers/MockDomEnv.ts` | < 300 lines |
 ---
+| `src/core/SaveStateReconciler.ts` | `core` | Save state hydration and save snapshot builder |
+| `src/ui/bag/BagTMCatalog.ts` | `ui` | Gen 2 TM01-TM50 and HM01-HM07 metadata catalog |
 
 ## 1. Executive Overview & Core Architectural Pillars
 

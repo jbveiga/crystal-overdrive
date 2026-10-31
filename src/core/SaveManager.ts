@@ -543,8 +543,10 @@ export class SaveManager {
     }
   }
 
-  public static hydrateGameState(params: Parameters<typeof SaveStateReconciler.hydrateGameState>[0]): ReturnType<typeof SaveStateReconciler.hydrateGameState> {
-    return SaveStateReconciler.hydrateGameState(params);
+  public static hydrateGameState(
+    ...args: Parameters<typeof SaveStateReconciler.hydrateGameState>
+  ): ReturnType<typeof SaveStateReconciler.hydrateGameState> {
+    return SaveStateReconciler.hydrateGameState(...args);
   }
 
   public static createSaveSnapshot(params: Parameters<typeof SaveStateReconciler.createSaveSnapshot>[0]): SaveData {

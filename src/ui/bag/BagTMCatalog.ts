@@ -7,9 +7,9 @@
  * @sections L1-16: Micro-Header & Imports | L17-488: TM01-TM50 & HM01-HM07 Catalog Entries
  */
 
-import type { ItemCatalogEntry } from './BagItemCatalogs';
+import type { TMDefinition } from './BagItemCatalogs';
 
-export const BAG_TM_HM_ITEMS: Record<string, ItemCatalogEntry> = {
+export const BAG_TM_HM_ITEMS: Record<string, TMDefinition> = {
   HM01: {
     id: 'HM01',
     moveId: 'cut',

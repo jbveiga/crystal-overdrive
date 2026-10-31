@@ -8,7 +8,7 @@
  */
 
 import type { GridEntity } from './GridPhysics';
-import type { Direction } from '../types/game';
+import type { Direction, MapData } from '../types/game';
 import { GridPhysics } from './GridPhysics';
 import { MapManager } from './MapManager';
 import { BattleAudio } from '../audio/BattleAudio';
@@ -153,7 +153,7 @@ export class OverworldItemfinderAndNpcStepper {
 
   public static handleRocketAndMahoganyStepEvents(
     coord: { x: number; y: number },
-    currentMap: { id: string } | null,
+    currentMap: MapData | null,
     ctx: OverworldTickerContext
   ): boolean {
     const {

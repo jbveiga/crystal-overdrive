@@ -7,7 +7,8 @@
  * @sections L1-25: Micro-Header & Contracts | L26-135: Link Registration & Lookup | L136-190: Property-Preserving Teleport
  */
 
-import type { Direction, GridEntity, MapData, WarpEvent, WarpTransitionConfig } from '../../types/game';
+import type { Direction, MapData, WarpEvent, WarpTransitionConfig } from '../../types/game';
+import type { GridEntity } from '../GridPhysics';
 
 export interface WarpLinkEndpoint {
   mapId: string;
