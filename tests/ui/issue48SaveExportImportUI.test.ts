@@ -200,9 +200,8 @@ describe("Issue #48 — Cross-Device Save Game Export & Import (SaveManager + St
     expect(restoredFromCode?.player.y).toBe(25);
   });
 
-  it("wires Export Save and Import Save buttons in the Start Menu Save Console modal", async () => {
-    const onExportSave = vi.fn().mockResolvedValue('{"player":{"name":"GOLD"},"party":[]}');
-    const onImportSave = vi.fn().mockResolvedValue(true);
+  it("renders clean authentic in-game Save Console without crashing even if export/import callbacks are omitted (Issue #59)", async () => {
+    const onSaveGame = vi.fn().mockResolvedValue(undefined);
 
     const ui = new StartMenuUI(
       "modal-container",
@@ -219,28 +218,24 @@ describe("Issue #48 — Cross-Device Save Game Export & Import (SaveManager + St
         onOpenParty: vi.fn(),
         onOpenBag: vi.fn(),
         onOpenPokegear: vi.fn(),
-        onSaveGame: vi.fn().mockResolvedValue(undefined),
-        onExportSave,
-        onImportSave,
+        onSaveGame,
+        // Intentionally omit onExportSave and onImportSave to verify defensive behavior
       }
     );
 
-    ui.openSaveConfirm();
+    expect(() => ui.openSaveConfirm()).not.toThrow();
     const saveModal = mockDoc.getElementById("save-confirm-modal")!;
     expect(saveModal).toBeDefined();
-    expect(saveModal.innerHTML).toContain("EXPORT SAVE");
-    expect(saveModal.innerHTML).toContain("IMPORT SAVE");
+    expect(saveModal.innerHTML).toContain("Would you like to save the game?");
+    expect(saveModal.innerHTML).toContain("YES, SAVE");
 
-    const exportBtn = saveModal.querySelector("#export-save-btn") as any;
-    expect(exportBtn).not.toBeNull();
-    await exportBtn.listeners["click"][0]();
-    expect(onExportSave).toHaveBeenCalledTimes(1);
+    // In-game save console is purely retro Game Boy; export/import is moved to title menu
+    expect(saveModal.querySelector("#export-save-btn")).toBeNull();
+    expect(saveModal.querySelector("#import-save-btn")).toBeNull();
 
-    const textarea = saveModal.querySelector("#portable-save-textarea") as any;
-    expect(textarea.value).toContain('"GOLD"');
-
-    const confirmImportBtn = saveModal.querySelector("#confirm-import-save-btn") as any;
-    await confirmImportBtn.listeners["click"][0]();
-    expect(onImportSave).toHaveBeenCalledWith('{"player":{"name":"GOLD"},"party":[]}');
+    const yesBtn = saveModal.querySelector("#confirm-save-yes-btn") as any;
+    expect(yesBtn).not.toBeNull();
+    await yesBtn.listeners["click"][0]();
+    expect(onSaveGame).toHaveBeenCalledTimes(1);
   });
 });

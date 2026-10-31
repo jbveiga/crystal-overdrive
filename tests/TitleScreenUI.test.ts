@@ -72,12 +72,15 @@ describe('TitleScreenUI (Ticket 4.2)', () => {
     ui.handleKeyDown({ code: 'ArrowDown' });
     expect(ui.getFocusedOption()).toBe('OPTIONS');
 
+    ui.handleKeyDown({ code: 'ArrowDown' });
+    expect(ui.getFocusedOption()).toBe('SAVE_DATA');
+
     // Wrapping around skips CONTINUE (index 0) and lands back on NEW_GAME (index 1)
     ui.handleKeyDown({ code: 'ArrowDown' });
     expect(ui.getFocusedOption()).toBe('NEW_GAME');
 
     ui.handleKeyDown({ code: 'ArrowUp' });
-    expect(ui.getFocusedOption()).toBe('OPTIONS');
+    expect(ui.getFocusedOption()).toBe('SAVE_DATA');
   });
 
   it('gates NEW_GAME behind an Overwrite Confirmation modal when a save exists', async () => {

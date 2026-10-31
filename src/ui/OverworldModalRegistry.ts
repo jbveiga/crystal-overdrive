@@ -57,6 +57,7 @@ export interface OverworldModalRegistryParams {
   getMissionLogUI: () => any;
   getNamingModalUI: () => any;
   saveCurrentGame: () => Promise<void> | void;
+  saveManager?: any;
   launchStadiumChallenge: (challengerId: string, cupId: string) => void;
   cyclePlayerSpeed: () => SpeedMultiplier;
   cycleBattleSpeed: () => SpeedMultiplier;
@@ -435,6 +436,12 @@ export class OverworldModalRegistry {
         },
         onSaveGame: async () => {
           await saveCurrentGame();
+        },
+        onExportSave: async () => {
+          return (await this.params.saveManager?.exportSaveJson()) || '';
+        },
+        onImportSave: async (raw: string) => {
+          return (await this.params.saveManager?.importSaveJson(raw)) ?? false;
         },
         onToggleMute: () => {
           const muted = audioManager.toggleMute();

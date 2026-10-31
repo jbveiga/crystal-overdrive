@@ -15,6 +15,7 @@ import {
   renderMainMenu,
   renderOverwriteModal,
   renderOptionsModal,
+  renderSaveDataModal,
 } from './title/TitleScreenModalsAndStyles';
 
 export interface TitleScreenCallbacks {
@@ -22,15 +23,17 @@ export interface TitleScreenCallbacks {
   onContinue: () => Promise<void> | void;
   onNewGame: () => Promise<void> | void;
   onOptionsChanged?: (options: GameOptions) => void;
+  onExportSave?: () => Promise<string>;
+  onImportSave?: (raw: string) => Promise<boolean>;
 }
 
-export type TitleMenuOptionId = 'CONTINUE' | 'NEW_GAME' | 'OPTIONS';
+export type TitleMenuOptionId = 'CONTINUE' | 'NEW_GAME' | 'OPTIONS' | 'SAVE_DATA';
 
 /**
  * Crystal Overdrive Title Screen UI (Ticket 4.2).
  * Renders the crystalline midnight backdrop, iridescent title typography,
  * upward-drifting crystal particle field, audio unlock gate, Save Preview Card,
- * New Game overwrite confirmation modal, and Options modal.
+ * New Game overwrite confirmation modal, Options modal, and Save Data Management modal.
  * Supports both full browser DOM rendering and headless unit testing.
  */
 export class TitleScreenUI {
@@ -40,6 +43,7 @@ export class TitleScreenUI {
   private menuElement: HTMLDivElement | null = null;
   private overwriteModalElement: HTMLDivElement | null = null;
   private optionsModalElement: HTMLDivElement | null = null;
+  private saveModalElement: HTMLDivElement | null = null;
 
   private savePreview: SavePreview | null;
   private options: GameOptions;
@@ -47,12 +51,13 @@ export class TitleScreenUI {
 
   private visible: boolean = true;
   private gateUnlocked: boolean = false;
-  private cursorIndex: number = 0; // 0 = CONTINUE, 1 = NEW_GAME, 2 = OPTIONS
+  private cursorIndex: number = 0; // 0 = CONTINUE, 1 = NEW_GAME, 2 = OPTIONS, 3 = SAVE_DATA
   private overwriteConfirmOpen: boolean = false;
   private overwriteCursorIndex: number = 1; // 0 = YES (OVERWRITE), 1 = NO (CANCEL)
   private optionsModalOpen: boolean = false;
+  private saveModalOpen: boolean = false;
 
-  private readonly menuOptions: TitleMenuOptionId[] = ['CONTINUE', 'NEW_GAME', 'OPTIONS'];
+  private readonly menuOptions: TitleMenuOptionId[] = ['CONTINUE', 'NEW_GAME', 'OPTIONS', 'SAVE_DATA'];
   private boundKeyDownHandler: ((e: KeyboardEvent) => void) | null = null;
 
   constructor(
@@ -116,6 +121,36 @@ export class TitleScreenUI {
     return this.optionsModalOpen;
   }
 
+  public isSaveModalOpen(): boolean {
+    return this.saveModalOpen;
+  }
+
+  public openSaveModal(): void {
+    this.saveModalOpen = true;
+    BattleAudio.playMenuSound('CONFIRM');
+    this.syncDOM();
+  }
+
+  public closeSaveModal(): void {
+    if (!this.saveModalOpen) return;
+    this.saveModalOpen = false;
+    BattleAudio.playMenuSound('CANCEL');
+    this.syncDOM();
+  }
+
+  public async exportSave(): Promise<string> {
+    return (await this.callbacks.onExportSave?.()) ?? '';
+  }
+
+  public async importSave(raw: string): Promise<boolean> {
+    const ok = (await this.callbacks.onImportSave?.(raw)) ?? false;
+    if (ok) {
+      this.cursorIndex = 0;
+      this.syncDOM();
+    }
+    return ok;
+  }
+
   public getOptions(): GameOptions {
     return { ...this.options };
   }
@@ -168,7 +203,7 @@ export class TitleScreenUI {
       return;
     }
 
-    if (this.optionsModalOpen) {
+    if (this.optionsModalOpen || this.saveModalOpen) {
       return;
     }
 
@@ -179,7 +214,7 @@ export class TitleScreenUI {
       return;
     }
 
-    const validIndices = this.hasSave() ? [0, 1, 2] : [1, 2];
+    const validIndices = this.hasSave() ? [0, 1, 2, 3] : [1, 2, 3];
     const currentPos = validIndices.indexOf(this.cursorIndex);
     const nextPos = (currentPos + delta + validIndices.length) % validIndices.length;
     this.cursorIndex = validIndices[nextPos];
@@ -198,6 +233,10 @@ export class TitleScreenUI {
 
     if (this.optionsModalOpen) {
       this.closeOptionsModal();
+      return;
+    }
+
+    if (this.saveModalOpen) {
       return;
     }
 
@@ -237,11 +276,13 @@ export class TitleScreenUI {
       this.optionsModalOpen = true;
       BattleAudio.playMenuSound('CONFIRM');
       this.syncDOM();
+    } else if (selected === 'SAVE_DATA') {
+      this.openSaveModal();
     }
   }
 
   /**
-   * Cancels / closes any active sub-modal (`Overwrite Confirmation` or `Options`).
+   * Cancels / closes any active sub-modal (`Overwrite Confirmation`, `Options`, or `Save Data`).
    */
   public cancelModal(): void {
     if (this.overwriteConfirmOpen) {
@@ -250,6 +291,8 @@ export class TitleScreenUI {
       this.syncDOM();
     } else if (this.optionsModalOpen) {
       this.closeOptionsModal();
+    } else if (this.saveModalOpen) {
+      this.closeSaveModal();
     }
   }
 
@@ -379,6 +422,7 @@ export class TitleScreenUI {
     this.visible = false;
     this.overwriteConfirmOpen = false;
     this.optionsModalOpen = false;
+    this.saveModalOpen = false;
     this.syncDOM();
   }
 
@@ -590,6 +634,22 @@ export class TitleScreenUI {
     `;
     this.rootElement.appendChild(this.optionsModalElement);
 
+    // Save Data Management Modal
+    this.saveModalElement = document.createElement('div');
+    this.saveModalElement.id = 'title-save-modal';
+    this.saveModalElement.style.cssText = `
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 20px;
+    `;
+    this.rootElement.appendChild(this.saveModalElement);
+
     // Footer Controls Legend
     const footerBar = document.createElement('div');
     footerBar.style.cssText = `
@@ -614,7 +674,7 @@ export class TitleScreenUI {
   }
 
   private attachKeyboardListeners(): void {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
     this.boundKeyDownHandler = (e: KeyboardEvent) => {
       if (!this.visible) return;
       this.handleKeyDown(e);
@@ -659,6 +719,15 @@ export class TitleScreenUI {
       options: this.options,
       onClose: () => this.closeOptionsModal(),
       onUpdateOptions: (patch) => this.updateOptions(patch),
+    });
+
+    renderSaveDataModal({
+      saveModalElement: this.saveModalElement,
+      saveModalOpen: this.saveModalOpen,
+      savePreview: this.savePreview,
+      onExportSave: () => this.exportSave(),
+      onImportSave: (raw) => this.importSave(raw),
+      onClose: () => this.closeSaveModal(),
     });
   }
 }

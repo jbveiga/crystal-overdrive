@@ -224,6 +224,38 @@ export function renderMainMenu({
     onSelectOption(2);
   });
   menuElement.appendChild(optionsBtn);
+
+  // 4. SAVE DATA Button
+  const saveDataFocused = cursorIndex === 3;
+  const saveDataBtn = document.createElement('div');
+  saveDataBtn.id = 'title-opt-save-data';
+  saveDataBtn.style.cssText = `
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: ${
+      saveDataFocused
+        ? 'linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(30, 58, 138, 0.72))'
+        : 'rgba(15, 23, 42, 0.82)'
+    };
+    border: 2px solid ${saveDataFocused ? '#38bdf8' : 'rgba(148, 163, 184, 0.3)'};
+    box-shadow: ${saveDataFocused ? '0 0 20px rgba(56, 189, 248, 0.4)' : 'none'};
+    cursor: pointer;
+    transition: all 0.15s ease;
+  `;
+  saveDataBtn.innerHTML = `
+    <span style="font-size: 16px; font-weight: 900; color: #f8fafc; letter-spacing: 1px;">
+      ${saveDataFocused ? '▶ ' : ''}SAVE DATA
+    </span>
+    <span style="font-size: 12px; font-weight: 700; color: #94a3b8;">Import / Export Cross-Device Save</span>
+  `;
+  saveDataBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    onSelectOption(3);
+  });
+  menuElement.appendChild(saveDataBtn);
 }
 
 export interface RenderOverwriteModalParams {
@@ -576,3 +608,156 @@ export function renderOptionsModal({
     });
   });
 }
+
+export interface RenderSaveDataModalParams {
+  saveModalElement: HTMLElement | null;
+  saveModalOpen: boolean;
+  savePreview: SavePreview | null;
+  onExportSave: () => Promise<string>;
+  onImportSave: (raw: string) => Promise<boolean>;
+  onClose: () => void;
+}
+
+/**
+ * Renders the Title Screen Cross-Device Save Data Management modal.
+ */
+export function renderSaveDataModal({
+  saveModalElement,
+  saveModalOpen,
+  savePreview,
+  onExportSave,
+  onImportSave,
+  onClose,
+}: RenderSaveDataModalParams): void {
+  if (!saveModalElement) return;
+  saveModalElement.style.display = saveModalOpen ? 'flex' : 'none';
+  if (!saveModalOpen) return;
+
+  const hasSave = savePreview !== null;
+  const currentSaveSummary = hasSave
+    ? `👤 ${savePreview.playerName} | 📍 ${savePreview.currentLocationName} | 🏅 ${savePreview.badgeCount}/8 | ⏱️ ${savePreview.playTimeFormatted}`
+    : 'No saved adventure on this device.';
+
+  saveModalElement.innerHTML = `
+    <div style="background: #0f172a; border: 2px solid #38bdf8; border-radius: 14px; padding: 20px; width: min(520px, 94vw); max-height: 85vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; gap: 12px; color: #f8fafc; font-family: 'Space Mono', monospace;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #22324f; padding-bottom: 8px;">
+        <div>
+          <div style="font-size: 15px; font-weight: 900; color: #38bdf8; letter-spacing: 0.5px;">💾 SAVE DATA MANAGEMENT</div>
+          <div style="font-size: 10px; color: #94a3b8;">Cross-Device Save Export & Import</div>
+        </div>
+        <button id="title-close-save-modal-btn" class="neo-kanto-tactile-btn" style="background: #1e293b; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">← BACK</button>
+      </div>
+
+      <div style="background: #080e1d; border: 1.5px solid #22324f; border-radius: 8px; padding: 8px 10px; font-size: 11px;">
+        <div style="color: #94a3b8; font-size: 9px; margin-bottom: 2px; font-weight: 700;">CURRENT LOCAL SAVE STATUS</div>
+        <div style="color: ${hasSave ? '#4ade80' : '#facc15'}; font-weight: 700;">${currentSaveSummary}</div>
+      </div>
+
+      <div id="title-save-status-msg" style="display: none; padding: 8px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; line-height: 1.4;"></div>
+
+      <!-- Export Section -->
+      <div style="background: #141e33; border: 1px solid #22324f; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 12px; font-weight: 800; color: #38bdf8;">📤 EXPORT SAVE FILE</div>
+        <div style="font-size: 10px; color: #94a3b8;">Export your current adventure as a downloaded JSON file and copy save text.</div>
+        <button id="title-export-save-btn" class="neo-kanto-tactile-btn" style="background: #1e3a8a; color: #f8fafc; border: 1.5px solid #38bdf8; border-radius: 6px; padding: 8px; font-size: 11px; font-weight: 800; cursor: pointer;">📤 EXPORT & DOWNLOAD SAVE JSON</button>
+        <textarea id="title-save-export-textarea" rows="3" readonly placeholder="Exported save JSON will appear here..." style="width: 100%; background: #080e1d; color: #cbd5e1; border: 1px solid #334155; border-radius: 4px; padding: 6px; font-size: 10px; box-sizing: border-box; display: none;"></textarea>
+      </div>
+
+      <!-- Import Section -->
+      <div style="background: #141e33; border: 1px solid #22324f; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 6px;">
+        <div style="font-size: 12px; font-weight: 800; color: #a78bfa;">📥 IMPORT SAVE FILE</div>
+        <div style="font-size: 10px; color: #94a3b8;">Choose a previously exported .json file or paste raw save JSON / CRYSTAL_SAVE_V1 code.</div>
+        <input id="title-import-file-input" type="file" accept=".json,application/json,text/plain" style="font-size: 11px; color: #94a3b8;" />
+        <textarea id="title-save-import-textarea" rows="3" placeholder="Paste exported save JSON or code here..." style="width: 100%; background: #080e1d; color: #f8fafc; border: 1px solid #334155; border-radius: 4px; padding: 6px; font-size: 10px; box-sizing: border-box;"></textarea>
+        <button id="title-confirm-import-btn" class="neo-kanto-tactile-btn" style="background: #059669; color: white; border: 1.5px solid #34d399; border-radius: 6px; padding: 8px; font-size: 11px; font-weight: 800; cursor: pointer;">📥 LOAD & RESTORE SAVE</button>
+      </div>
+    </div>
+  `;
+
+  const statusMsg = saveModalElement.querySelector('#title-save-status-msg') as HTMLDivElement | null;
+  const setStatus = (msg: string, isSuccess: boolean) => {
+    if (!statusMsg) return;
+    statusMsg.style.display = 'block';
+    statusMsg.style.background = isSuccess ? 'rgba(5, 150, 105, 0.2)' : 'rgba(220, 38, 38, 0.2)';
+    statusMsg.style.border = isSuccess ? '1px solid #34d399' : '1px solid #f87171';
+    statusMsg.style.color = isSuccess ? '#4ade80' : '#f87171';
+    statusMsg.textContent = msg;
+  };
+
+  const closeBtn = saveModalElement.querySelector('#title-close-save-modal-btn');
+  closeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    onClose();
+  });
+
+  const exportBtn = saveModalElement.querySelector('#title-export-save-btn');
+  const exportTextarea = saveModalElement.querySelector('#title-save-export-textarea') as HTMLTextAreaElement | null;
+
+  exportBtn?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const json = await onExportSave();
+    if (!json) {
+      BattleAudio.playMenuSound('CANCEL');
+      setStatus('⚠️ No active save data available to export.', false);
+      return;
+    }
+    if (exportTextarea) {
+      exportTextarea.style.display = 'block';
+      exportTextarea.value = json;
+    }
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(json);
+      }
+      if (typeof Blob !== 'undefined' && typeof URL !== 'undefined' && URL.createObjectURL) {
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const pName = (savePreview?.playerName || 'trainer').toLowerCase();
+        a.download = `crystal-overdrive-${pName}-save.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch {
+      // headless fallback
+    }
+    BattleAudio.playMenuSound('SAVE');
+    setStatus('✅ Save exported! Downloaded file and copied JSON to clipboard.', true);
+  });
+
+  const fileInput = saveModalElement.querySelector('#title-import-file-input') as HTMLInputElement | null;
+  const importTextarea = saveModalElement.querySelector('#title-save-import-textarea') as HTMLTextAreaElement | null;
+  const confirmImportBtn = saveModalElement.querySelector('#title-confirm-import-btn');
+
+  fileInput?.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (!file || typeof FileReader === 'undefined') return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (importTextarea && typeof reader.result === 'string') {
+        importTextarea.value = reader.result;
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  confirmImportBtn?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const raw = importTextarea?.value?.trim() || '';
+    if (!raw) {
+      BattleAudio.playMenuSound('CANCEL');
+      setStatus('⚠️ Please select a file or paste save data first.', false);
+      return;
+    }
+    const success = await onImportSave(raw);
+    if (success) {
+      BattleAudio.playMenuSound('SAVE');
+      setStatus('✅ Save data imported successfully! You can now Continue your journey.', true);
+    } else {
+      BattleAudio.playMenuSound('CANCEL');
+      setStatus('⚠️ Invalid save data format. Please verify your JSON or code.', false);
+    }
+  });
+}
+

@@ -98,15 +98,23 @@ async function bootstrap() {
   const overworldItemManager = new OverworldItemManager(), boxManager = new BoxManager(existingSave?.storage, existingSave?.box);
   let lastVisitedPokecenter = { mapId: 'new_bark_town', x: 13, y: 6 };
 
-  if (existingSave) {
+  const hydrateFromSaveData = (saveData: any) => {
     const playTimeBox = { val: playTimeSeconds }, playerNameBox = { val: playerName }, playerGenderBox = { val: playerGender }, rivalNameBox = { val: rivalName };
-    const loc = SaveManager.hydrateGameState(existingSave, {
+    const loc = SaveManager.hydrateGameState(saveData, {
       playTimeSeconds: playTimeBox, playerName: playerNameBox, playerGender: playerGenderBox, rivalName: rivalNameBox,
       playerParty, playerBox, gameOptions, inventory, defeatedTrainers, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
       missionManager, gameClock, roamingManager,
     });
     playTimeSeconds = playTimeBox.val; playerName = playerNameBox.val; playerGender = playerGenderBox.val; rivalName = rivalNameBox.val;
     initialMapId = loc.mapId; initialPlayerX = loc.x; initialPlayerY = loc.y; initialPlayerDir = loc.direction; lastVisitedPokecenter = loc.lastVisitedPokecenter;
+    if (player) {
+      player.x = initialPlayerX; player.y = initialPlayerY; player.targetX = initialPlayerX; player.targetY = initialPlayerY;
+      player.renderX = initialPlayerX; player.renderY = initialPlayerY; player.direction = initialPlayerDir;
+    }
+  };
+
+  if (existingSave) {
+    hydrateFromSaveData(existingSave);
   }
 
   const displayThemeManager = new DisplayThemeManager(gameOptions.crtScanlines ?? false, gameOptions.gbcPalette ?? 'VIBRANT');
@@ -359,7 +367,7 @@ async function bootstrap() {
     getPlayerName: () => playerName,
     getPlayTimeSeconds: () => playTimeSeconds, getOverworldHUD: () => overworldHUD,
     getPartyUI: () => partyUI, getBagUI: () => bagUI, getMissionLogUI: () => missionLogUI,
-    getNamingModalUI: () => namingModalUI, saveCurrentGame, launchStadiumChallenge,
+    getNamingModalUI: () => namingModalUI, saveCurrentGame, saveManager, launchStadiumChallenge,
     cyclePlayerSpeed, cycleBattleSpeed, setBattleSpeed, cycleTextSpeed, setTextSpeed,
   });
 
@@ -515,10 +523,30 @@ async function bootstrap() {
       overworldRenderer.setPlayerGender(playerGender);
       gameState = 'OVERWORLD';
       overworldHUD.show();
-      const activeMap = mapManager.getCurrentMap();
-      if (activeMap) { overworldHUD.updateRouteName(activeMap.name); audioManager.playMapBgm(activeMap.id, 0.6); }
+      const activeMap = mapManager.setCurrentMap(initialMapId) || mapManager.getCurrentMap();
+      if (activeMap) {
+        await overworldRenderer.ensureMapTilesLoaded(activeMap, lookupMap);
+        overworldRenderer.renderMap(activeMap, lookupMap);
+        syncMapOverworldItems(activeMap);
+        overworldHUD.updateRouteName(activeMap.name);
+        audioManager.playMapBgm(activeMap.id, 0.6);
+      }
     },
     onNewGame: async () => { titleScreenUI.hide(); introSequenceUI.start(); },
+    onExportSave: async () => {
+      return await saveManager.exportSaveJson();
+    },
+    onImportSave: async (raw: string) => {
+      const ok = await saveManager.importSaveJson(raw);
+      if (ok) {
+        const updatedSave = await saveManager.loadGame();
+        if (updatedSave) {
+          hydrateFromSaveData(updatedSave);
+        }
+        titleScreenUI.setSavePreview(await saveManager.getSavePreview());
+      }
+      return ok;
+    },
     onOptionsChanged: (opts) => {
       Object.assign(gameOptions, opts);
       audioManager.setBgmVolume(opts.bgmVolume);
