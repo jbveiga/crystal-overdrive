@@ -27,6 +27,7 @@ import { deduplicateAndSortTms } from '../ui/bag/BagItemCatalogs';
 import type { KurtCraftingOrder } from '../world/KurtCraftingManager';
 import type { BugContestLeaderboardEntry } from '../world/BugContestManager';
 import { SaveStateReconciler } from './SaveStateReconciler';
+import { signSaveData, verifySaveEnvelope } from './SaveIntegrity';
 
 export interface SaveData {
   version: number;
@@ -527,7 +528,8 @@ export class SaveManager {
     if (!save) {
       throw new Error('No save state found to export.');
     }
-    return JSON.stringify(save, null, 2);
+    const envelope = await signSaveData(save);
+    return JSON.stringify(envelope, null, 2);
   }
 
   public async importSaveJson(rawInput: string): Promise<boolean> {
@@ -537,7 +539,12 @@ export class SaveManager {
       const jsonStr = trimmed.startsWith('CRYSTAL_SAVE_V1:')
         ? decodeURIComponent(escape(atob(trimmed.slice('CRYSTAL_SAVE_V1:'.length).trim())))
         : trimmed;
-      const parsed: SaveData = JSON.parse(jsonStr);
+      const verifyResult = await verifySaveEnvelope(jsonStr);
+      if (!verifyResult.valid || !verifyResult.data) {
+        console.error('Failed to import save file: signature invalid or missing:', verifyResult.error);
+        return false;
+      }
+      const parsed: SaveData = verifyResult.data;
       if (!parsed.player || !parsed.party) {
         throw new Error('Invalid save file format.');
       }

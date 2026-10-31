@@ -182,6 +182,7 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Test Source Inspector Helper** | Reusable file inspection, recursive TS search, line counters | `tests/helpers/SourceInspector.ts` | < 100 lines |
 | **Test Mock DOM Environment** | Lightweight in-memory DOM element/document mock & container reset | `tests/helpers/MockDomEnv.ts` | < 300 lines |
 | **Save State Reconciler** | Save state hydration and save snapshot builder | `src/core/SaveStateReconciler.ts` | < 450 lines |
+| **Save Integrity & Anti-Tampering** | Cryptographic HMAC-SHA256 signing and canonical save verification | `src/core/SaveIntegrity.ts` | < 250 lines |
 | **Bag TM Catalog** | Gen 2 TM01-TM50 and HM01-HM07 metadata catalog | `src/ui/bag/BagTMCatalog.ts` | < 350 lines |
 | **Start Menu DOM Setup** | Start Menu Neo-Kanto stylesheet injection, modal container creation, and drawer header HTML builder | `src/ui/start-menu/StartMenuDomSetup.ts` | < 250 lines |
 | **Chiptune Patterns Catalog** | Authentic 8-bit chiptune synthesizer track patterns and note sequences | `src/audio/ChiptunePatternsCatalog.ts` | < 350 lines |
