@@ -34,13 +34,13 @@ describe('TICKET-BUGFIX-BT10-EG10-MOBILE-TURN-01: 10 Burned Tower Bugs, 10 Ecrut
       });
 
       // Simulate internal touch tap via private state or TOUCH_TURN_HOLD_DELAY_MS
-      expect(OverworldTouchAndKeyController.TOUCH_TURN_HOLD_DELAY_MS).toBe(145);
+      expect(OverworldTouchAndKeyController.TOUCH_TURN_HOLD_DELAY_MS).toBe(90);
       (controller as any).pendingTouchTurnDirection = 'LEFT';
       (controller as any).touchDirection = 'LEFT';
       (controller as any).activeDirection = 'LEFT';
-      (controller as any).touchTurnUntilMs = performance.now() + 145;
+      (controller as any).touchTurnUntilMs = performance.now() + 90;
 
-      // During the 145ms tap window, getHeldDirection() returns null so the player does not walk
+      // During the tap window, getHeldDirection() returns null so the player does not walk
       expect(controller.getHeldDirection()).toBeNull();
       // Meanwhile consumePendingTouchTurnDirection() returns 'LEFT' so the player rotates in place
       expect(controller.consumePendingTouchTurnDirection()).toBe('LEFT');

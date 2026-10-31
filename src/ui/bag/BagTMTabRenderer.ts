@@ -15,6 +15,8 @@ import { MoveReplacementModalUI } from '../MoveReplacementModalUI';
 import {
   CARD_STYLE,
   INFINITE_TMS,
+  normalizeTmId,
+  deduplicateAndSortTms,
   type TMDefinition,
   type BagInventory,
 } from './BagItemCatalogs';
@@ -232,23 +234,22 @@ export class BagTMTabRenderer {
       container.appendChild(partyInfo);
     }
 
-    const tms = inventory.tms;
+    const tms = deduplicateAndSortTms(inventory.tms);
+    inventory.tms = [...tms];
     if (tms.length === 0) {
       container.innerHTML += `<div style="text-align: center; color: #94a3b8; padding: 24px; font-family: 'Space Mono', monospace; font-size: 12px; background: #141E33; border: 1px dashed #22324F; border-radius: 10px; box-shadow: 0 3px 0 0 #070B14;">No TMs acquired yet.</div>`;
       return;
     }
 
-    const seenCanonicalIds = new Set<string>();
     for (const tmId of tms) {
-      const tm: TMDefinition = INFINITE_TMS[tmId] || {
-        id: tmId,
-        moveId: tmId.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      const canonicalId = normalizeTmId(tmId);
+      const tm: TMDefinition = INFINITE_TMS[canonicalId] || INFINITE_TMS[tmId] || {
+        id: canonicalId || tmId,
+        moveId: (canonicalId || tmId).toLowerCase().replace(/[^a-z0-9]/g, ''),
         name: OverworldItemManager.formatItemName(tmId),
         type: 'Normal',
         desc: `Teaches ${OverworldItemManager.formatItemName(tmId)} to a compatible Pokémon.`,
       };
-      if (seenCanonicalIds.has(tm.id)) continue;
-      seenCanonicalIds.add(tm.id);
 
       const isFieldHM = tm.id.startsWith('HM');
       const fieldBadgeHtml = isFieldHM

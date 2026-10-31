@@ -1094,13 +1094,6 @@
   "connections": {},
   "warps": [
     {
-      "x": 13,
-      "y": 3,
-      "targetMapId": "olivine_lighthouse_4f",
-      "targetX": 13,
-      "targetY": 3
-    },
-    {
       "x": 5,
       "y": 3,
       "targetMapId": "olivine_lighthouse_2f",
@@ -1127,34 +1120,6 @@
       "targetMapId": "olivine_lighthouse_2f",
       "targetX": 17,
       "targetY": 11
-    },
-    {
-      "x": 16,
-      "y": 9,
-      "targetMapId": "olivine_lighthouse_4f",
-      "targetX": 16,
-      "targetY": 9
-    },
-    {
-      "x": 17,
-      "y": 9,
-      "targetMapId": "olivine_lighthouse_4f",
-      "targetX": 17,
-      "targetY": 9
-    },
-    {
-      "x": 8,
-      "y": 3,
-      "targetMapId": "olivine_lighthouse_4f",
-      "targetX": 8,
-      "targetY": 3
-    },
-    {
-      "x": 9,
-      "y": 3,
-      "targetMapId": "olivine_lighthouse_4f",
-      "targetX": 9,
-      "targetY": 3
     }
   ],
   "bgEvents": [],

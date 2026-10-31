@@ -112,7 +112,7 @@ export function isCaveMap(mapId: string): boolean {
 export function isDungeonOrCaveMap(mapId: string): boolean {
   return (
     isCaveMap(mapId) ||
-    mapId.includes('ruins_of_alph') ||
+    mapId === 'ruins_of_alph_inner_chamber' ||
     mapId.includes('sprout_tower') ||
     mapId.includes('burned_tower') ||
     mapId.includes('tin_tower') ||

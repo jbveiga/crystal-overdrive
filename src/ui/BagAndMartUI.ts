@@ -17,6 +17,8 @@ import {
   MART_POKEBALL_CATALOG,
   INFINITE_TMS,
   EVOLUTION_STONE_CATALOG,
+  normalizeTmId,
+  deduplicateAndSortTms,
   type BagInventory,
   type TMDefinition,
   type MartBallItem,
@@ -45,6 +47,8 @@ export {
   MART_POKEBALL_CATALOG,
   INFINITE_TMS,
   EVOLUTION_STONE_CATALOG,
+  normalizeTmId,
+  deduplicateAndSortTms,
 };
 
 export class BagAndMartUI {

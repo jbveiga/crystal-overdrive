@@ -137,7 +137,6 @@ export class OverworldTrainerSightAndTourController {
     // Auto-detect key progression HMs/items and trigger associated story/mission flags
     if (rawItemId.toLowerCase().includes('waterfall') || rawItemId.toLowerCase().includes('hm07')) {
       if (!inventory.tms.includes('HM07')) inventory.tms.push('HM07');
-      if (!inventory.tms.includes('HM07_WATERFALL')) inventory.tms.push('HM07_WATERFALL');
       flags.add('has_hm07_waterfall');
       flags.add('EVENT_GOT_HM07_WATERFALL');
       mm.checkStoryFlags(flags);

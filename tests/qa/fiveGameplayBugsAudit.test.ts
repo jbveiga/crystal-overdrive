@@ -103,10 +103,16 @@ describe('TICKET-BUGFIX-AUDIT-FIVE-01: Five High-Impact Gameplay Bug Remediation
       const roaPath = path.resolve(__dirname, '../../public/assets/data/maps/ruins_of_alph_outside.json');
       const roa = JSON.parse(fs.readFileSync(roaPath, 'utf8'));
 
+      const chamberMap: Record<string, string> = {
+        '2,17': 'ruins_of_alph_omanyte_chamber',
+        '2,29': 'ruins_of_alph_aerodactyl_chamber',
+        '16,33': 'ruins_of_alph_ho_oh_chamber',
+      };
+
       for (const coord of [{ x: 2, y: 17 }, { x: 2, y: 29 }, { x: 16, y: 33 }]) {
         const warp = roa.warps.find((w: any) => w.x === coord.x && w.y === coord.y);
         expect(warp, `ruins_of_alph_outside must have warp at (${coord.x}, ${coord.y})`).toBeDefined();
-        expect(warp.targetMapId).toBe('ruins_of_alph_kabuto_chamber');
+        expect(warp.targetMapId).toBe(chamberMap[`${coord.x},${coord.y}`]);
       }
     });
   });

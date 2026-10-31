@@ -2195,6 +2195,13 @@
       "targetMapId": "route_29_route_46_gate",
       "targetX": 5,
       "targetY": 1
+    },
+    {
+      "x": 14,
+      "y": 5,
+      "targetMapId": "dark_cave_violet_entrance",
+      "targetX": 17,
+      "targetY": 15
     }
   ],
   "bgEvents": [

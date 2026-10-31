@@ -2232,21 +2232,21 @@
     {
       "x": 2,
       "y": 17,
-      "targetMapId": "ruins_of_alph_kabuto_chamber",
+      "targetMapId": "ruins_of_alph_omanyte_chamber",
       "targetX": 4,
       "targetY": 8
     },
     {
       "x": 2,
       "y": 29,
-      "targetMapId": "ruins_of_alph_kabuto_chamber",
+      "targetMapId": "ruins_of_alph_aerodactyl_chamber",
       "targetX": 4,
       "targetY": 8
     },
     {
       "x": 16,
       "y": 33,
-      "targetMapId": "ruins_of_alph_kabuto_chamber",
+      "targetMapId": "ruins_of_alph_ho_oh_chamber",
       "targetX": 4,
       "targetY": 8
     }
@@ -2255,7 +2255,7 @@
     {
       "x": 12,
       "y": 16,
-      "speaker": "\ud83e\udea7 RUINS OF ALPH",
+      "speaker": "🪧 RUINS OF ALPH",
       "pages": [
         "RUINS OF ALPH",
         "Explore the ancient mysteries!"
@@ -2264,20 +2264,13 @@
     {
       "x": 18,
       "y": 12,
-      "speaker": "\ud83e\udea7 RESEARCH CENTER",
+      "speaker": "🪧 RESEARCH CENTER",
       "pages": [
         "RUINS OF ALPH RESEARCH CENTER"
       ]
     }
   ],
-  "grassEncounters": [
-    {
-      "speciesId": "unown",
-      "minLevel": 5,
-      "maxLevel": 5,
-      "weight": 100
-    }
-  ],
+  "grassEncounters": [],
   "waterEncounters": [
     {
       "speciesId": "wooper",

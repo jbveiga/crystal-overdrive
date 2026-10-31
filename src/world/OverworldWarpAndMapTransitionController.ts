@@ -405,7 +405,11 @@ export class OverworldWarpAndMapTransitionController {
 
     if (
       warp.targetMapId === 'ruins_of_alph_inner_chamber' &&
-      !storyFlags.has('unown_awakened_kabuto')
+      !storyFlags.has('unown_awakened_kabuto') &&
+      !storyFlags.has('unown_awakened_omanyte') &&
+      !storyFlags.has('unown_awakened_aerodactyl') &&
+      !storyFlags.has('unown_awakened_ho_oh') &&
+      !storyFlags.has('EVENT_MADE_UNOWN_APPEAR_IN_RUINS')
     ) {
       // The stone floor has not collapsed into a trapdoor hole yet
       return;
@@ -672,12 +676,13 @@ export class OverworldWarpAndMapTransitionController {
 
   public static handleRuinsPuzzleSolve(
     ctx: OverworldTransitionContext,
-    _puzzleId: string
+    puzzleId: string
   ): void {
     const { storyFlags, overworldHUD, triggerCanvasEarthquake } = ctx;
 
-    storyFlags.add('unown_awakened_kabuto');
-    storyFlags.add('EVENT_SOLVED_KABUTO_PUZZLE');
+    const normId = (puzzleId || 'kabuto').toLowerCase();
+    storyFlags.add(`unown_awakened_${normId}`);
+    storyFlags.add(`EVENT_SOLVED_${normId.toUpperCase()}_PUZZLE`);
     storyFlags.add('EVENT_MADE_UNOWN_APPEAR_IN_RUINS');
 
     // Trigger Screen shake tremor via delegate to preserve layer purity

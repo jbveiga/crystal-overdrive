@@ -609,6 +609,11 @@ export class MapManager {
   private checkConnectionWalkable(x: number, y: number): boolean {
     if (!this.currentMap) return false;
 
+    const isWalkableTile = (tile: number): boolean => {
+      if (tile === 3) return this.surfEnabled;
+      return tile === 0 || tile === 2;
+    };
+
     // Check West
     if (x < 0 && this.currentMap.connections.WEST) {
       const conn = this.currentMap.connections.WEST;
@@ -618,7 +623,7 @@ export class MapManager {
       const targetY = y - conn.offset;
       if (targetY < 0 || targetY >= targetMap.height) return false;
       const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
-      return tileType === 0 || tileType === 2;
+      return isWalkableTile(tileType);
     }
 
     // Check East
@@ -630,7 +635,7 @@ export class MapManager {
       const targetY = y - conn.offset;
       if (targetY < 0 || targetY >= targetMap.height) return false;
       const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
-      return tileType === 0 || tileType === 2;
+      return isWalkableTile(tileType);
     }
 
     // Check North
@@ -642,7 +647,7 @@ export class MapManager {
       const targetY = targetMap.height - 1;
       if (targetX < 0 || targetX >= targetMap.width) return false;
       const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
-      return tileType === 0 || tileType === 2;
+      return isWalkableTile(tileType);
     }
 
     // Check South
@@ -654,7 +659,7 @@ export class MapManager {
       const targetY = 0;
       if (targetX < 0 || targetX >= targetMap.width) return false;
       const tileType = targetMap.collisionGrid[targetY * targetMap.width + targetX];
-      return tileType === 0 || tileType === 2;
+      return isWalkableTile(tileType);
     }
 
     return false;

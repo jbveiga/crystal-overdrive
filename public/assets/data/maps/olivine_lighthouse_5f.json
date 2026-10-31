@@ -1127,20 +1127,6 @@
       "targetMapId": "olivine_lighthouse_4f",
       "targetX": 17,
       "targetY": 7
-    },
-    {
-      "x": 16,
-      "y": 5,
-      "targetMapId": "olivine_lighthouse_6f",
-      "targetX": 16,
-      "targetY": 5
-    },
-    {
-      "x": 17,
-      "y": 5,
-      "targetMapId": "olivine_lighthouse_6f",
-      "targetX": 17,
-      "targetY": 5
     }
   ],
   "bgEvents": [],

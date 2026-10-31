@@ -57,7 +57,10 @@ export class RuinsPuzzleModalUI {
     return { ...this.state, tiles: [...this.state.tiles] };
   }
 
-  public open(callbacks: RuinsPuzzleModalCallbacks, puzzleId: 'kabuto' = 'kabuto'): void {
+  public open(
+    callbacks: RuinsPuzzleModalCallbacks,
+    puzzleId: 'kabuto' | 'omanyte' | 'aerodactyl' | 'ho_oh' = 'kabuto'
+  ): void {
     this.callbacks = callbacks;
     this.active = true;
     this.state.puzzleId = puzzleId;
@@ -305,6 +308,14 @@ export class RuinsPuzzleModalUI {
         const posX = (origCol / 3) * 100;
         const posY = (origRow / 3) * 100;
 
+        const spriteMap: Record<string, string> = {
+          kabuto: './assets/sprites/pokemon/kabuto_front.png',
+          omanyte: './assets/sprites/pokemon/omanyte_front.png',
+          aerodactyl: './assets/sprites/pokemon/aerodactyl_front.png',
+          ho_oh: './assets/sprites/pokemon/ho_oh_front.png',
+        };
+        const spriteUrl = spriteMap[this.state.puzzleId] || spriteMap.kabuto;
+
         return `
           <button 
             type="button"
@@ -313,7 +324,7 @@ export class RuinsPuzzleModalUI {
             data-piece="${pieceVal}"
             aria-label="Tile piece ${pieceVal + 1}"
             style="
-              background-image: url('./assets/sprites/pokemon/kabuto_front.png');
+              background-image: url('${spriteUrl}');
               background-size: 400% 400%;
               background-position: ${posX}% ${posY}%;
             "
@@ -343,6 +354,26 @@ export class RuinsPuzzleModalUI {
       this.modalElement.remove();
     }
 
+    const titleMap: Record<string, { title: string; inscription: string }> = {
+      kabuto: {
+        title: 'RUINS OF ALPH — KABUTO PANEL',
+        inscription: '"A POKéMON that hid on the sea floor. Eyes on its back scanned the area."',
+      },
+      omanyte: {
+        title: 'RUINS OF ALPH — OMANYTE PANEL',
+        inscription: '"A prehistoric POKéMON that swam by twisting its 10 tentacles. It lived in ancient seas."',
+      },
+      aerodactyl: {
+        title: 'RUINS OF ALPH — AERODACTYL PANEL',
+        inscription: '"A ferocious prehistoric POKéMON that soared through the skies. It attacked with saw-like teeth."',
+      },
+      ho_oh: {
+        title: 'RUINS OF ALPH — HO-OH PANEL',
+        inscription: '"A legendary rainbow POKéMON said to fly continuously on magnificent wings."',
+      },
+    };
+    const info = titleMap[this.state.puzzleId] || titleMap.kabuto;
+
     const modal = document.createElement('div');
     modal.id = 'ruins-puzzle-modal';
     modal.className = 'ruins-puzzle-modal-overlay';
@@ -351,7 +382,7 @@ export class RuinsPuzzleModalUI {
         <div class="ruins-puzzle-header">
           <div class="ruins-puzzle-title">
             <span class="ruins-puzzle-glyph">🏛️</span>
-            <span>RUINS OF ALPH — KABUTO PANEL</span>
+            <span>${info.title}</span>
           </div>
           <div class="ruins-puzzle-telemetry">
             <span id="ruins-puzzle-move-count" class="ruins-move-count">MOVES: ${this.state.moveCount}</span>
@@ -364,7 +395,7 @@ export class RuinsPuzzleModalUI {
         </div>
 
         <p class="ruins-puzzle-inscription">
-          "A POKéMON that hid on the sea floor. Eyes on its back scanned the area."
+          ${info.inscription}
         </p>
 
         <div id="ruins-puzzle-board" class="ruins-puzzle-board">

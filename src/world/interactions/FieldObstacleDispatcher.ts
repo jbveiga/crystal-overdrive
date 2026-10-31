@@ -211,63 +211,63 @@ export class FieldObstacleDispatcher {
         }
       }
 
-      // Dark Cave Entrance on Route 31 (HM05 Flash Field Technique)
-      if (currentMap.id === 'route_31' && facingX === 34 && facingY === 5) {
-        const flashCheck = ModernHMHandler.checkFlash(ctx.inventory, ctx.storyFlags, ctx.playerParty);
-        if (flashCheck.canUse) {
-          const userPkmn = flashCheck.userPokemon;
-          const userName = userPkmn ? userPkmn.nickname : ctx.playerName;
-          ctx.playFlashEffect();
-          BattleAudio.playOverworldSound('KEY_ITEM');
-          const firstClear = !ctx.storyFlags.has('dark_cave_cleared');
-          ctx.storyFlags.add('dark_cave_cleared');
-          ctx.missionManager.checkStoryFlags(ctx.storyFlags);
-          ctx.missionManager.completeMission('S06');
-          const pages = [
-            `Pitch-black darkness ahead… ${userName} used FLASH to illuminate DARK CAVE!`,
-            firstClear
-              ? 'Deep inside the illuminated cavern, you discovered TM13 SNORE and startled a rare DUNSPARCE!'
-              : 'A wild DUNSPARCE emerged from the illuminated cavern depths!',
-          ];
-          if (firstClear && !ctx.inventory.tms.includes('TM13')) {
-            ctx.inventory.tms.push('TM13');
-          }
-          ctx.openDialogue(pages, '⛰️ DARK CAVE (FLASH)', () => {
-            ctx.saveCurrentGame();
-            if (firstClear) {
-              ctx.showToast('✨ Illuminated Dark Cave & found TM13 SNORE!');
-            }
-            const wildDunsparce = PokemonFactory.create('dunsparce', 6);
-            ctx.triggerBattle(wildDunsparce, { isTrainer: false });
-          });
-        } else {
-          ctx.openDialogue(
-            [
-              'DARK CAVE — Pitch-black cavern ahead.',
-              flashCheck.missingReason || 'A blinding FLASH of light is required to navigate safely.',
-            ],
-            '⛰️ DARK CAVE'
-          );
-        }
-        return true;
-      }
 
-      // Ruins of Alph Kabuto Chamber Altar & Inscription Interaction
-      if (currentMap.id === 'ruins_of_alph_kabuto_chamber') {
+      // Ruins of Alph Chambers Altar & Inscription Interaction (Kabuto, Omanyte, Aerodactyl, Ho-Oh)
+      const ruinsChamberMap = {
+        'ruins_of_alph_kabuto_chamber': {
+          puzzleId: 'kabuto',
+          name: 'KABUTO',
+          flag: 'unown_awakened_kabuto',
+          inscription: [
+            'A POKéMON that hid on the sea floor.',
+            'Eyes on its back scanned the area.',
+          ],
+        },
+        ruins_of_alph_omanyte_chamber: {
+          puzzleId: 'omanyte',
+          name: 'OMANYTE',
+          flag: 'unown_awakened_omanyte',
+          inscription: [
+            'A prehistoric POKéMON that swam by twisting its 10 tentacles.',
+            'It lived in ancient seas long ago.',
+          ],
+        },
+        ruins_of_alph_aerodactyl_chamber: {
+          puzzleId: 'aerodactyl',
+          name: 'AERODACTYL',
+          flag: 'unown_awakened_aerodactyl',
+          inscription: [
+            'A ferocious prehistoric POKéMON that soared through the skies.',
+            'It attacked with saw-like teeth.',
+          ],
+        },
+        ruins_of_alph_ho_oh_chamber: {
+          puzzleId: 'ho_oh',
+          name: 'HO-OH',
+          flag: 'unown_awakened_ho_oh',
+          inscription: [
+            'A legendary rainbow POKéMON said to fly continuously on magnificent wings.',
+            'It reveals itself only to pure-hearted trainers.',
+          ],
+        },
+      } as const;
+
+      if (currentMap.id in ruinsChamberMap) {
+        const chamber = ruinsChamberMap[currentMap.id as keyof typeof ruinsChamberMap];
         if (facingX === 3 && facingY === 2) {
-          if (ctx.storyFlags.has('unown_awakened_kabuto')) {
-            ctx.openDialogue(['A completed stone panel of KABUTO.'], '🧩 KABUTO PUZZLE');
+          if (ctx.storyFlags.has(chamber.flag)) {
+            ctx.openDialogue([`A completed stone panel of ${chamber.name}.`], `🧩 ${chamber.name} PUZZLE`);
           } else {
             ctx.openDialogue(
               [
-                "It's an ancient stone puzzle depicting a prehistoric POKéMON.",
+                `It's an ancient stone puzzle depicting ${chamber.name}.`,
                 'Attempt to assemble the sliding panels?',
               ],
-              '🧩 KABUTO PUZZLE',
+              `🧩 ${chamber.name} PUZZLE`,
               () => {
                 ctx.openRuinsPuzzleModal({
                   onSolve: (puzzleId) => {
-                    ctx.handleRuinsPuzzleSolve(puzzleId);
+                    ctx.handleRuinsPuzzleSolve(puzzleId || chamber.puzzleId);
                   },
                   onClose: () => {},
                 });
@@ -279,10 +279,7 @@ export class FieldObstacleDispatcher {
 
         if (facingX === 4 && facingY === 2) {
           ctx.openDialogue(
-            [
-              'A POKéMON that hid on the sea floor.',
-              'Eyes on its back scanned the area.',
-            ],
+            [...chamber.inscription],
             '📜 ANCIENT INSCRIPTION'
           );
           return true;

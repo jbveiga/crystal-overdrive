@@ -15,6 +15,7 @@ import {
   MART_REPEL_CATALOG,
   MART_POKEBALL_CATALOG,
   DEPT_STORE_5F_TM_CATALOG,
+  deduplicateAndSortTms,
   type MedicineItemDef,
   type BagInventory,
 } from './BagItemCatalogs';
@@ -206,6 +207,7 @@ export class PokeMartRenderer {
             BattleAudio.playMenuSound('CONFIRM');
             inventory.money -= tm.price;
             inventory.tms.push(tm.id);
+            inventory.tms = deduplicateAndSortTms(inventory.tms);
             updateHeaderDisplay();
             showFeedback(`Purchased ${tm.id} ${tm.name}!`);
             reRender();

@@ -229,6 +229,11 @@ const { ISSUE_RESOLUTIONS } = (() => {
 - **Fix**:
   1. Changed \`.nk-evo-celebration-card\` in \`src/ui/styles/evolutionStyles.ts\` from \`position: absolute\` to in-flow \`position: relative\` inside \`.nk-evo-arena\`.
   2. Added responsive flex layout rules for \`.nk-evo-stage[data-phase="TRIUMPH"] .nk-evo-arena\` (side-by-side row on desktop \`>= 768px\`, and clean vertical column stacking with compact pedestal sizing on mobile \`<= 767px\`), ensuring the evolved Pokémon sprite and celebration card never overlap.`,
+      46: `### Resolution Details for Issue #46
+- **Root Cause**: In \`src/world/MapManager.ts\`, \`checkConnectionWalkable()\` checked destination collision values with \`tileType === 0 || tileType === 2\`, completely omitting \`tileType === 3\` (water). Consequently, when a surfing player at the south water border of Route 40 (\`y = 35\`, facing \`DOWN\`) stepped forward into connected Route 41's northern water tiles (\`y = 0\`), the movement step was rejected as non-walkable.
+- **Fix**:
+  1. Updated \`checkConnectionWalkable()\` in \`src/world/MapManager.ts\` to use \`isWalkableTile(tileType)\`, which permits \`tileType === 3\` whenever surfing is active (\`this.surfEnabled\`) across all 4 cardinal connections (North, South, East, West).
+  2. Verified seamless water boundary traversal between Route 40 and Route 41.`,
     },
   };
 })();

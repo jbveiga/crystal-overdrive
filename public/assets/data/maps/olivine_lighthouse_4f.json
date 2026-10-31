@@ -1109,13 +1109,6 @@
     },
     {
       "x": 9,
-      "y": 7,
-      "targetMapId": "olivine_lighthouse_5f",
-      "targetX": 9,
-      "targetY": 7
-    },
-    {
-      "x": 9,
       "y": 5,
       "targetMapId": "olivine_lighthouse_3f",
       "targetX": 9,
@@ -1148,20 +1141,6 @@
       "targetMapId": "olivine_lighthouse_3f",
       "targetX": 9,
       "targetY": 3
-    },
-    {
-      "x": 16,
-      "y": 7,
-      "targetMapId": "olivine_lighthouse_5f",
-      "targetX": 16,
-      "targetY": 7
-    },
-    {
-      "x": 17,
-      "y": 7,
-      "targetMapId": "olivine_lighthouse_5f",
-      "targetX": 17,
-      "targetY": 7
     }
   ],
   "bgEvents": [],

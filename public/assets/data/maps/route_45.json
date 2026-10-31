@@ -5421,7 +5421,15 @@
       "offset": 72
     }
   },
-  "warps": [],
+  "warps": [
+    {
+      "x": 2,
+      "y": 5,
+      "targetMapId": "dark_cave_blackthorn_entrance",
+      "targetX": 3,
+      "targetY": 15
+    }
+  ],
   "bgEvents": [
     {
       "x": 10,
