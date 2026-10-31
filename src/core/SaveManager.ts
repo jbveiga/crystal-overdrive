@@ -530,8 +530,13 @@ export class SaveManager {
     return JSON.stringify(save, null, 2);
   }
 
-  public async importSaveJson(jsonStr: string): Promise<boolean> {
+  public async importSaveJson(rawInput: string): Promise<boolean> {
     try {
+      const trimmed = (rawInput || '').trim();
+      if (!trimmed) return false;
+      const jsonStr = trimmed.startsWith('CRYSTAL_SAVE_V1:')
+        ? decodeURIComponent(escape(atob(trimmed.slice('CRYSTAL_SAVE_V1:'.length).trim())))
+        : trimmed;
       const parsed: SaveData = JSON.parse(jsonStr);
       if (!parsed.player || !parsed.party) {
         throw new Error('Invalid save file format.');

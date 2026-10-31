@@ -80,6 +80,8 @@ export interface StartMenuCallbacks {
   onOpenMissions?: () => void;
   onLaunchStadiumBattle?: (challengerId: string, cupId: string) => void;
   onSaveGame: () => Promise<void>;
+  onExportSave?: () => Promise<string>;
+  onImportSave?: (rawJsonOrCode: string) => Promise<boolean>;
   onToggleMute?: () => boolean;
   onSetBgmVolume?: (volume: number) => void;
   onSetSoundVolume?: (volume: number) => void;
