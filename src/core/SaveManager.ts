@@ -26,7 +26,6 @@ import type { DayCareState } from '../world/DayCareManager';
 import { deduplicateAndSortTms } from '../ui/bag/BagItemCatalogs';
 import type { KurtCraftingOrder } from '../world/KurtCraftingManager';
 import type { BugContestLeaderboardEntry } from '../world/BugContestManager';
-
 export interface SaveData {
   version: number;
   timestamp: number;
@@ -135,7 +134,6 @@ export class SaveManager {
       });
     }
   }
-
   /**
    * Returns canonical default GameOptions (Ticket 4.1 & TICKET-KEY-ITEMS-UNBOUND-01).
    */
@@ -147,7 +145,6 @@ export class SaveManager {
       crtScanlines: false, gbcPalette: 'VIBRANT', lowHpBeepEnabled: true, chiptuneMode: false,
     };
   }
-
   /**
    * Defensively normalizes user options against canonical defaults.
    */
@@ -176,7 +173,6 @@ export class SaveManager {
       lowHpBeepEnabled: b(r.lowHpBeepEnabled, def.lowHpBeepEnabled!), chiptuneMode: b(r.chiptuneMode, def.chiptuneMode!),
     };
   }
-
   /**
    * Returns a fresh, pristine SaveData structure for a new game adventure (Ticket 4.3).
    */
@@ -235,7 +231,6 @@ export class SaveManager {
       options: SaveManager.getDefaultOptions(),
     };
   }
-
   /**
    * Formats total elapsed seconds into canonical `"HH:MM:ss"` (e.g. `0` -> `"00:00:00"`, `65` -> `"00:01:05"`, `3665` -> `"01:01:05"`).
    */
@@ -246,7 +241,6 @@ export class SaveManager {
     const secs = safeSeconds % 60;
     return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
-
   /**
    * Resolves a human-readable location title from a `mapId`.
    */
@@ -260,7 +254,6 @@ export class SaveManager {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   }
-
   /**
    * Reconciles legacy save states where the player already owns a starter (or party Pokémon)
    * from an earlier game version but lacks 'starter_chosen' / 'starter_<species>' in storyFlags.
@@ -268,7 +261,6 @@ export class SaveManager {
   public static reconcileStarterFlags(save: SaveData): void {
     if (!save) return;
     save.storyFlags = Array.isArray(save.storyFlags) ? save.storyFlags : [];
-
     // 1. Gather all candidate Pokémon from party, box, and storage boxes
     const candidatePkmn: Array<{ speciesId?: string; isEgg?: boolean }> = [];
     if (Array.isArray(save.party)) {
@@ -290,12 +282,10 @@ export class SaveManager {
         }
       }
     }
-
     const nonEggPkmn = candidatePkmn.filter((p) => Boolean(p && !p.isEgg && p.speciesId));
     if (nonEggPkmn.length === 0 && (!Array.isArray(save.party) || save.party.length === 0)) {
       return;
     }
-
     // 2. Check for starter lineage
     let baseStarter: 'cyndaquil' | 'totodile' | 'chikorita' | undefined;
     for (const p of nonEggPkmn) {

@@ -19,14 +19,12 @@ import { handleVictoryRoadGateStep } from './interactions/VictoryRoadGateInterac
 import { handleVictoryRoadStep } from './interactions/VictoryRoadInteractions';
 import { handleEliteFourStep } from './interactions/EliteFourAndChampionInteractions';
 import type { OverworldTickerContext } from '../types/gameContext';
-
 export class OverworldTickerCoordinator {
   private static lastBumpSoundTime = 0;
   private static npcMoveTimer = 0;
   private static directions: Direction[] = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
   private static npcObstaclesScratch: GridEntity[] = [];
   private static emptyNpcs: GridEntity[] = [];
-
   public static handlePlayerBump(): void {
     const now = performance.now();
     if (now - this.lastBumpSoundTime > 260) {
@@ -34,7 +32,6 @@ export class OverworldTickerCoordinator {
       BattleAudio.playOverworldSound('BUMP');
     }
   }
-
   public static isTileWalkableForPlayer(
     x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>
   ): boolean {
@@ -45,7 +42,6 @@ export class OverworldTickerCoordinator {
     }
     return true;
   }
-
   public static isTileWalkableForActiveMapNpc(
     x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>
   ): boolean {
@@ -56,7 +52,6 @@ export class OverworldTickerCoordinator {
     }
     return true;
   }
-
   public static refreshItemfinderRadar(
     playSonar: boolean,
     ctx: { itemfinderHUD: any; mapManager: MapManager; overworldItemManager: any; storyFlags: Set<string>; player: GridEntity }
@@ -72,13 +67,11 @@ export class OverworldTickerCoordinator {
       BattleAudio.playItemfinderSonar(ping.distance, ping.isFacingDirectly);
     }
   }
-
   public static toggleLiveItemfinderRadar(ctx: {
     getGameState: () => string; isCutsceneLocked: () => boolean; overworldHUD: any;
     itemfinderHUD: any; mapManager: MapManager; overworldItemManager: any; storyFlags: Set<string>; player: GridEntity;
   }): boolean {
     const { getGameState, isCutsceneLocked, overworldHUD, itemfinderHUD } = ctx;
-
     if (getGameState() !== 'OVERWORLD' || isCutsceneLocked() || overworldHUD.isDialogueOpen()) {
       return itemfinderHUD.isActive();
     }
@@ -95,7 +88,6 @@ export class OverworldTickerCoordinator {
     }
     return active;
   }
-
   public static triggerItemfinderScan(ctx: {
     getGameState: () => string;
     isCutsceneLocked: () => boolean;
@@ -116,7 +108,6 @@ export class OverworldTickerCoordinator {
       storyFlags,
       player,
     } = ctx;
-
     if (getGameState() !== 'OVERWORLD' || isCutsceneLocked() || overworldHUD.isDialogueOpen()) return;
     const currentMap = mapManager.getCurrentMap();
     if (!currentMap) return;
@@ -136,7 +127,6 @@ export class OverworldTickerCoordinator {
       overworldHUD.openDialogue(["... ... Nope! There's no response."], '📡 ITEMFINDER');
     }
   }
-
   public static stepNeighborNpcs(
     neighborMapId: string | undefined,
     triggerNewWanderStep: boolean,
@@ -148,7 +138,6 @@ export class OverworldTickerCoordinator {
     const neighborMap = mapManager.getMap(neighborMapId);
     const neighborNpcs = neighborMap ? getActiveMapNpcs(neighborMap.id) : undefined;
     if (!neighborMap || !neighborNpcs) return;
-
     mapManager.setNeighborScratchMap(neighborMap);
     for (let i = 0; i < neighborNpcs.length; i++) {
       const npcEntity = neighborNpcs[i];

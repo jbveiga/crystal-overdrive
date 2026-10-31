@@ -17,12 +17,10 @@ export interface RuinsPuzzleState {
   isSolved: boolean;
   moveCount: number;
 }
-
 export interface RuinsPuzzleModalCallbacks {
   onSolve: (puzzleId: string) => void;
   onClose: () => void;
 }
-
 /**
  * Ruins of Alph 16-Tile Sliding Puzzle Mini-Game (Ticket TICKET-MINIGAME-RUINS-SLIDING-PUZZLE-01).
  * Adheres to Google Stitch Neo-Kanto Protocol: dark slate aesthetics,
@@ -36,7 +34,6 @@ export class RuinsPuzzleModalUI {
   private initialTiles: number[] = [];
   private callbacks: RuinsPuzzleModalCallbacks | null = null;
   private boundKeyHandler: ((e: KeyboardEvent) => void) | null = null;
-
   constructor(containerId: string = 'overworld-hud-container') {
     const el = document.getElementById(containerId) || document.body;
     this.container = el;
@@ -48,15 +45,12 @@ export class RuinsPuzzleModalUI {
       moveCount: 0,
     };
   }
-
   public isOpen(): boolean {
     return this.active;
   }
-
   public getState(): RuinsPuzzleState {
     return { ...this.state, tiles: [...this.state.tiles] };
   }
-
   public open(
     callbacks: RuinsPuzzleModalCallbacks,
     puzzleId: 'kabuto' | 'omanyte' | 'aerodactyl' | 'ho_oh' = 'kabuto'
@@ -66,15 +60,12 @@ export class RuinsPuzzleModalUI {
     this.state.puzzleId = puzzleId;
     this.state.isSolved = false;
     this.state.moveCount = 0;
-
     // Generate solvable scrambled state by taking valid random steps from solved
     this.scrambleBoard();
     this.initialTiles = [...this.state.tiles];
-
     this.render();
     this.bindEvents();
   }
-
   public close(): void {
     this.active = false;
     if (this.boundKeyHandler) {
@@ -86,7 +77,6 @@ export class RuinsPuzzleModalUI {
       this.modalElement = null;
     }
   }
-
   /**
    * Generates a guaranteed 100% mathematically solvable permutation of the 15-puzzle
    * by walking 24 random adjacent moves backwards from the solved state.
@@ -94,7 +84,6 @@ export class RuinsPuzzleModalUI {
   public scrambleBoard(steps: number = 24): void {
     this.state.tiles = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
     let blankIdx = 15;
-
     for (let step = 0; step < steps; step++) {
       const neighbors = this.getAdjacentIndices(blankIdx);
       const chosen = neighbors[Math.floor(Math.random() * neighbors.length)];
@@ -105,7 +94,6 @@ export class RuinsPuzzleModalUI {
       ];
       blankIdx = chosen;
     }
-
     // Ensure it's not solved initially
     if (this.checkIsSolved()) {
       const neighbors = this.getAdjacentIndices(blankIdx);
@@ -116,7 +104,6 @@ export class RuinsPuzzleModalUI {
       ];
     }
   }
-
   /**
    * Returns valid adjacent grid indices (UP, DOWN, LEFT, RIGHT) for a given index
    */
@@ -124,15 +111,12 @@ export class RuinsPuzzleModalUI {
     const neighbors: number[] = [];
     const r = Math.floor(index / 4);
     const c = index % 4;
-
     if (r > 0) neighbors.push((r - 1) * 4 + c); // UP
     if (r < 3) neighbors.push((r + 1) * 4 + c); // DOWN
     if (c > 0) neighbors.push(r * 4 + (c - 1)); // LEFT
     if (c < 3) neighbors.push(r * 4 + (c + 1)); // RIGHT
-
     return neighbors;
   }
-
   /**
    * Slides the tile at the specified index into the blank space if adjacent
    */
@@ -140,12 +124,10 @@ export class RuinsPuzzleModalUI {
     if (this.state.isSolved) return false;
     const blankIdx = this.state.tiles.indexOf(15);
     if (blankIdx === -1 || index === blankIdx) return false;
-
     const r = Math.floor(index / 4);
     const c = index % 4;
     const br = Math.floor(blankIdx / 4);
     const bc = blankIdx % 4;
-
     const isAdjacent = Math.abs(r - br) + Math.abs(c - bc) === 1;
     if (!isAdjacent) return false;
 
@@ -413,30 +395,23 @@ export class RuinsPuzzleModalUI {
             ✕ CLOSE
           </button>
         </div>
-
         <div class="ruins-puzzle-footer-hints">
           <span>Tap adjacent tiles or use Arrow keys / WASD to slide stone panels</span>
         </div>
       </div>
     `;
-
     // Inject CSS
     this.injectStyles();
-
     this.container.appendChild(modal);
     this.modalElement = modal;
-
     const board = modal.querySelector('#ruins-puzzle-board');
     if (board) {
       this.attachTileListeners(board);
     }
-
     const resetBtn = modal.querySelector('#ruins-puzzle-reset-btn');
     resetBtn?.addEventListener('click', () => this.reset());
-
     const solveBtn = modal.querySelector('#ruins-puzzle-solve-btn');
     solveBtn?.addEventListener('click', () => this.solve());
-
     const cancelBtn = modal.querySelector('#ruins-puzzle-cancel-btn');
     cancelBtn?.addEventListener('click', () => {
       BattleAudio.playMenuSound('CANCEL');
@@ -444,7 +419,6 @@ export class RuinsPuzzleModalUI {
       this.callbacks?.onClose();
     });
   }
-
   private injectStyles(): void {
     injectRuinsPuzzleStyles();
   }
