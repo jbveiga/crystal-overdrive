@@ -1400,7 +1400,7 @@
     0,
     0,
     0,
-    0,
+    1,
     0,
     1,
     1,
@@ -3287,17 +3287,10 @@
       "targetY": 6
     },
     {
-      "x": 12,
-      "y": 15,
-      "targetMapId": "day_care",
-      "targetX": 2,
-      "targetY": 7
-    },
-    {
       "x": 13,
       "y": 15,
       "targetMapId": "day_care",
-      "targetX": 3,
+      "targetX": 2,
       "targetY": 7
     }
   ],

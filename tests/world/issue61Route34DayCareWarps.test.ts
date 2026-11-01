@@ -36,22 +36,17 @@ describe('Issue #61 — Route 34 & Day-Care Bidirectional Entrance/Exit Mappings
     });
   });
 
-  it('maps Route 34 down/south Day-Care entrance (12, 15) and (13, 15) to Day-Care down interior (2, 7) and (3, 7)', () => {
-    const downLeft = route34Map.warps.find((w) => w.x === 12 && w.y === 15);
-    const downRight = route34Map.warps.find((w) => w.x === 13 && w.y === 15);
+  it('enforces (12, 15) as a solid building wall with no warp, and maps the single bottom door (13, 15) to Day-Care down interior (2, 7)', () => {
+    const wallWarp = route34Map.warps.find((w) => w.x === 12 && w.y === 15);
+    expect(wallWarp).toBeUndefined();
+    expect(route34Map.collisionGrid[15 * route34Map.width + 12]).toBe(1);
 
-    expect(downLeft).toEqual({
-      x: 12,
-      y: 15,
-      targetMapId: 'day_care',
-      targetX: 2,
-      targetY: 7,
-    });
-    expect(downRight).toEqual({
+    const singleBottomDoor = route34Map.warps.find((w) => w.x === 13 && w.y === 15);
+    expect(singleBottomDoor).toEqual({
       x: 13,
       y: 15,
       targetMapId: 'day_care',
-      targetX: 3,
+      targetX: 2,
       targetY: 7,
     });
   });
@@ -72,7 +67,7 @@ describe('Issue #61 — Route 34 & Day-Care Bidirectional Entrance/Exit Mappings
     expect([cfgBottom.landingX, cfgBottom.landingY, cfgBottom.landingFacing]).toEqual([10, 15, 'LEFT']);
   });
 
-  it('exits Day-Care down carpet (2, 7) and (3, 7) into Route 34 Day-Care yard (12, 16) and (13, 16) facing DOWN', () => {
+  it('exits Day-Care down carpet (2, 7) and (3, 7) through the single bottom door (13, 15) into the yard at (13, 16) facing DOWN', () => {
     const exitDownLeft = dayCareMap.warps.find((w) => w.x === 2 && w.y === 7)!;
     const exitDownRight = dayCareMap.warps.find((w) => w.x === 3 && w.y === 7)!;
 
@@ -82,7 +77,7 @@ describe('Issue #61 — Route 34 & Day-Care Bidirectional Entrance/Exit Mappings
     expect(MapManager.isCarpetWarp(exitDownRight, dayCareMap)).toBe(true);
 
     const cfgDownLeft = MapManager.resolveWarpTransition(exitDownLeft, dayCareMap, route34Map);
-    expect([cfgDownLeft.landingX, cfgDownLeft.landingY, cfgDownLeft.landingFacing]).toEqual([12, 16, 'DOWN']);
+    expect([cfgDownLeft.landingX, cfgDownLeft.landingY, cfgDownLeft.landingFacing]).toEqual([13, 16, 'DOWN']);
 
     const cfgDownRight = MapManager.resolveWarpTransition(exitDownRight, dayCareMap, route34Map);
     expect([cfgDownRight.landingX, cfgDownRight.landingY, cfgDownRight.landingFacing]).toEqual([13, 16, 'DOWN']);
