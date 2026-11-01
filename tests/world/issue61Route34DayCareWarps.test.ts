@@ -82,4 +82,29 @@ describe('Issue #61 — Route 34 & Day-Care Bidirectional Entrance/Exit Mappings
     const cfgDownRight = MapManager.resolveWarpTransition(exitDownRight, dayCareMap, route34Map);
     expect([cfgDownRight.landingX, cfgDownRight.landingY, cfgDownRight.landingFacing]).toEqual([13, 16, 'DOWN']);
   });
+
+  it('does not treat indoor wall paintings (in_house_2d_2e_3d_3e) as cuttable trees', async () => {
+    const { handleOverworldItemsAndHMObstacles } = await import('../../src/world/interactions/FieldCutRockAndWaterDispatcher');
+    let dialogueOpened = false;
+    const mockCtx: any = {
+      overworldItemManager: {
+        checkItemBall: () => null,
+        checkHiddenItemInteraction: () => null,
+        checkFruitTree: () => null,
+      },
+      storyFlags: new Set(),
+      player: { x: 3, y: 1, direction: 'UP' },
+      inventory: { badges: ['hive'], tms: ['HM01'], keyItems: [] },
+      playerParty: [{ speciesId: 'scyther', nickname: 'SCYTHER', isEgg: false, currentHp: 50, moves: [{ moveId: 'cut', currentPp: 30, maxPp: 30 }] }],
+      openDialogue: () => {
+        dialogueOpened = true;
+      },
+    };
+
+    // (3, 0) in day_care is "in_house_2d_2e_3d_3e" (wall painting)
+    expect(dayCareMap.tileMap?.[3]).toBe('in_house_2d_2e_3d_3e');
+    const handled = handleOverworldItemsAndHMObstacles(mockCtx, dayCareMap, 3, 0);
+    expect(handled).toBe(false);
+    expect(dialogueOpened).toBe(false);
+  });
 });

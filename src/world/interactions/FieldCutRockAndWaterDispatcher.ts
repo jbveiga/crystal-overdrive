@@ -174,9 +174,12 @@ export function handleOverworldItemsAndHMObstacles(
     const isCutTree =
       isIlexCutTree ||
       (currentMap.collisionGrid[tileIdx] === 1 &&
+        !facingTileName.startsWith('in_house_') &&
+        !facingTileName.startsWith('in_tower_') &&
         (facingTileName === 'tree_short_0' ||
           facingTileName.includes('13_15_45_1d') ||
-          facingTileName.includes('2d_2e_3d_3e') ||
+          facingTileName === 'kt_2d_2e_3d_3e' ||
+          facingTileName === 'jt_2d_2e_3d_3e' ||
           facingTileName.includes('28_39_38_3a') ||
           facingTileName.includes('cut_tree') ||
           facingTileName.includes('cuttable')));
