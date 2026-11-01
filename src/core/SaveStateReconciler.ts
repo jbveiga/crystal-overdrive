@@ -121,25 +121,65 @@ export class SaveStateReconciler {
       state.visitedMaps.add(initialMapId);
       state.visitedMaps.add('new_bark_town');
       const badges = state.inventory.badges || [];
-      if (badges.includes('zephyr') || state.storyFlags.has('sprout_tower_cleared')) {
+      const hasPlainOrLater =
+        badges.includes('plain') ||
+        badges.includes('fog') ||
+        badges.includes('storm') ||
+        badges.includes('mineral') ||
+        badges.includes('glacier') ||
+        badges.includes('rising') ||
+        state.storyFlags.has('whitney_defeated') ||
+        state.storyFlags.has('has_squirtbottle') ||
+        state.storyFlags.has('morty_defeated') ||
+        state.storyFlags.has('chuck_defeated') ||
+        state.storyFlags.has('has_hm02_fly');
+      const hasFogOrLater =
+        badges.includes('fog') ||
+        badges.includes('storm') ||
+        badges.includes('mineral') ||
+        badges.includes('glacier') ||
+        badges.includes('rising') ||
+        state.storyFlags.has('morty_defeated') ||
+        state.storyFlags.has('chuck_defeated') ||
+        state.storyFlags.has('has_hm02_fly');
+      const hasStormOrLater =
+        badges.includes('storm') ||
+        badges.includes('mineral') ||
+        badges.includes('glacier') ||
+        badges.includes('rising') ||
+        state.storyFlags.has('chuck_defeated') ||
+        state.storyFlags.has('has_hm02_fly');
+
+      if (
+        badges.includes('zephyr') ||
+        badges.includes('hive') ||
+        hasPlainOrLater ||
+        state.storyFlags.has('sprout_tower_cleared') ||
+        state.storyFlags.has('falkner_defeated')
+      ) {
         ['cherrygrove_city', 'route_29', 'route_30', 'route_31', 'violet_city'].forEach((m) => state.visitedMaps!.add(m));
       }
-      if (badges.includes('hive') || state.storyFlags.has('slowpoke_well_cleared')) {
+      if (
+        badges.includes('hive') ||
+        hasPlainOrLater ||
+        state.storyFlags.has('slowpoke_well_cleared') ||
+        state.storyFlags.has('bugsy_defeated')
+      ) {
         ['route_32', 'route_33', 'azalea_town'].forEach((m) => state.visitedMaps!.add(m));
       }
-      if (badges.includes('plain')) {
+      if (hasPlainOrLater) {
         ['route_34', 'goldenrod_city'].forEach((m) => state.visitedMaps!.add(m));
       }
-      if (badges.includes('fog')) {
+      if (hasFogOrLater) {
         ['route_35', 'route_36', 'route_37', 'ecruteak_city'].forEach((m) => state.visitedMaps!.add(m));
       }
-      if (badges.includes('storm') || badges.includes('mineral')) {
+      if (hasStormOrLater) {
         ['route_38', 'route_39', 'olivine_city', 'route_40', 'route_41', 'cianwood_city'].forEach((m) => state.visitedMaps!.add(m));
       }
-      if (badges.includes('glacier')) {
+      if (badges.includes('glacier') || badges.includes('rising') || state.storyFlags.has('pryce_defeated')) {
         ['route_42', 'route_43', 'mahogany_town', 'lake_of_rage'].forEach((m) => state.visitedMaps!.add(m));
       }
-      if (badges.includes('rising')) {
+      if (badges.includes('rising') || state.storyFlags.has('clair_defeated')) {
         ['route_44', 'route_45', 'blackthorn_city'].forEach((m) => state.visitedMaps!.add(m));
       }
     }

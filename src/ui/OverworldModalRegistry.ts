@@ -20,6 +20,7 @@ import { DayCareManager } from '../world/DayCareManager';
 import { KurtCraftingModalUI } from './KurtCraftingModalUI';
 import { BattleAudio } from '../audio/BattleAudio';
 import { ModernHMHandler } from '../world/ModernHMHandler';
+import type { TownMapLandmark } from '../world/townMapData';
 import type {
   SpeedMultiplier,
   ExpShareMode,
@@ -59,6 +60,7 @@ export interface OverworldModalRegistryParams {
   saveCurrentGame: () => Promise<void> | void;
   saveManager?: any;
   launchStadiumChallenge: (challengerId: string, cupId: string) => void;
+  onFlyToLandmark?: (landmark: TownMapLandmark, pokemonName?: string) => Promise<void> | void;
   cyclePlayerSpeed: () => SpeedMultiplier;
   cycleBattleSpeed: () => SpeedMultiplier;
   setBattleSpeed: (spd: SpeedMultiplier) => void;
@@ -125,9 +127,34 @@ export class OverworldModalRegistry {
 
   public getTownMapUI(): TownMapUI {
     if (!this._townMapUI) {
-      this._townMapUI = new TownMapUI({ containerId: this.params.containerId || 'modal-container' });
+      this._townMapUI = new TownMapUI({
+        containerId: this.params.containerId || 'modal-container',
+        onFly: (landmark) => this.handleTownMapFly(landmark),
+      });
     }
     return this._townMapUI;
+  }
+
+  private handleTownMapFly(landmark: TownMapLandmark): void {
+    const autoHm = this.params.gameOptions?.autoHm ?? true;
+    const flyCheck = ModernHMHandler.checkFly(
+      this.params.inventory,
+      this.params.storyFlags,
+      this.params.playerParty,
+      autoHm
+    );
+
+    if (!flyCheck.canUse) {
+      BattleAudio.playMenuSound('CANCEL');
+      this.params
+        .getOverworldHUD()
+        ?.showToast(flyCheck.missingReason || 'Cannot use FLY right now!');
+      return;
+    }
+
+    this._townMapUI?.close();
+    this.startMenuUI?.closeAll();
+    void this.params.onFlyToLandmark?.(landmark, flyCheck.compatiblePokemonName);
   }
 
   public getRuinsPuzzleModalUI(): RuinsPuzzleModalUI {

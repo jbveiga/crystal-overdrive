@@ -260,6 +260,7 @@ export function resolveCurrentLandmark(mapId: string): TownMapLandmark | null {
   // Indigo Plateau, League Chambers & Hall of Fame
   if (
     clean.startsWith('indigo_plateau') ||
+    clean === 'route_23' ||
     clean.includes('wills_room') ||
     clean.includes('kogas_room') ||
     clean.includes('brunos_room') ||
@@ -282,6 +283,113 @@ export function resolveCurrentLandmark(mapId: string): TownMapLandmark | null {
   }
 
   return null;
+}
+
+export interface FlyDestination {
+  mapId: string;
+  x: number;
+  y: number;
+  pokecenterMapId: string;
+  pokecenterX: number;
+  pokecenterY: number;
+}
+
+export const FLY_LANDING_COORDS: Record<string, FlyDestination> = {
+  new_bark_town: {
+    mapId: 'new_bark_town',
+    x: 6,
+    y: 4,
+    pokecenterMapId: 'new_bark_town',
+    pokecenterX: 13,
+    pokecenterY: 6,
+  },
+  cherrygrove_city: {
+    mapId: 'cherrygrove_city',
+    x: 29,
+    y: 4,
+    pokecenterMapId: 'cherrygrove_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 5,
+  },
+  violet_city: {
+    mapId: 'violet_city',
+    x: 31,
+    y: 26,
+    pokecenterMapId: 'violet_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 6,
+  },
+  azalea_town: {
+    mapId: 'azalea_town',
+    x: 15,
+    y: 10,
+    pokecenterMapId: 'azalea_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 6,
+  },
+  goldenrod_city: {
+    mapId: 'goldenrod_city',
+    x: 15,
+    y: 28,
+    pokecenterMapId: 'goldenrod_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 6,
+  },
+  ecruteak_city: {
+    mapId: 'ecruteak_city',
+    x: 23,
+    y: 28,
+    pokecenterMapId: 'ecruteak_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 6,
+  },
+  olivine_city: {
+    mapId: 'olivine_city',
+    x: 13,
+    y: 22,
+    pokecenterMapId: 'olivine_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 6,
+  },
+  cianwood_city: {
+    mapId: 'cianwood_city',
+    x: 23,
+    y: 44,
+    pokecenterMapId: 'cianwood_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 6,
+  },
+  mahogany_town: {
+    mapId: 'mahogany_town',
+    x: 15,
+    y: 14,
+    pokecenterMapId: 'mahogany_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 6,
+  },
+  blackthorn_city: {
+    mapId: 'blackthorn_city',
+    x: 21,
+    y: 30,
+    pokecenterMapId: 'blackthorn_poke_center',
+    pokecenterX: 3,
+    pokecenterY: 6,
+  },
+  indigo_plateau: {
+    mapId: 'indigo_plateau_poke_center',
+    x: 5,
+    y: 12,
+    pokecenterMapId: 'indigo_plateau_poke_center',
+    pokecenterX: 5,
+    pokecenterY: 12,
+  },
+};
+
+export function resolveFlyDestination(landmarkId: string): FlyDestination | null {
+  if (!landmarkId) return null;
+  const resolvedLm = resolveCurrentLandmark(landmarkId);
+  const key = resolvedLm?.id || landmarkId.toLowerCase().trim();
+  return FLY_LANDING_COORDS[key] || null;
 }
 
 /**

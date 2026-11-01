@@ -116,7 +116,8 @@ export class ModernHMFieldChecks {
   public static checkFly(
     inventory: BagInventory,
     storyFlags: Set<string>,
-    party: PokemonInstance[]
+    party: PokemonInstance[],
+    autoHm: boolean = false
   ): HMFieldCheckResult {
     const badges = inventory?.badges || [];
     const tms = inventory?.tms || [];
@@ -139,9 +140,13 @@ export class ModernHMFieldChecks {
       Boolean(partyKnowsFly);
 
     const nonEggParty = party.filter((p) => !p.isEgg);
-    const compatiblePokemon =
+    const partyCanBeTaughtFly =
       partyKnowsFly ||
       nonEggParty.find((p) => ModernHMHandler.canSpeciesUseFieldHM(p.speciesId, 'fly')) ||
+      null;
+
+    const compatiblePokemon =
+      partyCanBeTaughtFly ||
       nonEggParty.find((p) => p.types.includes('Flying')) ||
       nonEggParty[0] ||
       null;
@@ -174,6 +179,19 @@ export class ModernHMFieldChecks {
         compatiblePokemon,
         'Defeat Leader Chuck at Cianwood Gym to earn the STORM BADGE and use FLY in the field!'
       );
+    }
+
+    if (autoHm) {
+      if (!partyCanBeTaughtFly) {
+        return this.makeResult(
+          false,
+          hasBadge,
+          hasHM,
+          null,
+          'You need a POKéMON in your party that can be taught FLY to use Fast Travel!'
+        );
+      }
+      return this.makeResult(true, true, true, partyCanBeTaughtFly);
     }
 
     if (!partyKnowsFly) {
