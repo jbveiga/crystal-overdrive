@@ -1419,10 +1419,11 @@
       "y": 3,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "LASS",
+      "speaker": "👧 EMY",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
-      ]
+        "EMY: I really want a DRAGONAIR! Would you trade one for my DODRIO?"
+      ],
+      "action": "EMY_TRADE"
     }
   ],
   "blackthorn_mart": [

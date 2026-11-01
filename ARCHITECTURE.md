@@ -162,6 +162,8 @@ To eliminate exploratory agent searches (`grep`, `find`, directory walking) and 
 | **Overworld HUD Facade** | D-Pad / Analog Joystick overlay, A/B buttons, header telemetry | `src/ui/OverworldHUD.ts` | < 700 lines |
 | **Overworld Touch & Key Controller** | Touch D-Pad / Joystick event routing, keyboard listeners, direction state | `src/ui/hud/OverworldTouchAndKeyController.ts` | < 400 lines |
 | **Overworld Cutscene & Pokegear Modals** | Starter choice modal, Pokémon Center healing tray, field rest, roamer radar | `src/ui/hud/OverworldCutsceneAndPokegearModals.ts` | < 450 lines |
+| **Overworld HUD Template & Styles** | HTML vector templates, touch overlays, and responsive styles for OverworldHUD | `src/ui/OverworldHUDTemplate.ts` | < 400 lines |
+| **Overworld Signpost & Landmark Banner** | Dynamic route name banner theming and entrance animations | `src/ui/OverworldSignpostBanner.ts` | < 100 lines |
 | **Battle HUD Facade** | Neo-Kanto battle dialogue, move cards, HP/EXP bars, type badges | `src/ui/BattleHUD.ts` | < 750 lines |
 | **Battle Catalogs & Stage Badges** | Battle item catalog, type/status colors, stat stage badge generators | `src/ui/battle/BattleItemCatalogAndStyles.ts` | < 250 lines |
 | **Battle HUD Keyframes & Template** | Keyframe animations and HTML vector template for the Battle HUD | `src/ui/styles/battleHudStyles.ts` | < 500 lines |

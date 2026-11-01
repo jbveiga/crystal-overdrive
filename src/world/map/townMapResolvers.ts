@@ -23,241 +23,51 @@ export function resolveCurrentLandmark(mapId: string): TownMapLandmark | null {
     return JOHTO_LANDMARKS[clean];
   }
 
-  // New Bark Town & residences
-  if (
-    clean.startsWith('new_bark') ||
-    clean.startsWith('elms_lab') ||
-    clean.startsWith('players_house') ||
-    clean.includes('elms_house') ||
-    clean.includes('players_neighbor')
-  ) {
-    return JOHTO_LANDMARKS.new_bark_town;
-  }
-
-  // Cherrygrove City & interiors
-  if (clean.startsWith('cherrygrove') || clean.includes('guide_gent')) {
-    return JOHTO_LANDMARKS.cherrygrove_city;
-  }
-
-  // Route 30 (Mr. Pokémon's House & Berry House)
-  if (clean.startsWith('route_30') || clean.includes('mr_pokemon')) {
-    return JOHTO_LANDMARKS.route_30;
-  }
-
-  // Dark Cave (West, South & East exits)
-  if (clean.startsWith('dark_cave') || clean.includes('dark_cave')) {
-    return JOHTO_LANDMARKS.dark_cave;
-  }
-
-  // Route 31 (Gate & road)
-  if (clean.startsWith('route_31')) {
-    return JOHTO_LANDMARKS.route_31;
-  }
-
-  // Sprout Tower floors
-  if (clean.startsWith('sprout_tower')) {
-    return JOHTO_LANDMARKS.sprout_tower;
-  }
-
-  // Violet City & Earl's Pokémon Academy
-  if (clean.startsWith('violet') || clean.includes('earls_pokemon_academy')) {
-    return JOHTO_LANDMARKS.violet_city;
-  }
-
-  // Ruins of Alph
-  if (clean.startsWith('ruins_of_alph')) {
-    return JOHTO_LANDMARKS.ruins_of_alph;
-  }
-
-  // Route 32 & Gate
-  if (clean.startsWith('route_32')) {
-    return JOHTO_LANDMARKS.route_32;
-  }
-
-  // Union Cave
-  if (clean.startsWith('union_cave')) {
-    return JOHTO_LANDMARKS.union_cave;
-  }
-
-  // Route 33
-  if (clean.startsWith('route_33')) {
-    return JOHTO_LANDMARKS.route_33;
-  }
-
-  // Slowpoke Well
-  if (clean.startsWith('slowpoke_well')) {
-    return JOHTO_LANDMARKS.slowpoke_well;
-  }
-
-  // Azalea Town, Kurt's House, Charcoal Kiln
-  if (
-    clean.startsWith('azalea') ||
-    clean.includes('kurts_house') ||
-    clean.includes('charcoal_kiln')
-  ) {
-    return JOHTO_LANDMARKS.azalea_town;
-  }
-
-  // Ilex Forest
-  if (clean.startsWith('ilex_forest')) {
-    return JOHTO_LANDMARKS.ilex_forest;
-  }
-
-  // Route 34 & Pokémon Day Care
-  if (clean.startsWith('route_34') || clean.includes('day_care')) {
-    return JOHTO_LANDMARKS.route_34;
-  }
-
-  // Goldenrod City, Radio Tower, Dept Store, Underground, Bill's House
-  if (clean.startsWith('goldenrod') || clean.startsWith('radio_tower')) {
-    return JOHTO_LANDMARKS.goldenrod_city;
-  }
-
-  // Route 35
-  if (clean.startsWith('route_35')) {
-    return JOHTO_LANDMARKS.route_35;
-  }
-
-  // National Park
-  if (clean.startsWith('national_park')) {
-    return JOHTO_LANDMARKS.national_park;
-  }
-
-  // Route 36
-  if (clean.startsWith('route_36')) {
-    return JOHTO_LANDMARKS.route_36;
-  }
-
-  // Route 37
-  if (clean.startsWith('route_37')) {
-    return JOHTO_LANDMARKS.route_37;
-  }
-
-  // Burned Tower
-  if (clean.startsWith('burned_tower')) {
-    return JOHTO_LANDMARKS.burned_tower;
-  }
-
-  // Tin Tower / Bellchime Trail
-  if (clean.startsWith('tin_tower') || clean.includes('bellchime') || clean.includes('wise_trio')) {
-    return JOHTO_LANDMARKS.tin_tower;
-  }
-
-  // Ecruteak City & Kimono Dance Theater
-  if (clean.startsWith('ecruteak') || clean.includes('dance_theat')) {
-    return JOHTO_LANDMARKS.ecruteak_city;
-  }
-
-  // Route 38
-  if (clean.startsWith('route_38')) {
-    return JOHTO_LANDMARKS.route_38;
-  }
-
-  // Route 39 & Moomoo Farm
-  if (clean.startsWith('route_39')) {
-    return JOHTO_LANDMARKS.route_39;
-  }
-
-  // Olivine City & Lighthouse floors
-  if (clean.startsWith('olivine') || clean.includes('lighthouse')) {
-    return JOHTO_LANDMARKS.olivine_city;
-  }
-
-  // Route 40 & Battle Tower facility
-  if (clean.startsWith('route_40') || clean.startsWith('battle_tower')) {
-    return JOHTO_LANDMARKS.route_40;
-  }
-
-  // Whirl Islands subterranean chambers
-  if (clean.startsWith('whirl_island')) {
-    return JOHTO_LANDMARKS.whirl_islands;
-  }
-
-  // Route 41
-  if (clean.startsWith('route_41')) {
-    return JOHTO_LANDMARKS.route_41;
-  }
-
-  // Cianwood City & Cliff passages
-  if (
-    clean.startsWith('cianwood') ||
-    clean.includes('poke_seer') ||
-    clean.includes('cliff_cave') ||
-    clean.includes('cliff_edge')
-  ) {
-    return JOHTO_LANDMARKS.cianwood_city;
-  }
-
-  // Mount Mortar multi-tiered cavern
-  if (
-    clean.startsWith('mount_mortar') ||
-    clean.startsWith('mt_mortar')
-  ) {
-    return JOHTO_LANDMARKS.mount_mortar;
-  }
-
-  // Route 42
-  if (clean.startsWith('route_42')) {
-    return JOHTO_LANDMARKS.route_42;
-  }
-
-  // Mahogany Town & Team Rocket Base
-  if (
-    clean.startsWith('mahogany') ||
-    clean.includes('team_rocket_base') ||
-    clean.includes('rocket_hideout')
-  ) {
-    return JOHTO_LANDMARKS.mahogany_town;
-  }
-
-  // Route 43
-  if (clean.startsWith('route_43')) {
-    return JOHTO_LANDMARKS.route_43;
-  }
-
-  // Lake of Rage
-  if (clean.startsWith('lake_of_rage')) {
-    return JOHTO_LANDMARKS.lake_of_rage;
-  }
-
-  // Route 44
-  if (clean.startsWith('route_44')) {
-    return JOHTO_LANDMARKS.route_44;
-  }
-
-  // Ice Path
-  if (clean.startsWith('ice_path')) {
-    return JOHTO_LANDMARKS.ice_path;
-  }
-
-  // Dragon's Den & Shrine
-  if (clean.startsWith('dragons_den') || clean.includes('dragon_shrine')) {
-    return JOHTO_LANDMARKS.dragons_den;
-  }
-
-  // Blackthorn City & Move Deleter
-  if (
-    clean.startsWith('blackthorn') ||
-    clean.includes('move_deleter')
-  ) {
-    return JOHTO_LANDMARKS.blackthorn_city;
-  }
-
-  // Route 45 & Route 46
+  if (clean.startsWith('new_bark') || clean.startsWith('elms_lab') || clean.startsWith('players_house') || clean.includes('elms_house') || clean.includes('players_neighbor')) return JOHTO_LANDMARKS.new_bark_town;
+  if (clean.startsWith('cherrygrove') || clean.includes('guide_gent')) return JOHTO_LANDMARKS.cherrygrove_city;
+  if (clean.startsWith('route_30') || clean.includes('mr_pokemon')) return JOHTO_LANDMARKS.route_30;
+  if (clean.startsWith('dark_cave') || clean.includes('dark_cave')) return JOHTO_LANDMARKS.dark_cave;
+  if (clean.startsWith('route_31')) return JOHTO_LANDMARKS.route_31;
+  if (clean.startsWith('sprout_tower')) return JOHTO_LANDMARKS.sprout_tower;
+  if (clean.startsWith('violet') || clean.includes('earls_pokemon_academy')) return JOHTO_LANDMARKS.violet_city;
+  if (clean.startsWith('ruins_of_alph')) return JOHTO_LANDMARKS.ruins_of_alph;
+  if (clean.startsWith('route_32')) return JOHTO_LANDMARKS.route_32;
+  if (clean.startsWith('union_cave')) return JOHTO_LANDMARKS.union_cave;
+  if (clean.startsWith('route_33')) return JOHTO_LANDMARKS.route_33;
+  if (clean.startsWith('slowpoke_well')) return JOHTO_LANDMARKS.slowpoke_well;
+  if (clean.startsWith('azalea') || clean.includes('kurts_house') || clean.includes('charcoal_kiln')) return JOHTO_LANDMARKS.azalea_town;
+  if (clean.startsWith('ilex_forest')) return JOHTO_LANDMARKS.ilex_forest;
+  if (clean.startsWith('route_34') || clean.includes('day_care')) return JOHTO_LANDMARKS.route_34;
+  if (clean.startsWith('goldenrod') || clean.startsWith('radio_tower')) return JOHTO_LANDMARKS.goldenrod_city;
+  if (clean.startsWith('route_35')) return JOHTO_LANDMARKS.route_35;
+  if (clean.startsWith('national_park')) return JOHTO_LANDMARKS.national_park;
+  if (clean.startsWith('route_36')) return JOHTO_LANDMARKS.route_36;
+  if (clean.startsWith('route_37')) return JOHTO_LANDMARKS.route_37;
+  if (clean.startsWith('burned_tower')) return JOHTO_LANDMARKS.burned_tower;
+  if (clean.startsWith('tin_tower') || clean.includes('bellchime') || clean.includes('wise_trio')) return JOHTO_LANDMARKS.tin_tower;
+  if (clean.startsWith('ecruteak') || clean.includes('dance_theat')) return JOHTO_LANDMARKS.ecruteak_city;
+  if (clean.startsWith('route_38')) return JOHTO_LANDMARKS.route_38;
+  if (clean.startsWith('route_39')) return JOHTO_LANDMARKS.route_39;
+  if (clean.startsWith('olivine') || clean.includes('lighthouse')) return JOHTO_LANDMARKS.olivine_city;
+  if (clean.startsWith('route_40') || clean.startsWith('battle_tower')) return JOHTO_LANDMARKS.route_40;
+  if (clean.startsWith('whirl_island')) return JOHTO_LANDMARKS.whirl_islands;
+  if (clean.startsWith('route_41')) return JOHTO_LANDMARKS.route_41;
+  if (clean.startsWith('cianwood') || clean.includes('poke_seer') || clean.includes('cliff_cave') || clean.includes('cliff_edge')) return JOHTO_LANDMARKS.cianwood_city;
+  if (clean.startsWith('mount_mortar') || clean.startsWith('mt_mortar')) return JOHTO_LANDMARKS.mount_mortar;
+  if (clean.startsWith('route_42')) return JOHTO_LANDMARKS.route_42;
+  if (clean.startsWith('mahogany') || clean.includes('team_rocket_base') || clean.includes('rocket_hideout')) return JOHTO_LANDMARKS.mahogany_town;
+  if (clean.startsWith('route_43')) return JOHTO_LANDMARKS.route_43;
+  if (clean.startsWith('lake_of_rage')) return JOHTO_LANDMARKS.lake_of_rage;
+  if (clean.startsWith('route_44')) return JOHTO_LANDMARKS.route_44;
+  if (clean.startsWith('ice_path')) return JOHTO_LANDMARKS.ice_path;
+  if (clean.startsWith('dragons_den') || clean.includes('dragon_shrine')) return JOHTO_LANDMARKS.dragons_den;
+  if (clean.startsWith('blackthorn') || clean.includes('move_deleter')) return JOHTO_LANDMARKS.blackthorn_city;
   if (clean.startsWith('route_45')) return JOHTO_LANDMARKS.route_45;
   if (clean.startsWith('route_46')) return JOHTO_LANDMARKS.route_46;
-
-  // Route 27 & Tohjo Falls
   if (clean.includes('tohjo_falls')) return JOHTO_LANDMARKS.tohjo_falls;
   if (clean.startsWith('route_27')) return JOHTO_LANDMARKS.route_27;
-
-  // Route 26
   if (clean.startsWith('route_26')) return JOHTO_LANDMARKS.route_26;
-
-  // Victory Road
   if (clean.startsWith('victory_road')) return JOHTO_LANDMARKS.victory_road;
-
-  // Indigo Plateau, League Chambers & Hall of Fame
   if (
     clean.startsWith('indigo_plateau') ||
     clean === 'route_23' ||

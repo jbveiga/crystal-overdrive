@@ -197,7 +197,10 @@ describe('GitHub Issues #53, #54, #55, #56, and #57 Regression Suite', () => {
 
   describe('Issue #54: Remove #interact-btn from OverworldHUD', () => {
     it('does not include #interact-btn in OverworldHUD template', () => {
-      const hudSource = fs.readFileSync(path.resolve(__dirname, '../../src/ui/OverworldHUD.ts'), 'utf-8');
+      const hudSource =
+        fs.readFileSync(path.resolve(__dirname, '../../src/ui/OverworldHUD.ts'), 'utf-8') +
+        '\n' +
+        fs.readFileSync(path.resolve(__dirname, '../../src/ui/OverworldHUDTemplate.ts'), 'utf-8');
       expect(hudSource).not.toContain('id="interact-btn"');
       expect(hudSource).toContain('id="desktop-controls-bar"');
     });

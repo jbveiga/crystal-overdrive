@@ -255,7 +255,10 @@ describe('BUGFIX-POST-REFACTOR-AUDIT-01: Regression Invariant Tests', () => {
     });
 
     it('verifies OverworldHUD source contract for #hud-root, #desktop-controls-bar, and gamepad sync', () => {
-      const hudSrc = fs.readFileSync(path.resolve(__dirname, '../src/ui/OverworldHUD.ts'), 'utf-8');
+      const hudSrc =
+        fs.readFileSync(path.resolve(__dirname, '../src/ui/OverworldHUD.ts'), 'utf-8') +
+        '\n' +
+        fs.readFileSync(path.resolve(__dirname, '../src/ui/OverworldHUDTemplate.ts'), 'utf-8');
       expect(hudSrc).toContain("this.rootElement.id = 'hud-root'");
       expect(hudSrc).toContain('id="desktop-controls-bar"');
       expect(hudSrc).toContain('this.desktopControlsBar.style.setProperty(\'display\', \'none\', \'important\')');

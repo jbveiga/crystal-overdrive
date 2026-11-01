@@ -48,8 +48,8 @@ import { ensureGlobalNeoKantoStyles } from './ui/styles/globalNeoKantoStyles';
 import { DisplayThemeManager } from './ui/DisplayThemeManager';
 import type { MapData, WarpEvent, Direction, PokemonInstance, PlayerGender, GameOptions, SpeedMultiplier } from './types/game';
 import {
-  makeNpc, createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS, isNpcActiveForStoryFlags, applyMapNpcStoryMutations,
-  resolveElmLabDialogue, applyStoryRecoveryFlags, filterInitialMapNpcs, resetStoryNpcSpawns,
+  createNpcsByMap, DAY_SIBLINGS, GUIDE_GENT_TOUR_LEGS, isNpcActiveForStoryFlags, applyMapNpcStoryMutations,
+  applyStoryRecoveryFlags, filterInitialMapNpcs,
 } from './world/npcData';
 import { TrackedStoryFlagSet, ActiveNpcCache } from './world/ActiveNpcCache';
 import { AdjacentMapPrefetcher } from './world/AdjacentMapPrefetcher';
@@ -197,12 +197,9 @@ async function bootstrap() {
   const SC = StoryCutscenes;
   const triggerSlowpokeWellGruntIntercept = async (grunt: GridEntity) => SC.triggerSlowpokeWellGruntIntercept(grunt, getCutsceneContext());
   const triggerAzaleaRivalAmbush = () => SC.triggerAzaleaRivalAmbush(getCutsceneContext());
-  const triggerCherrygroveRivalAmbush = () => SC.triggerCherrygroveRivalAmbush(getCutsceneContext());
-  const triggerBurnedTowerRivalBattle = () => SC.triggerBurnedTowerRivalBattle(getCutsceneContext());
-  const triggerBeastsAwakeningCutscene = () => SC.triggerBeastsAwakeningCutscene(getCutsceneContext());
-  const triggerOlivineRivalConfrontation = () => SC.triggerOlivineRivalConfrontation(getCutsceneContext());
-  const triggerCianwoodSuicuneAndEusine = () => SC.triggerCianwoodSuicuneAndEusine(getCutsceneContext());
-  const triggerRoute42Suicune = () => SC.triggerRoute42Suicune(getCutsceneContext());
+  const triggerCherrygroveRivalAmbush = () => SC.triggerCherrygroveRivalAmbush(getCutsceneContext()), triggerBurnedTowerRivalBattle = () => SC.triggerBurnedTowerRivalBattle(getCutsceneContext());
+  const triggerBeastsAwakeningCutscene = () => SC.triggerBeastsAwakeningCutscene(getCutsceneContext()), triggerOlivineRivalConfrontation = () => SC.triggerOlivineRivalConfrontation(getCutsceneContext());
+  const triggerCianwoodSuicuneAndEusine = () => SC.triggerCianwoodSuicuneAndEusine(getCutsceneContext()), triggerRoute42Suicune = () => SC.triggerRoute42Suicune(getCutsceneContext());
 
   const saveCurrentGame = async () => {
     missionManager.checkStoryFlags(storyFlags);
@@ -212,11 +209,8 @@ async function bootstrap() {
       chiptuneMode: audioManager.isChiptuneMode(), lowHpBeepEnabled: BattleAudio.lowHpBeepEnabled,
       crtScanlines: displayThemeManager.isCrtEnabled(), gbcPalette: displayThemeManager.getPalette(),
       encounterRateMode: mapManager.getEncounterRateMode(),
+      ...(overworldHUD ? { touchControlStyle: overworldHUD.getTouchControlStyle(), gamepadActive: overworldHUD.isGamepadActive() } : {}),
     });
-    if (overworldHUD) {
-      gameOptions.touchControlStyle = overworldHUD.getTouchControlStyle();
-      gameOptions.gamepadActive = overworldHUD.isGamepadActive();
-    }
     const saveData = SaveManager.createSaveSnapshot({
       playTimeSeconds, playerName, playerGender, rivalName,
       player: { x: player.x, y: player.y, direction: player.direction },
@@ -259,16 +253,8 @@ async function bootstrap() {
   // Pre-loads critical maps (standalone/from ./assets/data/world_maps.json)
   const criticalBootMapIds = Array.from(new Set([initialMapId, 'new_bark_town', 'players_house_2f', 'players_house_1f']));
   const bootMapManifest = new AssetManifestQueue();
-  for (const mapId of criticalBootMapIds) {
-    bootMapManifest.enqueue({
-      id: `boot_map:${mapId}`, label: `Loading map ${mapId}.json`, category: 'MAP_JSON',
-      execute: async () => { await ensureMapAndNeighborsLoaded(mapId); },
-    });
-  }
-  await bootMapManifest.run({
-    startPercent: 12, endPercent: 40, concurrency: 4,
-    onProgress: (snap) => { window.updateLoaderProgress?.(snap.percent, snap.currentLabel); },
-  });
+  for (const mapId of criticalBootMapIds) bootMapManifest.enqueue({ id: `boot_map:${mapId}`, label: `Loading map ${mapId}.json`, category: 'MAP_JSON', execute: async () => { await ensureMapAndNeighborsLoaded(mapId); } });
+  await bootMapManifest.run({ startPercent: 12, endPercent: 40, concurrency: 4, onProgress: (s) => { window.updateLoaderProgress?.(s.percent, s.currentLabel); } });
 
   let initialMap = mapManager.setCurrentMap(initialMapId);
   if (!mapManager.isWalkable(initialPlayerX, initialPlayerY)) {
@@ -290,23 +276,14 @@ async function bootstrap() {
   });
 
   const TST = OverworldTrainerSightAndTourController;
-  const addOverworldItemToInventory = (rawItemId: string) => TST.addOverworldItemToInventory(getTrainerSightContext(), rawItemId);
-  const getApricornCount = (apricornId: string) => TST.getApricornCount(getTrainerSightContext(), apricornId);
-  const deductApricorn = (apricornId: string, qty: number) => TST.deductApricorn(getTrainerSightContext(), apricornId, qty);
-  const launchStadiumChallenge = (challengerId: string, cupId: string) => TST.launchStadiumChallenge(challengerId, cupId, getTrainerSightContext());
-  const runTrainerSightSequence = (trainer: GridEntity) => TST.runTrainerSightSequence(trainer, getCutsceneContext());
-  const completeSlowpokeWellProtonVictory = () => TST.completeSlowpokeWellProtonVictory(getTrainerSightContext());
-  const runGuideGentWalkingTour = (guide: GridEntity) => TST.runGuideGentWalkingTour(guide, getCutsceneContext());
+  const addOverworldItemToInventory = (id: string) => TST.addOverworldItemToInventory(getTrainerSightContext(), id), getApricornCount = (id: string) => TST.getApricornCount(getTrainerSightContext(), id);
+  const deductApricorn = (id: string, q: number) => TST.deductApricorn(getTrainerSightContext(), id, q), launchStadiumChallenge = (c: string, cup: string) => TST.launchStadiumChallenge(c, cup, getTrainerSightContext());
+  const runTrainerSightSequence = (t: GridEntity) => TST.runTrainerSightSequence(t, getCutsceneContext()), completeSlowpokeWellProtonVictory = () => TST.completeSlowpokeWellProtonVictory(getTrainerSightContext()), runGuideGentWalkingTour = (g: GridEntity) => TST.runGuideGentWalkingTour(g, getCutsceneContext());
 
-  const bagUI = new BagAndMartUI(
-    'modal-container', inventory, playerParty,
-    () => { saveCurrentGame(); },
-    () => { OverworldTickerCoordinator.triggerItemfinderScan(getTickerContext()); },
-    (steps: number, itemName: string) => {
-      mapManager.setRepelSteps(steps);
-      if (overworldHUD) overworldHUD.showToast(`🛡️ ${itemName} active! Wild encounters warded off for ${steps} steps.`);
-    }
-  );
+  const bagUI = new BagAndMartUI('modal-container', inventory, playerParty, () => { saveCurrentGame(); }, () => { OverworldTickerCoordinator.triggerItemfinderScan(getTickerContext()); }, (steps, itemName) => {
+    mapManager.setRepelSteps(steps);
+    if (overworldHUD) overworldHUD.showToast(`🛡️ ${itemName} active! Wild encounters warded off for ${steps} steps.`);
+  });
 
   const partyUI = new PartyManagementUI('modal-container', playerParty, () => { saveCurrentGame(); });
   const missionLogUI = new MissionLogUI('modal-container', missionManager);
@@ -357,20 +334,9 @@ async function bootstrap() {
     onFlyToLandmark: async (landmark, pokemonName) => {
       const dest = resolveFlyDestination(landmark.id);
       if (!dest) return;
-      lastVisitedPokecenter = {
-        mapId: dest.pokecenterMapId,
-        x: dest.pokecenterX,
-        y: dest.pokecenterY,
-      };
+      lastVisitedPokecenter = { mapId: dest.pokecenterMapId, x: dest.pokecenterX, y: dest.pokecenterY };
       overworldHUD.showToast(`🦅 ${pokemonName || 'POKéMON'} used FLY to ${landmark.name.toUpperCase()}!`);
-      await executeWarpTransition({
-        x: player.x,
-        y: player.y,
-        targetMapId: dest.mapId,
-        targetX: dest.x,
-        targetY: dest.y,
-        direction: 'DOWN',
-      });
+      await executeWarpTransition({ x: player.x, y: player.y, targetMapId: dest.mapId, targetX: dest.x, targetY: dest.y, direction: 'DOWN' });
     },
     cyclePlayerSpeed, cycleBattleSpeed, setBattleSpeed, cycleTextSpeed, setTextSpeed,
   });
@@ -391,12 +357,12 @@ async function bootstrap() {
       return m;
     },
     onMenuToggle: () => {
-      if (dayCareModalUI.isOpen()) { dayCareModalUI.close(); return; }
-      if (ruinsPuzzleModalUI.isOpen()) { ruinsPuzzleModalUI.close(); return; }
-      if (boxManagementUI.isOpen()) { boxManagementUI.close(); return; }
-      if (missionLogUI.isOpen()) { missionLogUI.hide(); return; }
-      if (partyUI.isOpen()) { partyUI.hide(); return; }
-      if (bagUI.isOpen()) { bagUI.hide(); return; }
+      if (dayCareModalUI.isOpen()) return dayCareModalUI.close();
+      if (ruinsPuzzleModalUI.isOpen()) return ruinsPuzzleModalUI.close();
+      if (boxManagementUI.isOpen()) return boxManagementUI.close();
+      if (missionLogUI.isOpen()) return missionLogUI.hide();
+      if (partyUI.isOpen()) return partyUI.hide();
+      if (bagUI.isOpen()) return bagUI.hide();
       startMenuUI.toggle();
     },
     onPartyOpen: () => { startMenuUI.closeAll(); bagUI.hide(); partyUI.open(); },
@@ -425,10 +391,7 @@ async function bootstrap() {
   window.updateLoaderProgress?.(40, 'Mounting overworld engine...');
   const canvasContainer = (document.getElementById('canvas-container') || document.getElementById('game-container') || document.body) as HTMLElement;
   overworldRenderer = new OverworldRenderer();
-  await overworldRenderer.init(canvasContainer, {
-    startPercent: 40, endPercent: 72, concurrency: 6,
-    onProgress: (snap) => { window.updateLoaderProgress?.(snap.percent, snap.currentLabel); },
-  });
+  await overworldRenderer.init(canvasContainer, { startPercent: 40, endPercent: 72, concurrency: 6, onProgress: (snap) => { window.updateLoaderProgress?.(snap.percent, snap.currentLabel); } });
   overworldRenderer.setPlayerGender(playerGender);
 
   mapManager.setNpcLifecycleCallbacks({
@@ -439,17 +402,13 @@ async function bootstrap() {
   overworldRenderer.setNpcLookup((id) => getActiveMapNpcs(id));
   resetMapNpcsToOrigin(initialMap.id);
 
-  await overworldRenderer.ensureMapTilesLoaded(initialMap, lookupMap, {
-    startPercent: 72, endPercent: 95, concurrency: 8,
-    onProgress: (snap) => { window.updateLoaderProgress?.(snap.percent, snap.currentLabel); },
-  });
+  await overworldRenderer.ensureMapTilesLoaded(initialMap, lookupMap, { startPercent: 72, endPercent: 95, concurrency: 8, onProgress: (snap) => { window.updateLoaderProgress?.(snap.percent, snap.currentLabel); } });
   applyMapStoryMutations(initialMap);
   overworldRenderer.renderMap(initialMap, lookupMap);
   syncMapOverworldItems(initialMap);
 
   adjacentMapPrefetcher = new AdjacentMapPrefetcher({
-    mapManager,
-    activeNpcCache,
+    mapManager, activeNpcCache,
     prepareMapNpcs: (id) => { resetMapNpcsToOrigin(id); return getActiveMapNpcs(id); },
     onWarmNpcSprites: (types) => overworldRenderer?.warmNpcSpriteTypes(types),
     onWarmMapTiles: (m) => (overworldRenderer ? overworldRenderer.ensureMapTilesLoaded(m, lookupMap) : undefined),
@@ -517,8 +476,8 @@ async function bootstrap() {
         audioManager.playMapBgm(activeMap.id, 0.6);
       }
     },
-    onNewGame: async () => { titleScreenUI.hide(); introSequenceUI.start(); },
-    onExportSave: async () => saveManager.exportSaveJson(),
+    onNewGame: () => { titleScreenUI.hide(); introSequenceUI.start(); },
+    onExportSave: () => saveManager.exportSaveJson(),
     onImportSave: async (raw: string) => {
       const ok = await saveManager.importSaveJson(raw);
       if (ok) {
@@ -546,14 +505,11 @@ async function bootstrap() {
   });
 
   window.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Shift' && !e.repeat && gameState === 'BATTLE') {
-      battleHUD.triggerSpeedToggle();
-      return;
-    }
+    if (e.key === 'Shift' && !e.repeat && gameState === 'BATTLE') return battleHUD.triggerSpeedToggle();
     if (gameState === 'OVERWORLD') {
-      if (townMapUI.isOpen()) { townMapUI.handleKeyDown(e); return; }
-      if (missionLogUI.isOpen()) { missionLogUI.handleKeyDown(e); return; }
-      if (startMenuUI.isOpen()) { startMenuUI.handleKeyDown(e); return; }
+      if (townMapUI.isOpen()) return townMapUI.handleKeyDown(e);
+      if (missionLogUI.isOpen()) return missionLogUI.handleKeyDown(e);
+      if (startMenuUI.isOpen()) return startMenuUI.handleKeyDown(e);
       if (!isAnyOverworldModalOpen() && !overworldHUD.isDialogueOpen() && !isCutsceneLocked && !e.repeat) {
         if (startMenuUI.handleOverworldShortcutKey(e.code, e.shiftKey)) e.preventDefault();
       }
@@ -577,16 +533,7 @@ async function bootstrap() {
   };
 
   const getFieldObstacleContext = (): FieldObstacleContext => ({
-    playerName,
-    playerParty,
-    inventory,
-    storyFlags,
-    player,
-    mapManager,
-    overworldItemManager,
-    missionManager,
-    visitedMaps,
-    roamingManager,
+    playerName, playerParty, inventory, storyFlags, player, mapManager, overworldItemManager, missionManager, visitedMaps, roamingManager,
     detectChosenStarterSpecies: () => detectChosenStarterSpecies() || null,
     openStarterChoiceModal: (speciesId, name, type, onConfirm, onCancel) => overworldHUD.openStarterChoiceModal(speciesId, name, type, onConfirm, onCancel),
     openDialogue: (pages, speaker, onComplete) => overworldHUD.openDialogue(pages, speaker, onComplete),
@@ -642,38 +589,21 @@ async function bootstrap() {
     openDayCareModal: () => modalRegistry.openDayCareModal(),
     openNamingModal: (_title, defaultName, onConfirm) => { namingModalUI.open({ onConfirm }, defaultName); },
     openDeptElevatorModal: (currentMapId, onSelectFloor) => deptStoreElevatorUI.open({ currentMapId, onSelectFloor: (f) => onSelectFloor(f.mapId), onClose: () => {} }),
-    openRadioTowerQuizModal: (callbacks) => {
-      radioTowerQuizUI.open({
-        onComplete: callbacks.onComplete,
-        onClose: () => {},
-      });
-    },
-    openKurtCraftingModal: (callbacks) =>
-      modalRegistry.openKurtCraftingModal(getApricornCount, deductApricorn, callbacks),
+    openRadioTowerQuizModal: (callbacks) => { radioTowerQuizUI.open({ onComplete: callbacks.onComplete, onClose: () => {} }); },
+    openKurtCraftingModal: (callbacks) => modalRegistry.openKurtCraftingModal(getApricornCount, deductApricorn, callbacks),
     openKyleTradeModal: (callbacks) => modalRegistry.openKyleTradeModal(callbacks),
     shakeScreen: (durationMs = 400) => {
       const canvas = document.getElementById('game-canvas');
-      if (canvas) {
-        canvas.classList.add('screen-shake');
-        setTimeout(() => canvas.classList.remove('screen-shake'), durationMs);
-      }
+      if (canvas) { canvas.classList.add('screen-shake'); setTimeout(() => canvas.classList.remove('screen-shake'), durationMs); }
     },
     mountBugContestHUD: (balls, timeSec) => bugContestHUD.mount(balls, timeSec),
     destroyBugContestHUD: () => bugContestHUD.destroy(),
     executeWarpTransition: (warp) => executeWarpTransition(warp),
-    triggerBattle,
-    buildTrainerTeamInstances,
-    handleTrainerDefeatRewards,
+    triggerBattle, buildTrainerTeamInstances, handleTrainerDefeatRewards,
     getOppositeDirection: (dir) => OverworldTrainerSightAndTourController.getOppositeDirection(dir),
-    launchStadiumChallenge,
-    runGuideGentWalkingTour,
-    triggerBeastsAwakeningCutscene,
-    triggerBurnedTowerRivalBattle,
-    triggerAzaleaRivalAmbush,
-    triggerCherrygroveRivalAmbush,
-    triggerSlowpokeWellGruntIntercept,
-    setCutsceneLocked: (locked) => { isCutsceneLocked = locked; },
-    getCutsceneContext,
+    launchStadiumChallenge, runGuideGentWalkingTour, triggerBeastsAwakeningCutscene,
+    triggerBurnedTowerRivalBattle, triggerAzaleaRivalAmbush, triggerCherrygroveRivalAmbush,
+    triggerSlowpokeWellGruntIntercept, setCutsceneLocked: (locked) => { isCutsceneLocked = locked; }, getCutsceneContext,
   });
 
   const handleInteract = () => {
@@ -682,43 +612,30 @@ async function bootstrap() {
     if (!currentMap) return;
 
     const { dx, dy } = GridPhysics.getDirectionDelta(player.direction);
-    const facingX = player.x + dx;
-    const facingY = player.y + dy;
-    const acrossX = player.x + dx * 2;
-    const acrossY = player.y + dy * 2;
+    const facingX = player.x + dx, facingY = player.y + dy;
+    const acrossX = player.x + dx * 2, acrossY = player.y + dy * 2;
 
     const visibleWorldNpcs = populateWorldNpcs(currentMap);
     for (let i = 0; i < visibleWorldNpcs.length; i++) {
       const targetNpc = visibleWorldNpcs[i];
-      const npcWorldX = targetNpc.x + (targetNpc.worldOffsetX || 0);
-      const npcWorldY = targetNpc.y + (targetNpc.worldOffsetY || 0);
-      const isDirect = npcWorldX === facingX && npcWorldY === facingY;
-      const isAcrossCounter = targetNpc.talkAcrossCounter === true && npcWorldX === acrossX && npcWorldY === acrossY;
-      if (isDirect || isAcrossCounter) {
+      const npcWorldX = targetNpc.x + (targetNpc.worldOffsetX || 0), npcWorldY = targetNpc.y + (targetNpc.worldOffsetY || 0);
+      if ((npcWorldX === facingX && npcWorldY === facingY) || (targetNpc.talkAcrossCounter === true && npcWorldX === acrossX && npcWorldY === acrossY)) {
         npcInteractionRouter.dispatch(targetNpc, currentMap, getNpcInteractionContext());
         return;
       }
     }
 
-    if (FieldObstacleDispatcher.handleFieldAndBgInteraction(getFieldObstacleContext(), currentMap, facingX, facingY)) {
-      return;
-    }
+    if (FieldObstacleDispatcher.handleFieldAndBgInteraction(getFieldObstacleContext(), currentMap, facingX, facingY)) return;
   };
 
-  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) overworldRenderer.app.ticker.stop();
-      else overworldRenderer.app.ticker.start();
-    });
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => { document.hidden ? overworldRenderer.app.ticker.stop() : overworldRenderer.app.ticker.start(); });
   }
 
-  overworldRenderer.app.ticker.add((ticker) => {
-    OverworldTickerCoordinator.updateOverworldTick(ticker.deltaMS / 1000, getTickerContext());
-  });
+  overworldRenderer.app.ticker.add((ticker) => { OverworldTickerCoordinator.updateOverworldTick(ticker.deltaMS / 1000, getTickerContext()); });
 
-  const uiOverlay = document.getElementById('ui-overlay') || document.body;
   modalRegistry.mountReportButton({
-    uiOverlay, mapManager, player, getGameState: () => gameState, inventory, playerParty,
+    uiOverlay: document.getElementById('ui-overlay') || document.body, mapManager, player, getGameState: () => gameState, inventory, playerParty,
   });
 
   window.syncGitHubIssues = syncGitHubIssues;

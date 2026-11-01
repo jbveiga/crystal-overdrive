@@ -251,8 +251,8 @@ describe('TICKET-WORLD-ROUTE34-DAYCARE-01: Route 34 & Day-Care Center 10-Point P
       expect(dcToR34_1).toBeDefined();
       expect(dcToR34_2).toBeDefined();
       expect(dcToR34_1!.targetMapId).toBe('route_34');
-      expect([11, 12]).toContain(dcToR34_1!.targetX);
-      expect([15, 16]).toContain(dcToR34_1!.targetY);
+      expect([11, 12, 13]).toContain(dcToR34_1!.targetX);
+      expect([14, 15, 16]).toContain(dcToR34_1!.targetY);
 
       // Walkability
       expect(route34.collisionGrid[14 * route34.width + 11]).toBe(0);

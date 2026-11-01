@@ -112,37 +112,37 @@ describe('TICKET-BUGFIX-GITHUB-ISSUES-27-THROUGH-34-01: GitHub Issues #27 - #34 
       fs.readFileSync(path.join(mapsDir, 'day_care.json'), 'utf8')
     );
 
-    it('asserts Route 34 (12, 15) is walkable 0 with warp targeting day_care (2, 7)', () => {
-      expect(route34.collisionGrid[15 * route34.width + 12]).toBe(0);
-      const warp = route34.warps.find((w) => w.x === 12 && w.y === 15);
+    it('asserts Route 34 (13, 15) is walkable 0 with warp targeting day_care (2, 7)', () => {
+      expect(route34.collisionGrid[15 * route34.width + 13]).toBe(0);
+      const warp = route34.warps.find((w) => w.x === 13 && w.y === 15);
       expect(warp).toBeDefined();
       expect(warp?.targetMapId).toBe('day_care');
       expect(warp?.targetX).toBe(2);
       expect(warp?.targetY).toBe(7);
     });
 
-    it('asserts Route 34 step tile (12, 16) is walkable 0', () => {
-      expect(route34.collisionGrid[16 * route34.width + 12]).toBe(0);
+    it('asserts Route 34 step tile (13, 16) is walkable 0', () => {
+      expect(route34.collisionGrid[16 * route34.width + 13]).toBe(0);
     });
 
-    it('asserts day_care interior warps reciprocal back to Route 34 (12, 16) and side yard (13, 15)', () => {
+    it('asserts day_care interior warps reciprocal back to Route 34 (13, 15) and side yard (11, 14)', () => {
       const exit1 = dayCare.warps.find((w) => w.x === 2 && w.y === 7);
       expect(exit1).toBeDefined();
       expect(exit1?.targetMapId).toBe('route_34');
-      expect(exit1?.targetX).toBe(12);
-      expect(exit1?.targetY).toBe(16);
+      expect(exit1?.targetX).toBe(13);
+      expect(exit1?.targetY).toBe(15);
 
       const exit2 = dayCare.warps.find((w) => w.x === 3 && w.y === 7);
       expect(exit2).toBeDefined();
       expect(exit2?.targetMapId).toBe('route_34');
-      expect(exit2?.targetX).toBe(12);
-      expect(exit2?.targetY).toBe(16);
+      expect(exit2?.targetX).toBe(13);
+      expect(exit2?.targetY).toBe(15);
 
       const yard1 = dayCare.warps.find((w) => w.x === 0 && w.y === 5);
       expect(yard1).toBeDefined();
       expect(yard1?.targetMapId).toBe('route_34');
-      expect(yard1?.targetX).toBe(13);
-      expect(yard1?.targetY).toBe(15);
+      expect(yard1?.targetX).toBe(11);
+      expect(yard1?.targetY).toBe(14);
     });
   });
 

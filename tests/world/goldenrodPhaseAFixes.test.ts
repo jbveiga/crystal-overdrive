@@ -108,7 +108,7 @@ describe('TICKET-WORLD-GOLDENROD-PHASE-A-01: Bike Shop, Day-Care Warps & Undergr
   });
 
   describe('2. Day-Care Side Warps & Route 34 Yard Reciprocity', () => {
-    it('verifies day_care.json side warps (0, 5) and (0, 6) lead into Route 34 fenced yard (13, 15)', () => {
+    it('verifies day_care.json side warps (0, 5) and (0, 6) lead into Route 34 fenced yard (11, 14) and (11, 15)', () => {
       const dayCare: MapData = JSON.parse(
         fs.readFileSync(path.join(mapsDir, 'day_care.json'), 'utf8')
       );
@@ -118,26 +118,26 @@ describe('TICKET-WORLD-GOLDENROD-PHASE-A-01: Bike Shop, Day-Care Warps & Undergr
       const warp05 = sideWarps.find((w) => w.x === 0 && w.y === 5);
       const warp06 = sideWarps.find((w) => w.x === 0 && w.y === 6);
 
-      expect(warp05).toEqual({ x: 0, y: 5, targetMapId: 'route_34', targetX: 13, targetY: 15 });
-      expect(warp06).toEqual({ x: 0, y: 6, targetMapId: 'route_34', targetX: 13, targetY: 15 });
+      expect(warp05).toEqual({ x: 0, y: 5, targetMapId: 'route_34', targetX: 11, targetY: 14 });
+      expect(warp06).toEqual({ x: 0, y: 6, targetMapId: 'route_34', targetX: 11, targetY: 15 });
 
       // Landing tiles in day_care are walkable 0
       expect(dayCare.collisionGrid[5 * dayCare.width + 0]).toBe(0);
       expect(dayCare.collisionGrid[6 * dayCare.width + 0]).toBe(0);
     });
 
-    it('verifies route_34.json reciprocal yard warp at (13, 15) leads back into day_care (0, 5)', () => {
+    it('verifies route_34.json reciprocal yard warps at (11, 14) and (11, 15) lead back into day_care (0, 5) and (0, 6)', () => {
       const route34: MapData = JSON.parse(
         fs.readFileSync(path.join(mapsDir, 'route_34.json'), 'utf8')
       );
       const yardWarp = route34.warps.find(
-        (w) => w.targetMapId === 'day_care' && w.x === 13 && w.y === 15
+        (w) => w.targetMapId === 'day_care' && w.x === 11 && w.y === 14
       );
       expect(yardWarp).toBeDefined();
-      expect(yardWarp).toEqual({ x: 13, y: 15, targetMapId: 'day_care', targetX: 0, targetY: 5 });
+      expect(yardWarp).toEqual({ x: 11, y: 14, targetMapId: 'day_care', targetX: 0, targetY: 5 });
 
       // Landing tile in Route 34 yard is walkable 0
-      expect(route34.collisionGrid[15 * route34.width + 13]).toBe(0);
+      expect(route34.collisionGrid[14 * route34.width + 11]).toBe(0);
     });
   });
 

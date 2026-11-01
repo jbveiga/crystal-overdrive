@@ -147,12 +147,24 @@ describe('Olivine Lighthouse One-Way Drop Holes', () => {
     expect(lighthouse2f.warps.some((w: any) => w.targetMapId === 'olivine_lighthouse_3f' && w.y === 11)).toBe(false);
     expect(lighthouse2f.warps.some((w: any) => w.targetMapId === 'olivine_lighthouse_1f' && w.y === 13)).toBe(true); // hole down
 
-    // 3F
-    expect(lighthouse3f.warps.some((w: any) => w.targetMapId === 'olivine_lighthouse_4f' && (w.y === 9 || w.y === 3))).toBe(false);
+    // 3F: hole landing tiles at (16..17, 9) and (8..9, 3) must not warp up to 4F, while stairs at (13, 3) and (9, 5) DO warp up to 4F
+    expect(
+      lighthouse3f.warps.some(
+        (w: any) =>
+          w.targetMapId === 'olivine_lighthouse_4f' &&
+          (w.y === 9 || (w.y === 3 && (w.x === 8 || w.x === 9)))
+      )
+    ).toBe(false);
+    expect(lighthouse3f.warps.some((w: any) => w.targetMapId === 'olivine_lighthouse_4f' && w.x === 13 && w.y === 3)).toBe(true);
     expect(lighthouse3f.warps.some((w: any) => w.targetMapId === 'olivine_lighthouse_2f' && w.y === 11)).toBe(true); // hole down
 
-    // 4F
-    expect(lighthouse4f.warps.some((w: any) => w.targetMapId === 'olivine_lighthouse_5f' && w.y === 7)).toBe(false);
+    // 4F: hole landing tiles at (16..17, 7) must not warp up to 5F, while stairs at (3, 5) and (9, 7) DO warp up to 5F
+    expect(
+      lighthouse4f.warps.some(
+        (w: any) => w.targetMapId === 'olivine_lighthouse_5f' && w.y === 7 && (w.x === 16 || w.x === 17)
+      )
+    ).toBe(false);
+    expect(lighthouse4f.warps.some((w: any) => w.targetMapId === 'olivine_lighthouse_5f' && w.x === 9 && w.y === 7)).toBe(true);
     expect(lighthouse4f.warps.some((w: any) => w.targetMapId === 'olivine_lighthouse_3f' && w.y === 9)).toBe(true); // hole down
 
     // 5F

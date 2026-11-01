@@ -186,9 +186,9 @@ describe('TICKET-WORLD-POWER-PLANT-CERULEAN-MISTY-01: Cerulean City, Power Plant
       expect(saffron.collisionGrid[3 * saffron.width + 18]).toBe(0);
     });
 
-    it('verifies world_maps.json contains all 338 maps including power_plant and lavender_radio_tower_1f', () => {
+    it('verifies world_maps.json contains all 343 maps including power_plant and lavender_radio_tower_1f', () => {
       const bundle = JSON.parse(fs.readFileSync(bundlePath, 'utf8'));
-      expect(bundle.length).toBe(338);
+      expect(bundle.length).toBe(343);
       expect(bundle.some((m: any) => m.id === 'power_plant')).toBe(true);
       expect(bundle.some((m: any) => m.id === 'lavender_radio_tower_1f')).toBe(true);
     });

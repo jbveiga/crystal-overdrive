@@ -241,13 +241,13 @@ export class BattleRenderer {
       tl.to(this.enemyPokemonSprite, {
         y: enemyPlatformY - 14,
         scaleY: 2.6,
-        duration: 0.075 / this.speedMultiplier,
+        duration: 0.065 / this.speedMultiplier,
         ease: 'power2.out',
       });
       tl.to(this.enemyPokemonSprite, {
         y: enemyPlatformY,
         scaleY: 2.4,
-        duration: 0.075 / this.speedMultiplier,
+        duration: 0.065 / this.speedMultiplier,
         ease: 'power2.in',
       });
       tl.to(this.enemyPokemonSprite, {

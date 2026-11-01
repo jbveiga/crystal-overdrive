@@ -61,6 +61,7 @@ export function evaluateWarpProgressionGuards(
     }
 
     if (
+      currentM.id.endsWith('_chamber') &&
       warp.targetMapId === 'ruins_of_alph_inner_chamber' &&
       !storyFlags.has('unown_awakened_kabuto') &&
       !storyFlags.has('unown_awakened_omanyte') &&
