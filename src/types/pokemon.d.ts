@@ -65,6 +65,7 @@ export interface BaseStats {
 
 export interface PokemonInstance {
   uid: string;
+  id?: string;
   speciesId: string;
   nickname: string;
   level: number;

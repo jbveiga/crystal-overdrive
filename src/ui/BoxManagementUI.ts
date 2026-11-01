@@ -113,11 +113,15 @@ export class BoxManagementUI {
 
   public open(
     party: PokemonInstance[],
-    storageState: PokemonStorageState,
+    storageOrManager: PokemonStorageState | BoxManager,
     callbacks: BoxManagementCallbacks = {}
   ): void {
     this.party = party;
-    this.boxManager = new BoxManager(storageState);
+    this.boxManager =
+      storageOrManager instanceof BoxManager
+        ? storageOrManager
+        : new BoxManager(storageOrManager);
+    StorageManager.reconcilePartyAndStorageIntegrity(this.party, this.boxManager.getState());
     this.activeBoxIndex = this.boxManager.getCurrentBoxIndex();
     this.callbacks = callbacks;
     this.selectedSlot = null;
@@ -147,6 +151,7 @@ export class BoxManagementUI {
     }
 
     BattleAudio.playMenuSound('CANCEL');
+    StorageManager.reconcilePartyAndStorageIntegrity(this.party, this.boxManager.getState());
     if (this.callbacks.onClose) {
       this.callbacks.onClose(this.party, this.boxManager.getState());
     }
@@ -161,6 +166,9 @@ export class BoxManagementUI {
       this.selectedSlot = null;
     }
     BattleAudio.playMenuSound('CURSOR');
+    if (this.callbacks.onSave) {
+      this.callbacks.onSave(this.party, this.boxManager.getState());
+    }
     this.render();
   }
 
@@ -170,6 +178,9 @@ export class BoxManagementUI {
       this.boxManager.changeBox(index);
       if (!this.isSwapPending) {
         this.selectedSlot = null;
+      }
+      if (this.callbacks.onSave) {
+        this.callbacks.onSave(this.party, this.boxManager.getState());
       }
       this.render();
     }
@@ -215,12 +226,13 @@ export class BoxManagementUI {
     const sourceBoxIndex = source.boxIndex ?? this.activeBoxIndex;
     const targetBoxIndex = target.boxIndex ?? this.activeBoxIndex;
 
-    // Party to Party swap
+    // Party to Party swap (mutate in-place to preserve shared party reference!)
     if (source.type === 'party' && target.type === 'party') {
       const temp = this.party[source.slotIndex];
       this.party[source.slotIndex] = this.party[target.slotIndex];
       this.party[target.slotIndex] = temp;
-      this.party = this.party.filter((p) => Boolean(p));
+      const compacted = this.party.filter((p): p is PokemonInstance => Boolean(p));
+      this.party.splice(0, this.party.length, ...compacted);
       success = true;
     }
     // Box to Box swap (handles intra-box or cross-box)
@@ -247,6 +259,7 @@ export class BoxManagementUI {
     this.movingSource = null;
 
     if (success) {
+      StorageManager.reconcilePartyAndStorageIntegrity(this.party, this.boxManager.getState());
       BattleAudio.playMenuSound('CONFIRM');
       this.selectedSlot = { type: target.type, boxIndex: target.boxIndex, slotIndex: target.slotIndex };
       if (this.callbacks.onSave) {

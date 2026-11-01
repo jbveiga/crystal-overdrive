@@ -91,7 +91,8 @@ export class BattleSessionController {
         caughtSpeciesIds.add(id);
       }
     }
-    for (const p of ctx.playerBox) {
+    const boxedPokemon = ctx.boxManager ? ctx.boxManager.flatten() : (ctx.playerBox || []);
+    for (const p of boxedPokemon) {
       for (const id of PokemonFactory.getOwnedAndEvolvedSpeciesIds(p)) {
         caughtSpeciesIds.add(id);
       }
@@ -307,9 +308,10 @@ export class BattleSessionController {
           }
           if (ctx.playerParty.length < 6) {
             ctx.playerParty.push(opponentPokemon);
+            ctx.saveCurrentGame();
           } else {
             const depositRes = ctx.boxManager.deposit(opponentPokemon);
-            ctx.setPlayerBox(ctx.boxManager.flatten());
+            ctx.setPlayerBox?.(ctx.boxManager.flatten());
             const targetBox = ctx.boxManager.getBox(depositRes.boxIndex);
             const boxName = targetBox ? targetBox.name : `BOX ${depositRes.boxIndex + 1}`;
             BattleAudio.playOverworldSound('FANFARE');

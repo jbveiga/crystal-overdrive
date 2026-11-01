@@ -37,7 +37,8 @@ export class SaveStateReconciler {
       playerGender: { val: PlayerGender };
       rivalName: { val: string };
       playerParty: PokemonInstance[];
-      playerBox: PokemonInstance[];
+      playerBox?: PokemonInstance[];
+      boxManager?: any;
       gameOptions: GameOptions;
       inventory: {
         balls: Partial<Record<PokeballId, number>>;
@@ -68,10 +69,23 @@ export class SaveStateReconciler {
     state.playerName.val = existingSave.player.name || 'GOLD';
     state.playerGender.val = existingSave.player.gender || 'BOY';
     state.rivalName.val = existingSave.player.rivalName || existingSave.rivalName || 'SILVER';
-    const validParty = (existingSave.party || []).filter((p) => p && typeof p === 'object');
-    const validBox = (existingSave.box || []).filter((p) => p && typeof p === 'object');
+    const validParty = (existingSave.party || []).filter((p) => p && typeof p === 'object' && p.speciesId);
     state.playerParty.splice(0, state.playerParty.length, ...validParty);
-    state.playerBox.splice(0, state.playerBox.length, ...validBox);
+
+    const legacyBox = Array.isArray((existingSave as any).box)
+      ? (existingSave as any).box.filter((p: any) => p && typeof p === 'object' && p.speciesId)
+      : undefined;
+    const storageState = existingSave.storage || StorageManager.createDefaultStorage(legacyBox);
+    StorageManager.reconcilePartyAndStorageIntegrity(state.playerParty, storageState);
+
+    if (state.boxManager && typeof state.boxManager.setState === 'function') {
+      state.boxManager.setState(storageState);
+    }
+    const flattenedBoxes = StorageManager.flattenStorage(storageState);
+    if (state.playerBox) {
+      state.playerBox.splice(0, state.playerBox.length, ...flattenedBoxes);
+    }
+
     const normalizedOpts = SaveManager.normalizeOptions(existingSave.options, existingSave.player);
     Object.assign(state.gameOptions, normalizedOpts);
     state.inventory.balls = existingSave.inventory?.balls || {};
@@ -86,7 +100,7 @@ export class SaveStateReconciler {
     existingSave.seenSpecies?.forEach((s) => state.seenSpecies.add(s));
     if (state.caughtSpecies) existingSave.caughtSpecies?.forEach((s) => state.caughtSpecies!.add(s));
     state.playerParty.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
-    state.playerBox.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
+    flattenedBoxes.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
 
     state.overworldItemManager.setCollectedFlags([
       ...(existingSave.collectedItems || []),
@@ -224,6 +238,9 @@ export class SaveStateReconciler {
       battleSpeedMultiplier: gameClock.battleSpeed,
     });
 
+    const storageState = boxManager.getState();
+    StorageManager.reconcilePartyAndStorageIntegrity(playerParty, storageState);
+
     return {
       version: 1,
       timestamp: Date.now(),
@@ -243,8 +260,7 @@ export class SaveStateReconciler {
       },
       rivalName,
       party: playerParty,
-      box: boxManager.flatten(),
-      storage: boxManager.getState(),
+      storage: storageState,
       inventory: {
         balls: inventory.balls,
         items: inventory.items,

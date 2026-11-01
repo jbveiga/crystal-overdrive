@@ -203,7 +203,6 @@ export class SaveManager {
       },
       rivalName: 'SILVER',
       party: [],
-      box: [],
       storage: StorageManager.createDefaultStorage(),
       inventory: {
         balls: {
@@ -339,6 +338,17 @@ export class SaveManager {
 
   public async saveGame(data: SaveData): Promise<boolean> {
     try {
+      if (!Array.isArray(data.party)) {
+        data.party = [];
+      }
+      const legacyBox = Array.isArray((data as any).box)
+        ? (data as any).box.filter((p: any) => p && typeof p === 'object' && p.speciesId)
+        : undefined;
+      if (!data.storage) {
+        data.storage = StorageManager.createDefaultStorage(legacyBox);
+      }
+      delete (data as any).box;
+      StorageManager.reconcilePartyAndStorageIntegrity(data.party, data.storage);
       SaveManager.reconcileStarterFlags(data);
       data.timestamp = Date.now();
       this.memoryStore.set(SAVE_KEY, JSON.parse(JSON.stringify(data)));
@@ -433,10 +443,17 @@ export class SaveManager {
         try {
           if (Array.isArray(loaded.party)) {
             loaded.party = loaded.party.filter((p) => p && typeof p === 'object' && p.speciesId);
+          } else {
+            loaded.party = [];
           }
-          if (Array.isArray(loaded.box)) {
-            loaded.box = loaded.box.filter((p) => p && typeof p === 'object' && p.speciesId);
+          const legacyBox = Array.isArray((loaded as any).box)
+            ? (loaded as any).box.filter((p: any) => p && typeof p === 'object' && p.speciesId)
+            : undefined;
+          if (!loaded.storage) {
+            loaded.storage = StorageManager.createDefaultStorage(legacyBox);
           }
+          delete (loaded as any).box;
+          StorageManager.reconcilePartyAndStorageIntegrity(loaded.party, loaded.storage);
           SaveManager.reconcileStarterFlags(loaded);
           loaded.options = SaveManager.normalizeOptions(loaded.options, loaded.player);
           if (loaded.player && !loaded.player.rivalName && loaded.rivalName) {
@@ -454,9 +471,6 @@ export class SaveManager {
               }
             }
             loaded.inventory.tms = deduplicateAndSortTms(loaded.inventory.tms);
-          }
-          if (!loaded.storage) {
-            loaded.storage = StorageManager.createDefaultStorage(loaded.box);
           }
         } catch (normErr) {
           console.warn('Error normalizing loaded save:', normErr);

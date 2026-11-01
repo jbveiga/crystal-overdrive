@@ -103,6 +103,63 @@ export class StorageManager {
   }
 
   /**
+   * Ensures every PokemonInstance in party and storage.boxes has a unique ID,
+   * compacts party in-place without breaking array references, and removes any
+   * duplicate instance from storage.boxes that already exists in party or an earlier box slot.
+   */
+  public static reconcilePartyAndStorageIntegrity(
+    party: PokemonInstance[],
+    state: PokemonStorageState
+  ): void {
+    if (!Array.isArray(party) || !state || !Array.isArray(state.boxes)) return;
+
+    const validParty = party.filter(
+      (p): p is PokemonInstance => Boolean(p && typeof p === 'object' && p.speciesId)
+    );
+    party.splice(0, party.length, ...validParty);
+
+    const seenIds = new Set<string>();
+    const seenRefs = new Set<PokemonInstance>();
+
+    for (let i = 0; i < party.length; i++) {
+      const p = party[i];
+      const existingKey = p.uid || p.id;
+      if (!existingKey || seenIds.has(existingKey)) {
+        const freshKey = `${p.speciesId}_p${i}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        p.uid = freshKey;
+        if (p.id !== undefined) p.id = freshKey;
+      } else {
+        p.uid = existingKey;
+      }
+      seenIds.add(p.uid);
+      seenRefs.add(p);
+    }
+
+    for (let bIdx = 0; bIdx < state.boxes.length; bIdx++) {
+      const box = state.boxes[bIdx];
+      if (!box || !Array.isArray(box.pokemon)) continue;
+      for (let sIdx = 0; sIdx < this.BOX_CAPACITY; sIdx++) {
+        const pkmn = box.pokemon[sIdx];
+        if (!pkmn || typeof pkmn !== 'object' || !pkmn.speciesId) {
+          box.pokemon[sIdx] = null;
+          continue;
+        }
+        const key = pkmn.uid || pkmn.id;
+        if (seenRefs.has(pkmn) || (key && seenIds.has(key))) {
+          // Duplicate instance already in party or earlier box slot — purge duplicate
+          box.pokemon[sIdx] = null;
+          continue;
+        }
+        const finalKey =
+          key || `${pkmn.speciesId}_b${bIdx}s${sIdx}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+        pkmn.uid = finalKey;
+        seenIds.add(finalKey);
+        seenRefs.add(pkmn);
+      }
+    }
+  }
+
+  /**
    * Deposits a Pokémon into the current active box (or requested box).
    * Automatically rolls over to next available box if the current box is full.
    */
@@ -111,6 +168,21 @@ export class StorageManager {
     pokemon: PokemonInstance,
     targetBoxIndex?: number
   ): DepositResult {
+    const key =
+      pokemon.uid ||
+      pokemon.id ||
+      `${pokemon.speciesId}_dep_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    pokemon.uid = key;
+    // Remove any existing duplicate of this exact pokemon uid/id in boxes before depositing
+    for (const b of state.boxes) {
+      for (let i = 0; i < b.pokemon.length; i++) {
+        const slotPkmn = b.pokemon[i];
+        if (slotPkmn && (slotPkmn === pokemon || (slotPkmn.uid || slotPkmn.id) === key)) {
+          b.pokemon[i] = null;
+        }
+      }
+    }
+
     const startBox =
       typeof targetBoxIndex === 'number' && targetBoxIndex >= 0 && targetBoxIndex < this.TOTAL_BOXES
         ? targetBoxIndex
@@ -191,14 +263,16 @@ export class StorageManager {
 
       box.pokemon[slotIndex] = partyPkmn;
       party.splice(partyIndex, 1);
+      this.reconcilePartyAndStorageIntegrity(party, state);
       return true;
     }
 
     // Case 2: Withdraw from box to empty party slot
     if (!partyPkmn && boxPkmn) {
       if (party.length >= 6) return false;
-      party.push(boxPkmn);
       box.pokemon[slotIndex] = null;
+      party.push(boxPkmn);
+      this.reconcilePartyAndStorageIntegrity(party, state);
       return true;
     }
 
@@ -215,6 +289,7 @@ export class StorageManager {
 
       party[partyIndex] = boxPkmn;
       box.pokemon[slotIndex] = partyPkmn;
+      this.reconcilePartyAndStorageIntegrity(party, state);
       return true;
     }
 

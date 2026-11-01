@@ -109,7 +109,7 @@ async function bootstrap() {
     const playTimeBox = { val: playTimeSeconds }, playerNameBox = { val: playerName }, playerGenderBox = { val: playerGender }, rivalNameBox = { val: rivalName };
     const loc = SaveManager.hydrateGameState(saveData, {
       playTimeSeconds: playTimeBox, playerName: playerNameBox, playerGender: playerGenderBox, rivalName: rivalNameBox,
-      playerParty, playerBox, gameOptions, inventory, defeatedTrainers, visitedMaps, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
+      playerParty, playerBox, boxManager, gameOptions, inventory, defeatedTrainers, visitedMaps, storyFlags, seenSpecies, caughtSpecies, overworldItemManager,
       missionManager, gameClock, roamingManager,
     });
     playTimeSeconds = playTimeBox.val; playerName = playerNameBox.val; playerGender = playerGenderBox.val; rivalName = rivalNameBox.val;
@@ -145,7 +145,7 @@ async function bootstrap() {
 
   const lookupMap = (id: string) => mapManager.getMap(id);
   const getActiveMapNpcs = (mapId: string): GridEntity[] => activeNpcCache.getActiveNpcs(mapId, npcsByMap[mapId], storyFlags, isNpcActiveForStoryFlags);
-  const detectChosenStarterSpecies = () => OverworldTrainerSightAndTourController.detectChosenStarterSpecies(storyFlags, playerParty, playerBox, seenSpecies);
+  const detectChosenStarterSpecies = () => OverworldTrainerSightAndTourController.detectChosenStarterSpecies(storyFlags, playerParty, boxManager.flatten(), seenSpecies);
   const healPlayerParty = (playSound: boolean = true) => OverworldTrainerSightAndTourController.healParty(playerParty, playSound);
   const getCaughtSpeciesSet = () => {
     const allIds = new Set<string>(caughtSpecies);
@@ -225,9 +225,13 @@ async function bootstrap() {
       gameOptions, missionManager, dayCareManager, kurtCraftingManager, bugContestManager,
     });
     await saveManager.saveGame(saveData);
-    console.log('💾 Game saved.');
   };
-  const syncStorageAndSave = (_p: any, s?: any) => { if (s) boxManager.setState(s); void saveCurrentGame(); };
+  const syncStorageAndSave = (p?: PokemonInstance[], s?: any) => {
+    if (s) boxManager.setState(s);
+    if (p && p !== playerParty) playerParty.splice(0, playerParty.length, ...p.filter(Boolean));
+    playerBox.splice(0, playerBox.length, ...boxManager.flatten());
+    void saveCurrentGame();
+  };
 
   const getTransitionContext = (): OverworldTransitionContext => ({
     mapManager, overworldRenderer, overworldItemManager, missionManager, storyFlags, defeatedTrainers,
@@ -269,14 +273,8 @@ async function bootstrap() {
   if (!mapManager.isWalkable(initialPlayerX, initialPlayerY)) {
     initialMapId = 'new_bark_town';
     initialMap = mapManager.setCurrentMap(initialMapId);
-    initialPlayerX = 13;
-    initialPlayerY = 6;
-    player.x = 13;
-    player.y = 6;
-    player.targetX = 13;
-    player.targetY = 6;
-    player.renderX = 13;
-    player.renderY = 6;
+    initialPlayerX = 13; initialPlayerY = 6;
+    Object.assign(player, { x: 13, y: 6, targetX: 13, targetY: 6, renderX: 13, renderY: 6 });
   }
   missionManager.registerMapEntry(initialMap.id, storyFlags);
   mapManager.activateEncounterGracePeriod(MapManager.GRACE_STEPS_DEFAULT);
@@ -290,13 +288,14 @@ async function bootstrap() {
     roamingManager, gameClock, healPlayerParty, lookupMap, syncMapOverworldItems, mapManager,
   });
 
-  const addOverworldItemToInventory = (rawItemId: string) => OverworldTrainerSightAndTourController.addOverworldItemToInventory(getTrainerSightContext(), rawItemId);
-  const getApricornCount = (apricornId: string) => OverworldTrainerSightAndTourController.getApricornCount(getTrainerSightContext(), apricornId);
-  const deductApricorn = (apricornId: string, qty: number) => OverworldTrainerSightAndTourController.deductApricorn(getTrainerSightContext(), apricornId, qty);
-  const launchStadiumChallenge = (challengerId: string, cupId: string) => OverworldTrainerSightAndTourController.launchStadiumChallenge(challengerId, cupId, getTrainerSightContext());
-  const runTrainerSightSequence = (trainer: GridEntity) => OverworldTrainerSightAndTourController.runTrainerSightSequence(trainer, getCutsceneContext());
-  const completeSlowpokeWellProtonVictory = () => OverworldTrainerSightAndTourController.completeSlowpokeWellProtonVictory(getTrainerSightContext());
-  const runGuideGentWalkingTour = (guide: GridEntity) => OverworldTrainerSightAndTourController.runGuideGentWalkingTour(guide, getCutsceneContext());
+  const TST = OverworldTrainerSightAndTourController;
+  const addOverworldItemToInventory = (rawItemId: string) => TST.addOverworldItemToInventory(getTrainerSightContext(), rawItemId);
+  const getApricornCount = (apricornId: string) => TST.getApricornCount(getTrainerSightContext(), apricornId);
+  const deductApricorn = (apricornId: string, qty: number) => TST.deductApricorn(getTrainerSightContext(), apricornId, qty);
+  const launchStadiumChallenge = (challengerId: string, cupId: string) => TST.launchStadiumChallenge(challengerId, cupId, getTrainerSightContext());
+  const runTrainerSightSequence = (trainer: GridEntity) => TST.runTrainerSightSequence(trainer, getCutsceneContext());
+  const completeSlowpokeWellProtonVictory = () => TST.completeSlowpokeWellProtonVictory(getTrainerSightContext());
+  const runGuideGentWalkingTour = (guide: GridEntity) => TST.runGuideGentWalkingTour(guide, getCutsceneContext());
 
   const bagUI = new BagAndMartUI(
     'modal-container', inventory, playerParty,
@@ -466,14 +465,10 @@ async function bootstrap() {
 
       gameClock.playerSpeed = gameOptions.playerSpeedDefault;
       overworldHUD.updateSpeedDisplay(gameClock.playerSpeed);
-      bagUI.setSpeedMultiplier(gameClock.playerSpeed);
-      partyUI.setSpeedMultiplier(gameClock.playerSpeed);
-      startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
+      bagUI.setSpeedMultiplier(gameClock.playerSpeed); partyUI.setSpeedMultiplier(gameClock.playerSpeed); startMenuUI.setSpeedMultiplier(gameClock.playerSpeed);
 
       const startMap = mapManager.setCurrentMap('players_house_2f');
-      player.x = 7; player.y = 1; player.targetX = 7; player.targetY = 1;
-      player.renderX = 7; player.renderY = 1; player.direction = 'DOWN';
-      player.isMoving = false; player.progress = 0;
+      Object.assign(player, { x: 7, y: 1, targetX: 7, targetY: 1, renderX: 7, renderY: 1, direction: 'DOWN', isMoving: false, progress: 0 });
 
       await overworldRenderer.ensureMapTilesLoaded(startMap, lookupMap);
       overworldRenderer.renderMap(startMap, lookupMap);
@@ -577,7 +572,7 @@ async function bootstrap() {
     openStarterChoiceModal: (speciesId, name, type, onConfirm, onCancel) => overworldHUD.openStarterChoiceModal(speciesId, name, type, onConfirm, onCancel),
     openDialogue: (pages, speaker, onComplete) => overworldHUD.openDialogue(pages, speaker, onComplete),
     showToast: (msg) => overworldHUD.showToast(msg),
-    openPcStorage: () => boxManagementUI.open(playerParty, boxManager.getState(), { onSave: syncStorageAndSave, onClose: syncStorageAndSave }),
+    openPcStorage: () => boxManagementUI.open(playerParty, boxManager, { onSave: syncStorageAndSave, onClose: syncStorageAndSave }),
     openTownMap: (mapId, visited, roamers) => townMapUI.open(mapId, visited, roamers),
     openRuinsPuzzleModal: (callbacks) => ruinsPuzzleModalUI.open(callbacks),
     handleRuinsPuzzleSolve,
@@ -616,7 +611,7 @@ async function bootstrap() {
     playFieldRestAnimation: (onComplete) => overworldHUD.playFieldRestAnimation(onComplete),
     saveCurrentGame,
     openMart: (martId?: string) => bagUI.openMart(martId || mapManager.getCurrentMap()?.id),
-    openPcStorage: () => boxManagementUI.open(playerParty, boxManager.getState(), { onSave: syncStorageAndSave, onClose: syncStorageAndSave }),
+    openPcStorage: () => boxManagementUI.open(playerParty, boxManager, { onSave: syncStorageAndSave, onClose: syncStorageAndSave }),
     openTownMap: (mapId, visited, roamers) => townMapUI.open(mapId, visited, roamers),
     addOverworldItemToInventory,
     renderMap: (map) => overworldRenderer.renderMap(map, lookupMap),
