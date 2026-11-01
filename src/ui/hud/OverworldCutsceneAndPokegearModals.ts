@@ -31,7 +31,154 @@ export class OverworldCutsceneAndPokegearModals {
     const healOpen = healOverlay ? healOverlay.style.display === 'flex' : false;
     const fieldRestOverlay = this.ctx.rootElement.querySelector('#field-rest-overlay') as HTMLElement | null;
     const fieldRestOpen = fieldRestOverlay ? fieldRestOverlay.style.display === 'block' : false;
-    return starterOpen || healOpen || fieldRestOpen;
+    const tradeOverlay = this.ctx.rootElement.querySelector('#pokemon-trade-overlay') as HTMLElement | null;
+    const tradeOpen = tradeOverlay ? tradeOverlay.style.display === 'flex' : false;
+    return starterOpen || healOpen || fieldRestOpen || tradeOpen;
+  }
+
+  public playTradeAnimation(
+    params: {
+      givenSpeciesId: string;
+      givenName: string;
+      receivedSpeciesId: string;
+      receivedName: string;
+      traderName: string;
+    },
+    onComplete?: () => void
+  ): void {
+    this.ctx.onClearActiveDirection();
+    let overlay = this.ctx.rootElement.querySelector('#pokemon-trade-overlay') as HTMLDivElement | null;
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'pokemon-trade-overlay';
+      overlay.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(15, 23, 42, 0.88) 100%);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 68;
+        pointer-events: auto;
+      `;
+      this.ctx.rootElement.appendChild(overlay);
+    }
+
+    const givenSprite = `./assets/sprites/pokemon/${params.givenSpeciesId.toLowerCase()}_front.png`;
+    const receivedSprite = `./assets/sprites/pokemon/${params.receivedSpeciesId.toLowerCase()}_front.png`;
+
+    overlay.innerHTML = `
+      <div style="
+        width: min(420px, 92vw);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 29, 0.99) 100%);
+        border: 3px solid #38bdf8;
+        outline: 3px solid #1e293b;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.85), 0 0 28px rgba(56, 189, 248, 0.4);
+        border-radius: 14px;
+        padding: 20px 22px;
+        color: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+      ">
+        <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 1.2px;">🔄 LINK CABLE POKéMON TRADE</div>
+        <div style="
+          position: relative;
+          width: 100%;
+          height: 120px;
+          background: rgba(30, 41, 59, 0.85);
+          border: 1.5px solid rgba(56, 189, 248, 0.4);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+        ">
+          <div id="trade-cable-beam" style="
+            position: absolute;
+            width: 85%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #38bdf8, #facc15, #38bdf8, transparent);
+            box-shadow: 0 0 12px #38bdf8;
+            opacity: 0.85;
+          "></div>
+          <div id="trade-sprite-stage" style="
+            position: relative;
+            z-index: 2;
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(15, 23, 42, 0.95) 75%);
+            border: 2px solid #38bdf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.5);
+            transition: transform 0.32s ease, border-color 0.32s ease, box-shadow 0.32s ease;
+          ">
+            <img id="trade-pokemon-img" src="${givenSprite}" alt="${params.givenName}" onerror="this.onerror=null;this.src='./assets/sprites/pokemon/marill_front.png';" style="width: 68px; height: 68px; image-rendering: pixelated; object-fit: contain; transition: transform 0.28s ease, opacity 0.28s ease;" />
+          </div>
+        </div>
+        <div id="trade-status-caption" style="font-size: 14px; font-weight: 800; color: #e2e8f0; text-align: center; min-height: 22px;">
+          Sending ${params.givenName} to ${params.traderName}…
+        </div>
+      </div>
+    `;
+
+    overlay.style.display = 'flex';
+    BattleAudio.playCry(params.givenSpeciesId.toLowerCase());
+
+    setTimeout(() => {
+      const img = overlay?.querySelector('#trade-pokemon-img') as HTMLImageElement | null;
+      const stage = overlay?.querySelector('#trade-sprite-stage') as HTMLDivElement | null;
+      const caption = overlay?.querySelector('#trade-status-caption') as HTMLDivElement | null;
+      if (img) {
+        img.style.transform = 'scale(0.15) rotate(180deg)';
+        img.style.opacity = '0';
+      }
+      if (stage) {
+        stage.style.transform = 'scale(0.75)';
+        stage.style.borderColor = '#facc15';
+        stage.style.boxShadow = '0 0 24px rgba(250, 204, 21, 0.75)';
+      }
+      if (caption) {
+        caption.style.color = '#facc15';
+        caption.innerText = `⚡ Link Cable transfer in progress…`;
+      }
+      BattleAudio.playMenuSound('CONFIRM');
+    }, 650);
+
+    setTimeout(() => {
+      const img = overlay?.querySelector('#trade-pokemon-img') as HTMLImageElement | null;
+      const stage = overlay?.querySelector('#trade-sprite-stage') as HTMLDivElement | null;
+      const caption = overlay?.querySelector('#trade-status-caption') as HTMLDivElement | null;
+      if (img) {
+        img.src = receivedSprite;
+        img.alt = params.receivedName;
+        img.style.transform = 'scale(1) rotate(0deg)';
+        img.style.opacity = '1';
+      }
+      if (stage) {
+        stage.style.transform = 'scale(1.08)';
+        stage.style.borderColor = '#4ade80';
+        stage.style.boxShadow = '0 0 24px rgba(74, 222, 128, 0.75)';
+      }
+      if (caption) {
+        caption.style.color = '#4ade80';
+        caption.innerText = `✨ Received ${params.receivedName} from ${params.traderName}!`;
+      }
+      BattleAudio.playCry(params.receivedSpeciesId.toLowerCase());
+      BattleAudio.playOverworldSound('FANFARE');
+    }, 1300);
+
+    setTimeout(() => {
+      if (overlay) overlay.style.display = 'none';
+      if (onComplete) onComplete();
+    }, 2250);
   }
 
   public playFieldRestAnimation(onComplete?: () => void): void {

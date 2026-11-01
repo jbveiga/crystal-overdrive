@@ -26,6 +26,12 @@ export interface FieldObstacleContext {
   visitedMaps: Set<string>; roamingManager: RoamingManager; detectChosenStarterSpecies: () => string | null;
   openStarterChoiceModal: (speciesId: 'cyndaquil' | 'totodile' | 'chikorita', name: string, type: string, onConfirm: () => void, onCancel: () => void) => void;
   openDialogue: (pages: string[], speaker?: string, onComplete?: () => void) => void;
+  openChoiceDialogue?: (
+    pages: string[],
+    speaker: string | undefined,
+    onSelect: (choice: 'YES' | 'NO') => void,
+    options?: { yesLabel?: string; noLabel?: string; defaultChoice?: 'YES' | 'NO' }
+  ) => void;
   showToast: (msg: string) => void; openPcStorage: () => void;
   openTownMap: (mapId: string, visited: Set<string>, roamers: any) => void;
   openRuinsPuzzleModal: (callbacks: { onSolve: (puzzleId: string) => void; onClose: () => void }) => void;
@@ -125,6 +131,22 @@ export interface NpcInteractionContext {
   kurtCraftingManager?: KurtCraftingManager; boxManager?: BoxManager;
   lastVisitedPokecenter: { mapId: string; x: number; y: number }; setLastVisitedPokecenter: (loc: { mapId: string; x: number; y: number }) => void;
   openDialogue: (pages: string[], speaker?: string, onComplete?: () => void) => void;
+  openChoiceDialogue?: (
+    pages: string[],
+    speaker: string | undefined,
+    onSelect: (choice: 'YES' | 'NO') => void,
+    options?: { yesLabel?: string; noLabel?: string; defaultChoice?: 'YES' | 'NO' }
+  ) => void;
+  playTradeAnimation?: (
+    params: {
+      givenSpeciesId: string;
+      givenName: string;
+      receivedSpeciesId: string;
+      receivedName: string;
+      traderName: string;
+    },
+    onComplete?: () => void
+  ) => void;
   showToast: (msg: string) => void; healPlayerParty: (playAnim?: boolean) => void;
   playHealingAnimation: (partyCount?: number, onComplete?: () => void) => void;
   playFieldRestAnimation: (onComplete?: () => void) => void; saveCurrentGame: () => void;

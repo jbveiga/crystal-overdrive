@@ -9,6 +9,7 @@
 
 import type { Direction, SpeedMultiplier, RoamerState, TouchControlStyle } from '../types/game';
 import { eventBus } from '../core/EventBus';
+import { BattleAudio } from '../audio/BattleAudio';
 import { OverworldTouchAndKeyController } from './hud/OverworldTouchAndKeyController';
 import { OverworldCutsceneAndPokegearModals } from './hud/OverworldCutsceneAndPokegearModals';
 
@@ -63,6 +64,7 @@ export class OverworldHUD {
   private dialogueSpeaker!: HTMLDivElement;
   private dialogueText!: HTMLDivElement;
   private dialoguePrompt!: HTMLDivElement;
+  private dialogueChoiceBox!: HTMLDivElement;
   private dialoguePages: string[] = [];
   private dialoguePageIndex: number = 0;
   private dialogueCharIndex: number = 0;
@@ -71,6 +73,11 @@ export class OverworldHUD {
   private dialogueOnComplete?: () => void;
   private dialogueOnPageChange?: (pageIndex: number) => void;
   private dialogueActive: boolean = false;
+  private choicePending: boolean = false;
+  private choiceActive: boolean = false;
+  private choiceIndex: 0 | 1 = 0;
+  private choiceLabels: [string, string] = ['YES', 'NO'];
+  private choiceOnSelect?: (choice: 'YES' | 'NO') => void;
   private rootElement!: HTMLDivElement;
   private options: OverworldHUDOptions;
   private touchAndKeyController!: OverworldTouchAndKeyController;
@@ -98,10 +105,16 @@ export class OverworldHUD {
     this.touchAndKeyController = new OverworldTouchAndKeyController({
       rootElement: this.rootElement,
       isDialogueOpen: () => this.isDialogueOpen(),
+      isChoiceOpen: () => this.isChoiceOpen(),
+      moveChoiceCursor: (delta) => this.moveChoiceCursor(delta),
+      confirmChoice: () => this.confirmChoice(),
+      cancelChoice: () => this.cancelChoice(),
       isModalOpen: this.options.isModalOpen,
       isPokegearOpen: () => this.isPokegearOpen(),
       onInteract: () => {
-        if (this.dialogueActive) {
+        if (this.choiceActive) {
+          this.confirmChoice();
+        } else if (this.dialogueActive) {
           this.advanceDialogue();
         } else if (this.options.onInteract) {
           this.options.onInteract();
@@ -378,6 +391,56 @@ export class OverworldHUD {
           <div id="dialogue-speaker" style="display: none; background: #0284c7; border: 2px solid #f8fafc; color: #ffffff; font-size: 12px; font-weight: 800; letter-spacing: 0.6px; padding: 3px 10px; border-radius: 6px; width: fit-content; margin-bottom: 8px; text-transform: uppercase;"></div>
           <div id="dialogue-text" style="font-size: 17px; font-weight: 600; line-height: 1.5; min-height: 52px; color: #f8fafc; letter-spacing: 0.2px; white-space: pre-wrap;"></div>
           <div id="dialogue-prompt" style="display: flex; justify-content: flex-end; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: #38bdf8; margin-top: 6px;"></div>
+          <div id="dialogue-choice-box" style="
+            display: none;
+            position: absolute;
+            right: 12px;
+            bottom: calc(100% + 8px);
+            min-width: 132px;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(10, 15, 29, 0.99) 100%);
+            border: 3px solid #f8fafc;
+            outline: 3px solid #1e293b;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 0 2px #38bdf8;
+            border-radius: 8px;
+            padding: 8px 10px;
+            flex-direction: column;
+            gap: 4px;
+            z-index: 48;
+            pointer-events: auto;
+          ">
+            <button type="button" id="dialogue-choice-yes" data-choice="YES" style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              width: 100%;
+              background: transparent;
+              border: none;
+              border-radius: 5px;
+              padding: 6px 10px;
+              color: #f8fafc;
+              font-size: 15px;
+              font-weight: 800;
+              letter-spacing: 0.5px;
+              cursor: pointer;
+              text-align: left;
+            "><span id="dialogue-choice-cursor-0" style="color: #38bdf8; width: 14px; display: inline-block;">▶</span><span id="dialogue-choice-label-0">YES</span></button>
+            <button type="button" id="dialogue-choice-no" data-choice="NO" style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              width: 100%;
+              background: transparent;
+              border: none;
+              border-radius: 5px;
+              padding: 6px 10px;
+              color: #f8fafc;
+              font-size: 15px;
+              font-weight: 800;
+              letter-spacing: 0.5px;
+              cursor: pointer;
+              text-align: left;
+            "><span id="dialogue-choice-cursor-1" style="color: #38bdf8; width: 14px; display: inline-block;"></span><span id="dialogue-choice-label-1">NO</span></button>
+          </div>
         </div>
 
         <div id="desktop-controls-bar" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -403,6 +466,24 @@ export class OverworldHUD {
     this.dialogueSpeaker = this.rootElement.querySelector('#dialogue-speaker') as HTMLDivElement;
     this.dialogueText = this.rootElement.querySelector('#dialogue-text') as HTMLDivElement;
     this.dialoguePrompt = this.rootElement.querySelector('#dialogue-prompt') as HTMLDivElement;
+    this.dialogueChoiceBox = this.rootElement.querySelector('#dialogue-choice-box') as HTMLDivElement;
+
+    const choiceYesBtn = this.rootElement.querySelector('#dialogue-choice-yes') as HTMLButtonElement | null;
+    const choiceNoBtn = this.rootElement.querySelector('#dialogue-choice-no') as HTMLButtonElement | null;
+    choiceYesBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!this.choiceActive) return;
+      this.choiceIndex = 0;
+      this.renderChoiceBoxCursor();
+      this.confirmChoice();
+    });
+    choiceNoBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!this.choiceActive) return;
+      this.choiceIndex = 1;
+      this.renderChoiceBoxCursor();
+      this.confirmChoice();
+    });
 
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', () => {
@@ -467,6 +548,19 @@ export class OverworldHUD {
     this.cutsceneModals.playHealingAnimation(partyCount, onComplete);
   }
 
+  public playTradeAnimation(
+    params: {
+      givenSpeciesId: string;
+      givenName: string;
+      receivedSpeciesId: string;
+      receivedName: string;
+      traderName: string;
+    },
+    onComplete?: () => void
+  ): void {
+    this.cutsceneModals.playTradeAnimation(params, onComplete);
+  }
+
   public openStarterChoiceModal(
     speciesId: 'cyndaquil' | 'totodile' | 'chikorita',
     speciesLabel: string,
@@ -477,14 +571,122 @@ export class OverworldHUD {
     this.cutsceneModals.openStarterChoiceModal(speciesId, speciesLabel, typeLabel, onConfirm, onCancel);
   }
 
+  public isChoiceOpen(): boolean {
+    return this.choiceActive;
+  }
+
+  private renderChoiceBoxCursor(): void {
+    if (!this.dialogueChoiceBox) return;
+    const cursor0 = this.dialogueChoiceBox.querySelector('#dialogue-choice-cursor-0') as HTMLElement | null;
+    const cursor1 = this.dialogueChoiceBox.querySelector('#dialogue-choice-cursor-1') as HTMLElement | null;
+    const btn0 = this.dialogueChoiceBox.querySelector('#dialogue-choice-yes') as HTMLElement | null;
+    const btn1 = this.dialogueChoiceBox.querySelector('#dialogue-choice-no') as HTMLElement | null;
+    const label0 = this.dialogueChoiceBox.querySelector('#dialogue-choice-label-0') as HTMLElement | null;
+    const label1 = this.dialogueChoiceBox.querySelector('#dialogue-choice-label-1') as HTMLElement | null;
+
+    if (label0) label0.innerText = this.choiceLabels[0];
+    if (label1) label1.innerText = this.choiceLabels[1];
+    if (cursor0) cursor0.innerText = this.choiceIndex === 0 ? '▶' : '';
+    if (cursor1) cursor1.innerText = this.choiceIndex === 1 ? '▶' : '';
+    if (btn0) btn0.style.background = this.choiceIndex === 0 ? 'rgba(56, 189, 248, 0.2)' : 'transparent';
+    if (btn1) btn1.style.background = this.choiceIndex === 1 ? 'rgba(56, 189, 248, 0.2)' : 'transparent';
+  }
+
+  private showPendingChoiceIfReady(): void {
+    if (
+      this.choicePending &&
+      this.dialoguePageIndex === this.dialoguePages.length - 1 &&
+      this.dialogueCharIndex >= (this.dialoguePages[this.dialoguePageIndex] || '').length
+    ) {
+      this.choiceActive = true;
+      this.renderChoiceBoxCursor();
+      if (this.dialogueChoiceBox) {
+        this.dialogueChoiceBox.style.display = 'flex';
+      }
+      this.dialoguePrompt.innerHTML = '<span>▲/▼ Select • A/Enter Confirm</span>';
+      this.dialoguePrompt.style.opacity = '1';
+    }
+  }
+
+  public moveChoiceCursor(delta: -1 | 1): void {
+    if (!this.choiceActive) return;
+    const next: 0 | 1 = delta < 0 ? 0 : 1;
+    if (next !== this.choiceIndex) {
+      this.choiceIndex = next;
+      BattleAudio.playMenuSound('CURSOR');
+      this.renderChoiceBoxCursor();
+    }
+  }
+
+  public confirmChoice(): void {
+    if (!this.choiceActive) return;
+    const selected: 'YES' | 'NO' = this.choiceIndex === 0 ? 'YES' : 'NO';
+    BattleAudio.playMenuSound(selected === 'YES' ? 'CONFIRM' : 'CANCEL');
+    this.finalizeChoice(selected);
+  }
+
+  public cancelChoice(): void {
+    if (!this.choiceActive) return;
+    this.choiceIndex = 1;
+    this.renderChoiceBoxCursor();
+    BattleAudio.playMenuSound('CANCEL');
+    this.finalizeChoice('NO');
+  }
+
+  private finalizeChoice(selected: 'YES' | 'NO'): void {
+    if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
+    this.dialogueTypeTimer = undefined;
+    this.choicePending = false;
+    this.choiceActive = false;
+    if (this.dialogueChoiceBox) {
+      this.dialogueChoiceBox.style.display = 'none';
+    }
+    this.dialogueActive = false;
+    this.dialogueBox.style.display = 'none';
+    this.touchAndKeyController.computeActiveDirection();
+
+    const cb = this.choiceOnSelect;
+    this.choiceOnSelect = undefined;
+    if (cb) cb(selected);
+  }
+
+  public openChoiceDialogue(
+    pages: string[],
+    speaker: string | undefined,
+    onSelect: (choice: 'YES' | 'NO') => void,
+    options?: { yesLabel?: string; noLabel?: string; defaultChoice?: 'YES' | 'NO' }
+  ): void {
+    if (!pages || pages.length === 0) return;
+    this.choicePending = true;
+    this.choiceActive = false;
+    this.choiceIndex = options?.defaultChoice === 'NO' ? 1 : 0;
+    this.choiceLabels = [options?.yesLabel || 'YES', options?.noLabel || 'NO'];
+    this.choiceOnSelect = onSelect;
+    if (this.dialogueChoiceBox) {
+      this.dialogueChoiceBox.style.display = 'none';
+    }
+
+    this.openDialogue(pages, speaker, undefined, undefined, true);
+  }
+
   public openDialogue(
     pages: string[],
     speaker?: string,
     onComplete?: () => void,
-    onPageChange?: (pageIndex: number) => void
+    onPageChange?: (pageIndex: number) => void,
+    keepChoicePending: boolean = false
   ): void {
     if (!pages || pages.length === 0) return;
     if (this.dialogueTypeTimer) clearInterval(this.dialogueTypeTimer);
+
+    if (!keepChoicePending) {
+      this.choicePending = false;
+      this.choiceActive = false;
+      this.choiceOnSelect = undefined;
+      if (this.dialogueChoiceBox) {
+        this.dialogueChoiceBox.style.display = 'none';
+      }
+    }
 
     this.dialoguePages = pages;
     this.dialoguePageIndex = 0;
@@ -514,6 +716,7 @@ export class OverworldHUD {
       this.dialogueText.innerText = fullText;
       this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
       this.dialoguePrompt.style.opacity = '1';
+      this.showPendingChoiceIfReady();
       return;
     }
 
@@ -525,6 +728,7 @@ export class OverworldHUD {
         this.dialogueTypeTimer = undefined;
         this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
         this.dialoguePrompt.style.opacity = '1';
+        this.showPendingChoiceIfReady();
       }
     }, charDelay);
   }
@@ -542,6 +746,12 @@ export class OverworldHUD {
         this.dialoguePages.length > 1 ? `(${this.dialoguePageIndex + 1}/${this.dialoguePages.length}) ` : '';
       this.dialoguePrompt.innerHTML = this.getDialogueContinuePromptHtml(pageLabel);
       this.dialoguePrompt.style.opacity = '1';
+      this.showPendingChoiceIfReady();
+      return;
+    }
+
+    if (this.choiceActive) {
+      this.confirmChoice();
       return;
     }
 
@@ -551,6 +761,11 @@ export class OverworldHUD {
       if (this.dialogueOnPageChange) {
         this.dialogueOnPageChange(this.dialoguePageIndex);
       }
+      return;
+    }
+
+    if (this.choicePending) {
+      this.showPendingChoiceIfReady();
       return;
     }
 

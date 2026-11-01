@@ -60,6 +60,7 @@ import { OverworldWarpAndMapTransitionController } from './world/OverworldWarpAn
 import { OverworldTrainerSightAndTourController } from './world/OverworldTrainerSightAndTourController';
 import { OverworldTickerCoordinator } from './world/OverworldTickerCoordinator';
 import { OverworldModalRegistry } from './ui/OverworldModalRegistry';
+import { resolveFlyDestination } from './world/townMapData';
 declare global {
   interface Window {
     updateLoaderProgress?: (pct: number, label: string) => void;
@@ -353,6 +354,24 @@ async function bootstrap() {
     getPlayTimeSeconds: () => playTimeSeconds, getOverworldHUD: () => overworldHUD,
     getPartyUI: () => partyUI, getBagUI: () => bagUI, getMissionLogUI: () => missionLogUI,
     getNamingModalUI: () => namingModalUI, saveCurrentGame, saveManager, launchStadiumChallenge,
+    onFlyToLandmark: async (landmark, pokemonName) => {
+      const dest = resolveFlyDestination(landmark.id);
+      if (!dest) return;
+      lastVisitedPokecenter = {
+        mapId: dest.pokecenterMapId,
+        x: dest.pokecenterX,
+        y: dest.pokecenterY,
+      };
+      overworldHUD.showToast(`🦅 ${pokemonName || 'POKéMON'} used FLY to ${landmark.name.toUpperCase()}!`);
+      await executeWarpTransition({
+        x: player.x,
+        y: player.y,
+        targetMapId: dest.mapId,
+        targetX: dest.x,
+        targetY: dest.y,
+        direction: 'DOWN',
+      });
+    },
     cyclePlayerSpeed, cycleBattleSpeed, setBattleSpeed, cycleTextSpeed, setTextSpeed,
   });
 
@@ -571,6 +590,7 @@ async function bootstrap() {
     detectChosenStarterSpecies: () => detectChosenStarterSpecies() || null,
     openStarterChoiceModal: (speciesId, name, type, onConfirm, onCancel) => overworldHUD.openStarterChoiceModal(speciesId, name, type, onConfirm, onCancel),
     openDialogue: (pages, speaker, onComplete) => overworldHUD.openDialogue(pages, speaker, onComplete),
+    openChoiceDialogue: (pages, speaker, onSelect, options) => overworldHUD.openChoiceDialogue(pages, speaker, onSelect, options),
     showToast: (msg) => overworldHUD.showToast(msg),
     openPcStorage: () => boxManagementUI.open(playerParty, boxManager, { onSave: syncStorageAndSave, onClose: syncStorageAndSave }),
     openTownMap: (mapId, visited, roamers) => townMapUI.open(mapId, visited, roamers),
@@ -605,6 +625,8 @@ async function bootstrap() {
     setRivalName: (name: string) => { rivalName = name; },
     setLastVisitedPokecenter: (loc) => { lastVisitedPokecenter = loc; },
     openDialogue: (pages, speaker, onComplete) => overworldHUD.openDialogue(pages, speaker, onComplete),
+    openChoiceDialogue: (pages, speaker, onSelect, options) => overworldHUD.openChoiceDialogue(pages, speaker, onSelect, options),
+    playTradeAnimation: (params, onComplete) => overworldHUD.playTradeAnimation(params, onComplete),
     showToast: (msg) => overworldHUD.showToast(msg),
     healPlayerParty: (playAnim) => healPlayerParty(playAnim),
     playHealingAnimation: (partyCount, onComplete) => overworldHUD.playHealingAnimation(partyCount, onComplete),

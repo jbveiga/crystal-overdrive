@@ -56,68 +56,110 @@ export function getVioletAndAzaleaServiceInteractions(): NpcInteractionRegistrat
           return true;
         }
 
+        const findBellsprout = () => {
+          const partyIdx = ctx.playerParty.findIndex((p) => p.speciesId === 'bellsprout');
+          const boxState = ctx.boxManager?.getState();
+          let boxFound: { boxIdx: number; slotIdx: number; level: number } | null = null;
+          if (partyIdx === -1 && boxState) {
+            for (let b = 0; b < boxState.boxes.length; b++) {
+              const idx = boxState.boxes[b].pokemon.findIndex((p) => p.speciesId === 'bellsprout');
+              if (idx !== -1) {
+                boxFound = { boxIdx: b, slotIdx: idx, level: boxState.boxes[b].pokemon[idx].level };
+                break;
+              }
+            }
+          }
+          return { partyIdx, boxState, boxFound };
+        };
+
+        const executeKyleTrade = () => {
+          const { partyIdx, boxState, boxFound } = findBellsprout();
+          if (partyIdx === -1 && !boxFound) {
+            BattleAudio.playMenuSound('CANCEL');
+            ctx.openDialogue(
+              [
+                "KYLE: Awww! You don't have a BELLSPROUT!",
+                'You can catch wild BELLSPROUT in the tall grass on ROUTE 31 or ROUTE 32. Come back when you have one!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          const tradeLevel =
+            partyIdx !== -1 ? Math.max(5, ctx.playerParty[partyIdx].level) : Math.max(5, boxFound!.level);
+          const rockyOnix = PokemonFactory.create('onix', tradeLevel);
+          rockyOnix.nickname = 'ROCKY';
+          rockyOnix.heldItem = 'persim-berry';
+
+          if (partyIdx !== -1) {
+            ctx.playerParty[partyIdx] = rockyOnix;
+          } else if (boxFound && boxState) {
+            boxState.boxes[boxFound.boxIdx].pokemon[boxFound.slotIdx] = rockyOnix;
+          }
+
+          ctx.storyFlags.add('traded_onix_rocky');
+          ctx.missionManager.checkStoryFlags(ctx.storyFlags);
+
+          const finishTradeDialogue = () => {
+            BattleAudio.playOverworldSound('FANFARE');
+            ctx.showToast('🪨 Traded BELLSPROUT for ONIX ("ROCKY")!');
+            ctx.saveCurrentGame();
+
+            ctx.openDialogue(
+              [
+                'KYLE: Yay! Thanks! We traded BELLSPROUT for ONIX!',
+                'Take good care of ROCKY! Rock-type moves are super effective against FALKNER at the VIOLET GYM!',
+              ],
+              targetNpc.speaker
+            );
+          };
+
+          if (ctx.playTradeAnimation) {
+            ctx.playTradeAnimation(
+              {
+                givenSpeciesId: 'bellsprout',
+                givenName: 'BELLSPROUT',
+                receivedSpeciesId: 'onix',
+                receivedName: 'ONIX (ROCKY)',
+                traderName: 'KYLE',
+              },
+              finishTradeDialogue
+            );
+          } else {
+            finishTradeDialogue();
+          }
+        };
+
+        const cancelKyleTrade = () => {
+          BattleAudio.playMenuSound('CANCEL');
+          ctx.openDialogue(["KYLE: Oh, you don't want to trade? That's okay then."], targetNpc.speaker);
+        };
+
+        if (ctx.openChoiceDialogue) {
+          ctx.openChoiceDialogue(
+            ['KYLE: I collect POKéMON! Do you have a BELLSPROUT?', 'Want to trade your BELLSPROUT for my ONIX?'],
+            targetNpc.speaker,
+            (choice) => {
+              if (choice === 'YES') {
+                executeKyleTrade();
+              } else {
+                cancelKyleTrade();
+              }
+            }
+          );
+          return true;
+        }
+
         ctx.openDialogue(
           ['KYLE: I collect POKéMON! Do you have a BELLSPROUT?', 'Want to trade your BELLSPROUT for my ONIX?'],
           targetNpc.speaker,
           () => {
-            const partyIdx = ctx.playerParty.findIndex((p) => p.speciesId === 'bellsprout');
-            const boxState = ctx.boxManager?.getState();
-            let boxFound: { boxIdx: number; slotIdx: number; level: number } | null = null;
-            if (partyIdx === -1 && boxState) {
-              for (let b = 0; b < boxState.boxes.length; b++) {
-                const idx = boxState.boxes[b].pokemon.findIndex((p) => p.speciesId === 'bellsprout');
-                if (idx !== -1) {
-                  boxFound = { boxIdx: b, slotIdx: idx, level: boxState.boxes[b].pokemon[idx].level };
-                  break;
-                }
-              }
-            }
-
+            const { partyIdx } = findBellsprout();
             ctx.openKyleTradeModal({
               bellsproutIndex: partyIdx,
-              onConfirm: () => {
-                if (partyIdx === -1 && !boxFound) {
-                  BattleAudio.playMenuSound('CANCEL');
-                  ctx.openDialogue(
-                    [
-                      "KYLE: Awww! You don't have a BELLSPROUT!",
-                      'You can catch wild BELLSPROUT in the tall grass on ROUTE 31 or ROUTE 32. Come back when you have one!',
-                    ],
-                    targetNpc.speaker
-                  );
-                  return;
-                }
-
-                const tradeLevel =
-                  partyIdx !== -1 ? Math.max(5, ctx.playerParty[partyIdx].level) : Math.max(5, boxFound!.level);
-                const rockyOnix = PokemonFactory.create('onix', tradeLevel);
-                rockyOnix.nickname = 'ROCKY';
-                rockyOnix.heldItem = 'persim-berry';
-
-                if (partyIdx !== -1) {
-                  ctx.playerParty[partyIdx] = rockyOnix;
-                } else if (boxFound && boxState) {
-                  boxState.boxes[boxFound.boxIdx].pokemon[boxFound.slotIdx] = rockyOnix;
-                }
-
-                ctx.storyFlags.add('traded_onix_rocky');
-                ctx.missionManager.checkStoryFlags(ctx.storyFlags);
-                BattleAudio.playOverworldSound('FANFARE');
-                ctx.showToast('🪨 Traded BELLSPROUT for ONIX ("ROCKY")!');
-                ctx.saveCurrentGame();
-
-                ctx.openDialogue(
-                  [
-                    'KYLE: Yay! Thanks! We traded BELLSPROUT for ONIX!',
-                    'Take good care of ROCKY! Rock-type moves are super effective against FALKNER at the VIOLET GYM!',
-                  ],
-                  targetNpc.speaker
-                );
-              },
-              onCancel: () => {
-                BattleAudio.playMenuSound('CANCEL');
-                ctx.openDialogue(["KYLE: Oh, you don't want to trade? That's okay then."], targetNpc.speaker);
-              },
+              onConfirm: executeKyleTrade,
+              onCancel: cancelKyleTrade,
             });
           }
         );

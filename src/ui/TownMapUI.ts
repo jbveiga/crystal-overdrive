@@ -99,7 +99,15 @@ export class TownMapUI {
     focusLandmarkId?: string
   ): void {
     this.currentMapId = currentMapId;
-    this.visitedLandmarkIds = new Set(visitedLandmarks);
+    this.visitedLandmarkIds = new Set();
+    for (const rawId of visitedLandmarks) {
+      if (!rawId) continue;
+      this.visitedLandmarkIds.add(rawId);
+      const resolved = resolveCurrentLandmark(rawId);
+      if (resolved) {
+        this.visitedLandmarkIds.add(resolved.id);
+      }
+    }
     this.activeRoamers = activeRoamers;
 
     // Resolve current player landmark with comprehensive interior map resolution

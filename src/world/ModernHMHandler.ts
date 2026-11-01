@@ -120,7 +120,8 @@ const STRENGTH_COMPATIBLE_SPECIES = new Set<string>([
 const FLY_COMPATIBLE_SPECIES = new Set<string>([
   'pidgey', 'pidgeotto', 'pidgeot', 'spearow', 'fearow', 'zubat', 'golbat', 'crobat',
   'farfetchd', 'doduo', 'dodrio', 'aerodactyl', 'dragonite', 'hoothoot', 'noctowl',
-  'togetic', 'xatu', 'natu', 'murkrow', 'skarmory', 'charizard', 'lugia', 'ho-oh', 'mew',
+  'togetic', 'xatu', 'natu', 'murkrow', 'skarmory', 'delibird', 'charizard',
+  'articuno', 'zapdos', 'moltres', 'lugia', 'ho-oh', 'hooh', 'mew',
 ]);
 
 const WHIRLPOOL_COMPATIBLE_SPECIES = new Set<string>([
@@ -446,9 +447,10 @@ export class ModernHMHandler {
   public static checkFly(
     inventory: BagInventory,
     storyFlags: Set<string>,
-    party: PokemonInstance[]
+    party: PokemonInstance[],
+    autoHm: boolean = false
   ): HMFieldCheckResult {
-    return ModernHMFieldChecks.checkFly(inventory, storyFlags, party);
+    return ModernHMFieldChecks.checkFly(inventory, storyFlags, party, autoHm);
   }
 
   public static canUseWhirlpool(

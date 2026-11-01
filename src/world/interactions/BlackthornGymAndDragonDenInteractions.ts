@@ -373,6 +373,116 @@ export const handleBlackthornGymStatue: NpcInteractionHandler = (targetNpc: Grid
 };
 
 /**
+ * 7. Blackthorn City: Emy's Dragonair for Dodrio ("DORIS") Trade
+ */
+export const handleBlackthornEmyTrade: NpcInteractionHandler = (
+  targetNpc: GridEntity,
+  _currentMap: MapData,
+  ctx: NpcInteractionContext
+) => {
+  const speaker = targetNpc?.speaker || '👧 EMY';
+  if (
+    ctx.storyFlags.has('traded_dodrio_doris') ||
+    ctx.storyFlags.has('EVENT_TRADED_EMY_DODRIO')
+  ) {
+    ctx.openDialogue(
+      ['EMY: How is my DODRIO doing? DORIS loves running across open plains!'],
+      speaker
+    );
+    return true;
+  }
+
+  const executeEmyTrade = () => {
+    const dragonairIdx = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'dragonair');
+    if (dragonairIdx === -1) {
+      BattleAudio.playMenuSound('CANCEL');
+      ctx.openDialogue(
+        [
+          "EMY: Oh, you don't have a DRAGONAIR with you!",
+          "You can find wild DRATINI and DRAGONAIR in the DRAGON'S DEN!",
+        ],
+        speaker
+      );
+      return;
+    }
+
+    const tradeLevel = Math.max(30, ctx.playerParty[dragonairIdx].level);
+    const dodrio = PokemonFactory.create('dodrio', tradeLevel, ['triattack', 'drillpeck', 'pursuit', 'agility']);
+    dodrio.nickname = 'DORIS';
+    dodrio.heldItem = 'smoke-ball';
+    dodrio.originalTrainer = 'EMY';
+
+    ctx.playerParty[dragonairIdx] = dodrio;
+    ctx.storyFlags.add('traded_dodrio_doris');
+    ctx.storyFlags.add('EVENT_TRADED_EMY_DODRIO');
+
+    const finishTradeDialogue = () => {
+      BattleAudio.playOverworldSound('FANFARE');
+      ctx.openDialogue(
+        [
+          'EMY: Yay! A real DRAGONAIR! Thank you so much!',
+          `${ctx.playerName} traded DRAGONAIR for EMY's DODRIO (DORIS)!`,
+          'EMY: Take good care of DORIS! She is holding a SMOKE BALL too!',
+        ],
+        speaker,
+        () => {
+          ctx.saveCurrentGame();
+          ctx.showToast('🐦 Traded DRAGONAIR for EMY’s DODRIO (DORIS)!');
+        }
+      );
+    };
+
+    if (ctx.playTradeAnimation) {
+      ctx.playTradeAnimation(
+        {
+          givenSpeciesId: 'dragonair',
+          givenName: 'DRAGONAIR',
+          receivedSpeciesId: 'dodrio',
+          receivedName: 'DODRIO (DORIS)',
+          traderName: 'EMY',
+        },
+        finishTradeDialogue
+      );
+    } else {
+      finishTradeDialogue();
+    }
+  };
+
+  if (ctx.openChoiceDialogue) {
+    ctx.openChoiceDialogue(
+      [
+        "EMY: I really want a DRAGONAIR! Do you have one?",
+        'Would you trade your DRAGONAIR for my prized DODRIO (DORIS)?',
+      ],
+      speaker,
+      (choice) => {
+        if (choice === 'YES') {
+          executeEmyTrade();
+        } else {
+          BattleAudio.playMenuSound('CANCEL');
+          ctx.openDialogue(["EMY: Awww, you don't want to trade? That's too bad..."], speaker);
+        }
+      }
+    );
+    return true;
+  }
+
+  const dragonairIdx = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'dragonair');
+  if (dragonairIdx === -1) {
+    ctx.openDialogue(
+      [
+        'EMY: I really want a DRAGONAIR! Do you have one?',
+        'Would you trade your DRAGONAIR for my prized DODRIO (DORIS)?',
+      ],
+      speaker
+    );
+    return true;
+  }
+  executeEmyTrade();
+  return true;
+};
+
+/**
  * Registers all Blackthorn Gym and Dragon's Den interactions for O(1) routing.
  */
 export function getBlackthornGymAndDragonDenInteractions(): NpcInteractionRegistration[] {
@@ -410,6 +520,11 @@ export function getBlackthornGymAndDragonDenInteractions(): NpcInteractionRegist
       actions: ['BLACKTHORN_GYM_STATUE'],
       npcIds: ['blackthorn_gym_1f_statue_left', 'blackthorn_gym_1f_statue_right'],
       handler: handleBlackthornGymStatue,
+    },
+    {
+      actions: ['EMY_TRADE'],
+      npcIds: ['blackthorn_emys_house_lass_0', 'blackthorn_emy'],
+      handler: handleBlackthornEmyTrade,
     },
   ];
 }

@@ -149,7 +149,7 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("blackthorn_dragon_speech_house_granny_0",2,3,"DOWN","teacher","GRANNY",[D5]),
   ],
   "blackthorn_emys_house": [
-    n("blackthorn_emys_house_lass_0",2,3,"DOWN","girl","LASS",[D5]),
+    n("blackthorn_emys_house_lass_0",2,3,"DOWN","girl","👧 EMY",["EMY: I really want a DRAGONAIR! Would you trade one for my DODRIO?"],{"action":"EMY_TRADE"}),
   ],
   "blackthorn_mart": [
     n("blackthorn_mart_clerk_0",1,3,"RIGHT","boy","🏪 CLERK",[D13], {"action":"OPEN_MART","counter":true}),

@@ -323,35 +323,107 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
           );
           return true;
         }
-        ctx.openDialogue(
-          [
-            'QUIZ RECEPTIONIST: Welcome to GOLDENROD RADIO TOWER!',
-            'We are running a special promotional campaign! Answer our 5-question radio certification quiz to earn the official RADIO CARD for your POKéGEAR!',
-          ],
-          targetNpc.speaker,
-          () => {
-            ctx.openRadioTowerQuizModal({
-              onComplete: () => {
-                ctx.storyFlags.add('has_radio_card');
-                ctx.storyFlags.add('ENGINE_RADIO_CARD');
-                ctx.storyFlags.add('HAS_RADIO_CARD');
-                if (!ctx.inventory.keyItems) ctx.inventory.keyItems = [];
-                if (!ctx.inventory.keyItems.includes('RADIO CARD')) ctx.inventory.keyItems.push('RADIO CARD');
-                BattleAudio.playOverworldSound('KEY_ITEM');
+
+        const awardRadioCard = () => {
+          ctx.storyFlags.add('has_radio_card');
+          ctx.storyFlags.add('ENGINE_RADIO_CARD');
+          ctx.storyFlags.add('HAS_RADIO_CARD');
+          if (!ctx.inventory.keyItems) ctx.inventory.keyItems = [];
+          if (!ctx.inventory.keyItems.includes('RADIO CARD')) ctx.inventory.keyItems.push('RADIO CARD');
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          ctx.openDialogue(
+            [
+              'QUIZ RECEPTIONIST: Ding-ding-ding! You got all 5 questions right! Congratulations!',
+              `${ctx.playerName} received the RADIO CARD for the POKéGEAR!`,
+              'QUIZ RECEPTIONIST: You can now tune into music, news, and Pokémon talk shows anywhere across Johto!',
+            ],
+            targetNpc.speaker,
+            () => {
+              ctx.saveCurrentGame();
+              ctx.showToast('📻 Upgraded POKéGEAR with RADIO CARD!');
+            }
+          );
+        };
+
+        if (!ctx.openChoiceDialogue) {
+          ctx.openDialogue(
+            [
+              'QUIZ RECEPTIONIST: Welcome to GOLDENROD RADIO TOWER!',
+              'We are running a special promotional campaign! Answer our 5-question radio certification quiz to earn the official RADIO CARD for your POKéGEAR!',
+            ],
+            targetNpc.speaker,
+            () => {
+              ctx.openRadioTowerQuizModal({ onComplete: awardRadioCard });
+            }
+          );
+          return true;
+        }
+
+        const quizQuestions: Array<{ question: string; expected: 'YES' | 'NO' }> = [
+          {
+            question: 'Question 1: Can you check the Town Map using your POKéGEAR?',
+            expected: 'YES',
+          },
+          {
+            question: 'Question 2: Is the POKéMON NIDORINA always female?',
+            expected: 'YES',
+          },
+          {
+            question: 'Question 3: Does KURT the POKé BALL creator use BERRIES to craft his custom balls?',
+            expected: 'NO',
+          },
+          {
+            question: 'Question 4: Is TM01 DynamicPunch effective against Normal-type POKéMON?',
+            expected: 'YES',
+          },
+          {
+            question: "Question 5: In PROF. OAK's POKéMON TALK, does he co-host the show alongside DJ BEN?",
+            expected: 'NO',
+          },
+        ];
+
+        const askQuizQuestion = (idx: number) => {
+          const item = quizQuestions[idx];
+          ctx.openChoiceDialogue!(
+            [`QUIZ RECEPTIONIST: ${item.question}`],
+            targetNpc.speaker,
+            (choice) => {
+              if (choice !== item.expected) {
+                BattleAudio.playMenuSound('CANCEL');
                 ctx.openDialogue(
                   [
-                    'QUIZ RECEPTIONIST: Congratulations! You got all 5 questions right!',
-                    `${ctx.playerName} received the RADIO CARD for the POKéGEAR!`,
-                    'QUIZ RECEPTIONIST: You can now tune into music, news, and Pokémon talk shows anywhere across Johto!',
+                    'QUIZ RECEPTIONIST: Oh, dear! That was the wrong answer!',
+                    'Please try again anytime from the first question!',
                   ],
-                  targetNpc.speaker,
-                  () => {
-                    ctx.saveCurrentGame();
-                    ctx.showToast('📻 Upgraded POKéGEAR with RADIO CARD!');
-                  }
+                  targetNpc.speaker
                 );
-              },
-            });
+                return;
+              }
+              BattleAudio.playMenuSound('CONFIRM');
+              if (idx + 1 < quizQuestions.length) {
+                askQuizQuestion(idx + 1);
+              } else {
+                awardRadioCard();
+              }
+            }
+          );
+        };
+
+        ctx.openChoiceDialogue(
+          [
+            'QUIZ RECEPTIONIST: Welcome to GOLDENROD RADIO TOWER!',
+            'We have a special quiz campaign! Answer 5 questions correctly to win a RADIO CARD! Would you like to take the quiz?',
+          ],
+          targetNpc.speaker,
+          (startChoice) => {
+            if (startChoice === 'NO') {
+              ctx.openDialogue(
+                ['QUIZ RECEPTIONIST: Oh, I see. Please come back whenever you want to take the quiz!'],
+                targetNpc.speaker
+              );
+              return;
+            }
+            askQuizQuestion(0);
           }
         );
         return true;
@@ -376,8 +448,18 @@ export function getGoldenrodAndRoute34Interactions(): NpcInteractionRegistration
             x: ctx.player.x,
             y: ctx.player.y,
             targetMapId,
-            targetX: targetMapId === 'goldenrod_dept_store_roof' ? 13 : 2,
-            targetY: targetMapId === 'goldenrod_dept_store_roof' ? 2 : 1,
+            targetX:
+              targetMapId === 'goldenrod_dept_store_roof'
+                ? 13
+                : targetMapId === 'goldenrod_underground_warehouse'
+                  ? 17
+                  : 2,
+            targetY:
+              targetMapId === 'goldenrod_dept_store_roof'
+                ? 2
+                : targetMapId === 'goldenrod_underground_warehouse'
+                  ? 2
+                  : 1,
             direction: 'DOWN',
           });
         });

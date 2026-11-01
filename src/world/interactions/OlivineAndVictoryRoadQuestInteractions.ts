@@ -138,39 +138,91 @@ export function getOlivineAndVictoryRoadQuestInteractions(): NpcInteractionRegis
           return true;
         }
 
+        const executeTimTrade = () => {
+          const krabbyIndex = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'krabby');
+          if (krabbyIndex === -1) {
+            BattleAudio.playMenuSound('CANCEL');
+            ctx.openDialogue(
+              [
+                "TIM: Oh, you don't have a KRABBY with you!",
+                'Try fishing or smashing rocks along the coast to catch a KRABBY!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          const voltorb = PokemonFactory.create('voltorb', 20, ['tackle', 'screech', 'sonicboom', 'spark']);
+          voltorb.nickname = 'VOLTY';
+          voltorb.heldItem = 'cheri-berry';
+          voltorb.originalTrainer = 'TIM';
+
+          ctx.playerParty[krabbyIndex] = voltorb;
+          ctx.storyFlags.add('EVENT_TRADED_TIM_VOLTORB');
+
+          const finishTradeDialogue = () => {
+            BattleAudio.playOverworldSound('FANFARE');
+            ctx.openDialogue(
+              [
+                'TIM: Wow! A real KRABBY! Thank you so much!',
+                `${ctx.playerName} traded KRABBY for TIM's VOLTORB (VOLTY)!`,
+                "TIM: Take good care of VOLTY! It's super fast!",
+              ],
+              targetNpc.speaker,
+              () => {
+                ctx.saveCurrentGame();
+                ctx.showToast('⚡ Traded KRABBY for TIM’s VOLTORB (VOLTY)!');
+              }
+            );
+          };
+
+          if (ctx.playTradeAnimation) {
+            ctx.playTradeAnimation(
+              {
+                givenSpeciesId: 'krabby',
+                givenName: 'KRABBY',
+                receivedSpeciesId: 'voltorb',
+                receivedName: 'VOLTORB (VOLTY)',
+                traderName: 'TIM',
+              },
+              finishTradeDialogue
+            );
+          } else {
+            finishTradeDialogue();
+          }
+        };
+
+        if (ctx.openChoiceDialogue) {
+          ctx.openChoiceDialogue(
+            [
+              'TIM: I love sea POKéMON! Do you have a KRABBY?',
+              "If you trade me a KRABBY, I'll give you my prized VOLTORB (VOLTY)! Would you like to trade?",
+            ],
+            targetNpc.speaker,
+            (choice) => {
+              if (choice === 'YES') {
+                executeTimTrade();
+              } else {
+                BattleAudio.playMenuSound('CANCEL');
+                ctx.openDialogue(["TIM: Oh, you don't want to trade? Let me know if you change your mind!"], targetNpc.speaker);
+              }
+            }
+          );
+          return true;
+        }
+
         const krabbyIndex = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'krabby');
         if (krabbyIndex === -1) {
           ctx.openDialogue(
             [
-              "TIM: I love sea POKéMON! Do you have a KRABBY?",
+              'TIM: I love sea POKéMON! Do you have a KRABBY?',
               "If you trade me a KRABBY, I'll give you my prized VOLTORB (VOLTY)!",
             ],
             targetNpc.speaker
           );
           return true;
         }
-
-        const voltorb = PokemonFactory.create('voltorb', 20, ['tackle', 'screech', 'sonicboom', 'spark']);
-        voltorb.nickname = 'VOLTY';
-        voltorb.heldItem = 'cheri-berry';
-        voltorb.originalTrainer = 'TIM';
-
-        ctx.playerParty[krabbyIndex] = voltorb;
-        ctx.storyFlags.add('EVENT_TRADED_TIM_VOLTORB');
-        BattleAudio.playOverworldSound('FANFARE');
-
-        ctx.openDialogue(
-          [
-            'TIM: Wow! A real KRABBY! Thank you so much!',
-            `${ctx.playerName} traded KRABBY for TIM's VOLTORB (VOLTY)!`,
-            "TIM: Take good care of VOLTY! It's super fast!",
-          ],
-          targetNpc.speaker,
-          () => {
-            ctx.saveCurrentGame();
-            ctx.showToast('⚡ Traded KRABBY for TIM’s VOLTORB (VOLTY)!');
-          }
-        );
+        executeTimTrade();
         return true;
       },
     },

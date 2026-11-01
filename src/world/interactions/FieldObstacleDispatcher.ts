@@ -50,10 +50,13 @@ export class FieldObstacleDispatcher {
   ): boolean {
     // Dept Store Elevator Interaction Trigger
     if (
-      currentMap.id.startsWith('goldenrod_dept_store_') &&
-      currentMap.id !== 'goldenrod_dept_store_roof' &&
-      (facingX === 2 || facingX === 3) &&
-      facingY === 0 &&
+      ((currentMap.id.startsWith('goldenrod_dept_store_') &&
+        currentMap.id !== 'goldenrod_dept_store_roof' &&
+        (facingX === 2 || facingX === 3) &&
+        facingY === 0) ||
+        (currentMap.id === 'goldenrod_underground_warehouse' &&
+          (facingX === 16 || facingX === 17) &&
+          facingY === 0)) &&
       ctx.openDeptElevatorModal
     ) {
       ctx.openDeptElevatorModal(currentMap.id, (targetMapId) => {
@@ -62,8 +65,18 @@ export class FieldObstacleDispatcher {
             x: ctx.player.x,
             y: ctx.player.y,
             targetMapId,
-            targetX: targetMapId === 'goldenrod_dept_store_roof' ? 13 : 2,
-            targetY: targetMapId === 'goldenrod_dept_store_roof' ? 2 : 1,
+            targetX:
+              targetMapId === 'goldenrod_dept_store_roof'
+                ? 13
+                : targetMapId === 'goldenrod_underground_warehouse'
+                  ? 17
+                  : 2,
+            targetY:
+              targetMapId === 'goldenrod_dept_store_roof'
+                ? 2
+                : targetMapId === 'goldenrod_underground_warehouse'
+                  ? 2
+                  : 1,
             direction: 'DOWN',
           });
         }
@@ -281,15 +294,85 @@ export class FieldObstacleDispatcher {
       // Dept Store Elevator Panel bgEvent (Issue #29 & #33)
       if (bgEvent.action === 'DEPT_ELEVATOR_PANEL' || bgEvent.action === 'DEPT_ELEVATOR') {
         const curMap = ctx.mapManager.getCurrentMap();
-        ctx.openDeptElevatorModal(curMap?.id || 'goldenrod_dept_store_1f', (targetMapId) => {
+        ctx.openDeptElevatorModal?.(curMap?.id || 'goldenrod_dept_store_1f', (targetMapId) => {
           if (targetMapId === curMap?.id) {
             ctx.openDialogue(['You are already on this floor!'], bgEvent.speaker);
             return;
           }
           ctx.executeWarpTransition?.({
-            x: ctx.player.x, y: ctx.player.y, targetMapId, targetX: 2, targetY: 1, direction: 'DOWN',
+            x: ctx.player.x,
+            y: ctx.player.y,
+            targetMapId,
+            targetX:
+              targetMapId === 'goldenrod_dept_store_roof'
+                ? 13
+                : targetMapId === 'goldenrod_underground_warehouse'
+                  ? 17
+                  : 2,
+            targetY:
+              targetMapId === 'goldenrod_dept_store_roof'
+                ? 2
+                : targetMapId === 'goldenrod_underground_warehouse'
+                  ? 2
+                  : 1,
+            direction: 'DOWN',
           });
         });
+        return true;
+      }
+
+      // Goldenrod Underground Switch Room Switches
+      if (
+        currentMap.id === 'goldenrod_underground_switch_room_entrances' &&
+        (bgEvent.speaker?.toUpperCase().includes('SWITCH') || bgEvent.action?.toUpperCase().includes('SWITCH'))
+      ) {
+        let flagName = 'SWITCH_1_ON';
+        let label = 'SWITCH 1';
+        if (facingX === 10 || bgEvent.speaker?.includes('2')) {
+          flagName = 'SWITCH_2_ON';
+          label = 'SWITCH 2';
+        } else if (facingX === 2 || bgEvent.speaker?.includes('3')) {
+          flagName = 'SWITCH_3_ON';
+          label = 'SWITCH 3';
+        } else if (facingX === 20 || bgEvent.speaker?.toUpperCase().includes('EMERGENCY')) {
+          flagName = 'SWITCH_EMERGENCY_ON';
+          label = 'EMERGENCY SWITCH';
+        }
+
+        const toggleSwitch = () => {
+          const wasOn = ctx.storyFlags.has(flagName);
+          if (wasOn) {
+            ctx.storyFlags.delete(flagName);
+          } else {
+            ctx.storyFlags.add(flagName);
+          }
+          BattleAudio.playMenuSound('CONFIRM');
+          const stateText = wasOn ? 'Turned it OFF.' : 'Turned it ON.';
+          ctx.openDialogue(
+            [`Click! ${stateText}`],
+            bgEvent.speaker || `🔌 ${label}`,
+            () => {
+              ctx.saveCurrentGame();
+            }
+          );
+        };
+
+        if (ctx.openChoiceDialogue) {
+          const isCurrentlyOn = ctx.storyFlags.has(flagName);
+          ctx.openChoiceDialogue(
+            [`It's labeled ${label} (currently ${isCurrentlyOn ? 'ON' : 'OFF'}). Press it?`],
+            bgEvent.speaker || `🔌 ${label}`,
+            (choice) => {
+              if (choice === 'YES') {
+                toggleSwitch();
+              } else {
+                ctx.openDialogue(['Left the switch alone.'], bgEvent.speaker || `🔌 ${label}`);
+              }
+            }
+          );
+        } else {
+          toggleSwitch();
+        }
         return true;
       }
 

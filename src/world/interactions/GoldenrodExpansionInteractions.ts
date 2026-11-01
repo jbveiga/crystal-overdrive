@@ -236,39 +236,87 @@ export function getGoldenrodExpansionInteractions(): NpcInteractionRegistration[
           return true;
         }
 
-        const drowzeeIdx = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'drowzee');
-        if (drowzeeIdx === -1) {
-          ctx.openDialogue(
-            [
-              "MIKE: Hi! I'm looking for a DROWZEE! Would you trade one for my MACHOP?",
-            ],
-            targetNpc.speaker
+        const executeMikeTrade = () => {
+          const drowzeeIdx = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'drowzee');
+          if (drowzeeIdx === -1) {
+            BattleAudio.playMenuSound('CANCEL');
+            ctx.openDialogue(
+              [
+                "MIKE: Awww, you don't have a DROWZEE with you!",
+                'You can catch wild DROWZEE on ROUTE 34 or ROUTE 35. Come back if you find one!',
+              ],
+              targetNpc.speaker
+            );
+            return;
+          }
+
+          const machop = PokemonFactory.create('machop', 15, ['karatechop', 'lowkick', 'leer', 'focusenergy']);
+          machop.nickname = 'CHRIS';
+          machop.heldItem = 'gold-berry';
+          machop.originalTrainer = 'MIKE';
+          machop.otId = '25740';
+          ctx.playerParty[drowzeeIdx] = machop;
+          ctx.storyFlags.add('traded_machop_chris');
+          ctx.storyFlags.add('EVENT_TRADED_MACHOP_CHRIS');
+          ctx.storyFlags.add('EVENT_TRADED_MIKE_MACHOP');
+
+          const finishTradeDialogue = () => {
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            ctx.openDialogue(
+              [
+                'MIKE: Whoa! Thank you so much for the DROWZEE!',
+                `${ctx.playerName} traded DROWZEE for MIKE's MACHOP (CHRIS)!`,
+                'MIKE: Take good care of CHRIS! It has tremendous Fighting power!',
+              ],
+              targetNpc.speaker,
+              () => {
+                ctx.saveCurrentGame?.();
+                ctx.showToast?.('🔄 Traded DROWZEE for MIKE’s MACHOP (CHRIS)!');
+              }
+            );
+          };
+
+          if (ctx.playTradeAnimation) {
+            ctx.playTradeAnimation(
+              {
+                givenSpeciesId: 'drowzee',
+                givenName: 'DROWZEE',
+                receivedSpeciesId: 'machop',
+                receivedName: 'MACHOP (CHRIS)',
+                traderName: 'MIKE',
+              },
+              finishTradeDialogue
+            );
+          } else {
+            finishTradeDialogue();
+          }
+        };
+
+        if (ctx.openChoiceDialogue) {
+          ctx.openChoiceDialogue(
+            ["MIKE: Hi! I'm looking for a DROWZEE! Would you trade one for my MACHOP?"],
+            targetNpc.speaker,
+            (choice) => {
+              if (choice === 'YES') {
+                executeMikeTrade();
+              } else {
+                BattleAudio.playMenuSound('CANCEL');
+                ctx.openDialogue(["MIKE: Oh, you don't want to trade? Maybe next time!"], targetNpc.speaker);
+              }
+            }
           );
           return true;
         }
 
-        const machop = PokemonFactory.create('machop', 15, ['karatechop', 'lowkick', 'leer', 'focusenergy']);
-        machop.nickname = 'CHRIS';
-        machop.heldItem = 'gold-berry';
-        machop.originalTrainer = 'MIKE';
-        machop.otId = '25740';
-        ctx.playerParty[drowzeeIdx] = machop;
-        ctx.storyFlags.add('traded_machop_chris');
-        ctx.storyFlags.add('EVENT_TRADED_MACHOP_CHRIS');
-        ctx.storyFlags.add('EVENT_TRADED_MIKE_MACHOP');
-        BattleAudio.playOverworldSound('KEY_ITEM');
-        ctx.openDialogue(
-          [
-            'MIKE: Whoa! Thank you so much for the DROWZEE!',
-            `${ctx.playerName} traded DROWZEE for MIKE's MACHOP (CHRIS)!`,
-            'MIKE: Take good care of CHRIS! It has tremendous Fighting power!',
-          ],
-          targetNpc.speaker,
-          () => {
-            ctx.saveCurrentGame?.();
-            ctx.showToast?.('🔄 Traded DROWZEE for MIKE’s MACHOP (CHRIS)!');
-          }
-        );
+        const drowzeeIdx = ctx.playerParty.findIndex((p) => p.speciesId.toLowerCase() === 'drowzee');
+        if (drowzeeIdx === -1) {
+          ctx.openDialogue(
+            ["MIKE: Hi! I'm looking for a DROWZEE! Would you trade one for my MACHOP?"],
+            targetNpc.speaker
+          );
+          return true;
+        }
+        executeMikeTrade();
         return true;
       },
     },

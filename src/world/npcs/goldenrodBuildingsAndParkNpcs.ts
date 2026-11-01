@@ -117,10 +117,11 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       ),
     ],
     radio_tower_1f: [
-      makeNpc('radio_rec', 5, 6, 'DOWN', 'teacher', '📻 QUIZ RECEPTIONIST', 
+      makeNpc('radio_rec', 5, 6, 'UP', 'teacher', '📻 QUIZ RECEPTIONIST', 
         [
           'Welcome to GOLDENROD RADIO TOWER! Tune your POKéGEAR to our broadcast frequencies to hear daily music and tips!',
-        ]
+        ],
+        { talkAcrossCounter: true }
       ),
     ],
     radio_tower_2f: [
@@ -235,6 +236,10 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
           "Take this CARD KEY! It will unlock the 3F security shutters in the RADIO TOWER so you can stop them!",
         ],
         { action: 'UNDERGROUND_REAL_DIRECTOR' }
+      ),
+      makeNpc('dept_elevator_b1f', 16, 1, 'DOWN', 'clerk', '🛗 ELEVATOR ATTENDANT',
+        ['ELEVATOR ATTENDANT: Welcome to the GOLDENROD DEPT. STORE B1F service elevator! Which floor would you like to visit?'],
+        { action: 'DEPT_ELEVATOR' }
       ),
     ],
     route_35: [

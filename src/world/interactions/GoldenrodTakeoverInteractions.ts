@@ -64,19 +64,39 @@ export const handleShutterSwitches: NpcInteractionHandler = (targetNpc, _map, ct
     label = 'EMERGENCY SWITCH';
   }
 
-  const wasOn = ctx.storyFlags.has(flagName);
-  if (wasOn) {
-    ctx.storyFlags.delete(flagName);
-  } else {
-    ctx.storyFlags.add(flagName);
+  const toggleSwitch = () => {
+    const wasOn = ctx.storyFlags.has(flagName);
+    if (wasOn) {
+      ctx.storyFlags.delete(flagName);
+    } else {
+      ctx.storyFlags.add(flagName);
+    }
+
+    BattleAudio.playMenuSound('CONFIRM');
+    const stateText = wasOn ? 'Turned it OFF.' : 'Turned it ON.';
+    ctx.openDialogue(
+      [`It's labeled ${label}. Click! ${stateText}`],
+      targetNpc.speaker || '🔌 WALL SWITCH'
+    );
+  };
+
+  if (ctx.openChoiceDialogue) {
+    const isCurrentlyOn = ctx.storyFlags.has(flagName);
+    ctx.openChoiceDialogue(
+      [`It's labeled ${label} (currently ${isCurrentlyOn ? 'ON' : 'OFF'}). Press it?`],
+      targetNpc.speaker || '🔌 WALL SWITCH',
+      (choice) => {
+        if (choice === 'YES') {
+          toggleSwitch();
+        } else {
+          ctx.openDialogue(['Left the switch alone.'], targetNpc.speaker || '🔌 WALL SWITCH');
+        }
+      }
+    );
+    return true;
   }
 
-  BattleAudio.playMenuSound('CONFIRM');
-  const stateText = wasOn ? 'Turned it OFF.' : 'Turned it ON.';
-  ctx.openDialogue(
-    [`It's labeled ${label}. Click! ${stateText}`],
-    targetNpc.speaker || '🔌 WALL SWITCH'
-  );
+  toggleSwitch();
   return true;
 };
 

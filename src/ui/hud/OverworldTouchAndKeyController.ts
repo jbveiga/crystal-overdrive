@@ -12,6 +12,10 @@ import type { Direction, TouchControlStyle, SpeedMultiplier } from '../../types/
 export interface TouchAndKeyControllerOptions {
   rootElement: HTMLElement;
   isDialogueOpen: () => boolean;
+  isChoiceOpen?: () => boolean;
+  moveChoiceCursor?: (delta: -1 | 1) => void;
+  confirmChoice?: () => void;
+  cancelChoice?: () => void;
   isModalOpen?: () => boolean;
   isPokegearOpen?: () => boolean;
   onInteract?: () => void;
@@ -248,6 +252,19 @@ export class OverworldTouchAndKeyController {
     };
 
     const updateTouchDir = (dir: Direction | null) => {
+      if (this.opts.isChoiceOpen?.()) {
+        if (dir !== null && dir !== this.touchDirection) {
+          if (dir === 'UP' || dir === 'LEFT') {
+            this.opts.moveChoiceCursor?.(-1);
+          } else if (dir === 'DOWN' || dir === 'RIGHT') {
+            this.opts.moveChoiceCursor?.(1);
+          }
+        }
+        this.touchDirection = dir;
+        if (dir === null) resetJoystickKnob();
+        highlightDpadSegment(dir);
+        return;
+      }
       if (dir !== null && dir !== this.touchDirection) {
         const currentFacing = this.getPlayerDirection();
         if (dir === currentFacing) {
@@ -308,7 +325,9 @@ export class OverworldTouchAndKeyController {
 
     const triggerButtonA = (e: Event) => {
       e.preventDefault();
-      if (this.opts.isDialogueOpen()) {
+      if (this.opts.isChoiceOpen?.()) {
+        this.opts.confirmChoice?.();
+      } else if (this.opts.isDialogueOpen()) {
         if (this.opts.advanceDialogue) this.opts.advanceDialogue();
       } else if (this.opts.onInteract) {
         this.opts.onInteract();
@@ -322,6 +341,10 @@ export class OverworldTouchAndKeyController {
 
     const triggerButtonB = (e: Event) => {
       e.preventDefault();
+      if (this.opts.isChoiceOpen?.()) {
+        this.opts.cancelChoice?.();
+        return;
+      }
       if (this.opts.isDialogueOpen()) {
         if (this.opts.advanceDialogue) this.opts.advanceDialogue();
         return;
@@ -350,6 +373,29 @@ export class OverworldTouchAndKeyController {
           if (this.opts.updateSpeedDisplay) this.opts.updateSpeedDisplay(nextSpeed);
         }
         return;
+      }
+
+      if (this.opts.isChoiceOpen?.() && this.opts.isVisible()) {
+        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'ArrowLeft' || e.code === 'KeyA') {
+          e.preventDefault();
+          if (!e.repeat) this.opts.moveChoiceCursor?.(-1);
+          return;
+        }
+        if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'ArrowRight' || e.code === 'KeyD') {
+          e.preventDefault();
+          if (!e.repeat) this.opts.moveChoiceCursor?.(1);
+          return;
+        }
+        if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyZ' || e.code === 'KeyE') {
+          e.preventDefault();
+          if (!e.repeat) this.opts.confirmChoice?.();
+          return;
+        }
+        if (e.code === 'Escape' || e.code === 'KeyX' || e.code === 'Backspace') {
+          e.preventDefault();
+          if (!e.repeat) this.opts.cancelChoice?.();
+          return;
+        }
       }
 
       if (e.code === 'Escape' && !e.repeat && this.opts.isVisible() && !this.opts.isDialogueOpen()) {

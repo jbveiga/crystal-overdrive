@@ -160,10 +160,13 @@ export class OverworldTickerCoordinator {
 
           // Goldenrod Dept. Store Elevator Step Trigger
           if (
-            currentMap?.id.startsWith('goldenrod_dept_store_') &&
-            currentMap.id !== 'goldenrod_dept_store_roof' &&
-            coord.x === 2 &&
-            coord.y === 0
+            (currentMap?.id.startsWith('goldenrod_dept_store_') &&
+              currentMap.id !== 'goldenrod_dept_store_roof' &&
+              coord.x === 2 &&
+              coord.y === 0) ||
+            (currentMap?.id === 'goldenrod_underground_warehouse' &&
+              coord.x === 17 &&
+              coord.y === 0)
           ) {
             ctx.openDeptElevatorModal?.(currentMap.id, (targetMapId) => {
               if (targetMapId !== currentMap.id) {
@@ -171,8 +174,18 @@ export class OverworldTickerCoordinator {
                   x: player.x,
                   y: player.y,
                   targetMapId,
-                  targetX: targetMapId === 'goldenrod_dept_store_roof' ? 13 : 2,
-                  targetY: targetMapId === 'goldenrod_dept_store_roof' ? 2 : 1,
+                  targetX:
+                    targetMapId === 'goldenrod_dept_store_roof'
+                      ? 13
+                      : targetMapId === 'goldenrod_underground_warehouse'
+                        ? 17
+                        : 2,
+                  targetY:
+                    targetMapId === 'goldenrod_dept_store_roof'
+                      ? 2
+                      : targetMapId === 'goldenrod_underground_warehouse'
+                        ? 2
+                        : 1,
                   direction: 'DOWN',
                 });
               }
