@@ -43299,29 +43299,29 @@
     "connections": {},
     "warps": [
       {
-        "x": 2,
-        "y": 7,
-        "targetMapId": "route_34",
-        "targetX": 12,
-        "targetY": 16
-      },
-      {
-        "x": 3,
-        "y": 7,
-        "targetMapId": "route_34",
-        "targetX": 12,
-        "targetY": 16
-      },
-      {
         "x": 0,
         "y": 5,
         "targetMapId": "route_34",
-        "targetX": 13,
-        "targetY": 15
+        "targetX": 11,
+        "targetY": 14
       },
       {
         "x": 0,
         "y": 6,
+        "targetMapId": "route_34",
+        "targetX": 11,
+        "targetY": 15
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "targetMapId": "route_34",
+        "targetX": 12,
+        "targetY": 15
+      },
+      {
+        "x": 3,
+        "y": 7,
         "targetMapId": "route_34",
         "targetX": 13,
         "targetY": 15
@@ -275369,22 +275369,15 @@
         "x": 11,
         "y": 14,
         "targetMapId": "day_care",
-        "targetX": 2,
-        "targetY": 7
+        "targetX": 0,
+        "targetY": 5
       },
       {
         "x": 11,
         "y": 15,
         "targetMapId": "day_care",
-        "targetX": 3,
-        "targetY": 7
-      },
-      {
-        "x": 13,
-        "y": 15,
-        "targetMapId": "day_care",
         "targetX": 0,
-        "targetY": 5
+        "targetY": 6
       },
       {
         "x": 12,
@@ -275394,11 +275387,11 @@
         "targetY": 7
       },
       {
-        "x": 10,
+        "x": 13,
         "y": 15,
         "targetMapId": "day_care",
-        "targetX": 0,
-        "targetY": 5
+        "targetX": 3,
+        "targetY": 7
       }
     ],
     "bgEvents": [

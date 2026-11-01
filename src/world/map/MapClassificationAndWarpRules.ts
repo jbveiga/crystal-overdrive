@@ -144,12 +144,12 @@ export function getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): 
   if (isOutdoorMap(currentMap.id)) return null;
   if (warp.direction) return warp.direction;
 
-  // Check lateral West/East doorway thresholds first when not on the top/bottom 2-tile rows
-  // Fixes Issue #50: horizontal gatehouses (10x8) have bottom-lane warps at (0, 5) and (9, 5) where y === height - 3
-  if (warp.x <= 1 && warp.y > 1 && warp.y < currentMap.height - 2) {
+  // Check lateral West/East doorway thresholds first when not on the top/bottom boundary row
+  // Fixes Issue #50 & #61: horizontal gatehouses and day_care (10x8) have lateral warps at (0, 5) and (0, 6)
+  if (warp.x <= 1 && warp.y > 1 && warp.y < currentMap.height - 1) {
     return 'LEFT';
   }
-  if (warp.x >= currentMap.width - 2 && warp.y > 1 && warp.y < currentMap.height - 2) {
+  if (warp.x >= currentMap.width - 2 && warp.y > 1 && warp.y < currentMap.height - 1) {
     return 'RIGHT';
   }
 
@@ -176,7 +176,7 @@ export function getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): 
  */
 export function isCarpetWarp(warp: WarpEvent, currentMap: MapData): boolean {
   if (isOutdoorMap(currentMap.id)) return false;
-  if ((warp.x <= 1 || warp.x >= currentMap.width - 2) && warp.y > 1 && warp.y < currentMap.height - 2) {
+  if ((warp.x <= 1 || warp.x >= currentMap.width - 2) && warp.y > 1 && warp.y < currentMap.height - 1) {
     return false;
   }
   return warp.y >= currentMap.height - 2 || (warp.y >= currentMap.height - 3 && isOutdoorMap(warp.targetMapId));

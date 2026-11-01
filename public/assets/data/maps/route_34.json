@@ -3276,22 +3276,15 @@
       "x": 11,
       "y": 14,
       "targetMapId": "day_care",
-      "targetX": 2,
-      "targetY": 7
+      "targetX": 0,
+      "targetY": 5
     },
     {
       "x": 11,
       "y": 15,
       "targetMapId": "day_care",
-      "targetX": 3,
-      "targetY": 7
-    },
-    {
-      "x": 13,
-      "y": 15,
-      "targetMapId": "day_care",
       "targetX": 0,
-      "targetY": 5
+      "targetY": 6
     },
     {
       "x": 12,
@@ -3301,11 +3294,11 @@
       "targetY": 7
     },
     {
-      "x": 10,
+      "x": 13,
       "y": 15,
       "targetMapId": "day_care",
-      "targetX": 0,
-      "targetY": 5
+      "targetX": 3,
+      "targetY": 7
     }
   ],
   "bgEvents": [
