@@ -16,8 +16,12 @@ import { PokemonFactory } from '../battle/PokemonFactory';
 import { ItemfinderRadar } from './ItemfinderRadar';
 import type { OverworldTickerContext } from '../types/gameContext';
 
+import { isEcruteakGymSafeTile } from './ecruteakGymMaze';
+
 export class OverworldItemfinderAndNpcStepper {
   private static directions: Direction[] = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
+  private static horizontalDirs: Direction[] = ['LEFT', 'RIGHT'];
+  private static verticalDirs: Direction[] = ['UP', 'DOWN'];
 
   public static isTileWalkableForPlayer(
     x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>
@@ -31,14 +35,53 @@ export class OverworldItemfinderAndNpcStepper {
   }
 
   public static isTileWalkableForActiveMapNpc(
-    x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>
+    x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>,
+    npcEntity?: GridEntity
   ): boolean {
     if (!mapManager.isWalkableInBounds(x, y)) return false;
     const activeMap = mapManager.getCurrentMap();
     if (activeMap && overworldItemManager.isSolidObstacle(activeMap.id, x, y, storyFlags)) {
       return false;
     }
+    // Never allow wandering NPCs to step onto warp/door/staircase/hole tiles
+    if (mapManager.checkWarp({ x, y })) {
+      return false;
+    }
+    // Never allow wandering NPCs in Ecruteak Gym to step off the safe path
+    if (activeMap?.id === 'ecruteak_gym' && y >= 4 && y <= 15 && !isEcruteakGymSafeTile(x, y)) {
+      return false;
+    }
+    // Enforce Gen 2 origin bounding box (wanderRadius around originX/originY)
+    if (npcEntity) {
+      const ox = npcEntity.originX ?? npcEntity.x;
+      const oy = npcEntity.originY ?? npcEntity.y;
+      const radius = npcEntity.wanderRadius ?? 1;
+      if (Math.abs(x - ox) > radius || Math.abs(y - oy) > radius) {
+        return false;
+      }
+      // Prevent NPCs from stepping into a 1-tile-wide choke point where opposite sides are solid walls
+      const leftWalk = mapManager.isWalkableInBounds(x - 1, y);
+      const rightWalk = mapManager.isWalkableInBounds(x + 1, y);
+      const upWalk = mapManager.isWalkableInBounds(x, y - 1);
+      const downWalk = mapManager.isWalkableInBounds(x, y + 1);
+      const walkableNeighbors = (leftWalk ? 1 : 0) + (rightWalk ? 1 : 0) + (upWalk ? 1 : 0) + (downWalk ? 1 : 0);
+      if (walkableNeighbors <= 2 && ((!leftWalk && !rightWalk) || (!upWalk && !downWalk))) {
+        return false;
+      }
+    }
     return true;
+  }
+
+  public static pickNpcWanderDirection(npcEntity: GridEntity): Direction | null {
+    const moveType = npcEntity.movementType ?? (npcEntity.wanders ? 'WANDER' : 'STILL');
+    if (moveType === 'STILL') return null;
+    if (moveType === 'WALK_LEFT_RIGHT') {
+      return this.horizontalDirs[Math.floor(Math.random() * 2)];
+    }
+    if (moveType === 'WALK_UP_DOWN') {
+      return this.verticalDirs[Math.floor(Math.random() * 2)];
+    }
+    return this.directions[Math.floor(Math.random() * 4)];
   }
 
   public static refreshItemfinderRadar(
@@ -136,15 +179,30 @@ export class OverworldItemfinderAndNpcStepper {
     mapManager.setNeighborScratchMap(neighborMap);
     for (let i = 0; i < neighborNpcs.length; i++) {
       const npcEntity = neighborNpcs[i];
-      if (!npcEntity.wanders) continue;
+      const moveType = npcEntity.movementType ?? (npcEntity.wanders ? 'WANDER' : 'STILL');
+      if (moveType === 'STILL' && !npcEntity.isMoving) continue;
+
+      if (moveType === 'SPINRANDOM') {
+        if (triggerNewWanderStep && !npcEntity.isMoving && Math.random() < 0.55) {
+          npcEntity.direction = this.directions[Math.floor(Math.random() * 4)];
+        }
+        continue;
+      }
 
       const desiredDir =
         triggerNewWanderStep && !npcEntity.isMoving && Math.random() < 0.55
-          ? this.directions[Math.floor(Math.random() * 4)]
+          ? this.pickNpcWanderDirection(npcEntity)
           : null;
 
       GridPhysics.updateEntity(
-        npcEntity, dtWorld, desiredDir, mapManager.isWalkableInNeighborBounds,
+        npcEntity, dtWorld, desiredDir,
+        (x, y) => {
+          if (!mapManager.isWalkableInNeighborBounds(x, y)) return false;
+          const ox = npcEntity.originX ?? npcEntity.x;
+          const oy = npcEntity.originY ?? npcEntity.y;
+          const radius = npcEntity.wanderRadius ?? 1;
+          return Math.abs(x - ox) <= radius && Math.abs(y - oy) <= radius;
+        },
         mapManager.getTileType, undefined, neighborNpcs
       );
     }

@@ -8,7 +8,131 @@
  */
 
 import type { NpcInteractionRegistration } from '../../types/gameContext';
+import type { Direction } from '../../types/game';
+import type { GridEntity } from '../GridPhysics';
 import { BattleAudio } from '../../audio/BattleAudio';
+
+export const FARFETCHD_WAYPOINTS: ReadonlyArray<{ x: number; y: number }> = [
+  { x: 15, y: 23 },
+  { x: 20, y: 24 },
+  { x: 29, y: 24 },
+  { x: 22, y: 31 },
+  { x: 15, y: 29 },
+];
+
+export const FARFETCHD_PATH_SEGMENTS: ReadonlyArray<ReadonlyArray<{ x: number; y: number; dir: Direction }>> = [
+  // Leg 0: (15, 23) -> (20, 24)
+  [
+    { x: 16, y: 23, dir: 'RIGHT' },
+    { x: 17, y: 23, dir: 'RIGHT' },
+    { x: 18, y: 23, dir: 'RIGHT' },
+    { x: 19, y: 23, dir: 'RIGHT' },
+    { x: 20, y: 23, dir: 'RIGHT' },
+    { x: 20, y: 24, dir: 'DOWN' },
+  ],
+  // Leg 1: (20, 24) -> (29, 24)
+  [
+    { x: 21, y: 24, dir: 'RIGHT' },
+    { x: 22, y: 24, dir: 'RIGHT' },
+    { x: 23, y: 24, dir: 'RIGHT' },
+    { x: 24, y: 24, dir: 'RIGHT' },
+    { x: 25, y: 24, dir: 'RIGHT' },
+    { x: 26, y: 24, dir: 'RIGHT' },
+    { x: 27, y: 24, dir: 'RIGHT' },
+    { x: 28, y: 24, dir: 'RIGHT' },
+    { x: 29, y: 24, dir: 'RIGHT' },
+  ],
+  // Leg 2: (29, 24) -> (22, 31)
+  [
+    { x: 29, y: 25, dir: 'DOWN' },
+    { x: 29, y: 26, dir: 'DOWN' },
+    { x: 29, y: 27, dir: 'DOWN' },
+    { x: 29, y: 28, dir: 'DOWN' },
+    { x: 29, y: 29, dir: 'DOWN' },
+    { x: 29, y: 30, dir: 'DOWN' },
+    { x: 29, y: 31, dir: 'DOWN' },
+    { x: 28, y: 31, dir: 'LEFT' },
+    { x: 27, y: 31, dir: 'LEFT' },
+    { x: 26, y: 31, dir: 'LEFT' },
+    { x: 25, y: 31, dir: 'LEFT' },
+    { x: 24, y: 31, dir: 'LEFT' },
+    { x: 23, y: 31, dir: 'LEFT' },
+    { x: 22, y: 31, dir: 'LEFT' },
+  ],
+  // Leg 3: (22, 31) -> (15, 29)
+  [
+    { x: 22, y: 30, dir: 'UP' },
+    { x: 22, y: 29, dir: 'UP' },
+    { x: 21, y: 29, dir: 'LEFT' },
+    { x: 20, y: 29, dir: 'LEFT' },
+    { x: 19, y: 29, dir: 'LEFT' },
+    { x: 18, y: 29, dir: 'LEFT' },
+    { x: 17, y: 29, dir: 'LEFT' },
+    { x: 16, y: 29, dir: 'LEFT' },
+    { x: 15, y: 29, dir: 'LEFT' },
+  ],
+];
+
+function animateFarfetchdSegment(
+  targetNpc: GridEntity,
+  startCoord: { x: number; y: number },
+  steps: ReadonlyArray<{ x: number; y: number; dir: Direction }>,
+  finalWp: { x: number; y: number }
+): void {
+  // Update logical coordinates immediately so pathfinding/collision & tests see the destination,
+  // then animate visual renderX/renderY & walking frames tile-by-tile along the forest path.
+  targetNpc.x = finalWp.x;
+  targetNpc.y = finalWp.y;
+  targetNpc.gridX = finalWp.x;
+  targetNpc.gridY = finalWp.y;
+  targetNpc.targetX = finalWp.x;
+  targetNpc.targetY = finalWp.y;
+  targetNpc.originX = finalWp.x;
+  targetNpc.originY = finalWp.y;
+  targetNpc.renderX = finalWp.x;
+  targetNpc.renderY = finalWp.y;
+
+  if (!steps || steps.length === 0) return;
+
+  let prevX = startCoord.x;
+  let prevY = startCoord.y;
+  targetNpc.renderX = prevX;
+  targetNpc.renderY = prevY;
+  targetNpc.isMoving = true;
+  targetNpc.progress = 0.25;
+  targetNpc.direction = steps[0].dir;
+
+  steps.forEach((step, idx) => {
+    const fromX = prevX;
+    const fromY = prevY;
+    prevX = step.x;
+    prevY = step.y;
+
+    // Halfway sub-step for smooth 2-frame walking cycle
+    setTimeout(() => {
+      targetNpc.direction = step.dir;
+      targetNpc.isMoving = true;
+      targetNpc.progress = 0.35;
+      targetNpc.renderX = fromX + (step.x - fromX) * 0.5;
+      targetNpc.renderY = fromY + (step.y - fromY) * 0.5;
+    }, idx * 90 + 30);
+
+    // Tile arrival sub-step
+    setTimeout(() => {
+      targetNpc.direction = step.dir;
+      targetNpc.renderX = step.x;
+      targetNpc.renderY = step.y;
+      if (idx === steps.length - 1) {
+        targetNpc.isMoving = false;
+        targetNpc.progress = 0;
+        targetNpc.direction = 'DOWN';
+      } else {
+        targetNpc.isMoving = true;
+        targetNpc.progress = 0.75;
+      }
+    }, (idx + 1) * 90);
+  });
+}
 
 /**
  * IlexForestInteractions — Farfetch'd Herding Puzzle, Charcoal Master & Move Tutors
@@ -29,7 +153,6 @@ export function getIlexForestInteractions(): NpcInteractionRegistration[] {
           ctx.storyFlags.add('EVENT_GOT_HM01_CUT');
           if (!ctx.inventory.tms) ctx.inventory.tms = [];
           if (!ctx.inventory.tms.includes('HM01')) ctx.inventory.tms.push('HM01');
-          if (!ctx.inventory.tms.includes('HM01_CUT')) ctx.inventory.tms.push('HM01_CUT');
           BattleAudio.playOverworldSound('KEY_ITEM');
           ctx.openDialogue(
             [
@@ -56,7 +179,7 @@ export function getIlexForestInteractions(): NpcInteractionRegistration[] {
       },
     },
 
-    // 2. Farfetch'd Herding Puzzle
+    // 2. Farfetch'd Herding Puzzle (Animated Tile-by-Tile Running)
     {
       actions: ['FARFETCHD_HERD_EVENT'],
       npcIds: ['forest_farfetchd'],
@@ -68,7 +191,6 @@ export function getIlexForestInteractions(): NpcInteractionRegistration[] {
           ctx.storyFlags.add('EVENT_GOT_HM01_CUT');
           if (!ctx.inventory.tms) ctx.inventory.tms = [];
           if (!ctx.inventory.tms.includes('HM01')) ctx.inventory.tms.push('HM01');
-          if (!ctx.inventory.tms.includes('HM01_CUT')) ctx.inventory.tms.push('HM01_CUT');
           BattleAudio.playOverworldSound('KEY_ITEM');
           ctx.saveCurrentGame();
           ctx.showToast("🦆 FARFETCH'D returned! 🪓 Received HM01 CUT from the Charcoal Master!");
@@ -85,13 +207,7 @@ export function getIlexForestInteractions(): NpcInteractionRegistration[] {
           return true;
         }
 
-        const FARFETCHD_WAYPOINTS = [
-          { x: 15, y: 23 },
-          { x: 20, y: 24 },
-          { x: 22, y: 31 },
-          { x: 15, y: 29 },
-        ];
-
+        const startCoord = { x: targetNpc.x, y: targetNpc.y };
         let currentWpIdx = FARFETCHD_WAYPOINTS.findIndex(
           (wp) => wp.x === targetNpc.x && wp.y === targetNpc.y
         );
@@ -116,14 +232,11 @@ export function getIlexForestInteractions(): NpcInteractionRegistration[] {
         }
 
         const nextWp = FARFETCHD_WAYPOINTS[nextWpIdx];
-        targetNpc.x = nextWp.x;
-        targetNpc.y = nextWp.y;
-        targetNpc.gridX = nextWp.x;
-        targetNpc.gridY = nextWp.y;
-        targetNpc.renderX = nextWp.x;
-        targetNpc.renderY = nextWp.y;
+        const pathSteps = FARFETCHD_PATH_SEGMENTS[currentWpIdx] || [{ x: nextWp.x, y: nextWp.y, dir: 'DOWN' as Direction }];
+        animateFarfetchdSegment(targetNpc, startCoord, pathSteps, nextWp);
 
         BattleAudio.playCry('farfetchd');
+        BattleAudio.playOverworldSound('RUSTLE');
 
         if (nextWpIdx === FARFETCHD_WAYPOINTS.length - 1) {
           ctx.openDialogue(
@@ -143,7 +256,7 @@ export function getIlexForestInteractions(): NpcInteractionRegistration[] {
           ctx.openDialogue(
             [
               "FARFETCH'D: Quaaack!",
-              "FARFETCH'D fluttered along the eastern forest path towards the apprentice!",
+              "FARFETCH'D scurried along the forest path!",
             ],
             targetNpc.speaker
           );
@@ -182,7 +295,6 @@ export function getIlexForestInteractions(): NpcInteractionRegistration[] {
               ctx.storyFlags.add('EVENT_GOT_HM01_CUT');
               if (!ctx.inventory.tms) ctx.inventory.tms = [];
               if (!ctx.inventory.tms.includes('HM01')) ctx.inventory.tms.push('HM01');
-              if (!ctx.inventory.tms.includes('HM01_CUT')) ctx.inventory.tms.push('HM01_CUT');
               BattleAudio.playOverworldSound('KEY_ITEM');
               ctx.saveCurrentGame();
               ctx.showToast('🪓 Received HM01 CUT from the Charcoal Master!');
@@ -224,7 +336,6 @@ export function getIlexForestInteractions(): NpcInteractionRegistration[] {
             ctx.storyFlags.add('has_tm02_headbutt');
             if (!ctx.inventory.tms) ctx.inventory.tms = [];
             if (!ctx.inventory.tms.includes('TM02')) ctx.inventory.tms.push('TM02');
-            if (!ctx.inventory.tms.includes('TM02_HEADBUTT')) ctx.inventory.tms.push('TM02_HEADBUTT');
             BattleAudio.playOverworldSound('KEY_ITEM');
             ctx.saveCurrentGame();
             ctx.showToast('🥊 Received TM02 HEADBUTT from the Headbutt Guy!');

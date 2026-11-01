@@ -234,6 +234,12 @@ const { ISSUE_RESOLUTIONS } = (() => {
 - **Fix**:
   1. Updated \`checkConnectionWalkable()\` in \`src/world/MapManager.ts\` to use \`isWalkableTile(tileType)\`, which permits \`tileType === 3\` whenever surfing is active (\`this.surfEnabled\`) across all 4 cardinal connections (North, South, East, West).
   2. Verified seamless water boundary traversal between Route 40 and Route 41.`,
+      62: `### Resolution Details for Issue #62
+- **Root Cause**: No \`favicon.ico\` file existed in \`public/\` and \`index.html\` lacked a \`<link rel="icon">\` tag, resulting in browser 404 requests for \`/favicon.ico\` and a missing tab icon.
+- **Fix**:
+  1. Created a 32x32 32-bit BGRA Crystal Poké Ball icon at \`public/favicon.ico\`.
+  2. Linked \`<link rel="icon" type="image/x-icon" href="./favicon.ico" />\` and \`<link rel="shortcut icon" href="./favicon.ico" />\` in \`index.html\`.
+  3. Added regression verification in \`tests/bugfixes/npcMovementAndCutscenes.test.ts\`.`,
     },
   };
 })();

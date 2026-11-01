@@ -433,10 +433,26 @@ export class StoryCutscenes {
                 const mapNpcs = ctx.npcsByMap['burned_tower_1f'] || [];
                 const silverNpc = mapNpcs.find((n) => n.id === 'silver_burned');
                 if (silverNpc) {
-                  silverNpc.x = 8; silverNpc.y = 10;
-                  silverNpc.renderX = 8; silverNpc.renderY = 10;
-                  silverNpc.gridX = 8; silverNpc.gridY = 10;
-                  silverNpc.targetX = 8; silverNpc.targetY = 10;
+                  silverNpc.direction = 'LEFT';
+                  silverNpc.x = 8;
+                  silverNpc.y = 10;
+                  silverNpc.gridX = 8;
+                  silverNpc.gridY = 10;
+                  silverNpc.targetX = 8;
+                  silverNpc.targetY = 10;
+                  silverNpc.renderX = 8;
+                  silverNpc.renderY = 10;
+                  setTimeout(() => {
+                    silverNpc.isMoving = true;
+                    silverNpc.progress = 0.5;
+                    silverNpc.renderX = 8.5;
+                  }, 30);
+                  setTimeout(() => {
+                    silverNpc.renderX = 8;
+                    silverNpc.isMoving = false;
+                    silverNpc.progress = 0;
+                    silverNpc.direction = 'DOWN';
+                  }, 140);
                 }
                 ctx.saveCurrentGame();
                 ctx.overworldHUD.showToast('Rival Silver stepped aside from the Burned Tower hole!');

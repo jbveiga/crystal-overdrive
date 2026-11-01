@@ -10,6 +10,7 @@
 import { BattleAudio } from '../audio/BattleAudio';
 import { PokemonFactory } from '../battle/PokemonFactory';
 import { eventBus } from '../core/EventBus';
+import { makeNpc } from './npcs/npcShared';
 import type { StoryCutsceneContext } from './StoryCutscenes';
 
 export class SuicuneAndBeastsCutscenes {
@@ -32,9 +33,11 @@ export class SuicuneAndBeastsCutscenes {
       '⚡ LEGENDARY BEASTS',
       () => {
         BattleAudio.playCry('raikou');
+        BattleAudio.playOverworldSound('HOP');
         const b1fNpcs = ctx.npcsByMap['burned_tower_b1f'] || [];
         const raikou = b1fNpcs.find((n) => n.id === 'burned_raikou');
         if (raikou) {
+          raikou.direction = 'LEFT';
           raikou.x = 6;
           raikou.y = 8;
           raikou.renderX = 6;
@@ -43,12 +46,35 @@ export class SuicuneAndBeastsCutscenes {
           raikou.gridY = 8;
           raikou.targetX = 6;
           raikou.targetY = 8;
+          // Multi-step visual leap animation while preserving synchronous t=0 and t=400 checkpoints
+          setTimeout(() => {
+            raikou.isMoving = true;
+            raikou.isJumping = true;
+            raikou.progress = 0.4;
+            raikou.renderX = 7;
+            raikou.renderY = 5;
+          }, 60);
+          setTimeout(() => {
+            raikou.direction = 'DOWN';
+            raikou.progress = 0.75;
+            raikou.renderX = 6;
+            raikou.renderY = 7;
+          }, 160);
+          setTimeout(() => {
+            raikou.renderX = 6;
+            raikou.renderY = 8;
+            raikou.isMoving = false;
+            raikou.isJumping = false;
+            raikou.progress = 0;
+          }, 280);
         }
 
         setTimeout(() => {
           BattleAudio.playCry('entei');
+          BattleAudio.playOverworldSound('HOP');
           const entei = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'burned_entei');
           if (entei) {
+            entei.direction = 'RIGHT';
             entei.x = 14;
             entei.y = 8;
             entei.renderX = 14;
@@ -57,11 +83,32 @@ export class SuicuneAndBeastsCutscenes {
             entei.gridY = 8;
             entei.targetX = 14;
             entei.targetY = 8;
+            setTimeout(() => {
+              entei.isMoving = true;
+              entei.isJumping = true;
+              entei.progress = 0.4;
+              entei.renderX = 13;
+              entei.renderY = 5;
+            }, 80);
+            setTimeout(() => {
+              entei.direction = 'DOWN';
+              entei.progress = 0.75;
+              entei.renderX = 14;
+              entei.renderY = 7;
+            }, 180);
+            setTimeout(() => {
+              entei.renderX = 14;
+              entei.renderY = 8;
+              entei.isMoving = false;
+              entei.isJumping = false;
+              entei.progress = 0;
+            }, 280);
           }
         }, 350);
 
         setTimeout(() => {
           BattleAudio.playCry('suicune');
+          BattleAudio.playOverworldSound('HOP');
           const suicune = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'beasts');
           if (suicune) {
             suicune.x = 10;
@@ -73,6 +120,16 @@ export class SuicuneAndBeastsCutscenes {
             suicune.targetX = 10;
             suicune.targetY = 4;
             suicune.direction = 'DOWN';
+            setTimeout(() => {
+              suicune.isMoving = true;
+              suicune.progress = 0.5;
+              suicune.renderY = 3.5;
+            }, 120);
+            setTimeout(() => {
+              suicune.renderY = 4;
+              suicune.isMoving = false;
+              suicune.progress = 0;
+            }, 260);
           }
         }, 700);
 
@@ -86,6 +143,7 @@ export class SuicuneAndBeastsCutscenes {
             () => {
               const suicune = (ctx.npcsByMap['burned_tower_b1f'] || []).find((n) => n.id === 'beasts');
               if (suicune) {
+                BattleAudio.playOverworldSound('HOP');
                 suicune.x = 10;
                 suicune.y = 8;
                 suicune.renderX = 10;
@@ -95,8 +153,55 @@ export class SuicuneAndBeastsCutscenes {
                 suicune.targetX = 10;
                 suicune.targetY = 8;
                 suicune.direction = 'DOWN';
+                setTimeout(() => {
+                  suicune.isMoving = true;
+                  suicune.isJumping = true;
+                  suicune.progress = 0.4;
+                  suicune.renderY = 6;
+                }, 40);
+                setTimeout(() => {
+                  suicune.progress = 0.8;
+                  suicune.renderY = 7.5;
+                }, 100);
+                setTimeout(() => {
+                  suicune.renderY = 8;
+                  suicune.isMoving = false;
+                  suicune.isJumping = false;
+                  suicune.progress = 0;
+                }, 170);
               }
               BattleAudio.playOverworldSound('RUSTLE');
+
+              // Spawn Eusine rushing down the ladder and stepping up toward the player
+              if (ctx.npcsByMap['burned_tower_b1f']) {
+                const eusineTargetY = Math.min(10, (ctx.player.y || 6) + 1);
+                const eusineB1f = makeNpc(
+                  'eusine_b1f_cutscene',
+                  10,
+                  eusineTargetY + 1,
+                  'UP',
+                  'eusine',
+                  '🎩 EUSINE',
+                  []
+                );
+                ctx.npcsByMap['burned_tower_b1f'] = ctx.npcsByMap['burned_tower_b1f'].filter(
+                  (n) => n.id !== 'eusine_b1f_cutscene'
+                );
+                ctx.npcsByMap['burned_tower_b1f'].push(eusineB1f);
+                setTimeout(() => {
+                  eusineB1f.isMoving = true;
+                  eusineB1f.progress = 0.5;
+                  eusineB1f.renderY = eusineTargetY + 0.5;
+                }, 180);
+                setTimeout(() => {
+                  eusineB1f.y = eusineTargetY;
+                  eusineB1f.gridY = eusineTargetY;
+                  eusineB1f.targetY = eusineTargetY;
+                  eusineB1f.renderY = eusineTargetY;
+                  eusineB1f.isMoving = false;
+                  eusineB1f.progress = 0;
+                }, 320);
+              }
 
               setTimeout(() => {
                 ctx.overworldHUD.openDialogue(
@@ -115,7 +220,11 @@ export class SuicuneAndBeastsCutscenes {
 
                     if (ctx.npcsByMap['burned_tower_b1f']) {
                       ctx.npcsByMap['burned_tower_b1f'] = ctx.npcsByMap['burned_tower_b1f'].filter(
-                        (n) => n.id !== 'beasts' && n.id !== 'burned_raikou' && n.id !== 'burned_entei'
+                        (n) =>
+                          n.id !== 'beasts' &&
+                          n.id !== 'burned_raikou' &&
+                          n.id !== 'burned_entei' &&
+                          n.id !== 'eusine_b1f_cutscene'
                       );
                     }
                     if (ctx.npcsByMap['burned_tower_1f']) {

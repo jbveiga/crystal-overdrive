@@ -43,9 +43,10 @@ export class OverworldTickerCoordinator {
   }
 
   public static isTileWalkableForActiveMapNpc(
-    x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>
+    x: number, y: number, mapManager: MapManager, overworldItemManager: any, storyFlags: Set<string>,
+    npcEntity?: GridEntity
   ): boolean {
-    return OverworldItemfinderAndNpcStepper.isTileWalkableForActiveMapNpc(x, y, mapManager, overworldItemManager, storyFlags);
+    return OverworldItemfinderAndNpcStepper.isTileWalkableForActiveMapNpc(x, y, mapManager, overworldItemManager, storyFlags, npcEntity);
   }
 
   public static refreshItemfinderRadar(
@@ -395,7 +396,11 @@ export class OverworldTickerCoordinator {
           if (canEncounter && playerParty.length > 0) {
             if (
               latestMap?.id === 'ruins_of_alph_inner_chamber' &&
-              !storyFlags.has('unown_awakened_kabuto')
+              !storyFlags.has('unown_awakened_kabuto') &&
+              !storyFlags.has('unown_awakened_omanyte') &&
+              !storyFlags.has('unown_awakened_aerodactyl') &&
+              !storyFlags.has('unown_awakened_ho_oh') &&
+              !storyFlags.has('EVENT_MADE_UNOWN_APPEAR_IN_RUINS')
             ) {
               // Chamber is quiet until puzzle is solved
             } else {
@@ -463,24 +468,60 @@ export class OverworldTickerCoordinator {
           this.npcObstaclesScratch.push(activeNpcs[i]);
         }
 
+        let anyNpcRotatedOrStepped = false;
         for (let i = 0; i < activeNpcs.length; i++) {
           const npcEntity = activeNpcs[i];
-          if (!npcEntity.wanders) continue;
+          const moveType = npcEntity.movementType ?? (npcEntity.wanders ? 'WANDER' : 'STILL');
+          if (moveType === 'STILL' && !npcEntity.isMoving) continue;
+
+          if (moveType === 'SPINRANDOM') {
+            if (triggerNewWanderStep && !npcEntity.isMoving && Math.random() < 0.55) {
+              const nextDir = this.directions[Math.floor(Math.random() * 4)];
+              if (nextDir !== npcEntity.direction) {
+                npcEntity.direction = nextDir;
+                anyNpcRotatedOrStepped = true;
+              }
+            }
+            continue;
+          }
 
           const desiredDir =
             triggerNewWanderStep && !npcEntity.isMoving && Math.random() < 0.55
-              ? this.directions[Math.floor(Math.random() * 4)]
+              ? OverworldItemfinderAndNpcStepper.pickNpcWanderDirection(npcEntity)
               : null;
 
+          const prevX = npcEntity.x;
+          const prevY = npcEntity.y;
+          const prevDir = npcEntity.direction;
           GridPhysics.updateEntity(
             npcEntity,
             dtWorld,
             desiredDir,
-            (x, y) => this.isTileWalkableForActiveMapNpc(x, y, mapManager, overworldItemManager, storyFlags),
+            (x, y) => this.isTileWalkableForActiveMapNpc(x, y, mapManager, overworldItemManager, storyFlags, npcEntity),
             mapManager.getTileType,
             undefined,
             this.npcObstaclesScratch
           );
+          if (npcEntity.x !== prevX || npcEntity.y !== prevY || npcEntity.direction !== prevDir) {
+            anyNpcRotatedOrStepped = true;
+          }
+        }
+
+        // If an undefeated trainer rotated or stepped into line-of-sight of an idle player, trigger challenge
+        if (anyNpcRotatedOrStepped && !player.isMoving && !isCutsceneLocked() && !overworldHUD.isDialogueOpen()) {
+          const spottedByRotation = GridPhysics.checkTrainerLineOfSight(
+            player,
+            activeNpcs,
+            defeatedTrainers,
+            mapManager.getTileType
+          );
+          if (spottedByRotation) {
+            if (spottedByRotation.id === 'officer_keith' && gameClock.getTimeOfDay() !== 'NIGHT') {
+              // Officer Keith only challenges at night
+            } else {
+              void runTrainerSightSequence(spottedByRotation);
+            }
+          }
         }
 
         // Update wandering NPCs on connected neighbor maps

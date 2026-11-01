@@ -8,7 +8,205 @@
  */
 
 import type { Direction } from '../../types/game';
-import type { GridEntity } from '../GridPhysics';
+import type { GridEntity, NpcMovementType } from '../GridPhysics';
+
+const STATIONARY_SPRITE_TYPES = new Set<GridEntity['spriteType']>([
+  'nurse' as any,
+  'clerk',
+  'receptionist',
+  'bike_shop_owner',
+  'sudowoodo',
+  'lapras',
+  'suicune',
+  'raikou',
+  'entei',
+  'ho_oh',
+  'lugia',
+  'gyarados',
+  'electrode',
+  'voltorb',
+  'boulder',
+  'fruit_tree',
+  'farfetchd',
+  'slowpoke',
+  'miltank',
+  'butterfree',
+  'prof_elm',
+  'oak',
+  'mom',
+  'elder_li',
+  'falkner',
+  'whitney',
+  'morty',
+  'clair',
+  'pryce',
+  'silver',
+]);
+
+const STATIONARY_NPC_ID_PATTERNS = [
+  'nurse',
+  'clerk',
+  'guard',
+  'blocker',
+  'officer',
+  'guide',
+  'statue',
+  'sign',
+  'shutter',
+  'door',
+  'switch',
+  'elevator',
+  'cut_tree',
+  'boulder',
+  'snorlax',
+  'sudowoodo',
+  'gyarados',
+  'suicune',
+  'raikou',
+  'entei',
+  'beasts',
+  'lugia',
+  'ho_oh',
+  'rival',
+  'silver',
+  'kurt',
+  'elm',
+  'oak',
+  'mom',
+  'bill',
+  'lance',
+  'falkner',
+  'bugsy',
+  'whitney',
+  'morty',
+  'chuck',
+  'jasmine',
+  'pryce',
+  'clair',
+  'brock',
+  'misty',
+  'surge',
+  'erika',
+  'janine',
+  'sabrina',
+  'blaine',
+  'blue',
+  'will',
+  'koga',
+  'bruno',
+  'karen',
+  'proton',
+  'petrel',
+  'ariana',
+  'archer',
+  'director',
+  'kimono',
+  'farfetchd',
+  'apprentice',
+  'cut_master',
+  'tutor',
+  'day_care',
+  'daycare',
+  'namerater',
+  'name_rater',
+  'move_deleter',
+  'deleter',
+  'guru',
+  'mania',
+  'recluse',
+  'warden',
+  'captain',
+  'conductor',
+  'salesman',
+  'merchant',
+  'haircut',
+  'brother',
+  'trade',
+  'sibling',
+  'monica',
+  'tuscany',
+  'wesley',
+  'arthur',
+  'frieda',
+  'santos',
+  'sunny',
+  'kenya',
+  'randy',
+];
+
+function hashNpcKey(id: string, x: number, y: number): number {
+  let h = (x * 37 + y * 101) | 0;
+  for (let i = 0; i < id.length; i++) {
+    h = ((h << 5) - h + id.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+function resolveDefaultNpcMovement(
+  id: string,
+  x: number,
+  y: number,
+  spriteType: GridEntity['spriteType'],
+  opts: {
+    wanders?: boolean;
+    movementType?: NpcMovementType;
+    wanderRadius?: number;
+    talkAcrossCounter?: boolean;
+    action?: GridEntity['action'];
+    trainerId?: string;
+    visionRange?: number;
+    trainerTeam?: GridEntity['trainerTeam'];
+    team?: GridEntity['trainerTeam'];
+  }
+): { wanders: boolean; movementType: NpcMovementType; wanderRadius: number } {
+  if (opts.movementType) {
+    const isMovingType = opts.movementType !== 'STILL';
+    return {
+      wanders: opts.wanders ?? isMovingType,
+      movementType: opts.movementType,
+      wanderRadius: opts.wanderRadius ?? (opts.movementType === 'SPINRANDOM' ? 0 : 1),
+    };
+  }
+  if (opts.wanders === true) {
+    return {
+      wanders: true,
+      movementType: 'WANDER',
+      wanderRadius: opts.wanderRadius ?? 1,
+    };
+  }
+  if (
+    opts.wanders === false ||
+    opts.talkAcrossCounter ||
+    opts.action ||
+    opts.trainerId ||
+    (opts.visionRange && opts.visionRange > 0) ||
+    (opts.trainerTeam && opts.trainerTeam.length > 0) ||
+    (opts.team && opts.team.length > 0) ||
+    STATIONARY_SPRITE_TYPES.has(spriteType)
+  ) {
+    return { wanders: false, movementType: 'STILL', wanderRadius: 0 };
+  }
+
+  const lowerId = id.toLowerCase();
+  for (let i = 0; i < STATIONARY_NPC_ID_PATTERNS.length; i++) {
+    if (lowerId.includes(STATIONARY_NPC_ID_PATTERNS[i])) {
+      return { wanders: false, movementType: 'STILL', wanderRadius: 0 };
+    }
+  }
+
+  // Deterministic Gen 2 ambient NPC movement assignment (WANDER, WALK_LEFT_RIGHT, WALK_UP_DOWN, SPINRANDOM)
+  const h = hashNpcKey(id, x, y) % 5;
+  if (h === 0 || h === 1) {
+    return { wanders: true, movementType: 'WANDER', wanderRadius: opts.wanderRadius ?? 1 };
+  }
+  if (h === 2) {
+    return { wanders: true, movementType: 'WALK_LEFT_RIGHT', wanderRadius: opts.wanderRadius ?? 1 };
+  }
+  if (h === 3) {
+    return { wanders: true, movementType: 'WALK_UP_DOWN', wanderRadius: opts.wanderRadius ?? 1 };
+  }
+  return { wanders: true, movementType: 'SPINRANDOM', wanderRadius: 0 };
+}
 
 export const makeNpc = (
   id: string,
@@ -20,6 +218,8 @@ export const makeNpc = (
   pages: string[],
   opts: {
     wanders?: boolean;
+    movementType?: NpcMovementType;
+    wanderRadius?: number;
     talkAcrossCounter?: boolean;
     action?: GridEntity['action'];
     trainerId?: string;
@@ -31,17 +231,23 @@ export const makeNpc = (
     trainerTeam?: GridEntity['trainerTeam'];
     team?: GridEntity['trainerTeam'];
   } = {}
-): GridEntity => ({
-  id, x, y, originX: x, originY: y, originDirection: direction,
-  gridX: x, gridY: y, targetX: x, targetY: y, renderX: x, renderY: y,
-  direction, isMoving: false, progress: 0, isPlayer: false,
-  spriteType, speaker, pages,
-  wanders: opts.wanders ?? false, talkAcrossCounter: opts.talkAcrossCounter ?? false,
-  action: opts.action, trainerId: opts.trainerId, trainerName: opts.trainerName,
-  visionRange: opts.visionRange, challengePages: opts.challengePages, defeatPages: opts.defeatPages,
-  trainerPokemon: opts.trainerPokemon, trainerTeam: opts.trainerTeam || opts.team,
-  team: opts.team || opts.trainerTeam,
-});
+): GridEntity => {
+  const movement = resolveDefaultNpcMovement(id, x, y, spriteType, opts);
+  return {
+    id, x, y, originX: x, originY: y, originDirection: direction,
+    gridX: x, gridY: y, targetX: x, targetY: y, renderX: x, renderY: y,
+    direction, isMoving: false, progress: 0, isPlayer: false,
+    spriteType, speaker, pages,
+    wanders: movement.wanders,
+    movementType: movement.movementType,
+    wanderRadius: movement.wanderRadius,
+    talkAcrossCounter: opts.talkAcrossCounter ?? false,
+    action: opts.action, trainerId: opts.trainerId, trainerName: opts.trainerName,
+    visionRange: opts.visionRange, challengePages: opts.challengePages, defeatPages: opts.defeatPages,
+    trainerPokemon: opts.trainerPokemon, trainerTeam: opts.trainerTeam || opts.team,
+    team: opts.team || opts.trainerTeam,
+  };
+};
 
 export interface GuideGentTourLegDef {
   leg: number;

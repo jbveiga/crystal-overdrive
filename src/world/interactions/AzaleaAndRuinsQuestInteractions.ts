@@ -51,7 +51,13 @@ export function getAzaleaAndRuinsQuestInteractions(): NpcInteractionRegistration
     {
       actions: ['UNOWN_DEX_EVENT'],
       handler: (targetNpc, _map, ctx) => {
-        if (ctx.storyFlags.has('unown_awakened_kabuto')) {
+        if (
+          ctx.storyFlags.has('unown_awakened_kabuto') ||
+          ctx.storyFlags.has('unown_awakened_omanyte') ||
+          ctx.storyFlags.has('unown_awakened_aerodactyl') ||
+          ctx.storyFlags.has('unown_awakened_ho_oh') ||
+          ctx.storyFlags.has('EVENT_MADE_UNOWN_APPEAR_IN_RUINS')
+        ) {
           if (!ctx.storyFlags.has('ENGINE_UNOWN_DEX')) {
             ctx.storyFlags.add('ENGINE_UNOWN_DEX');
             ctx.openDialogue(

@@ -85,6 +85,13 @@ export interface TrainerPokemonSpec {
   heldItem?: string;
 }
 
+export type NpcMovementType =
+  | 'STILL'
+  | 'WANDER'
+  | 'WALK_LEFT_RIGHT'
+  | 'WALK_UP_DOWN'
+  | 'SPINRANDOM';
+
 export interface GridEntity {
   id: string;
   x: number;
@@ -102,7 +109,10 @@ export interface GridEntity {
   isMoving: boolean;
   isJumping?: boolean;
   progress: number;
-  isPlayer: boolean;
+  isPlayer?: boolean;
+  speed?: number;
+  frame?: number;
+  animTimer?: number;
   turnDelayTimer?: number;
   worldOffsetX?: number;
   worldOffsetY?: number;
@@ -110,6 +120,8 @@ export interface GridEntity {
   speaker?: string;
   pages?: string[];
   wanders?: boolean;
+  movementType?: NpcMovementType;
+  wanderRadius?: number;
   talkAcrossCounter?: boolean;
   action?:
     | 'HEAL_AND_SAVE'
@@ -516,6 +528,8 @@ export class GridPhysics {
         // Snap logically to target
         entity.x = entity.targetX;
         entity.y = entity.targetY;
+        entity.gridX = entity.x;
+        entity.gridY = entity.y;
         entity.isJumping = false;
         const overflow = entity.progress - 1.0;
 
