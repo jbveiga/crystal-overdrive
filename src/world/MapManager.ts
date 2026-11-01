@@ -359,18 +359,55 @@ export class MapManager {
     return this.isWalkableInMapBounds(this.neighborScratchMap, x, y);
   };
 
-  /**
-   * Returns tile type at coordinate: 0 = normal, 1 = solid, 2 = grass, 3 = water
-   */
   getTileType = (x: number, y: number): number => {
     if (!this.currentMap) return 1;
 
-    if (x < 0 || x >= this.currentMap.width || y < 0 || y >= this.currentMap.height) {
-      return 1;
+    if (x >= 0 && x < this.currentMap.width && y >= 0 && y < this.currentMap.height) {
+      const index = y * this.currentMap.width + x;
+      return this.currentMap.collisionGrid[index] ?? 1;
     }
 
-    const index = y * this.currentMap.width + x;
-    return this.currentMap.collisionGrid[index] ?? 1;
+    if (this.currentMap.connections) {
+      if (x < 0 && this.currentMap.connections.WEST) {
+        const west = this.maps.get(this.currentMap.connections.WEST.mapId);
+        if (west) {
+          const wx = x + west.width;
+          const wy = y - (this.currentMap.connections.WEST.offset ?? 0);
+          if (wx >= 0 && wx < west.width && wy >= 0 && wy < west.height) {
+            return west.collisionGrid[wy * west.width + wx] ?? 1;
+          }
+        }
+      } else if (x >= this.currentMap.width && this.currentMap.connections.EAST) {
+        const east = this.maps.get(this.currentMap.connections.EAST.mapId);
+        if (east) {
+          const ex = x - this.currentMap.width;
+          const ey = y - (this.currentMap.connections.EAST.offset ?? 0);
+          if (ex >= 0 && ex < east.width && ey >= 0 && ey < east.height) {
+            return east.collisionGrid[ey * east.width + ex] ?? 1;
+          }
+        }
+      } else if (y < 0 && this.currentMap.connections.NORTH) {
+        const north = this.maps.get(this.currentMap.connections.NORTH.mapId);
+        if (north) {
+          const nx = x - (this.currentMap.connections.NORTH.offset ?? 0);
+          const ny = y + north.height;
+          if (nx >= 0 && nx < north.width && ny >= 0 && ny < north.height) {
+            return north.collisionGrid[ny * north.width + nx] ?? 1;
+          }
+        }
+      } else if (y >= this.currentMap.height && this.currentMap.connections.SOUTH) {
+        const south = this.maps.get(this.currentMap.connections.SOUTH.mapId);
+        if (south) {
+          const sx = x - (this.currentMap.connections.SOUTH.offset ?? 0);
+          const sy = y - this.currentMap.height;
+          if (sx >= 0 && sx < south.width && sy >= 0 && sy < south.height) {
+            return south.collisionGrid[sy * south.width + sx] ?? 1;
+          }
+        }
+      }
+    }
+
+    return 1;
   };
 
   /**

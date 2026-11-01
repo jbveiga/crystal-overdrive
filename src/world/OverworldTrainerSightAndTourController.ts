@@ -455,9 +455,57 @@ export class OverworldTrainerSightAndTourController {
       storyFlags.add('TODD_REGISTERED');
       overworldHUD.showToast("📱 Registered Todd's number in Pokégear!");
       saveCurrentGame();
+    } else if (trainer.trainerId === 'schoolboy_alan') {
+      storyFlags.add('ALAN_REGISTERED');
+      if (!storyFlags.has('ALAN_GAVE_FIRE_STONE')) {
+        storyFlags.add('ALAN_GAVE_FIRE_STONE');
+        if (!inventory.items) inventory.items = {};
+        inventory.items['fire-stone'] = (inventory.items['fire-stone'] || 0) + 1;
+        inventory.items['fire_stone'] = (inventory.items['fire_stone'] || 0) + 1;
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        overworldHUD.showToast('🔥 Received FIRE STONE from Schoolboy Alan!');
+      } else {
+        overworldHUD.showToast("📱 Registered Alan's number in Pokégear!");
+      }
+      saveCurrentGame();
     } else if (trainer.trainerId === 'picnicker_gina') {
       storyFlags.add('GINA_REGISTERED');
-      overworldHUD.showToast("📱 Registered Gina's number in Pokégear!");
+      if (!storyFlags.has('GINA_GAVE_LEAF_STONE')) {
+        storyFlags.add('GINA_GAVE_LEAF_STONE');
+        if (!inventory.items) inventory.items = {};
+        inventory.items['leaf-stone'] = (inventory.items['leaf-stone'] || 0) + 1;
+        inventory.items['leaf_stone'] = (inventory.items['leaf_stone'] || 0) + 1;
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        overworldHUD.showToast('🍃 Received LEAF STONE from Picnicker Gina!');
+      } else {
+        overworldHUD.showToast("📱 Registered Gina's number in Pokégear!");
+      }
+      saveCurrentGame();
+    } else if (trainer.trainerId === 'lass_dana') {
+      storyFlags.add('DANA_REGISTERED');
+      if (!storyFlags.has('DANA_GAVE_THUNDERSTONE')) {
+        storyFlags.add('DANA_GAVE_THUNDERSTONE');
+        if (!inventory.items) inventory.items = {};
+        inventory.items['thunder-stone'] = (inventory.items['thunder-stone'] || 0) + 1;
+        inventory.items['thunderstone'] = (inventory.items['thunderstone'] || 0) + 1;
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        overworldHUD.showToast('⚡ Received THUNDERSTONE from Lass Dana!');
+      } else {
+        overworldHUD.showToast("📱 Registered Dana's number in Pokégear!");
+      }
+      saveCurrentGame();
+    } else if (trainer.trainerId === 'fisher_tully') {
+      storyFlags.add('TULLY_REGISTERED');
+      if (!storyFlags.has('TULLY_GAVE_WATER_STONE')) {
+        storyFlags.add('TULLY_GAVE_WATER_STONE');
+        if (!inventory.items) inventory.items = {};
+        inventory.items['water-stone'] = (inventory.items['water-stone'] || 0) + 1;
+        inventory.items['water_stone'] = (inventory.items['water_stone'] || 0) + 1;
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        overworldHUD.showToast('🌊 Received WATER STONE from Fisher Tully!');
+      } else {
+        overworldHUD.showToast("📱 Registered Tully's number in Pokégear!");
+      }
       saveCurrentGame();
     } else if (trainer.trainerId === 'cooltrainer_kate') {
       if (!storyFlags.has('KATE_DEFEATED_REWARD')) {

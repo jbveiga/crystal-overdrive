@@ -212,7 +212,7 @@ describe('TICKET-WORLD-WHIRL-ISLANDS-CAVERNS-01: Caverns, Whirlpools & Silver Wi
       expect(mockContext.storyFlags!.has('whirlpool_cleared_12_17')).toBe(false);
     });
 
-    it('successfully clears whirlpool and sets collision to 0 when player has Glacier Badge & HM06', () => {
+    it('successfully clears whirlpool and sets collision to 3 (water) when player has Glacier Badge & HM06', () => {
       const mockRoute41: MapData = JSON.parse(fs.readFileSync(path.join(mapsDir, 'route_41.json'), 'utf8'));
       const idx = 17 * mockRoute41.width + 12;
       expect(mockRoute41.collisionGrid[idx]).toBe(1);
@@ -223,10 +223,10 @@ describe('TICKET-WORLD-WHIRL-ISLANDS-CAVERNS-01: Caverns, Whirlpools & Silver Wi
       expect(handled).toBe(true);
       expect(lastDialoguePages[1]).toContain('used WHIRLPOOL to calm the churning waters!');
       expect(mockContext.storyFlags!.has('whirlpool_cleared_12_17')).toBe(true);
-      expect(mockRoute41.collisionGrid[idx]).toBe(0);
+      expect(mockRoute41.collisionGrid[idx]).toBe(3);
     });
 
-    it('applies map story mutations to dynamically persist cleared whirlpools on Route 41', () => {
+    it('applies map story mutations to dynamically persist cleared whirlpools on Route 41 as water (3)', () => {
       const mockRoute41: MapData = JSON.parse(fs.readFileSync(path.join(mapsDir, 'route_41.json'), 'utf8'));
       mockContext.storyFlags!.add('whirlpool_cleared_36_19');
 
@@ -234,7 +234,7 @@ describe('TICKET-WORLD-WHIRL-ISLANDS-CAVERNS-01: Caverns, Whirlpools & Silver Wi
 
       const clearedIdx = 19 * mockRoute41.width + 36;
       const unclearedIdx = 17 * mockRoute41.width + 12;
-      expect(mockRoute41.collisionGrid[clearedIdx]).toBe(0);
+      expect(mockRoute41.collisionGrid[clearedIdx]).toBe(3);
       expect(mockRoute41.collisionGrid[unclearedIdx]).toBe(1);
     });
   });

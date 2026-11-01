@@ -82,7 +82,7 @@ export interface OverworldTrainerSightContext {
   npcsByMap: Record<string, GridEntity[]>; gameState: () => 'TITLE' | 'OVERWORLD' | 'BATTLE';
   isCutsceneLocked: () => boolean; setCutsceneLocked: (locked: boolean) => void;
   audioManager: {
-    playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader') => void;
+    playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader' | 'suicune') => void;
     restoreOverworldBgm: (volume?: number) => void; playMapBgm: (mapId: string, volume?: number) => void; playSfx?: (name: string) => void;
   };
   overworldRenderer: { renderMap: (map: MapData, lookupMap: (id: string) => MapData | undefined) => void };
@@ -124,7 +124,7 @@ export interface NpcInteractionContext {
   mapManager: MapManager; gameClock: GameClock;
   getRivalName?: () => string; setRivalName?: (name: string) => void;
   audioManager: {
-    playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader') => void; restoreOverworldBgm: (volume?: number) => void;
+    playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader' | 'suicune') => void; restoreOverworldBgm: (volume?: number) => void;
     playMapBgm: (mapId: string, volume?: number) => void; playSfx?: (name: string) => void;
   };
   missionManager: MissionManager; bugContestManager: BugContestManager; dayCareManager: DayCareManager;

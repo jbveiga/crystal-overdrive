@@ -45,6 +45,7 @@ export class OverworldTileLayerRenderer {
     waterAnimStep: number;
     mapContainer: Container;
     animatedWaterSprites: Array<{ sprite: Sprite; frames: [Texture, Texture, Texture, Texture] }>;
+    animatedWhirlpools?: Array<{ container: Container; speed: number }>;
   }): void {
     const {
       map,
@@ -57,6 +58,7 @@ export class OverworldTileLayerRenderer {
       waterAnimStep,
       mapContainer,
       animatedWaterSprites,
+      animatedWhirlpools,
     } = opts;
 
     const isOutdoor = Object.keys(map.connections || {}).length > 0;
@@ -98,6 +100,43 @@ export class OverworldTileLayerRenderer {
 
         if (waterFrames) {
           animatedWaterSprites.push({ sprite: featureSprite, frames: waterFrames });
+        }
+
+        // Active Moving Whirlpool Vortex Overlay (Ticket 7: Animated churning whirlpools)
+        const isWhirlpoolTile =
+          map.collisionGrid[index] === 1 &&
+          (tileName.includes('whirlpool') ||
+            tileName.includes('46_47_56_57') ||
+            (map.id === 'route_41' &&
+              ((x === 12 && y === 17) ||
+                (x === 36 && y === 19) ||
+                (x === 12 && y === 37) ||
+                (x === 36 && y === 45))));
+
+        if (isWhirlpoolTile) {
+          const wpContainer = new Container();
+          wpContainer.position.set(px + tileSize / 2, py + tileSize / 2);
+          const vortex = new Graphics();
+          vortex.circle(0, 0, tileSize * 0.44).fill({ color: 0x1d4ed8, alpha: 0.85 });
+          vortex.circle(0, 0, tileSize * 0.30).fill({ color: 0x1e40af, alpha: 0.9 });
+          vortex.circle(0, 0, tileSize * 0.16).fill({ color: 0x0f172a, alpha: 0.95 });
+          for (let arm = 0; arm < 4; arm++) {
+            const rot = (arm * Math.PI) / 2;
+            const cos = Math.cos(rot);
+            const sin = Math.sin(rot);
+            vortex
+              .moveTo(cos * 4, sin * 4)
+              .quadraticCurveTo(
+                -sin * tileSize * 0.35 + cos * tileSize * 0.2,
+                cos * tileSize * 0.35 + sin * tileSize * 0.2,
+                -sin * tileSize * 0.42,
+                cos * tileSize * 0.42
+              )
+              .stroke({ color: 0x93c5fd, width: 3.5, alpha: 0.9 });
+          }
+          wpContainer.addChild(vortex);
+          mapContainer.addChild(wpContainer);
+          animatedWhirlpools?.push({ container: wpContainer, speed: 4.8 });
         }
 
         if (

@@ -248,4 +248,17 @@ export const CHIPTUNE_PATTERNS: Record<string, ChiptunePattern> = {
       s(N.F5, N.A4, N.F2, 'KICK', 1.9), s(null, N.C5, N.C3, 'HAT'), s(N.C5, N.A4, N.F3, 'SNARE'), s(N.E5, N.As4, N.C3, 'CRASH'),
     ],
   },
+  bgm_suicune_battle: {
+    id: 'bgm_suicune_battle', bpm: 176, duty1: 0.25, duty2: 0.125,
+    steps: [
+      s(N.D5, N.A4, N.D2, 'CRASH', 1, N.D6), s(N.F5, N.D5, N.D3, 'HAT'), s(N.A5, N.F5, N.D2, 'SNARE'), s(N.D6, N.A5, N.D3, 'HAT'),
+      s(N.C6, N.G5, N.C2, 'KICK', 1.6), s(N.A5, N.F5, N.C3, 'HAT'), s(N.G5, N.E5, N.C2, 'SNARE'), s(N.F5, N.D5, N.C3, 'HAT'),
+      s(N.D5, N.A4, N.D2, 'KICK'), s(N.F5, N.D5, N.D3, 'HAT'), s(N.A5, N.F5, N.D2, 'SNARE'), s(N.D6, N.A5, N.D3, 'HAT'),
+      s(N.E6, N.C6, N.A2, 'KICK', 1.7), s(N.D6, N.As5, N.A3, 'HAT'), s(N.Cs6, N.A5, N.A2, 'SNARE'), s(N.A5, N.F5, N.A3, 'HAT'),
+      s(N.D6, N.A5, N.D3, 'KICK', 1.8), s(N.A5, N.F5, N.D2, 'HAT'), s(N.F5, N.D5, N.D3, 'SNARE'), s(N.D5, N.A4, N.D2, 'HAT'),
+      s(N.As5, N.F5, N.As2, 'KICK', 1.8), s(N.F5, N.D5, N.F2, 'HAT'), s(N.G5, N.D5, N.As2, 'SNARE'), s(N.A5, N.F5, N.F3, 'HAT'),
+      s(N.G5, N.E5, N.G2, 'KICK', 1.7), s(N.F5, N.D5, N.D3, 'HAT'), s(N.E5, N.Cs5, N.A2, 'SNARE'), s(N.D5, N.A4, N.A3, 'HAT'),
+      s(N.Cs5, N.A4, N.A2, 'KICK', 1.9), s(N.E5, N.Cs5, N.E3, 'HAT'), s(N.D5, N.A4, N.D2, 'SNARE'), s(N.D6, N.A5, N.D3, 'CRASH'),
+    ],
+  },
 };

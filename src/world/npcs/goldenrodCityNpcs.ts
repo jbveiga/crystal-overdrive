@@ -289,7 +289,8 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),
       makeNpc('goldenrod_pc_clerk', 1, 6, 'RIGHT', 'fat_man', '👨‍💼 NETWORK CLERK', 
-        ['This POKéMON CENTER connects trainers across the globe through high-speed mobile communications!']
+        ['This POKéMON CENTER connects trainers across the globe through high-speed mobile communications!'],
+        { action: 'GOLDENROD_PC_CLERK_EVENT' }
       ),
       makeNpc('goldenrod_pc_lass', 6, 4, 'LEFT', 'lass', '👧 LASS', 
         ['A boy on the 5th floor of the DEPT. STORE traded me a MACHOP named MUSCLE!']

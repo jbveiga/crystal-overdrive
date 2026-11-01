@@ -532,7 +532,134 @@ export function getGoldenrodExpansionInteractions(): NpcInteractionRegistration[
       },
     },
 
-    // 8-9. Underground Haircut Brothers & Specialty Merchants
+    // 8. Goldenrod PC Network Clerk (GS Ball Gift Event)
+    {
+      actions: ['GOLDENROD_PC_CLERK_EVENT'],
+      npcIds: ['goldenrod_pc_clerk'],
+      handler: (targetNpc, _map, ctx) => {
+        if (ctx.storyFlags.has('HAS_GS_BALL') || ctx.storyFlags.has('EVENT_FOUGHT_CELEBI') || ctx.storyFlags.has('EVENT_CAUGHT_CELEBI')) {
+          ctx.openDialogue(
+            [
+              'NETWORK CLERK: Did you take that GS BALL to KURT in AZALEA TOWN?',
+              'He is the foremost authority on mysterious Poké Balls in the Johto region!',
+            ],
+            targetNpc.speaker
+          );
+          return true;
+        }
+
+        ctx.openDialogue(
+          [
+            'NETWORK CLERK: Greetings, trainer! We received an important delivery for you through the Mobile Communications Center!',
+            'It is a strange, metallic ball engraved with the letters "GS"!',
+            'Please, take this GS BALL to KURT in AZALEA TOWN! He may be able to discern its origins!',
+            `${ctx.playerName} received the GS BALL!`,
+          ],
+          targetNpc.speaker,
+          () => {
+            if (!ctx.inventory.keyItems) ctx.inventory.keyItems = [];
+            if (!ctx.inventory.keyItems.includes('GS_BALL')) ctx.inventory.keyItems.push('GS_BALL');
+            ctx.storyFlags.add('HAS_GS_BALL');
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            ctx.saveCurrentGame();
+            ctx.showToast('✨ Received the GS BALL! Take it to Kurt in Azalea Town!');
+          }
+        );
+        return true;
+      },
+    },
+
+    // 9. Buena's Password & Blue Card Prize Exchange
+    {
+      actions: ['BUENA_PASSWORD_EVENT'],
+      npcIds: ['buena'],
+      handler: (targetNpc, _map, ctx) => {
+        const hasBlueCard =
+          ctx.inventory.keyItems?.includes('BLUE_CARD') ||
+          ctx.inventory.keyItems?.includes('blue_card') ||
+          ctx.storyFlags.has('HAS_BLUE_CARD');
+
+        if (!hasBlueCard) {
+          ctx.openDialogue(
+            [
+              "BUENA: Hi! I'm BUENA, the host of BUENA'S PASSWORD!",
+              'Do you tune into my radio show every night on FM 10.5?',
+              "Here, take this BLUE CARD! Whenever you tell me today's password, you'll earn points on it!",
+              `${ctx.playerName} received the BLUE CARD!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              if (!ctx.inventory.keyItems) ctx.inventory.keyItems = [];
+              if (!ctx.inventory.keyItems.includes('BLUE_CARD')) ctx.inventory.keyItems.push('BLUE_CARD');
+              ctx.storyFlags.add('HAS_BLUE_CARD');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              ctx.saveCurrentGame();
+              ctx.showToast('📻 Received BLUE CARD from Buena!');
+            }
+          );
+          return true;
+        }
+
+        if (ctx.storyFlags.has('BUENA_ANSWERED_TODAY')) {
+          ctx.openDialogue(
+            [
+              "BUENA: You already answered today's password! Come back tomorrow after listening to BUENA'S PASSWORD on FM 10.5!",
+            ],
+            targetNpc.speaker
+          );
+          return true;
+        }
+
+        const promptPages = [
+          "BUENA: Welcome to BUENA'S PASSWORD! Tune to FM 10.5 on your POKéGEAR to hear the answer!",
+          "Today's password question: What was broadcast on tonight's show?",
+        ];
+
+        if (ctx.openChoiceDialogue) {
+          ctx.openChoiceDialogue(
+            promptPages,
+            targetNpc.speaker,
+            (choice) => {
+              if (choice === 'YES') {
+                ctx.storyFlags.add('BUENA_ANSWERED_TODAY');
+                if (!ctx.inventory.items) ctx.inventory.items = {};
+                ctx.inventory.items['ultra-ball'] = (ctx.inventory.items['ultra-ball'] || 0) + 1;
+                ctx.inventory.items['ultra_ball'] = (ctx.inventory.items['ultra_ball'] || 0) + 1;
+                BattleAudio.playOverworldSound('KEY_ITEM');
+                ctx.openDialogue(
+                  [
+                    'BUENA: BINGO! That is correct! You earned points on your BLUE CARD!',
+                    'Here is an ULTRA BALL prize for being such a loyal listener!',
+                  ],
+                  targetNpc.speaker,
+                  () => {
+                    ctx.saveCurrentGame();
+                    ctx.showToast('📻 Buena awarded points & an Ultra Ball!');
+                  }
+                );
+              } else {
+                ctx.openDialogue(
+                  ["BUENA: Aw, too bad! Tune to FM 10.5 on your POKéGEAR and try again!"],
+                  targetNpc.speaker
+                );
+              }
+            },
+            { yesLabel: 'CYNDAQUIL', noLabel: 'POTION' }
+          );
+          return true;
+        }
+
+        ctx.openDialogue(
+          [
+            "BUENA: Tune into BUENA'S PASSWORD on FM 10.5 tonight to collect points on your BLUE CARD!",
+          ],
+          targetNpc.speaker
+        );
+        return true;
+      },
+    },
+
+    // 10. Underground Haircut Brothers & Specialty Merchants
     ...getGoldenrodUndergroundInteractions(),
   ];
 }

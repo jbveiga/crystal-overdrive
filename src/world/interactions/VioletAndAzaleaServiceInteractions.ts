@@ -320,6 +320,30 @@ export function getVioletAndAzaleaServiceInteractions(): NpcInteractionRegistrat
           return true;
         }
 
+        const hasGsBall =
+          ctx.inventory.keyItems?.includes('GS_BALL') ||
+          ctx.inventory.keyItems?.includes('gs_ball') ||
+          ctx.storyFlags.has('HAS_GS_BALL');
+
+        if (hasGsBall && !ctx.storyFlags.has('KURT_CHECKED_GS_BALL')) {
+          ctx.storyFlags.add('KURT_CHECKED_GS_BALL');
+          BattleAudio.playOverworldSound('KEY_ITEM');
+          ctx.openDialogue(
+            [
+              'KURT: Wh-what is that?! ...A GS BALL?!',
+              'I have never seen anything like this in all my years of ball crafting! The metal and latch are completely seamless...',
+              'Wait! An ancient legend in AZALEA speaks of a golden ball and the guardian deity of ILEX FOREST!',
+              'Take this GS BALL to the ILEX FOREST SHRINE! If the forest spirit senses its presence, a miracle may occur!',
+            ],
+            targetNpc.speaker,
+            () => {
+              ctx.saveCurrentGame();
+              ctx.showToast('⛩️ Kurt inspected the GS BALL! Take it to Ilex Forest Shrine!');
+            }
+          );
+          return true;
+        }
+
         if (ctx.kurtCraftingManager?.activeOrder?.isReady) {
           const finished = ctx.kurtCraftingManager.collectOrder()!;
           if (!ctx.inventory.balls) ctx.inventory.balls = {};

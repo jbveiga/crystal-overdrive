@@ -53,8 +53,22 @@ export class BattleSessionController {
     ctx.itemfinderHUD.suspend();
     ctx.player.isMoving = false;
     ctx.player.progress = 0;
+    const isLegendaryBeast =
+      opponentPokemon.speciesId === 'suicune' ||
+      opponentPokemon.speciesId === 'entei' ||
+      opponentPokemon.speciesId === 'raikou' ||
+      opponentPokemon.speciesId === '243' ||
+      opponentPokemon.speciesId === '244' ||
+      opponentPokemon.speciesId === '245';
+
     ctx.audioManager.playBattleBgm(
-      options.isGymLeader ? 'gym_leader' : options.isTrainer ? 'trainer' : 'wild'
+      isLegendaryBeast
+        ? 'suicune'
+        : options.isGymLeader
+        ? 'gym_leader'
+        : options.isTrainer
+        ? 'trainer'
+        : 'wild'
     );
 
     // Record species as SEEN in Pokédex

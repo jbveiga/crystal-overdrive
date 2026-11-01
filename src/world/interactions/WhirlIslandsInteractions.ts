@@ -108,10 +108,12 @@ export const handleWhirlpoolObstacle: NpcInteractionHandler = (
   ctx,
   opts?: { targetCoord?: { x: number; y: number } }
 ) => {
+  const isAutoHm = (ctx as any).getAutoHm ? (ctx as any).getAutoHm() : (ctx as any).autoHm ?? false;
   const wpCheck = ModernHMHandler.canUseWhirlpool(
     ctx.playerParty,
     ctx.inventory,
-    ctx.storyFlags
+    ctx.storyFlags,
+    isAutoHm
   );
 
   const targetX = (opts as any)?.targetCoord?.x ?? ctx.player.x;
@@ -136,7 +138,7 @@ export const handleWhirlpoolObstacle: NpcInteractionHandler = (
       () => {
         ctx.storyFlags.add(`whirlpool_cleared_${targetX}_${targetY}`);
         if (currentMap?.collisionGrid) {
-          currentMap.collisionGrid[targetY * currentMap.width + targetX] = 0;
+          currentMap.collisionGrid[targetY * currentMap.width + targetX] = 3;
         }
         ctx.renderMap?.(currentMap);
         ctx.saveCurrentGame();

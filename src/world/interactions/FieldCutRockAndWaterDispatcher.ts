@@ -269,10 +269,12 @@ export function handleOverworldItemsAndHMObstacles(
         !ctx.storyFlags.has(`whirlpool_cleared_${facingX}_${facingY}`));
 
     if (isWhirlpool) {
+      const isAutoHm = (ctx as any).getAutoHm ? (ctx as any).getAutoHm() : (ctx as any).autoHm ?? false;
       const wpCheck = ModernHMHandler.canUseWhirlpool(
         ctx.playerParty,
         ctx.inventory,
-        ctx.storyFlags
+        ctx.storyFlags,
+        isAutoHm
       );
 
       if (wpCheck.canUse) {
@@ -292,7 +294,7 @@ export function handleOverworldItemsAndHMObstacles(
           ],
           '🌀 WHIRLPOOL',
           () => {
-            currentMap.collisionGrid[tileIdx] = 0;
+            currentMap.collisionGrid[tileIdx] = 3;
             ctx.storyFlags.add(`whirlpool_cleared_${facingX}_${facingY}`);
             ctx.renderMap(currentMap);
             ctx.saveCurrentGame();

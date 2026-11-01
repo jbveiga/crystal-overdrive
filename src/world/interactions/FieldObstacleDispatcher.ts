@@ -161,6 +161,92 @@ export class FieldObstacleDispatcher {
         }
       }
 
+      // Ilex Forest Shrine Celebi Event (Crystal Exclusive Event)
+      if (
+        currentMap.id === 'ilex_forest' &&
+        facingX === 8 &&
+        (facingY === 22 || facingY === 23)
+      ) {
+        if (ctx.storyFlags.has('EVENT_CAUGHT_CELEBI') || ctx.storyFlags.has('EVENT_FOUGHT_CELEBI')) {
+          ctx.openDialogue(
+            [
+              'ILEX FOREST SHRINE…',
+              'A peaceful, verdant silence gently envelopes the woodland clearing.',
+            ],
+            '⛩️ ILEX FOREST SHRINE'
+          );
+          return true;
+        }
+
+        const hasGsBall =
+          ctx.inventory.keyItems?.includes('GS_BALL') ||
+          ctx.inventory.keyItems?.includes('gs_ball') ||
+          ctx.storyFlags.has('HAS_GS_BALL');
+
+        if (hasGsBall) {
+          if (!ctx.storyFlags.has('KURT_CHECKED_GS_BALL')) {
+            ctx.openDialogue(
+              [
+                'ILEX FOREST SHRINE…',
+                "It is dedicated to the forest's protector.",
+                'There is a small, carved hollow on the front. Perhaps KURT in AZALEA TOWN could inspect the mysterious GS BALL?',
+              ],
+              '⛩️ ILEX FOREST SHRINE'
+            );
+            return true;
+          }
+
+          const promptPages = [
+            'ILEX FOREST SHRINE…',
+            "There's a carved hollow niche in the shrine... It fits the inspected GS BALL perfectly!",
+            'Would you like to place the GS BALL in the shrine?',
+          ];
+
+          const onChoice = (choice: 'YES' | 'NO') => {
+            if (choice === 'YES') {
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              ctx.openDialogue(
+                [
+                  `${ctx.playerName} gently placed the GS BALL into the shrine niche!`,
+                  '…… …… ……',
+                  'A warm, ethereal breeze suddenly stirs through the leaves!',
+                  'A melodious flutter of translucent wings descends from the canopy above!',
+                ],
+                '⛩️ ILEX FOREST SHRINE',
+                () => {
+                  BattleAudio.playCry('celebi');
+                  const celebi = PokemonFactory.create('celebi', 30, [
+                    'healbell',
+                    'safeguard',
+                    'ancientpower',
+                    'batonpass',
+                  ]);
+                  ctx.storyFlags.add('EVENT_FOUGHT_CELEBI');
+                  if (ctx.inventory.keyItems) {
+                    ctx.inventory.keyItems = ctx.inventory.keyItems.filter(
+                      (k) => k !== 'GS_BALL' && k !== 'gs_ball'
+                    );
+                  }
+                  void ctx.triggerBattle(celebi, { isLegendary: true });
+                }
+              );
+            } else {
+              ctx.openDialogue(
+                ['The GS BALL remains safely tucked in your BAG.'],
+                '⛩️ ILEX FOREST SHRINE'
+              );
+            }
+          };
+
+          if (ctx.openChoiceDialogue) {
+            ctx.openChoiceDialogue(promptPages, '⛩️ ILEX FOREST SHRINE', onChoice);
+          } else {
+            onChoice('YES');
+          }
+          return true;
+        }
+      }
+
       // Bill's PC Storage Terminal Interaction
       if (
         bgEvent.action === 'OPEN_PC' ||

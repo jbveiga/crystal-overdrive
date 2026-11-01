@@ -22,9 +22,10 @@ export type BgmTrackId =
   | 'bgm_wild_battle'
   | 'bgm_trainer_battle'
   | 'bgm_gym_leader_battle'
-  | 'bgm_evolution';
+  | 'bgm_evolution'
+  | 'bgm_suicune_battle';
 
-export type BattleBgmType = 'wild' | 'trainer' | 'gym_leader';
+export type BattleBgmType = 'wild' | 'trainer' | 'gym_leader' | 'suicune';
 
 const MUTE_STORAGE_KEY = 'crystal_overdrive_muted';
 
@@ -394,5 +395,6 @@ export const BATTLE_BGM_TABLE: Record<BattleBgmType, BgmTrackId> = {
   wild: 'bgm_wild_battle',
   trainer: 'bgm_trainer_battle',
   gym_leader: 'bgm_gym_leader_battle',
+  suicune: 'bgm_suicune_battle',
 };
 

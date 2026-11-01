@@ -22,6 +22,7 @@ export type { DoubleBattleConfig };
 
 export interface TriggerBattleOptions {
   isRoamer?: boolean;
+  isLegendary?: boolean;
   isTrainer?: boolean;
   isGymLeader?: boolean;
   trainerName?: string;
@@ -52,7 +53,7 @@ export interface BattleSessionContext {
     direction: Direction;
   };
   audioManager: {
-    playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader') => void;
+    playBattleBgm: (type: 'wild' | 'trainer' | 'gym_leader' | 'suicune') => void;
     restoreOverworldBgm: (volume?: number) => void;
   };
   seenSpecies: Set<string>;

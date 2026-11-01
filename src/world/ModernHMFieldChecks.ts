@@ -207,27 +207,40 @@ export class ModernHMFieldChecks {
     return this.makeResult(true, true, true, partyKnowsFly);
   }
 
+  private static extractKeys(val: unknown): string[] {
+    if (!val) return [];
+    if (Array.isArray(val)) return val.map((v) => String(v));
+    if (typeof val === 'object') return Object.keys(val as Record<string, unknown>);
+    return [];
+  }
+
   public static checkWhirlpool(
     inventory: BagInventory,
     storyFlags: Set<string>,
-    party: PokemonInstance[]
+    party: PokemonInstance[],
+    autoHm: boolean = true
   ): HMFieldCheckResult {
-    const badges = inventory?.badges || [];
-    const tms = inventory?.tms || [];
+    const badges = this.extractKeys(inventory?.badges).map((b) => b.toLowerCase());
+    const tms = this.extractKeys(inventory?.tms).map((t) => t.toUpperCase());
+    const keyItems = this.extractKeys(inventory?.keyItems).map((k) => k.toUpperCase());
 
     const hasBadge =
       badges.includes('glacier') ||
       badges.includes('glacier_badge') ||
+      badges.includes('glacierbadge') ||
       storyFlags.has('pryce_defeated') ||
+      storyFlags.has('has_glacier_badge') ||
       storyFlags.has('glacierbadge');
 
     const partyKnowsWhirlpool = party.find(
-      (p) => !p.isEgg && p.moves.some((m) => m.moveId.toLowerCase() === 'whirlpool')
+      (p) => !p.isEgg && p.moves?.some((m) => m.moveId.toLowerCase() === 'whirlpool')
     );
 
     const hasHM =
       tms.includes('HM06') ||
       tms.includes('HM06_WHIRLPOOL') ||
+      keyItems.includes('HM06') ||
+      keyItems.includes('HM06_WHIRLPOOL') ||
       storyFlags.has('has_hm06_whirlpool') ||
       storyFlags.has('EVENT_GOT_HM06_WHIRLPOOL') ||
       Boolean(partyKnowsWhirlpool);
@@ -236,7 +249,7 @@ export class ModernHMFieldChecks {
     const compatiblePokemon =
       partyKnowsWhirlpool ||
       nonEggParty.find((p) => ModernHMHandler.canSpeciesUseFieldHM(p.speciesId, 'whirlpool')) ||
-      nonEggParty.find((p) => p.types.includes('Water')) ||
+      nonEggParty.find((p) => p.types?.includes('Water')) ||
       null;
 
     if (!compatiblePokemon) {
@@ -279,7 +292,18 @@ export class ModernHMFieldChecks {
       );
     }
 
-    return this.makeResult(true, true, true, compatiblePokemon);
+    // Classic Gen 2 Mode (Auto-HM: OFF): strictly requires a Pokémon with WHIRLPOOL in its active moveset
+    if (!autoHm && !partyKnowsWhirlpool) {
+      return this.makeResult(
+        false,
+        hasBadge,
+        hasHM,
+        compatiblePokemon,
+        'A POKéMON in your party must know WHIRLPOOL in its battle moves to pass vicious whirlpools!'
+      );
+    }
+
+    return this.makeResult(true, true, true, partyKnowsWhirlpool || compatiblePokemon);
   }
 
   public static canUseWaterfall(
@@ -287,8 +311,9 @@ export class ModernHMFieldChecks {
     inventory: BagInventory | Partial<BagInventory>,
     storyFlags: Set<string> = new Set()
   ): HMFieldCheckResult {
-    const badges = (inventory.badges || []).map((b) => b.toLowerCase());
-    const tms = (inventory.tms || []).map((t) => t.toUpperCase());
+    const badges = this.extractKeys(inventory.badges).map((b) => b.toLowerCase());
+    const tms = this.extractKeys(inventory.tms).map((t) => t.toUpperCase());
+    const keyItems = this.extractKeys(inventory.keyItems).map((k) => k.toUpperCase());
 
     const hasBadge =
       badges.includes('rising') ||

@@ -128,7 +128,8 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       makeNpc('buena', 6, 6, 'DOWN', 'girl', '🎙️ BUENA', 
         [
           "I'm BUENA! Tune into BUENA'S PASSWORD every night on the radio to earn points on your BLUE CARD!",
-        ]
+        ],
+        { action: 'BUENA_PASSWORD_EVENT' }
       ),
     ],
     radio_tower_3f: [

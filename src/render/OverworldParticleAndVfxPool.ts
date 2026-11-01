@@ -155,7 +155,15 @@ export class OverworldParticleAndVfxPool {
     });
   }
 
-  public async showExclamationBubble(npc: GridEntity, durationMs: number = 600): Promise<void> {
+  public showExclamationBubble(npc: GridEntity, durationMs: number = 600): Promise<void> {
+    return this.showEmotionBubble(npc, '!', durationMs);
+  }
+
+  public async showEmotionBubble(
+    npc: GridEntity,
+    emotion: '!' | '?' | '♥' | '...' = '!',
+    durationMs: number = 600
+  ): Promise<void> {
     if (this.exclamationContainer) {
       this.exclamationContainer.destroy({ children: true });
       this.exclamationContainer = null;
@@ -177,18 +185,22 @@ export class OverworldParticleAndVfxPool {
     bg.moveTo(-5, 14).lineTo(0, 22).lineTo(5, 14).fill({ color: 0x111827 });
     bubble.addChild(bg);
 
-    const bang = new Text({
-      text: '!',
+    const emotionColor =
+      emotion === '!' ? 0xdc2626 : emotion === '?' ? 0x2563eb : emotion === '♥' ? 0xec4899 : 0x475569;
+    const fontSize = emotion === '...' ? 20 : emotion === '♥' ? 22 : 26;
+
+    const textNode = new Text({
+      text: emotion,
       style: new TextStyle({
         fontFamily: 'monospace',
-        fontSize: 26,
+        fontSize,
         fontWeight: '900',
-        fill: 0xdc2626,
+        fill: emotionColor,
       }),
     });
-    bang.anchor.set(0.5);
-    bang.position.set(0, -4);
-    bubble.addChild(bang);
+    textNode.anchor.set(0.5);
+    textNode.position.set(0, emotion === '...' ? -7 : -4);
+    bubble.addChild(textNode);
 
     this.foregroundContainer.addChild(bubble);
     this.exclamationContainer = bubble;

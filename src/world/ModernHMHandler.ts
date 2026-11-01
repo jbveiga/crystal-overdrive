@@ -456,17 +456,19 @@ export class ModernHMHandler {
   public static canUseWhirlpool(
     party: PokemonInstance[],
     inventory: BagInventory,
-    storyFlags: Set<string>
+    storyFlags: Set<string>,
+    autoHm: boolean = true
   ): HMFieldCheckResult {
-    return this.checkWhirlpool(inventory, storyFlags, party);
+    return this.checkWhirlpool(inventory, storyFlags, party, autoHm);
   }
 
   public static checkWhirlpool(
     inventory: BagInventory,
     storyFlags: Set<string>,
-    party: PokemonInstance[]
+    party: PokemonInstance[],
+    autoHm: boolean = true
   ): HMFieldCheckResult {
-    return ModernHMFieldChecks.checkWhirlpool(inventory, storyFlags, party);
+    return ModernHMFieldChecks.checkWhirlpool(inventory, storyFlags, party, autoHm);
   }
 
   public static canUseWaterfall(

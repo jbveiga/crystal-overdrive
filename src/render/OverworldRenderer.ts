@@ -42,6 +42,8 @@ export class OverworldRenderer {
   private tileTextures: Map<string, Texture> = new Map();
   private waterAnimFrames: Map<string, [Texture, Texture, Texture, Texture]> = new Map();
   private animatedWaterSprites: Array<{ sprite: Sprite; frames: [Texture, Texture, Texture, Texture] }> = [];
+  private animatedWhirlpools: Array<{ container: Container; speed: number }> = [];
+  private cachedLookupMap?: (mapId: string) => MapData | undefined;
   private waterAnimState = { timer: 0, step: 0 };
   private goldFrames!: CharacterFrames; private krisFrames!: CharacterFrames; private playerFrames!: CharacterFrames;
   private npcFrames: Map<NpcSpriteType, CharacterFrames> = new Map();
@@ -224,7 +226,15 @@ export class OverworldRenderer {
   }
 
   public showExclamationBubble(npc: GridEntity, durationMs: number = 600): Promise<void> {
-    return this.particlePoolAndVfx.showExclamationBubble(npc, durationMs);
+    return this.particlePoolAndVfx.showEmotionBubble(npc, '!', durationMs);
+  }
+
+  public showEmotionBubble(
+    npc: GridEntity,
+    emotion: '!' | '?' | '♥' | '...' = '!',
+    durationMs: number = 600
+  ): Promise<void> {
+    return this.particlePoolAndVfx.showEmotionBubble(npc, emotion, durationMs);
   }
 
   public getFadeOverlayAlpha(): number {
@@ -271,6 +281,7 @@ export class OverworldRenderer {
       waterAnimStep: this.waterAnimState.step,
       mapContainer: this.mapContainer,
       animatedWaterSprites: this.animatedWaterSprites,
+      animatedWhirlpools: this.animatedWhirlpools,
     });
   }
 
@@ -391,11 +402,15 @@ export class OverworldRenderer {
   }
 
   public renderMap(map: MapData, lookupMap?: (mapId: string) => MapData | undefined): void {
+    if (lookupMap) {
+      this.cachedLookupMap = lookupMap;
+    }
     const oldChildren = this.mapContainer.removeChildren();
     for (let i = 0; i < oldChildren.length; i++) {
       oldChildren[i].destroy({ children: true, texture: false });
     }
     this.animatedWaterSprites.length = 0;
+    this.animatedWhirlpools.length = 0;
     this.currentRenderedMap = map;
     this.tileSize = map.tileSize;
     this.lastCullState.camX = Number.NaN;
@@ -477,26 +492,95 @@ export class OverworldRenderer {
     });
   }
 
+  public getTileCollisionAt(tx: number, ty: number): number {
+    const map = this.currentRenderedMap;
+    if (!map) return 1;
+    if (tx >= 0 && tx < map.width && ty >= 0 && ty < map.height) {
+      return map.collisionGrid[ty * map.width + tx] ?? 1;
+    }
+    const lookup = this.cachedLookupMap;
+    if (lookup && map.connections) {
+      if (tx < 0 && map.connections.WEST) {
+        const west = lookup(map.connections.WEST.mapId);
+        if (west) {
+          const wtx = tx + west.width;
+          const wty = ty - (map.connections.WEST.offset ?? 0);
+          if (wtx >= 0 && wtx < west.width && wty >= 0 && wty < west.height) {
+            return west.collisionGrid[wty * west.width + wtx] ?? 1;
+          }
+        }
+      } else if (tx >= map.width && map.connections.EAST) {
+        const east = lookup(map.connections.EAST.mapId);
+        if (east) {
+          const etx = tx - map.width;
+          const ety = ty - (map.connections.EAST.offset ?? 0);
+          if (etx >= 0 && etx < east.width && ety >= 0 && ety < east.height) {
+            return east.collisionGrid[ety * east.width + etx] ?? 1;
+          }
+        }
+      } else if (ty < 0 && map.connections.NORTH) {
+        const north = lookup(map.connections.NORTH.mapId);
+        if (north) {
+          const ntx = tx - (map.connections.NORTH.offset ?? 0);
+          const nty = ty + north.height;
+          if (ntx >= 0 && ntx < north.width && nty >= 0 && nty < north.height) {
+            return north.collisionGrid[nty * north.width + ntx] ?? 1;
+          }
+        }
+      } else if (ty >= map.height && map.connections.SOUTH) {
+        const south = lookup(map.connections.SOUTH.mapId);
+        if (south) {
+          const stx = tx - (map.connections.SOUTH.offset ?? 0);
+          const sty = ty - map.height;
+          if (stx >= 0 && stx < south.width && sty >= 0 && sty < south.height) {
+            return south.collisionGrid[sty * south.width + stx] ?? 1;
+          }
+        }
+      }
+    }
+    const clampedX = Math.max(0, Math.min(map.width - 1, tx));
+    const clampedY = Math.max(0, Math.min(map.height - 1, ty));
+    return map.collisionGrid[clampedY * map.width + clampedX] ?? 1;
+  }
+
   private isEntityOnTallGrass(entity: GridEntity): boolean {
     const map = this.currentRenderedMap;
     if (!map || entity.isJumping) return false;
     const tx = Math.round(entity.renderX), ty = Math.round(entity.renderY);
-    if (tx < 0 || tx >= map.width || ty < 0 || ty >= map.height) return false;
-    return map.collisionGrid[ty * map.width + tx] === 2;
+    const col = this.getTileCollisionAt(tx, ty);
+    if (col === 2) return true;
+    if (entity.isMoving) {
+      const origCol = this.getTileCollisionAt(entity.x, entity.y);
+      const targetCol = this.getTileCollisionAt(entity.targetX, entity.targetY);
+      if (origCol === 2 && targetCol === 2) return true;
+    }
+    return false;
   }
 
   public isEntityOnWater(entity: GridEntity): boolean {
     const map = this.currentRenderedMap;
     if (!map || entity.isJumping) return false;
     const tx = Math.round(entity.renderX), ty = Math.round(entity.renderY);
-    if (tx < 0 || tx >= map.width || ty < 0 || ty >= map.height) return false;
-    return map.collisionGrid[ty * map.width + tx] === 3;
+    const col = this.getTileCollisionAt(tx, ty);
+    if (col === 3) return true;
+    // Prevent 1-frame mid-step border flicker when moving between water tiles across connected map borders
+    if (entity.isMoving) {
+      const origCol = this.getTileCollisionAt(entity.x, entity.y);
+      const targetCol = this.getTileCollisionAt(entity.targetX, entity.targetY);
+      if (origCol === 3 && targetCol === 3) return true;
+    }
+    return false;
   }
 
   public update(player: GridEntity, npcs: GridEntity[] = [], dtWorld: number = 0): void {
     const scale = 3;
 
     this.particlePoolAndVfx.updateAnimatedWater(this.animatedWaterSprites, dtWorld, this.waterAnimState);
+    if (this.animatedWhirlpools.length > 0 && dtWorld > 0) {
+      for (let i = 0; i < this.animatedWhirlpools.length; i++) {
+        this.animatedWhirlpools[i].container.rotation += dtWorld * this.animatedWhirlpools[i].speed;
+      }
+    }
     if (dtWorld > 0) {
       this.particlePoolAndVfx.updateParticles(dtWorld);
     }

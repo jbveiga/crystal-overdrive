@@ -60,7 +60,7 @@ export class OverworldWarpAndMapTransitionController {
     if (map.id === 'route_41') {
       const whirlpoolCoords = [[12, 17], [36, 19], [12, 37], [36, 45]];
       for (const [wx, wy] of whirlpoolCoords) {
-        map.collisionGrid[wy * map.width + wx] = ctx.storyFlags.has(`whirlpool_cleared_${wx}_${wy}`) ? 0 : 1;
+        map.collisionGrid[wy * map.width + wx] = ctx.storyFlags.has(`whirlpool_cleared_${wx}_${wy}`) ? 3 : 1;
       }
     }
     if (map.id === 'vermilion_gym') {

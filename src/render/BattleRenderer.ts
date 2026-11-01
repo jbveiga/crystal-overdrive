@@ -237,12 +237,28 @@ export class BattleRenderer {
       tl.call(() => {
         BattleAudio.playCry(enemyPokemon.speciesId);
       });
+      // Crystal signature 2-frame sprite entry hop & landing compression
       tl.to(this.enemyPokemonSprite, {
-        y: enemyPlatformY - 8,
-        duration: 0.065 / this.speedMultiplier,
-        yoyo: true,
-        repeat: 2,
+        y: enemyPlatformY - 14,
+        scaleY: 2.6,
+        duration: 0.075 / this.speedMultiplier,
+        ease: 'power2.out',
+      });
+      tl.to(this.enemyPokemonSprite, {
+        y: enemyPlatformY,
+        scaleY: 2.4,
+        duration: 0.075 / this.speedMultiplier,
+        ease: 'power2.in',
+      });
+      tl.to(this.enemyPokemonSprite, {
+        y: enemyPlatformY - 7,
+        duration: 0.055 / this.speedMultiplier,
         ease: 'power1.out',
+      });
+      tl.to(this.enemyPokemonSprite, {
+        y: enemyPlatformY,
+        duration: 0.055 / this.speedMultiplier,
+        ease: 'power1.in',
       });
     });
   }
