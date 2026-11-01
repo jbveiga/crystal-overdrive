@@ -127,6 +127,7 @@ const LOCATION_NAME_TABLE: Record<string, string> = {
 export class SaveManager {
   private dbPromise: Promise<IDBPDatabase> | null = null;
   private memoryStore: Map<string, SaveData> = new Map();
+  private saveQueue: Promise<void> = Promise.resolve();
   constructor() {
     if (typeof indexedDB !== 'undefined') {
       this.dbPromise = openDB(DB_NAME, DB_VERSION, {
@@ -351,17 +352,28 @@ export class SaveManager {
       StorageManager.reconcilePartyAndStorageIntegrity(data.party, data.storage);
       SaveManager.reconcileStarterFlags(data);
       data.timestamp = Date.now();
-      this.memoryStore.set(SAVE_KEY, JSON.parse(JSON.stringify(data)));
-      if (this.dbPromise) {
-        const db = await this.dbPromise;
-        await db.put(STORE_NAME, data, SAVE_KEY);
-      }
+      // Synchronously clone snapshot & mirror to memoryStore + localStorage before async IndexedDB write
+      const serialized = JSON.stringify(data);
+      const snapshot: SaveData = JSON.parse(serialized);
+      this.memoryStore.set(SAVE_KEY, snapshot);
+
       if (typeof localStorage !== 'undefined') {
         try {
-          localStorage.setItem('crystal-overdrive-save', JSON.stringify(data));
+          localStorage.setItem('crystal-overdrive-save', serialized);
         } catch (err) {
           console.warn('Could not mirror save to localStorage:', err);
         }
+      }
+
+      if (this.dbPromise) {
+        const dbPromise = this.dbPromise;
+        this.saveQueue = this.saveQueue
+          .catch(() => {})
+          .then(async () => {
+            const db = await dbPromise;
+            await db.put(STORE_NAME, snapshot, SAVE_KEY);
+          });
+        await this.saveQueue;
       }
       return true;
     } catch (err) {
@@ -372,6 +384,7 @@ export class SaveManager {
 
   public async loadGame(): Promise<SaveData | null> {
     try {
+      await this.saveQueue.catch(() => {});
       let loaded: SaveData | null = null;
       if (this.dbPromise) {
         const db = await this.dbPromise;
@@ -385,6 +398,26 @@ export class SaveManager {
             if (found) loaded = found;
           } catch {
             // ignore getAll errors
+          }
+        }
+        // Reconcile if synchronous localStorage mirror has a newer timestamp than IndexedDB
+        if (typeof localStorage !== 'undefined') {
+          try {
+            const rawMirror = localStorage.getItem('crystal-overdrive-save');
+            if (rawMirror) {
+              const parsedMirror = JSON.parse(rawMirror);
+              if (
+                parsedMirror &&
+                typeof parsedMirror === 'object' &&
+                parsedMirror.player &&
+                (!loaded || (parsedMirror.timestamp ?? 0) > (loaded.timestamp ?? 0))
+              ) {
+                loaded = parsedMirror;
+                await db.put(STORE_NAME, loaded, SAVE_KEY);
+              }
+            }
+          } catch {
+            // ignore mirror parse errors
           }
         }
       }
