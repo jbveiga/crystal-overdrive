@@ -106,7 +106,6 @@ export class OverworldTileLayerRenderer {
         const isWhirlpoolTile =
           map.collisionGrid[index] === 1 &&
           (tileName.includes('whirlpool') ||
-            tileName.includes('46_47_56_57') ||
             (map.id === 'route_41' &&
               ((x === 12 && y === 17) ||
                 (x === 36 && y === 19) ||

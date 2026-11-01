@@ -87,6 +87,7 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   pryce: './assets/sprites/characters/elder.png',
   ho_oh: './assets/sprites/characters/lapras.png',
   miltank: './assets/sprites/characters/miltank.png',
+  ampharos: './assets/sprites/characters/ampharos.png',
   gyarados: './assets/sprites/characters/lapras.png',
   electrode: './assets/sprites/characters/pokefan_m.png',
   voltorb: './assets/sprites/characters/pokefan_m.png',

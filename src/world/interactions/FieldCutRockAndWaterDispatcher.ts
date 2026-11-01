@@ -264,7 +264,6 @@ export function handleOverworldItemsAndHMObstacles(
 
     const isWhirlpool =
       facingTileName.includes('whirlpool') ||
-      facingTileName.includes('46_47_56_57') ||
       (isRoute41Whirlpool &&
         !ctx.storyFlags.has(`whirlpool_cleared_${facingX}_${facingY}`));
 

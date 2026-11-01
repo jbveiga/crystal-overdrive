@@ -71,6 +71,7 @@ export type NpcSpriteType =
   | 'pryce'
   | 'ho_oh'
   | 'miltank'
+  | 'ampharos'
   | 'gyarados'
   | 'electrode'
   | 'voltorb'

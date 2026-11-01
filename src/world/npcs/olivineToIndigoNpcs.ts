@@ -273,7 +273,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'AMPHY_EVENT' }
       ),
-      makeNpc('lighthouse_amphy', 9, 8, 'DOWN', 'fat_man', '💡 AMPHAROS', 
+      makeNpc('lighthouse_amphy', 9, 8, 'DOWN', 'ampharos', '💡 AMPHAROS', 
         ['AMPHAROS: …Palu… (It looks pale and feverish…)'],
         { action: 'AMPHY_EVENT' }
       ),

@@ -240,6 +240,22 @@ const { ISSUE_RESOLUTIONS } = (() => {
   1. Created a 32x32 32-bit BGRA Crystal Poké Ball icon at \`public/favicon.ico\`.
   2. Linked \`<link rel="icon" type="image/x-icon" href="./favicon.ico" />\` and \`<link rel="shortcut icon" href="./favicon.ico" />\` in \`index.html\`.
   3. Added regression verification in \`tests/bugfixes/npcMovementAndCutscenes.test.ts\`.`,
+      65: `### Resolution Details for Issue #65
+- **Root Cause**:
+  1. \`OverworldTileLayerRenderer.ts\` and \`FieldCutRockAndWaterDispatcher.ts\` checked \`tileName.includes('46_47_56_57')\`, which matched the lighthouse bed tile (\`in_lighthouse_46_47_56_57\`), creating a spinning whirlpool on the bed.
+  2. \`lighthouse_amphy\` in \`src/world/npcs/olivineToIndigoNpcs.ts\` was assigned the placeholder \`fat_man\` human sprite.
+- **Fix**:
+  1. Removed \`46_47_56_57\` checks from whirlpool rendering and interaction dispatchers, restricting whirlpools exclusively to water routes.
+  2. Generated an authentic 144x32 9-frame RGBA Ampharos overworld character sprite sheet at \`public/assets/sprites/characters/ampharos.png\`.
+  3. Registered \`ampharos\` in \`NpcSpriteType\` and \`NPC_SHEET_PATHS\`.
+  4. Updated \`lighthouse_amphy\` in \`src/world/npcs/olivineToIndigoNpcs.ts\` to use \`spriteType: 'ampharos'\`.
+  5. Added automated regression verification in \`tests/bugfixes/githubIssues65And66.test.ts\`.`,
+      66: `### Resolution Details for Issue #66
+- **Root Cause**: \`OverworldTileLayerRenderer.ts\` erroneously treated any solid tile containing \`46_47_56_57\` as an active whirlpool, matching numerous interior gym pillars and floor tiles (\`kt_46_47_56_57\`) in \`olivine_gym\`.
+- **Fix**:
+  1. Removed the \`46_47_56_57\` heuristic from \`OverworldTileLayerRenderer.ts\` and \`FieldCutRockAndWaterDispatcher.ts\`.
+  2. Confirmed 0 whirlpools render inside \`olivine_gym\`, while preserving the 4 canonical ocean whirlpools on Route 41.
+  3. Added automated regression verification in \`tests/bugfixes/githubIssues65And66.test.ts\`.`,
     },
   };
 })();
