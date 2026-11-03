@@ -71,7 +71,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     ecruteak_poke_center: [
-      makeNpc('ecruteak_nurse_joy', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
+      makeNpc('ecruteak_nurse_joy', 3, 1, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to the ECRUTEAK CITY POKéMON CENTER!',
           'We heal your POKéMON to full health in no time.',

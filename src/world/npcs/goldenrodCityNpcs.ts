@@ -280,7 +280,7 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_poke_center: [
-      makeNpc('goldenrod_nurse_joy', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
+      makeNpc('goldenrod_nurse_joy', 3, 1, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to the GOLDENROD POKéMON CENTER!',
           'We heal your POKéMON to full health in no time.',

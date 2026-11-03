@@ -310,7 +310,7 @@ export function createKantoFuchsiaNpcs(): Record<string, GridEntity[]> {
         3,
         1,
         'DOWN',
-        'teacher',
+        'nurse',
         '👩‍⚕️ NURSE',
         ['Welcome to our POKéMON CENTER!', 'We can heal your tired POKéMON back to full health.'],
         { action: 'HEAL_AND_SAVE', talkAcrossCounter: true }

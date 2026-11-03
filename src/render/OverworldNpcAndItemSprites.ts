@@ -50,6 +50,7 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   whitney: './assets/sprites/characters/whitney.png',
   bike_shop_owner: './assets/sprites/characters/bike_shop_owner.png',
   clerk: './assets/sprites/characters/clerk.png',
+  nurse: './assets/sprites/characters/nurse.png',
   receptionist: './assets/sprites/characters/receptionist.png',
   gentleman: './assets/sprites/characters/gentleman.png',
   lass: './assets/sprites/characters/lass.png',

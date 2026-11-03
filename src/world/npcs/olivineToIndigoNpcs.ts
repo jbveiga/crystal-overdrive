@@ -29,7 +29,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     olivine_poke_center: [
-      makeNpc('olivine_nurse', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
+      makeNpc('olivine_nurse', 3, 1, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', 
         ['Welcome to the Olivine Pokémon Center!', 'We can heal your Pokémon to full health.'],
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),
@@ -317,7 +317,7 @@ export function createOlivineToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     cianwood_poke_center: [
-      makeNpc('cianwood_nurse', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
+      makeNpc('cianwood_nurse', 3, 1, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', 
         ['Welcome to the Cianwood Pokémon Center!', 'We can heal your Pokémon to full health.'],
         { talkAcrossCounter: true, action: 'HEAL_AND_SAVE' }
       ),

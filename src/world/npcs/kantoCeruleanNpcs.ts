@@ -256,5 +256,24 @@ export function createKantoCeruleanNpcs(): Record<string, GridEntity[]> {
         'The Underground Path runs right underneath Saffron City all the way south to Route 6.',
       ]),
     ],
+
+    cerulean_poke_center: [
+      makeNpc(
+        'cerulean_poke_center_nurse',
+        3,
+        1,
+        'DOWN',
+        'nurse',
+        '👩‍⚕️ NURSE JOY',
+        ['Welcome to our POKéMON CENTER!', 'We can heal your POKéMON back to full health.'],
+        { action: 'HEAL_AND_SAVE', talkAcrossCounter: true }
+      ),
+      makeNpc('cerulean_poke_center_super_nerd', 8, 4, 'LEFT', 'super_nerd', '👓 SUPER NERD', [
+        "For battles, I'd much rather use POKéMON I've been raising, even if they're weaker than some newly caught POKéMON.",
+      ]),
+      makeNpc('cerulean_poke_center_gym_guide', 1, 5, 'DOWN', 'boy', '🏆 GYM GUIDE', [
+        'The MAGNET TRAIN travels at over 340 mph. It goes between KANTO and JOHTO in almost no time at all.',
+      ]),
+    ],
   };
 }

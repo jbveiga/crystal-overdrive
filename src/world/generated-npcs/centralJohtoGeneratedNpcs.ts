@@ -76,7 +76,7 @@ export const CENTRAL_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("pewter_gym_gym_guide_2",6,11,"DOWN","boy",D10,[D6]),
   ],
   "pewter_poke_center": [
-    n("pewter_poke_center_nurse_0",3,1,"DOWN","teacher",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("pewter_poke_center_nurse_0",3,1,"DOWN","nurse",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
     n("pewter_poke_center_teacher_1",8,6,"DOWN","teacher","TEACHER",[D8]),
     n("pewter_poke_center_bug_catcher_2",2,3,"DOWN","bug_catcher","BUG CATCHER",[D6]),
     n("pewter_poke_center_pokefan_m_3",7,2,"DOWN","fat_man","POKEFAN M",[D1]),
@@ -127,7 +127,7 @@ export const CENTRAL_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("vermilion_gym_gym_guide_4",7,15,"DOWN","boy",D10,undefined),
   ],
   "vermilion_poke_center": [
-    n("vermilion_poke_center_nurse_0",3,1,"DOWN","teacher",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("vermilion_poke_center_nurse_0",3,1,"DOWN","nurse",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
     n("vermilion_poke_center_fishing_guru_1",7,2,"DOWN","fisherman",D15,undefined),
     n("vermilion_poke_center_sailor_2",6,5,"UP","fisherman","SAILOR",undefined),
     n("vermilion_poke_center_bug_catcher_3",1,5,"DOWN","bug_catcher","BUG CATCHER",undefined),
@@ -231,7 +231,7 @@ export const CENTRAL_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     t("route_10_south_pokefan_m_1",8,10,"DOWN","fat_man","⚔️ ROBERT",["Robert: That was a great battle!"],"route_10_south_robert","Pokefanm Robert",3,["ROBERT: Let's battle!"],[m("quagsire",33)]),
   ],
   "route_10_poke_center": [
-    n("route_10_poke_center_nurse_0",3,1,"DOWN","teacher",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("route_10_poke_center_nurse_0",3,1,"DOWN","nurse",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
     n("route_10_poke_center_gentleman_1",7,6,"LEFT","fat_man","GENTLEMAN",undefined),
     n("route_10_poke_center_gym_guide_2",7,2,"DOWN","boy",D10,undefined),
     n("route_10_poke_center_cooltrainer_f_3",1,3,"DOWN","girl",D7,undefined),
@@ -243,7 +243,7 @@ export const CENTRAL_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("lavender_town_youngster_3",6,11,"LEFT","boy","YOUNGSTER",undefined),
   ],
   "lavender_poke_center": [
-    n("lavender_poke_center_nurse_0",3,1,"DOWN","teacher",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("lavender_poke_center_nurse_0",3,1,"DOWN","nurse",D11,[D12,D13], {"action":"HEAL_AND_SAVE","counter":true}),
     n("lavender_poke_center_gentleman_1",7,6,"LEFT","fat_man","GENTLEMAN",undefined),
     n("lavender_poke_center_teacher_2",5,3,"DOWN","teacher","TEACHER",undefined),
     n("lavender_poke_center_youngster_3",1,5,"UP","boy","YOUNGSTER",undefined),

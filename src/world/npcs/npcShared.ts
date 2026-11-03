@@ -11,7 +11,7 @@ import type { Direction } from '../../types/game';
 import type { GridEntity, NpcMovementType } from '../GridPhysics';
 
 const STATIONARY_SPRITE_TYPES = new Set<GridEntity['spriteType']>([
-  'nurse' as any,
+  'nurse',
   'clerk',
   'receptionist',
   'bike_shop_owner',

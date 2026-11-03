@@ -33,6 +33,7 @@ export type NpcSpriteType =
   | 'whitney'
   | 'bike_shop_owner'
   | 'clerk'
+  | 'nurse'
   | 'receptionist'
   | 'gentleman'
   | 'lass'

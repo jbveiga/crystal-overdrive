@@ -79,7 +79,7 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("mahogany_gym_gym_guide_6",7,15,"DOWN","boy",D7,[D4]),
   ],
   "mahogany_poke_center": [
-    n("mahogany_poke_center_nurse_0",3,1,"DOWN","teacher",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("mahogany_poke_center_nurse_0",3,1,"DOWN","nurse",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
     n("mahogany_poke_center_pokefan_m_1",7,2,"DOWN","fat_man","POKEFAN M",[D4]),
     n("mahogany_poke_center_youngster_2",1,3,"RIGHT","boy","YOUNGSTER",[D6]),
     n("mahogany_poke_center_cooltrainer_f_3",2,3,"LEFT","girl",D11,[D2]),
@@ -157,7 +157,7 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("blackthorn_mart_black_belt_2",5,2,"DOWN","fat_man","BLACK BELT",[D3]),
   ],
   "blackthorn_poke_center": [
-    n("blackthorn_poke_center_nurse_0",3,1,"DOWN","teacher",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("blackthorn_poke_center_nurse_0",3,1,"DOWN","nurse",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
     n("blackthorn_poke_center_gentleman_1",5,3,"DOWN","fat_man","GENTLEMAN",[D3]),
     n("blackthorn_poke_center_twin_2",1,4,"DOWN","girl","TWIN",[D1]),
     n("blackthorn_poke_center_cooltrainer_m_3",7,6,"LEFT","boy",D14,[D4]),
@@ -233,7 +233,7 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("victory_road_gate_black_belt_2",12,5,"LEFT","fat_man","BLACK BELT",[D1]),
   ],
   "indigo_plateau_poke_center": [
-    n("indigo_plateau_poke_center_nurse_0",3,7,"DOWN","teacher",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("indigo_plateau_poke_center_nurse_0",3,7,"DOWN","nurse",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
     n("indigo_plateau_poke_center_clerk_1",11,7,"DOWN","boy","🏪 CLERK",[D13], {"action":"OPEN_MART","counter":true}),
     n("indigo_plateau_poke_center_cooltrainer_m_2",11,11,"DOWN","boy",D14,[D6]),
     n("indigo_plateau_poke_center_gramps_3",1,9,"DOWN","fat_man","GRAMPS",[D1]),
@@ -261,7 +261,7 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("route_28_steel_wing_house_cooltrainer_f_0",2,3,"DOWN","girl",D11,[D5]),
   ],
   "silver_cave_poke_center": [
-    n("silver_cave_poke_center_nurse_0",3,1,"DOWN","teacher",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("silver_cave_poke_center_nurse_0",3,1,"DOWN","nurse",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
     n("silver_cave_poke_center_granny_1",1,5,"LEFT","teacher","GRANNY",[D1]),
   ],
   "silver_cave_room_3": [
@@ -290,7 +290,7 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("viridian_gym_gym_guide_1",7,13,"DOWN","boy",D7,[D3]),
   ],
   "viridian_poke_center": [
-    n("viridian_poke_center_nurse_0",3,1,"DOWN","teacher",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
+    n("viridian_poke_center_nurse_0",3,1,"DOWN","nurse",D8,[D9,D10], {"action":"HEAL_AND_SAVE","counter":true}),
     n("viridian_poke_center_cooltrainer_m_1",8,4,"LEFT","boy",D14,[D1]),
     n("viridian_poke_center_cooltrainer_f_2",5,3,"UP","girl",D11,[D4]),
     n("viridian_poke_center_bug_catcher_3",1,6,"RIGHT","bug_catcher","BUG CATCHER",[D4]),

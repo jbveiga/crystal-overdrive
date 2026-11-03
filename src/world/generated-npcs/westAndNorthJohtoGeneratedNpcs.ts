@@ -49,7 +49,7 @@ export const WEST_AND_NORTH_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]>
     n("soul_house_granny_3",1,3,"UP","teacher","GRANNY",undefined),
   ],
   "saffron_poke_center": [
-    n(undefined,3,1,"DOWN","teacher",D2,[D3,D4], {"action":"HEAL_AND_SAVE","counter":true}),
+    n(undefined,3,1,"DOWN","nurse",D2,[D3,D4], {"action":"HEAL_AND_SAVE","counter":true}),
     n(undefined,7,2,"DOWN","teacher",undefined,undefined),
     n(undefined,8,6,"LEFT","fisherman",undefined,undefined),
     n(undefined,1,4,"DOWN","boy",undefined,undefined),
@@ -110,7 +110,7 @@ export const WEST_AND_NORTH_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]>
     n(undefined,9,6,"DOWN","boy","🏆 LEADER BLUE",undefined, {"action":"BLUE_EVENT","trainerId":"blue","trainerName":"Leader Blue","team":[{"speciesId":"pidgeot","level":56,"moves":["quickattack","whirlwind","wingattack","mirrormove"]},{"speciesId":"alakazam","level":54,"moves":["disable","recover","psychic","reflect"]},{"speciesId":"rhydon","level":56,"moves":["furyattack","sandstorm","rockslide","earthquake"]},{"speciesId":"gyarados","level":58,"moves":["twister","hydropump","raindance","hyperbeam"]},{"speciesId":"exeggutor","level":58,"moves":["sunnyday","leechseed","eggbomb","solarbeam"]},{"speciesId":"arcanine","level":58,"moves":["roar","swift","flamethrower","extremespeed"]}]}),
   ],
   "cinnabar_poke_center": [
-    n(undefined,3,1,"DOWN","teacher",D2,[D3,D4], {"action":"HEAL_AND_SAVE","counter":true}),
+    n(undefined,3,1,"DOWN","nurse",D2,[D3,D4], {"action":"HEAL_AND_SAVE","counter":true}),
     n(undefined,7,6,"LEFT","girl",undefined,undefined),
     n(undefined,2,4,"DOWN","fisherman",undefined,undefined),
   ],

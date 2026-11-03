@@ -387,7 +387,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     indigo_plateau_poke_center: [
-      makeNpc('indigo_plateau_nurse', 3, 7, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', [
+      makeNpc('indigo_plateau_nurse', 3, 7, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', [
         'Welcome to the POKéMON LEAGUE POKéMON CENTER!',
         'We can heal your POKéMON to perfect health before your big challenge.',
       ], { action: 'HEAL_AND_SAVE', talkAcrossCounter: true }),

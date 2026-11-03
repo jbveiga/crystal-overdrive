@@ -319,7 +319,7 @@ export function createNewBarkToSproutTowerNpcs(): Record<string, GridEntity[]> {
       ]),
     ],
     cherrygrove_poke_center: [
-      makeNpc('nurse_joy', 3, 1, 'DOWN', 'girl', '👩‍⚕️ NURSE JOY', 
+      makeNpc('nurse_joy', 3, 1, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to our POKéMON CENTER!',
           'We can heal your POKéMON to perfect health in no time at all.',

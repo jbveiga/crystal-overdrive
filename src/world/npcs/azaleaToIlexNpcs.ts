@@ -49,7 +49,7 @@ export function createAzaleaToIlexNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     azalea_poke_center: [
-      makeNpc('azalea_nurse_joy', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
+      makeNpc('azalea_nurse_joy', 3, 1, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to the AZALEA TOWN POKéMON CENTER!',
           'We heal your POKéMON to full health.',

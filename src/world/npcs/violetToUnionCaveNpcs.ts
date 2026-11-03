@@ -89,7 +89,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     violet_poke_center: [
-      makeNpc('nurse_violet', 3, 1, 'DOWN', 'mom', '💖 NURSE JOY', 
+      makeNpc('nurse_violet', 3, 1, 'DOWN', 'nurse', '💖 NURSE JOY', 
         [
           'Welcome to our POKéMON CENTER!',
           'We can heal your POKéMON back to perfect health in just a moment!',
@@ -270,7 +270,7 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     route_32_poke_center: [
-      makeNpc('r32_nurse_joy', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', 
+      makeNpc('r32_nurse_joy', 3, 1, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', 
         [
           'Welcome to the ROUTE 32 POKéMON CENTER!',
           'We heal your POKéMON to full health in no time.',

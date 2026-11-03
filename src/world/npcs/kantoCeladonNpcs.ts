@@ -271,7 +271,7 @@ export function createKantoCeladonNpcs(): Record<string, GridEntity[]> {
     ],
 
     celadon_poke_center: [
-      makeNpc('celadon_poke_center_nurse', 3, 1, 'DOWN', 'teacher', '👩‍⚕️ NURSE JOY', ["Hello, and welcome to the POKéMON CENTER.", "We restore your tired POKéMON to full health."], { action: 'HEAL_AND_SAVE', talkAcrossCounter: true }),
+      makeNpc('celadon_poke_center_nurse', 3, 1, 'DOWN', 'nurse', '👩‍⚕️ NURSE JOY', ["Hello, and welcome to the POKéMON CENTER.", "We restore your tired POKéMON to full health."], { action: 'HEAL_AND_SAVE', talkAcrossCounter: true }),
       makeNpc('celadon_poke_center_gentleman', 1, 5, 'LEFT', 'gentleman', '🎩 GENTLEMAN', ["The CELADON DEPT. STORE is so enormous, I lost my way on the 4th floor!"]),
       makeNpc('celadon_poke_center_pharmacist', 0, 3, 'DOWN', 'super_nerd', '👓 RESEARCHER', ["Grass-type Pokémon are deeply tied to nature and environmental effects."]),
       makeNpc('celadon_poke_center_cooltrainer_f', 8, 6, 'LEFT', 'cooltrainer_f', '👩 COOLTRAINER', ["ERIKA is admired by trainers all across Kanto for her calm demeanor."]),

@@ -49,6 +49,7 @@ const VALID_SPRITE_TYPES: Set<string> = new Set<NpcSpriteType>([
   'bill',
   'kris',
   'nurse_joy',
+  'nurse',
   'clerk',
   'officer',
   'gentleman',
@@ -146,6 +147,9 @@ const VALID_SPRITE_TYPES: Set<string> = new Set<NpcSpriteType>([
   'butterfree',
   'bike_shop_owner',
   'fisher',
+  'ampharos',
+  'gyarados',
+  'electrode',
 ]);
 
 describe('NPC Path and Sprite Audit', () => {
@@ -364,6 +368,28 @@ describe('NPC Path and Sprite Audit', () => {
     }
 
     expect(checkedNpcs).toBeGreaterThan(100);
+  });
+
+  it('verifies all 22 Pokémon Centers across Johto and Kanto use the dedicated nurse sprite sheet (144x32)', () => {
+    const nursePngPath = path.join(process.cwd(), 'public/assets/sprites/characters/nurse.png');
+    expect(fs.existsSync(nursePngPath)).toBe(true);
+    const buf = fs.readFileSync(nursePngPath);
+    expect(buf.readUInt32BE(16)).toBe(144);
+    expect(buf.readUInt32BE(20)).toBe(32);
+
+    const pokeCenterMaps = fs
+      .readdirSync(path.join(process.cwd(), 'public/assets/data/maps'))
+      .filter((f) => f.includes('poke_center'))
+      .map((f) => f.replace('.json', ''));
+
+    expect(pokeCenterMaps.length).toBe(22);
+
+    for (const mapId of pokeCenterMaps) {
+      const npcs = npcsByMap[mapId] || [];
+      const nurse = npcs.find((n) => n.action === 'HEAL_AND_SAVE');
+      expect(nurse, `Expected HEAL_AND_SAVE nurse in ${mapId}`).toBeDefined();
+      expect(nurse?.spriteType, `Expected nurse in ${mapId} to have spriteType 'nurse'`).toBe('nurse');
+    }
   });
 });
 
