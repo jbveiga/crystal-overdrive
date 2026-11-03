@@ -85,8 +85,10 @@ export class FieldObstacleDispatcher {
     }
 
     // 2. Check Street Signs & Interactive Background Objects (bgEvents)
-    const bgEvent = ctx.mapManager.checkBgEvent(facingX, facingY);
-    if (bgEvent && bgEvent.pages.length > 0) {
+    const bgEvent = typeof ctx.mapManager?.checkBgEvent === 'function'
+      ? (ctx.mapManager.checkBgEvent(facingX, facingY) ?? currentMap.bgEvents?.find((b: any) => b.x === facingX && b.y === facingY))
+      : currentMap.bgEvents?.find((b: any) => b.x === facingX && b.y === facingY);
+    if (bgEvent && bgEvent.pages && bgEvent.pages.length > 0) {
       // Starter Pokéball Selection in Elm's Lab (Ticket 6.1)
       if (
         bgEvent.action === 'STARTER_CYNDAQUIL' ||
@@ -168,6 +170,77 @@ export class FieldObstacleDispatcher {
         (facingY === 22 || facingY === 23)
       ) {
         if (ctx.storyFlags.has('EVENT_CAUGHT_CELEBI') || ctx.storyFlags.has('EVENT_FOUGHT_CELEBI')) {
+          const hasCelebi =
+            ctx.playerParty.some((p) => p.speciesId === 'celebi') ||
+            ctx.storyFlags.has('EVENT_CAUGHT_CELEBI') ||
+            ctx.storyFlags.has('EVENT_FOUGHT_CELEBI');
+          const radioTowerSaved =
+            ctx.storyFlags.has('radio_tower_cleared') ||
+            ctx.storyFlags.has('GOLDENROD_ROCKET_TAKEOVER_CLEARED') ||
+            ctx.storyFlags.has('has_radio_card');
+
+          if (hasCelebi && radioTowerSaved && !ctx.storyFlags.has('celebi_giovanni_memory_complete')) {
+            BattleAudio.playCry('celebi');
+            BattleAudio.playOverworldSound('FANFARE');
+            ctx.openDialogue(
+              [
+                'ILEX FOREST SHRINE…',
+                'The woodland air suddenly trembles with a dazzling emerald glow!',
+                'CELEBI begins to radiate an ancient, rippling temporal aura!',
+                'A gentle vortex of time spirals outward, enveloping you and the shrine…',
+                '…… …… …… (Three Years Ago — Tohjo Roadway)',
+                'SILVER: Why are you running away, Father?! What happened to TEAM ROCKET?!',
+                'GIOVANNI: One child defeated me in the VIRIDIAN GYM... Team Rocket is finished. I must go into solitude to reflect on my weakness.',
+                "SILVER: Weakness?! I won't accept this! If Team Rocket was beaten by one kid, you are all pathetic! I'll become the strongest trainer entirely on my own!",
+                'Giovanni turned away in silence and dissolved into the cold mountain mist…',
+                '…… …… …… (Present Day — Hidden Cavern beneath Tohjo Falls)',
+                'A warm flash of green light returns you to the present day, deep inside a secret waterfall cavern!',
+                'GIOVANNI: Who is there?! ...Wait. You are no Rocket Grunt. How did you pierce through time to find my secret hermitage?!',
+                'I sense an extraordinary bond between you and your POKéMON... Show me the true strength that dismantled Team Rocket!',
+              ],
+              '⏳ TIME RIPPLE',
+              () => {
+                const giovanniTeam = [
+                  PokemonFactory.create('nidoking', 50, ['earthpower', 'sludgebomb', 'megahorn', 'icebeam']),
+                  PokemonFactory.create('dugtrio', 48, ['earthquake', 'slash', 'rockslide', 'suckerpunch']),
+                  PokemonFactory.create('persian', 48, ['fakeout', 'slash', 'nightslash', 'powergem']),
+                  PokemonFactory.create('nidoqueen', 50, ['earthpower', 'sludgebomb', 'superpower', 'thunderbolt']),
+                  PokemonFactory.create('kangaskhan', 50, ['dizzypunch', 'crunch', 'earthquake', 'suckerpunch']),
+                  PokemonFactory.create('rhydon', 52, ['earthquake', 'stoneedge', 'megahorn', 'hammerarm']),
+                ];
+
+                ctx.triggerBattle(giovanniTeam[0], {
+                  isTrainer: true,
+                  trainerName: 'Boss Giovanni',
+                  trainerTeam: giovanniTeam,
+                  onVictory: () => {
+                    ctx.storyFlags.add('celebi_giovanni_memory_complete');
+                    if (!ctx.inventory.items) ctx.inventory.items = {};
+                    ctx.inventory.items['master_ball'] = (ctx.inventory.items['master_ball'] || 0) + 1;
+                    if (!ctx.inventory.balls) ctx.inventory.balls = {};
+                    ctx.inventory.balls['master_ball'] = (ctx.inventory.balls['master_ball'] || 0) + 1;
+                    BattleAudio.playOverworldSound('KEY_ITEM');
+                    ctx.openDialogue(
+                      [
+                        'GIOVANNI: Truly magnificent... It is not cold cruelty that makes a trainer formidable, but mutual devotion.',
+                        'My son Silver sought strength without compassion, but you have shown me what a true champion embodies.',
+                        'Take this MASTER BALL, young trainer. A testament to one who mastered both power and heart.',
+                        `${ctx.playerName} received MASTER BALL from GIOVANNI!`,
+                        'Giovanni bowed quietly and vanished into the swirling waterfall mists…',
+                      ],
+                      '👑 GIOVANNI',
+                      () => {
+                        ctx.saveCurrentGame();
+                        ctx.showToast('⏳ Time-Travel Event Complete: Giovanni defeated!');
+                      }
+                    );
+                  },
+                });
+              }
+            );
+            return true;
+          }
+
           ctx.openDialogue(
             [
               'ILEX FOREST SHRINE…',
@@ -359,6 +432,175 @@ export class FieldObstacleDispatcher {
         }
 
         if (facingX === 4 && facingY === 2) {
+          const helperAddItem = (itemId: string, count: number = 1) => {
+            if (!ctx.inventory.items) ctx.inventory.items = {};
+            ctx.inventory.items[itemId] = (ctx.inventory.items[itemId] || 0) + count;
+          };
+
+          // 1. Kabuto Chamber -> Inscription "ESCAPE"
+          if (currentMap.id === 'ruins_of_alph_kabuto_chamber') {
+            if (ctx.storyFlags.has('ruins_kabuto_vault_opened')) {
+              ctx.openDialogue(['The hidden vault in the rear stone wall stands open.'], '📜 ANCIENT INSCRIPTION');
+              return true;
+            }
+            const hasEscapeRope = (ctx.inventory.items?.['escape_rope'] || 0) > 0 || (ctx.inventory.items?.['escape-rope'] || 0) > 0;
+            if (hasEscapeRope) {
+              BattleAudio.playOverworldSound('FANFARE');
+              ctx.storyFlags.add('ruins_kabuto_vault_opened');
+              helperAddItem('heal_powder', 1);
+              helperAddItem('energypowder', 1);
+              helperAddItem('oran_berry', 1);
+              helperAddItem('pecha_berry', 1);
+              ctx.openDialogue(
+                [
+                  'Ancient UNOWN glyphs glow across the wall: "E - S - C - A - P - E"',
+                  'The glyphs resonate deeply with the ESCAPE ROPE in your BAG!',
+                  'A hidden doorway slides open in the rear wall, revealing an ancient secret vault!',
+                  `${ctx.playerName} retrieved HEAL POWDER, ENERGYPOWDER, ORAN BERRY, and PECHA BERRY!`,
+                ],
+                '📜 KABUTO VAULT',
+                () => {
+                  ctx.saveCurrentGame();
+                  ctx.showToast('🗝️ Kabuto Chamber Secret Vault opened!');
+                }
+              );
+              return true;
+            }
+            ctx.openDialogue(
+              [
+                ...chamber.inscription,
+                'Carved beneath the text are mysterious UNOWN glyphs: "E - S - C - A - P - E"',
+                'The wall seems to be waiting for an item associated with "ESCAPE"…',
+              ],
+              '📜 ANCIENT INSCRIPTION'
+            );
+            return true;
+          }
+
+          // 2. Omanyte Chamber -> Inscription "WATER"
+          if (currentMap.id === 'ruins_of_alph_omanyte_chamber') {
+            if (ctx.storyFlags.has('ruins_omanyte_vault_opened')) {
+              ctx.openDialogue(['The hidden vault in the rear stone wall stands open.'], '📜 ANCIENT INSCRIPTION');
+              return true;
+            }
+            const hasWaterStone = (ctx.inventory.items?.['water_stone'] || 0) > 0 || (ctx.inventory.items?.['waterstone'] || 0) > 0;
+            if (hasWaterStone) {
+              BattleAudio.playOverworldSound('FANFARE');
+              ctx.storyFlags.add('ruins_omanyte_vault_opened');
+              helperAddItem('mystic_water', 1);
+              helperAddItem('star_piece', 1);
+              helperAddItem('stardust', 2);
+              ctx.openDialogue(
+                [
+                  'Ancient UNOWN glyphs pulse with an aquatic blue light: "W - A - T - E - R"',
+                  'The stone glyphs resonate with the WATER STONE in your BAG!',
+                  'The carved stone wall grinds backward, revealing a shimmering secret vault!',
+                  `${ctx.playerName} retrieved MYSTIC WATER, STAR PIECE, and STARDUST!`,
+                ],
+                '📜 OMANYTE VAULT',
+                () => {
+                  ctx.saveCurrentGame();
+                  ctx.showToast('🗝️ Omanyte Chamber Secret Vault opened!');
+                }
+              );
+              return true;
+            }
+            ctx.openDialogue(
+              [
+                ...chamber.inscription,
+                'Carved beneath the text are mysterious UNOWN glyphs: "W - A - T - E - R"',
+                'The wall seems to be waiting for a source of ancient "WATER"…',
+              ],
+              '📜 ANCIENT INSCRIPTION'
+            );
+            return true;
+          }
+
+          // 3. Aerodactyl Chamber -> Inscription "LIGHT"
+          if (currentMap.id === 'ruins_of_alph_aerodactyl_chamber') {
+            if (ctx.storyFlags.has('ruins_aerodactyl_vault_opened')) {
+              ctx.openDialogue(['The hidden vault in the rear stone wall stands open.'], '📜 ANCIENT INSCRIPTION');
+              return true;
+            }
+            const hasFlash =
+              ctx.inventory.keyItems?.includes('HM05') ||
+              ctx.inventory.keyItems?.includes('hm05') ||
+              ctx.playerParty.some((p) => p.moves.some((m) => m.moveId === 'flash'));
+            if (hasFlash) {
+              BattleAudio.playOverworldSound('FANFARE');
+              ctx.storyFlags.add('ruins_aerodactyl_vault_opened');
+              helperAddItem('moon_stone', 1);
+              helperAddItem('heal_powder', 2);
+              helperAddItem('energy_root', 1);
+              ctx.openDialogue(
+                [
+                  'Ancient UNOWN glyphs gleam brightly: "L - I - G - H - T"',
+                  'A burst of luminous radiance from FLASH illuminates the ancient stone!',
+                  'A hidden passage rumbles open into a secret vault filled with ancient relics!',
+                  `${ctx.playerName} retrieved MOON STONE, HEAL POWDER, and ENERGY ROOT!`,
+                ],
+                '📜 AERODACTYL VAULT',
+                () => {
+                  ctx.saveCurrentGame();
+                  ctx.showToast('🗝️ Aerodactyl Chamber Secret Vault opened!');
+                }
+              );
+              return true;
+            }
+            ctx.openDialogue(
+              [
+                ...chamber.inscription,
+                'Carved beneath the text are mysterious UNOWN glyphs: "L - I - G - H - T"',
+                'The wall seems to be waiting for a radiant beam of "LIGHT"…',
+              ],
+              '📜 ANCIENT INSCRIPTION'
+            );
+            return true;
+          }
+
+          // 4. Ho-Oh Chamber -> Inscription "HO-OH"
+          if (currentMap.id === 'ruins_of_alph_ho_oh_chamber') {
+            if (ctx.storyFlags.has('ruins_ho_oh_vault_opened')) {
+              ctx.openDialogue(['The hidden royal vault in the rear stone wall stands open.'], '📜 ANCIENT INSCRIPTION');
+              return true;
+            }
+            const hasHoOh =
+              ctx.playerParty.some((p) => p.speciesId === 'ho-oh' || p.speciesId === 'ho_oh') ||
+              ctx.inventory.keyItems?.includes('RAINBOW_WING') ||
+              ctx.inventory.keyItems?.includes('rainbow_wing') ||
+              ctx.storyFlags.has('caught_ho_oh');
+            if (hasHoOh) {
+              BattleAudio.playOverworldSound('FANFARE');
+              ctx.storyFlags.add('ruins_ho_oh_vault_opened');
+              helperAddItem('sacred_ash', 1);
+              helperAddItem('revival_herb', 2);
+              helperAddItem('charcoal', 1);
+              ctx.openDialogue(
+                [
+                  'Ancient UNOWN glyphs shimmer with prismatic rainbow fire: "H - O - - - O - H"',
+                  'A magnificent rainbow radiance cascades across the wall in honor of the sky guardian!',
+                  'The sacred royal vault glides open, revealing timeless sacred treasures!',
+                  `${ctx.playerName} retrieved SACRED ASH, REVIVAL HERB, and CHARCOAL!`,
+                ],
+                '📜 HO-OH VAULT',
+                () => {
+                  ctx.saveCurrentGame();
+                  ctx.showToast('🗝️ Ho-Oh Chamber Sacred Vault opened!');
+                }
+              );
+              return true;
+            }
+            ctx.openDialogue(
+              [
+                ...chamber.inscription,
+                'Carved beneath the text are mysterious UNOWN glyphs: "H - O - - - O - H"',
+                'The wall seems to be waiting for the majestic presence of "HO-OH"…',
+              ],
+              '📜 ANCIENT INSCRIPTION'
+            );
+            return true;
+          }
+
           ctx.openDialogue(
             [...chamber.inscription],
             '📜 ANCIENT INSCRIPTION'

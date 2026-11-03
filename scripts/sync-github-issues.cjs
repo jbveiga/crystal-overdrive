@@ -256,6 +256,19 @@ const { ISSUE_RESOLUTIONS } = (() => {
   1. Removed the \`46_47_56_57\` heuristic from \`OverworldTileLayerRenderer.ts\` and \`FieldCutRockAndWaterDispatcher.ts\`.
   2. Confirmed 0 whirlpools render inside \`olivine_gym\`, while preserving the 4 canonical ocean whirlpools on Route 41.
   3. Added automated regression verification in \`tests/bugfixes/githubIssues65And66.test.ts\`.`,
+      67: `### Resolution Details for Issue #67
+- **Root Cause**: The character sprite sheet for \`boulder\` (\`public/assets/sprites/characters/boulder.png\`) was previously byte-identical to \`sudowoodo.png\`, causing Strength boulders (e.g., Mount Mortar 1F Inside at 21, 44) to mistakenly render as Sudowoodo.
+- **Fix**:
+  1. Generated an authentic 144x32 9-frame RGBA rock boulder character sprite sheet at \`public/assets/sprites/characters/boulder.png\` extracted from Pokémon Crystal GBC boulder graphics using canonical rock earth palette (#9C744A, #E0BA88, #261C14).
+  2. Verified distinct visual hash and dimensions from \`sudowoodo.png\`.
+  3. Added automated regression verification in \`tests/bugfixes/githubIssues67And68.test.ts\`.`,
+      68: `### Resolution Details for Issue #68
+- **Root Cause**: \`mahogany_town\` was compiled from the beta block layout (\`maps__unused__BetaMahoganyTown.blk\`) instead of canonical \`maps__MahoganyTown.blk\`. The beta layout placed the Poké Center door at (3, 13) and Gym door at (12, 13), whereas canonical Gen 2 maps place the Gym door at (6, 13) and Poké Center door at (15, 13).
+- **Fix**:
+  1. Updated \`scripts/generate-authentic-tiles.cjs\` to compile \`mahogany_town\` using canonical \`maps__MahoganyTown.blk\`.
+  2. Rebuilt \`public/assets/data/maps/mahogany_town.json\` and \`public/assets/data/world_maps.json\` with canonical building and warp coordinates: Mahogany Gym door at (6, 13) and Poké Center door at (15, 13).
+  3. Preserved a backward-compatibility warp at (3, 13) so players loading existing saves at (3, 13) can seamlessly enter the Poké Center.
+  4. Added automated regression verification in \`tests/bugfixes/githubIssues67And68.test.ts\`.`,
     },
   };
 })();

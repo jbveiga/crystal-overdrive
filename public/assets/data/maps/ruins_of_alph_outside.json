@@ -2278,7 +2278,14 @@
       ]
     }
   ],
-  "grassEncounters": [],
+  "grassEncounters": [
+    {
+      "speciesId": "unown",
+      "minLevel": 5,
+      "maxLevel": 5,
+      "weight": 100
+    }
+  ],
   "waterEncounters": [
     {
       "speciesId": "wooper",

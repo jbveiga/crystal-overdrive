@@ -51,15 +51,19 @@ export function getAzaleaAndRuinsQuestInteractions(): NpcInteractionRegistration
     {
       actions: ['UNOWN_DEX_EVENT'],
       handler: (targetNpc, _map, ctx) => {
-        if (
-          ctx.storyFlags.has('unown_awakened_kabuto') ||
-          ctx.storyFlags.has('unown_awakened_omanyte') ||
-          ctx.storyFlags.has('unown_awakened_aerodactyl') ||
-          ctx.storyFlags.has('unown_awakened_ho_oh') ||
-          ctx.storyFlags.has('EVENT_MADE_UNOWN_APPEAR_IN_RUINS')
-        ) {
-          if (!ctx.storyFlags.has('ENGINE_UNOWN_DEX')) {
+        const solvedCount = [
+          ctx.storyFlags.has('unown_awakened_kabuto') || ctx.storyFlags.has('EVENT_SOLVED_KABUTO_PUZZLE'),
+          ctx.storyFlags.has('unown_awakened_omanyte') || ctx.storyFlags.has('EVENT_SOLVED_OMANYTE_PUZZLE'),
+          ctx.storyFlags.has('unown_awakened_aerodactyl') || ctx.storyFlags.has('EVENT_SOLVED_AERODACTYL_PUZZLE'),
+          ctx.storyFlags.has('unown_awakened_ho_oh') || ctx.storyFlags.has('EVENT_SOLVED_HO_OH_PUZZLE'),
+          ctx.storyFlags.has('EVENT_MADE_UNOWN_APPEAR_IN_RUINS'),
+        ].filter(Boolean).length;
+
+        if (solvedCount > 0) {
+          if (!ctx.storyFlags.has('ENGINE_UNOWN_DEX') || !ctx.storyFlags.has('unown_dex_upgraded')) {
             ctx.storyFlags.add('ENGINE_UNOWN_DEX');
+            ctx.storyFlags.add('unown_dex_upgraded');
+            BattleAudio.playOverworldSound('KEY_ITEM');
             ctx.openDialogue(
               [
                 'HEAD RESEARCHER: You discovered how to awaken the UNOWN in the ruins? That is incredible news!',
@@ -68,13 +72,74 @@ export function getAzaleaAndRuinsQuestInteractions(): NpcInteractionRegistration
               ],
               targetNpc.speaker,
               () => {
-                BattleAudio.playOverworldSound('KEY_ITEM');
                 ctx.saveCurrentGame();
+                ctx.showToast?.('📖 POKéDEX updated with UNOWN MODE!');
               }
             );
-          } else {
-            ctx.openDialogue(['The UNOWN DEX records all forms of UNOWN you encounter!'], targetNpc.speaker);
+            return true;
           }
+
+          if (!ctx.inventory.items) ctx.inventory.items = {};
+
+          if (!ctx.storyFlags.has('ruins_fossil_helix_given')) {
+            ctx.storyFlags.add('ruins_fossil_helix_given');
+            ctx.inventory.items['helix_fossil'] = (ctx.inventory.items['helix_fossil'] || 0) + 1;
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            ctx.openDialogue(
+              [
+                'HEAD RESEARCHER: As our archaeological excavation progresses, we recovered an ancient prehistoric artifact!',
+                `${ctx.playerName} received the HELIX FOSSIL from the RESEARCHER!`,
+                'Take it to a POKéMON research facility to revive the ancient spiraling creature!',
+              ],
+              targetNpc.speaker,
+              () => {
+                ctx.saveCurrentGame();
+                ctx.showToast?.('🐚 Received HELIX FOSSIL!');
+              }
+            );
+            return true;
+          }
+
+          if (!ctx.storyFlags.has('ruins_fossil_dome_given')) {
+            ctx.storyFlags.add('ruins_fossil_dome_given');
+            ctx.inventory.items['dome_fossil'] = (ctx.inventory.items['dome_fossil'] || 0) + 1;
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            ctx.openDialogue(
+              [
+                'HEAD RESEARCHER: Another incredible find from deep beneath the ancient chambers!',
+                `${ctx.playerName} received the DOME FOSSIL from the RESEARCHER!`,
+                'This armored fossil preserved a creature that scuttled along primeval ocean floors!',
+              ],
+              targetNpc.speaker,
+              () => {
+                ctx.saveCurrentGame();
+                ctx.showToast?.('🛡️ Received DOME FOSSIL!');
+              }
+            );
+            return true;
+          }
+
+          if (!ctx.storyFlags.has('ruins_fossil_amber_given')) {
+            ctx.storyFlags.add('ruins_fossil_amber_given');
+            ctx.inventory.items['old_amber'] = (ctx.inventory.items['old_amber'] || 0) + 1;
+            ctx.inventory.items['rare_candy'] = (ctx.inventory.items['rare_candy'] || 0) + 3;
+            BattleAudio.playOverworldSound('KEY_ITEM');
+            ctx.openDialogue(
+              [
+                'HEAD RESEARCHER: Outstanding work! Thanks to your efforts, we unlocked the deepest chamber vaults!',
+                `${ctx.playerName} received OLD AMBER and 3 RARE CANDIES!`,
+                'This fossilized tree sap holds genetic code of a ferocious primordial dragon!',
+              ],
+              targetNpc.speaker,
+              () => {
+                ctx.saveCurrentGame();
+                ctx.showToast?.('💎 Received OLD AMBER & 3 RARE CANDY!');
+              }
+            );
+            return true;
+          }
+
+          ctx.openDialogue(['The UNOWN DEX records all forms of UNOWN you encounter!'], targetNpc.speaker);
         } else {
           ctx.openDialogue(
             [

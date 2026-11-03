@@ -3803,13 +3803,18 @@ buildMapFromBlk({
   id: 'mahogany_town',
   name: "Mahogany Town",
   tileset: 'johto',
-  blkFile: 'maps__unused__BetaMahoganyTown.blk',
+  blkFile: 'maps__MahoganyTown.blk',
   blocksW: 10,
   blocksH: 9,
   roofGroup: 'mh',
   connections: {"NORTH":{"mapId":"route_43","offset":0},"WEST":{"mapId":"route_42","offset":0},"EAST":{"mapId":"route_44","offset":0}},
-  warps: [{"x":11,"y":7,"targetMapId":"mahogany_mart","targetX":3,"targetY":7},{"x":17,"y":7,"targetMapId":"mahogany_red_gyarados_speech_house","targetX":2,"targetY":7},{"x":6,"y":13,"targetMapId":"mahogany_gym","targetX":4,"targetY":17},{"x":15,"y":13,"targetMapId":"mahogany_poke_center","targetX":3,"targetY":7},{"x":9,"y":1,"targetMapId":"route_43_mahogany_gate","targetX":4,"targetY":7}],
-  bgEvents: [],
+  warps: [{"x":11,"y":7,"targetMapId":"mahogany_mart","targetX":3,"targetY":7},{"x":17,"y":7,"targetMapId":"mahogany_red_gyarados_speech_house","targetX":2,"targetY":7},{"x":6,"y":13,"targetMapId":"mahogany_gym","targetX":4,"targetY":17},{"x":15,"y":13,"targetMapId":"mahogany_poke_center","targetX":3,"targetY":7},{"x":3,"y":13,"targetMapId":"mahogany_poke_center","targetX":3,"targetY":7},{"x":9,"y":1,"targetMapId":"route_43_mahogany_gate","targetX":4,"targetY":7}],
+  bgEvents: [
+    {"x":3,"y":13,"type":"sign","text":"MAHOGANY TOWN POKéMON GYM\nLEADER: PRYCE\nThe Teacher of Winter's Harshness","pages":["MAHOGANY TOWN POKéMON GYM\nLEADER: PRYCE\nThe Teacher of Winter's Harshness"]},
+    {"x":16,"y":13,"type":"sign","text":"POKéMON CENTER\nHeal your POKéMON!","pages":["POKéMON CENTER\nHeal your POKéMON!"]},
+    {"x":1,"y":9,"type":"sign","text":"MAHOGANY TOWN\nWelcome to the Home of the Ninja!","pages":["MAHOGANY TOWN\nWelcome to the Home of the Ninja!"]},
+    {"x":9,"y":9,"type":"sign","text":"Just a Souvenir Shop\nGrandma's Specialty Shop","pages":["Just a Souvenir Shop\nGrandma's Specialty Shop"]}
+  ],
   grassEncounters: [],
 });
 
