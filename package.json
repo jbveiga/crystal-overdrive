@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port=3000 --host=0.0.0.0",
     "build:maps": "node -e \"if(require('fs').existsSync('scripts/build-world-maps.cjs')) require('child_process').execSync('node scripts/build-world-maps.cjs', {stdio:'inherit'})\"",
     "build": "tsc && vite build",
     "preview": "vite preview",
