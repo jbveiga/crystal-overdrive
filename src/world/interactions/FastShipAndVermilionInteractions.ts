@@ -444,5 +444,29 @@ export function getFastShipAndVermilionInteractions(): NpcInteractionRegistratio
       npcIds: ['vermilion_city_snorlax'],
       handler: handleSleepingSnorlax,
     },
+    {
+      actions: ['VERMILION_PORT_SUICUNE_EVENT'],
+      npcIds: ['vermilion_port_suicune'],
+      handler: (targetNpc, _map, ctx) => {
+        if (typeof (ctx as any).triggerVermilionPortSuicune === 'function') {
+          (ctx as any).triggerVermilionPortSuicune();
+          return true;
+        }
+        BattleAudio.playCry('suicune');
+        ctx.storyFlags.add('EVENT_SAW_SUICUNE_AT_VERMILION_PORT');
+        ctx.openDialogue(
+          [
+            'SUICUNE: Gurr-oooh!',
+            'SUICUNE leaps down from the pier, galloping gracefully across the ocean waves before disappearing toward the horizon!',
+          ],
+          targetNpc.speaker || '🌊 SUICUNE',
+          () => {
+            ctx.showToast?.('💎 Spotted Suicune at Vermilion Port!');
+            if (_map) ctx.renderMap?.(_map);
+          }
+        );
+        return true;
+      },
+    },
   ];
 }

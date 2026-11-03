@@ -89,7 +89,7 @@ export class OverworldTickerCoordinator {
       getActiveMapNpcs, populateWorldNpcs, handleMapTransition, executeWarpTransition, runTrainerSightSequence,
       triggerSlowpokeWellGruntIntercept, triggerBeastsAwakeningCutscene, triggerBurnedTowerRivalBattle,
       triggerCherrygroveRivalAmbush, triggerAzaleaRivalAmbush, triggerOlivineRivalConfrontation,
-      triggerCianwoodSuicuneAndEusine, triggerRoute42Suicune, saveCurrentGame, triggerWildEncounter,
+      triggerCianwoodSuicuneAndEusine, triggerRoute42Suicune, triggerRoute36Suicune, triggerVermilionPortSuicune, saveCurrentGame, triggerWildEncounter,
       addPlayTimeDelta, overworldItemManager, storyFlags, itemfinderHUD, dayCareManager, playerParty,
       seenSpecies, defeatedTrainers, roamingManager, inventory,
     } = ctx as any;
@@ -254,6 +254,33 @@ export class OverworldTickerCoordinator {
             triggerRoute42Suicune
           ) {
             triggerRoute42Suicune();
+            return;
+          }
+
+          // Route 36 Suicune Sighting (Story Arc A)
+          if (
+            currentMap?.id === 'route_36' &&
+            ((coord.x === 35 && (coord.y === 10 || coord.y === 11)) ||
+             (coord.y === 9 && (coord.x === 34 || coord.x === 36))) &&
+            (storyFlags.has('sudowoodo_cleared') || storyFlags.has('EVENT_FOUGHT_SUDOWOODO')) &&
+            (storyFlags.has('beasts_awakened') || storyFlags.has('EVENT_RELEASED_THE_BEASTS')) &&
+            !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_36') &&
+            triggerRoute36Suicune
+          ) {
+            triggerRoute36Suicune();
+            return;
+          }
+
+          // Vermilion Port Suicune Sighting (Story Arc A)
+          if (
+            currentMap?.id === 'vermilion_port' &&
+            ((coord.x === 12 && coord.y === 11) ||
+             (coord.x === 11 && coord.y === 10) ||
+             (coord.x === 13 && coord.y === 10)) &&
+            !storyFlags.has('EVENT_SAW_SUICUNE_AT_VERMILION_PORT') &&
+            triggerVermilionPortSuicune
+          ) {
+            triggerVermilionPortSuicune();
             return;
           }
 

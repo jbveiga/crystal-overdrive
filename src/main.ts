@@ -194,12 +194,13 @@ async function bootstrap() {
     setCutsceneLocked: (locked) => { isCutsceneLocked = locked; },
   });
 
-  const SC = StoryCutscenes;
-  const triggerSlowpokeWellGruntIntercept = async (grunt: GridEntity) => SC.triggerSlowpokeWellGruntIntercept(grunt, getCutsceneContext());
-  const triggerAzaleaRivalAmbush = () => SC.triggerAzaleaRivalAmbush(getCutsceneContext());
-  const triggerCherrygroveRivalAmbush = () => SC.triggerCherrygroveRivalAmbush(getCutsceneContext()), triggerBurnedTowerRivalBattle = () => SC.triggerBurnedTowerRivalBattle(getCutsceneContext());
-  const triggerBeastsAwakeningCutscene = () => SC.triggerBeastsAwakeningCutscene(getCutsceneContext()), triggerOlivineRivalConfrontation = () => SC.triggerOlivineRivalConfrontation(getCutsceneContext());
-  const triggerCianwoodSuicuneAndEusine = () => SC.triggerCianwoodSuicuneAndEusine(getCutsceneContext()), triggerRoute42Suicune = () => SC.triggerRoute42Suicune(getCutsceneContext());
+  const SC = StoryCutscenes, cc = () => getCutsceneContext();
+  const triggerSlowpokeWellGruntIntercept = async (g: GridEntity) => SC.triggerSlowpokeWellGruntIntercept(g, cc());
+  const triggerAzaleaRivalAmbush = () => SC.triggerAzaleaRivalAmbush(cc());
+  const triggerCherrygroveRivalAmbush = () => SC.triggerCherrygroveRivalAmbush(cc()), triggerBurnedTowerRivalBattle = () => SC.triggerBurnedTowerRivalBattle(cc());
+  const triggerBeastsAwakeningCutscene = () => SC.triggerBeastsAwakeningCutscene(cc()), triggerOlivineRivalConfrontation = () => SC.triggerOlivineRivalConfrontation(cc());
+  const triggerCianwoodSuicuneAndEusine = () => SC.triggerCianwoodSuicuneAndEusine(cc()), triggerRoute42Suicune = () => SC.triggerRoute42Suicune(cc());
+  const triggerRoute36Suicune = () => SC.triggerRoute36Suicune(cc()), triggerVermilionPortSuicune = () => SC.triggerVermilionPortSuicune(cc());
 
   const saveCurrentGame = async () => {
     missionManager.checkStoryFlags(storyFlags);
@@ -516,12 +517,11 @@ async function bootstrap() {
     }
   });
 
-  // Pre-allocated reusable ticker context for 0 allocations per frame in hot loop (Pillar 7 Gate 1)
   const cachedTickerContext: OverworldTickerContext & { dayCareManager: any; playerParty: any[]; seenSpecies: Set<string>; defeatedTrainers: Set<string>; overworldRenderer: any; triggerBattle?: any; } = {
     getGameState: () => gameState, isCutsceneLocked: () => isCutsceneLocked, setCutsceneLocked: (locked: boolean) => { isCutsceneLocked = locked; }, isDialogueOpen: () => overworldHUD.isDialogueOpen(), isMenuOpen: () => startMenuUI.isOpen(), isAnyModalOpen: isAnyOverworldModalOpen,
     player, mapManager, overworldItemManager, gameClock, storyFlags, visitedMaps, roamingManager, missionManager, itemfinderHUD, overworldHUD, audioManager, overworldRenderer,
     getActiveMapNpcs, populateWorldNpcs, handleMapTransition, executeWarpTransition, runTrainerSightSequence, triggerSlowpokeWellGruntIntercept, triggerBeastsAwakeningCutscene, triggerBurnedTowerRivalBattle,
-    triggerCherrygroveRivalAmbush, triggerAzaleaRivalAmbush, triggerOlivineRivalConfrontation, triggerCianwoodSuicuneAndEusine, triggerRoute42Suicune, saveCurrentGame,
+    triggerCherrygroveRivalAmbush, triggerAzaleaRivalAmbush, triggerOlivineRivalConfrontation, triggerCianwoodSuicuneAndEusine, triggerRoute42Suicune, triggerRoute36Suicune, triggerVermilionPortSuicune, saveCurrentGame,
     triggerWildEncounter: async (wildPkmn, options) => triggerBattle(wildPkmn, options), triggerBattle: async (oppPkmn: any, options?: any) => triggerBattle(oppPkmn, options),
     addPlayTimeDelta: (dtSec) => { playTimeSeconds += dtSec; }, isSurfEnabled: () => mapManager.isSurfEnabled(),
     openDeptElevatorModal: (currentMapId, onSelectFloor) => deptStoreElevatorUI.open({ currentMapId, onSelectFloor: (f) => onSelectFloor(f.mapId), onClose: () => {} }),

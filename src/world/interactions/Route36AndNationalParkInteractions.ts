@@ -243,5 +243,29 @@ export function getRoute36AndNationalParkInteractions(): NpcInteractionRegistrat
         return true;
       },
     },
+    {
+      actions: ['ROUTE_36_SUICUNE_EVENT'],
+      npcIds: ['route_36_suicune'],
+      handler: (targetNpc, _map, ctx) => {
+        if (typeof (ctx as any).triggerRoute36Suicune === 'function') {
+          (ctx as any).triggerRoute36Suicune();
+          return true;
+        }
+        BattleAudio.playCry('suicune');
+        ctx.storyFlags.add('EVENT_SAW_SUICUNE_ON_ROUTE_36');
+        ctx.openDialogue(
+          [
+            'SUICUNE: Gurr-oooh!',
+            'SUICUNE locks eyes with you, leaps over the trees, and dashes away across Johto!',
+          ],
+          targetNpc.speaker || '💎 SUICUNE',
+          () => {
+            ctx.showToast?.('💎 Spotted Suicune on Route 36!');
+            if (_map) ctx.renderMap?.(_map);
+          }
+        );
+        return true;
+      },
+    },
   ];
 }

@@ -379,6 +379,49 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         ],
         { action: 'TIN_TOWER_SAGE_EVENT' }
       ),
+      makeNpc('wise_trio_gaku', 7, 6, 'RIGHT', 'sage', '🏮 SAGE GAKU',
+        ['GAKU: We three sages guard the sacred heights of TIN TOWER.'],
+        {
+          action: 'WISE_TRIO_SAGE_EVENT',
+          trainerId: 'wise_trio_gaku',
+          trainerName: 'Sage Gaku',
+          challengePages: ['SAGE GAKU: According to legend, three nameless Pokémon perished in the burning tower! Prove your strength!'],
+          trainerTeam: [
+            { speciesId: 'noctowl', level: 32, moves: ['hypnosis', 'confusion', 'tackle', 'reflect'] },
+            { speciesId: 'flareon', level: 32, moves: ['flamethrower', 'quickattack', 'bite', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc('wise_trio_masa', 11, 5, 'DOWN', 'sage', '🏮 SAGE MASA',
+        ['MASA: The crystal beast honors only those of tranquil, resolute purpose.'],
+        {
+          action: 'WISE_TRIO_SAGE_EVENT',
+          trainerId: 'wise_trio_masa',
+          trainerName: 'Sage Masa',
+          challengePages: ['SAGE MASA: When lightning struck the tower, the legend of the beasts was born! Show me your spirit!'],
+          trainerTeam: [
+            { speciesId: 'noctowl', level: 32, moves: ['hypnosis', 'confusion', 'tackle', 'reflect'] },
+            { speciesId: 'jolteon', level: 32, moves: ['thundershock', 'quickattack', 'pinmissile', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc('wise_trio_koji', 12, 6, 'LEFT', 'sage', '🏮 SAGE KOJI',
+        ['KOJI: Legends tell of the brass tower enveloped in storm, fire, and rain.'],
+        {
+          action: 'WISE_TRIO_SAGE_EVENT',
+          trainerId: 'wise_trio_koji',
+          trainerName: 'Sage Koji',
+          challengePages: ['SAGE KOJI: SUICUNE is the reincarnation of northern winds that purifies the world! Face my trial!'],
+          trainerTeam: [
+            { speciesId: 'noctowl', level: 32, moves: ['hypnosis', 'confusion', 'tackle', 'reflect'] },
+            { speciesId: 'vaporeon', level: 32, moves: ['watergun', 'quickattack', 'aurorabeam', 'sandattack'] },
+          ],
+        }
+      ),
+      makeNpc('tin_tower_eusine', 8, 9, 'RIGHT', 'eusine', '🎩 EUSINE',
+        ['EUSINE: Amazing, truly magnificent! You and SUICUNE have forged a mythic bond.'],
+        { action: 'TIN_TOWER_EUSINE_EVENT' }
+      ),
     ],
 
     tin_tower_roof: [

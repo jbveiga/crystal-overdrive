@@ -28,6 +28,18 @@ export function getOlivineAndVictoryRoadQuestInteractions(): NpcInteractionRegis
           );
           return true;
         }
+
+        if (!ctx.storyFlags.has('wise_trio_cleared') && !ctx.storyFlags.has('EVENT_BEAT_WISE_TRIO')) {
+          ctx.openDialogue(
+            [
+              'SUICUNE stands motionless atop the sacred crystal altar, surrounded by shimmering azure mist.',
+              'The WISE TRIO must test your spirit in trial before the legendary crystal beast will accept your challenge!',
+            ],
+            '💎 TIN TOWER ALTAR'
+          );
+          return true;
+        }
+
         BattleAudio.playCry('suicune');
         ctx.openDialogue(
           [
@@ -43,6 +55,10 @@ export function getOlivineAndVictoryRoadQuestInteractions(): NpcInteractionRegis
                   ctx.storyFlags.add('suicune_caught_or_defeated');
                   ctx.storyFlags.add('suicune_altar_reached');
                   ctx.storyFlags.add('wise_trio_cleared');
+                  ctx.storyFlags.add('EVENT_FOUGHT_SUICUNE');
+                  if (_res.caught) {
+                    ctx.storyFlags.add('EVENT_CAUGHT_SUICUNE');
+                  }
                   ctx.missionManager.checkStoryFlags(ctx.storyFlags);
                   ctx.missionManager.completeMission('M11');
                   const curMap = ctx.mapManager.getCurrentMap();

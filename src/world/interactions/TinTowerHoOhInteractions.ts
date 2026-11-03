@@ -15,8 +15,8 @@ import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 
 /**
- * 1. Tin Tower 1F: Tower Sage Barrier Unblocking
- * Verifies Clear Bell and Rainbow Wing progression items.
+ * 1. Tin Tower 1F: Tower Sage Barrier Unblocking & Rainbow Wing Bestowal
+ * Verifies Clear Bell, Suicune/Legendary Beasts mastery, and awards Rainbow Wing.
  */
 export const handleTinTowerSage: NpcInteractionHandler = (targetNpc, _map, ctx) => {
   const hasClearBell =
@@ -37,6 +37,7 @@ export const handleTinTowerSage: NpcInteractionHandler = (targetNpc, _map, ctx) 
     Boolean((ctx.inventory as any)?.keyItems?.includes?.('rainbow-wing')) ||
     Boolean((ctx.inventory as any)?.keyItems?.some?.((k: string) => k.toLowerCase().includes('rainbow')));
 
+  // Case 1: Player already has both Clear Bell and Rainbow Wing
   if (hasClearBell && hasRainbowWing) {
     ctx.storyFlags.add('EVENT_TIN_TOWER_SAGE_UNBLOCKED');
     ctx.openDialogue(
@@ -50,12 +51,207 @@ export const handleTinTowerSage: NpcInteractionHandler = (targetNpc, _map, ctx) 
     return true;
   }
 
+  // Case 2: Player has calmed Suicune and captured/accounted for Raikou & Entei -> Bestow Rainbow Wing!
+  const hasSuicune =
+    ctx.storyFlags.has('suicune_caught_or_defeated') ||
+    ctx.storyFlags.has('EVENT_CAUGHT_SUICUNE') ||
+    ctx.storyFlags.has('EVENT_FOUGHT_SUICUNE') ||
+    ctx.caughtSpecies?.has('suicune') ||
+    ctx.caughtSpecies?.has('245') ||
+    ctx.playerParty?.some((p) => p.speciesId === 'suicune' || p.speciesId === '245') ||
+    ctx.playerBox?.some((p) => p.speciesId === 'suicune' || p.speciesId === '245');
+
+  const hasRaikou =
+    ctx.caughtSpecies?.has('raikou') ||
+    ctx.caughtSpecies?.has('243') ||
+    ctx.storyFlags.has('caught_raikou') ||
+    ctx.playerParty?.some((p) => p.speciesId === 'raikou' || p.speciesId === '243') ||
+    ctx.playerBox?.some((p) => p.speciesId === 'raikou' || p.speciesId === '243');
+
+  const hasEntei =
+    ctx.caughtSpecies?.has('entei') ||
+    ctx.caughtSpecies?.has('244') ||
+    ctx.storyFlags.has('caught_entei') ||
+    ctx.playerParty?.some((p) => p.speciesId === 'entei' || p.speciesId === '244') ||
+    ctx.playerBox?.some((p) => p.speciesId === 'entei' || p.speciesId === '244');
+
+  const hasMasteredBeasts = (hasSuicune && hasRaikou && hasEntei) || ctx.storyFlags.has('beasts_mastered');
+
+  if (!hasRainbowWing && hasMasteredBeasts) {
+    ctx.storyFlags.add('has_rainbow_wing');
+    ctx.storyFlags.add('EVENT_GOT_RAINBOW_WING');
+    if (Array.isArray(ctx.inventory?.keyItems)) {
+      if (!ctx.inventory.keyItems.includes('RAINBOW WING') && !ctx.inventory.keyItems.includes('rainbow_wing')) {
+        ctx.inventory.keyItems.push('RAINBOW WING');
+      }
+    }
+    if ((ctx.inventory as any)?.items && typeof (ctx.inventory as any).items === 'object') {
+      (ctx.inventory as any).items.rainbow_wing = 1;
+    }
+    ctx.audioManager?.playSfx?.('sfx_badge_get');
+    BattleAudio.playOverworldSound('KEY_ITEM');
+    ctx.openDialogue(
+      [
+        'TOWER SAGE: Remarkable! The spirits of the three legendary beasts—RAIKOU of the lightning, ENTEI of the flames, and SUICUNE of the pure rain—reverberate through your very soul!',
+        'You are truly the chosen bearer of the sacred skies. Take this sacred relic!',
+        `${ctx.playerName || 'Player'} received the RAINBOW WING!`,
+        'With the CLEAR BELL and RAINBOW WING in hand, the stairway to the summit of TIN TOWER is open to you!',
+      ],
+      targetNpc?.speaker || '🏮 TOWER SAGE',
+      () => {
+        ctx.showToast?.('🌈 Received the Rainbow Wing from the Tower Sage!');
+        ctx.saveCurrentGame?.();
+        if (_map) ctx.renderMap?.(_map);
+      }
+    );
+    return true;
+  }
+
+  // Case 3: Missing requirements
+  if (hasSuicune) {
+    ctx.openDialogue(
+      [
+        'TOWER SAGE: You have proven yourself before SUICUNE at the altar.',
+        'However, the sacred sky guardian HO-OH will only manifest for one who has demonstrated harmony with all three beasts: RAIKOU, ENTEI, and SUICUNE.',
+        'Seek the running beasts across Johto and earn their recognition before ascending to the summit!',
+      ],
+      targetNpc?.speaker || '🏮 TOWER SAGE'
+    );
+    return true;
+  }
+
   ctx.openDialogue(
     [
       'TOWER SAGE: Only the chosen bearer of the CLEAR BELL and RAINBOW WING may ascend this sacred tower!',
-      'Seek the sacred relics across Johto before daring to climb to the summit!',
+      'Seek the sacred relics and quell the beast trials across Johto before daring to climb to the summit!',
     ],
     targetNpc?.speaker || '🏮 TOWER SAGE'
+  );
+  return true;
+};
+
+/**
+ * 2. Wise Trio Trial: Sages Gaku, Masa, and Koji
+ */
+export const handleWiseTrioSage: NpcInteractionHandler = (targetNpc, _map, ctx) => {
+  const sageId = targetNpc.trainerId || targetNpc.id;
+  const isDefeated = ctx.defeatedTrainers?.has(sageId);
+
+  // If already defeated: deliver ancient lore
+  if (isDefeated) {
+    if (sageId === 'wise_trio_gaku') {
+      ctx.openDialogue(
+        [
+          'SAGE GAKU: According to legend, when a sudden lightning bolt struck the Brass Tower and engulfed it in flames, three nameless Pokémon perished in the inferno.',
+          'HO-OH descended from the heavens and breathed new life into them as the elements: lightning, fire, and rain!',
+        ],
+        targetNpc.speaker || '🏮 SAGE GAKU'
+      );
+      return true;
+    }
+    if (sageId === 'wise_trio_masa') {
+      ctx.openDialogue(
+        [
+          'SAGE MASA: When lightning struck the tower, the legend of the beasts was born!',
+          'RAIKOU embodies the speed and fury of lightning. ENTEI runs with the untamed passion of volcanic fire. And SUICUNE is the crystal rain that purifies all.',
+        ],
+        targetNpc.speaker || '🏮 SAGE MASA'
+      );
+      return true;
+    }
+    if (sageId === 'wise_trio_koji') {
+      ctx.openDialogue(
+        [
+          'SAGE KOJI: SUICUNE is said to be the reincarnation of northern winds.',
+          'It races across Johto and Kanto, purifying polluted water with every breath.',
+          ctx.storyFlags.has('wise_trio_cleared') || ctx.storyFlags.has('EVENT_BEAT_WISE_TRIO')
+            ? 'You have proven your worthy spirit to all three of us. Approach the crystal altar!'
+            : 'Defeat my fellow sages, and SUICUNE will test your heart!',
+        ],
+        targetNpc.speaker || '🏮 SAGE KOJI'
+      );
+      return true;
+    }
+
+    ctx.openDialogue(
+      ['You have proven your courage to the WISE TRIO. May the sacred crystal beast guide you!'],
+      targetNpc.speaker || '🏮 SAGE'
+    );
+    return true;
+  }
+
+  // Not defeated yet: Challenge to battle!
+  const challengeText = targetNpc.challengePages?.[0] || 'Prove your strength and spirit in trial!';
+  ctx.openDialogue(
+    [challengeText],
+    targetNpc.speaker || '🏮 SAGE',
+    () => {
+      const team = targetNpc.trainerTeam || [
+        { speciesId: 'noctowl', level: 32, moves: ['hypnosis', 'confusion', 'tackle', 'reflect'] }
+      ];
+      const trainerPkmn = team.map((p: any) =>
+        PokemonFactory.create(p.speciesId, p.level, p.moves)
+      );
+
+      ctx.triggerBattle(trainerPkmn[0], {
+        isTrainer: true,
+        trainerName: targetNpc.trainerName || targetNpc.speaker?.replace(/^[^\w]+/, '').trim() || 'Sage',
+        trainerTeam: trainerPkmn,
+        onVictory: () => {
+          ctx.defeatedTrainers?.add(sageId);
+          // Check if all 3 sages are defeated
+          const gakuBeat = ctx.defeatedTrainers?.has('wise_trio_gaku');
+          const masaBeat = ctx.defeatedTrainers?.has('wise_trio_masa');
+          const kojiBeat = ctx.defeatedTrainers?.has('wise_trio_koji');
+
+          if (gakuBeat && masaBeat && kojiBeat) {
+            ctx.storyFlags.add('wise_trio_cleared');
+            ctx.storyFlags.add('EVENT_BEAT_WISE_TRIO');
+            ctx.openDialogue(
+              [
+                'You have bested all three of us in sacred trial!',
+                'The trial of the WISE TRIO is complete. SUICUNE will now accept your challenge at the altar!',
+              ],
+              targetNpc.speaker || '🏮 SAGE',
+              () => {
+                ctx.saveCurrentGame?.();
+                ctx.showToast?.('🏮 Cleared the Wise Trio Trial! Suicune awaits at the altar!');
+                if (_map) ctx.renderMap?.(_map);
+              }
+            );
+          } else {
+            const remaining = 3 - [gakuBeat, masaBeat, kojiBeat].filter(Boolean).length;
+            ctx.openDialogue(
+              [
+                'Well fought! But you must overcome all three sages of TIN TOWER before SUICUNE will acknowledge your spirit.',
+                `Remaining sages to face: ${remaining}.`,
+              ],
+              targetNpc.speaker || '🏮 SAGE',
+              () => {
+                ctx.saveCurrentGame?.();
+                if (_map) ctx.renderMap?.(_map);
+              }
+            );
+          }
+        },
+      });
+    }
+  );
+  return true;
+};
+
+/**
+ * 3. Tin Tower 1F: Eusine Post-Suicune Cameo & Acknowledgement
+ */
+export const handleTinTowerEusine: NpcInteractionHandler = (targetNpc, _map, ctx) => {
+  ctx.openDialogue(
+    [
+      `EUSINE: Staggering, ${ctx.playerName || 'trainer'}! Absolutely magnificent!`,
+      'All my life, I have pursued the legendary north wind beast across cities, shores, and mountains…',
+      'Yet SUICUNE chose you. When I saw the crystal radiance in your battle, I understood why.',
+      'You possess the true heart of a champion. Go on—seek the legendary guardian of the skies!',
+    ],
+    targetNpc.speaker || '🎩 EUSINE'
   );
   return true;
 };
@@ -155,9 +351,20 @@ export const handleHoOhBoss: NpcInteractionHandler = (_targetNpc, currentMap, ct
 export function getTinTowerHoOhInteractions(): NpcInteractionRegistration[] {
   return [
     {
-      npcIds: ['tin_tower_sage'],
-      actions: ['TIN_TOWER_SAGE_EVENT'],
-      handler: handleTinTowerSage,
+      npcIds: ['tin_tower_sage', 'wise_trio_gaku', 'wise_trio_masa', 'wise_trio_koji', 'tin_tower_eusine'],
+      actions: ['TIN_TOWER_SAGE_EVENT', 'WISE_TRIO_SAGE_EVENT', 'TIN_TOWER_EUSINE_EVENT'],
+      handler: (targetNpc, map, ctx) => {
+        if (
+          targetNpc.action === 'WISE_TRIO_SAGE_EVENT' ||
+          ['wise_trio_gaku', 'wise_trio_masa', 'wise_trio_koji'].includes(targetNpc.id)
+        ) {
+          return handleWiseTrioSage(targetNpc, map, ctx);
+        }
+        if (targetNpc.action === 'TIN_TOWER_EUSINE_EVENT' || targetNpc.id === 'tin_tower_eusine') {
+          return handleTinTowerEusine(targetNpc, map, ctx);
+        }
+        return handleTinTowerSage(targetNpc, map, ctx);
+      },
     },
     {
       npcIds: ['ho_oh_boss'],

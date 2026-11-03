@@ -141,7 +141,12 @@ export function handleRoute42GateOfficer(targetNpc: GridEntity, _map: MapData, c
 }
 
 export function handleRoute42SuicuneInteraction(targetNpc: GridEntity, _map: MapData, ctx: NpcInteractionContext): boolean {
+  if (typeof (ctx as any)?.triggerRoute42Suicune === 'function') {
+    (ctx as any).triggerRoute42Suicune();
+    return true;
+  }
   BattleAudio.playCry('suicune');
+  ctx.storyFlags?.add('EVENT_SAW_SUICUNE_ON_ROUTE_42');
   ctx.openDialogue(
     ['SUICUNE: Gurr-oooh! (It gazes intently before preparing to leap across the waters!)'],
     targetNpc.speaker

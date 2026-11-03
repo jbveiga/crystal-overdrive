@@ -565,6 +565,15 @@ export function isNpcActiveForStoryFlags(
     return !storyFlags.has('beasts_awakened') && !storyFlags.has('EVENT_RELEASED_THE_BEASTS');
   }
 
+  // Route 36 Suicune (Story Arc A)
+  if (npcId === 'route_36_suicune') {
+    return (
+      (storyFlags.has('sudowoodo_cleared') || storyFlags.has('EVENT_FOUGHT_SUDOWOODO')) &&
+      (storyFlags.has('beasts_awakened') || storyFlags.has('EVENT_RELEASED_THE_BEASTS')) &&
+      !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_36')
+    );
+  }
+
   // Cianwood City Suicune & Eusine
   if (npcId === 'cianwood_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
   if (npcId === 'cianwood_eusine') return !storyFlags.has('EVENT_FOUGHT_EUSINE');
@@ -572,12 +581,16 @@ export function isNpcActiveForStoryFlags(
   // Route 42 Suicune
   if (npcId === 'route_42_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_42');
 
+  // Vermilion Port Suicune (Story Arc A)
+  if (npcId === 'vermilion_port_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_AT_VERMILION_PORT');
+
   // Olivine Lighthouse 6F & Olivine Gym Jasmine lifecycle
   if (npcId === 'lighthouse_jasmine') return !storyFlags.has('amphy_cured');
   if (npcId === 'leader_jasmine') return storyFlags.has('amphy_cured');
 
-  // Tin Tower Suicune Altar (Act 8)
+  // Tin Tower Suicune Altar & Eusine Cameo (Act 8 / Arc A)
   if (npcId === 'suicune_altar') return storyFlags.has('has_clear_bell') && !storyFlags.has('suicune_caught_or_defeated');
+  if (npcId === 'tin_tower_eusine') return storyFlags.has('suicune_caught_or_defeated');
 
   // Whirl Islands Lugia Chamber (Act 8 / Post-Radio Tower)
   if (npcId === 'whirl_island_lugia') return !storyFlags.has('lugia_defeated') && !storyFlags.has('EVENT_FOUGHT_LUGIA');

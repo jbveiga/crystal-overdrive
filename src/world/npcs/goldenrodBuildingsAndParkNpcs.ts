@@ -484,6 +484,12 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
         ],
         { action: 'SUDOWOODO_EVENT' }
       ),
+      makeNpc('route_36_suicune', 35, 9, 'DOWN', 'suicune', '💎 SUICUNE',
+        [
+          'SUICUNE: Gurr-oooh! (The azure beast pauses before bounding across the trees!)',
+        ],
+        { action: 'ROUTE_36_SUICUNE_EVENT' }
+      ),
       makeNpc('hard_rock_guy', 44, 9, 'LEFT', 'fisherman', '🥊 ROCK SMASH GUY', 
         [
           'Wa-hey!',

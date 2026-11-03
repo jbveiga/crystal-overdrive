@@ -283,6 +283,18 @@ export function createKantoVermilionNpcs(): Record<string, GridEntity[]> {
       makeNpc('vermilion_port_super_nerd_2', 11, 11, 'LEFT', 'super_nerd', '👓 TOURIST', [
         'I came all the way from Goldenrod City on the S.S. AQUA! What an exquisite luxury cruise!',
       ]),
+      makeNpc(
+        'vermilion_port_suicune',
+        12,
+        10,
+        'DOWN',
+        'suicune',
+        '💎 SUICUNE',
+        [
+          'SUICUNE: Gurr-oooh! (The north wind beast looks out across the open ocean waters!)',
+        ],
+        { action: 'VERMILION_PORT_SUICUNE_EVENT' }
+      ),
     ],
 
     vermilion_port_passage: [

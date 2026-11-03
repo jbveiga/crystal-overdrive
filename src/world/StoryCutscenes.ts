@@ -514,6 +514,14 @@ export class StoryCutscenes {
     SuicuneAndBeastsCutscenes.triggerRoute42Suicune(ctx);
   }
 
+  public static triggerRoute36Suicune(ctx: StoryCutsceneContext): void {
+    SuicuneAndBeastsCutscenes.triggerRoute36Suicune(ctx);
+  }
+
+  public static triggerVermilionPortSuicune(ctx: StoryCutsceneContext): void {
+    SuicuneAndBeastsCutscenes.triggerVermilionPortSuicune(ctx);
+  }
+
   /**
    * Authentic Gen 2 Cherrygrove City Guide Gent Scripted Walking Tour
    */

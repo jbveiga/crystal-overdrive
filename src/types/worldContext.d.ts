@@ -99,7 +99,7 @@ export interface OverworldTickerContext {
   triggerBeastsAwakeningCutscene: () => void; triggerBurnedTowerRivalBattle: () => void; triggerCherrygroveRivalAmbush: () => void; triggerAzaleaRivalAmbush: () => void;
   saveCurrentGame: () => void | Promise<void>; triggerWildEncounter: (encounter: any, options?: any) => Promise<void>;
   addPlayTimeDelta: (dtSec: number) => void; isSurfEnabled: () => boolean; openDeptElevatorModal?: (currentMapId: string, onSelectFloor: (targetMapId: string) => void) => void;
-  triggerOlivineRivalConfrontation?: () => void; triggerCianwoodSuicuneAndEusine?: () => void; triggerRoute42Suicune?: () => void; triggerBattle?: (opponentPokemon: PokemonInstance, options?: TriggerBattleOptions) => Promise<void>; inventory?: BagInventory;
+  triggerOlivineRivalConfrontation?: () => void; triggerCianwoodSuicuneAndEusine?: () => void; triggerRoute42Suicune?: () => void; triggerRoute36Suicune?: () => void; triggerVermilionPortSuicune?: () => void; triggerBattle?: (opponentPokemon: PokemonInstance, options?: TriggerBattleOptions) => Promise<void>; inventory?: BagInventory;
   buildTrainerTeamInstances?: (entity: GridEntity) => PokemonInstance[]; npcsByMap?: Record<string, GridEntity[]>; setCutsceneLocked?: (locked: boolean) => void;
 }
 

@@ -467,4 +467,177 @@ export class SuicuneAndBeastsCutscenes {
       }, 400);
     }, 550);
   }
+
+  /**
+   * Route 36 Suicune Sighting (Story Arc A)
+   */
+  public static triggerRoute36Suicune(ctx: StoryCutsceneContext): void {
+    if (ctx.storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_36')) return;
+    ctx.setCutsceneLocked(true);
+    ctx.player.isMoving = false;
+    ctx.player.progress = 0;
+
+    void (ctx.overworldRenderer as any)?.showEmotionBubble?.(ctx.player, '!', 500);
+    BattleAudio.playOverworldSound('EXCLAMATION');
+
+    const suicuneNpc: GridEntity = {
+      id: 'route36_suicune_cutscene',
+      x: 35,
+      y: 9,
+      targetX: 35,
+      targetY: 9,
+      renderX: 35,
+      renderY: 9,
+      direction: 'DOWN',
+      isMoving: false,
+      progress: 0,
+      spriteType: 'suicune',
+    };
+
+    if (ctx.npcsByMap) {
+      if (!ctx.npcsByMap['route_36']) ctx.npcsByMap['route_36'] = [];
+      ctx.npcsByMap['route_36'].push(suicuneNpc);
+    }
+
+    const finishRoute36 = () => {
+      if (ctx.npcsByMap?.['route_36']) {
+        ctx.npcsByMap['route_36'] = ctx.npcsByMap['route_36'].filter(
+          (n) => n.id !== 'route36_suicune_cutscene' && n.id !== 'route_36_suicune'
+        );
+      }
+
+      ctx.overworldHUD.openDialogue(
+        [
+          '💎 A brilliant azure flash illuminates the trees of Route 36!',
+          'SUICUNE pauses, locks its crystal-clear gaze directly upon you, and bounds gracefully north into the morning mist!',
+        ],
+        '💎 SUICUNE',
+        () => {
+          ctx.storyFlags.add('EVENT_SAW_SUICUNE_ON_ROUTE_36');
+          ctx.setCutsceneLocked(false);
+          void ctx.saveCurrentGame();
+          ctx.overworldHUD.showToast?.('💎 Spotted Suicune on Route 36!');
+        }
+      );
+    };
+
+    const isTestEnv =
+      Boolean(
+        (globalThis as any).process?.env?.VITEST ||
+          (globalThis as any).process?.env?.NODE_ENV === 'test'
+      ) || (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test');
+
+    if (isTestEnv) {
+      finishRoute36();
+      return;
+    }
+
+    setTimeout(() => {
+      BattleAudio.playCry('suicune');
+      BattleAudio.playOverworldSound('HOP');
+      suicuneNpc.isJumping = true;
+      suicuneNpc.targetY = 7;
+      suicuneNpc.y = 7;
+      suicuneNpc.renderY = 7;
+
+      setTimeout(() => {
+        BattleAudio.playOverworldSound('HOP');
+        suicuneNpc.isJumping = true;
+        suicuneNpc.targetY = 4;
+        suicuneNpc.y = 4;
+        suicuneNpc.renderY = 4;
+
+        setTimeout(() => {
+          finishRoute36();
+        }, 450);
+      }, 400);
+    }, 550);
+  }
+
+  /**
+   * Vermilion Port Suicune Sighting (Story Arc A)
+   */
+  public static triggerVermilionPortSuicune(ctx: StoryCutsceneContext): void {
+    if (ctx.storyFlags.has('EVENT_SAW_SUICUNE_AT_VERMILION_PORT')) return;
+    ctx.setCutsceneLocked(true);
+    ctx.player.isMoving = false;
+    ctx.player.progress = 0;
+
+    void (ctx.overworldRenderer as any)?.showEmotionBubble?.(ctx.player, '!', 500);
+    BattleAudio.playOverworldSound('EXCLAMATION');
+
+    const suicuneNpc: GridEntity = {
+      id: 'vermilion_port_suicune_cutscene',
+      x: 12,
+      y: 10,
+      targetX: 12,
+      targetY: 10,
+      renderX: 12,
+      renderY: 10,
+      direction: 'DOWN',
+      isMoving: false,
+      progress: 0,
+      spriteType: 'suicune',
+    };
+
+    if (ctx.npcsByMap) {
+      if (!ctx.npcsByMap['vermilion_port']) ctx.npcsByMap['vermilion_port'] = [];
+      ctx.npcsByMap['vermilion_port'].push(suicuneNpc);
+    }
+
+    const finishVermilionPort = () => {
+      if (ctx.npcsByMap?.['vermilion_port']) {
+        ctx.npcsByMap['vermilion_port'] = ctx.npcsByMap['vermilion_port'].filter(
+          (n) => n.id !== 'vermilion_port_suicune_cutscene' && n.id !== 'vermilion_port_suicune'
+        );
+      }
+
+      ctx.overworldHUD.openDialogue(
+        [
+          '🌊 Overlooking the harbor pier, the magnificent north wind beast looks out toward the open sea!',
+          'SUICUNE leaps gracefully down onto the water, running effortlessly across the ocean swells before vanishing into the maritime horizon!',
+        ],
+        '🌊 SUICUNE',
+        () => {
+          ctx.storyFlags.add('EVENT_SAW_SUICUNE_AT_VERMILION_PORT');
+          ctx.setCutsceneLocked(false);
+          void ctx.saveCurrentGame();
+          ctx.overworldHUD.showToast?.('💎 Spotted Suicune at Vermilion Port!');
+        }
+      );
+    };
+
+    const isTestEnv =
+      Boolean(
+        (globalThis as any).process?.env?.VITEST ||
+          (globalThis as any).process?.env?.NODE_ENV === 'test'
+      ) || (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test');
+
+    if (isTestEnv) {
+      finishVermilionPort();
+      return;
+    }
+
+    setTimeout(() => {
+      BattleAudio.playCry('suicune');
+      BattleAudio.playOverworldSound('HOP');
+      suicuneNpc.isJumping = true;
+      suicuneNpc.targetY = 12;
+      suicuneNpc.y = 12;
+      suicuneNpc.renderY = 12;
+
+      setTimeout(() => {
+        BattleAudio.playOverworldSound('HOP');
+        suicuneNpc.isJumping = true;
+        suicuneNpc.targetY = 16;
+        suicuneNpc.y = 16;
+        suicuneNpc.renderY = 16;
+
+        setTimeout(() => {
+          finishVermilionPort();
+        }, 450);
+      }, 400);
+    }, 550);
+  }
 }
+
