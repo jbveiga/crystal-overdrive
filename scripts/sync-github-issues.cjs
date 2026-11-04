@@ -278,7 +278,7 @@ const { ISSUE_RESOLUTIONS } = (() => {
       70: `### Resolution Details for Issue #70
 - **Root Cause**: \`scripts/build-phase.cjs\` used an unanchored \`blocksText.indexOf(\`\${asm}_Blocks\`)\` search, which matched \`BetaLakeOfRage_Blocks\` instead of canonical \`LakeOfRage_Blocks\` from \`data/maps/blocks.asm\`. This generated the 1997 Spaceworld beta map with an unauthentic Gym, Mart, and Center in the northwest corner instead of the canonical tree maze.
 - **Fix**:
-  1. Anchored the block label match with \`^${asm}_Blocks:\` in \`scripts/build-phase.cjs\` and pointed \`scripts/generate-authentic-tiles.cjs\` to canonical \`maps__LakeOfRage.blk\`.
+  1. Anchored the block label match with \`^\\\${asm}_Blocks:\` in \`scripts/build-phase.cjs\` and pointed \`scripts/generate-authentic-tiles.cjs\` to canonical \`maps__LakeOfRage.blk\`.
   2. Regenerated \`public/assets/data/maps/lake_of_rage.json\` (40x36 step tiles / 20x18 blocks) and bundled \`public/assets/data/world_maps.json\`.
   3. Verified complete elimination of beta building tiles, restoring the canonical northwest tree maze and house warps at (7, 3) and (27, 31).`,
       71: `### Resolution Details for Issue #71 & Red Gyarados Features
