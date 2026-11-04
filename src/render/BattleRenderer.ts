@@ -180,9 +180,18 @@ export class BattleRenderer {
     this.arenaContainer.addChild(this.playerShadow);
 
     // 3. Load Pokémon Sprites
+    const enemyPath =
+      enemyPokemon.isShiny && enemyPokemon.speciesId.toLowerCase() === 'gyarados'
+        ? `./assets/sprites/pokemon/${enemyPokemon.speciesId}_shiny_front.png`
+        : `./assets/sprites/pokemon/${enemyPokemon.speciesId}_front.png`;
+    const playerPath =
+      playerPokemon.isShiny && playerPokemon.speciesId.toLowerCase() === 'gyarados'
+        ? `./assets/sprites/pokemon/${playerPokemon.speciesId}_shiny_back.png`
+        : `./assets/sprites/pokemon/${playerPokemon.speciesId}_back.png`;
+
     const [enemyTex, playerTex] = await Promise.all([
-      Assets.load<Texture>(`./assets/sprites/pokemon/${enemyPokemon.speciesId}_front.png`),
-      Assets.load<Texture>(`./assets/sprites/pokemon/${playerPokemon.speciesId}_back.png`),
+      Assets.load<Texture>(enemyPath),
+      Assets.load<Texture>(playerPath),
     ]);
 
     enemyTex.source.scaleMode = 'nearest';
@@ -259,6 +268,46 @@ export class BattleRenderer {
         y: enemyPlatformY,
         duration: 0.055 / this.speedMultiplier,
         ease: 'power1.in',
+      });
+
+      if (enemyPokemon.isShiny) {
+        tl.call(() => {
+          this.playShinySparkleAnimation(enemyPlatformX, enemyPlatformY - 50);
+        });
+      }
+    });
+  }
+
+  private playShinySparkleAnimation(cx: number, cy: number): void {
+    const sparkleContainer = new Container();
+    this.arenaContainer.addChild(sparkleContainer);
+    const count = 8;
+    const sparkles: Graphics[] = [];
+    for (let i = 0; i < count; i++) {
+      const g = new Graphics();
+      g.poly([0, -8, 2, -2, 8, 0, 2, 2, 0, 8, -2, 2, -8, 0, -2, -2]);
+      g.fill({ color: 0xffdf20 });
+      g.position.set(cx, cy);
+      sparkleContainer.addChild(g);
+      sparkles.push(g);
+    }
+    sparkles.forEach((s, idx) => {
+      const angle = (idx / count) * Math.PI * 2;
+      const dist = 52;
+      gsap.to(s, {
+        x: cx + Math.cos(angle) * dist,
+        y: cy + Math.sin(angle) * dist,
+        rotation: Math.PI,
+        alpha: 0,
+        scale: 1.5,
+        duration: 0.45 / this.speedMultiplier,
+        ease: 'power2.out',
+        onComplete: () => {
+          if (idx === sparkles.length - 1) {
+            this.arenaContainer.removeChild(sparkleContainer);
+            sparkleContainer.destroy({ children: true });
+          }
+        },
       });
     });
   }

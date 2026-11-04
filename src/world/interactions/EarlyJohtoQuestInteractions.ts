@@ -81,6 +81,72 @@ export function getEarlyJohtoQuestInteractions(): NpcInteractionRegistration[] {
           return true;
         }
 
+        if (
+          ctx.storyFlags.has('received_exp_share') ||
+          ctx.storyFlags.has('EVENT_GOT_EXP_SHARE_FROM_MR_POKEMON')
+        ) {
+          ctx.openDialogue(
+            [
+              "MR. POKéMON: That's quite something, that scale! It has a strange luster to it!",
+              'Life is wonderful! Always new discoveries to be made!',
+            ],
+            targetNpc.speaker,
+            () => {
+              ctx.healPlayerParty(false);
+              ctx.saveCurrentGame();
+              ctx.playFieldRestAnimation();
+            }
+          );
+          return true;
+        }
+
+        const hasRedScale =
+          Boolean(
+            ctx.inventory.keyItems &&
+              (ctx.inventory.keyItems.includes('red_scale') ||
+                ctx.inventory.keyItems.includes('red-scale') ||
+                ctx.inventory.keyItems.includes('RED SCALE'))
+          ) ||
+          Boolean(
+            ctx.inventory.items &&
+              ((ctx.inventory.items['red-scale'] || 0) > 0 ||
+                (ctx.inventory.items['red_scale'] || 0) > 0)
+          );
+
+        if (hasRedScale) {
+          if (ctx.inventory.keyItems) {
+            ctx.inventory.keyItems = ctx.inventory.keyItems.filter(
+              (i) => i !== 'red_scale' && i !== 'red-scale' && i !== 'RED SCALE'
+            );
+          }
+          if (ctx.inventory.items) {
+            delete ctx.inventory.items['red-scale'];
+            delete ctx.inventory.items['red_scale'];
+          }
+
+          ctx.addOverworldItemToInventory('exp-share');
+          ctx.storyFlags.add('received_exp_share');
+          ctx.storyFlags.add('EVENT_GOT_EXP_SHARE_FROM_MR_POKEMON');
+          ctx.missionManager?.checkStoryFlags?.(ctx.storyFlags);
+          BattleAudio.playOverworldSound('KEY_ITEM');
+
+          ctx.openDialogue(
+            [
+              `MR. POKéMON: That SCALE! What's that? A red GYARADOS scale? That is rare! I, I want it...`,
+              `${ctx.playerName}, would you care to trade it? I can give you this EXP.SHARE I got from PROF. OAK!`,
+              `${ctx.playerName} handed over the RED SCALE and received the EXP. SHARE!`,
+            ],
+            targetNpc.speaker,
+            () => {
+              ctx.healPlayerParty(false);
+              ctx.saveCurrentGame();
+              ctx.playFieldRestAnimation();
+              ctx.showToast('🎓 Received EXP. SHARE from Mr. Pokémon!');
+            }
+          );
+          return true;
+        }
+
         ctx.openDialogue(
           ['MR. POKéMON: Life is wonderful! Always new discoveries to be made!'],
           targetNpc.speaker,

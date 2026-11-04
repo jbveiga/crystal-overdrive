@@ -269,6 +269,26 @@ const { ISSUE_RESOLUTIONS } = (() => {
   2. Rebuilt \`public/assets/data/maps/mahogany_town.json\` and \`public/assets/data/world_maps.json\` with canonical building and warp coordinates: Mahogany Gym door at (6, 13) and Poké Center door at (15, 13).
   3. Preserved a backward-compatibility warp at (3, 13) so players loading existing saves at (3, 13) can seamlessly enter the Poké Center.
   4. Added automated regression verification in \`tests/bugfixes/githubIssues67And68.test.ts\`.`,
+      69: `### Resolution Details for Issue #69
+- **Root Cause**: Rocket Grunt NPC \`mahogany_town_rocket_1\` in \`src/world/npcs/mahoganyToIndigoNpcs.ts\` was positioned at (16, 13), placing the sprite inside the solid wall of the Pokémon Center.
+- **Fix**:
+  1. Repositioned \`mahogany_town_rocket_1\` to canonical coordinate (11, 8) standing outside the Souvenir Shop door (11, 7) on a walkable tile.
+  2. Verified grunt lifecycle: actively blocks until Team Rocket generator is quelled, then properly despawns.
+  3. Added automated unit verification in \`tests/bugfixes/githubIssues69Through71AndRedGyarados.test.ts\`.`,
+      70: `### Resolution Details for Issue #70
+- **Root Cause**: \`scripts/build-phase.cjs\` used an unanchored \`blocksText.indexOf(\`\${asm}_Blocks\`)\` search, which matched \`BetaLakeOfRage_Blocks\` instead of canonical \`LakeOfRage_Blocks\` from \`data/maps/blocks.asm\`. This generated the 1997 Spaceworld beta map with an unauthentic Gym, Mart, and Center in the northwest corner instead of the canonical tree maze.
+- **Fix**:
+  1. Anchored the block label match with \`^${asm}_Blocks:\` in \`scripts/build-phase.cjs\` and pointed \`scripts/generate-authentic-tiles.cjs\` to canonical \`maps__LakeOfRage.blk\`.
+  2. Regenerated \`public/assets/data/maps/lake_of_rage.json\` (40x36 step tiles / 20x18 blocks) and bundled \`public/assets/data/world_maps.json\`.
+  3. Verified complete elimination of beta building tiles, restoring the canonical northwest tree maze and house warps at (7, 3) and (27, 31).`,
+      71: `### Resolution Details for Issue #71 & Red Gyarados Features
+- **Root Cause**: Overworld Gyarados previously defaulted to \`lapras.png\` and was placed on land at (21, 15). The shiny battle visual and canonical Mr. Pokémon Red Scale trade were also incomplete.
+- **Fix**:
+  1. Generated dedicated 144x32 9-frame overworld sprite sheets at \`public/assets/sprites/characters/gyarados.png\` and \`red_gyarados.png\` using authentic GBC Gyarados icons with the canonical Red Gyarados palette.
+  2. Relocated \`lake_of_rage_red_gyarados\` into the lake at canonical coordinates (18, 22) with sprite type \`red_gyarados\`.
+  3. Added shiny Gyarados front and back battle sprites, and implemented shiny encounter sparkle burst animations in \`BattleRenderer.ts\`.
+  4. Fully wired the canonical questline: Lv. 30 shiny battle, Gyashaa! cry, Red Scale reward upon defeat or capture, shoreline Lance encounter, and Mr. Pokémon trade exchanging the Red Scale for the Exp. Share.
+  5. Added comprehensive automated regression tests in \`tests/bugfixes/githubIssues69Through71AndRedGyarados.test.ts\`.`,
     },
   };
 })();

@@ -105,10 +105,7 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("route_43_gate_rocket_2",7,4,"UP","boy","ROCKET",[D1]),
   ],
   "lake_of_rage": [
-    n("lake_of_rage_super_nerd_0",36,13,"LEFT","fat_man","SUPER NERD",[D1]),
     n("lake_of_rage_cooltrainer_f_1",25,28,"LEFT","girl",D11,[D6]),
-    t("lake_of_rage_cooltrainer_f_2",36,7,"LEFT","girl","⚔️ LOIS",["Lois: That was a great battle!"],"lake_of_rage_lois","Cooltrainerf Lois",2,["LOIS: Let's battle!"],[m("skiploom",25,["synthesis","poisonpowder","megadrain","leechseed"]),m("ninetales",25,["ember","quickattack","confuseray","safeguard"])]),
-    n("lake_of_rage_super_nerd_3",4,4,"DOWN","fat_man","SUPER NERD",[D5]),
   ],
   "lake_of_rage_hidden_power_house": [
     n("lake_of_rage_hidden_power_house_fisher_0",2,3,"DOWN","fisherman","FISHER",[D5]),

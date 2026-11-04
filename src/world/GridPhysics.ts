@@ -74,6 +74,7 @@ export type NpcSpriteType =
   | 'miltank'
   | 'ampharos'
   | 'gyarados'
+  | 'red_gyarados'
   | 'electrode'
   | 'voltorb'
   | 'lugia'

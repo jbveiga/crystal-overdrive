@@ -59,9 +59,10 @@ function dims(asm) {
 }
 
 function blkFor(asm) {
-  const i = blocksText.indexOf(`${asm}_Blocks`);
-  const m = blocksText.slice(i).match(/INCBIN\s+"([^"]+)"/);
-  return m[1];
+  const m = blocksText.match(new RegExp(`^${asm}_Blocks:`, 'm'));
+  if (!m) throw new Error(`Block label not found for ${asm}`);
+  const inc = blocksText.slice(m.index).match(/INCBIN\s+"([^"]+)"/);
+  return inc[1];
 }
 
 function warpsOf(asm) {

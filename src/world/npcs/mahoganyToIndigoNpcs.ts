@@ -130,25 +130,82 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     lake_of_rage: [
-      makeNpc('lake_of_rage_red_gyarados', 21, 15, 'DOWN', 'lapras', '🐉 GYARADOS', 
+      makeNpc('lake_of_rage_red_gyarados', 18, 22, 'DOWN', 'red_gyarados', '🐉 GYARADOS', 
         [
           "GYARADOS: Gyashaa! The lake's waters churn violently as the crimson Gyarados thrashes with fury!",
         ],
         { action: 'RED_GYARADOS_EVENT' }
       ),
-      makeNpc('lake_of_rage_lance', 21, 30, 'UP', 'gentleman', '🏆 CHAMPION LANCE', 
+      makeNpc('lake_of_rage_lance', 21, 28, 'UP', 'gentleman', '🏆 CHAMPION LANCE', 
         [
           "LANCE: ...So you're the one who quelled that Gyarados. Impressive!",
         ],
         { action: 'LANCE_LAKE_EVENT' }
       ),
-      makeNpc('wesley_of_wednesday', 8, 18, 'DOWN', 'black_belt', '🥋 WESLEY OF WEDNESDAY', 
+      makeNpc('wesley_of_wednesday', 4, 4, 'DOWN', 'black_belt', '🥋 WESLEY OF WEDNESDAY', 
         [
           "WESLEY: Yo! I'm WESLEY of Wednesday! You must train diligently!",
           "Here's a BLACK BELT! It boosts the power of FIGHTING-type moves!",
         ],
         { action: 'DAY_SIBLING_EVENT' }
       ),
+      makeNpc('lake_of_rage_gramps', 20, 26, 'UP', 'gramps', '👴 GRAMPS', [
+        "LAKE OF RAGE is also known as GYARADOS LAKE... But the Magikarp here have suddenly transformed into Gyarados!",
+      ]),
+      makeNpc('lake_of_rage_super_nerd', 36, 13, 'LEFT', 'super_nerd', '🤓 SUPER NERD', [
+        "Did an earthquake cause the lake to expand? The water level seems much higher than usual.",
+      ]),
+      makeNpc('lake_of_rage_andre', 30, 23, 'LEFT', 'fisherman', '🎣 FISHER ANDRE', [
+        "I'm the best fisherman at the lake! My Gyarados is magnificent!",
+      ], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'fisher_andre',
+        trainerName: 'Fisher Andre',
+        visionRange: 1,
+        challengePages: ["ANDRE: I'm the best fisherman at the lake! Let's battle!"],
+        trainerPokemon: { speciesId: 'gyarados', level: 27, moves: ['bite', 'leer', 'twister', 'dragonrage'] },
+        trainerTeam: [{ speciesId: 'gyarados', level: 27, moves: ['bite', 'leer', 'twister', 'dragonrage'] }],
+      }),
+      makeNpc('lake_of_rage_raymond', 24, 26, 'UP', 'fisherman', '🎣 FISHER RAYMOND', [
+        "Even with the lake churned up, I'll never give up fishing!",
+      ], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'fisher_raymond',
+        trainerName: 'Fisher Raymond',
+        visionRange: 1,
+        challengePages: ["RAYMOND: Even with the lake churned up, I'll never give up fishing!"],
+        trainerPokemon: { speciesId: 'magikarp', level: 24, moves: ['splash', 'tackle', 'flail'] },
+        trainerTeam: [
+          { speciesId: 'magikarp', level: 24, moves: ['splash', 'tackle', 'flail'] },
+          { speciesId: 'magikarp', level: 24, moves: ['splash', 'tackle', 'flail'] },
+          { speciesId: 'gyarados', level: 26, moves: ['bite', 'leer', 'twister'] },
+        ],
+      }),
+      makeNpc('lake_of_rage_aaron', 4, 15, 'RIGHT', 'camper', '⚔️ AARON', [
+        "Training through this maze made my team stronger than ever!",
+      ], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'cooltrainer_aaron',
+        trainerName: 'Cooltrainer Aaron',
+        visionRange: 2,
+        challengePages: ["AARON: You found your way through the maze! Now face me!"],
+        trainerPokemon: { speciesId: 'charmeleon', level: 27, moves: ['ember', 'smokescreen', 'rage', 'scaryface'] },
+        trainerTeam: [{ speciesId: 'charmeleon', level: 27, moves: ['ember', 'smokescreen', 'rage', 'scaryface'] }],
+      }),
+      makeNpc('lake_of_rage_lois', 36, 7, 'LEFT', 'cooltrainer_f', '⚔️ LOIS', [
+        "Lois: That was a great battle!",
+      ], {
+        action: 'TRAINER_BATTLE',
+        trainerId: 'lake_of_rage_lois',
+        trainerName: 'Cooltrainerf Lois',
+        visionRange: 2,
+        challengePages: ["LOIS: Did you come to see the red Gyarados? Let's battle!"],
+        trainerPokemon: { speciesId: 'skiploom', level: 25, moves: ['synthesis', 'poisonpowder', 'megadrain', 'leechseed'] },
+        trainerTeam: [
+          { speciesId: 'skiploom', level: 25, moves: ['synthesis', 'poisonpowder', 'megadrain', 'leechseed'] },
+          { speciesId: 'ninetales', level: 25, moves: ['ember', 'quickattack', 'confuseray', 'safeguard'] },
+        ],
+      }),
     ],
 
     mahogany_town: [
@@ -159,7 +216,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('mahogany_rage_candy_bar_salesman', 19, 8, 'DOWN', 'pokefan_m', '🍬 RAGECANDYBAR SALESMAN', [
         'While visiting MAHOGANY TOWN, try a delicious RAGECANDYBAR!',
       ], { action: 'MAHOGANY_RAGECANDYBAR_SALESMAN' }),
-      makeNpc('mahogany_town_rocket_1', 16, 13, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
+      makeNpc('mahogany_town_rocket_1', 11, 8, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
         "TEAM ROCKET: What are you looking at? Mind your own business, brat!",
       ]),
     ],

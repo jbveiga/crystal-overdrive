@@ -3953,7 +3953,7 @@ buildMapFromBlk({
   id: 'lake_of_rage',
   name: "Lake of Rage",
   tileset: 'johto',
-  blkFile: 'maps__unused__BetaLakeOfRage.blk',
+  blkFile: 'maps__LakeOfRage.blk',
   blocksW: 20,
   blocksH: 18,
   roofGroup: 'lr',
