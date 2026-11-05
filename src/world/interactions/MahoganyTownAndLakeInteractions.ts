@@ -133,9 +133,16 @@ export const handleLanceMartReveal: NpcInteractionHandler = (_targetNpc, _map, c
     ],
     '🏆 LANCE',
     () => {
+      ctx.storyFlags.add('lance_lake_talked');
+      ctx.storyFlags.add('EVENT_DECIDED_TO_HELP_LANCE');
       ctx.storyFlags.add('lance_hideout_briefed');
       ctx.storyFlags.add('EVENT_UNCOVERED_STAIRCASE_IN_MAHOGANY_MART');
       ctx.missionManager?.checkStoryFlags?.(ctx.storyFlags);
+      const curMap = ctx.mapManager?.getCurrentMap?.();
+      if (curMap) {
+        ctx.renderMap?.(curMap);
+        ctx.syncMapOverworldItems?.(curMap);
+      }
       ctx.saveCurrentGame();
       ctx.showToast('Infiltrate Team Rocket Hideout B1F via secret stairs!');
     }

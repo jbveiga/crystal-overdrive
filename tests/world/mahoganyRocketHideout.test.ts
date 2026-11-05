@@ -556,4 +556,43 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
     expect(npcsByMap.team_rocket_base_b2f.length).toBeGreaterThanOrEqual(5);
     expect(npcsByMap.team_rocket_base_b3f.length).toBeGreaterThanOrEqual(7);
   });
+
+  // 18. End-to-End Souvenir Shop Rendezvous & B1F Pathfinding
+  it('18. Unblocks Souvenir Shop after Lake of Rage, spawns Lance inside Mahogany Mart, and provides walkable B1F path to Security Switch and B2F stairs', () => {
+    const flagsAfterLake = new Set<string>(['red_gyarados_subdued']);
+    expect(isNpcActiveForStoryFlags('mahogany_town_rocket_1', flagsAfterLake)).toBe(false);
+    expect(isNpcActiveForStoryFlags('mahogany_mart_lance', flagsAfterLake)).toBe(true);
+
+    const b1f: MapData = JSON.parse(fs.readFileSync(path.join(mapsDir, 'team_rocket_base_b1f.json'), 'utf8'));
+    const visited = new Set<string>();
+    const queue: Array<[number, number]> = [[27, 2]];
+    visited.add('27,2');
+    while (queue.length > 0) {
+      const [cx, cy] = queue.shift()!;
+      for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+        const nx = cx + dx;
+        const ny = cy + dy;
+        if (nx < 0 || ny < 0 || nx >= b1f.width || ny >= b1f.height) continue;
+        const key = `${nx},${ny}`;
+        if (visited.has(key)) continue;
+        if (b1f.collisionGrid[ny * b1f.width + nx] === 0) {
+          visited.add(key);
+          queue.push([nx, ny]);
+        }
+      }
+    }
+
+    // Must reach Security Switch (19, 11) and B2F stairs (3, 14) from entrance stairs (27, 2)
+    expect(visited.has('19,11')).toBe(true);
+    expect(visited.has('3,14')).toBe(true);
+
+    // Generated B2F/B3F Rockets and Scientists despawn when hideout cleared
+    const flagsCleared = new Set<string>(['rocket_base_generator_cleared']);
+    expect(isNpcActiveForStoryFlags('team_rocket_base_b2f_rocket_0', flagsCleared)).toBe(false);
+    expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_rocket_0', flagsCleared)).toBe(false);
+    expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_scientist_3', flagsCleared)).toBe(false);
+    expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_scientist_4', flagsCleared)).toBe(false);
+    expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_rocket_5', flagsCleared)).toBe(false);
+  });
 });
+

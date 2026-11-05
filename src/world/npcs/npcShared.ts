@@ -486,15 +486,28 @@ export function isNpcActiveForStoryFlags(
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
   if (npcId === 'mahogany_gym_blocker') return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
+  if (npcId === 'mahogany_town_rocket_1') {
+    return (
+      !isRedGyaradosSubdued &&
+      !storyFlags.has('lance_lake_talked') &&
+      !storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE') &&
+      !storyFlags.has('rocket_base_generator_cleared') &&
+      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
+    );
+  }
   if (npcId === 'mahogany_mart_lance') return (
-      (storyFlags.has('lance_lake_talked') || storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE')) &&
+      (isRedGyaradosSubdued || storyFlags.has('lance_lake_talked') || storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE')) &&
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
   if (
-    npcId === 'mahogany_town_rocket_1' ||
     npcId === 'mahogany_mart_rocket' ||
-    npcId.startsWith('team_rocket_base_b1f_')
+    npcId.startsWith('team_rocket_base_b1f_') ||
+    npcId === 'team_rocket_base_b2f_rocket_0' ||
+    npcId === 'team_rocket_base_b3f_rocket_0' ||
+    npcId === 'team_rocket_base_b3f_scientist_3' ||
+    npcId === 'team_rocket_base_b3f_scientist_4' ||
+    npcId === 'team_rocket_base_b3f_rocket_5'
   ) {
     return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
   }
