@@ -281,14 +281,24 @@ describe('TICKET-GAMEPLAY-FIDELITY-01: Moves, Evolutions, Holes, Ecruteak Gym & 
   // 4. Ecruteak Gym Collision & Unobstructed Safe-Path Traversal
   // =========================================================================
   describe('4. Ecruteak Gym Unobstructed Safe Path to Morty', () => {
-    it('verifies 100% of abyss tiles (x: 2..7, y: 4..13) are collisionGrid=0', () => {
+    it('verifies 100% of abyss tiles (x: 2..7, y: 4..13) are collisionGrid=0 in both ecruteak_gym.json and world_maps.json', () => {
       const eg = JSON.parse(fs.readFileSync(path.join(mapsDir, 'ecruteak_gym.json'), 'utf8'));
+      const bundle = JSON.parse(fs.readFileSync(path.join(mapsDir, '../world_maps.json'), 'utf8'));
+      const bundledEg = Array.isArray(bundle) ? bundle.find((m: any) => m.id === 'ecruteak_gym') : null;
+      expect(bundledEg).toBeDefined();
       const w = eg.width;
       for (let y = 4; y <= 13; y++) {
         for (let x = 2; x <= 7; x++) {
           const col = eg.collisionGrid[y * w + x];
           expect(col, `Tile (${x}, ${y}) in Ecruteak Gym must be walkable (0)`).toBe(0);
+          expect(bundledEg.collisionGrid[y * w + x], `Bundled tile (${x}, ${y}) in world_maps.json must be walkable (0)`).toBe(0);
         }
+      }
+      for (let y = 14; y <= 17; y++) {
+        expect(eg.collisionGrid[y * w + 4]).toBe(0);
+        expect(eg.collisionGrid[y * w + 5]).toBe(0);
+        expect(bundledEg.collisionGrid[y * w + 4]).toBe(0);
+        expect(bundledEg.collisionGrid[y * w + 5]).toBe(0);
       }
     });
 
