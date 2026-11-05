@@ -112,10 +112,79 @@ export class RoamingManager {
     let idx = 0;
     for (const roamer of this.roamers.values()) {
       roamer.isAwakened = true;
+      if (roamer.pokemon && roamer.pokemon.currentHp <= 0 && !roamer.isCaught) {
+        roamer.isDefeated = true;
+      }
+      if (roamer.isCaught || roamer.isDefeated) {
+        roamer.currentMapId = '';
+        idx++;
+        continue;
+      }
       if (roamer.currentMapId === 'burned_tower' || !this.isAllowedRoamNode(roamer.currentMapId)) {
         roamer.currentMapId = scatterRoutes[idx % scatterRoutes.length];
       }
       idx++;
+    }
+  }
+
+  /**
+   * Restores saved roamer states and reconciles party/PC/Pokedex/storyFlags so caught or fainted
+   * roaming legendaries never roam again across save reloads.
+   */
+  public hydrateRoamers(
+    savedRoamers?: RoamerState[],
+    opts?: {
+      caughtSpecies?: Iterable<string>;
+      ownedSpecies?: Iterable<string>;
+      storyFlags?: Iterable<string>;
+    }
+  ): void {
+    if (Array.isArray(savedRoamers)) {
+      for (const saved of savedRoamers) {
+        if (!saved || !saved.speciesId) continue;
+        const key = saved.speciesId.toLowerCase();
+        const existing = this.roamers.get(key);
+        if (!existing) continue;
+        if (saved.pokemon && typeof saved.pokemon === 'object') {
+          existing.pokemon = saved.pokemon;
+        }
+        existing.isAwakened = Boolean(saved.isAwakened);
+        existing.isCaught = Boolean(saved.isCaught);
+        existing.isDefeated =
+          Boolean(saved.isDefeated) ||
+          (!existing.isCaught && typeof existing.pokemon?.currentHp === 'number' && existing.pokemon.currentHp <= 0);
+        if (existing.isCaught || existing.isDefeated) {
+          existing.currentMapId = '';
+        } else if (saved.currentMapId) {
+          existing.currentMapId = saved.currentMapId;
+        }
+      }
+    }
+
+    const caughtSet = new Set(Array.from(opts?.caughtSpecies || [], (s) => s.toLowerCase()));
+    const ownedSet = new Set(Array.from(opts?.ownedSpecies || [], (s) => s.toLowerCase()));
+    const flagSet = new Set(Array.from(opts?.storyFlags || []));
+
+    for (const [speciesId, roamer] of this.roamers.entries()) {
+      const upper = speciesId.toUpperCase();
+      if (
+        caughtSet.has(speciesId) ||
+        ownedSet.has(speciesId) ||
+        flagSet.has(`caught_${speciesId}`) ||
+        flagSet.has(`${speciesId}_caught`) ||
+        flagSet.has(`EVENT_CAUGHT_${upper}`)
+      ) {
+        this.markCaught(speciesId);
+      } else if (
+        flagSet.has(`${speciesId}_defeated`) ||
+        flagSet.has(`defeated_${speciesId}`) ||
+        flagSet.has(`${speciesId}_fainted`) ||
+        flagSet.has(`${speciesId}_caught_or_defeated`) ||
+        flagSet.has(`EVENT_FOUGHT_${upper}`) ||
+        flagSet.has(`EVENT_DEFEATED_${upper}`)
+      ) {
+        this.markDefeated(speciesId);
+      }
     }
   }
 
@@ -125,7 +194,9 @@ export class RoamingManager {
   public sleepBeasts(): void {
     for (const roamer of this.roamers.values()) {
       roamer.isAwakened = false;
-      roamer.currentMapId = 'burned_tower';
+      if (!roamer.isCaught && !roamer.isDefeated) {
+        roamer.currentMapId = 'burned_tower';
+      }
     }
   }
 
@@ -142,7 +213,9 @@ export class RoamingManager {
   }
 
   public getActiveRoamers(): RoamerState[] {
-    return this.getAllRoamers().filter((r) => r.isAwakened && !r.isCaught && !r.isDefeated);
+    return this.getAllRoamers().filter(
+      (r) => r.isAwakened && !r.isCaught && !r.isDefeated && (r.pokemon?.currentHp ?? 1) > 0
+    );
   }
 
   public getActiveRoamerOnRoute(routeId: string): RoamerState | undefined {
@@ -151,16 +224,21 @@ export class RoamingManager {
   }
 
   public markCaught(speciesId: string): void {
-    const roamer = this.roamers.get(speciesId);
+    const roamer = this.roamers.get(speciesId.toLowerCase());
     if (roamer) {
       roamer.isCaught = true;
+      roamer.currentMapId = '';
     }
   }
 
   public markDefeated(speciesId: string): void {
-    const roamer = this.roamers.get(speciesId);
+    const roamer = this.roamers.get(speciesId.toLowerCase());
     if (roamer) {
       roamer.isDefeated = true;
+      if (roamer.pokemon) {
+        roamer.pokemon.currentHp = 0;
+      }
+      roamer.currentMapId = '';
     }
   }
 

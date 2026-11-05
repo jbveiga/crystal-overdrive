@@ -233,8 +233,14 @@ export class OverworldTickerCoordinator {
             return;
           }
 
+          const isSuicuneResolved =
+            storyFlags.has('suicune_caught_or_defeated') ||
+            storyFlags.has('EVENT_CAUGHT_SUICUNE') ||
+            storyFlags.has('EVENT_FOUGHT_SUICUNE');
+
           // Cianwood City Suicune & Eusine Encounter
           if (
+            !isSuicuneResolved &&
             currentMap?.id === 'cianwood_city' &&
             coord.x === 11 &&
             coord.y === 16 &&
@@ -247,6 +253,7 @@ export class OverworldTickerCoordinator {
 
           // Route 42 Suicune Sprint
           if (
+            !isSuicuneResolved &&
             currentMap?.id === 'route_42' &&
             coord.x === 24 &&
             coord.y === 14 &&
@@ -259,6 +266,7 @@ export class OverworldTickerCoordinator {
 
           // Route 36 Suicune Sighting (Story Arc A)
           if (
+            !isSuicuneResolved &&
             currentMap?.id === 'route_36' &&
             ((coord.x === 35 && (coord.y === 10 || coord.y === 11)) ||
              (coord.y === 9 && (coord.x === 34 || coord.x === 36))) &&
@@ -273,6 +281,7 @@ export class OverworldTickerCoordinator {
 
           // Vermilion Port Suicune Sighting (Story Arc A)
           if (
+            !isSuicuneResolved &&
             currentMap?.id === 'vermilion_port' &&
             ((coord.x === 12 && coord.y === 11) ||
              (coord.x === 11 && coord.y === 10) ||

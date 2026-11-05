@@ -56,6 +56,35 @@ describe('RoamingManager', () => {
     // Mark as caught
     rm.markCaught('raikou');
     expect(rm.getActiveRoamerOnRoute('route_29')).toBeUndefined();
+    expect(rm.getRoamer('raikou')?.currentMapId).toBe('');
+  });
+
+  it('permanently retires roamers when fainted or caught and prevents re-scattering on awakenBeasts or route changes', () => {
+    const rm = new RoamingManager();
+    rm.awakenBeasts();
+
+    rm.markDefeated('entei');
+    expect(rm.getRoamer('entei')?.isDefeated).toBe(true);
+    expect(rm.getRoamer('entei')?.pokemon.currentHp).toBe(0);
+    expect(rm.getRoamer('entei')?.currentMapId).toBe('');
+    expect(rm.getActiveRoamers().map((r) => r.speciesId)).toEqual(['raikou']);
+
+    // Calling awakenBeasts or onPlayerRouteChange must not resurrect fainted Entei
+    rm.awakenBeasts();
+    rm.onPlayerRouteChange('route_37');
+    expect(rm.getRoamer('entei')?.currentMapId).toBe('');
+    expect(rm.getActiveRoamers().map((r) => r.speciesId)).toEqual(['raikou']);
+
+    // Hydrating from saved roamers or storyFlags preserves caught/fainted retirement
+    const rmReloaded = new RoamingManager();
+    rmReloaded.hydrateRoamers(rm.getAllRoamers(), {
+      caughtSpecies: new Set(['raikou']),
+      storyFlags: new Set(['entei_defeated']),
+    });
+    rmReloaded.awakenBeasts();
+    expect(rmReloaded.getActiveRoamers()).toHaveLength(0);
+    expect(rmReloaded.getRoamer('raikou')?.isCaught).toBe(true);
+    expect(rmReloaded.getRoamer('entei')?.isDefeated).toBe(true);
   });
 });
 

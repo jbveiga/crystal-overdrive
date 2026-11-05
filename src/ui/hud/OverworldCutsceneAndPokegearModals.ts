@@ -524,12 +524,16 @@ export class OverworldCutsceneAndPokegearModals {
       `;
 
       const formattedName = r.speciesId.toUpperCase();
-      const formattedRoute = r.currentMapId.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+      const isRetired = r.isCaught || r.isDefeated || (r.pokemon?.currentHp ?? 1) <= 0;
+      const formattedRoute =
+        isRetired || !r.currentMapId
+          ? 'No longer roaming'
+          : r.currentMapId.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
       let statusBadge = `<span style="background: #2563eb; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">ROAMING</span>`;
       if (r.isCaught) {
         statusBadge = `<span style="background: #16a34a; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">CAUGHT</span>`;
-      } else if (r.isDefeated) {
+      } else if (r.isDefeated || (r.pokemon?.currentHp ?? 1) <= 0) {
         statusBadge = `<span style="background: #dc2626; font-size: 11px; padding: 2px 6px; border-radius: 4px; font-weight: 700;">DEFEATED</span>`;
       }
 

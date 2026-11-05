@@ -472,11 +472,18 @@ export function isNpcActiveForStoryFlags(
   if (npcId === 'sudowoodo') return !storyFlags.has('sudowoodo_cleared') && !storyFlags.has('EVENT_FOUGHT_SUDOWOODO');
 
   // Phase 11: Lake of Rage, Mahogany Town, and Team Rocket Base
-  if (npcId === 'lake_of_rage_red_gyarados') return !storyFlags.has('red_gyarados_subdued') && !storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS');
+  const isRedGyaradosSubdued =
+    storyFlags.has('red_gyarados_subdued') ||
+    storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS') ||
+    storyFlags.has('received_exp_share') ||
+    storyFlags.has('EVENT_GOT_EXP_SHARE_FROM_MR_POKEMON');
+  if (npcId === 'lake_of_rage_red_gyarados') return !isRedGyaradosSubdued;
   if (npcId === 'lake_of_rage_lance') return (
-      (storyFlags.has('red_gyarados_subdued') || storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS')) &&
+      isRedGyaradosSubdued &&
       !storyFlags.has('lance_lake_talked') &&
-      !storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE')
+      !storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE') &&
+      !storyFlags.has('rocket_base_generator_cleared') &&
+      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
   if (npcId === 'mahogany_gym_blocker') return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
   if (npcId === 'mahogany_mart_lance') return (
@@ -565,9 +572,15 @@ export function isNpcActiveForStoryFlags(
     return !storyFlags.has('beasts_awakened') && !storyFlags.has('EVENT_RELEASED_THE_BEASTS');
   }
 
+  const isSuicuneResolved =
+    storyFlags.has('suicune_caught_or_defeated') ||
+    storyFlags.has('EVENT_CAUGHT_SUICUNE') ||
+    storyFlags.has('EVENT_FOUGHT_SUICUNE');
+
   // Route 36 Suicune (Story Arc A)
   if (npcId === 'route_36_suicune') {
     return (
+      !isSuicuneResolved &&
       (storyFlags.has('sudowoodo_cleared') || storyFlags.has('EVENT_FOUGHT_SUDOWOODO')) &&
       (storyFlags.has('beasts_awakened') || storyFlags.has('EVENT_RELEASED_THE_BEASTS')) &&
       !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_36')
@@ -575,25 +588,38 @@ export function isNpcActiveForStoryFlags(
   }
 
   // Cianwood City Suicune & Eusine
-  if (npcId === 'cianwood_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
-  if (npcId === 'cianwood_eusine') return !storyFlags.has('EVENT_FOUGHT_EUSINE');
+  if (npcId === 'cianwood_suicune') return !isSuicuneResolved && !storyFlags.has('EVENT_SAW_SUICUNE_AT_CIANWOOD_CITY');
+  if (npcId === 'cianwood_eusine') return !isSuicuneResolved && !storyFlags.has('EVENT_FOUGHT_EUSINE');
 
   // Route 42 Suicune
-  if (npcId === 'route_42_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_42');
+  if (npcId === 'route_42_suicune') return !isSuicuneResolved && !storyFlags.has('EVENT_SAW_SUICUNE_ON_ROUTE_42');
 
   // Vermilion Port Suicune (Story Arc A)
-  if (npcId === 'vermilion_port_suicune') return !storyFlags.has('EVENT_SAW_SUICUNE_AT_VERMILION_PORT');
+  if (npcId === 'vermilion_port_suicune') return !isSuicuneResolved && !storyFlags.has('EVENT_SAW_SUICUNE_AT_VERMILION_PORT');
 
   // Olivine Lighthouse 6F & Olivine Gym Jasmine lifecycle
   if (npcId === 'lighthouse_jasmine') return !storyFlags.has('amphy_cured');
   if (npcId === 'leader_jasmine') return storyFlags.has('amphy_cured');
 
-  // Tin Tower Suicune Altar & Eusine Cameo (Act 8 / Arc A)
-  if (npcId === 'suicune_altar') return storyFlags.has('has_clear_bell') && !storyFlags.has('suicune_caught_or_defeated');
-  if (npcId === 'tin_tower_eusine') return storyFlags.has('suicune_caught_or_defeated');
+  // Tin Tower Suicune Altar, Eusine Cameo & Ho-Oh Roof (Act 8 / Arc A)
+  if (npcId === 'suicune_altar') return storyFlags.has('has_clear_bell') && !isSuicuneResolved;
+  if (npcId === 'tin_tower_eusine') return isSuicuneResolved;
+  if (npcId === 'ho_oh_boss') {
+    return (
+      !storyFlags.has('ho_oh_defeated') &&
+      !storyFlags.has('EVENT_FOUGHT_HO_OH') &&
+      !storyFlags.has('EVENT_CAUGHT_HO_OH')
+    );
+  }
 
   // Whirl Islands Lugia Chamber (Act 8 / Post-Radio Tower)
-  if (npcId === 'whirl_island_lugia') return !storyFlags.has('lugia_defeated') && !storyFlags.has('EVENT_FOUGHT_LUGIA');
+  if (npcId === 'whirl_island_lugia') {
+    return (
+      !storyFlags.has('lugia_defeated') &&
+      !storyFlags.has('EVENT_FOUGHT_LUGIA') &&
+      !storyFlags.has('EVENT_CAUGHT_LUGIA')
+    );
+  }
 
   // Ice Path B1F & B2F Strength Boulders
   if (npcId.startsWith('ice_path_b1f_boulder_')) {

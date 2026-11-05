@@ -99,8 +99,81 @@ export class SaveStateReconciler {
     existingSave.storyFlags?.forEach((f) => state.storyFlags.add(f));
     existingSave.seenSpecies?.forEach((s) => state.seenSpecies.add(s));
     if (state.caughtSpecies) existingSave.caughtSpecies?.forEach((s) => state.caughtSpecies!.add(s));
-    state.playerParty.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
-    flattenedBoxes.forEach((p) => { if (p && p.speciesId) state.seenSpecies.add(p.speciesId); });
+    const ownedSpecies = new Set<string>();
+    state.playerParty.forEach((p) => {
+      if (p && p.speciesId) {
+        const sp = p.speciesId.toLowerCase();
+        state.seenSpecies.add(p.speciesId);
+        ownedSpecies.add(sp);
+        state.caughtSpecies?.add(sp);
+      }
+    });
+    flattenedBoxes.forEach((p) => {
+      if (p && p.speciesId) {
+        const sp = p.speciesId.toLowerCase();
+        state.seenSpecies.add(p.speciesId);
+        ownedSpecies.add(sp);
+        state.caughtSpecies?.add(sp);
+      }
+    });
+
+    // Reconcile single-encounter legendary flags from owned/caught species
+    if (ownedSpecies.has('raikou') || state.caughtSpecies?.has('raikou')) {
+      state.storyFlags.add('caught_raikou');
+      state.storyFlags.add('EVENT_CAUGHT_RAIKOU');
+    }
+    if (ownedSpecies.has('entei') || state.caughtSpecies?.has('entei')) {
+      state.storyFlags.add('caught_entei');
+      state.storyFlags.add('EVENT_CAUGHT_ENTEI');
+    }
+    if (ownedSpecies.has('suicune') || state.caughtSpecies?.has('suicune')) {
+      state.storyFlags.add('suicune_caught_or_defeated');
+      state.storyFlags.add('EVENT_CAUGHT_SUICUNE');
+      state.storyFlags.add('EVENT_FOUGHT_SUICUNE');
+    }
+    if (ownedSpecies.has('lugia') || state.caughtSpecies?.has('lugia')) {
+      state.storyFlags.add('lugia_defeated');
+      state.storyFlags.add('EVENT_FOUGHT_LUGIA');
+      state.storyFlags.add('EVENT_CAUGHT_LUGIA');
+    }
+    if (
+      ownedSpecies.has('ho-oh') ||
+      ownedSpecies.has('ho_oh') ||
+      state.caughtSpecies?.has('ho-oh') ||
+      state.caughtSpecies?.has('ho_oh')
+    ) {
+      state.storyFlags.add('ho_oh_defeated');
+      state.storyFlags.add('EVENT_FOUGHT_HO_OH');
+      state.storyFlags.add('EVENT_CAUGHT_HO_OH');
+    }
+    if (ownedSpecies.has('celebi') || state.caughtSpecies?.has('celebi')) {
+      state.storyFlags.add('EVENT_FOUGHT_CELEBI');
+      state.storyFlags.add('EVENT_CAUGHT_CELEBI');
+    }
+
+    // Reconcile Lake of Rage Red Gyarados & Champion Lance shoreline appearance
+    const hasRedScaleInInv =
+      Boolean(
+        state.inventory.keyItems?.some((k) => {
+          const kl = k.toLowerCase();
+          return kl === 'red_scale' || kl === 'red-scale' || kl === 'red scale';
+        })
+      ) ||
+      Boolean((state.inventory.items as any)?.red_scale || (state.inventory.items as any)?.['red-scale']);
+    const hasShinyGyarados = [...state.playerParty, ...flattenedBoxes].some(
+      (p) => p && p.speciesId?.toLowerCase() === 'gyarados' && p.isShiny
+    );
+    if (
+      state.storyFlags.has('red_gyarados_subdued') ||
+      state.storyFlags.has('EVENT_LAKE_OF_RAGE_RED_GYARADOS') ||
+      state.storyFlags.has('received_exp_share') ||
+      state.storyFlags.has('EVENT_GOT_EXP_SHARE_FROM_MR_POKEMON') ||
+      hasRedScaleInInv ||
+      hasShinyGyarados
+    ) {
+      state.storyFlags.add('red_gyarados_subdued');
+      state.storyFlags.add('EVENT_LAKE_OF_RAGE_RED_GYARADOS');
+    }
 
     state.overworldItemManager.setCollectedFlags([
       ...(existingSave.collectedItems || []),
@@ -196,6 +269,12 @@ export class SaveStateReconciler {
     state.gameOptions.playerSpeedDefault = state.gameClock.playerSpeed;
     state.gameOptions.battleSpeedMultiplier = state.gameClock.battleSpeed;
 
+    state.roamingManager.hydrateRoamers?.(existingSave.roamers, {
+      caughtSpecies: state.caughtSpecies,
+      ownedSpecies,
+      storyFlags: state.storyFlags,
+    });
+
     if (
       existingSave.storyFlags?.includes('beasts_awakened') ||
       state.storyFlags.has('beasts_awakened') ||
@@ -204,6 +283,20 @@ export class SaveStateReconciler {
       state.roamingManager.awakenBeasts();
     } else {
       state.roamingManager.sleepBeasts();
+    }
+
+    // Sync roamer caught/defeated states back into storyFlags
+    const hydratedRoamers: RoamerState[] = state.roamingManager.getAllRoamers?.() || [];
+    for (const r of hydratedRoamers) {
+      const sp = r.speciesId.toLowerCase();
+      const upper = sp.toUpperCase();
+      if (r.isCaught) {
+        state.storyFlags.add(`caught_${sp}`);
+        state.storyFlags.add(`EVENT_CAUGHT_${upper}`);
+      } else if (r.isDefeated) {
+        state.storyFlags.add(`${sp}_defeated`);
+        state.storyFlags.add(`EVENT_FOUGHT_${upper}`);
+      }
     }
 
     return {

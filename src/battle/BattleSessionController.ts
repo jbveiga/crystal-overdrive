@@ -312,14 +312,50 @@ export class BattleSessionController {
       }
 
       if (result.isBattleOver) {
+        const oppSpecies = opponentPokemon.speciesId.toLowerCase();
+        const isRoamerSpecies =
+          Boolean(options.isRoamer) || ['raikou', 'entei', 'suicune'].includes(oppSpecies);
+        const recordSingleEncounterLegendaryResolution = (wasCaught: boolean) => {
+          if (wasCaught) {
+            caughtSpeciesIds.add(oppSpecies);
+            (ctx as any).caughtSpecies?.add?.(oppSpecies);
+          }
+          if (isRoamerSpecies) {
+            if (wasCaught) {
+              ctx.roamingManager.markCaught(oppSpecies);
+              ctx.storyFlags.add(`caught_${oppSpecies}`);
+              ctx.storyFlags.add(`EVENT_CAUGHT_${oppSpecies.toUpperCase()}`);
+            } else {
+              ctx.roamingManager.markDefeated(oppSpecies);
+              ctx.storyFlags.add(`${oppSpecies}_defeated`);
+              ctx.storyFlags.add(`EVENT_FOUGHT_${oppSpecies.toUpperCase()}`);
+            }
+            ctx.overworldHUD.hideRoamerAlert();
+            ctx.eventBus.emit('roamer:updated', { roamers: ctx.roamingManager.getAllRoamers() });
+          }
+          if (oppSpecies === 'suicune') {
+            ctx.storyFlags.add('suicune_caught_or_defeated');
+            ctx.storyFlags.add('EVENT_FOUGHT_SUICUNE');
+            if (wasCaught) ctx.storyFlags.add('EVENT_CAUGHT_SUICUNE');
+          } else if (oppSpecies === 'lugia') {
+            ctx.storyFlags.add('lugia_defeated');
+            ctx.storyFlags.add('EVENT_FOUGHT_LUGIA');
+            if (wasCaught) ctx.storyFlags.add('EVENT_CAUGHT_LUGIA');
+          } else if (oppSpecies === 'ho-oh' || oppSpecies === 'ho_oh') {
+            ctx.storyFlags.add('ho_oh_defeated');
+            ctx.storyFlags.add('EVENT_FOUGHT_HO_OH');
+            if (wasCaught) ctx.storyFlags.add('EVENT_CAUGHT_HO_OH');
+          } else if (oppSpecies === 'celebi') {
+            ctx.storyFlags.add('EVENT_FOUGHT_CELEBI');
+            if (wasCaught) ctx.storyFlags.add('EVENT_CAUGHT_CELEBI');
+          }
+        };
+
         if (result.caught) {
           if (ctx.bugContestManager.state.isActive) {
             await ctx.promptBugContestSpecimenSwap(opponentPokemon);
           }
-          if (options.isRoamer) {
-            ctx.roamingManager.markCaught(opponentPokemon.speciesId);
-            ctx.overworldHUD.hideRoamerAlert();
-          }
+          recordSingleEncounterLegendaryResolution(true);
           if (ctx.playerParty.length < 6) {
             ctx.playerParty.push(opponentPokemon);
             ctx.saveCurrentGame();
@@ -341,9 +377,11 @@ export class BattleSessionController {
             ctx.saveCurrentGame();
           }
         } else if (result.winner === 'PLAYER') {
-          if (options.isRoamer) {
-            ctx.roamingManager.markDefeated(opponentPokemon.speciesId);
-            ctx.overworldHUD.hideRoamerAlert();
+          if (!options.isTrainer) {
+            recordSingleEncounterLegendaryResolution(false);
+            if (isRoamerSpecies || options.isLegendary) {
+              ctx.saveCurrentGame();
+            }
           }
 
           // Award EXP & Check Level-Up across party via Unbound-Style Exp. Share (OFF | ALL | CAPPED)

@@ -65,6 +65,9 @@ export const handleTinTowerSage: NpcInteractionHandler = (targetNpc, _map, ctx) 
     ctx.caughtSpecies?.has('raikou') ||
     ctx.caughtSpecies?.has('243') ||
     ctx.storyFlags.has('caught_raikou') ||
+    ctx.storyFlags.has('raikou_defeated') ||
+    ctx.storyFlags.has('EVENT_CAUGHT_RAIKOU') ||
+    ctx.storyFlags.has('EVENT_FOUGHT_RAIKOU') ||
     ctx.playerParty?.some((p) => p.speciesId === 'raikou' || p.speciesId === '243') ||
     ctx.playerBox?.some((p) => p.speciesId === 'raikou' || p.speciesId === '243');
 
@@ -72,6 +75,9 @@ export const handleTinTowerSage: NpcInteractionHandler = (targetNpc, _map, ctx) 
     ctx.caughtSpecies?.has('entei') ||
     ctx.caughtSpecies?.has('244') ||
     ctx.storyFlags.has('caught_entei') ||
+    ctx.storyFlags.has('entei_defeated') ||
+    ctx.storyFlags.has('EVENT_CAUGHT_ENTEI') ||
+    ctx.storyFlags.has('EVENT_FOUGHT_ENTEI') ||
     ctx.playerParty?.some((p) => p.speciesId === 'entei' || p.speciesId === '244') ||
     ctx.playerBox?.some((p) => p.speciesId === 'entei' || p.speciesId === '244');
 

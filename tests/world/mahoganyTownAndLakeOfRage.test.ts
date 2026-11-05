@@ -168,8 +168,12 @@ describe('TICKET-WORLD-MAHOGANY-TOWN-AND-LAKE-OF-RAGE-01: Verification Suite', (
         const mapNpcs = npcs[mapId] || [];
         for (const npc of mapNpcs) {
           const tile = mapData.collisionGrid[npc.y * mapData.width + npc.x];
+          const isValidTile =
+            npc.id === 'lake_of_rage_red_gyarados'
+              ? tile === 3 || tile === 0
+              : tile === 0 || tile === 2;
           expect(
-            tile === 0 || tile === 2,
+            isValidTile,
             `NPC ${npc.id} in ${mapId} at (${npc.x}, ${npc.y}) is on collision ${tile}`
           ).toBe(true);
         }

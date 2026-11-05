@@ -443,8 +443,13 @@ export function renderInspectorCard({
           <div style="display: flex; flex-direction: column; gap: 6px;">
             ${activeRoamers
               .map((r) => {
-                const rLm = resolveCurrentLandmark(r.currentMapId) || JOHTO_LANDMARKS.burned_tower;
-                const hops = computeLandmarkDistance(playerLandmark?.id || 'new_bark_town', rLm.id);
+                const isRetired = r.isCaught || r.isDefeated || (r.pokemon?.currentHp ?? 1) <= 0;
+                const rLm = !isRetired
+                  ? resolveCurrentLandmark(r.currentMapId) || JOHTO_LANDMARKS.burned_tower
+                  : null;
+                const hops = rLm
+                  ? computeLandmarkDistance(playerLandmark?.id || 'new_bark_town', rLm.id)
+                  : null;
                 const icon = r.speciesId === 'raikou' ? '⚡' : r.speciesId === 'entei' ? '🔥' : '💧';
                 const name = r.speciesId.toUpperCase();
                 let proxLabel = '📡 TRACKING';
@@ -452,7 +457,7 @@ export function renderInspectorCard({
                 if (r.isCaught) {
                   proxLabel = '🔴 CAUGHT';
                   proxColor = '#4ADE80';
-                } else if (r.isDefeated) {
+                } else if (r.isDefeated || (r.pokemon?.currentHp ?? 1) <= 0) {
                   proxLabel = '⚔️ DEFEATED';
                   proxColor = '#94A3B8';
                 } else if (!r.isAwakened) {
@@ -468,12 +473,13 @@ export function renderInspectorCard({
                   proxLabel = `📡 ${hops} HOPS AWAY`;
                   proxColor = '#38BDF8';
                 }
-                const isSelectedRoamerLm = sel.id === rLm.id;
+                const isSelectedRoamerLm = rLm ? sel.id === rLm.id : false;
+                const locationSubtitle = isRetired ? 'No longer roaming' : rLm?.name || 'Unknown';
                 return `
                   <div
                     id="roamer-radar-${r.speciesId}"
                     class="roamer-radar-item"
-                    data-landmark-id="${rLm.id}"
+                    ${rLm ? `data-landmark-id="${rLm.id}"` : ''}
                     style="
                       background: ${isSelectedRoamerLm ? '#1E293B' : '#080E1D'};
                       border: 1px solid ${isSelectedRoamerLm ? '#FFD028' : '#22324F'};
@@ -482,14 +488,14 @@ export function renderInspectorCard({
                       display: flex;
                       justify-content: space-between;
                       align-items: center;
-                      cursor: pointer;
+                      cursor: ${rLm ? 'pointer' : 'default'};
                     "
                   >
                     <div style="display: flex; align-items: center; gap: 6px;">
                       <span style="font-size: 13px;">${icon}</span>
                       <div>
                         <div style="font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 800; color: #F6F8F3;">${name}</div>
-                        <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;">${rLm.name}</div>
+                        <div style="font-family: 'Space Mono', monospace; font-size: 10px; color: #94A3B8;">${locationSubtitle}</div>
                       </div>
                     </div>
                     <span style="font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 800; color: ${proxColor}; background: rgba(15, 23, 42, 0.8); border: 1px solid ${proxColor}; padding: 2px 6px; border-radius: 4px;">${proxLabel}</span>
