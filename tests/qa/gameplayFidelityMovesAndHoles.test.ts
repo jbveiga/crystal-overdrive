@@ -292,10 +292,10 @@ describe('TICKET-GAMEPLAY-FIDELITY-01: Moves, Evolutions, Holes, Ecruteak Gym & 
       }
     });
 
-    it('verifies safe path connects entrance (4, 16) to Leader Morty (4, 3) continuously', () => {
-      // BFS from entrance landing through ECRUTEAK_GYM_SAFE_SET
+    it('verifies safe path connects entrance (4, 16) to Leader Morty (4, 3) continuously with collisionGrid=0', () => {
+      const eg = JSON.parse(fs.readFileSync(path.join(mapsDir, 'ecruteak_gym.json'), 'utf8'));
+      // BFS from entrance landing through ECRUTEAK_GYM_SAFE_SET and walkable collisionGrid
       const startCoord = '4,16';
-      const goalCoord = '4,3';
 
       const visited = new Set<string>([startCoord]);
       const queue = [[4, 16]];
@@ -304,6 +304,7 @@ describe('TICKET-GAMEPLAY-FIDELITY-01: Moves, Evolutions, Holes, Ecruteak Gym & 
       let reachedMorty = false;
       while (queue.length > 0) {
         const [cx, cy] = queue.shift()!;
+        expect(eg.collisionGrid[cy * eg.width + cx], `Safe tile (${cx}, ${cy}) must have collisionGrid=0`).toBe(0);
         if (cx === 4 && cy === 3) {
           reachedMorty = true;
           break;
@@ -313,7 +314,11 @@ describe('TICKET-GAMEPLAY-FIDELITY-01: Moves, Evolutions, Holes, Ecruteak Gym & 
           const nx = cx + dx;
           const ny = cy + dy;
           const key = `${nx},${ny}`;
-          if (!visited.has(key) && isEcruteakGymSafeTile(nx, ny)) {
+          if (
+            !visited.has(key) &&
+            isEcruteakGymSafeTile(nx, ny) &&
+            eg.collisionGrid[ny * eg.width + nx] === 0
+          ) {
             visited.add(key);
             queue.push([nx, ny]);
           }
