@@ -595,11 +595,11 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
     expect(visited.has('21,12')).toBe(true);
     expect(visited.has('3,11')).toBe(true);
 
-    // Canonical B1F warp tiles
-    expect(b1f.tileMap?.[2 * b1f.width + 27]).toBe('in_facility_10_11_20_21');
-    expect(b1f.tileMap?.[14 * b1f.width + 3]).toBe('in_facility_30_31_18_19');
-    expect(b1f.tileMap?.[2 * b1f.width + 25]).toBe('in_facility_27_27_37_37');
-    expect(b1f.tileMap?.[15 * b1f.width + 5]).toBe('in_facility_27_27_37_37');
+    // Canonical B1F underground warp tiles
+    expect(b1f.tileMap?.[2 * b1f.width + 27]).toBe('in_underground_2a_2b_3a_3b');
+    expect(b1f.tileMap?.[14 * b1f.width + 3]).toBe('in_underground_2c_2d_3c_3d');
+    expect(b1f.tileMap?.[2 * b1f.width + 25]).toBe('in_underground_10_10_10_10');
+    expect(b1f.tileMap?.[15 * b1f.width + 5]).toBe('in_underground_22_23_32_33');
 
     // Generated B2F/B3F Rockets and Scientists despawn when hideout cleared
     const flagsCleared = new Set<string>(['rocket_base_generator_cleared']);

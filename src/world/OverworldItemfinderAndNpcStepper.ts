@@ -356,6 +356,11 @@ export class OverworldItemfinderAndNpcStepper {
             !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
           ) {
             const isStatueCamera =
+              (coord.x === 24 && (coord.y === 2 || coord.y === 3)) ||
+              (coord.x === 6 && (coord.y === 2 || coord.y === 3)) ||
+              (coord.x === 24 && (coord.y === 6 || coord.y === 7)) ||
+              (coord.x === 22 && coord.y === 16) ||
+              (coord.x === 8 && coord.y === 16) ||
               (coord.x === 19 && (coord.y === 2 || coord.y === 3)) ||
               (coord.x === 4 && (coord.y === 7 || coord.y === 8)) ||
               (coord.x === 19 && (coord.y === 6 || coord.y === 7)) ||

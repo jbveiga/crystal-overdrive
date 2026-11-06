@@ -3873,13 +3873,13 @@ buildMapFromBlk({
 buildMapFromBlk({
   id: 'team_rocket_base_b1f',
   name: "Rocket Hideout B1F",
-  tileset: 'facility',
+  tileset: 'underground',
   blkFile: 'maps__TeamRocketBaseB1F.blk',
   blocksW: 15,
   blocksH: 9,
   connections: {},
   warps: [{"x":27,"y":2,"targetMapId":"mahogany_mart","targetX":7,"targetY":3},{"x":3,"y":14,"targetMapId":"team_rocket_base_b2f","targetX":3,"targetY":14},{"x":5,"y":15,"targetMapId":"team_rocket_base_b1f","targetX":25,"targetY":2},{"x":25,"y":2,"targetMapId":"team_rocket_base_b1f","targetX":5,"targetY":15}],
-  bgEvents: [],
+  bgEvents: [{"x":19,"y":11,"speaker":"💻 SECURITY TERMINAL","pages":["A surveillance camera control terminal.","The security switch is right here!"],"action":"ROCKET_BASE_SECURITY_SWITCH"},{"x":24,"y":14,"speaker":"💻 SECURITY TERMINAL","pages":["A surveillance camera control terminal.","The security switch is right here!"],"action":"ROCKET_BASE_SECURITY_SWITCH"},{"x":24,"y":15,"speaker":"💻 SECURITY TERMINAL","pages":["A surveillance camera control terminal.","The security switch is right here!"],"action":"ROCKET_BASE_SECURITY_SWITCH"}],
   grassEncounters: [],
 });
 
@@ -3892,7 +3892,7 @@ buildMapFromBlk({
   blocksH: 9,
   connections: {},
   warps: [{"x":3,"y":14,"targetMapId":"team_rocket_base_b1f","targetX":3,"targetY":14},{"x":3,"y":2,"targetMapId":"team_rocket_base_b3f","targetX":3,"targetY":2},{"x":27,"y":2,"targetMapId":"team_rocket_base_b3f","targetX":27,"targetY":2},{"x":3,"y":6,"targetMapId":"team_rocket_base_b3f","targetX":3,"targetY":6},{"x":27,"y":14,"targetMapId":"team_rocket_base_b3f","targetX":27,"targetY":14}],
-  bgEvents: [],
+  bgEvents: [{"x":14,"y":12,"speaker":"🔒 BLAST DOOR","pages":["The door is locked electronically.","It requires a voice password to open!"],"action":"ROCKET_BASE_TRANSMITTER_DOOR"},{"x":15,"y":12,"speaker":"🔒 BLAST DOOR","pages":["The door is locked electronically.","It requires a voice password to open!"],"action":"ROCKET_BASE_TRANSMITTER_DOOR"}],
   grassEncounters: [],
 });
 
@@ -3905,7 +3905,7 @@ buildMapFromBlk({
   blocksH: 9,
   connections: {},
   warps: [{"x":3,"y":2,"targetMapId":"team_rocket_base_b2f","targetX":3,"targetY":2},{"x":27,"y":2,"targetMapId":"team_rocket_base_b2f","targetX":27,"targetY":2},{"x":3,"y":6,"targetMapId":"team_rocket_base_b2f","targetX":3,"targetY":6},{"x":27,"y":14,"targetMapId":"team_rocket_base_b2f","targetX":27,"targetY":14}],
-  bgEvents: [],
+  bgEvents: [{"x":10,"y":9,"speaker":"🔒 BLAST DOOR","pages":["The door is heavily sealed.","Two passwords are required to unlock it!"],"action":"ROCKET_BASE_OFFICE_DOOR"},{"x":11,"y":9,"speaker":"🔒 BLAST DOOR","pages":["The door is heavily sealed.","Two passwords are required to unlock it!"],"action":"ROCKET_BASE_OFFICE_DOOR"},{"x":10,"y":8,"speaker":"🔒 BLAST DOOR","pages":["The door is heavily sealed.","Two passwords are required to unlock it!"],"action":"ROCKET_BASE_OFFICE_DOOR"},{"x":11,"y":8,"speaker":"🔒 BLAST DOOR","pages":["The door is heavily sealed.","Two passwords are required to unlock it!"],"action":"ROCKET_BASE_OFFICE_DOOR"}],
   grassEncounters: [],
 });
 
