@@ -136,7 +136,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
         ],
         { action: 'RED_GYARADOS_EVENT' }
       ),
-      makeNpc('lake_of_rage_lance', 21, 28, 'UP', 'gentleman', '🏆 CHAMPION LANCE', 
+      makeNpc('lake_of_rage_lance', 21, 28, 'UP', 'lance', '🏆 CHAMPION LANCE', 
         [
           "LANCE: ...So you're the one who quelled that Gyarados. Impressive!",
         ],
@@ -222,7 +222,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     mahogany_mart: [
-      makeNpc('mahogany_mart_lance', 4, 4, 'UP', 'gentleman', '🏆 CHAMPION LANCE', [
+      makeNpc('mahogany_mart_lance', 4, 4, 'UP', 'lance', '🏆 CHAMPION LANCE', [
         "LANCE: You made it! The transmitter signal is emanating right from beneath this floor.",
         "Lance moves the heavy cabinet to reveal a secret stairway descending underground!",
         "LANCE: Follow me down! We need to shut down the generator Electrodes powering their broadcast!",
@@ -251,7 +251,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     team_rocket_base_b2f: [
-      makeNpc('team_rocket_base_b2f_lance', 18, 10, 'DOWN', 'gentleman', '🏆 CHAMPION LANCE', [
+      makeNpc('team_rocket_base_b2f_lance', 18, 10, 'DOWN', 'lance', '🏆 CHAMPION LANCE', [
         "LANCE: Are your Pokémon holding up? Here, let me restore your team to full fighting strength!",
       ], { action: 'LANCE_BASE_HEAL' }),
       makeNpc('team_rocket_base_b2f_ariana', 15, 10, 'DOWN', 'rocket_grunt_f', '⚡ EXECUTIVE ARIANA', [
@@ -382,7 +382,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     lances_room: [
-      makeNpc('champion_lance', 5, 6, 'DOWN', 'cooltrainer_m', '👑 CHAMPION LANCE', ["LANCE: I have been waiting for you, trainer. I knew that you, with your valor and bond, would reach me."], {
+      makeNpc('champion_lance', 5, 6, 'DOWN', 'lance', '👑 CHAMPION LANCE', ["LANCE: I have been waiting for you, trainer. I knew that you, with your valor and bond, would reach me."], {
         action: 'E4_EVENT', trainerId: 'lance', trainerName: 'Champion Lance',
         challengePages: ["LANCE: As the POKéMON LEAGUE CHAMPION, I accept your challenge! Dragon-types are invincible! Let's begin!"],
         trainerPokemon: { speciesId: 'gyarados', level: 44, moves: ['hyperbeam', 'surf', 'bite'] },
@@ -466,7 +466,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     hall_of_fame: [
-      makeNpc('hall_of_fame_lance', 4, 2, 'DOWN', 'cooltrainer_m', '👑 CHAMPION LANCE', [
+      makeNpc('hall_of_fame_lance', 4, 2, 'DOWN', 'lance', '👑 CHAMPION LANCE', [
         'Welcome to the HALL OF FAME!',
         'Step forward to the induction machine to record your victory for all eternity!',
       ], { action: 'HALL_OF_FAME_EVENT' }),

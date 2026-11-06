@@ -582,9 +582,24 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
       }
     }
 
-    // Must reach Security Switch (19, 11) and B2F stairs (3, 14) from entrance stairs (27, 2)
+    // Must reach Security Switch (19, 11), B2F stairs (3, 14), teleporters, NPCs, and items from entrance stairs (27, 2)
     expect(visited.has('19,11')).toBe(true);
     expect(visited.has('3,14')).toBe(true);
+    expect(visited.has('25,2')).toBe(true);
+    expect(visited.has('5,15')).toBe(true);
+    expect(visited.has('2,2')).toBe(true);
+    expect(visited.has('17,6')).toBe(true);
+    expect(visited.has('18,12')).toBe(true);
+    expect(visited.has('27,6')).toBe(true);
+    expect(visited.has('14,15')).toBe(true);
+    expect(visited.has('21,12')).toBe(true);
+    expect(visited.has('3,11')).toBe(true);
+
+    // Canonical B1F warp tiles
+    expect(b1f.tileMap?.[2 * b1f.width + 27]).toBe('in_facility_10_11_20_21');
+    expect(b1f.tileMap?.[14 * b1f.width + 3]).toBe('in_facility_30_31_18_19');
+    expect(b1f.tileMap?.[2 * b1f.width + 25]).toBe('in_facility_27_27_37_37');
+    expect(b1f.tileMap?.[15 * b1f.width + 5]).toBe('in_facility_27_27_37_37');
 
     // Generated B2F/B3F Rockets and Scientists despawn when hideout cleared
     const flagsCleared = new Set<string>(['rocket_base_generator_cleared']);
@@ -594,5 +609,37 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
     expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_scientist_4', flagsCleared)).toBe(false);
     expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_rocket_5', flagsCleared)).toBe(false);
   });
+
+  // 19. Mahogany Shop Secret Staircase Entrance & Authentic Lance Sprite
+  it('19. Reveals secret staircase tile in Mahogany Shop and assigns authentic lance sprite to all Lance NPCs', async () => {
+    const mart: MapData = JSON.parse(fs.readFileSync(path.join(mapsDir, 'mahogany_mart.json'), 'utf8'));
+    expect(mart.tileMap?.[3 * mart.width + 7]).toBe('in_traditional_house_4c_4d_5c_5d');
+
+    const { OverworldWarpAndMapTransitionController } = await import('../../src/world/OverworldWarpAndMapTransitionController');
+    const martCopy: MapData = JSON.parse(JSON.stringify(mart));
+    OverworldWarpAndMapTransitionController.applyMapStoryMutations(
+      { storyFlags: new Set<string>() } as any,
+      martCopy
+    );
+    expect(martCopy.tileMap?.[3 * martCopy.width + 7]).toBe('in_traditional_house_44_45_54_55');
+
+    OverworldWarpAndMapTransitionController.applyMapStoryMutations(
+      { storyFlags: new Set<string>(['EVENT_UNCOVERED_STAIRCASE_IN_MAHOGANY_MART']) } as any,
+      martCopy
+    );
+    expect(martCopy.tileMap?.[3 * martCopy.width + 7]).toBe('in_traditional_house_4c_4d_5c_5d');
+
+    const { NPC_SHEET_PATHS } = await import('../../src/render/OverworldNpcAndItemSprites');
+    expect(NPC_SHEET_PATHS.lance).toBe('./assets/sprites/characters/lance.png');
+    expect(fs.existsSync(path.resolve(__dirname, '../../public/assets/sprites/characters/lance.png'))).toBe(true);
+
+    const npcsByMap = createMahoganyToIndigoNpcs();
+    expect(npcsByMap.lake_of_rage.find((n) => n.id === 'lake_of_rage_lance')?.spriteType).toBe('lance');
+    expect(npcsByMap.mahogany_mart.find((n) => n.id === 'mahogany_mart_lance')?.spriteType).toBe('lance');
+    expect(npcsByMap.team_rocket_base_b2f.find((n) => n.id === 'team_rocket_base_b2f_lance')?.spriteType).toBe('lance');
+    expect(npcsByMap.lances_room.find((n) => n.id === 'champion_lance')?.spriteType).toBe('lance');
+    expect(npcsByMap.hall_of_fame.find((n) => n.id === 'hall_of_fame_lance')?.spriteType).toBe('lance');
+  });
 });
+
 

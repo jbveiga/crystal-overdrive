@@ -140,8 +140,11 @@ export const handleLanceMartReveal: NpcInteractionHandler = (_targetNpc, _map, c
       ctx.missionManager?.checkStoryFlags?.(ctx.storyFlags);
       const curMap = ctx.mapManager?.getCurrentMap?.();
       if (curMap) {
-        ctx.renderMap?.(curMap);
+        if (curMap.id === 'mahogany_mart' && curMap.tileMap) {
+          curMap.tileMap[3 * curMap.width + 7] = 'in_traditional_house_4c_4d_5c_5d';
+        }
         ctx.syncMapOverworldItems?.(curMap);
+        ctx.renderMap?.(curMap);
       }
       ctx.saveCurrentGame();
       ctx.showToast('Infiltrate Team Rocket Hideout B1F via secret stairs!');

@@ -51,6 +51,17 @@ export class OverworldWarpAndMapTransitionController {
       map.collisionGrid[25 * map.width + 8] = 0;
       if (map.tileMap) map.tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05';
     }
+    if (map.id === 'mahogany_mart' && map.tileMap) {
+      const stairsRevealed =
+        ctx.storyFlags.has('EVENT_UNCOVERED_STAIRCASE_IN_MAHOGANY_MART') ||
+        ctx.storyFlags.has('lance_hideout_briefed') ||
+        ctx.storyFlags.has('EVENT_DECIDED_TO_HELP_LANCE') ||
+        ctx.storyFlags.has('rocket_base_generator_cleared') ||
+        ctx.storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
+      map.tileMap[3 * map.width + 7] = stairsRevealed
+        ? 'in_traditional_house_4c_4d_5c_5d'
+        : 'in_traditional_house_44_45_54_55';
+    }
     if (map.id === 'team_rocket_base_b3f' && ctx.storyFlags.has('EVENT_OPENED_DOOR_TO_GIOVANNIS_OFFICE')) {
       map.collisionGrid[9 * map.width + 10] = 0; map.collisionGrid[9 * map.width + 11] = 0;
     }

@@ -79,7 +79,8 @@ export type NpcSpriteType =
   | 'voltorb'
   | 'lugia'
   | 'swimmer_m'
-  | 'swimmer_f';
+  | 'swimmer_f'
+  | 'lance';
 
 export interface TrainerPokemonSpec {
   speciesId: string;
