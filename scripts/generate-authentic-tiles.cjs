@@ -3878,7 +3878,7 @@ buildMapFromBlk({
   blocksW: 15,
   blocksH: 9,
   connections: {},
-  warps: [{"x":27,"y":2,"targetMapId":"mahogany_mart","targetX":7,"targetY":3},{"x":3,"y":14,"targetMapId":"team_rocket_base_b2f","targetX":3,"targetY":14},{"x":5,"y":15,"targetMapId":"team_rocket_base_b1f","targetX":25,"targetY":2},{"x":25,"y":2,"targetMapId":"team_rocket_base_b1f","targetX":5,"targetY":15}],
+  warps: [{"x":27,"y":2,"targetMapId":"mahogany_mart","targetX":7,"targetY":3},{"x":3,"y":14,"targetMapId":"team_rocket_base_b2f","targetX":3,"targetY":14},{"x":5,"y":15,"targetMapId":"team_rocket_base_b1f","targetX":25,"targetY":2}],
   bgEvents: [{"x":19,"y":11,"speaker":"💻 SECURITY TERMINAL","pages":["A surveillance camera control terminal.","The security switch is right here!"],"action":"ROCKET_BASE_SECURITY_SWITCH"},{"x":24,"y":14,"speaker":"💻 SECURITY TERMINAL","pages":["A surveillance camera control terminal.","The security switch is right here!"],"action":"ROCKET_BASE_SECURITY_SWITCH"},{"x":24,"y":15,"speaker":"💻 SECURITY TERMINAL","pages":["A surveillance camera control terminal.","The security switch is right here!"],"action":"ROCKET_BASE_SECURITY_SWITCH"}],
   grassEncounters: [],
 });

@@ -1653,13 +1653,6 @@
       "targetMapId": "team_rocket_base_b1f",
       "targetX": 25,
       "targetY": 2
-    },
-    {
-      "x": 25,
-      "y": 2,
-      "targetMapId": "team_rocket_base_b1f",
-      "targetX": 5,
-      "targetY": 15
     }
   ],
   "bgEvents": [

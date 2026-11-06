@@ -44,7 +44,7 @@ export class TwoPointWarpLinkRegistry {
       this.linksByEndpointKey.set(forwardKey, w);
 
       const reverseKey = this.makeEndpointKey(w.targetMapId, w.targetX, w.targetY);
-      if (!this.linksByEndpointKey.has(reverseKey)) {
+      if (w.targetMapId !== map.id && !this.linksByEndpointKey.has(reverseKey)) {
         this.linksByEndpointKey.set(reverseKey, {
           x: w.targetX,
           y: w.targetY,
