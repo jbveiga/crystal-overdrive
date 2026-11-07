@@ -52,39 +52,25 @@ export class BattleRenderer {
   }
 
   public startIdleBreathing(sprite: Sprite, baseScale: number, isPlayer: boolean): void {
-    if (isPlayer && this.playerIdleTween) {
-      this.playerIdleTween.kill();
-    } else if (!isPlayer && this.enemyIdleTween) {
-      this.enemyIdleTween.kill();
-    }
+    if (isPlayer && this.playerIdleTween) this.playerIdleTween.kill();
+    else if (!isPlayer && this.enemyIdleTween) this.enemyIdleTween.kill();
 
     const tween = gsap.to(sprite.scale, {
-      x: baseScale * 1.03,
-      y: baseScale * 0.96,
-      duration: 0.75 / this.speedMultiplier,
-      yoyo: true,
-      repeat: -1,
-      ease: 'sine.inOut',
+      x: baseScale * 1.03, y: baseScale * 0.96,
+      duration: 0.75 / this.speedMultiplier, yoyo: true, repeat: -1, ease: 'sine.inOut',
     });
 
-    if (isPlayer) {
-      this.playerIdleTween = tween;
-    } else {
-      this.enemyIdleTween = tween;
-    }
+    if (isPlayer) this.playerIdleTween = tween;
+    else this.enemyIdleTween = tween;
   }
 
   private clearDisplayContainers(): void {
     gsap.killTweensOf(this.arenaContainer.children);
     gsap.killTweensOf(this.fxContainer.children);
     const oldArena = this.arenaContainer.removeChildren();
-    for (let i = 0; i < oldArena.length; i++) {
-      oldArena[i].destroy({ children: true, texture: false });
-    }
+    for (let i = 0; i < oldArena.length; i++) oldArena[i].destroy({ children: true, texture: false });
     const oldFx = this.fxContainer.removeChildren();
-    for (let i = 0; i < oldFx.length; i++) {
-      oldFx[i].destroy({ children: true, texture: false });
-    }
+    for (let i = 0; i < oldFx.length; i++) oldFx[i].destroy({ children: true, texture: false });
   }
 
   public async startBattle(playerPokemon: PokemonInstance, enemyPokemon: PokemonInstance): Promise<void> {
@@ -99,12 +85,9 @@ export class BattleRenderer {
     const bg = new Graphics();
 
     // Sky bands (Classic Gen 3/4 upper sky to warm horizon gradient)
-    bg.rect(0, 0, width, horizonY * 0.45);
-    bg.fill({ color: 0x38bdf8 });
-    bg.rect(0, horizonY * 0.45, width, horizonY * 0.35);
-    bg.fill({ color: 0x7dd3fc });
-    bg.rect(0, horizonY * 0.8, width, horizonY * 0.2);
-    bg.fill({ color: 0xbae6fd });
+    bg.rect(0, 0, width, horizonY * 0.45); bg.fill({ color: 0x38bdf8 });
+    bg.rect(0, horizonY * 0.45, width, horizonY * 0.35); bg.fill({ color: 0x7dd3fc });
+    bg.rect(0, horizonY * 0.8, width, horizonY * 0.2); bg.fill({ color: 0xbae6fd });
 
     // Retro pixel clouds
     const drawCloud = (cx: number, cy: number, s: number) => {
@@ -118,10 +101,8 @@ export class BattleRenderer {
     drawCloud(width * 0.84, horizonY * 0.32, 0.9);
 
     // Distant Johto mountains & rolling hills
-    bg.ellipse(width * 0.25, horizonY, width * 0.38, 75);
-    bg.fill({ color: 0x4ade80 });
-    bg.ellipse(width * 0.78, horizonY, width * 0.45, 92);
-    bg.fill({ color: 0x22c55e });
+    bg.ellipse(width * 0.25, horizonY, width * 0.38, 75); bg.fill({ color: 0x4ade80 });
+    bg.ellipse(width * 0.78, horizonY, width * 0.45, 92); bg.fill({ color: 0x22c55e });
 
     // Distant treeline silhouette along horizon
     for (let tx = 0; tx < width + 40; tx += 36) {

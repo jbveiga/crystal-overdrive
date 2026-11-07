@@ -369,40 +369,20 @@ export class FieldObstacleDispatcher {
       // Ruins of Alph Chambers Altar & Inscription Interaction (Kabuto, Omanyte, Aerodactyl, Ho-Oh)
       const ruinsChamberMap = {
         'ruins_of_alph_kabuto_chamber': {
-          puzzleId: 'kabuto',
-          name: 'KABUTO',
-          flag: 'unown_awakened_kabuto',
-          inscription: [
-            'A POKéMON that hid on the sea floor.',
-            'Eyes on its back scanned the area.',
-          ],
+          puzzleId: 'kabuto', name: 'KABUTO', flag: 'unown_awakened_kabuto',
+          inscription: ['A POKéMON that hid on the sea floor.', 'Eyes on its back scanned the area.'],
         },
         ruins_of_alph_omanyte_chamber: {
-          puzzleId: 'omanyte',
-          name: 'OMANYTE',
-          flag: 'unown_awakened_omanyte',
-          inscription: [
-            'A prehistoric POKéMON that swam by twisting its 10 tentacles.',
-            'It lived in ancient seas long ago.',
-          ],
+          puzzleId: 'omanyte', name: 'OMANYTE', flag: 'unown_awakened_omanyte',
+          inscription: ['A prehistoric POKéMON that swam by twisting its 10 tentacles.', 'It lived in ancient seas long ago.'],
         },
         ruins_of_alph_aerodactyl_chamber: {
-          puzzleId: 'aerodactyl',
-          name: 'AERODACTYL',
-          flag: 'unown_awakened_aerodactyl',
-          inscription: [
-            'A ferocious prehistoric POKéMON that soared through the skies.',
-            'It attacked with saw-like teeth.',
-          ],
+          puzzleId: 'aerodactyl', name: 'AERODACTYL', flag: 'unown_awakened_aerodactyl',
+          inscription: ['A ferocious prehistoric POKéMON that soared through the skies.', 'It attacked with saw-like teeth.'],
         },
         ruins_of_alph_ho_oh_chamber: {
-          puzzleId: 'ho_oh',
-          name: 'HO-OH',
-          flag: 'unown_awakened_ho_oh',
-          inscription: [
-            'A legendary rainbow POKéMON said to fly continuously on magnificent wings.',
-            'It reveals itself only to pure-hearted trainers.',
-          ],
+          puzzleId: 'ho_oh', name: 'HO-OH', flag: 'unown_awakened_ho_oh',
+          inscription: ['A legendary rainbow POKéMON said to fly continuously on magnificent wings.', 'It reveals itself only to pure-hearted trainers.'],
         },
       } as const;
 
@@ -413,19 +393,9 @@ export class FieldObstacleDispatcher {
             ctx.openDialogue([`A completed stone panel of ${chamber.name}.`], `🧩 ${chamber.name} PUZZLE`);
           } else {
             ctx.openDialogue(
-              [
-                `It's an ancient stone puzzle depicting ${chamber.name}.`,
-                'Attempt to assemble the sliding panels?',
-              ],
+              [`It's an ancient stone puzzle depicting ${chamber.name}.`, 'Attempt to assemble the sliding panels?'],
               `🧩 ${chamber.name} PUZZLE`,
-              () => {
-                ctx.openRuinsPuzzleModal({
-                  onSolve: (puzzleId) => {
-                    ctx.handleRuinsPuzzleSolve(puzzleId || chamber.puzzleId);
-                  },
-                  onClose: () => {},
-                });
-              }
+              () => { ctx.openRuinsPuzzleModal({ onSolve: (puzzleId) => { ctx.handleRuinsPuzzleSolve(puzzleId || chamber.puzzleId); }, onClose: () => {} }); }
             );
           }
           return true;
@@ -447,10 +417,7 @@ export class FieldObstacleDispatcher {
             if (hasEscapeRope) {
               BattleAudio.playOverworldSound('FANFARE');
               ctx.storyFlags.add('ruins_kabuto_vault_opened');
-              helperAddItem('heal_powder', 1);
-              helperAddItem('energypowder', 1);
-              helperAddItem('oran_berry', 1);
-              helperAddItem('pecha_berry', 1);
+              helperAddItem('heal_powder', 1); helperAddItem('energypowder', 1); helperAddItem('oran_berry', 1); helperAddItem('pecha_berry', 1);
               ctx.openDialogue(
                 [
                   'Ancient UNOWN glyphs glow across the wall: "E - S - C - A - P - E"',
@@ -459,21 +426,11 @@ export class FieldObstacleDispatcher {
                   `${ctx.playerName} retrieved HEAL POWDER, ENERGYPOWDER, ORAN BERRY, and PECHA BERRY!`,
                 ],
                 '📜 KABUTO VAULT',
-                () => {
-                  ctx.saveCurrentGame();
-                  ctx.showToast('🗝️ Kabuto Chamber Secret Vault opened!');
-                }
+                () => { ctx.saveCurrentGame(); ctx.showToast('🗝️ Kabuto Chamber Secret Vault opened!'); }
               );
               return true;
             }
-            ctx.openDialogue(
-              [
-                ...chamber.inscription,
-                'Carved beneath the text are mysterious UNOWN glyphs: "E - S - C - A - P - E"',
-                'The wall seems to be waiting for an item associated with "ESCAPE"…',
-              ],
-              '📜 ANCIENT INSCRIPTION'
-            );
+            ctx.openDialogue([...chamber.inscription, 'Carved beneath the text are mysterious UNOWN glyphs: "E - S - C - A - P - E"', 'The wall seems to be waiting for an item associated with "ESCAPE"…'], '📜 ANCIENT INSCRIPTION');
             return true;
           }
 
@@ -487,9 +444,7 @@ export class FieldObstacleDispatcher {
             if (hasWaterStone) {
               BattleAudio.playOverworldSound('FANFARE');
               ctx.storyFlags.add('ruins_omanyte_vault_opened');
-              helperAddItem('mystic_water', 1);
-              helperAddItem('star_piece', 1);
-              helperAddItem('stardust', 2);
+              helperAddItem('mystic_water', 1); helperAddItem('star_piece', 1); helperAddItem('stardust', 2);
               ctx.openDialogue(
                 [
                   'Ancient UNOWN glyphs pulse with an aquatic blue light: "W - A - T - E - R"',
@@ -498,21 +453,11 @@ export class FieldObstacleDispatcher {
                   `${ctx.playerName} retrieved MYSTIC WATER, STAR PIECE, and STARDUST!`,
                 ],
                 '📜 OMANYTE VAULT',
-                () => {
-                  ctx.saveCurrentGame();
-                  ctx.showToast('🗝️ Omanyte Chamber Secret Vault opened!');
-                }
+                () => { ctx.saveCurrentGame(); ctx.showToast('🗝️ Omanyte Chamber Secret Vault opened!'); }
               );
               return true;
             }
-            ctx.openDialogue(
-              [
-                ...chamber.inscription,
-                'Carved beneath the text are mysterious UNOWN glyphs: "W - A - T - E - R"',
-                'The wall seems to be waiting for a source of ancient "WATER"…',
-              ],
-              '📜 ANCIENT INSCRIPTION'
-            );
+            ctx.openDialogue([...chamber.inscription, 'Carved beneath the text are mysterious UNOWN glyphs: "W - A - T - E - R"', 'The wall seems to be waiting for a source of ancient "WATER"…'], '📜 ANCIENT INSCRIPTION');
             return true;
           }
 
@@ -522,16 +467,11 @@ export class FieldObstacleDispatcher {
               ctx.openDialogue(['The hidden vault in the rear stone wall stands open.'], '📜 ANCIENT INSCRIPTION');
               return true;
             }
-            const hasFlash =
-              ctx.inventory.keyItems?.includes('HM05') ||
-              ctx.inventory.keyItems?.includes('hm05') ||
-              ctx.playerParty.some((p) => p.moves.some((m) => m.moveId === 'flash'));
+            const hasFlash = ctx.inventory.keyItems?.includes('HM05') || ctx.inventory.keyItems?.includes('hm05') || ctx.playerParty.some((p) => p.moves.some((m) => m.moveId === 'flash'));
             if (hasFlash) {
               BattleAudio.playOverworldSound('FANFARE');
               ctx.storyFlags.add('ruins_aerodactyl_vault_opened');
-              helperAddItem('moon_stone', 1);
-              helperAddItem('heal_powder', 2);
-              helperAddItem('energy_root', 1);
+              helperAddItem('moon_stone', 1); helperAddItem('heal_powder', 2); helperAddItem('energy_root', 1);
               ctx.openDialogue(
                 [
                   'Ancient UNOWN glyphs gleam brightly: "L - I - G - H - T"',
@@ -540,21 +480,11 @@ export class FieldObstacleDispatcher {
                   `${ctx.playerName} retrieved MOON STONE, HEAL POWDER, and ENERGY ROOT!`,
                 ],
                 '📜 AERODACTYL VAULT',
-                () => {
-                  ctx.saveCurrentGame();
-                  ctx.showToast('🗝️ Aerodactyl Chamber Secret Vault opened!');
-                }
+                () => { ctx.saveCurrentGame(); ctx.showToast('🗝️ Aerodactyl Chamber Secret Vault opened!'); }
               );
               return true;
             }
-            ctx.openDialogue(
-              [
-                ...chamber.inscription,
-                'Carved beneath the text are mysterious UNOWN glyphs: "L - I - G - H - T"',
-                'The wall seems to be waiting for a radiant beam of "LIGHT"…',
-              ],
-              '📜 ANCIENT INSCRIPTION'
-            );
+            ctx.openDialogue([...chamber.inscription, 'Carved beneath the text are mysterious UNOWN glyphs: "L - I - G - H - T"', 'The wall seems to be waiting for a radiant beam of "LIGHT"…'], '📜 ANCIENT INSCRIPTION');
             return true;
           }
 
@@ -564,17 +494,11 @@ export class FieldObstacleDispatcher {
               ctx.openDialogue(['The hidden royal vault in the rear stone wall stands open.'], '📜 ANCIENT INSCRIPTION');
               return true;
             }
-            const hasHoOh =
-              ctx.playerParty.some((p) => p.speciesId === 'ho-oh' || p.speciesId === 'ho_oh') ||
-              ctx.inventory.keyItems?.includes('RAINBOW_WING') ||
-              ctx.inventory.keyItems?.includes('rainbow_wing') ||
-              ctx.storyFlags.has('caught_ho_oh');
+            const hasHoOh = ctx.playerParty.some((p) => p.speciesId === 'ho-oh' || p.speciesId === 'ho_oh') || ctx.inventory.keyItems?.includes('RAINBOW_WING') || ctx.inventory.keyItems?.includes('rainbow_wing') || ctx.storyFlags.has('caught_ho_oh');
             if (hasHoOh) {
               BattleAudio.playOverworldSound('FANFARE');
               ctx.storyFlags.add('ruins_ho_oh_vault_opened');
-              helperAddItem('sacred_ash', 1);
-              helperAddItem('revival_herb', 2);
-              helperAddItem('charcoal', 1);
+              helperAddItem('sacred_ash', 1); helperAddItem('revival_herb', 2); helperAddItem('charcoal', 1);
               ctx.openDialogue(
                 [
                   'Ancient UNOWN glyphs shimmer with prismatic rainbow fire: "H - O - - - O - H"',
@@ -583,28 +507,15 @@ export class FieldObstacleDispatcher {
                   `${ctx.playerName} retrieved SACRED ASH, REVIVAL HERB, and CHARCOAL!`,
                 ],
                 '📜 HO-OH VAULT',
-                () => {
-                  ctx.saveCurrentGame();
-                  ctx.showToast('🗝️ Ho-Oh Chamber Sacred Vault opened!');
-                }
+                () => { ctx.saveCurrentGame(); ctx.showToast('🗝️ Ho-Oh Chamber Sacred Vault opened!'); }
               );
               return true;
             }
-            ctx.openDialogue(
-              [
-                ...chamber.inscription,
-                'Carved beneath the text are mysterious UNOWN glyphs: "H - O - - - O - H"',
-                'The wall seems to be waiting for the majestic presence of "HO-OH"…',
-              ],
-              '📜 ANCIENT INSCRIPTION'
-            );
+            ctx.openDialogue([...chamber.inscription, 'Carved beneath the text are mysterious UNOWN glyphs: "H - O - - - O - H"', 'The wall seems to be waiting for the majestic presence of "HO-OH"…'], '📜 ANCIENT INSCRIPTION');
             return true;
           }
 
-          ctx.openDialogue(
-            [...chamber.inscription],
-            '📜 ANCIENT INSCRIPTION'
-          );
+          ctx.openDialogue([...chamber.inscription], '📜 ANCIENT INSCRIPTION');
           return true;
         }
       }
@@ -631,18 +542,8 @@ export class FieldObstacleDispatcher {
             x: ctx.player.x,
             y: ctx.player.y,
             targetMapId,
-            targetX:
-              targetMapId === 'goldenrod_dept_store_roof'
-                ? 13
-                : targetMapId === 'goldenrod_underground_warehouse'
-                  ? 17
-                  : 2,
-            targetY:
-              targetMapId === 'goldenrod_dept_store_roof'
-                ? 2
-                : targetMapId === 'goldenrod_underground_warehouse'
-                  ? 2
-                  : 1,
+            targetX: targetMapId === 'goldenrod_dept_store_roof' ? 13 : targetMapId === 'goldenrod_underground_warehouse' ? 17 : 2,
+            targetY: targetMapId === 'goldenrod_dept_store_roof' || targetMapId === 'goldenrod_underground_warehouse' ? 2 : 1,
             direction: 'DOWN',
           });
         });
@@ -654,35 +555,18 @@ export class FieldObstacleDispatcher {
         currentMap.id === 'goldenrod_underground_switch_room_entrances' &&
         (bgEvent.speaker?.toUpperCase().includes('SWITCH') || bgEvent.action?.toUpperCase().includes('SWITCH'))
       ) {
-        let flagName = 'SWITCH_1_ON';
-        let label = 'SWITCH 1';
-        if (facingX === 10 || bgEvent.speaker?.includes('2')) {
-          flagName = 'SWITCH_2_ON';
-          label = 'SWITCH 2';
-        } else if (facingX === 2 || bgEvent.speaker?.includes('3')) {
-          flagName = 'SWITCH_3_ON';
-          label = 'SWITCH 3';
-        } else if (facingX === 20 || bgEvent.speaker?.toUpperCase().includes('EMERGENCY')) {
-          flagName = 'SWITCH_EMERGENCY_ON';
-          label = 'EMERGENCY SWITCH';
-        }
+        let flagName = 'SWITCH_1_ON', label = 'SWITCH 1';
+        if (facingX === 10 || bgEvent.speaker?.includes('2')) { flagName = 'SWITCH_2_ON'; label = 'SWITCH 2'; }
+        else if (facingX === 2 || bgEvent.speaker?.includes('3')) { flagName = 'SWITCH_3_ON'; label = 'SWITCH 3'; }
+        else if (facingX === 20 || bgEvent.speaker?.toUpperCase().includes('EMERGENCY')) { flagName = 'SWITCH_EMERGENCY_ON'; label = 'EMERGENCY SWITCH'; }
 
         const toggleSwitch = () => {
           const wasOn = ctx.storyFlags.has(flagName);
-          if (wasOn) {
-            ctx.storyFlags.delete(flagName);
-          } else {
-            ctx.storyFlags.add(flagName);
-          }
+          if (wasOn) ctx.storyFlags.delete(flagName);
+          else ctx.storyFlags.add(flagName);
           BattleAudio.playMenuSound('CONFIRM');
           const stateText = wasOn ? 'Turned it OFF.' : 'Turned it ON.';
-          ctx.openDialogue(
-            [`Click! ${stateText}`],
-            bgEvent.speaker || `🔌 ${label}`,
-            () => {
-              ctx.saveCurrentGame();
-            }
-          );
+          ctx.openDialogue([`Click! ${stateText}`], bgEvent.speaker || `🔌 ${label}`, () => { ctx.saveCurrentGame(); });
         };
 
         if (ctx.openChoiceDialogue) {
@@ -691,11 +575,8 @@ export class FieldObstacleDispatcher {
             [`It's labeled ${label} (currently ${isCurrentlyOn ? 'ON' : 'OFF'}). Press it?`],
             bgEvent.speaker || `🔌 ${label}`,
             (choice) => {
-              if (choice === 'YES') {
-                toggleSwitch();
-              } else {
-                ctx.openDialogue(['Left the switch alone.'], bgEvent.speaker || `🔌 ${label}`);
-              }
+              if (choice === 'YES') toggleSwitch();
+              else ctx.openDialogue(['Left the switch alone.'], bgEvent.speaker || `🔌 ${label}`);
             }
           );
         } else {
@@ -773,35 +654,19 @@ export class FieldObstacleDispatcher {
             ctx.openDialogue(
               ['Spoke the secret voice password: "Hail GIOVANNI"!', 'The master blast door slid open!'],
               bgEvent.speaker,
-              () => {
-                ctx.saveCurrentGame();
-                ctx.renderMap?.(currentMap);
-              }
+              () => { ctx.saveCurrentGame(); ctx.renderMap?.(currentMap); }
             );
           }
         } else if (bgEvent.action === 'LUGIA_SHRINE_EVENT' || bgEvent.speaker?.includes('LUGIA')) {
-          handleLugiaShrineOrBoss(
-            { id: 'lugia_shrine', x: facingX, y: facingY } as any,
-            currentMap,
-            ctx as any
-          );
+          handleLugiaShrineOrBoss({ id: 'lugia_shrine', x: facingX, y: facingY } as any, currentMap, ctx as any);
         }
       });
       return true;
     }
 
     // 2a-fallback. Universal Pokémon Center & Bedroom PC Terminal Fallback
-    if (
-      (currentMap.id.endsWith('_poke_center') && facingX === 9 && facingY === 1) ||
-      (currentMap.id === 'players_house_2f' && facingX === 0 && facingY === 1)
-    ) {
-      ctx.openDialogue(
-        ["Accessed BILL'S PC!", 'POKéMON Storage System is online and synced.'],
-        "💻 BILL'S PC",
-        () => {
-          ctx.openPcStorage();
-        }
-      );
+    if ((currentMap.id.endsWith('_poke_center') && facingX === 9 && facingY === 1) || (currentMap.id === 'players_house_2f' && facingX === 0 && facingY === 1)) {
+      ctx.openDialogue(["Accessed BILL'S PC!", 'POKéMON Storage System is online and synced.'], "💻 BILL'S PC", () => { ctx.openPcStorage(); });
       return true;
     }
 

@@ -14,43 +14,25 @@ import { createRoute26And27Npcs } from './route26And27Npcs';
 export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
   return {
     route_42: [
-      makeNpc('route_42_fisher_tully', 40, 10, 'LEFT', 'fisherman', '🎣 FISHER TULLY', [
-        "Let's see if the fish are biting!",
-      ], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'fisher_tully',
-        trainerName: 'Fisher Tully',
-        visionRange: 1,
+      makeNpc('route_42_fisher_tully', 40, 10, 'LEFT', 'fisherman', '🎣 FISHER TULLY', ["Let's see if the fish are biting!"], {
+        action: 'TRAINER_BATTLE', trainerId: 'fisher_tully', trainerName: 'Fisher Tully', visionRange: 1,
         challengePages: ["TULLY: Let's see if the fish are biting!"],
         trainerPokemon: { speciesId: 'qwilfish', level: 19, moves: ['tackle', 'poisonsting', 'watergun', 'harden'] },
         trainerTeam: [{ speciesId: 'qwilfish', level: 19, moves: ['tackle', 'poisonsting', 'watergun', 'harden'] }],
       }),
-      makeNpc('route_42_hiker_benjamin', 51, 9, 'DOWN', 'fat_man', '🥾 HIKER BENJAMIN', [
-        "The mountain trails keep my legs strong!",
-      ], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'hiker_benjamin',
-        trainerName: 'Hiker Benjamin',
-        wanders: true,
-        visionRange: 3,
+      makeNpc('route_42_hiker_benjamin', 51, 9, 'DOWN', 'fat_man', '🥾 HIKER BENJAMIN', ["The mountain trails keep my legs strong!"], {
+        action: 'TRAINER_BATTLE', trainerId: 'hiker_benjamin', trainerName: 'Hiker Benjamin', wanders: true, visionRange: 3,
         challengePages: ["BENJAMIN: The mountain trails keep my legs strong! Let's battle!"],
         trainerPokemon: { speciesId: 'diglett', level: 14, moves: ['scratch', 'growl', 'magnitude'] },
         trainerTeam: [{ speciesId: 'diglett', level: 14, moves: ['scratch', 'growl', 'magnitude'] }, { speciesId: 'geodude', level: 14, moves: ['tackle', 'defensecurl', 'rockthrow'] }, { speciesId: 'dugtrio', level: 16, moves: ['scratch', 'growl', 'magnitude', 'dig'] }],
       }),
-      makeNpc('route_42_pokemaniac_shane', 47, 8, 'DOWN', 'super_nerd', '🎒 POKéMANIAC SHANE', [
-        "I'm looking for rare Pokémon inside Mt. Mortar!",
-      ], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'pokemaniac_shane',
-        trainerName: 'Pokémaniac Shane',
-        visionRange: 3,
+      makeNpc('route_42_pokemaniac_shane', 47, 8, 'DOWN', 'super_nerd', '🎒 POKéMANIAC SHANE', ["I'm looking for rare Pokémon inside Mt. Mortar!"], {
+        action: 'TRAINER_BATTLE', trainerId: 'pokemaniac_shane', trainerName: 'Pokémaniac Shane', visionRange: 3,
         challengePages: ["SHANE: I'm looking for rare Pokémon inside Mt. Mortar! Are you tough enough?"],
         trainerPokemon: { speciesId: 'nidorina', level: 16, moves: ['growl', 'tackle', 'scratch', 'poisonsting'] },
         trainerTeam: [{ speciesId: 'nidorina', level: 16, moves: ['growl', 'tackle', 'scratch', 'poisonsting'] }, { speciesId: 'nidorino', level: 16, moves: ['leer', 'tackle', 'hornattack', 'poisonsting'] }],
       }),
-      makeNpc('route_42_suicune', 26, 16, 'DOWN', 'suicune', '💎 SUICUNE', [
-        'SUICUNE: Gurr-oooh!',
-      ], { action: 'ROUTE_42_SUICUNE_EVENT' }),
+      makeNpc('route_42_suicune', 26, 16, 'DOWN', 'suicune', '💎 SUICUNE', ['SUICUNE: Gurr-oooh!'], { action: 'ROUTE_42_SUICUNE_EVENT' }),
     ],
 
     route_42_ecruteak_gate: [
@@ -61,13 +43,8 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     mount_mortar_1f_inside: [
-      makeNpc('mount_mortar_1f_inside_miller', 33, 43, 'LEFT', 'super_nerd', '🎒 POKéMANIAC MILLER', [
-        'I love rare horned Pokémon!',
-      ], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'pokemaniac_miller',
-        trainerName: 'Pokémaniac Miller',
-        visionRange: 3,
+      makeNpc('mount_mortar_1f_inside_miller', 33, 43, 'LEFT', 'super_nerd', '🎒 POKéMANIAC MILLER', ['I love rare horned Pokémon!'], {
+        action: 'TRAINER_BATTLE', trainerId: 'pokemaniac_miller', trainerName: 'Pokémaniac Miller', visionRange: 3,
         challengePages: ["MILLER: My horned beasts rule this cavern! Let's see your team!"],
         trainerPokemon: { speciesId: 'nidoking', level: 17, moves: ['tackle', 'hornattack', 'poisonsting', 'focusenergy'] },
         trainerTeam: [
@@ -78,28 +55,17 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('mount_mortar_1f_inside_markus', 24, 28, 'DOWN', 'super_nerd', '🤓 SUPER NERD MARKUS', [
         'I came in here exploring with my research partner HUGH, but we got separated in the darkness!',
       ], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'super_nerd_markus',
-        trainerName: 'Super Nerd Markus',
-        visionRange: 3,
+        action: 'TRAINER_BATTLE', trainerId: 'super_nerd_markus', trainerName: 'Super Nerd Markus', visionRange: 3,
         challengePages: ["MARKUS: Hey! Did you see my partner HUGH? No? Then let's battle while I search!"],
         trainerPokemon: { speciesId: 'slowpoke', level: 19, moves: ['tackle', 'growl', 'watergun', 'confusion'] },
         trainerTeam: [{ speciesId: 'slowpoke', level: 19, moves: ['tackle', 'growl', 'watergun', 'confusion'] }],
       }),
-      makeNpc('mount_mortar_1f_inside_boulder', 21, 43, 'DOWN', 'boulder', '🪨 BOULDER', [
-        'A large boulder blocks the path.',
-        'A Pokémon with STRENGTH could shove it aside!',
-      ], { action: 'STRENGTH_BOULDER' }),
+      makeNpc('mount_mortar_1f_inside_boulder', 21, 43, 'DOWN', 'boulder', '🪨 BOULDER', ['A large boulder blocks the path.', 'A Pokémon with STRENGTH could shove it aside!'], { action: 'STRENGTH_BOULDER' }),
     ],
 
     mount_mortar_2f_inside: [
-      makeNpc('mount_mortar_2f_inside_hugh', 13, 26, 'DOWN', 'super_nerd', '🤓 SUPER NERD HUGH', [
-        "I'm looking for my buddy MARKUS. He's probably lost on the lower levels…",
-      ], {
-        action: 'TRAINER_BATTLE',
-        trainerId: 'super_nerd_hugh',
-        trainerName: 'Super Nerd Hugh',
-        visionRange: 2,
+      makeNpc('mount_mortar_2f_inside_hugh', 13, 26, 'DOWN', 'super_nerd', '🤓 SUPER NERD HUGH', ["I'm looking for my buddy MARKUS. He's probably lost on the lower levels…"], {
+        action: 'TRAINER_BATTLE', trainerId: 'super_nerd_hugh', trainerName: 'Super Nerd Hugh', visionRange: 2,
         challengePages: ["HUGH: Yo! I've been training up here on the high cliffs of Mt. Mortar!"],
         trainerPokemon: { speciesId: 'seadra', level: 39, moves: ['bubblebeam', 'smokescreen', 'twister', 'agility'] },
         trainerTeam: [{ speciesId: 'seadra', level: 39, moves: ['bubblebeam', 'smokescreen', 'twister', 'agility'] }],
@@ -107,54 +73,24 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     mount_mortar_b1f: [
-      makeNpc('mount_mortar_b1f_kiyo', 16, 4, 'DOWN', 'black_belt', '🥋 KARATE KING KIYO', [
-        'KIYO: Hey! I am the KARATE KING! I train alone here in the dark depths of Mt. Mortar!',
-      ], {
-        action: 'KIYO_EVENT',
-        trainerId: 'blackbelt_kiyo',
-        trainerName: 'Karate King Kiyo',
-        challengePages: [
-          'KIYO: Hey! I am the KARATE KING!',
-          'I train alone here in the dark! You want to challenge me? Prepare yourself!',
-        ],
+      makeNpc('mount_mortar_b1f_kiyo', 16, 4, 'DOWN', 'black_belt', '🥋 KARATE KING KIYO', ['KIYO: Hey! I am the KARATE KING! I train alone here in the dark depths of Mt. Mortar!'], {
+        action: 'KIYO_EVENT', trainerId: 'blackbelt_kiyo', trainerName: 'Karate King Kiyo',
+        challengePages: ['KIYO: Hey! I am the KARATE KING!', 'I train alone here in the dark! You want to challenge me? Prepare yourself!'],
         trainerPokemon: { speciesId: 'hitmonlee', level: 34, moves: ['doublekick', 'meditate', 'jumpkick', 'focusenergy'] },
         trainerTeam: [
           { speciesId: 'hitmonlee', level: 34, moves: ['doublekick', 'meditate', 'jumpkick', 'focusenergy'] },
           { speciesId: 'hitmonchan', level: 34, moves: ['cometpunch', 'agility', 'firepunch', 'icepunch'] },
         ],
       }),
-      makeNpc('mount_mortar_b1f_boulder', 9, 10, 'DOWN', 'boulder', '🪨 BOULDER', [
-        'A large boulder blocks the path.',
-        'A Pokémon with STRENGTH could shove it aside!',
-      ], { action: 'STRENGTH_BOULDER' }),
+      makeNpc('mount_mortar_b1f_boulder', 9, 10, 'DOWN', 'boulder', '🪨 BOULDER', ['A large boulder blocks the path.', 'A Pokémon with STRENGTH could shove it aside!'], { action: 'STRENGTH_BOULDER' }),
     ],
 
     lake_of_rage: [
-      makeNpc('lake_of_rage_red_gyarados', 18, 22, 'DOWN', 'red_gyarados', '🐉 GYARADOS', 
-        [
-          "GYARADOS: Gyashaa! The lake's waters churn violently as the crimson Gyarados thrashes with fury!",
-        ],
-        { action: 'RED_GYARADOS_EVENT' }
-      ),
-      makeNpc('lake_of_rage_lance', 21, 28, 'UP', 'lance', '🏆 CHAMPION LANCE', 
-        [
-          "LANCE: ...So you're the one who quelled that Gyarados. Impressive!",
-        ],
-        { action: 'LANCE_LAKE_EVENT' }
-      ),
-      makeNpc('wesley_of_wednesday', 4, 4, 'DOWN', 'black_belt', '🥋 WESLEY OF WEDNESDAY', 
-        [
-          "WESLEY: Yo! I'm WESLEY of Wednesday! You must train diligently!",
-          "Here's a BLACK BELT! It boosts the power of FIGHTING-type moves!",
-        ],
-        { action: 'DAY_SIBLING_EVENT' }
-      ),
-      makeNpc('lake_of_rage_gramps', 20, 26, 'UP', 'gramps', '👴 GRAMPS', [
-        "LAKE OF RAGE is also known as GYARADOS LAKE... But the Magikarp here have suddenly transformed into Gyarados!",
-      ]),
-      makeNpc('lake_of_rage_super_nerd', 36, 13, 'LEFT', 'super_nerd', '🤓 SUPER NERD', [
-        "Did an earthquake cause the lake to expand? The water level seems much higher than usual.",
-      ]),
+      makeNpc('lake_of_rage_red_gyarados', 18, 22, 'DOWN', 'red_gyarados', '🐉 GYARADOS', ["GYARADOS: Gyashaa! The lake's waters churn violently as the crimson Gyarados thrashes with fury!"], { action: 'RED_GYARADOS_EVENT' }),
+      makeNpc('lake_of_rage_lance', 21, 28, 'UP', 'lance', '🏆 CHAMPION LANCE', ["LANCE: ...So you're the one who quelled that Gyarados. Impressive!"], { action: 'LANCE_LAKE_EVENT' }),
+      makeNpc('wesley_of_wednesday', 4, 4, 'DOWN', 'black_belt', '🥋 WESLEY OF WEDNESDAY', ["WESLEY: Yo! I'm WESLEY of Wednesday! You must train diligently!", "Here's a BLACK BELT! It boosts the power of FIGHTING-type moves!"], { action: 'DAY_SIBLING_EVENT' }),
+      makeNpc('lake_of_rage_gramps', 20, 26, 'UP', 'gramps', '👴 GRAMPS', ["LAKE OF RAGE is also known as GYARADOS LAKE... But the Magikarp here have suddenly transformed into Gyarados!"]),
+      makeNpc('lake_of_rage_super_nerd', 36, 13, 'LEFT', 'super_nerd', '🤓 SUPER NERD', ["Did an earthquake cause the lake to expand? The water level seems much higher than usual."]),
       makeNpc('lake_of_rage_andre', 30, 23, 'LEFT', 'fisherman', '🎣 FISHER ANDRE', [
         "I'm the best fisherman at the lake! My Gyarados is magnificent!",
       ], {

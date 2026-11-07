@@ -186,7 +186,7 @@ describe('JOHTO AREA BUGS AUDIT: 38 Areas & 190 Bug Resolutions', () => {
     it('sets authentic sprites for Bosses, Legendaries, and Trainers', () => {
       const mahoganyNpcs = createMahoganyToIndigoNpcs();
       const gyarados = mahoganyNpcs.lake_of_rage?.find((n) => n.id === 'lake_of_rage_red_gyarados');
-      expect(gyarados?.spriteType).toBe('lapras');
+      expect(gyarados?.spriteType).toBe('red_gyarados');
 
       const electrode1 = mahoganyNpcs.team_rocket_base_b2f?.find((n) => n.id === 'b2f_electrode_1');
       expect(electrode1?.spriteType).toBe('voltorb');

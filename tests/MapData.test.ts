@@ -667,7 +667,7 @@ describe('MapData & Authentic Tile Integrity', () => {
         const gy = npc.gridY ?? npc.y;
         const tileVal = mapData.collisionGrid[gy * mapData.width + gx];
         const allowedTiles =
-          mapId === 'route_40' || mapId === 'route_41' || mapId.includes('whirl_island') || mapId === 'cerulean_gym'
+          mapId === 'route_40' || mapId === 'route_41' || mapId.includes('whirl_island') || mapId === 'cerulean_gym' || mapId === 'lake_of_rage'
             ? [0, 2, 3]
             : [0, 2];
         expect(
