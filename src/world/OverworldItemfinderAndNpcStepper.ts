@@ -355,39 +355,143 @@ export class OverworldItemfinderAndNpcStepper {
             !storyFlags.has('rocket_base_generator_cleared') &&
             !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
           ) {
-            const isStatueCamera =
-              (coord.x === 24 && (coord.y === 2 || coord.y === 3)) ||
-              (coord.x === 6 && (coord.y === 2 || coord.y === 3)) ||
-              (coord.x === 24 && (coord.y === 6 || coord.y === 7)) ||
-              (coord.x === 22 && coord.y === 16) ||
-              (coord.x === 8 && coord.y === 16) ||
-              (coord.x === 19 && (coord.y === 2 || coord.y === 3)) ||
-              (coord.x === 4 && (coord.y === 7 || coord.y === 8)) ||
-              (coord.x === 19 && (coord.y === 6 || coord.y === 7)) ||
-              (coord.x === 4 && (coord.y === 11 || coord.y === 12)) ||
-              (coord.x === 27 && coord.y === 13);
-            if (isStatueCamera) {
+            let cameraFlag: string | null = null;
+            if (coord.x === 24 && (coord.y === 2 || coord.y === 3)) {
+              cameraFlag = 'EVENT_SECURITY_CAMERA_1';
+            } else if (coord.x === 6 && (coord.y === 2 || coord.y === 3)) {
+              cameraFlag = 'EVENT_SECURITY_CAMERA_2';
+            } else if (coord.x === 24 && (coord.y === 6 || coord.y === 7)) {
+              cameraFlag = 'EVENT_SECURITY_CAMERA_3';
+            } else if (coord.x === 22 && coord.y === 16) {
+              cameraFlag = 'EVENT_SECURITY_CAMERA_4';
+            } else if (coord.x === 8 && coord.y === 16) {
+              cameraFlag = 'EVENT_SECURITY_CAMERA_5';
+            }
+
+            if (cameraFlag && !storyFlags.has(cameraFlag)) {
+              const activeCameraFlag = cameraFlag;
               (ctx as any).audioManager?.playSfx?.('sfx_alarm');
-              overworldHUD.openDialogue(
-                [
-                  'A secret surveillance camera is embedded in the PERSIAN statue!',
-                  'The alarm blares loudly!',
-                  'ROCKET GRUNT: Intruder detected! You are not getting past me!',
-                ],
-                '🚨 SECURITY CAMERA',
-                () => {
-                  const grunt = [
-                    PokemonFactory.create('drowzee', 20, ['pound', 'hypnosis']),
-                    PokemonFactory.create('zubat', 20, ['leechlife', 'bite']),
-                  ];
-                  (ctx as any).triggerBattle?.(grunt[0], {
-                    isTrainer: true,
-                    trainerName: 'Rocket Grunt',
-                    trainerTeam: grunt,
-                    onBattleEnd: () => void saveCurrentGame(),
-                  });
+              player.isMoving = false;
+              player.progress = 0;
+              player.direction = 'LEFT';
+
+              const startX = Math.max(1, coord.x - 4);
+              const stopX = Math.max(1, coord.x - 1);
+              const gruntY = coord.y;
+              const cameraGrunt: GridEntity = {
+                id: 'team_rocket_base_b1f_camera_grunt',
+                x: startX,
+                y: gruntY,
+                gridX: startX,
+                gridY: gruntY,
+                targetX: startX,
+                targetY: gruntY,
+                renderX: startX,
+                renderY: gruntY,
+                direction: 'RIGHT',
+                isMoving: false,
+                progress: 0,
+                spriteType: 'rocket_grunt_m',
+                speaker: '⚡ ROCKET GRUNT',
+                pages: ['ROCKET GRUNT: Hey! Intruder detected!'],
+              };
+
+              const npcsByMap = (ctx as any).npcsByMap as Record<string, GridEntity[]> | undefined;
+              if (npcsByMap) {
+                if (!npcsByMap.team_rocket_base_b1f) npcsByMap.team_rocket_base_b1f = [];
+                npcsByMap.team_rocket_base_b1f = npcsByMap.team_rocket_base_b1f.filter(
+                  (n) => n.id !== 'team_rocket_base_b1f_camera_grunt'
+                );
+                npcsByMap.team_rocket_base_b1f.push(cameraGrunt);
+                (storyFlags as any).bumpVersion?.();
+              }
+
+              const cleanupCameraGrunt = () => {
+                if (npcsByMap?.team_rocket_base_b1f) {
+                  npcsByMap.team_rocket_base_b1f = npcsByMap.team_rocket_base_b1f.filter(
+                    (n) => n.id !== 'team_rocket_base_b1f_camera_grunt'
+                  );
+                  (storyFlags as any).bumpVersion?.();
                 }
-              );
+              };
+
+              const openAlarmDialogueAndBattle = () => {
+                overworldHUD.openDialogue(
+                  [
+                    'A secret surveillance camera is embedded in the PERSIAN statue!',
+                    'The alarm blares loudly!',
+                    'ROCKET GRUNT: Hey! Intruder detected! You are not getting past me!',
+                  ],
+                  '🚨 SECURITY CAMERA',
+                  () => {
+                    (ctx as any).setCutsceneLocked?.(false);
+                    storyFlags.add(activeCameraFlag);
+                    const gruntTeam = [
+                      PokemonFactory.create('drowzee', 20, ['pound', 'hypnosis']),
+                      PokemonFactory.create('zubat', 20, ['leechlife', 'bite']),
+                    ];
+                    (ctx as any).triggerBattle?.(gruntTeam[0], {
+                      isTrainer: true,
+                      trainerName: 'Rocket Grunt',
+                      trainerTeam: gruntTeam,
+                      onBattleEnd: () => {
+                        cleanupCameraGrunt();
+                        void saveCurrentGame();
+                      },
+                    });
+                  }
+                );
+              };
+
+              if (typeof (ctx as any).setCutsceneLocked === 'function' && typeof requestAnimationFrame === 'function') {
+                (ctx as any).setCutsceneLocked(true);
+                void (async () => {
+                  BattleAudio.playOverworldSound('EXCLAMATION');
+                  const playerSpeed = (ctx as any).gameClock?.playerSpeed || 1;
+                  await (ctx as any).overworldRenderer?.showExclamationBubble?.(
+                    player,
+                    Math.round(360 / playerSpeed)
+                  );
+                  const stepMs = (GridPhysics.BASE_TRAVERSAL_TIME * 1000) / playerSpeed;
+                  while (cameraGrunt.x < stopX) {
+                    const currX = cameraGrunt.x;
+                    const nextX = currX + 1;
+                    cameraGrunt.direction = 'RIGHT';
+                    cameraGrunt.targetX = nextX;
+                    cameraGrunt.targetY = gruntY;
+                    cameraGrunt.isMoving = true;
+                    cameraGrunt.progress = 0;
+                    await new Promise<void>((resolve) => {
+                      const t0 = performance.now();
+                      const animateStep = (now: number) => {
+                        const p = Math.min(1, (now - t0) / stepMs);
+                        cameraGrunt.progress = p;
+                        cameraGrunt.renderX = currX + (nextX - currX) * p;
+                        cameraGrunt.renderY = gruntY;
+                        if (p < 1) {
+                          requestAnimationFrame(animateStep);
+                        } else {
+                          cameraGrunt.x = nextX;
+                          cameraGrunt.gridX = nextX;
+                          cameraGrunt.renderX = nextX;
+                          cameraGrunt.isMoving = false;
+                          cameraGrunt.progress = 0;
+                          resolve();
+                        }
+                      };
+                      requestAnimationFrame(animateStep);
+                    });
+                  }
+                  player.direction = 'LEFT';
+                  openAlarmDialogueAndBattle();
+                })();
+              } else {
+                cameraGrunt.x = stopX;
+                cameraGrunt.gridX = stopX;
+                cameraGrunt.targetX = stopX;
+                cameraGrunt.renderX = stopX;
+                openAlarmDialogueAndBattle();
+              }
               return true;
             }
           }

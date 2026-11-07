@@ -128,9 +128,10 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
   });
 
   // 3. Persian Surveillance Cameras Step Trigger in OverworldTickerCoordinator
-  it('3. Stepping into surveillance camera line triggers alarm battle when active, and silent when disabled', () => {
+  it('3. Stepping into canonical Persian statue line (24, 2) spawns Rocket Grunt and triggers alarm battle, while non-statue tiles (27, 13) and disabled cameras stay silent', () => {
     let battleTriggered = false;
     let alarmPlayed = false;
+    const npcsByMap: Record<string, any[]> = { team_rocket_base_b1f: [] };
 
     const tickerCtx: any = {
       getGameState: () => 'OVERWORLD',
@@ -138,13 +139,14 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
       isDialogueOpen: () => false,
       isMenuOpen: () => false,
       isAnyModalOpen: () => false,
+      npcsByMap,
       player: {
         id: 'player',
-        x: 19,
+        x: 24,
         y: 1,
-        targetX: 19,
+        targetX: 24,
         targetY: 2,
-        renderX: 19 * 64,
+        renderX: 24 * 64,
         renderY: 1 * 64,
         direction: 'DOWN',
         isMoving: true,
@@ -168,6 +170,8 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
         isDialogueOpen: () => false,
         getHeldDirection: () => null,
         openDialogue: (_pages: string[], _spk: string, cb?: () => void) => {
+          // Verify Rocket Grunt spawned adjacent to player before battle
+          expect(npcsByMap.team_rocket_base_b1f.some((n) => n.id === 'team_rocket_base_b1f_camera_grunt' && n.x === 23 && n.y === 2)).toBe(true);
           if (cb) cb();
         },
         showToast: () => {},
@@ -193,27 +197,48 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
       defeatedTrainers: mockContext.defeatedTrainers!,
       addPlayTimeDelta: () => {},
       saveCurrentGame: () => {},
-      triggerBattle: () => {
+      triggerBattle: (_lead: any, opts?: any) => {
         battleTriggered = true;
+        opts?.onBattleEnd?.();
       },
-      getActiveMapNpcs: () => [],
-      populateWorldNpcs: () => [],
+      getActiveMapNpcs: () => npcsByMap.team_rocket_base_b1f,
+      populateWorldNpcs: () => npcsByMap.team_rocket_base_b1f,
       handleMapTransition: () => {},
       executeWarpTransition: async () => {},
     };
 
-    // When cameras are active
+    // Stepping onto non-statue tile (27, 13) below wooden crates must NOT trigger alarm
+    tickerCtx.player.x = 27;
+    tickerCtx.player.y = 12;
+    tickerCtx.player.targetX = 27;
+    tickerCtx.player.targetY = 13;
+    tickerCtx.player.isMoving = true;
+    tickerCtx.player.progress = 0.99;
+    OverworldTickerCoordinator.updateOverworldTick(0.016, tickerCtx);
+    expect(alarmPlayed).toBe(false);
+    expect(battleTriggered).toBe(false);
+
+    // Stepping onto canonical Persian statue camera (24, 2) when active triggers alarm & Rocket Grunt battle
+    tickerCtx.player.x = 24;
+    tickerCtx.player.y = 1;
+    tickerCtx.player.targetX = 24;
+    tickerCtx.player.targetY = 2;
+    tickerCtx.player.isMoving = true;
+    tickerCtx.player.progress = 0.99;
     OverworldTickerCoordinator.updateOverworldTick(0.016, tickerCtx);
     expect(alarmPlayed).toBe(true);
     expect(battleTriggered).toBe(true);
+    expect(mockContext.storyFlags!.has('EVENT_SECURITY_CAMERA_1')).toBe(true);
+    // Temporary camera grunt is cleaned up after battle
+    expect(npcsByMap.team_rocket_base_b1f.some((n) => n.id === 'team_rocket_base_b1f_camera_grunt')).toBe(false);
 
     // When cameras are deactivated
     alarmPlayed = false;
     battleTriggered = false;
     mockContext.storyFlags!.add('EVENT_SECURITY_CAMERA_DISABLED');
-    tickerCtx.player.x = 19;
+    tickerCtx.player.x = 6;
     tickerCtx.player.y = 1;
-    tickerCtx.player.targetX = 19;
+    tickerCtx.player.targetX = 6;
     tickerCtx.player.targetY = 2;
     tickerCtx.player.isMoving = true;
     tickerCtx.player.progress = 0.99;
