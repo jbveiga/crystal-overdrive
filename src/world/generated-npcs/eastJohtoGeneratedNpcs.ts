@@ -261,7 +261,7 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     n("silver_cave_poke_center_granny_1",1,5,"LEFT","teacher","GRANNY",[D1]),
   ],
   "silver_cave_room_3": [
-    n("silver_cave_room_3_red_0",9,10,"UP","boy","🏆 RED",["RED: You are truly strong. Go on!"], {"action":"E4_EVENT","trainerId":"red","trainerName":"Trainer Red","team":[{"speciesId":"pikachu","level":81,"moves":["charm","quickattack","thunderbolt","thunder"]},{"speciesId":"espeon","level":73,"moves":["mudslap","reflect","swift","psychic"]},{"speciesId":"snorlax","level":75,"moves":["amnesia","snore","rest","bodyslam"]},{"speciesId":"venusaur","level":77,"moves":["sunnyday","gigadrain","synthesis","solarbeam"]},{"speciesId":"charizard","level":77,"moves":["flamethrower","wingattack","slash","firespin"]},{"speciesId":"blastoise","level":77,"moves":["raindance","surf","blizzard","whirlpool"]}],"challenge":["RED: I have been waiting for a challenger. Show me your strength!"]}),
+    n("silver_cave_room_3_red_0",9,10,"UP","silver","🏆 RED",["..."], {"action":"RED_EVENT","trainerId":"red","trainerName":"Trainer Red","team":[{"speciesId":"pikachu","level":81,"moves":["charm","quickattack","thunderbolt","thunder"]},{"speciesId":"espeon","level":73,"moves":["mudslap","reflect","swift","psychic"]},{"speciesId":"snorlax","level":75,"moves":["amnesia","snore","rest","bodyslam"]},{"speciesId":"venusaur","level":77,"moves":["sunnyday","gigadrain","synthesis","solarbeam"]},{"speciesId":"charizard","level":77,"moves":["flamethrower","wingattack","slash","firespin"]},{"speciesId":"blastoise","level":77,"moves":["raindance","surf","blizzard","whirlpool"]}],"challenge":["..."]}),
   ],
   "pallet_town": [
     n("pallet_town_teacher_0",3,8,"DOWN","teacher","TEACHER",[D5]),

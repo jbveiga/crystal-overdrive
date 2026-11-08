@@ -482,6 +482,9 @@ export function isNpcActiveForStoryFlags(
     return !cleared && !alreadyPast;
   }
 
+  // Mt. Silver Summit: Red vanishes after his defeat
+  if (npcId === 'silver_cave_room_3_red_0') return !storyFlags.has('red_defeated');
+
   // Route 36 Sudowoodo
   if (npcId === 'sudowoodo') return !storyFlags.has('sudowoodo_cleared') && !storyFlags.has('EVENT_FOUGHT_SUDOWOODO');
 

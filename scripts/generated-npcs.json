@@ -3225,13 +3225,13 @@
       "x": 9,
       "y": 10,
       "dir": "UP",
-      "sprite": "boy",
+      "sprite": "silver",
       "id": "silver_cave_room_3_red_0",
       "speaker": "🏆 RED",
       "pages": [
-        "RED: You are truly strong. Go on!"
+        "..."
       ],
-      "action": "E4_EVENT",
+      "action": "RED_EVENT",
       "trainerId": "red",
       "trainerName": "Trainer Red",
       "team": [
@@ -3297,7 +3297,7 @@
         }
       ],
       "challenge": [
-        "RED: I have been waiting for a challenger. Show me your strength!"
+        "..."
       ]
     }
   ],

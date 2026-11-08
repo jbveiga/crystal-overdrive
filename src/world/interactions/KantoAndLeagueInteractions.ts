@@ -147,6 +147,47 @@ export function getKantoAndLeagueInteractions(): NpcInteractionRegistration[] {
       },
     },
 
+    // 12. Mt. Silver Summit: Red (silent final duel; he vanishes after defeat)
+    {
+      actions: ['RED_EVENT'],
+      npcIds: ['silver_cave_room_3_red_0'],
+      handler: (targetNpc, currentMap, ctx) => {
+        if (ctx.storyFlags.has('red_defeated')) return true;
+        ctx.openDialogue(['...'], targetNpc.speaker, () => {
+          const team = ctx.buildTrainerTeamInstances(targetNpc);
+          if (team.length === 0) return;
+          ctx.triggerBattle(team[0], {
+            isTrainer: true,
+            isGymLeader: true,
+            trainerName: targetNpc.trainerName || 'Trainer Red',
+            trainerTeam: team,
+            onVictory: () => {
+              ctx.defeatedTrainers.add('red');
+              ctx.storyFlags.add('red_defeated');
+              ctx.storyFlags.add('EVENT_BEAT_RED');
+              ctx.audioManager?.playSfx?.('sfx_badge_get');
+              BattleAudio.playOverworldSound('KEY_ITEM');
+              ctx.missionManager?.checkStoryFlags?.(ctx.storyFlags);
+              ctx.openDialogue(
+                [
+                  '...',
+                  'RED silently turned away... and vanished into the swirling snow.',
+                  `${ctx.playerName} is now the master of JOHTO and KANTO!`,
+                ],
+                targetNpc.speaker,
+                () => {
+                  ctx.showToast?.('🏔️ You defeated RED! Master of JOHTO and KANTO!');
+                  ctx.saveCurrentGame?.();
+                  if (currentMap) ctx.renderMap?.(currentMap);
+                }
+              );
+            },
+          });
+        });
+        return true;
+      },
+    },
+
     // 11. Elite Four, Champion Lance & Red
     {
       actions: [
@@ -157,7 +198,6 @@ export function getKantoAndLeagueInteractions(): NpcInteractionRegistration[] {
         'E4_BRUNO_EVENT',
         'E4_KAREN_EVENT',
         'CHAMPION_EVENT',
-        'RED_EVENT',
       ],
       handler: (targetNpc, _map, ctx) => {
         if (!ctx.storyFlags.has(`${targetNpc.trainerId}_defeated`)) {
