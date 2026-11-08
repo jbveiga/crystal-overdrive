@@ -370,9 +370,11 @@ export const handleLiberatedDirectorRewards: NpcInteractionHandler = (targetNpc,
 };
 
 /**
- * 9. DJ Mary Pink Bow Reward (4F)
+ * 9. DJ Mary Gratitude (4F)
+ * DJ Mary only thanks the player. The Pink Bow comes exclusively from Tuscany of Tuesday (Route 29),
+ * so there is a single canonical source. Saves that already hold a Pink Bow from DJ Mary keep it.
  */
-export const handleDJMaryPinkBow: NpcInteractionHandler = (targetNpc, _map, ctx) => {
+export const handleDJMaryThanks: NpcInteractionHandler = (targetNpc, _map, ctx) => {
   if (!ctx.storyFlags.has('radio_tower_liberated')) {
     ctx.openDialogue(
       ['DJ MARY: Eek! TEAM ROCKET took over our broadcasting studio! Somebody help!'],
@@ -380,31 +382,12 @@ export const handleDJMaryPinkBow: NpcInteractionHandler = (targetNpc, _map, ctx)
     );
     return true;
   }
-
-  if (ctx.storyFlags.has('EVENT_GOT_PINK_BOW_FROM_MARY')) {
-    ctx.openDialogue(
-      ['DJ MARY: Normal-type moves become more powerful when holding a PINK BOW! Tune in to POKéMON TALK every day!'],
-      targetNpc.speaker
-    );
-    return true;
-  }
-
-  ctx.storyFlags.add('EVENT_GOT_PINK_BOW_FROM_MARY');
-  if (!ctx.inventory.items) ctx.inventory.items = {};
-  ctx.inventory.items['pink_bow'] = (ctx.inventory.items['pink_bow'] || 0) + 1;
-  BattleAudio.playOverworldSound('KEY_ITEM');
-
   ctx.openDialogue(
     [
       'DJ MARY: Oh, you’re the hero who defeated TEAM ROCKET! Thank you so much!',
-      'Please take this PINK BOW as a token of my gratitude! It boosts Normal-type moves!',
-      `${ctx.playerName} received PINK BOW!`,
+      'Tune in to POKéMON TALK every day!',
     ],
-    targetNpc.speaker,
-    () => {
-      ctx.saveCurrentGame();
-      ctx.showToast('🎀 Received PINK BOW from DJ Mary!');
-    }
+    targetNpc.speaker
   );
   return true;
 };
@@ -454,7 +437,7 @@ export function createGoldenrodTakeoverInteractions(): NpcInteractionRegistratio
     {
       actions: ['DJ_MARY_EVENT'],
       npcIds: ['dj_mary', 'dj_mary_radio_4f'],
-      handler: handleDJMaryPinkBow,
+      handler: handleDJMaryThanks,
     },
   ];
 }

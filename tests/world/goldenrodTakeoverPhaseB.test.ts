@@ -12,7 +12,7 @@ import {
   handleExecutiveAriana,
   handleExecutiveArcherBoss,
   handleLiberatedDirectorRewards,
-  handleDJMaryPinkBow,
+  handleDJMaryThanks,
 } from '../../src/world/interactions/GoldenrodTakeoverInteractions';
 import { createGoldenrodBuildingsAndParkNpcs } from '../../src/world/npcs/goldenrodBuildingsAndParkNpcs';
 import { PokemonFactory } from '../../src/battle/PokemonFactory';
@@ -321,28 +321,24 @@ describe('TICKET-STORY-TEAM-ROCKET-GOLDENROD-TAKEOVER-01: Phase B Verification S
       expect(toast).toContain('POKé FLUTE');
     });
 
-    it('asserts DJ Mary on 4F awards Pink Bow after liberation', () => {
-      mockContext.storyFlags!.add('radio_tower_liberated');
-
-      let toast = '';
-      mockContext.showToast = (msg) => {
-        toast = msg;
-      };
-
+    it('asserts DJ Mary on 4F only thanks the player and never gives a Pink Bow (Tuscany is the single source)', () => {
       const maryNpc = { id: 'dj_mary', speaker: '🎙️ DJ MARY' } as any;
-      handleDJMaryPinkBow(maryNpc, {} as any, mockContext as NpcInteractionContext);
-
-      expect(mockContext.storyFlags!.has('EVENT_GOT_PINK_BOW_FROM_MARY')).toBe(true);
-      expect(mockContext.inventory!.items['pink_bow']).toBe(1);
-      expect(toast).toContain('PINK BOW');
-
-      // Subsequent interaction explains Pink Bow effect
       let dialogue: string[] = [];
       mockContext.openDialogue = (pages) => {
         dialogue = pages;
       };
-      handleDJMaryPinkBow(maryNpc, {} as any, mockContext as NpcInteractionContext);
-      expect(dialogue[0]).toContain('Normal-type moves become more powerful');
+
+      // Before liberation: asks for help, no gift
+      handleDJMaryThanks(maryNpc, {} as any, mockContext as NpcInteractionContext);
+      expect(dialogue[0]).toContain('TEAM ROCKET took over');
+
+      // After liberation: gratitude only
+      mockContext.storyFlags!.add('radio_tower_liberated');
+      handleDJMaryThanks(maryNpc, {} as any, mockContext as NpcInteractionContext);
+      handleDJMaryThanks(maryNpc, {} as any, mockContext as NpcInteractionContext);
+      expect(dialogue.join(' ')).toContain('Thank you');
+      expect(mockContext.inventory!.items?.['pink_bow']).toBeUndefined();
+      expect(mockContext.storyFlags!.has('EVENT_GOT_PINK_BOW_FROM_MARY')).toBe(false);
     });
   });
 
