@@ -281,6 +281,13 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       ], { action: 'STRENGTH_BOULDER' }),
     ],
 
+    oaks_lab: [
+      makeNpc('oaks_lab_oak', 5, 4, 'DOWN', 'oak', '🔬 PROF. OAK',
+        ['OAK: Welcome to my lab! The POKéMON world is full of mysteries.'],
+        { action: 'OAK_MT_SILVER_CLEARANCE' }
+      ),
+    ],
+
     wills_room: [
       makeNpc('e4_will', 5, 5, 'DOWN', 'psychic', '🎭 ELITE FOUR WILL', ["WILL: Welcome to the POKéMON LEAGUE! I am WILL, master of psychic power!"], {
         action: 'E4_EVENT', trainerId: 'will', trainerName: 'Elite Four Will',

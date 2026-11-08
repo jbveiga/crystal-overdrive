@@ -8,7 +8,7 @@
  */
 
 import { BattleAudio } from '../audio/BattleAudio';
-import { checkHasAllJohtoBadges } from './interactions/VictoryRoadGateInteractions';
+import { checkHasAllJohtoBadges, isMtSilverGateOpen, getMtSilverGateBlockedPages } from './interactions/VictoryRoadGateInteractions';
 import { evaluateFastShipWarp } from './interactions/FastShipAndVermilionInteractions';
 import type { MapData, WarpEvent } from '../types/game';
 import type { OverworldTransitionContext } from '../types/gameContext';
@@ -157,13 +157,10 @@ export function evaluateWarpProgressionGuards(
       return true;
     }
 
-    if (warp.targetMapId === 'route_28' && !storyFlags.has('champion_defeated')) {
+    if (warp.targetMapId === 'route_28' && !isMtSilverGateOpen(storyFlags)) {
       player.isMoving = false; player.progress = 0; setCutsceneLocked(false);
       BattleAudio.playMenuSound('CANCEL');
-      overworldHUD.openDialogue(
-        ['BLACK BELT: Hold on! This way leads to MT. SILVER.', 'Only a verified CHAMPION who has conquered both JOHTO and KANTO may pass!'],
-        '🥋 BLACK BELT'
-      );
+      overworldHUD.openDialogue(getMtSilverGateBlockedPages(storyFlags), '🥋 BLACK BELT');
       return true;
     }
 

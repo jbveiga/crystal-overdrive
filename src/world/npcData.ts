@@ -309,6 +309,10 @@ export function applyStoryRecoveryFlags(
       storyFlags.add('APRICORN_CRAFTING_UNLOCKED');
     }
   }
+  // Save safety: players who already reached the Mt. Silver summit / beat Red were past Route 28 before Oak's clearance existed
+  if ((storyFlags.has('reached_silver_cave_summit') || storyFlags.has('red_defeated') || defeatedTrainers.has('red')) && !storyFlags.has('mt_silver_cleared')) {
+    storyFlags.add('mt_silver_cleared');
+  }
   if (defeatedTrainers.has('falkner') && !storyFlags.has('falkner_defeated')) {
     storyFlags.add('falkner_defeated');
     storyFlags.add('CAN_USE_FLASH');

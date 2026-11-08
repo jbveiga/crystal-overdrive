@@ -299,10 +299,11 @@ describe('TICKET-WORLD-VICTORY-ROAD-GATE-01: Victory Road Reception Gate & 8-Bad
       );
     });
 
-    it('allows champion player through Mt. Silver passage (2, 7)', () => {
+    it('allows champion player with Oak clearance through Mt. Silver passage (2, 7)', () => {
       player.x = 2;
       player.y = 7;
       storyFlags.add('champion_defeated');
+      storyFlags.add('mt_silver_cleared');
       const blocked = handleVictoryRoadGateStep(
         { x: 2, y: 7 },
         gateMap,
@@ -376,8 +377,9 @@ describe('TICKET-WORLD-VICTORY-ROAD-GATE-01: Victory Road Reception Gate & 8-Bad
       );
     });
 
-    it('Mt. Silver guard welcomes champions', () => {
+    it('Mt. Silver guard welcomes champions with Oak clearance', () => {
       storyFlags.add('champion_defeated');
+      storyFlags.add('mt_silver_cleared');
       handleMtSilverGateGuard(
         { id: 'victory_road_gate_mt_silver_guard', speaker: '🥋 BLACK BELT' } as any,
         gateMap,
@@ -414,9 +416,9 @@ describe('TICKET-WORLD-VICTORY-ROAD-GATE-01: Victory Road Reception Gate & 8-Bad
       );
     });
 
-    it('registers all 3 Victory Road Gate interactions in getVictoryRoadGateInteractions', () => {
+    it('registers all 4 Victory Road Gate interactions (incl. Oak clearance) in getVictoryRoadGateInteractions', () => {
       const interactions = getVictoryRoadGateInteractions();
-      expect(interactions.length).toBe(3);
+      expect(interactions.length).toBe(4);
       expect(interactions.some((i) => i.actions?.includes('VICTORY_ROAD_GATE_OFFICER'))).toBe(true);
       expect(interactions.some((i) => i.actions?.includes('MT_SILVER_GATE_GUARD'))).toBe(true);
       expect(interactions.some((i) => i.actions?.includes('KANTO_GATE_GUARD'))).toBe(true);

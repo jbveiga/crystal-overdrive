@@ -46,6 +46,36 @@ export function checkHasAllJohtoBadges(
   return REQUIRED_JOHTO_BADGES.every((req) => normalized.includes(req));
 }
 
+const REQUIRED_KANTO_BADGES = ['boulder', 'cascade', 'thunder', 'rainbow', 'soul', 'marsh', 'volcano', 'earth'] as const;
+
+/**
+ * Checks whether the player holds all 16 badges (8 Johto + 8 Kanto).
+ */
+export function checkHasAllSixteenBadges(badges: string[] = [], storyFlags: Set<string> = new Set()): boolean {
+  if (!checkHasAllJohtoBadges(badges, storyFlags)) return false;
+  const normalized = (badges || []).map((b) => b.toLowerCase().replace(/_?badge$/, ''));
+  return REQUIRED_KANTO_BADGES.every((req) => normalized.includes(req));
+}
+
+/** Route 28 / Mt. Silver opens only for the Champion once Professor Oak has verified all 16 badges. */
+export function isMtSilverGateOpen(storyFlags: Set<string>): boolean {
+  return storyFlags.has('champion_defeated') && storyFlags.has('mt_silver_cleared');
+}
+
+/** Guard dialogue explaining which requirement is still missing. */
+export function getMtSilverGateBlockedPages(storyFlags: Set<string>): string[] {
+  if (!storyFlags.has('champion_defeated')) {
+    return [
+      'BLACK BELT: Hold on! This way leads to MT. SILVER.',
+      'Only a verified CHAMPION who has conquered both JOHTO and KANTO may pass!',
+    ];
+  }
+  return [
+    'BLACK BELT: Hold on! This way leads to MT. SILVER.',
+    'PROF. OAK in PALLET TOWN must first verify that you hold all 16 GYM BADGES. Go see him!',
+  ];
+}
+
 /**
  * 1. Victory Road Gate Officer Interaction Handler
  */
@@ -89,14 +119,8 @@ export const handleVictoryRoadGateOfficer: NpcInteractionHandler = (targetNpc, _
  * 2. Mt. Silver Gate Guard Interaction Handler (Route 28 West Passage)
  */
 export const handleMtSilverGateGuard: NpcInteractionHandler = (targetNpc, _map, ctx) => {
-  if (!ctx.storyFlags.has('champion_defeated')) {
-    ctx.openDialogue(
-      [
-        'BLACK BELT: Hold on! This way leads to MT. SILVER.',
-        'Only a verified CHAMPION who has conquered both JOHTO and KANTO may pass!',
-      ],
-      targetNpc.speaker || '🥋 BLACK BELT'
-    );
+  if (!isMtSilverGateOpen(ctx.storyFlags)) {
+    ctx.openDialogue(getMtSilverGateBlockedPages(ctx.storyFlags), targetNpc.speaker || '🥋 BLACK BELT');
   } else {
     ctx.openDialogue(
       ['Welcome, CHAMPION! The path to MT. SILVER is open to you. Train hard!'],
@@ -175,18 +199,12 @@ export function handleVictoryRoadGateStep(
 
   // West passage to Mt. Silver / Route 28: (1..2, 7)
   if ((coord.x === 1 || coord.x === 2) && coord.y === 7) {
-    if (!ctx.storyFlags.has('champion_defeated')) {
+    if (!isMtSilverGateOpen(ctx.storyFlags)) {
       ctx.player.x = 3;
       ctx.player.y = 7;
       ctx.player.direction = 'RIGHT';
       BattleAudio.playMenuSound('CANCEL');
-      ctx.openDialogue(
-        [
-          'BLACK BELT: Hold on! This way leads to MT. SILVER.',
-          'Only a verified CHAMPION who has conquered both JOHTO and KANTO may pass!',
-        ],
-        '🥋 BLACK BELT'
-      );
+      ctx.openDialogue(getMtSilverGateBlockedPages(ctx.storyFlags), '🥋 BLACK BELT');
       return true;
     }
   }
@@ -221,6 +239,48 @@ export function getVictoryRoadGateInteractions(): NpcInteractionRegistration[] {
       actions: ['VICTORY_ROAD_GATE_OFFICER'],
       npcIds: ['victory_road_gate_officer'],
       handler: handleVictoryRoadGateOfficer,
+    },
+    {
+      actions: ['OAK_MT_SILVER_CLEARANCE'],
+      npcIds: ['oaks_lab_oak'],
+      handler: (targetNpc, _map, ctx) => {
+        const speaker = targetNpc.speaker || '🔬 PROF. OAK';
+        if (ctx.storyFlags.has('mt_silver_cleared')) {
+          ctx.openDialogue(['OAK: You have my full clearance for MT. SILVER. Good luck up there!'], speaker);
+          return true;
+        }
+        if (!ctx.storyFlags.has('champion_defeated')) {
+          ctx.openDialogue(
+            ['OAK: Ah, GOLD! How is your POKéDEX coming along?', 'Become the POKéMON LEAGUE CHAMPION and collect all 16 GYM BADGES, and I may have something special for you.'],
+            speaker
+          );
+          return true;
+        }
+        if (!checkHasAllSixteenBadges(ctx.inventory.badges, ctx.storyFlags)) {
+          const have = (ctx.inventory.badges || []).length;
+          ctx.openDialogue(
+            ['OAK: Remarkable, you are the CHAMPION! But MT. SILVER is perilous.', `I can only grant clearance to a trainer with all 16 GYM BADGES from JOHTO and KANTO. You have ${Math.min(have, 16)} so far.`],
+            speaker
+          );
+          return true;
+        }
+        ctx.storyFlags.add('mt_silver_cleared');
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        ctx.missionManager?.checkStoryFlags?.(ctx.storyFlags);
+        ctx.openDialogue(
+          [
+            'OAK: Eight badges from JOHTO... and eight from KANTO! Magnificent!',
+            'You have proven yourself in both regions. I will notify the guard at ROUTE 28.',
+            'MT. SILVER is now open to you. Its wild POKéMON are the strongest in the world. Be careful!',
+          ],
+          speaker,
+          () => {
+            ctx.saveCurrentGame?.();
+            ctx.showToast?.('🏔️ Prof. Oak cleared you for Mt. Silver!');
+          }
+        );
+        return true;
+      },
     },
     {
       actions: ['MT_SILVER_GATE_GUARD'],
