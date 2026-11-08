@@ -101,3 +101,13 @@ describe('Route 32 Pokémon Center Fisherman & Old Rod', () => {
     expect([0, 2]).toContain(map.collisionGrid[npc.y * map.width + npc.x]);
   });
 });
+
+describe('Route 32 SlowpokeTail merchant (foreshadows the Slowpoke Well crisis)', () => {
+  it('stands on a walkable tile off the Pokémon Center approach and quotes the unaffordable ¥1,000,000 price', () => {
+    const npc: any = createNpcsByMap().route_32.find((n: any) => n.id === 'r32_slowpoke_tail_merchant')!;
+    const map = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../public/assets/data/maps/route_32.json'), 'utf8'));
+    expect([0, 2]).toContain(map.collisionGrid[npc.y * map.width + npc.x]);
+    expect(`${npc.x},${npc.y}`).not.toBe('11,74'); // tile directly in front of the Pokémon Center door
+    expect(JSON.stringify(npc.dialogue ?? npc.pages ?? npc)).toContain('1,000,000');
+  });
+});

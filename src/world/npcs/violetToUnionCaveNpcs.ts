@@ -194,6 +194,14 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     route_32: [
+      makeNpc('r32_slowpoke_tail_merchant', 9, 75, 'RIGHT', 'clerk', '🧳 MERCHANT',
+        [
+          'MERCHANT: Psst! Hey, kid! Wanna buy a SLOWPOKETAIL? It is a delicacy!',
+          'Just ¥1,000,000! Come on, it is a bargain!',
+          "...You can't carry that much money? Hmph! No SLOWPOKETAIL for you, then!",
+          "Funny, though... SLOWPOKETAILs have been turning up everywhere lately. Someone's been selling them from AZALEA TOWN's well...",
+        ]
+      ),
       makeNpc('youngster_albert', 12, 22, 'DOWN', 'boy', '👦 YOUNGSTER ALBERT', 
         ['I gave it my all, but your POKéMON were too tough!'],
         {
