@@ -187,7 +187,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
     ],
 
     team_rocket_base_b2f: [
-      makeNpc('team_rocket_base_b2f_lance', 18, 10, 'DOWN', 'lance', '🏆 CHAMPION LANCE', [
+      makeNpc('team_rocket_base_b2f_lance', 5, 13, 'DOWN', 'lance', '🏆 CHAMPION LANCE', [
         "LANCE: Are your Pokémon holding up? Here, let me restore your team to full fighting strength!",
       ], { action: 'LANCE_BASE_HEAL' }),
       makeNpc('team_rocket_base_b2f_ariana', 15, 10, 'DOWN', 'rocket_grunt_f', '⚡ EXECUTIVE ARIANA', [
@@ -217,15 +217,15 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('team_rocket_base_b3f_murkrow', 10, 2, 'DOWN', 'farfetchd', '🐦 MURKROW', [
         "MURKROW: Squawk! Hail GIOVANNI!",
       ], { action: 'ROCKET_BASE_MURKROW_EVENT' }),
-      makeNpc('b3f_electrode_1', 20, 5, 'DOWN', 'voltorb', '⚡ ELECTRODE', [
-        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
-      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
-      makeNpc('b3f_electrode_2', 20, 7, 'DOWN', 'voltorb', '⚡ ELECTRODE', [
-        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
-      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
-      makeNpc('b3f_electrode_3', 20, 9, 'DOWN', 'voltorb', '⚡ ELECTRODE', [
-        "⚡ The ELECTRODE is locked into the generator, crackling with violent electrical surge!"
-      ], { action: 'ROCKET_GENERATOR_ELECTRODE' }),
+      makeNpc('team_rocket_base_b3f_scientist_3', 23, 11, 'UP', 'super_nerd', '🔬 SCIENTIST ROSS', [
+        "ROSS: A radio signal that drives Pokémon mad... My experiment is a complete success.",
+      ], { action: 'TRAINER_BATTLE', trainerId: 'team_rocket_base_b3f_ross', trainerName: 'Scientist Ross', visionRange: 2, challengePages: ["ROSS: I used to work for SILPH, but now I run research for TEAM ROCKET!"], team: [{ speciesId: 'koffing', level: 22, moves: ['tackle', 'smog', 'sludge'] }, { speciesId: 'koffing', level: 22, moves: ['tackle', 'smog', 'sludge'] }] }),
+      makeNpc('team_rocket_base_b3f_scientist_4', 11, 15, 'RIGHT', 'super_nerd', '🔬 SCIENTIST MITCH', [
+        "MITCH: Thinking is my strong suit, not battling.",
+      ], { action: 'TRAINER_BATTLE', trainerId: 'team_rocket_base_b3f_mitch', trainerName: 'Scientist Mitch', visionRange: 3, challengePages: ["MITCH: I don't care that Pokémon are hurt by our experiment!"], team: [{ speciesId: 'ditto', level: 24, moves: ['transform'] }] }),
+      makeNpc('team_rocket_base_b3f_rocket_5', 24, 14, 'DOWN', 'rocket_grunt_m', '⚡ ROCKET GRUNT', [
+        "ROCKET GRUNT: Urrggh... It takes two passwords to get into the boss's quarters. Only a couple of Rockets on this floor know them!",
+      ]),
     ],
 
     blackthorn_city: [

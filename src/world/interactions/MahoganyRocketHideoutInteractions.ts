@@ -223,6 +223,10 @@ export const handleOfficeDoor: NpcInteractionHandler = (_targetNpc, currentMap, 
     currentMap.collisionGrid[9 * currentMap.width + 10] = 0;
     currentMap.collisionGrid[9 * currentMap.width + 11] = 0;
   }
+  if (currentMap?.tileMap && currentMap.tileMap.length > 9 * currentMap.width + 11) {
+    currentMap.tileMap[9 * currentMap.width + 10] = 'in_facility_01_26_26_01';
+    currentMap.tileMap[9 * currentMap.width + 11] = 'in_facility_01_26_26_01';
+  }
   BattleAudio.playOverworldSound('KEY_ITEM');
   ctx.openDialogue(
     [
@@ -345,6 +349,10 @@ export const handleTransmitterDoor: NpcInteractionHandler = (_targetNpc, current
   if (currentMap?.collisionGrid) {
     currentMap.collisionGrid[12 * currentMap.width + 14] = 0;
     currentMap.collisionGrid[12 * currentMap.width + 15] = 0;
+  }
+  if (currentMap?.tileMap && currentMap.tileMap.length > 12 * currentMap.width + 15) {
+    currentMap.tileMap[12 * currentMap.width + 14] = 'in_facility_01_26_26_01';
+    currentMap.tileMap[12 * currentMap.width + 15] = 'in_facility_01_26_26_01';
   }
   BattleAudio.playOverworldSound('KEY_ITEM');
   ctx.openDialogue(

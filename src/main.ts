@@ -114,6 +114,8 @@ async function bootstrap() {
       missionManager, gameClock, roamingManager,
     });
     playTimeSeconds = playTimeBox.val; playerName = playerNameBox.val; playerGender = playerGenderBox.val; rivalName = rivalNameBox.val;
+    applyStoryRecoveryFlags(storyFlags, defeatedTrainers, inventory);
+    activeNpcCache.invalidateAll();
     initialMapId = loc.mapId; initialPlayerX = loc.x; initialPlayerY = loc.y; initialPlayerDir = loc.direction; lastVisitedPokecenter = loc.lastVisitedPokecenter;
     Object.assign(player, { x: initialPlayerX, y: initialPlayerY, targetX: initialPlayerX, targetY: initialPlayerY, renderX: initialPlayerX, renderY: initialPlayerY, direction: initialPlayerDir });
   };

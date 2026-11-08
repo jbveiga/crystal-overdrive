@@ -64,9 +64,11 @@ export class OverworldWarpAndMapTransitionController {
     }
     if (map.id === 'team_rocket_base_b3f' && ctx.storyFlags.has('EVENT_OPENED_DOOR_TO_GIOVANNIS_OFFICE')) {
       map.collisionGrid[9 * map.width + 10] = 0; map.collisionGrid[9 * map.width + 11] = 0;
+      if (map.tileMap) { map.tileMap[9 * map.width + 10] = 'in_facility_01_26_26_01'; map.tileMap[9 * map.width + 11] = 'in_facility_01_26_26_01'; }
     }
     if (map.id === 'team_rocket_base_b2f' && ctx.storyFlags.has('EVENT_OPENED_DOOR_TO_ROCKET_HIDEOUT_TRANSMITTER')) {
       map.collisionGrid[12 * map.width + 14] = 0; map.collisionGrid[12 * map.width + 15] = 0;
+      if (map.tileMap) { map.tileMap[12 * map.width + 14] = 'in_facility_01_26_26_01'; map.tileMap[12 * map.width + 15] = 'in_facility_01_26_26_01'; }
     }
     if (map.id === 'route_41') {
       const whirlpoolCoords = [[12, 17], [36, 19], [12, 37], [36, 45]];

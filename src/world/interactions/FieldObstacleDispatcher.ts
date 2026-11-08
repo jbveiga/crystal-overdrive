@@ -17,6 +17,7 @@ import { handleVermilionGymTrashCan } from './VermilionGymInteractions';
 import { handleCeladonCafeTrashCan, handleCeladonGymGuideAndStatues } from './CeladonAndGymErikaInteractions';
 import { handleCeruleanGymMachinePart, handleCeruleanGymGuideAndStatues } from './CeruleanPowerPlantAndMistyInteractions';
 import { handleFuchsiaGymGuideAndStatues } from './CyclingRoadAndFuchsiaJanineInteractions';
+import { handleOfficeDoor, handleTransmitterDoor } from './MahoganyRocketHideoutInteractions';
 import {
   resolveCutReplacementTile,
   handleOverworldItemsAndHMObstacles,
@@ -592,6 +593,8 @@ export class FieldObstacleDispatcher {
       if (bgEvent.action === 'CERULEAN_GYM_MACHINE_PART') { handleCeruleanGymMachinePart(ctx as any, facingX, facingY); return true; }
       if (bgEvent.action === 'CERULEAN_GYM_STATUE') { handleCeruleanGymGuideAndStatues({ id: 'cerulean_gym_statue', x: facingX, y: facingY, action: 'CERULEAN_GYM_STATUE' } as any, ctx as any); return true; }
       if (bgEvent.action === 'FUCHSIA_GYM_STATUE') { handleFuchsiaGymGuideAndStatues({ id: 'fuchsia_gym_statue', x: facingX, y: facingY, action: 'FUCHSIA_GYM_STATUE' } as any, ctx as any); return true; }
+      if (bgEvent.action === 'ROCKET_BASE_OFFICE_DOOR') { handleOfficeDoor({ id: 'team_rocket_base_b3f_office_door', x: facingX, y: facingY } as any, currentMap, ctx as any); return true; }
+      if (bgEvent.action === 'ROCKET_BASE_TRANSMITTER_DOOR') { handleTransmitterDoor({ id: 'team_rocket_base_b2f_transmitter_door', x: facingX, y: facingY } as any, currentMap, ctx as any); return true; }
 
       ctx.openDialogue(bgEvent.pages, bgEvent.speaker, () => {
         if (
@@ -624,38 +627,6 @@ export class FieldObstacleDispatcher {
             BattleAudio.playOverworldSound('KEY_ITEM');
             ctx.showToast('🚨 Surveillance cameras deactivated!');
             ctx.saveCurrentGame();
-          }
-        } else if (bgEvent.action === 'ROCKET_BASE_OFFICE_DOOR') {
-          const hasP1 = ctx.storyFlags.has('EVENT_LEARNED_SLOWPOKETAIL');
-          const hasP2 =
-            ctx.storyFlags.has('EVENT_LEARNED_RATICATETAIL') ||
-            ctx.storyFlags.has('EVENT_LEARNED_RATICATE_TAIL');
-          if (hasP1 && hasP2) {
-            ctx.storyFlags.add('EVENT_OPENED_DOOR_TO_GIOVANNIS_OFFICE');
-            currentMap.collisionGrid[9 * currentMap.width + 10] = 0;
-            currentMap.collisionGrid[9 * currentMap.width + 11] = 0;
-            BattleAudio.playOverworldSound('KEY_ITEM');
-            ctx.openDialogue(
-              ['The passwords matched!', "The door to GIOVANNI'S office clicked open!"],
-              bgEvent.speaker,
-              () => {
-                ctx.saveCurrentGame();
-                ctx.renderMap?.(currentMap);
-              }
-            );
-          }
-        } else if (bgEvent.action === 'ROCKET_BASE_TRANSMITTER_DOOR') {
-          const hasVoice = ctx.storyFlags.has('EVENT_LEARNED_HAIL_GIOVANNI');
-          if (hasVoice) {
-            ctx.storyFlags.add('EVENT_OPENED_DOOR_TO_ROCKET_HIDEOUT_TRANSMITTER');
-            currentMap.collisionGrid[12 * currentMap.width + 14] = 0;
-            currentMap.collisionGrid[12 * currentMap.width + 15] = 0;
-            BattleAudio.playOverworldSound('KEY_ITEM');
-            ctx.openDialogue(
-              ['Spoke the secret voice password: "Hail GIOVANNI"!', 'The master blast door slid open!'],
-              bgEvent.speaker,
-              () => { ctx.saveCurrentGame(); ctx.renderMap?.(currentMap); }
-            );
           }
         } else if (bgEvent.action === 'LUGIA_SHRINE_EVENT' || bgEvent.speaker?.includes('LUGIA')) {
           handleLugiaShrineOrBoss({ id: 'lugia_shrine', x: facingX, y: facingY } as any, currentMap, ctx as any);

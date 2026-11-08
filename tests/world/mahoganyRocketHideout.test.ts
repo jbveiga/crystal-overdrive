@@ -658,7 +658,11 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
 
     const { NPC_SHEET_PATHS } = await import('../../src/render/OverworldNpcAndItemSprites');
     expect(NPC_SHEET_PATHS.lance).toBe('./assets/sprites/characters/lance.png');
+    expect(NPC_SHEET_PATHS.electrode).toBe('./assets/sprites/characters/electrode.png');
+    expect(NPC_SHEET_PATHS.voltorb).toBe('./assets/sprites/characters/voltorb.png');
     expect(fs.existsSync(path.resolve(__dirname, '../../public/assets/sprites/characters/lance.png'))).toBe(true);
+    expect(fs.existsSync(path.resolve(__dirname, '../../public/assets/sprites/characters/electrode.png'))).toBe(true);
+    expect(fs.existsSync(path.resolve(__dirname, '../../public/assets/sprites/characters/voltorb.png'))).toBe(true);
 
     const npcsByMap = createMahoganyToIndigoNpcs();
     expect(npcsByMap.lake_of_rage.find((n) => n.id === 'lake_of_rage_lance')?.spriteType).toBe('lance');
@@ -666,6 +670,23 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
     expect(npcsByMap.team_rocket_base_b2f.find((n) => n.id === 'team_rocket_base_b2f_lance')?.spriteType).toBe('lance');
     expect(npcsByMap.lances_room.find((n) => n.id === 'champion_lance')?.spriteType).toBe('lance');
     expect(npcsByMap.hall_of_fame.find((n) => n.id === 'hall_of_fame_lance')?.spriteType).toBe('lance');
+
+    // Verify premature B3F electrode save recovery restores all Rocket Hideout NPCs
+    const { applyStoryRecoveryFlags } = await import('../../src/world/npcData');
+    const brokenFlags = new Set<string>([
+      'b3f_electrode_1_cleared',
+      'b3f_electrode_2_cleared',
+      'b3f_electrode_3_cleared',
+      'rocket_base_generator_cleared',
+      'EVENT_CLEARED_ROCKET_HIDEOUT',
+    ]);
+    applyStoryRecoveryFlags(brokenFlags, new Set(), { balls: {}, badges: [], tms: [] });
+    expect(brokenFlags.has('rocket_base_generator_cleared')).toBe(false);
+    expect(brokenFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')).toBe(false);
+    expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_grunt_f', brokenFlags)).toBe(true);
+    expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_grunt_m', brokenFlags)).toBe(true);
+    expect(isNpcActiveForStoryFlags('team_rocket_base_b3f_petrel', brokenFlags)).toBe(true);
+    expect(isNpcActiveForStoryFlags('b2f_electrode_1', brokenFlags)).toBe(true);
   });
 });
 

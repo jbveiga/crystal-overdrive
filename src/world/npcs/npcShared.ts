@@ -526,22 +526,16 @@ export function isNpcActiveForStoryFlags(
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
-  if (npcId === 'team_rocket_base_b3f_murkrow') return (
-      storyFlags.has('EVENT_BEAT_ROCKET_EXECUTIVEM_4') &&
+  if (
+    npcId === 'team_rocket_base_b3f_murkrow' ||
+    npcId === 'team_rocket_base_b3f_grunt_f' ||
+    npcId === 'team_rocket_base_b3f_grunt_m'
+  ) {
+    return (
       !storyFlags.has('rocket_base_generator_cleared') &&
       !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
     );
-  if (npcId === 'team_rocket_base_b3f_grunt_f') return (
-      !storyFlags.has('EVENT_LEARNED_SLOWPOKETAIL') &&
-      !storyFlags.has('rocket_base_generator_cleared') &&
-      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
-    );
-  if (npcId === 'team_rocket_base_b3f_grunt_m') return (
-      !storyFlags.has('EVENT_LEARNED_RATICATETAIL') &&
-      !storyFlags.has('EVENT_LEARNED_RATICATE_TAIL') &&
-      !storyFlags.has('rocket_base_generator_cleared') &&
-      !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
-    );
+  }
   if (npcId === 'route_43_gate_rocket_1' || npcId === 'route_43_gate_rocket_2') return !storyFlags.has('rocket_base_generator_cleared') && !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT');
 
   // Radio Tower & Underground Takeover (Act 7)

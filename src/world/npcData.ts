@@ -330,6 +330,17 @@ export function applyStoryRecoveryFlags(
     if (!inventory.tms.includes('HM01')) inventory.tms.push('HM01');
     if (!inventory.tms.includes('HM01_CUT')) inventory.tms.push('HM01_CUT');
   }
+  if (
+    (storyFlags.has('rocket_base_generator_cleared') || storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')) &&
+    !storyFlags.has('b2f_electrode_1_cleared') &&
+    !storyFlags.has('EVENT_OPENED_DOOR_TO_ROCKET_HIDEOUT_TRANSMITTER')
+  ) {
+    storyFlags.delete('rocket_base_generator_cleared');
+    storyFlags.delete('EVENT_CLEARED_ROCKET_HIDEOUT');
+    storyFlags.delete('b3f_electrode_1_cleared');
+    storyFlags.delete('b3f_electrode_2_cleared');
+    storyFlags.delete('b3f_electrode_3_cleared');
+  }
 }
 
 export function filterInitialMapNpcs(npcsByMap: Record<string, GridEntity[]>, storyFlags: Set<string>): void {

@@ -2046,9 +2046,9 @@
       "dir": "DOWN",
       "sprite": "rocket_grunt_m",
       "id": "team_rocket_base_b1f_rocket_0",
-      "speaker": "ROCKET",
+      "speaker": "⚡ ROCKET GRUNT",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "ROCKET GRUNT: Heh! Our surveillance statues will spot any intruder!"
       ]
     },
     {
@@ -2056,17 +2056,17 @@
       "x": 18,
       "y": 12,
       "dir": "LEFT",
-      "sprite": "boy",
-      "speaker": "⚔️ JED",
+      "sprite": "super_nerd",
+      "speaker": "🔬 SCIENTIST JED",
       "pages": [
-        "Jed: That was a great battle!"
+        "JED: All right. I'll divulge a secret about our hideout. That thing at the end of the desk is the security camera switch!"
       ],
       "action": "TRAINER_BATTLE",
       "trainerId": "team_rocket_base_b1f_jed",
       "trainerName": "Scientist Jed",
       "vision": 3,
       "challenge": [
-        "JED: Let's battle!"
+        "JED: This was once a ninja hideout. There are traps to confound intruders like you!"
       ],
       "team": [
         {
@@ -2089,11 +2089,11 @@
       "x": 20,
       "y": 16,
       "dir": "UP",
-      "sprite": "boy",
+      "sprite": "rocket_grunt_m",
       "id": "team_rocket_base_b2f_rocket_0",
-      "speaker": "ROCKET",
+      "speaker": "⚡ ROCKET GRUNT",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "ROCKET GRUNT: The door won't open? Only the boss on B3F knows the voice password for the transmitter room!"
       ]
     }
   ],
@@ -2102,11 +2102,11 @@
       "x": 8,
       "y": 3,
       "dir": "UP",
-      "sprite": "boy",
+      "sprite": "rocket_grunt_m",
       "id": "team_rocket_base_b3f_rocket_0",
-      "speaker": "ROCKET",
+      "speaker": "⚡ ROCKET GRUNT",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "ROCKET GRUNT: This is the office of our leader, GIOVANNI!"
       ]
     },
     {
@@ -2114,17 +2114,17 @@
       "x": 23,
       "y": 11,
       "dir": "UP",
-      "sprite": "boy",
-      "speaker": "⚔️ ROSS",
+      "sprite": "super_nerd",
+      "speaker": "🔬 SCIENTIST ROSS",
       "pages": [
-        "Ross: That was a great battle!"
+        "ROSS: A radio signal that drives Pokémon mad... My experiment is a complete success."
       ],
       "action": "TRAINER_BATTLE",
       "trainerId": "team_rocket_base_b3f_ross",
       "trainerName": "Scientist Ross",
       "vision": 2,
       "challenge": [
-        "ROSS: Let's battle!"
+        "ROSS: I used to work for SILPH, but now I run research for TEAM ROCKET!"
       ],
       "team": [
         {
@@ -2142,17 +2142,17 @@
       "x": 11,
       "y": 15,
       "dir": "RIGHT",
-      "sprite": "boy",
-      "speaker": "⚔️ MITCH",
+      "sprite": "super_nerd",
+      "speaker": "🔬 SCIENTIST MITCH",
       "pages": [
-        "Mitch: That was a great battle!"
+        "MITCH: Thinking is my strong suit, not battling."
       ],
       "action": "TRAINER_BATTLE",
       "trainerId": "team_rocket_base_b3f_mitch",
       "trainerName": "Scientist Mitch",
       "vision": 3,
       "challenge": [
-        "MITCH: Let's battle!"
+        "MITCH: I don't care that Pokémon are hurt by our experiment!"
       ],
       "team": [
         {
@@ -2165,11 +2165,11 @@
       "x": 24,
       "y": 14,
       "dir": "DOWN",
-      "sprite": "boy",
+      "sprite": "rocket_grunt_m",
       "id": "team_rocket_base_b3f_rocket_5",
-      "speaker": "ROCKET",
+      "speaker": "⚡ ROCKET GRUNT",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "ROCKET GRUNT: Urrggh... It takes two passwords to get into the boss's quarters. Only a couple of Rockets on this floor know them!"
       ]
     }
   ],
