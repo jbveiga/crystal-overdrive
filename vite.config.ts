@@ -21,7 +21,8 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('@pkmn/dex')) {
+            // learnsets (~3MB) are dynamically imported by @pkmn/dex; keep them in their own lazy chunk
+            if (id.includes('@pkmn/dex') && !id.includes('learnsets')) {
               return 'dex';
             }
             if (id.includes('pixi.js')) {
@@ -29,6 +30,9 @@ export default defineConfig({
             }
             if (id.includes('howler')) {
               return 'audio';
+            }
+            if (id.includes('learnsets')) {
+              return undefined;
             }
             return 'vendor';
           }
