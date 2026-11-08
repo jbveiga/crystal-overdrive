@@ -318,7 +318,7 @@ export class BattleSessionController {
         const recordSingleEncounterLegendaryResolution = (wasCaught: boolean) => {
           if (wasCaught) {
             caughtSpeciesIds.add(oppSpecies);
-            (ctx as any).caughtSpecies?.add?.(oppSpecies);
+            (ctx as { caughtSpecies?: Set<string> }).caughtSpecies?.add(oppSpecies);
           }
           if (isRoamerSpecies) {
             if (wasCaught) {

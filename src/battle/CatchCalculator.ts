@@ -131,8 +131,8 @@ export class CatchCalculator {
         const tSpecies = target.speciesId.toLowerCase();
         const sameSpecies = Boolean(pSpecies && pSpecies === tSpecies);
 
-        const pGender = context.playerGender || (context.playerPokemon as any)?.gender;
-        const tGender = context.targetGender || (target as any)?.gender;
+        const pGender = context.playerGender || (context.playerPokemon as { gender?: string } | undefined)?.gender;
+        const tGender = context.targetGender || (target as { gender?: string }).gender;
         const oppositeGender =
           Boolean(context.isOppositeGender) ||
           Boolean(pGender && tGender && pGender !== 'N' && tGender !== 'N' && pGender !== tGender);
@@ -179,7 +179,7 @@ export class CatchCalculator {
 
     let baseCatchRate = target.catchRate;
     if (ballId === 'heavy-ball') {
-      const weight = context.targetWeightKg ?? (target as any).weightKg ?? 50;
+      const weight = context.targetWeightKg ?? (target as { weightKg?: number }).weightKg ?? 50;
       const mod = this.getHeavyBallModifier(weight);
       baseCatchRate = Math.max(1, Math.min(255, baseCatchRate + mod));
     }

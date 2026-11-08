@@ -172,6 +172,13 @@ export class StorageManager {
     }
   }
 
+  /** Filters a legacy flat `box` array from an old save down to valid Pokémon instances. */
+  public static sanitizeLegacyBox(box: unknown): PokemonInstance[] | undefined {
+    return Array.isArray(box)
+      ? box.filter((p): p is PokemonInstance => Boolean(p && typeof p === 'object' && (p as PokemonInstance).speciesId))
+      : undefined;
+  }
+
   /**
    * Deposits a Pokémon into the current active box (or requested box).
    * Automatically rolls over to next available box if the current box is full.

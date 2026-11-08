@@ -72,9 +72,7 @@ export class SaveStateReconciler {
     const validParty = (existingSave.party || []).filter((p) => p && typeof p === 'object' && p.speciesId);
     state.playerParty.splice(0, state.playerParty.length, ...validParty);
 
-    const legacyBox = Array.isArray((existingSave as any).box)
-      ? (existingSave as any).box.filter((p: any) => p && typeof p === 'object' && p.speciesId)
-      : undefined;
+    const legacyBox = StorageManager.sanitizeLegacyBox(existingSave.box);
     const storageState = existingSave.storage || StorageManager.createDefaultStorage(legacyBox);
     StorageManager.reconcilePartyAndStorageIntegrity(state.playerParty, storageState);
 
@@ -159,7 +157,7 @@ export class SaveStateReconciler {
           return kl === 'red_scale' || kl === 'red-scale' || kl === 'red scale';
         })
       ) ||
-      Boolean((state.inventory.items as any)?.red_scale || (state.inventory.items as any)?.['red-scale']);
+      Boolean(((state.inventory.items ?? {}) as Record<string, number | undefined>).red_scale || ((state.inventory.items ?? {}) as Record<string, number | undefined>)['red-scale']);
     const hasShinyGyarados = [...state.playerParty, ...flattenedBoxes].some(
       (p) => p && p.speciesId?.toLowerCase() === 'gyarados' && p.isShiny
     );

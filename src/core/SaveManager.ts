@@ -29,6 +29,8 @@ import type { BugContestLeaderboardEntry } from '../world/BugContestManager';
 import { SaveStateReconciler } from './SaveStateReconciler';
 import { signSaveData, verifySaveEnvelope } from './SaveIntegrity';
 
+const isSpeed = (v: unknown): v is SpeedMultiplier => v === 1 || v === 2 || v === 3 || v === 4;
+
 export interface SaveData {
   version: number;
   timestamp: number;
@@ -164,8 +166,8 @@ export class SaveManager {
     const cv = (v: any, d: number): number => { const n = Number(v); return Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : d; };
     const pick = <T>(v: any, valid: T[], d: T): T => (valid.includes(v) ? v : d);
     const b = (v: any, d: boolean): boolean => (typeof v === 'boolean' ? v : d);
-    const pSpeed = [1, 2, 3, 4].includes(r.playerSpeedDefault as any) ? r.playerSpeedDefault! : [1, 2, 3, 4].includes(player?.speedMultiplier as any) ? player!.speedMultiplier! : def.playerSpeedDefault;
-    const bSpeed = [1, 2, 3, 4].includes(r.battleSpeedMultiplier as any) ? r.battleSpeedMultiplier! : [1, 2, 3, 4].includes(player?.battleSpeedMultiplier as any) ? player!.battleSpeedMultiplier! : def.battleSpeedMultiplier!;
+    const pSpeed = isSpeed(r.playerSpeedDefault) ? r.playerSpeedDefault! : isSpeed(player?.speedMultiplier) ? player!.speedMultiplier! : def.playerSpeedDefault;
+    const bSpeed = isSpeed(r.battleSpeedMultiplier) ? r.battleSpeedMultiplier! : isSpeed(player?.battleSpeedMultiplier) ? player!.battleSpeedMultiplier! : def.battleSpeedMultiplier!;
     return {
       soundVolume: cv(r.soundVolume, def.soundVolume), bgmVolume: cv(r.bgmVolume, def.bgmVolume), muted: b(r.muted, def.muted!),
       textSpeed: pick(r.textSpeed, ['SLOW', 'MID', 'FAST', 'INSTANT'], def.textSpeed),
@@ -342,13 +344,11 @@ export class SaveManager {
       if (!Array.isArray(data.party)) {
         data.party = [];
       }
-      const legacyBox = Array.isArray((data as any).box)
-        ? (data as any).box.filter((p: any) => p && typeof p === 'object' && p.speciesId)
-        : undefined;
+      const legacyBox = StorageManager.sanitizeLegacyBox(data.box);
       if (!data.storage) {
         data.storage = StorageManager.createDefaultStorage(legacyBox);
       }
-      delete (data as any).box;
+      delete data.box;
       StorageManager.reconcilePartyAndStorageIntegrity(data.party, data.storage);
       SaveManager.reconcileStarterFlags(data);
       data.timestamp = Date.now();
@@ -479,13 +479,11 @@ export class SaveManager {
           } else {
             loaded.party = [];
           }
-          const legacyBox = Array.isArray((loaded as any).box)
-            ? (loaded as any).box.filter((p: any) => p && typeof p === 'object' && p.speciesId)
-            : undefined;
+          const legacyBox = StorageManager.sanitizeLegacyBox(loaded.box);
           if (!loaded.storage) {
             loaded.storage = StorageManager.createDefaultStorage(legacyBox);
           }
-          delete (loaded as any).box;
+          delete loaded.box;
           StorageManager.reconcilePartyAndStorageIntegrity(loaded.party, loaded.storage);
           SaveManager.reconcileStarterFlags(loaded);
           loaded.options = SaveManager.normalizeOptions(loaded.options, loaded.player);
