@@ -28,6 +28,9 @@ import {
 
 export type { PartyExpAward };
 
+/** Monotonic counter guaranteeing unique uids even for Pokémon created within the same millisecond. */
+let uidCounter = 0;
+
 export class PokemonFactory {
   private static learnsetCache = new Map<string, Record<string, string[]>>();
   private static moveDataCache = new Map<string, MoveData>();
@@ -380,7 +383,7 @@ export class PokemonFactory {
     }
 
     return {
-      uid: `${species.id}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      uid: `${species.id}-${Date.now()}-${Math.floor(Math.random() * 1000)}-${++uidCounter}`,
       speciesId: species.id,
       nickname,
       level,
