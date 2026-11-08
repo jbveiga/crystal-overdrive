@@ -24,6 +24,15 @@ export interface ReleaseResult {
  * Pure TypeScript domain engine for Bill's PC Pokémon Storage System.
  * Zero DOM or PixiJS dependencies.
  */
+const withoutIdentity = (p: PokemonInstance): string => { const { uid: _u, id: _i, ...rest } = p as PokemonInstance & { id?: string }; return JSON.stringify(rest); };
+
+/** True when two instances are the same Pokémon (deep-equal). Only evaluated on uid collisions, so cost is negligible. */
+function isIdenticalCopy(a: PokemonInstance, b: PokemonInstance | undefined): boolean {
+  if (!b) return false;
+  if (a === b) return true;
+  try { return withoutIdentity(a) === withoutIdentity(b); } catch { return false; }
+}
+
 export class StorageManager {
   public static readonly BOX_CAPACITY = 20;
   public static readonly TOTAL_BOXES = 14;
@@ -120,6 +129,7 @@ export class StorageManager {
 
     const seenIds = new Set<string>();
     const seenRefs = new Set<PokemonInstance>();
+    const seenByKey = new Map<string, PokemonInstance>();
 
     for (let i = 0; i < party.length; i++) {
       const p = party[i];
@@ -132,6 +142,7 @@ export class StorageManager {
         p.uid = existingKey;
       }
       seenIds.add(p.uid);
+      seenByKey.set(p.uid, p);
       seenRefs.add(p);
     }
 
@@ -145,15 +156,17 @@ export class StorageManager {
           continue;
         }
         const key = pkmn.uid || pkmn.id;
-        if (seenRefs.has(pkmn) || (key && seenIds.has(key))) {
-          // Duplicate instance already in party or earlier box slot — purge duplicate
+        if (seenRefs.has(pkmn) || (key && seenIds.has(key) && isIdenticalCopy(pkmn, seenByKey.get(key)))) {
+          // True duplicate (same reference, or identical copy) already in party or earlier box slot — purge
           box.pokemon[sIdx] = null;
           continue;
         }
+        // A uid collision between two DIFFERENT Pokémon (legacy same-millisecond uid bug) must never delete one: re-key it.
         const finalKey =
-          key || `${pkmn.speciesId}_b${bIdx}s${sIdx}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+          (key && !seenIds.has(key) ? key : '') || `${pkmn.speciesId}_b${bIdx}s${sIdx}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
         pkmn.uid = finalKey;
         seenIds.add(finalKey);
+        seenByKey.set(finalKey, pkmn);
         seenRefs.add(pkmn);
       }
     }
