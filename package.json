@@ -13,12 +13,12 @@
     "review": "node scripts/project-optimization-review.cjs"
   },
   "dependencies": {
+    "@pixi/tilemap": "^5.0.2",
     "@pkmn/dex": "^0.8.0",
     "gsap": "^3.12.5",
     "howler": "^2.2.4",
     "idb": "^8.0.0",
-    "pixi.js": "^8.5.2",
-    "@pixi/tilemap": "^5.0.2"
+    "pixi.js": "^8.5.2"
   },
   "devDependencies": {
     "@types/howler": "^2.2.11",

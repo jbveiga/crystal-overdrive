@@ -21,6 +21,7 @@ function loadMapJson(mapId: string): MapJson | null {
 
 const VALID_SPRITE_TYPES: Set<string> = new Set<NpcSpriteType>([
   'player',
+  'murkrow',
   'boy',
   'girl',
   'fat_man',
