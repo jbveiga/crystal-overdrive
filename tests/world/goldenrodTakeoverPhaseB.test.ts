@@ -299,7 +299,9 @@ describe('TICKET-STORY-TEAM-ROCKET-GOLDENROD-TAKEOVER-01: Phase B Verification S
       expect(mockContext.storyFlags!.has('TEAM_ROCKET_DISBANDED')).toBe(true);
       expect(mockContext.storyFlags!.has('has_clear_bell')).toBe(true);
       expect(mockContext.inventory!.items['clear-bell']).toBe(1);
-      expect(mockContext.inventory!.items['rainbow-wing']).toBe(1);
+      // Rainbow Wing is NOT given here: the Wise Trio award it after all three legendary beasts are mastered
+      expect(mockContext.inventory!.items['rainbow-wing']).toBeUndefined();
+      expect(mockContext.storyFlags!.has('has_rainbow_wing')).toBe(false);
     });
   });
 

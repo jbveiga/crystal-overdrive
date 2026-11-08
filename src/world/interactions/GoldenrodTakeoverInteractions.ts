@@ -307,7 +307,6 @@ export const handleExecutiveArcherBoss: NpcInteractionHandler = (targetNpc, _map
         ctx.storyFlags.add('has_clear_bell');
         if (ctx.addOverworldItemToInventory) {
           ctx.addOverworldItemToInventory('clear-bell');
-          ctx.addOverworldItemToInventory('rainbow-wing');
         }
         ctx.missionManager?.checkStoryFlags(ctx.storyFlags);
         ctx.missionManager?.completeMission?.('M09');
@@ -320,8 +319,8 @@ export const handleExecutiveArcherBoss: NpcInteractionHandler = (targetNpc, _map
             'It is finished... GIOVANNI will not return. TEAM ROCKET will disband this day!',
             'Executive Archer and the remaining grunts fled from Goldenrod City forever!',
             "DIRECTOR: You did it! You drove off TEAM ROCKET and saved all of JOHTO's airwaves!",
-            'Please, take these legendary sacred treasures: the CLEAR BELL and RAINBOW WING!',
-            `${ctx.playerName} received the CLEAR BELL and RAINBOW WING!`,
+            'Please, take this sacred treasure: the CLEAR BELL! It is said to resonate with a legendary beast of Johto.',
+            `${ctx.playerName} received the CLEAR BELL!`,
           ],
           targetNpc.speaker,
           () => {
@@ -331,7 +330,7 @@ export const handleExecutiveArcherBoss: NpcInteractionHandler = (targetNpc, _map
               ctx.syncMapOverworldItems?.(curMap);
             }
             ctx.saveCurrentGame();
-            ctx.showToast('🔔 Liberated Radio Tower! Received CLEAR BELL & RAINBOW WING!');
+            ctx.showToast('🔔 Liberated Radio Tower! Received the CLEAR BELL!');
           }
         );
       },

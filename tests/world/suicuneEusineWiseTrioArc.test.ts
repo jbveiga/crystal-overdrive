@@ -367,6 +367,39 @@ describe('Story Arc A: Eusine Quest, Multi-Stage Suicune Sightings & Wise Trio T
       expect(lastToastMessage).toContain('Rainbow Wing');
     });
 
+    it('Wise Trio sages award the Rainbow Wing only after the trial AND all 3 beasts; never twice', () => {
+      const sages = createEcruteakToRoute39Npcs().tin_tower_1f || [];
+      const koji = sages.find((n) => n.id === 'wise_trio_koji')!;
+      const map = { id: 'tin_tower_1f' } as any;
+      for (const id of ['wise_trio_gaku', 'wise_trio_masa', 'wise_trio_koji']) mockContext.defeatedTrainers?.add(id);
+      mockContext.storyFlags?.delete('has_rainbow_wing');
+      mockContext.storyFlags?.delete('beasts_mastered');
+
+      // Trial not flagged cleared yet -> lore only, no wing
+      handleWiseTrioSage(koji, map, mockContext as NpcInteractionContext);
+      expect(mockContext.storyFlags?.has('has_rainbow_wing')).toBe(false);
+
+      // Trial cleared but beasts not mastered -> still no wing
+      mockContext.storyFlags?.add('wise_trio_cleared');
+      handleWiseTrioSage(koji, map, mockContext as NpcInteractionContext);
+      expect(mockContext.storyFlags?.has('has_rainbow_wing')).toBe(false);
+
+      // Trial cleared + Suicune, Raikou and Entei mastered -> the Wise Trio bestow the Rainbow Wing
+      mockContext.storyFlags?.add('suicune_caught_or_defeated');
+      mockContext.storyFlags?.add('caught_raikou');
+      mockContext.storyFlags?.add('caught_entei');
+      handleWiseTrioSage(koji, map, mockContext as NpcInteractionContext);
+      expect(mockContext.storyFlags?.has('has_rainbow_wing')).toBe(true);
+      expect(mockContext.inventory?.keyItems).toContain('RAINBOW WING');
+      expect(lastDialoguePages.some((p) => p.includes('received the RAINBOW WING'))).toBe(true);
+
+      // Spamming A again only repeats lore (single award)
+      const count = (mockContext.inventory?.keyItems || []).filter((k: string) => k === 'RAINBOW WING').length;
+      handleWiseTrioSage(koji, map, mockContext as NpcInteractionContext);
+      expect((mockContext.inventory?.keyItems || []).filter((k: string) => k === 'RAINBOW WING').length).toBe(count);
+      expect(lastDialoguePages.some((p) => p.includes('received the RAINBOW WING'))).toBe(false);
+    });
+
     it('unblocks the sacred staircase when player possesses both Clear Bell and Rainbow Wing', () => {
       mockContext.storyFlags?.add('has_clear_bell');
       mockContext.storyFlags?.add('has_rainbow_wing');

@@ -14,6 +14,69 @@ import type {
 import { BattleAudio } from '../../audio/BattleAudio';
 import { PokemonFactory } from '../../battle/PokemonFactory';
 
+function hasMasteredSuicune(ctx: Parameters<NpcInteractionHandler>[2]): boolean {
+  return Boolean(
+    ctx.storyFlags.has('suicune_caught_or_defeated') ||
+      ctx.storyFlags.has('EVENT_CAUGHT_SUICUNE') ||
+      ctx.storyFlags.has('EVENT_FOUGHT_SUICUNE') ||
+      ctx.caughtSpecies?.has('suicune') ||
+      ctx.caughtSpecies?.has('245') ||
+      ctx.playerParty?.some((p) => p.speciesId === 'suicune' || p.speciesId === '245') ||
+      ctx.playerBox?.some((p) => p.speciesId === 'suicune' || p.speciesId === '245')
+  );
+}
+
+/** True once Suicune has been faced AND Raikou and Entei have been caught/defeated (or the `beasts_mastered` override). */
+export function hasMasteredAllBeasts(ctx: Parameters<NpcInteractionHandler>[2]): boolean {
+  const beast = (name: 'raikou' | 'entei', num: string): boolean =>
+    Boolean(
+      ctx.caughtSpecies?.has(name) ||
+        ctx.caughtSpecies?.has(num) ||
+        ctx.storyFlags.has(`caught_${name}`) ||
+        ctx.storyFlags.has(`${name}_defeated`) ||
+        ctx.storyFlags.has(`EVENT_CAUGHT_${name.toUpperCase()}`) ||
+        ctx.storyFlags.has(`EVENT_FOUGHT_${name.toUpperCase()}`) ||
+        ctx.playerParty?.some((p) => p.speciesId === name || p.speciesId === num) ||
+        ctx.playerBox?.some((p) => p.speciesId === name || p.speciesId === num)
+    );
+  return (hasMasteredSuicune(ctx) && beast('raikou', '243') && beast('entei', '244')) || ctx.storyFlags.has('beasts_mastered');
+}
+
+/** Awards the Rainbow Wing (key item + flags) with the sages' recognition dialogue. Idempotent. */
+export function bestowRainbowWing(
+  ctx: Parameters<NpcInteractionHandler>[2],
+  speaker: string,
+  map?: Parameters<NpcInteractionHandler>[1]
+): boolean {
+  if (ctx.storyFlags.has('has_rainbow_wing')) return false;
+  ctx.storyFlags.add('has_rainbow_wing');
+  ctx.storyFlags.add('EVENT_GOT_RAINBOW_WING');
+  if (Array.isArray(ctx.inventory?.keyItems)) {
+    if (!ctx.inventory.keyItems.includes('RAINBOW WING') && !ctx.inventory.keyItems.includes('rainbow_wing')) {
+      ctx.inventory.keyItems.push('RAINBOW WING');
+    }
+  }
+  const inv = ctx.inventory as { items?: Record<string, number> };
+  if (inv.items && typeof inv.items === 'object') inv.items.rainbow_wing = 1;
+  ctx.audioManager?.playSfx?.('sfx_badge_get');
+  BattleAudio.playOverworldSound('KEY_ITEM');
+  ctx.openDialogue(
+    [
+      'WISE TRIO: Remarkable! The spirits of the three legendary beasts—RAIKOU of the lightning, ENTEI of the flames, and SUICUNE of the pure rain—reverberate through you!',
+      'You are truly the chosen bearer of the sacred skies. Take this sacred relic!',
+      `${ctx.playerName || 'Player'} received the RAINBOW WING!`,
+      'With the CLEAR BELL and RAINBOW WING in hand, the stairway to the summit of TIN TOWER is open to you!',
+    ],
+    speaker,
+    () => {
+      ctx.showToast?.('🌈 Received the Rainbow Wing from the Wise Trio!');
+      ctx.saveCurrentGame?.();
+      if (map) ctx.renderMap?.(map);
+    }
+  );
+  return true;
+}
+
 /**
  * 1. Tin Tower 1F: Tower Sage Barrier Unblocking & Rainbow Wing Bestowal
  * Verifies Clear Bell, Suicune/Legendary Beasts mastery, and awards Rainbow Wing.
@@ -52,65 +115,9 @@ export const handleTinTowerSage: NpcInteractionHandler = (targetNpc, _map, ctx) 
   }
 
   // Case 2: Player has calmed Suicune and captured/accounted for Raikou & Entei -> Bestow Rainbow Wing!
-  const hasSuicune =
-    ctx.storyFlags.has('suicune_caught_or_defeated') ||
-    ctx.storyFlags.has('EVENT_CAUGHT_SUICUNE') ||
-    ctx.storyFlags.has('EVENT_FOUGHT_SUICUNE') ||
-    ctx.caughtSpecies?.has('suicune') ||
-    ctx.caughtSpecies?.has('245') ||
-    ctx.playerParty?.some((p) => p.speciesId === 'suicune' || p.speciesId === '245') ||
-    ctx.playerBox?.some((p) => p.speciesId === 'suicune' || p.speciesId === '245');
-
-  const hasRaikou =
-    ctx.caughtSpecies?.has('raikou') ||
-    ctx.caughtSpecies?.has('243') ||
-    ctx.storyFlags.has('caught_raikou') ||
-    ctx.storyFlags.has('raikou_defeated') ||
-    ctx.storyFlags.has('EVENT_CAUGHT_RAIKOU') ||
-    ctx.storyFlags.has('EVENT_FOUGHT_RAIKOU') ||
-    ctx.playerParty?.some((p) => p.speciesId === 'raikou' || p.speciesId === '243') ||
-    ctx.playerBox?.some((p) => p.speciesId === 'raikou' || p.speciesId === '243');
-
-  const hasEntei =
-    ctx.caughtSpecies?.has('entei') ||
-    ctx.caughtSpecies?.has('244') ||
-    ctx.storyFlags.has('caught_entei') ||
-    ctx.storyFlags.has('entei_defeated') ||
-    ctx.storyFlags.has('EVENT_CAUGHT_ENTEI') ||
-    ctx.storyFlags.has('EVENT_FOUGHT_ENTEI') ||
-    ctx.playerParty?.some((p) => p.speciesId === 'entei' || p.speciesId === '244') ||
-    ctx.playerBox?.some((p) => p.speciesId === 'entei' || p.speciesId === '244');
-
-  const hasMasteredBeasts = (hasSuicune && hasRaikou && hasEntei) || ctx.storyFlags.has('beasts_mastered');
-
-  if (!hasRainbowWing && hasMasteredBeasts) {
-    ctx.storyFlags.add('has_rainbow_wing');
-    ctx.storyFlags.add('EVENT_GOT_RAINBOW_WING');
-    if (Array.isArray(ctx.inventory?.keyItems)) {
-      if (!ctx.inventory.keyItems.includes('RAINBOW WING') && !ctx.inventory.keyItems.includes('rainbow_wing')) {
-        ctx.inventory.keyItems.push('RAINBOW WING');
-      }
-    }
-    if ((ctx.inventory as any)?.items && typeof (ctx.inventory as any).items === 'object') {
-      (ctx.inventory as any).items.rainbow_wing = 1;
-    }
-    ctx.audioManager?.playSfx?.('sfx_badge_get');
-    BattleAudio.playOverworldSound('KEY_ITEM');
-    ctx.openDialogue(
-      [
-        'TOWER SAGE: Remarkable! The spirits of the three legendary beasts—RAIKOU of the lightning, ENTEI of the flames, and SUICUNE of the pure rain—reverberate through your very soul!',
-        'You are truly the chosen bearer of the sacred skies. Take this sacred relic!',
-        `${ctx.playerName || 'Player'} received the RAINBOW WING!`,
-        'With the CLEAR BELL and RAINBOW WING in hand, the stairway to the summit of TIN TOWER is open to you!',
-      ],
-      targetNpc?.speaker || '🏮 TOWER SAGE',
-      () => {
-        ctx.showToast?.('🌈 Received the Rainbow Wing from the Tower Sage!');
-        ctx.saveCurrentGame?.();
-        if (_map) ctx.renderMap?.(_map);
-      }
-    );
-    return true;
+  const hasSuicune = hasMasteredSuicune(ctx);
+  if (!hasRainbowWing && hasMasteredAllBeasts(ctx)) {
+    return bestowRainbowWing(ctx, targetNpc?.speaker || '🏮 TOWER SAGE', _map);
   }
 
   // Case 3: Missing requirements
@@ -145,6 +152,14 @@ export const handleWiseTrioSage: NpcInteractionHandler = (targetNpc, _map, ctx) 
 
   // If already defeated: deliver ancient lore
   if (isDefeated) {
+    // After the trial and once all three legendary beasts are mastered, the Wise Trio award the Rainbow Wing
+    if (
+      (ctx.storyFlags.has('wise_trio_cleared') || ctx.storyFlags.has('EVENT_BEAT_WISE_TRIO')) &&
+      hasMasteredAllBeasts(ctx) &&
+      bestowRainbowWing(ctx, targetNpc.speaker || '🏮 WISE TRIO', _map)
+    ) {
+      return true;
+    }
     if (sageId === 'wise_trio_gaku') {
       ctx.openDialogue(
         [
