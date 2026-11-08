@@ -82,3 +82,22 @@ describe('Violet City Route 32 attendant checkpoint & Miracle Seed', () => {
     expect(isNpcActiveForStoryFlags(SIDE, f)).toBe(false);
   });
 });
+
+describe('Route 32 Pokémon Center Fisherman & Old Rod', () => {
+  it('gives the Old Rod exactly once as a key item and is placed on a walkable tile', () => {
+    const reg = getVioletAndAzaleaServiceInteractions().find((r) => r.npcIds?.includes('r32_old_rod_fisherman'))!;
+    const sf = new Set<string>();
+    const ctx: any = {
+      storyFlags: sf, inventory: { balls: {}, items: {}, keyItems: [] as string[], tms: [] }, playerName: 'GOLD',
+      openDialogue: vi.fn((_p: string[], _s: string, cb?: () => void) => cb?.()), showToast: vi.fn(), saveCurrentGame: vi.fn(),
+    };
+    reg.handler({ id: 'r32_old_rod_fisherman', speaker: 'F' } as any, {} as any, ctx);
+    reg.handler({ id: 'r32_old_rod_fisherman', speaker: 'F' } as any, {} as any, ctx);
+    expect(ctx.inventory.keyItems.filter((k: string) => k === 'old_rod')).toHaveLength(1);
+    expect(sf.has('has_old_rod')).toBe(true);
+
+    const npc = createNpcsByMap().route_32_poke_center.find((n: any) => n.id === 'r32_old_rod_fisherman')!;
+    const map = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../public/assets/data/maps/route_32_poke_center.json'), 'utf8'));
+    expect([0, 2]).toContain(map.collisionGrid[npc.y * map.width + npc.x]);
+  });
+});

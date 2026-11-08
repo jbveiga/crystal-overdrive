@@ -292,6 +292,9 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       makeNpc('r32_cooltrainer', 1, 6, 'RIGHT', 'boy', '🧢 COOLTRAINER', 
         ['UNION CAVE ahead is labyrinthine! Make sure your team is rested and you have POTIONS ready!']
       ),
+      makeNpc('r32_old_rod_fisherman', 8, 3, 'LEFT', 'fisherman', '🎣 FISHERMAN',
+        ['FISHERMAN: Wahahah! The fish are biting today! Talk to me and I might share my secret.']
+      ),
       makeNpc('r32_gentleman', 6, 4, 'LEFT', 'fat_man', '🎩 GENTLEMAN', 
         ['A fisherman gave me an OLD ROD here. It works on MAGIKARP, but you can find rarer fish deeper in caves!']
       ),

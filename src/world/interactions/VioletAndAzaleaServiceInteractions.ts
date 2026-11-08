@@ -15,6 +15,34 @@ import { PokemonFactory } from '../../battle/PokemonFactory';
 
 export function getVioletAndAzaleaServiceInteractions(): NpcInteractionRegistration[] {
   return [
+    // 0a. Route 32 Pokémon Center: Fisherman gifts the Old Rod
+    {
+      npcIds: ['r32_old_rod_fisherman'],
+      handler: (targetNpc, _map, ctx) => {
+        if (ctx.storyFlags.has('has_old_rod')) {
+          ctx.openDialogue(['FISHERMAN: Fishing is all about patience. Keep casting that OLD ROD!'], targetNpc.speaker);
+          return true;
+        }
+        ctx.storyFlags.add('has_old_rod');
+        ctx.storyFlags.add('EVENT_GOT_OLD_ROD');
+        if (!ctx.inventory.keyItems) ctx.inventory.keyItems = [];
+        if (!ctx.inventory.keyItems.includes('old_rod')) ctx.inventory.keyItems.push('old_rod');
+        BattleAudio.playOverworldSound('KEY_ITEM');
+        ctx.openDialogue(
+          [
+            'FISHERMAN: Ah, a young trainer! The water is full of POKéMON waiting to be caught.',
+            'Take this OLD ROD! Cast it at any pond, lake or shore.',
+            `${ctx.playerName} received OLD ROD!`,
+          ],
+          targetNpc.speaker,
+          () => {
+            ctx.saveCurrentGame();
+            ctx.showToast('🎣 Received OLD ROD from the Fisherman!');
+          }
+        );
+        return true;
+      },
+    },
     // 0. Violet City south exit: Route 32 attendant checkpoint & Miracle Seed
     {
       npcIds: ['violet_r32_attendant_w', 'violet_r32_attendant_e', 'violet_r32_attendant_side'],
