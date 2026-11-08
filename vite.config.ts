@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  test: { setupFiles: ['./tests/setup/browserGlobals.ts'] },
   base: './',
   server: {
     host: '0.0.0.0',
@@ -31,7 +32,8 @@ export default defineConfig({
             }
             return 'vendor';
           }
-          if (id.includes('src/ui/')) {
+          // interactions and ui import each other, so they share one chunk (avoids a circular chunk)
+          if (id.includes('src/ui/') || id.includes('src/world/interactions/')) {
             return 'ui';
           }
           if (
