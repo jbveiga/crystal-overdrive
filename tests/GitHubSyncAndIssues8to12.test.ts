@@ -210,7 +210,7 @@ describe('GitHub Issues #8, #9, #10, #11, #12 & Headless Sync Suite', () => {
     // Radio Tower 5F
     expect(npcs.radio_tower_5f).toBeDefined();
     expect(npcs.radio_tower_5f.find((n) => n.id === 'petrel_radio_5f')).toBeDefined();
-    expect(npcs.radio_tower_5f.find((n) => n.id === 'archer_radio_5f')).toBeDefined();
+    expect(npcs.radio_tower_3f.find((n) => n.id === 'archer_radio_3f')).toBeDefined();
     expect(npcs.radio_tower_5f.find((n) => n.id === 'radio_director')).toBeDefined();
 
     // Goldenrod Underground

@@ -238,10 +238,10 @@ export function getMidToLateJohtoQuestInteractions(): NpcInteractionRegistration
       },
     },
 
-    // 11. Radio Tower 5F: Executive Archer Boss
+    // 11. Radio Tower 3F: Executive Archer Boss
     {
       actions: ['ARCHER_EVENT'],
-      npcIds: ['archer_radio_5f'],
+      npcIds: ['archer_radio_3f'],
       handler: (targetNpc, _map, ctx) => {
         if (ctx.storyFlags.has('radio_tower_liberated')) {
           ctx.openDialogue(

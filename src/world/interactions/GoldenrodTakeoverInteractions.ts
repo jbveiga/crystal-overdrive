@@ -166,7 +166,7 @@ export const handleCardKeyShutter: NpcInteractionHandler = (targetNpc, map, ctx)
   }
   BattleAudio.playOverworldSound('KEY_ITEM');
   ctx.openDialogue(
-    [`${ctx.playerName} inserted the CARD KEY!`, 'The 3F security shutter retracted into the ceiling!'],
+    [`${ctx.playerName} inserted the CARD KEY!`, 'The 3F security shutter retracted into the ceiling!', 'Two TEAM ROCKET EXECUTIVES, ARIANA and ARCHER, step out of the shadows!'],
     targetNpc.speaker || '💳 CARD KEY SHUTTER',
     () => {
       ctx.saveCurrentGame();
@@ -221,7 +221,7 @@ export const handleExecutiveProton: NpcInteractionHandler = (targetNpc, _map, ct
 };
 
 /**
- * 6. Executive Ariana (5F)
+ * 6. Executive Ariana (3F, behind the Card Key shutter)
  */
 export const handleExecutiveAriana: NpcInteractionHandler = (targetNpc, _map, ctx) => {
   if (ctx.storyFlags.has('ariana_defeated')) {
@@ -253,12 +253,12 @@ export const handleExecutiveAriana: NpcInteractionHandler = (targetNpc, _map, ct
         ctx.openDialogue(
           [
             'ARIANA: How can a child be so powerful?!',
-            'ARCHER is just ahead in Studio 1... Prepare yourself!',
+            'ARCHER is right behind me... Prepare yourself!',
           ],
           targetNpc.speaker,
           () => {
             ctx.saveCurrentGame();
-            ctx.showToast('⚡ Defeated Executive Ariana on 5F!');
+            ctx.showToast('⚡ Defeated Executive Ariana on 3F!');
           }
         );
       },
@@ -268,13 +268,21 @@ export const handleExecutiveAriana: NpcInteractionHandler = (targetNpc, _map, ct
 };
 
 /**
- * 7. Executive Archer Boss (5F Studio 1)
+ * 7. Executive Archer Boss (3F, behind the Card Key shutter)
  */
 export const handleExecutiveArcherBoss: NpcInteractionHandler = (targetNpc, _map, ctx) => {
   if (ctx.storyFlags.has('radio_tower_liberated')) {
     ctx.openDialogue(
       ['The broadcast console is powered down and the transmitter is peaceful once more.'],
       '📻 TRANSMITTER'
+    );
+    return true;
+  }
+
+  if (!ctx.storyFlags.has('ariana_defeated')) {
+    ctx.openDialogue(
+      ['ARCHER: Hmph. You will have to get past ARIANA first, kid.'],
+      targetNpc.speaker
     );
     return true;
   }
@@ -420,12 +428,12 @@ export function createGoldenrodTakeoverInteractions(): NpcInteractionRegistratio
     },
     {
       actions: ['EXECUTIVE_ARIANA_EVENT'],
-      npcIds: ['executive_ariana_radio_5f'],
+      npcIds: ['executive_ariana_radio_3f'],
       handler: handleExecutiveAriana,
     },
     {
       actions: ['EXECUTIVE_ARCHER_EVENT', 'ARCHER_EVENT'],
-      npcIds: ['archer_radio_5f'],
+      npcIds: ['archer_radio_3f'],
       handler: handleExecutiveArcherBoss,
     },
     {

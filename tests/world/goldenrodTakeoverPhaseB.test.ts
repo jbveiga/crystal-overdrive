@@ -260,7 +260,7 @@ describe('TICKET-STORY-TEAM-ROCKET-GOLDENROD-TAKEOVER-01: Phase B Verification S
       expect(mockContext.defeatedTrainers!.has('proton_radio')).toBe(true);
     });
 
-    it('asserts 5F Executive Ariana battle defeat sets ariana_defeated', () => {
+    it('asserts 3F Executive Ariana battle defeat sets ariana_defeated', () => {
       let battleTriggered = false;
       mockContext.triggerBattle = (_mon, opts: any) => {
         battleTriggered = true;
@@ -268,7 +268,7 @@ describe('TICKET-STORY-TEAM-ROCKET-GOLDENROD-TAKEOVER-01: Phase B Verification S
       };
 
       const arianaNpc = {
-        id: 'executive_ariana_radio_5f',
+        id: 'executive_ariana_radio_3f',
         speaker: '⚡ EXECUTIVE ARIANA',
         trainerName: 'Executive Ariana',
       } as any;
@@ -279,7 +279,7 @@ describe('TICKET-STORY-TEAM-ROCKET-GOLDENROD-TAKEOVER-01: Phase B Verification S
       expect(mockContext.defeatedTrainers!.has('ariana_radio')).toBe(true);
     });
 
-    it('asserts 5F Executive Archer Boss battle defeat disbands Team Rocket and awards Clear Bell & Rainbow Wing', () => {
+    it('asserts 3F Executive Archer Boss battle defeat disbands Team Rocket and awards Clear Bell & Rainbow Wing', () => {
       let battleTriggered = false;
       mockContext.triggerBattle = (_mon, opts: any) => {
         battleTriggered = true;
@@ -287,10 +287,15 @@ describe('TICKET-STORY-TEAM-ROCKET-GOLDENROD-TAKEOVER-01: Phase B Verification S
       };
 
       const archerNpc = {
-        id: 'archer_radio_5f',
+        id: 'archer_radio_3f',
         speaker: '⚡ EXECUTIVE ARCHER',
         trainerName: 'Executive Archer',
       } as any;
+
+      // Archer refuses to fight until Ariana has been beaten
+      handleExecutiveArcherBoss(archerNpc, {} as any, mockContext as NpcInteractionContext);
+      expect(battleTriggered).toBe(false);
+      mockContext.storyFlags!.add('ariana_defeated');
 
       handleExecutiveArcherBoss(archerNpc, {} as any, mockContext as NpcInteractionContext);
       expect(battleTriggered).toBe(true);

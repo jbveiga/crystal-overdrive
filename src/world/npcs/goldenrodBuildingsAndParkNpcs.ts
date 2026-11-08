@@ -138,6 +138,41 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
           'We broadcast the POKéMON MARCH to energize traveling trainers, and POKéMON LULLABY to soothe wild monsters!',
         ]
       ),
+      // Executives ambush behind the Card Key shutter (visible only after it opens)
+      makeNpc('executive_ariana_radio_3f', 9, 3, 'LEFT', 'rocket_grunt_f', '⚡ EXECUTIVE ARIANA',
+        ['ARIANA: I am ARIANA, one of TEAM ROCKET’s four EXECUTIVES!', 'You shall not pass this door!'],
+        {
+          action: 'EXECUTIVE_ARIANA_EVENT',
+          trainerId: 'ariana_radio',
+          trainerName: 'Executive Ariana',
+          challengePages: ['ARIANA: I will show you why I am an EXECUTIVE of TEAM ROCKET!'],
+          trainerPokemon: { speciesId: 'arbok', level: 32, moves: ['poisonsting', 'bite', 'glare', 'screech'] },
+          trainerTeam: [
+            { speciesId: 'arbok', level: 32, moves: ['poisonsting', 'bite', 'glare', 'screech'] },
+            { speciesId: 'vileplume', level: 32, moves: ['absorb', 'sweetscent', 'acid', 'stunspore'] },
+            { speciesId: 'murkrow', level: 32, moves: ['peck', 'pursuit', 'haze', 'nightshade'] },
+          ],
+        }
+      ),
+      makeNpc('archer_radio_3f', 10, 3, 'LEFT', 'rocket_grunt_m', '⚡ EXECUTIVE ARCHER', 
+        [
+          "ARCHER: It's no use! The broadcast has already reached maximum transmitter power!",
+        ],
+        {
+          action: 'EXECUTIVE_ARCHER_EVENT',
+          trainerId: 'archer_radio',
+          trainerName: 'Executive Archer',
+          challengePages: [
+            "ARCHER: Giovanni will answer our signal! TEAM ROCKET will never perish! I will crush you where you stand!",
+          ],
+          trainerPokemon: { speciesId: 'houndour', level: 33, moves: ['bite', 'ember', 'smog'] },
+          trainerTeam: [
+            { speciesId: 'houndour', level: 33, moves: ['bite', 'ember', 'smog'] },
+            { speciesId: 'koffing', level: 33, moves: ['sludge', 'smokescreen', 'poisongas'] },
+            { speciesId: 'houndoom', level: 35, moves: ['flamethrower', 'crunch', 'roar'] },
+          ],
+        }
+      ),
     ],
     radio_tower_4f: [
       makeNpc('dj_mary', 7, 4, 'DOWN', 'girl', '🎙️ DJ MARY', 
@@ -178,40 +213,6 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
             { speciesId: 'koffing', level: 30, moves: ['sludge', 'smokescreen', 'tackle'] },
             { speciesId: 'koffing', level: 30, moves: ['sludge', 'smokescreen', 'tackle'] },
             { speciesId: 'weezing', level: 32, moves: ['sludge', 'explosion', 'tackle'] },
-          ],
-        }
-      ),
-      makeNpc('executive_ariana_radio_5f', 17, 2, 'LEFT', 'rocket_grunt_f', '⚡ EXECUTIVE ARIANA',
-        ['ARIANA: I am ARIANA, one of TEAM ROCKET’s four EXECUTIVES!', 'You shall not pass this door!'],
-        {
-          action: 'EXECUTIVE_ARIANA_EVENT',
-          trainerId: 'ariana_radio',
-          trainerName: 'Executive Ariana',
-          challengePages: ['ARIANA: I will show you why I am an EXECUTIVE of TEAM ROCKET!'],
-          trainerPokemon: { speciesId: 'arbok', level: 32, moves: ['poisonsting', 'bite', 'glare', 'screech'] },
-          trainerTeam: [
-            { speciesId: 'arbok', level: 32, moves: ['poisonsting', 'bite', 'glare', 'screech'] },
-            { speciesId: 'vileplume', level: 32, moves: ['absorb', 'sweetscent', 'acid', 'stunspore'] },
-            { speciesId: 'murkrow', level: 32, moves: ['peck', 'pursuit', 'haze', 'nightshade'] },
-          ],
-        }
-      ),
-      makeNpc('archer_radio_5f', 5, 4, 'DOWN', 'rocket_grunt_m', '⚡ EXECUTIVE ARCHER', 
-        [
-          "ARCHER: It's no use! The broadcast has already reached maximum transmitter power!",
-        ],
-        {
-          action: 'EXECUTIVE_ARCHER_EVENT',
-          trainerId: 'archer_radio',
-          trainerName: 'Executive Archer',
-          challengePages: [
-            "ARCHER: Giovanni will answer our signal! TEAM ROCKET will never perish! I will crush you where you stand!",
-          ],
-          trainerPokemon: { speciesId: 'houndour', level: 33, moves: ['bite', 'ember', 'smog'] },
-          trainerTeam: [
-            { speciesId: 'houndour', level: 33, moves: ['bite', 'ember', 'smog'] },
-            { speciesId: 'koffing', level: 33, moves: ['sludge', 'smokescreen', 'poisongas'] },
-            { speciesId: 'houndoom', level: 35, moves: ['flamethrower', 'crunch', 'roar'] },
           ],
         }
       ),

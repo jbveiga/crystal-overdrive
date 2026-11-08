@@ -468,7 +468,7 @@ export const EARLY_JOHTO_MISSIONS: ReadonlyArray<Mission> = [
       },
       {
         id: 'm09_step_5',
-        description: 'Defeat Executive Archer on 5F and disband Team Rocket forever.',
+        description: 'Defeat Executives Ariana and Archer behind the 3F shutter and disband Team Rocket forever.',
         completed: false,
         targetMapId: 'radio_tower_5f',
         storyFlag: 'radio_tower_liberated',

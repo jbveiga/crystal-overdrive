@@ -284,7 +284,7 @@ export class OverworldItemfinderAndNpcStepper {
               currentMap.collisionGrid[7 * currentMap.width + 0] = 0;
               BattleAudio.playOverworldSound('KEY_ITEM');
               overworldHUD.openDialogue(
-                ['Inserted the CARD KEY!', 'The 3F security shutter opened!'],
+                ['Inserted the CARD KEY!', 'The 3F security shutter opened!', 'Two TEAM ROCKET EXECUTIVES, ARIANA and ARCHER, step out of the shadows!'],
                 '💳 CARD KEY SHUTTER',
                 () => void saveCurrentGame()
               );
