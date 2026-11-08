@@ -15,6 +15,44 @@ import { PokemonFactory } from '../../battle/PokemonFactory';
 
 export function getVioletAndAzaleaServiceInteractions(): NpcInteractionRegistration[] {
   return [
+    // 0. Violet City south exit: Route 32 attendant checkpoint & Miracle Seed
+    {
+      npcIds: ['violet_r32_attendant_w', 'violet_r32_attendant_e', 'violet_r32_attendant_side'],
+      handler: (targetNpc, _map, ctx) => {
+        const hasBadge = ctx.storyFlags.has('falkner_defeated') || ctx.inventory.badges?.includes('zephyr');
+        const hasEgg = ctx.storyFlags.has('togepi_egg_received');
+        if (!hasBadge || !hasEgg) {
+          const missing = !hasBadge && !hasEgg ? 'the ZEPHYR BADGE and the MYSTERY EGG' : !hasBadge ? 'the ZEPHYR BADGE' : 'the MYSTERY EGG from PROF. ELM\'S AIDE';
+          ctx.openDialogue(
+            [
+              'ATTENDANT: The road south to ROUTE 32 is dangerous.',
+              `I can only let trainers through once they have ${missing}.`,
+            ],
+            targetNpc.speaker
+          );
+          return true;
+        }
+        if (ctx.storyFlags.has('received_miracle_seed')) return false;
+        ctx.storyFlags.add('received_miracle_seed');
+        ctx.storyFlags.add('route32_attendant_cleared');
+        if (!ctx.inventory.items) ctx.inventory.items = {};
+        ctx.inventory.items['miracle_seed'] = (ctx.inventory.items['miracle_seed'] || 0) + 1;
+        BattleAudio.playOverworldSound('FANFARE');
+        ctx.openDialogue(
+          [
+            'ATTENDANT: You have the ZEPHYR BADGE and a POKéMON EGG! You are ready for ROUTE 32.',
+            'Please take this MIRACLE SEED. It boosts Grass-type moves when held by a POKéMON.',
+            `${ctx.playerName} received MIRACLE SEED!`,
+          ],
+          targetNpc.speaker,
+          () => {
+            ctx.saveCurrentGame();
+            ctx.showToast('🌱 Received MIRACLE SEED! The road to ROUTE 32 is open.');
+          }
+        );
+        return true;
+      },
+    },
     // 9. Union Cave B2F: Friday Lapras
     {
       actions: ['LAPRAS_EVENT'],

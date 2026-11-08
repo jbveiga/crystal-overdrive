@@ -118,6 +118,17 @@ export function createVioletToUnionCaveNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     violet_city: [
+      // Route 32 checkpoint: two attendants block the 2-tile south corridor until Zephyr Badge + Mystery Egg
+      makeNpc('violet_r32_attendant_w', 14, 33, 'UP', 'officer', '🧑‍✈️ ATTENDANT',
+        ['ATTENDANT: The road south to ROUTE 32 is closed to trainers who are not ready.']
+      ),
+      makeNpc('violet_r32_attendant_e', 15, 33, 'UP', 'officer', '🧑‍✈️ ATTENDANT',
+        ['ATTENDANT: The road south to ROUTE 32 is closed to trainers who are not ready.']
+      ),
+      // Beside the road (never blocks): shown to players who are already past the checkpoint but never got the Miracle Seed
+      makeNpc('violet_r32_attendant_side', 12, 31, 'RIGHT', 'officer', '🧑‍✈️ ATTENDANT',
+        ['ATTENDANT: Welcome back! Come see me when you have the ZEPHYR BADGE and the MYSTERY EGG.']
+      ),
       makeNpc('earl', 28, 18, 'DOWN', 'earl', '🎓 EARL DERVISH', 
         [
           'Twirl! Twirl! Did you beat FALKNER at the GYM? Magnificent!',

@@ -47,6 +47,7 @@ export class OverworldWarpAndMapTransitionController {
 
   public static applyMapStoryMutations(ctx: OverworldTransitionContext, map: MapData | null): void {
     if (!map) return;
+    if (map.id === 'route_32') ctx.storyFlags.add('route_32_entered');
     if (map.id === 'ilex_forest' && ctx.storyFlags.has('ilex_tree_cut')) {
       map.collisionGrid[25 * map.width + 8] = 0;
       if (map.tileMap) map.tileMap[25 * map.width + 8] = 'in_forest_05_05_05_05';

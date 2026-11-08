@@ -469,6 +469,19 @@ export function isNpcActiveForStoryFlags(
     );
   if (npcId === 'forest_farfetchd') return !isFarfetchdReturned;
 
+  // Violet City Route 32 checkpoint (attendants block the south corridor until Zephyr Badge + Mystery Egg)
+  if (npcId === 'violet_r32_attendant_w' || npcId === 'violet_r32_attendant_e' || npcId === 'violet_r32_attendant_side') {
+    const cleared = storyFlags.has('route32_attendant_cleared');
+    // Save safety: players who are already past the checkpoint are never blocked
+    const alreadyPast =
+      storyFlags.has('route_32_entered') ||
+      storyFlags.has('bugsy_defeated') ||
+      storyFlags.has('slowpoke_well_cleared') ||
+      storyFlags.has('EVENT_CLEARED_SLOWPOKE_WELL');
+    if (npcId === 'violet_r32_attendant_side') return (cleared || alreadyPast) && !storyFlags.has('received_miracle_seed');
+    return !cleared && !alreadyPast;
+  }
+
   // Route 36 Sudowoodo
   if (npcId === 'sudowoodo') return !storyFlags.has('sudowoodo_cleared') && !storyFlags.has('EVENT_FOUGHT_SUDOWOODO');
 
