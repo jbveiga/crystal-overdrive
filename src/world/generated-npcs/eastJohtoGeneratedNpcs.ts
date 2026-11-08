@@ -189,17 +189,16 @@ export const EAST_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]> = {
     t("route_46_lass_2",2,13,"DOWN","girl","⚔️ ERIN",["Erin: That was a great battle!"],"route_46_erin","Picnicker Erin",2,["ERIN: Let's battle!"],[m("ponyta",16),m("ponyta",16)]),
   ],
   "team_rocket_base_b1f": [
-    n("team_rocket_base_b1f_rocket_0",2,2,"DOWN","rocket_grunt_m","ROCKET",[D1]),
-    t("team_rocket_base_b1f_scientist_2",18,12,"LEFT","boy","⚔️ JED",["Jed: That was a great battle!"],"team_rocket_base_b1f_jed","Scientist Jed",3,["JED: Let's battle!"],[m("magnemite",20),m("magnemite",20),m("magnemite",20)]),
+    n("team_rocket_base_b1f_rocket_0",2,2,"DOWN","rocket_grunt_m","⚡ ROCKET GRUNT",["ROCKET GRUNT: Heh! Our surveillance statues will spot any intruder!"]),
+    t("team_rocket_base_b1f_scientist_2",18,12,"LEFT","super_nerd","🔬 SCIENTIST JED",["JED: All right. I'll divulge a secret about our hideout. That thing at the end of the desk is the security camera switch!"],"team_rocket_base_b1f_jed","Scientist Jed",3,["JED: This was once a ninja hideout. There are traps to confound intruders like you!"],[m("magnemite",20),m("magnemite",20),m("magnemite",20)]),
   ],
   "team_rocket_base_b2f": [
-    n("team_rocket_base_b2f_rocket_0",20,16,"UP","boy","ROCKET",[D6]),
+    n("team_rocket_base_b2f_rocket_0",20,16,"UP","rocket_grunt_m","⚡ ROCKET GRUNT",["ROCKET GRUNT: The door won't open? Only the boss on B3F knows the voice password for the transmitter room!"]),
   ],
   "team_rocket_base_b3f": [
-    n("team_rocket_base_b3f_rocket_0",8,3,"UP","boy","ROCKET",[D5]),
-    t("team_rocket_base_b3f_scientist_3",23,11,"UP","boy","⚔️ ROSS",["Ross: That was a great battle!"],"team_rocket_base_b3f_ross","Scientist Ross",2,["ROSS: Let's battle!"],[m("koffing",22),m("koffing",22)]),
-    t("team_rocket_base_b3f_scientist_4",11,15,"RIGHT","boy","⚔️ MITCH",["Mitch: That was a great battle!"],"team_rocket_base_b3f_mitch","Scientist Mitch",3,["MITCH: Let's battle!"],[m("ditto",24)]),
-    n("team_rocket_base_b3f_rocket_5",24,14,"DOWN","boy","ROCKET",[D1]),
+    t("team_rocket_base_b3f_scientist_3",23,11,"UP","super_nerd","🔬 SCIENTIST ROSS",["ROSS: A radio signal that drives Pokémon mad... My experiment is a complete success."],"team_rocket_base_b3f_ross","Scientist Ross",2,["ROSS: I used to work for SILPH, but now I run research for TEAM ROCKET!"],[m("koffing",22),m("koffing",22)]),
+    t("team_rocket_base_b3f_scientist_4",11,15,"RIGHT","super_nerd","🔬 SCIENTIST MITCH",["MITCH: Thinking is my strong suit, not battling."],"team_rocket_base_b3f_mitch","Scientist Mitch",3,["MITCH: I don't care that Pokémon are hurt by our experiment!"],[m("ditto",24)]),
+    n("team_rocket_base_b3f_rocket_5",24,14,"DOWN","rocket_grunt_m","⚡ ROCKET GRUNT",["ROCKET GRUNT: Urrggh... It takes two passwords to get into the boss's quarters. Only a couple of Rockets on this floor know them!"]),
   ],
   "route_27": [
     t("route_27_cooltrainer_m_0",48,7,"UP","boy","⚔️ BLAKE",["Blake: That was a great battle!"],"route_27_blake","Cooltrainerm Blake",3,["BLAKE: Let's battle!"],[m("magneton",33,["thunderbolt","supersonic","swift","screech"]),m("quagsire",31,["watergun","slam","amnesia","earthquake"]),m("exeggcute",31,["leechseed","confusion","sleeppowder","solarbeam"])]),

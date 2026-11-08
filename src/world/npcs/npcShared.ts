@@ -28,6 +28,7 @@ const STATIONARY_SPRITE_TYPES = new Set<GridEntity['spriteType']>([
   'boulder',
   'fruit_tree',
   'farfetchd',
+  'murkrow',
   'slowpoke',
   'miltank',
   'butterfree',

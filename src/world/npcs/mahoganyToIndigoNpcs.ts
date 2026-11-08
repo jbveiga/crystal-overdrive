@@ -214,7 +214,7 @@ export function createMahoganyToIndigoNpcs(): Record<string, GridEntity[]> {
       makeNpc('team_rocket_base_b3f_petrel', 10, 3, 'DOWN', 'super_nerd', '⚡ EXECUTIVE PETREL', [
         "PETREL: What? Who let a child into the Executive Suite?",
       ], { action: 'ROCKET_BASE_PETREL_EVENT' }),
-      makeNpc('team_rocket_base_b3f_murkrow', 10, 2, 'DOWN', 'farfetchd', '🐦 MURKROW', [
+      makeNpc('team_rocket_base_b3f_murkrow', 10, 2, 'DOWN', 'murkrow', '🐦 MURKROW', [
         "MURKROW: Squawk! Hail GIOVANNI!",
       ], { action: 'ROCKET_BASE_MURKROW_EVENT' }),
       makeNpc('team_rocket_base_b3f_scientist_3', 23, 11, 'UP', 'super_nerd', '🔬 SCIENTIST ROSS', [

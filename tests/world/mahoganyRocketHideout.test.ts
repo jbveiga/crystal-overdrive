@@ -660,16 +660,27 @@ describe('TICKET-STORY-MAHOGANY-ROCKET-HIDEOUT-01: Verification Suite', () => {
     expect(NPC_SHEET_PATHS.lance).toBe('./assets/sprites/characters/lance.png');
     expect(NPC_SHEET_PATHS.electrode).toBe('./assets/sprites/characters/electrode.png');
     expect(NPC_SHEET_PATHS.voltorb).toBe('./assets/sprites/characters/voltorb.png');
+    expect(NPC_SHEET_PATHS.murkrow).toBe('./assets/sprites/characters/murkrow.png');
     expect(fs.existsSync(path.resolve(__dirname, '../../public/assets/sprites/characters/lance.png'))).toBe(true);
     expect(fs.existsSync(path.resolve(__dirname, '../../public/assets/sprites/characters/electrode.png'))).toBe(true);
     expect(fs.existsSync(path.resolve(__dirname, '../../public/assets/sprites/characters/voltorb.png'))).toBe(true);
+    expect(fs.existsSync(path.resolve(__dirname, '../../public/assets/sprites/characters/murkrow.png'))).toBe(true);
 
     const npcsByMap = createMahoganyToIndigoNpcs();
     expect(npcsByMap.lake_of_rage.find((n) => n.id === 'lake_of_rage_lance')?.spriteType).toBe('lance');
     expect(npcsByMap.mahogany_mart.find((n) => n.id === 'mahogany_mart_lance')?.spriteType).toBe('lance');
     expect(npcsByMap.team_rocket_base_b2f.find((n) => n.id === 'team_rocket_base_b2f_lance')?.spriteType).toBe('lance');
+    expect(npcsByMap.team_rocket_base_b3f.find((n) => n.id === 'team_rocket_base_b3f_murkrow')?.spriteType).toBe('murkrow');
     expect(npcsByMap.lances_room.find((n) => n.id === 'champion_lance')?.spriteType).toBe('lance');
     expect(npcsByMap.hall_of_fame.find((n) => n.id === 'hall_of_fame_lance')?.spriteType).toBe('lance');
+
+    const { EAST_JOHTO_GENERATED_NPCS } = await import('../../src/world/generated-npcs/eastJohtoGeneratedNpcs');
+    for (const mapId of ['team_rocket_base_b1f', 'team_rocket_base_b2f', 'team_rocket_base_b3f']) {
+      for (const npc of [...(npcsByMap[mapId] ?? []), ...(EAST_JOHTO_GENERATED_NPCS[mapId] ?? [])]) {
+        expect(npc.spriteType).not.toBe('boy');
+        expect(npc.spriteType).not.toBe('farfetchd');
+      }
+    }
 
     // Verify premature B3F electrode save recovery restores all Rocket Hideout NPCs
     const { applyStoryRecoveryFlags } = await import('../../src/world/npcData');

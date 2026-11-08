@@ -97,6 +97,7 @@ export const NPC_SHEET_PATHS: Record<NpcSpriteType, string> = {
   swimmer_m: './assets/sprites/characters/swimmer_m.png',
   swimmer_f: './assets/sprites/characters/swimmer_f.png',
   lance: './assets/sprites/characters/lance.png',
+  murkrow: './assets/sprites/characters/murkrow.png',
 };
 
 export class OverworldNpcAndItemSprites {

@@ -80,7 +80,8 @@ export type NpcSpriteType =
   | 'lugia'
   | 'swimmer_m'
   | 'swimmer_f'
-  | 'lance';
+  | 'lance'
+  | 'murkrow';
 
 export interface TrainerPokemonSpec {
   speciesId: string;

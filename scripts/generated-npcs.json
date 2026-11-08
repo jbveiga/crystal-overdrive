@@ -2099,17 +2099,6 @@
   ],
   "team_rocket_base_b3f": [
     {
-      "x": 8,
-      "y": 3,
-      "dir": "UP",
-      "sprite": "rocket_grunt_m",
-      "id": "team_rocket_base_b3f_rocket_0",
-      "speaker": "⚡ ROCKET GRUNT",
-      "pages": [
-        "ROCKET GRUNT: This is the office of our leader, GIOVANNI!"
-      ]
-    },
-    {
       "id": "team_rocket_base_b3f_scientist_3",
       "x": 23,
       "y": 11,
