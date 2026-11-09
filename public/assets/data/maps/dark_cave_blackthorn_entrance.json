@@ -1105,7 +1105,7 @@
     {
       "x": 10,
       "y": 4,
-      "speaker": "⛰️ DARK CAVE",
+      "speaker": "\u26f0\ufe0f DARK CAVE",
       "pages": [
         "DARK CAVE (BLACKTHORN ENTRANCE)",
         "Deep cavern tunnels leading toward the mountain peak."
@@ -1114,32 +1114,151 @@
   ],
   "grassEncounters": [
     {
+      "speciesId": "geodude",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "MORNING"
+    },
+    {
       "speciesId": "zubat",
-      "minLevel": 25,
-      "maxLevel": 28,
-      "weight": 40,
-      "timeOfDay": "ALL"
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "graveler",
-      "minLevel": 26,
-      "maxLevel": 28,
-      "weight": 30,
-      "timeOfDay": "ALL"
-    },
-    {
-      "speciesId": "golbat",
-      "minLevel": 27,
-      "maxLevel": 30,
+      "minLevel": 25,
+      "maxLevel": 25,
       "weight": 20,
-      "timeOfDay": "ALL"
+      "timeOfDay": "MORNING"
     },
     {
       "speciesId": "ursaring",
-      "minLevel": 28,
-      "maxLevel": 30,
+      "minLevel": 25,
+      "maxLevel": 25,
       "weight": 10,
-      "timeOfDay": "ALL"
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "teddiursa",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 5,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
+      "timeOfDay": "MORNING"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 20,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "ursaring",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 10,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "ursaring",
+      "minLevel": 30,
+      "maxLevel": 30,
+      "weight": 5,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
+      "timeOfDay": "DAY"
+    },
+    {
+      "speciesId": "geodude",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "zubat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 30,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "graveler",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 20,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "wobbuffet",
+      "minLevel": 20,
+      "maxLevel": 20,
+      "weight": 10,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "wobbuffet",
+      "minLevel": 25,
+      "maxLevel": 25,
+      "weight": 5,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 4,
+      "timeOfDay": "NIGHT"
+    },
+    {
+      "speciesId": "golbat",
+      "minLevel": 23,
+      "maxLevel": 23,
+      "weight": 1,
+      "timeOfDay": "NIGHT"
     }
   ]
 }
