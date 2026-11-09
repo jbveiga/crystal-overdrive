@@ -13,6 +13,7 @@ import { GridPhysics } from './GridPhysics';
 import { BattleAudio } from '../audio/BattleAudio';
 import type { AudioManager } from '../audio/AudioManager';
 import { PokemonFactory } from '../battle/PokemonFactory';
+import { buildRivalTeam, resolvePlayerStarter } from '../battle/RivalTeams';
 import type { OverworldHUD } from '../ui/OverworldHUD';
 import type { OverworldRenderer } from '../render/OverworldRenderer';
 import type { MapManager } from './MapManager';
@@ -369,32 +370,7 @@ export class StoryCutscenes {
     const rName = (ctx.rivalName || 'SILVER').toUpperCase();
     const rSpeaker = `❓ RIVAL ${rName}`;
 
-    let starterSpeciesId: 'croconaw' | 'bayleef' | 'quilava' = 'croconaw';
-    let starterMoves = ['watergun', 'bite', 'rage', 'scaryface'];
-
-    if (
-      ctx.storyFlags.has('starter_cyndaquil') ||
-      ctx.playerParty.some((p) => p.speciesId === 'cyndaquil' || p.speciesId === 'quilava' || p.speciesId === 'typhlosion')
-    ) {
-      starterSpeciesId = 'croconaw';
-      starterMoves = ['watergun', 'bite', 'rage', 'scaryface'];
-    } else if (
-      ctx.storyFlags.has('starter_totodile') ||
-      ctx.playerParty.some((p) => p.speciesId === 'totodile' || p.speciesId === 'croconaw' || p.speciesId === 'feraligatr')
-    ) {
-      starterSpeciesId = 'bayleef';
-      starterMoves = ['razorleaf', 'poisonpowder', 'reflect', 'tackle'];
-    } else {
-      starterSpeciesId = 'quilava';
-      starterMoves = ['flamewheel', 'ember', 'quickattack', 'smokescreen'];
-    }
-
-    const rivalTeam = [
-      PokemonFactory.create('haunter', 20, ['nightshade', 'curse', 'spite', 'hypnosis']),
-      PokemonFactory.create('magnemite', 18, ['thundershock', 'supersonic', 'sonicboom', 'tackle']),
-      PokemonFactory.create('zubat', 20, ['bite', 'confuseray', 'wingattack', 'supersonic']),
-      PokemonFactory.create(starterSpeciesId, 22, starterMoves),
-    ];
+    const rivalTeam = buildRivalTeam('burned_tower', resolvePlayerStarter(ctx.storyFlags, ctx.playerParty));
 
     ctx.audioManager.playBattleBgm('trainer');
     ctx.overworldHUD.openDialogue(

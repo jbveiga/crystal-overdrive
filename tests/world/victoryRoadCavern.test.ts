@@ -129,12 +129,12 @@ describe('TICKET-WORLD-VICTORY-ROAD-CAVERN-02: Victory Road 3-Tier Cavern & Riva
     expect(chikoTeam[5].speciesId).toBe('typhlosion');
     expect(chikoTeam[5].level).toBe(38);
 
-    // Default team includes Sneasel, Golbat, Magneton, Kadabra, Haunter
+    // Default team includes Sneasel, Golbat, Magneton, Haunter, Kadabra (canon order)
     expect(cyndTeam[0].speciesId).toBe('sneasel');
     expect(cyndTeam[1].speciesId).toBe('golbat');
     expect(cyndTeam[2].speciesId).toBe('magneton');
-    expect(cyndTeam[3].speciesId).toBe('kadabra');
-    expect(cyndTeam[4].speciesId).toBe('haunter');
+    expect(cyndTeam[3].speciesId).toBe('haunter');
+    expect(cyndTeam[4].speciesId).toBe('kadabra');
   });
 
   it('7. handleVictoryRoadRival triggers challenge dialogue and battle, then moves Silver to (12, 7) facing RIGHT', () => {

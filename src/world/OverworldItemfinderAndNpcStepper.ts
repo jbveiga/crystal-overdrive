@@ -13,6 +13,7 @@ import { GridPhysics } from './GridPhysics';
 import { MapManager } from './MapManager';
 import { BattleAudio } from '../audio/BattleAudio';
 import { PokemonFactory } from '../battle/PokemonFactory';
+import { buildRivalTeam, resolvePlayerStarter } from '../battle/RivalTeams';
 import { ItemfinderRadar } from './ItemfinderRadar';
 import type { OverworldTickerContext } from '../types/gameContext';
 
@@ -251,19 +252,33 @@ export class OverworldItemfinderAndNpcStepper {
             (coord.y === 4 || coord.y === 5) &&
             !storyFlags.has('EVENT_RIVAL_GOLDENROD_UNDERGROUND')
           ) {
-            storyFlags.add('EVENT_RIVAL_GOLDENROD_UNDERGROUND');
-            defeatedTrainers.add('rival_underground_4');
             BattleAudio.playOverworldSound('KEY_ITEM');
+            const rName = String((ctx as any).rivalName || 'SILVER').toUpperCase();
+            const startUndergroundBattle = () => {
+              const team = buildRivalTeam('goldenrod_underground', resolvePlayerStarter(storyFlags, (ctx as any).playerParty ?? []));
+              void (ctx as any).triggerBattle?.(team[0], {
+                isTrainer: true,
+                trainerName: `Rival ${rName}`,
+                trainerTeam: team,
+                onVictory: () => {
+                  storyFlags.add('EVENT_RIVAL_GOLDENROD_UNDERGROUND');
+                  defeatedTrainers.add('rival_underground_4');
+                  overworldHUD.openDialogue(
+                    [`${rName}: …Humph! You got lucky again. But don't think you're better than me!`, "I'll wipe out TEAM ROCKET myself! Just stay out of my way!"],
+                    '🔴 RIVAL SILVER',
+                    () => void saveCurrentGame()
+                  );
+                },
+              });
+            };
             overworldHUD.openDialogue(
               [
-                'SILVER: Hold it right there!',
+                `${rName}: Hold it right there!`,
                 "You again?! You're trying to bust TEAM ROCKET all by yourself?",
                 "Don't make me laugh! You're nowhere near tough enough. I'll prove it to you right now!",
-                "...Humph! You got lucky again. But don't think you're better than me!",
-                "I'll wipe out TEAM ROCKET myself! Just stay out of my way!",
               ],
               '🔴 RIVAL SILVER',
-              () => void saveCurrentGame()
+              startUndergroundBattle
             );
             return true;
           }

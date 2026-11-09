@@ -21,6 +21,7 @@ import type { NpcInteractionContext } from '../../types/worldContext';
 import type { PokemonInstance } from '../../types/pokemon';
 import { ModernHMHandler } from '../ModernHMHandler';
 import { BattleAudio } from '../../audio/BattleAudio';
+import { getRivalTeamSpecs, resolvePlayerStarter } from '../../battle/RivalTeams';
 
 // ============================================================================
 // 1. Types & Dialogue Constants
@@ -64,37 +65,7 @@ export function getVictoryRoadRivalTeam(
   playerParty: PokemonInstance[] = [],
   storyFlags: ReadonlySet<string> = new Set()
 ): RivalPokemonSpec[] {
-  let starterSpeciesId = 'feraligatr';
-  let starterMoves = ['surf', 'bite', 'slash', 'scaryface'];
-
-  if (
-    storyFlags.has('starter_cyndaquil') ||
-    playerParty.some((p) => p.speciesId === 'cyndaquil' || p.speciesId === 'quilava' || p.speciesId === 'typhlosion')
-  ) {
-    starterSpeciesId = 'feraligatr';
-    starterMoves = ['surf', 'bite', 'slash', 'scaryface'];
-  } else if (
-    storyFlags.has('starter_totodile') ||
-    playerParty.some((p) => p.speciesId === 'totodile' || p.speciesId === 'croconaw' || p.speciesId === 'feraligatr')
-  ) {
-    starterSpeciesId = 'meganium';
-    starterMoves = ['solarbeam', 'razorleaf', 'bodyslam', 'reflect'];
-  } else if (
-    storyFlags.has('starter_chikorita') ||
-    playerParty.some((p) => p.speciesId === 'chikorita' || p.speciesId === 'bayleef' || p.speciesId === 'meganium')
-  ) {
-    starterSpeciesId = 'typhlosion';
-    starterMoves = ['flamethrower', 'quickattack', 'smokescreen', 'swift'];
-  }
-
-  return [
-    { speciesId: 'sneasel', level: 36, moves: ['slash', 'feint-attack', 'quickattack'] },
-    { speciesId: 'golbat', level: 36, moves: ['wing-attack', 'bite', 'confuseray'] },
-    { speciesId: 'magneton', level: 35, moves: ['thundershock', 'sonicboom', 'supersonic'] },
-    { speciesId: 'kadabra', level: 35, moves: ['psybeam', 'recover', 'disable'] },
-    { speciesId: 'haunter', level: 35, moves: ['shadowball', 'curse', 'night-shade'] },
-    { speciesId: starterSpeciesId, level: 38, moves: starterMoves },
-  ];
+  return getRivalTeamSpecs('victory_road', resolvePlayerStarter(storyFlags, playerParty));
 }
 
 // ============================================================================
