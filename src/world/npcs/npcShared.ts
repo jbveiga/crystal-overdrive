@@ -558,6 +558,25 @@ export function isNpcActiveForStoryFlags(
   // Radio Tower & Underground Takeover (Act 7)
   if (npcId === 'petrel_radio_5f') return storyFlags.has('pryce_defeated') && !storyFlags.has('fake_director_defeated');
   if (npcId === 'executive_proton_radio_4f') return storyFlags.has('card_key_obtained') && !storyFlags.has('radio_tower_proton_defeated') && !storyFlags.has('radio_tower_liberated');
+  // Disguise infiltration (7.1): photo-studio operative, 1F guard, Rival unmasking on 2F
+  if (npcId === 'rocket_disguise_operative') return storyFlags.has('pryce_defeated') && !storyFlags.has('radio_tower_liberated');
+  if (npcId === 'radio_tower_1f_guard') {
+    return (
+      storyFlags.has('pryce_defeated') &&
+      !storyFlags.has('rocket_guard_bluffed') &&
+      !storyFlags.has('fake_director_defeated') &&
+      !storyFlags.has('EVENT_USED_BASEMENT_KEY') &&
+      !storyFlags.has('radio_tower_liberated')
+    );
+  }
+  if (npcId === 'rival_radio_2f') {
+    return (
+      storyFlags.has('rocket_guard_bluffed') &&
+      !storyFlags.has('rival_radio_defeated') &&
+      !storyFlags.has('fake_director_defeated') &&
+      !storyFlags.has('radio_tower_liberated')
+    );
+  }
   // Executives Ariana & Archer ambush on 3F once the Card Key shutter has been opened
   if (npcId === 'executive_ariana_radio_3f') return storyFlags.has('EVENT_USED_CARD_KEY') && !storyFlags.has('ariana_defeated') && !storyFlags.has('radio_tower_liberated');
   if (npcId === 'archer_radio_3f') return storyFlags.has('EVENT_USED_CARD_KEY') && !storyFlags.has('radio_tower_liberated');

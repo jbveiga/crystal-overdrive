@@ -221,6 +221,109 @@ export const handleExecutiveProton: NpcInteractionHandler = (targetNpc, _map, ct
 };
 
 /**
+ * 0. Disguise infiltration (Topic 7.1): photo-studio operative, 1F guard, Rival unmasking
+ */
+export const handleDisguiseOperative: NpcInteractionHandler = (targetNpc, _map, ctx) => {
+  if (ctx.storyFlags.has('rocket_guard_bluffed')) {
+    ctx.openDialogue(['Good luck up there. Try not to run into that red-haired kid!'], targetNpc.speaker);
+    return true;
+  }
+  if (ctx.storyFlags.has('rocket_disguise_worn')) {
+    ctx.openDialogue(['The uniform suits you. Now bluff the GUARD in the RADIO TOWER lobby!'], targetNpc.speaker);
+    return true;
+  }
+  ctx.openDialogue(
+    [
+      'TEAM ROCKET has seized the RADIO TOWER! The lobby guard only lets their own people in.',
+      'Hold still... Say cheese!',
+      `${ctx.playerName} put on a TEAM ROCKET uniform!`,
+    ],
+    targetNpc.speaker,
+    () => {
+      ctx.storyFlags.add('rocket_disguise_worn');
+      BattleAudio.playOverworldSound('KEY_ITEM');
+      ctx.showToast('🕶️ Disguised as a TEAM ROCKET grunt!');
+      ctx.saveCurrentGame();
+    }
+  );
+  return true;
+};
+
+export const handleRadioTowerGuard: NpcInteractionHandler = (targetNpc, _map, ctx) => {
+  if (ctx.storyFlags.has('rocket_guard_bluffed')) {
+    ctx.openDialogue(['ROCKET GUARD: Move along, recruit.'], targetNpc.speaker);
+    return true;
+  }
+  if (!ctx.storyFlags.has('rocket_disguise_worn')) {
+    ctx.openDialogue(
+      [
+        'ROCKET GUARD: Halt! The RADIO TOWER belongs to TEAM ROCKET now. Scram!',
+        'Only TEAM ROCKET members get past me. (Maybe the UNDERGROUND has a way to look the part...)',
+      ],
+      targetNpc.speaker
+    );
+    return true;
+  }
+  ctx.openDialogue(
+    ['ROCKET GUARD: Hm? A new recruit? Nobody told me about you.', 'Well, the uniform checks out. Go on up!'],
+    targetNpc.speaker,
+    () => {
+      ctx.storyFlags.add('rocket_guard_bluffed');
+      ctx.showToast('🕶️ The disguise worked! Head up the stairs.');
+      ctx.saveCurrentGame();
+    }
+  );
+  return true;
+};
+
+export const handleRivalUnmask: NpcInteractionHandler = (targetNpc, _map, ctx) => {
+  const rName = (ctx.getRivalName?.() || 'SILVER').toUpperCase();
+  const speaker = `❓ RIVAL ${rName}`;
+  if (ctx.storyFlags.has('rival_radio_defeated')) {
+    ctx.openDialogue([`${rName}: …Tch. Go on, then.`], speaker);
+    return true;
+  }
+  ctx.openDialogue(
+    [
+      `${rName}: …Hmph. A TEAM ROCKET uniform? Pathetic.`,
+      `${rName} rips the disguise right off ${ctx.playerName}! Your cover is blown!`,
+      `${rName}: Did you really think a cheap costume could fool me? Get ready!`,
+    ],
+    speaker,
+    () => {
+      ctx.storyFlags.delete('rocket_disguise_worn');
+      ctx.storyFlags.add('rocket_disguise_exposed');
+      const team = ctx.buildTrainerTeamInstances
+        ? ctx.buildTrainerTeamInstances(targetNpc)
+        : [
+            PokemonFactory.create('haunter', 28, ['nightshade', 'curse', 'spite', 'hypnosis']),
+            PokemonFactory.create('magneton', 28, ['thundershock', 'supersonic', 'sonicboom', 'thunderwave']),
+            PokemonFactory.create('golbat', 28, ['bite', 'confuseray', 'wingattack', 'supersonic']),
+            PokemonFactory.create('sneasel', 30, ['scratch', 'faintattack', 'screech', 'furycutter']),
+          ];
+      ctx.triggerBattle(team[0], {
+        isTrainer: true,
+        trainerName: `Rival ${rName}`,
+        trainerTeam: team,
+        onVictory: () => {
+          ctx.defeatedTrainers.add('rival_radio_2f');
+          ctx.storyFlags.add('rival_radio_defeated');
+          ctx.openDialogue(
+            [`${rName}: …Tch. Don't think this makes us even. TEAM ROCKET's bosses are higher up. Go bother them instead.`],
+            speaker,
+            () => {
+              ctx.saveCurrentGame();
+              ctx.showToast(`⚔️ Defeated ${rName} on 2F!`);
+            }
+          );
+        },
+      });
+    }
+  );
+  return true;
+};
+
+/**
  * 6. Executive Ariana (3F, behind the Card Key shutter)
  */
 export const handleExecutiveAriana: NpcInteractionHandler = (targetNpc, _map, ctx) => {
@@ -426,6 +529,9 @@ export function createGoldenrodTakeoverInteractions(): NpcInteractionRegistratio
       npcIds: ['executive_proton_radio_4f'],
       handler: handleExecutiveProton,
     },
+    { actions: ['ROCKET_DISGUISE_OPERATIVE'], npcIds: ['rocket_disguise_operative'], handler: handleDisguiseOperative },
+    { actions: ['RADIO_TOWER_GUARD'], npcIds: ['radio_tower_1f_guard'], handler: handleRadioTowerGuard },
+    { actions: ['RIVAL_RADIO_UNMASK'], npcIds: ['rival_radio_2f'], handler: handleRivalUnmask },
     {
       actions: ['EXECUTIVE_ARIANA_EVENT'],
       npcIds: ['executive_ariana_radio_3f'],

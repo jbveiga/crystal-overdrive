@@ -382,6 +382,11 @@ export function createGoldenrodCityNpcs(): Record<string, GridEntity[]> {
       ),
     ],
     goldenrod_underground: [
+      // Photo studio: dresses the player in a Team Rocket uniform to bluff past the Radio Tower 1F guard
+      makeNpc('rocket_disguise_operative', 4, 3, 'DOWN', 'clerk', '📸 PHOTO STUDIO OPERATIVE',
+        ['Psst... I run the PHOTO STUDIO down here. Want a TEAM ROCKET uniform?'],
+        { action: 'ROCKET_DISGUISE_OPERATIVE' }
+      ),
       makeNpc('true_director', 24, 25, 'DOWN', 'gentleman', '📻 REAL DIRECTOR', 
         [
           "DIRECTOR: Ah! You found me! I was kidnapped and locked in this dark underground warehouse by TEAM ROCKET!",

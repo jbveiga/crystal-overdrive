@@ -128,9 +128,9 @@ describe('TICKET-WORLD-GOLDENROD-SIGNS-UNDERGROUND-AND-TILES-01: Goldenrod Signs
   describe('4. Goldenrod Underground NPC Alignment & Counter Interactivity', () => {
     const npcs = createGoldenrodCityNpcs().goldenrod_underground;
 
-    it('registers all 9 canonical NPCs in goldenrod_underground', () => {
+    it('registers all 10 NPCs in goldenrod_underground (9 canonical + photo-studio operative)', () => {
       expect(npcs).toBeDefined();
-      expect(npcs.length).toBe(9);
+      expect(npcs.length).toBe(10);
     });
 
     it('verifies Haircut Brothers and Merchants positions behind counters with talkAcrossCounter', () => {

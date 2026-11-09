@@ -117,6 +117,11 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       ),
     ],
     radio_tower_1f: [
+      // Rocket guard blocks the stairs until the player shows up in a Rocket uniform
+      makeNpc('radio_tower_1f_guard', 15, 1, 'DOWN', 'rocket_grunt_m', '🚧 ROCKET GUARD',
+        ['ROCKET GUARD: Halt! The RADIO TOWER belongs to TEAM ROCKET now. Scram!'],
+        { action: 'RADIO_TOWER_GUARD' }
+      ),
       makeNpc('radio_rec', 5, 6, 'UP', 'teacher', '📻 QUIZ RECEPTIONIST', 
         [
           'Welcome to GOLDENROD RADIO TOWER! Tune your POKéGEAR to our broadcast frequencies to hear daily music and tips!',
@@ -125,6 +130,23 @@ export function createGoldenrodBuildingsAndParkNpcs(): Record<string, GridEntity
       ),
     ],
     radio_tower_2f: [
+      // Rival unmasks the disguised player right after the 1F guard is bluffed
+      makeNpc('rival_radio_2f', 15, 2, 'DOWN', 'silver', '❓ RIVAL SILVER',
+        ['SILVER: …Hmph.'],
+        {
+          action: 'RIVAL_RADIO_UNMASK',
+          trainerId: 'rival_radio_2f',
+          trainerName: 'Rival Silver',
+          challengePages: ['SILVER: Did you really think a cheap uniform could fool me? Get ready!'],
+          trainerPokemon: { speciesId: 'sneasel', level: 30, moves: ['scratch', 'faintattack', 'screech', 'furycutter'] },
+          trainerTeam: [
+            { speciesId: 'haunter', level: 28, moves: ['nightshade', 'curse', 'spite', 'hypnosis'] },
+            { speciesId: 'magneton', level: 28, moves: ['thundershock', 'supersonic', 'sonicboom', 'thunderwave'] },
+            { speciesId: 'golbat', level: 28, moves: ['bite', 'confuseray', 'wingattack', 'supersonic'] },
+            { speciesId: 'sneasel', level: 30, moves: ['scratch', 'faintattack', 'screech', 'furycutter'] },
+          ],
+        }
+      ),
       makeNpc('buena', 6, 6, 'DOWN', 'girl', '🎙️ BUENA', 
         [
           "I'm BUENA! Tune into BUENA'S PASSWORD every night on the radio to earn points on your BLUE CARD!",
