@@ -32,6 +32,20 @@ export function hasValidSsTicket(ctx: {
   );
 }
 
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+/** S.S. AQUA timetable (appendix A.2): departs Olivine on Mon/Fri and Vermilion on Sun/Wed. */
+export const SS_AQUA_DEPARTURES: Record<'olivine' | 'vermilion', number[]> = { olivine: [1, 5], vermilion: [0, 3] };
+export function ssAquaDepartsToday(port: 'olivine' | 'vermilion', day: number): boolean {
+  return SS_AQUA_DEPARTURES[port].includes(day);
+}
+export function ssAquaScheduleMessage(port: 'olivine' | 'vermilion'): string[] {
+  const days = SS_AQUA_DEPARTURES[port].map((d) => DAY_NAMES[d]).join(' and ');
+  const name = port === 'olivine' ? 'OLIVINE' : 'VERMILION';
+  return [`SAILOR: FAST SHIP S.S. AQUA only sails from ${name} PORT on ${days}.`, 'Please come back on one of those days!'];
+}
+const todayIndex = (ctx: { gameClock?: { getDayOfWeek?: () => number } }): number =>
+  ctx.gameClock?.getDayOfWeek ? ctx.gameClock.getDayOfWeek() : new Date().getDay();
+
 /**
  * 1. Olivine Port Sailor Guard (S.S. Ticket Verification & Pier Passage)
  */
@@ -44,6 +58,11 @@ export const handlePortSailorGuard: NpcInteractionHandler = (targetNpc, _map, ct
       ],
       targetNpc.speaker || '⚓ SAILOR'
     );
+    return true;
+  }
+
+  if (!ssAquaDepartsToday('olivine', todayIndex(ctx as any))) {
+    ctx.openDialogue(ssAquaScheduleMessage('olivine'), targetNpc.speaker || '⚓ SAILOR');
     return true;
   }
 
@@ -286,6 +305,11 @@ export const handleVermilionPortSailor: NpcInteractionHandler = (targetNpc, _map
     return true;
   }
 
+  if (!ssAquaDepartsToday('vermilion', todayIndex(ctx as any))) {
+    ctx.openDialogue(ssAquaScheduleMessage('vermilion'), targetNpc.speaker || '⚓ SAILOR');
+    return true;
+  }
+
   ctx.storyFlags.add('ship_bound_olivine');
   ctx.storyFlags.delete('ship_bound_vermilion');
   ctx.storyFlags.delete('fast_ship_arrived_olivine');
@@ -324,7 +348,8 @@ export function evaluateFastShipWarp(
   currentMapId: string,
   warp: { x: number; y: number; targetMapId: string; targetX: number; targetY: number },
   storyFlags: Set<string>,
-  inventory: { keyItems?: string[]; items?: Record<string, number> }
+  inventory: { keyItems?: string[]; items?: Record<string, number> },
+  dayOfWeek: number = new Date().getDay()
 ): FastShipWarpEvaluation {
   // 1. Disembarking from Fast Ship 1F at (25, 1)
   if (currentMapId === 'fast_ship_1f' && warp.x === 25 && warp.y === 1) {
@@ -375,6 +400,9 @@ export function evaluateFastShipWarp(
         blockedSpeaker: '⚓ SAILOR',
       };
     }
+    if (!ssAquaDepartsToday('vermilion', dayOfWeek)) {
+      return { blocked: true, blockedMessages: ssAquaScheduleMessage('vermilion'), blockedSpeaker: '⚓ SAILOR' };
+    }
     storyFlags.add('ship_bound_olivine');
     storyFlags.delete('ship_bound_vermilion');
     storyFlags.delete('fast_ship_arrived_olivine');
@@ -384,6 +412,9 @@ export function evaluateFastShipWarp(
 
   // 3. Boarding from Olivine Port
   if (currentMapId === 'olivine_port' && warp.targetMapId === 'fast_ship_1f') {
+    if (!ssAquaDepartsToday('olivine', dayOfWeek)) {
+      return { blocked: true, blockedMessages: ssAquaScheduleMessage('olivine'), blockedSpeaker: '⚓ SAILOR' };
+    }
     storyFlags.add('ship_bound_vermilion');
     storyFlags.delete('ship_bound_olivine');
     storyFlags.delete('fast_ship_arrived_olivine');

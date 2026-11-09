@@ -107,6 +107,7 @@ describe('TICKET-BUGFIX-SS-AQUA-VOYAGE-FLOW-02: S.S. Aqua Voyage Flow, Return Tr
     const guardNpc: any = { id: 'port_sailor_guard', x: 7, y: 15, speaker: '⚓ SAILOR' };
 
     // Refused without ticket
+    (mockContext as any).gameClock = { getDayOfWeek: () => 1 }; // Monday: S.S. Aqua departs Olivine
     let handled = handlePortSailorGuard(guardNpc, {} as any, mockContext as NpcInteractionContext);
     expect(handled).toBe(true);
     expect(lastDialoguePages[0]).toContain("not allowed onto the pier without an S.S. TICKET");
@@ -200,6 +201,7 @@ describe('TICKET-BUGFIX-SS-AQUA-VOYAGE-FLOW-02: S.S. Aqua Voyage Flow, Return Tr
     const portSailor: any = { id: 'vermilion_port_sailor', x: 8, y: 11, speaker: '⚓ SAILOR' };
 
     // Refuses without ticket
+    (mockContext as any).gameClock = { getDayOfWeek: () => 3 }; // Wednesday: S.S. Aqua departs Vermilion
     let handled = handleVermilionPortSailor(portSailor, {} as any, mockContext as NpcInteractionContext);
     expect(handled).toBe(true);
     expect(lastDialoguePages[0]).toContain('need an S.S. TICKET to board');
@@ -220,7 +222,7 @@ describe('TICKET-BUGFIX-SS-AQUA-VOYAGE-FLOW-02: S.S. Aqua Voyage Flow, Return Tr
 
     // Step A: Board at Olivine Port
     const olivineBoardingWarp = { x: 7, y: 23, targetMapId: 'fast_ship_1f', targetX: 25, targetY: 1 };
-    let evalResult = evaluateFastShipWarp('olivine_port', olivineBoardingWarp, flags, inv);
+    let evalResult = evaluateFastShipWarp('olivine_port', olivineBoardingWarp, flags, inv, 1);
     expect(evalResult.blocked).toBe(false);
     expect(flags.has('ship_bound_vermilion')).toBe(true);
     expect(flags.has('ship_bound_olivine')).toBe(false);
@@ -245,7 +247,7 @@ describe('TICKET-BUGFIX-SS-AQUA-VOYAGE-FLOW-02: S.S. Aqua Voyage Flow, Return Tr
 
     // Step E: Return trip boarding at Vermilion Port
     const vermilionBoardingWarp = { x: 7, y: 17, targetMapId: 'fast_ship_1f', targetX: 25, targetY: 1 };
-    evalResult = evaluateFastShipWarp('vermilion_port', vermilionBoardingWarp, flags, inv);
+    evalResult = evaluateFastShipWarp('vermilion_port', vermilionBoardingWarp, flags, inv, 3);
     expect(evalResult.blocked).toBe(false);
     expect(flags.has('ship_bound_olivine')).toBe(true);
 
@@ -327,5 +329,22 @@ describe('TICKET-BUGFIX-SS-AQUA-VOYAGE-FLOW-02: S.S. Aqua Voyage Flow, Return Tr
         }
       }
     }
+  });
+});
+
+describe('S.S. Aqua weekly timetable (appendix A.2)', () => {
+  it('departs Olivine on Mon/Fri and Vermilion on Sun/Wed only', async () => {
+    const { ssAquaDepartsToday } = await import('../../src/world/interactions/FastShipAndVermilionInteractions');
+    expect([0, 1, 2, 3, 4, 5, 6].filter((d) => ssAquaDepartsToday('olivine', d))).toEqual([1, 5]);
+    expect([0, 1, 2, 3, 4, 5, 6].filter((d) => ssAquaDepartsToday('vermilion', d))).toEqual([0, 3]);
+  });
+  it('boarding warps are blocked on non-sailing days with a timetable message', () => {
+    const inv = { keyItems: ['ss-ticket'] };
+    const w = () => ({ x: 0, y: 0, targetMapId: 'fast_ship_1f', targetX: 0, targetY: 0 });
+    const r = evaluateFastShipWarp('olivine_port', w(), new Set(), inv, 2);
+    expect(r.blocked).toBe(true);
+    expect(r.blockedMessages?.[0]).toContain('Monday and Friday');
+    expect(evaluateFastShipWarp('vermilion_port', w(), new Set(), inv, 6).blocked).toBe(true);
+    expect(evaluateFastShipWarp('vermilion_port', w(), new Set(), inv, 0).blocked).toBe(false);
   });
 });
