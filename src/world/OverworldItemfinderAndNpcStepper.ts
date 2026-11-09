@@ -329,21 +329,40 @@ export class OverworldItemfinderAndNpcStepper {
             !storyFlags.has('rocket_base_generator_cleared') &&
             !storyFlags.has('EVENT_CLEARED_ROCKET_HIDEOUT')
           ) {
-            const currentMoney = (ctx as any).inventory?.money ?? 1000;
-            const fee = Math.min(1000, currentMoney);
-            if ((ctx as any).inventory) {
-              (ctx as any).inventory.money = Math.max(0, currentMoney - 1000);
+            // The toll is paid once; a player who cannot pay is turned back (the western grass trail is the free detour)
+            if (storyFlags.has('route_43_toll_paid')) return false;
+            const wallet = (ctx as any).inventory as { money?: number } | undefined;
+            const currentMoney = wallet?.money ?? 0;
+            if (currentMoney >= 1000 && wallet) {
+              wallet.money = currentMoney - 1000;
+              storyFlags.add('route_43_toll_paid');
+              overworldHUD.openDialogue(
+                [
+                  'TEAM ROCKET: Hold it right there! This is a toll gate!',
+                  'Pay the toll fee of ¥1000!',
+                  'Hehehe, thank you for your generous contribution to TEAM ROCKET!',
+                ],
+                '⚡ TEAM ROCKET',
+                () => void saveCurrentGame()
+              );
+              return true;
             }
+            const back = { UP: [0, 1], DOWN: [0, -1], LEFT: [1, 0], RIGHT: [-1, 0] }[player.direction as 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'] ?? [0, 0];
+            player.x = coord.x + back[0];
+            player.y = coord.y + back[1];
+            player.targetX = player.x;
+            player.targetY = player.y;
+            player.renderX = player.x;
+            player.renderY = player.y;
+            player.isMoving = false;
+            player.progress = 0;
             overworldHUD.openDialogue(
               [
                 'TEAM ROCKET: Hold it right there! This is a toll gate!',
-                'Pay the toll fee of ¥1000!',
-                fee >= 1000
-                  ? 'Hehehe, thank you for your generous contribution to TEAM ROCKET!'
-                  : 'You are broke? Well, hand over everything you have got!',
+                'Pay the toll fee of ¥1000... What, you are short on cash? Then scram!',
+                'Go around through the grass maze to the west if you cannot pay!',
               ],
-              '⚡ TEAM ROCKET',
-              () => void saveCurrentGame()
+              '⚡ TEAM ROCKET'
             );
             return true;
           }

@@ -525,9 +525,11 @@ describe('TICKET-WORLD-MAHOGANY-TOWN-AND-LAKE-OF-RAGE-01: Verification Suite', (
 
       expect(dialogueTriggered).toBe(true);
       expect(inventory.money).toBe(1500);
+      expect(mockTickerCtx.storyFlags.has('route_43_toll_paid')).toBe(true);
+
     });
 
-    it('verifies Route 43 Gate Rocket extortion takes all funds if player has less than ¥1000', () => {
+    it('verifies Route 43 Gate Rocket turns back a player with less than ¥1000 without taking their money', () => {
       let dialogueTriggered = false;
       const playerEntity = {
         id: 'player',
@@ -569,7 +571,7 @@ describe('TICKET-WORLD-MAHOGANY-TOWN-AND-LAKE-OF-RAGE-01: Verification Suite', (
           openDialogue: (pages: string[], speaker: string) => {
             dialogueTriggered = true;
             expect(speaker).toContain('TEAM ROCKET');
-            expect(pages[2]).toContain('hand over everything you have got');
+            expect(pages[2]).toContain('grass maze');
           },
         },
         getActiveMapNpcs: () => [],
@@ -595,7 +597,9 @@ describe('TICKET-WORLD-MAHOGANY-TOWN-AND-LAKE-OF-RAGE-01: Verification Suite', (
       OverworldTickerCoordinator.updateOverworldTick(0.1, mockTickerCtx as any);
 
       expect(dialogueTriggered).toBe(true);
-      expect(inventory.money).toBe(0);
+      expect(inventory.money).toBe(450);
+      expect(playerEntity.y).toBe(3);
+      expect(playerEntity.isMoving).toBe(false);
     });
   });
 });
