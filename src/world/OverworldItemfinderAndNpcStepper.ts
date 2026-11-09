@@ -223,7 +223,7 @@ export class OverworldItemfinderAndNpcStepper {
       defeatedTrainers,
       getActiveMapNpcs,
       triggerSlowpokeWellGruntIntercept,
-    } = ctx as any;
+    } = ctx;
           // Goldenrod Gym Whitney Cry Step Trigger
           if (
             currentMap?.id === 'goldenrod_gym' &&
@@ -253,10 +253,10 @@ export class OverworldItemfinderAndNpcStepper {
             !storyFlags.has('EVENT_RIVAL_GOLDENROD_UNDERGROUND')
           ) {
             BattleAudio.playOverworldSound('KEY_ITEM');
-            const rName = String((ctx as any).rivalName || 'SILVER').toUpperCase();
+            const rName = String(ctx.rivalName || 'SILVER').toUpperCase();
             const startUndergroundBattle = () => {
-              const team = buildRivalTeam('goldenrod_underground', resolvePlayerStarter(storyFlags, (ctx as any).playerParty ?? []));
-              void (ctx as any).triggerBattle?.(team[0], {
+              const team = buildRivalTeam('goldenrod_underground', resolvePlayerStarter(storyFlags, ctx.playerParty ?? []));
+              void ctx.triggerBattle?.(team[0], {
                 isTrainer: true,
                 trainerName: `Rival ${rName}`,
                 trainerTeam: team,
@@ -293,7 +293,7 @@ export class OverworldItemfinderAndNpcStepper {
             const hasCardKey =
               storyFlags.has('card_key_obtained') ||
               storyFlags.has('has_card_key') ||
-              Boolean((ctx as any).inventory?.keyItems?.some((k: string) => k.toLowerCase().includes('card')));
+              Boolean(ctx.inventory?.keyItems?.some((k: string) => k.toLowerCase().includes('card')));
             if (hasCardKey) {
               storyFlags.add('EVENT_USED_CARD_KEY');
               currentMap.collisionGrid[7 * currentMap.width + 0] = 0;
@@ -346,7 +346,7 @@ export class OverworldItemfinderAndNpcStepper {
           ) {
             // The toll is paid once; a player who cannot pay is turned back (the western grass trail is the free detour)
             if (storyFlags.has('route_43_toll_paid')) return false;
-            const wallet = (ctx as any).inventory as { money?: number } | undefined;
+            const wallet = ctx.inventory as { money?: number } | undefined;
             const currentMoney = wallet?.money ?? 0;
             if (currentMoney >= 1000 && wallet) {
               wallet.money = currentMoney - 1000;
@@ -404,7 +404,7 @@ export class OverworldItemfinderAndNpcStepper {
 
             if (cameraFlag && !storyFlags.has(cameraFlag)) {
               const activeCameraFlag = cameraFlag;
-              (ctx as any).audioManager?.playSfx?.('sfx_alarm');
+              ctx.audioManager?.playSfx?.('sfx_alarm');
               player.isMoving = false;
               player.progress = 0;
               player.direction = 'LEFT';
@@ -430,7 +430,7 @@ export class OverworldItemfinderAndNpcStepper {
                 pages: ['ROCKET GRUNT: Hey! Intruder detected!'],
               };
 
-              const npcsByMap = (ctx as any).npcsByMap as Record<string, GridEntity[]> | undefined;
+              const npcsByMap = ctx.npcsByMap;
               if (npcsByMap) {
                 if (!npcsByMap.team_rocket_base_b1f) npcsByMap.team_rocket_base_b1f = [];
                 npcsByMap.team_rocket_base_b1f = npcsByMap.team_rocket_base_b1f.filter(
@@ -458,13 +458,13 @@ export class OverworldItemfinderAndNpcStepper {
                   ],
                   '🚨 SECURITY CAMERA',
                   () => {
-                    (ctx as any).setCutsceneLocked?.(false);
+                    ctx.setCutsceneLocked?.(false);
                     storyFlags.add(activeCameraFlag);
                     const gruntTeam = [
                       PokemonFactory.create('drowzee', 20, ['pound', 'hypnosis']),
                       PokemonFactory.create('zubat', 20, ['leechlife', 'bite']),
                     ];
-                    (ctx as any).triggerBattle?.(gruntTeam[0], {
+                    ctx.triggerBattle?.(gruntTeam[0], {
                       isTrainer: true,
                       trainerName: 'Rocket Grunt',
                       trainerTeam: gruntTeam,
@@ -477,12 +477,12 @@ export class OverworldItemfinderAndNpcStepper {
                 );
               };
 
-              if (typeof (ctx as any).setCutsceneLocked === 'function' && typeof requestAnimationFrame === 'function') {
-                (ctx as any).setCutsceneLocked(true);
+              if (typeof ctx.setCutsceneLocked === 'function' && typeof requestAnimationFrame === 'function') {
+                ctx.setCutsceneLocked(true);
                 void (async () => {
                   BattleAudio.playOverworldSound('EXCLAMATION');
-                  const playerSpeed = (ctx as any).gameClock?.playerSpeed || 1;
-                  await (ctx as any).overworldRenderer?.showExclamationBubble?.(
+                  const playerSpeed = ctx.gameClock?.playerSpeed || 1;
+                  await ctx.overworldRenderer?.showExclamationBubble?.(
                     player,
                     Math.round(360 / playerSpeed)
                   );

@@ -85,20 +85,20 @@ export const handleTinTowerSage: NpcInteractionHandler = (targetNpc, _map, ctx) 
   const hasClearBell =
     ctx.storyFlags.has('has_clear_bell') ||
     ctx.storyFlags.has('EVENT_GOT_CLEAR_BELL') ||
-    Boolean((ctx.inventory as any)?.items?.clear_bell) ||
-    Boolean((ctx.inventory as any)?.items?.['clear-bell']) ||
-    Boolean((ctx.inventory as any)?.keyItems?.includes?.('clear_bell')) ||
-    Boolean((ctx.inventory as any)?.keyItems?.includes?.('clear-bell')) ||
-    Boolean((ctx.inventory as any)?.keyItems?.some?.((k: string) => k.toLowerCase().includes('clear bell') || k.toLowerCase().includes('clear_bell')));
+    Boolean(ctx.inventory?.items?.clear_bell) ||
+    Boolean(ctx.inventory?.items?.['clear-bell']) ||
+    Boolean(ctx.inventory?.keyItems?.includes?.('clear_bell')) ||
+    Boolean(ctx.inventory?.keyItems?.includes?.('clear-bell')) ||
+    Boolean(ctx.inventory?.keyItems?.some?.((k: string) => k.toLowerCase().includes('clear bell') || k.toLowerCase().includes('clear_bell')));
 
   const hasRainbowWing =
     ctx.storyFlags.has('has_rainbow_wing') ||
     ctx.storyFlags.has('EVENT_GOT_RAINBOW_WING') ||
-    Boolean((ctx.inventory as any)?.items?.rainbow_wing) ||
-    Boolean((ctx.inventory as any)?.items?.['rainbow-wing']) ||
-    Boolean((ctx.inventory as any)?.keyItems?.includes?.('rainbow_wing')) ||
-    Boolean((ctx.inventory as any)?.keyItems?.includes?.('rainbow-wing')) ||
-    Boolean((ctx.inventory as any)?.keyItems?.some?.((k: string) => k.toLowerCase().includes('rainbow')));
+    Boolean(ctx.inventory?.items?.rainbow_wing) ||
+    Boolean(ctx.inventory?.items?.['rainbow-wing']) ||
+    Boolean(ctx.inventory?.keyItems?.includes?.('rainbow_wing')) ||
+    Boolean(ctx.inventory?.keyItems?.includes?.('rainbow-wing')) ||
+    Boolean(ctx.inventory?.keyItems?.some?.((k: string) => k.toLowerCase().includes('rainbow')));
 
   // Case 1: Player already has both Clear Bell and Rainbow Wing
   if (hasClearBell && hasRainbowWing) {
@@ -299,11 +299,11 @@ export const handleHoOhBoss: NpcInteractionHandler = (_targetNpc, currentMap, ct
   const hasRainbowWing =
     ctx.storyFlags.has('has_rainbow_wing') ||
     ctx.storyFlags.has('EVENT_GOT_RAINBOW_WING') ||
-    Boolean((ctx.inventory as any)?.items?.rainbow_wing) ||
-    Boolean((ctx.inventory as any)?.items?.['rainbow-wing']) ||
-    Boolean((ctx.inventory as any)?.keyItems?.includes?.('rainbow_wing')) ||
-    Boolean((ctx.inventory as any)?.keyItems?.includes?.('rainbow-wing')) ||
-    Boolean((ctx.inventory as any)?.keyItems?.some?.((k: string) => k.toLowerCase().includes('rainbow')));
+    Boolean(ctx.inventory?.items?.rainbow_wing) ||
+    Boolean(ctx.inventory?.items?.['rainbow-wing']) ||
+    Boolean(ctx.inventory?.keyItems?.includes?.('rainbow_wing')) ||
+    Boolean(ctx.inventory?.keyItems?.includes?.('rainbow-wing')) ||
+    Boolean(ctx.inventory?.keyItems?.some?.((k: string) => k.toLowerCase().includes('rainbow')));
 
   if (!hasRainbowWing) {
     ctx.openDialogue(

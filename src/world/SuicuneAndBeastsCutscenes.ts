@@ -14,6 +14,14 @@ import { makeNpc } from './npcs/npcShared';
 import type { StoryCutsceneContext } from './StoryCutscenes';
 import type { GridEntity } from './GridPhysics';
 
+
+/** True under Vitest/Node test runs, where cutscene timing is skipped. */
+function isTestEnvironment(): boolean {
+  const g = globalThis as { process?: { env?: Record<string, string | undefined> } };
+  const mode = typeof import.meta !== 'undefined' ? (import.meta as { env?: { MODE?: string } }).env?.MODE : undefined;
+  return Boolean(g.process?.env?.VITEST || g.process?.env?.NODE_ENV === 'test') || mode === 'test';
+}
+
 export class SuicuneAndBeastsCutscenes {
   /**
    * Legendary Beasts Awakening Cutscene (Burned Tower B1F)
@@ -260,7 +268,7 @@ export class SuicuneAndBeastsCutscenes {
     ctx.player.progress = 0;
 
     // 1. Pop exclamation bubble over player upon spotting Suicune
-    void (ctx.overworldRenderer as any)?.showEmotionBubble?.(ctx.player, '!', 500);
+    void ctx.overworldRenderer?.showEmotionBubble?.(ctx.player, '!', 500);
     BattleAudio.playOverworldSound('EXCLAMATION');
 
     // 2. Spawn temporary Suicune entity on water at (11, 14)
@@ -343,11 +351,7 @@ export class SuicuneAndBeastsCutscenes {
       );
     };
 
-    const isTestEnv =
-      Boolean(
-        (globalThis as any).process?.env?.VITEST ||
-          (globalThis as any).process?.env?.NODE_ENV === 'test'
-      ) || (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test');
+    const isTestEnv = isTestEnvironment();
 
     if (isTestEnv) {
       onSuicuneFinished();
@@ -390,7 +394,7 @@ export class SuicuneAndBeastsCutscenes {
     ctx.player.isMoving = false;
     ctx.player.progress = 0;
 
-    void (ctx.overworldRenderer as any)?.showEmotionBubble?.(ctx.player, '!', 500);
+    void ctx.overworldRenderer?.showEmotionBubble?.(ctx.player, '!', 500);
     BattleAudio.playOverworldSound('EXCLAMATION');
 
     const suicuneNpc: GridEntity = {
@@ -434,11 +438,7 @@ export class SuicuneAndBeastsCutscenes {
       );
     };
 
-    const isTestEnv =
-      Boolean(
-        (globalThis as any).process?.env?.VITEST ||
-          (globalThis as any).process?.env?.NODE_ENV === 'test'
-      ) || (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test');
+    const isTestEnv = isTestEnvironment();
 
     if (isTestEnv) {
       finishRoute42();
@@ -477,7 +477,7 @@ export class SuicuneAndBeastsCutscenes {
     ctx.player.isMoving = false;
     ctx.player.progress = 0;
 
-    void (ctx.overworldRenderer as any)?.showEmotionBubble?.(ctx.player, '!', 500);
+    void ctx.overworldRenderer?.showEmotionBubble?.(ctx.player, '!', 500);
     BattleAudio.playOverworldSound('EXCLAMATION');
 
     const suicuneNpc: GridEntity = {
@@ -521,11 +521,7 @@ export class SuicuneAndBeastsCutscenes {
       );
     };
 
-    const isTestEnv =
-      Boolean(
-        (globalThis as any).process?.env?.VITEST ||
-          (globalThis as any).process?.env?.NODE_ENV === 'test'
-      ) || (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test');
+    const isTestEnv = isTestEnvironment();
 
     if (isTestEnv) {
       finishRoute36();
@@ -563,7 +559,7 @@ export class SuicuneAndBeastsCutscenes {
     ctx.player.isMoving = false;
     ctx.player.progress = 0;
 
-    void (ctx.overworldRenderer as any)?.showEmotionBubble?.(ctx.player, '!', 500);
+    void ctx.overworldRenderer?.showEmotionBubble?.(ctx.player, '!', 500);
     BattleAudio.playOverworldSound('EXCLAMATION');
 
     const suicuneNpc: GridEntity = {
@@ -607,11 +603,7 @@ export class SuicuneAndBeastsCutscenes {
       );
     };
 
-    const isTestEnv =
-      Boolean(
-        (globalThis as any).process?.env?.VITEST ||
-          (globalThis as any).process?.env?.NODE_ENV === 'test'
-      ) || (typeof import.meta !== 'undefined' && (import.meta as any).env?.MODE === 'test');
+    const isTestEnv = isTestEnvironment();
 
     if (isTestEnv) {
       finishVermilionPort();

@@ -101,6 +101,7 @@ export interface OverworldTickerContext {
   addPlayTimeDelta: (dtSec: number) => void; isSurfEnabled: () => boolean; openDeptElevatorModal?: (currentMapId: string, onSelectFloor: (targetMapId: string) => void) => void;
   triggerOlivineRivalConfrontation?: () => void; triggerCianwoodSuicuneAndEusine?: () => void; triggerRoute42Suicune?: () => void; triggerRoute36Suicune?: () => void; triggerVermilionPortSuicune?: () => void; triggerBattle?: (opponentPokemon: PokemonInstance, options?: TriggerBattleOptions) => Promise<void>; inventory?: BagInventory;
   buildTrainerTeamInstances?: (entity: GridEntity) => PokemonInstance[]; npcsByMap?: Record<string, GridEntity[]>; setCutsceneLocked?: (locked: boolean) => void;
+  playerParty?: PokemonInstance[]; defeatedTrainers?: Set<string>; rivalName?: string;
 }
 
 export type NpcInteractionHandler = (targetNpc: GridEntity, currentMap: MapData, ctx: NpcInteractionContext) => boolean | void | Promise<boolean | void>;
