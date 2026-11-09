@@ -147,6 +147,20 @@ export function getKantoAndLeagueInteractions(): NpcInteractionRegistration[] {
       },
     },
 
+    // 11b. Blue on Cinnabar: tells you he is heading back to Viridian Gym
+    {
+      actions: ['BLUE_CINNABAR_MEET'],
+      npcIds: ['cinnabar_island_blue'],
+      handler: (targetNpc, _map, ctx) => {
+        ctx.openDialogue(targetNpc.pages ?? ['BLUE: …'], targetNpc.speaker, () => {
+          ctx.storyFlags.add('blue_met_cinnabar');
+          ctx.showToast?.('📍 Blue returned to VIRIDIAN GYM!');
+          ctx.saveCurrentGame?.();
+        });
+        return true;
+      },
+    },
+
     // 12. Mt. Silver Summit: Red (silent final duel; he vanishes after defeat)
     {
       actions: ['RED_EVENT'],

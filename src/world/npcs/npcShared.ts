@@ -558,6 +558,9 @@ export function isNpcActiveForStoryFlags(
   // Radio Tower & Underground Takeover (Act 7)
   if (npcId === 'petrel_radio_5f') return storyFlags.has('pryce_defeated') && !storyFlags.has('fake_director_defeated');
   if (npcId === 'executive_proton_radio_4f') return storyFlags.has('card_key_obtained') && !storyFlags.has('radio_tower_proton_defeated') && !storyFlags.has('radio_tower_liberated');
+  // Blue (11.3): waits on Cinnabar Island, then returns to Viridian Gym after you meet him there
+  if (npcId === 'cinnabar_island_blue') return !storyFlags.has('blue_met_cinnabar') && !storyFlags.has('blue_defeated');
+  if (npcId === 'viridian_gym_blue_0') return storyFlags.has('blue_met_cinnabar') || storyFlags.has('blue_defeated');
   // Disguise infiltration (7.1): photo-studio operative, 1F guard, Rival unmasking on 2F
   if (npcId === 'rocket_disguise_operative') return storyFlags.has('pryce_defeated') && !storyFlags.has('radio_tower_liberated');
   if (npcId === 'radio_tower_1f_guard') {

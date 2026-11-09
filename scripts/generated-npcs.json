@@ -6,7 +6,7 @@
       "y": 10,
       "dir": "LEFT",
       "sprite": "fisherman",
-      "speaker": "⚔️ TULLY",
+      "speaker": "\u2694\ufe0f TULLY",
       "pages": [
         "Tully: That was a great battle!"
       ],
@@ -30,7 +30,7 @@
       "y": 9,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ BENJAMIN",
+      "speaker": "\u2694\ufe0f BENJAMIN",
       "pages": [
         "Benjamin: That was a great battle!"
       ],
@@ -62,7 +62,7 @@
       "y": 8,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ SHANE",
+      "speaker": "\u2694\ufe0f SHANE",
       "pages": [
         "Shane: That was a great battle!"
       ],
@@ -94,7 +94,7 @@
       "id": "route_42_ecruteak_gate_officer_0",
       "speaker": "OFFICER",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     }
   ],
@@ -105,7 +105,7 @@
       "y": 43,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ MILLER",
+      "speaker": "\u2694\ufe0f MILLER",
       "pages": [
         "Miller: That was a great battle!"
       ],
@@ -133,7 +133,7 @@
       "y": 28,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ MARKUS",
+      "speaker": "\u2694\ufe0f MARKUS",
       "pages": [
         "Markus: That was a great battle!"
       ],
@@ -165,7 +165,7 @@
       "y": 26,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ HUGH",
+      "speaker": "\u2694\ufe0f HUGH",
       "pages": [
         "Hugh: That was a great battle!"
       ],
@@ -199,7 +199,7 @@
       "id": "mount_mortar_b1f_black_belt_0",
       "speaker": "BLACK BELT",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     }
   ],
@@ -212,7 +212,7 @@
       "id": "mahogany_town_pokefan_m_0",
       "speaker": "POKEFAN M",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     },
     {
@@ -245,7 +245,7 @@
       "id": "mahogany_town_lass_3",
       "speaker": "LASS",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     }
   ],
@@ -258,7 +258,7 @@
       "id": "mahogany_mart_pharmacist_0",
       "speaker": "PHARMACIST",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -269,7 +269,7 @@
       "id": "mahogany_mart_black_belt_1",
       "speaker": "BLACK BELT",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     },
     {
@@ -280,7 +280,7 @@
       "id": "mahogany_mart_granny_2",
       "speaker": "GRANNY",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -291,9 +291,9 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "mahogany_gym_pryce_0",
-      "speaker": "🏆 LEADER PRYCE",
+      "speaker": "\ud83c\udfc6 LEADER PRYCE",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ],
       "action": "PRYCE_EVENT",
       "trainerId": "pryce",
@@ -337,7 +337,7 @@
       "y": 7,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ ROXANNE",
+      "speaker": "\u2694\ufe0f ROXANNE",
       "pages": [
         "Roxanne: That was a great battle!"
       ],
@@ -361,7 +361,7 @@
       "y": 16,
       "dir": "UP",
       "sprite": "boy",
-      "speaker": "⚔️ RONALD",
+      "speaker": "\u2694\ufe0f RONALD",
       "pages": [
         "Ronald: That was a great battle!"
       ],
@@ -393,7 +393,7 @@
       "y": 16,
       "dir": "UP",
       "sprite": "girl",
-      "speaker": "⚔️ CLARISSA",
+      "speaker": "\u2694\ufe0f CLARISSA",
       "pages": [
         "Clarissa: That was a great battle!"
       ],
@@ -417,7 +417,7 @@
       "y": 10,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ BRAD",
+      "speaker": "\u2694\ufe0f BRAD",
       "pages": [
         "Brad: That was a great battle!"
       ],
@@ -445,7 +445,7 @@
       "y": 4,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ DOUGLAS",
+      "speaker": "\u2694\ufe0f DOUGLAS",
       "pages": [
         "Douglas: That was a great battle!"
       ],
@@ -477,7 +477,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "mahogany_gym_gym_guide_6",
-      "speaker": "🏆 GYM GUIDE",
+      "speaker": "\ud83c\udfc6 GYM GUIDE",
       "pages": [
         "Training every day is the secret to a strong team!"
       ]
@@ -490,10 +490,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "mahogany_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -517,7 +517,7 @@
       "id": "mahogany_poke_center_youngster_2",
       "speaker": "YOUNGSTER",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -528,7 +528,7 @@
       "id": "mahogany_poke_center_cooltrainer_f_3",
       "speaker": "COOLTRAINER F",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     }
   ],
@@ -541,7 +541,7 @@
       "id": "mahogany_red_gyarados_speech_house_black_belt_0",
       "speaker": "BLACK BELT",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     },
     {
@@ -552,7 +552,7 @@
       "id": "mahogany_red_gyarados_speech_house_teacher_1",
       "speaker": "TEACHER",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -563,7 +563,7 @@
       "y": 5,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ BEN",
+      "speaker": "\u2694\ufe0f BEN",
       "pages": [
         "Ben: That was a great battle!"
       ],
@@ -587,7 +587,7 @@
       "y": 20,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ BRENT",
+      "speaker": "\u2694\ufe0f BRENT",
       "pages": [
         "Brent: That was a great battle!"
       ],
@@ -611,7 +611,7 @@
       "y": 7,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ RON",
+      "speaker": "\u2694\ufe0f RON",
       "pages": [
         "Ron: That was a great battle!"
       ],
@@ -635,7 +635,7 @@
       "y": 16,
       "dir": "RIGHT",
       "sprite": "fisherman",
-      "speaker": "⚔️ MARVIN",
+      "speaker": "\u2694\ufe0f MARVIN",
       "pages": [
         "Marvin: That was a great battle!"
       ],
@@ -671,7 +671,7 @@
       "y": 25,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ TIFFANY",
+      "speaker": "\u2694\ufe0f TIFFANY",
       "pages": [
         "Tiffany: That was a great battle!"
       ],
@@ -701,7 +701,7 @@
       "y": 40,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ SPENCER",
+      "speaker": "\u2694\ufe0f SPENCER",
       "pages": [
         "Spencer: That was a great battle!"
       ],
@@ -761,7 +761,7 @@
       "id": "route_43_gate_rocket_1",
       "speaker": "ROCKET",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -772,7 +772,7 @@
       "id": "route_43_gate_rocket_2",
       "speaker": "ROCKET",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     }
   ],
@@ -785,7 +785,7 @@
       "id": "lake_of_rage_cooltrainer_f_1",
       "speaker": "COOLTRAINER F",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -798,7 +798,7 @@
       "id": "lake_of_rage_hidden_power_house_fisher_0",
       "speaker": "FISHER",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     }
   ],
@@ -811,7 +811,7 @@
       "id": "lake_of_rage_magikarp_house_fishing_guru_0",
       "speaker": "FISHING GURU",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     }
   ],
@@ -822,7 +822,7 @@
       "y": 3,
       "dir": "DOWN",
       "sprite": "fisherman",
-      "speaker": "⚔️ WILTON",
+      "speaker": "\u2694\ufe0f WILTON",
       "pages": [
         "Wilton: That was a great battle!"
       ],
@@ -854,7 +854,7 @@
       "y": 13,
       "dir": "RIGHT",
       "sprite": "fisherman",
-      "speaker": "⚔️ EDGAR",
+      "speaker": "\u2694\ufe0f EDGAR",
       "pages": [
         "Edgar: That was a great battle!"
       ],
@@ -894,7 +894,7 @@
       "y": 9,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ PHIL",
+      "speaker": "\u2694\ufe0f PHIL",
       "pages": [
         "Phil: That was a great battle!"
       ],
@@ -934,7 +934,7 @@
       "y": 2,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ ZACH",
+      "speaker": "\u2694\ufe0f ZACH",
       "pages": [
         "Zach: That was a great battle!"
       ],
@@ -958,7 +958,7 @@
       "y": 5,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ VANCE",
+      "speaker": "\u2694\ufe0f VANCE",
       "pages": [
         "Vance: That was a great battle!"
       ],
@@ -986,7 +986,7 @@
       "y": 15,
       "dir": "LEFT",
       "sprite": "boy",
-      "speaker": "⚔️ ALLEN",
+      "speaker": "\u2694\ufe0f ALLEN",
       "pages": [
         "Allen: That was a great battle!"
       ],
@@ -1016,7 +1016,7 @@
       "y": 14,
       "dir": "LEFT",
       "sprite": "girl",
-      "speaker": "⚔️ CYBIL",
+      "speaker": "\u2694\ufe0f CYBIL",
       "pages": [
         "Cybil: That was a great battle!"
       ],
@@ -1060,7 +1060,7 @@
       "id": "blackthorn_city_super_nerd_0",
       "speaker": "SUPER NERD",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -1071,7 +1071,7 @@
       "id": "blackthorn_city_super_nerd_1",
       "speaker": "SUPER NERD",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     },
     {
@@ -1082,7 +1082,7 @@
       "id": "blackthorn_city_gramps_2",
       "speaker": "GRAMPS",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -1093,7 +1093,7 @@
       "id": "blackthorn_city_gramps_3",
       "speaker": "GRAMPS",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     },
     {
@@ -1104,7 +1104,7 @@
       "id": "blackthorn_city_black_belt_4",
       "speaker": "BLACK BELT",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     },
     {
@@ -1115,7 +1115,7 @@
       "id": "blackthorn_city_cooltrainer_f_5",
       "speaker": "COOLTRAINER F",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     },
     {
@@ -1126,7 +1126,7 @@
       "id": "blackthorn_city_cooltrainer_f_6",
       "speaker": "COOLTRAINER F",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -1137,9 +1137,9 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "blackthorn_gym_1f_clair_0",
-      "speaker": "🏆 LEADER CLAIR",
+      "speaker": "\ud83c\udfc6 LEADER CLAIR",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ],
       "action": "CLAIR_EVENT",
       "trainerId": "clair",
@@ -1193,7 +1193,7 @@
       "y": 6,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ MIKE",
+      "speaker": "\u2694\ufe0f MIKE",
       "pages": [
         "Mike: That was a great battle!"
       ],
@@ -1217,7 +1217,7 @@
       "y": 14,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ PAUL",
+      "speaker": "\u2694\ufe0f PAUL",
       "pages": [
         "Paul: That was a great battle!"
       ],
@@ -1249,7 +1249,7 @@
       "y": 2,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ LOLA",
+      "speaker": "\u2694\ufe0f LOLA",
       "pages": [
         "Lola: That was a great battle!"
       ],
@@ -1277,9 +1277,9 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "blackthorn_gym_1f_gym_guide_4",
-      "speaker": "🏆 GYM GUIDE",
+      "speaker": "\ud83c\udfc6 GYM GUIDE",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     }
   ],
@@ -1290,7 +1290,7 @@
       "y": 1,
       "dir": "RIGHT",
       "sprite": "boy",
-      "speaker": "⚔️ CODY",
+      "speaker": "\u2694\ufe0f CODY",
       "pages": [
         "Cody: That was a great battle!"
       ],
@@ -1318,7 +1318,7 @@
       "y": 11,
       "dir": "LEFT",
       "sprite": "girl",
-      "speaker": "⚔️ FRAN",
+      "speaker": "\u2694\ufe0f FRAN",
       "pages": [
         "Fran: That was a great battle!"
       ],
@@ -1346,7 +1346,7 @@
       "id": "blackthorn_dragon_speech_house_granny_0",
       "speaker": "GRANNY",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     }
   ],
@@ -1357,7 +1357,7 @@
       "dir": "DOWN",
       "sprite": "girl",
       "id": "blackthorn_emys_house_lass_0",
-      "speaker": "👧 EMY",
+      "speaker": "\ud83d\udc67 EMY",
       "pages": [
         "EMY: I really want a DRAGONAIR! Would you trade one for my DODRIO?"
       ],
@@ -1371,7 +1371,7 @@
       "dir": "RIGHT",
       "sprite": "boy",
       "id": "blackthorn_mart_clerk_0",
-      "speaker": "🏪 CLERK",
+      "speaker": "\ud83c\udfea CLERK",
       "pages": [
         "Welcome! How may I help you?"
       ],
@@ -1386,7 +1386,7 @@
       "id": "blackthorn_mart_cooltrainer_m_1",
       "speaker": "COOLTRAINER M",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     },
     {
@@ -1397,7 +1397,7 @@
       "id": "blackthorn_mart_black_belt_2",
       "speaker": "BLACK BELT",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     }
   ],
@@ -1408,10 +1408,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "blackthorn_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -1424,7 +1424,7 @@
       "id": "blackthorn_poke_center_gentleman_1",
       "speaker": "GENTLEMAN",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     },
     {
@@ -1435,7 +1435,7 @@
       "id": "blackthorn_poke_center_twin_2",
       "speaker": "TWIN",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -1459,7 +1459,7 @@
       "id": "move_deleters_house_super_nerd_0",
       "speaker": "SUPER NERD",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     }
   ],
@@ -1470,9 +1470,9 @@
       "dir": "UP",
       "sprite": "boy",
       "id": "dragons_den_b1f_clair_0",
-      "speaker": "🏆 LEADER CLAIR",
+      "speaker": "\ud83c\udfc6 LEADER CLAIR",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ],
       "action": "CLAIR_EVENT",
       "trainerId": "clair",
@@ -1526,7 +1526,7 @@
       "y": 8,
       "dir": "UP",
       "sprite": "boy",
-      "speaker": "⚔️ DARIN",
+      "speaker": "\u2694\ufe0f DARIN",
       "pages": [
         "Darin: That was a great battle!"
       ],
@@ -1556,7 +1556,7 @@
       "y": 8,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ CARA",
+      "speaker": "\u2694\ufe0f CARA",
       "pages": [
         "Cara: That was a great battle!"
       ],
@@ -1610,7 +1610,7 @@
       "id": "dragon_shrine_elder_0",
       "speaker": "ELDER",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -1621,7 +1621,7 @@
       "id": "dragon_shrine_elder_1",
       "speaker": "ELDER",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -1632,7 +1632,7 @@
       "id": "dragon_shrine_elder_2",
       "speaker": "ELDER",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -1641,9 +1641,9 @@
       "dir": "UP",
       "sprite": "boy",
       "id": "dragon_shrine_clair_3",
-      "speaker": "🏆 LEADER CLAIR",
+      "speaker": "\ud83c\udfc6 LEADER CLAIR",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ],
       "action": "CLAIR_EVENT",
       "trainerId": "clair",
@@ -1699,7 +1699,7 @@
       "y": 15,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ ERIK",
+      "speaker": "\u2694\ufe0f ERIK",
       "pages": [
         "Erik: That was a great battle!"
       ],
@@ -1731,7 +1731,7 @@
       "y": 65,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ MICHAEL",
+      "speaker": "\u2694\ufe0f MICHAEL",
       "pages": [
         "Michael: That was a great battle!"
       ],
@@ -1763,7 +1763,7 @@
       "y": 27,
       "dir": "UP",
       "sprite": "fat_man",
-      "speaker": "⚔️ PARRY",
+      "speaker": "\u2694\ufe0f PARRY",
       "pages": [
         "Parry: That was a great battle!"
       ],
@@ -1791,7 +1791,7 @@
       "y": 65,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ TIMOTHY",
+      "speaker": "\u2694\ufe0f TIMOTHY",
       "pages": [
         "Timothy: That was a great battle!"
       ],
@@ -1831,7 +1831,7 @@
       "y": 50,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ KENJI",
+      "speaker": "\u2694\ufe0f KENJI",
       "pages": [
         "Kenji: That was a great battle!"
       ],
@@ -1867,7 +1867,7 @@
       "y": 17,
       "dir": "LEFT",
       "sprite": "boy",
-      "speaker": "⚔️ RYAN",
+      "speaker": "\u2694\ufe0f RYAN",
       "pages": [
         "Ryan: That was a great battle!"
       ],
@@ -1907,7 +1907,7 @@
       "y": 36,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ KELLY",
+      "speaker": "\u2694\ufe0f KELLY",
       "pages": [
         "Kelly: That was a great battle!"
       ],
@@ -1941,7 +1941,7 @@
       "id": "route_45_youngster_7",
       "speaker": "YOUNGSTER",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     }
   ],
@@ -1952,7 +1952,7 @@
       "y": 19,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ BAILEY",
+      "speaker": "\u2694\ufe0f BAILEY",
       "pages": [
         "Bailey: That was a great battle!"
       ],
@@ -1992,7 +1992,7 @@
       "y": 14,
       "dir": "UP",
       "sprite": "boy",
-      "speaker": "⚔️ TED",
+      "speaker": "\u2694\ufe0f TED",
       "pages": [
         "Ted: That was a great battle!"
       ],
@@ -2016,7 +2016,7 @@
       "y": 13,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ ERIN",
+      "speaker": "\u2694\ufe0f ERIN",
       "pages": [
         "Erin: That was a great battle!"
       ],
@@ -2046,7 +2046,7 @@
       "dir": "DOWN",
       "sprite": "rocket_grunt_m",
       "id": "team_rocket_base_b1f_rocket_0",
-      "speaker": "⚡ ROCKET GRUNT",
+      "speaker": "\u26a1 ROCKET GRUNT",
       "pages": [
         "ROCKET GRUNT: Heh! Our surveillance statues will spot any intruder!"
       ]
@@ -2057,7 +2057,7 @@
       "y": 12,
       "dir": "LEFT",
       "sprite": "super_nerd",
-      "speaker": "🔬 SCIENTIST JED",
+      "speaker": "\ud83d\udd2c SCIENTIST JED",
       "pages": [
         "JED: All right. I'll divulge a secret about our hideout. That thing at the end of the desk is the security camera switch!"
       ],
@@ -2091,7 +2091,7 @@
       "dir": "UP",
       "sprite": "rocket_grunt_m",
       "id": "team_rocket_base_b2f_rocket_0",
-      "speaker": "⚡ ROCKET GRUNT",
+      "speaker": "\u26a1 ROCKET GRUNT",
       "pages": [
         "ROCKET GRUNT: The door won't open? Only the boss on B3F knows the voice password for the transmitter room!"
       ]
@@ -2104,9 +2104,9 @@
       "y": 11,
       "dir": "UP",
       "sprite": "super_nerd",
-      "speaker": "🔬 SCIENTIST ROSS",
+      "speaker": "\ud83d\udd2c SCIENTIST ROSS",
       "pages": [
-        "ROSS: A radio signal that drives Pokémon mad... My experiment is a complete success."
+        "ROSS: A radio signal that drives Pok\u00e9mon mad... My experiment is a complete success."
       ],
       "action": "TRAINER_BATTLE",
       "trainerId": "team_rocket_base_b3f_ross",
@@ -2132,7 +2132,7 @@
       "y": 15,
       "dir": "RIGHT",
       "sprite": "super_nerd",
-      "speaker": "🔬 SCIENTIST MITCH",
+      "speaker": "\ud83d\udd2c SCIENTIST MITCH",
       "pages": [
         "MITCH: Thinking is my strong suit, not battling."
       ],
@@ -2141,7 +2141,7 @@
       "trainerName": "Scientist Mitch",
       "vision": 3,
       "challenge": [
-        "MITCH: I don't care that Pokémon are hurt by our experiment!"
+        "MITCH: I don't care that Pok\u00e9mon are hurt by our experiment!"
       ],
       "team": [
         {
@@ -2156,7 +2156,7 @@
       "dir": "DOWN",
       "sprite": "rocket_grunt_m",
       "id": "team_rocket_base_b3f_rocket_5",
-      "speaker": "⚡ ROCKET GRUNT",
+      "speaker": "\u26a1 ROCKET GRUNT",
       "pages": [
         "ROCKET GRUNT: Urrggh... It takes two passwords to get into the boss's quarters. Only a couple of Rockets on this floor know them!"
       ]
@@ -2169,7 +2169,7 @@
       "y": 7,
       "dir": "UP",
       "sprite": "boy",
-      "speaker": "⚔️ BLAKE",
+      "speaker": "\u2694\ufe0f BLAKE",
       "pages": [
         "Blake: That was a great battle!"
       ],
@@ -2219,7 +2219,7 @@
       "y": 6,
       "dir": "RIGHT",
       "sprite": "boy",
-      "speaker": "⚔️ BRIAN",
+      "speaker": "\u2694\ufe0f BRIAN",
       "pages": [
         "Brian: That was a great battle!"
       ],
@@ -2249,7 +2249,7 @@
       "y": 10,
       "dir": "UP",
       "sprite": "girl",
-      "speaker": "⚔️ REENA",
+      "speaker": "\u2694\ufe0f REENA",
       "pages": [
         "Reena: That was a great battle!"
       ],
@@ -2281,7 +2281,7 @@
       "y": 6,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ MEGAN",
+      "speaker": "\u2694\ufe0f MEGAN",
       "pages": [
         "Megan: That was a great battle!"
       ],
@@ -2331,7 +2331,7 @@
       "y": 7,
       "dir": "LEFT",
       "sprite": "boy",
-      "speaker": "⚔️ GILBERT",
+      "speaker": "\u2694\ufe0f GILBERT",
       "pages": [
         "Gilbert: That was a great battle!"
       ],
@@ -2363,7 +2363,7 @@
       "y": 13,
       "dir": "RIGHT",
       "sprite": "boy",
-      "speaker": "⚔️ JOSE",
+      "speaker": "\u2694\ufe0f JOSE",
       "pages": [
         "Jose: That was a great battle!"
       ],
@@ -2389,7 +2389,7 @@
       "id": "route_27_fisher_6",
       "speaker": "FISHER",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     }
   ],
@@ -2402,7 +2402,7 @@
       "id": "route_27_sandstorm_house_granny_0",
       "speaker": "GRANNY",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -2413,7 +2413,7 @@
       "y": 24,
       "dir": "LEFT",
       "sprite": "boy",
-      "speaker": "⚔️ JAKE",
+      "speaker": "\u2694\ufe0f JAKE",
       "pages": [
         "Jake: That was a great battle!"
       ],
@@ -2453,7 +2453,7 @@
       "y": 38,
       "dir": "LEFT",
       "sprite": "boy",
-      "speaker": "⚔️ GAVEN",
+      "speaker": "\u2694\ufe0f GAVEN",
       "pages": [
         "Gaven: That was a great battle!"
       ],
@@ -2503,7 +2503,7 @@
       "y": 56,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ JOYCE",
+      "speaker": "\u2694\ufe0f JOYCE",
       "pages": [
         "Joyce: That was a great battle!"
       ],
@@ -2543,7 +2543,7 @@
       "y": 8,
       "dir": "RIGHT",
       "sprite": "girl",
-      "speaker": "⚔️ BETH",
+      "speaker": "\u2694\ufe0f BETH",
       "pages": [
         "Beth: That was a great battle!"
       ],
@@ -2573,7 +2573,7 @@
       "y": 79,
       "dir": "RIGHT",
       "sprite": "boy",
-      "speaker": "⚔️ RICHARD",
+      "speaker": "\u2694\ufe0f RICHARD",
       "pages": [
         "Richard: That was a great battle!"
       ],
@@ -2597,7 +2597,7 @@
       "y": 92,
       "dir": "DOWN",
       "sprite": "fisherman",
-      "speaker": "⚔️ SCOTT",
+      "speaker": "\u2694\ufe0f SCOTT",
       "pages": [
         "Scott: That was a great battle!"
       ],
@@ -2633,7 +2633,7 @@
       "id": "route_26_heal_house_teacher_0",
       "speaker": "TEACHER",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     }
   ],
@@ -2646,7 +2646,7 @@
       "id": "victory_road_gate_officer_0",
       "speaker": "OFFICER",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -2657,7 +2657,7 @@
       "id": "victory_road_gate_black_belt_1",
       "speaker": "BLACK BELT",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -2668,7 +2668,7 @@
       "id": "victory_road_gate_black_belt_2",
       "speaker": "BLACK BELT",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     }
   ],
@@ -2679,10 +2679,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "indigo_plateau_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -2693,7 +2693,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "indigo_plateau_poke_center_clerk_1",
-      "speaker": "🏪 CLERK",
+      "speaker": "\ud83c\udfea CLERK",
       "pages": [
         "Welcome! How may I help you?"
       ],
@@ -2708,7 +2708,7 @@
       "id": "indigo_plateau_poke_center_cooltrainer_m_2",
       "speaker": "COOLTRAINER M",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -2719,7 +2719,7 @@
       "id": "indigo_plateau_poke_center_gramps_3",
       "speaker": "GRAMPS",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     }
   ],
@@ -2730,7 +2730,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "wills_room_will_0",
-      "speaker": "🏆 WILL",
+      "speaker": "\ud83c\udfc6 WILL",
       "pages": [
         "WILL: You are truly strong. Go on!"
       ],
@@ -2801,7 +2801,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "kogas_room_koga_0",
-      "speaker": "🏆 KOGA",
+      "speaker": "\ud83c\udfc6 KOGA",
       "pages": [
         "KOGA: You are truly strong. Go on!"
       ],
@@ -2872,7 +2872,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "brunos_room_bruno_0",
-      "speaker": "🏆 BRUNO",
+      "speaker": "\ud83c\udfc6 BRUNO",
       "pages": [
         "BRUNO: You are truly strong. Go on!"
       ],
@@ -2943,7 +2943,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "karens_room_karen_0",
-      "speaker": "🏆 KAREN",
+      "speaker": "\ud83c\udfc6 KAREN",
       "pages": [
         "KAREN: You are truly strong. Go on!"
       ],
@@ -3014,7 +3014,7 @@
       "dir": "DOWN",
       "sprite": "lance",
       "id": "lances_room_lance_0",
-      "speaker": "🏆 LANCE",
+      "speaker": "\ud83c\udfc6 LANCE",
       "pages": [
         "LANCE: You are truly strong. Go on!"
       ],
@@ -3095,7 +3095,7 @@
       "id": "lances_room_teacher_1",
       "speaker": "TEACHER",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -3106,7 +3106,7 @@
       "dir": "UP",
       "sprite": "lance",
       "id": "hall_of_fame_lance_0",
-      "speaker": "🏆 LANCE",
+      "speaker": "\ud83c\udfc6 LANCE",
       "pages": [
         "LANCE: You are truly strong. Go on!"
       ],
@@ -3189,7 +3189,7 @@
       "id": "route_28_steel_wing_house_cooltrainer_f_0",
       "speaker": "COOLTRAINER F",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     }
   ],
@@ -3200,10 +3200,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "silver_cave_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -3216,7 +3216,7 @@
       "id": "silver_cave_poke_center_granny_1",
       "speaker": "GRANNY",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     }
   ],
@@ -3227,7 +3227,7 @@
       "dir": "UP",
       "sprite": "silver",
       "id": "silver_cave_room_3_red_0",
-      "speaker": "🏆 RED",
+      "speaker": "\ud83c\udfc6 RED",
       "pages": [
         "..."
       ],
@@ -3310,7 +3310,7 @@
       "id": "pallet_town_teacher_0",
       "speaker": "TEACHER",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     },
     {
@@ -3321,7 +3321,7 @@
       "id": "pallet_town_fisher_1",
       "speaker": "FISHER",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     }
   ],
@@ -3334,7 +3334,7 @@
       "id": "oaks_lab_scientist_0",
       "speaker": "SCIENTIST",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     },
     {
@@ -3345,7 +3345,7 @@
       "id": "oaks_lab_scientist_1",
       "speaker": "SCIENTIST",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -3356,7 +3356,7 @@
       "id": "oaks_lab_scientist_2",
       "speaker": "SCIENTIST",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     }
   ],
@@ -3367,7 +3367,7 @@
       "y": 11,
       "dir": "RIGHT",
       "sprite": "boy",
-      "speaker": "⚔️ DANNY",
+      "speaker": "\u2694\ufe0f DANNY",
       "pages": [
         "Danny: That was a great battle!"
       ],
@@ -3399,7 +3399,7 @@
       "y": 25,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ QUINN",
+      "speaker": "\u2694\ufe0f QUINN",
       "pages": [
         "Quinn: That was a great battle!"
       ],
@@ -3431,7 +3431,7 @@
       "id": "viridian_city_gramps_0",
       "speaker": "GRAMPS",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     },
     {
@@ -3442,7 +3442,7 @@
       "id": "viridian_city_fisher_1",
       "speaker": "FISHER",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -3464,9 +3464,9 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "viridian_gym_blue_0",
-      "speaker": "🏆 LEADER BLUE",
+      "speaker": "\ud83c\udfc6 LEADER BLUE",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ],
       "action": "BLUE_EVENT",
       "trainerId": "blue",
@@ -3540,9 +3540,9 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "viridian_gym_gym_guide_1",
-      "speaker": "🏆 GYM GUIDE",
+      "speaker": "\ud83c\udfc6 GYM GUIDE",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     }
   ],
@@ -3553,10 +3553,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "viridian_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -3569,7 +3569,7 @@
       "id": "viridian_poke_center_cooltrainer_m_1",
       "speaker": "COOLTRAINER M",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -3602,7 +3602,7 @@
       "dir": "RIGHT",
       "sprite": "boy",
       "id": "viridian_mart_clerk_0",
-      "speaker": "🏪 CLERK",
+      "speaker": "\ud83c\udfea CLERK",
       "pages": [
         "Welcome! How may I help you?"
       ],
@@ -3628,7 +3628,7 @@
       "id": "viridian_mart_cooltrainer_m_2",
       "speaker": "COOLTRAINER M",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     }
   ],
@@ -3641,7 +3641,7 @@
       "id": "viridian_nickname_house_pokefan_m_0",
       "speaker": "POKEFAN M",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -3665,7 +3665,7 @@
       "id": "trainer_house_1f_receptionist_0",
       "speaker": "RECEPTIONIST",
       "pages": [
-        "The weather has been fierce lately, but the POKéMON here are tough!"
+        "The weather has been fierce lately, but the POK\u00e9MON here are tough!"
       ]
     },
     {
@@ -3676,7 +3676,7 @@
       "id": "trainer_house_1f_cooltrainer_m_1",
       "speaker": "COOLTRAINER M",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -3698,7 +3698,7 @@
       "id": "trainer_house_1f_youngster_3",
       "speaker": "YOUNGSTER",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     },
     {
@@ -3722,7 +3722,7 @@
       "id": "trainer_house_b1f_receptionist_0",
       "speaker": "RECEPTIONIST",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     }
   ],
@@ -3733,7 +3733,7 @@
       "y": 45,
       "dir": "LEFT",
       "sprite": "bug_catcher",
-      "speaker": "⚔️ ROB",
+      "speaker": "\u2694\ufe0f ROB",
       "pages": [
         "Rob: That was a great battle!"
       ],
@@ -3761,7 +3761,7 @@
       "y": 4,
       "dir": "DOWN",
       "sprite": "bug_catcher",
-      "speaker": "⚔️ ED",
+      "speaker": "\u2694\ufe0f ED",
       "pages": [
         "Ed: That was a great battle!"
       ],
@@ -3793,7 +3793,7 @@
       "y": 40,
       "dir": "RIGHT",
       "sprite": "bug_catcher",
-      "speaker": "⚔️ DOUG",
+      "speaker": "\u2694\ufe0f DOUG",
       "pages": [
         "Doug: That was a great battle!"
       ],
@@ -3834,7 +3834,7 @@
       "id": "route_2_nugget_house_fisher_0",
       "speaker": "FISHER",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -3847,7 +3847,7 @@
       "id": "pewter_city_cooltrainer_f_0",
       "speaker": "COOLTRAINER F",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -3858,7 +3858,7 @@
       "id": "pewter_city_bug_catcher_1",
       "speaker": "BUG CATCHER",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     },
     {
@@ -3869,7 +3869,7 @@
       "id": "pewter_city_gramps_2",
       "speaker": "GRAMPS",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -3880,9 +3880,9 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "pewter_gym_brock_0",
-      "speaker": "🏆 LEADER BROCK",
+      "speaker": "\ud83c\udfc6 LEADER BROCK",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ],
       "action": "BROCK_EVENT",
       "trainerId": "brock",
@@ -3946,7 +3946,7 @@
       "y": 5,
       "dir": "RIGHT",
       "sprite": "boy",
-      "speaker": "⚔️ JERRY",
+      "speaker": "\u2694\ufe0f JERRY",
       "pages": [
         "Jerry: That was a great battle!"
       ],
@@ -3970,9 +3970,9 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "pewter_gym_gym_guide_2",
-      "speaker": "🏆 GYM GUIDE",
+      "speaker": "\ud83c\udfc6 GYM GUIDE",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     }
   ],
@@ -3983,10 +3983,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "pewter_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -3999,7 +3999,7 @@
       "id": "pewter_poke_center_teacher_1",
       "speaker": "TEACHER",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     },
     {
@@ -4010,7 +4010,7 @@
       "id": "pewter_poke_center_bug_catcher_2",
       "speaker": "BUG CATCHER",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -4021,7 +4021,7 @@
       "id": "pewter_poke_center_pokefan_m_3",
       "speaker": "POKEFAN M",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -4032,7 +4032,7 @@
       "dir": "RIGHT",
       "sprite": "boy",
       "id": "pewter_mart_clerk_0",
-      "speaker": "🏪 CLERK",
+      "speaker": "\ud83c\udfea CLERK",
       "pages": [
         "Welcome! How may I help you?"
       ],
@@ -4047,7 +4047,7 @@
       "id": "pewter_mart_youngster_1",
       "speaker": "YOUNGSTER",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     },
     {
@@ -4058,7 +4058,7 @@
       "id": "pewter_mart_super_nerd_2",
       "speaker": "SUPER NERD",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     }
   ],
@@ -4071,7 +4071,7 @@
       "id": "pewter_nidoran_house_super_nerd_0",
       "speaker": "SUPER NERD",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     }
   ],
@@ -4084,7 +4084,7 @@
       "id": "pewter_snooze_house_gramps_0",
       "speaker": "GRAMPS",
       "pages": [
-        "I heard strange rumors about a legendary POKéMON in this region…"
+        "I heard strange rumors about a legendary POK\u00e9MON in this region\u2026"
       ]
     }
   ],
@@ -4095,7 +4095,7 @@
       "y": 12,
       "dir": "UP",
       "sprite": "fisherman",
-      "speaker": "⚔️ OTIS",
+      "speaker": "\u2694\ufe0f OTIS",
       "pages": [
         "Otis: That was a great battle!"
       ],
@@ -4127,7 +4127,7 @@
       "y": 7,
       "dir": "LEFT",
       "sprite": "boy",
-      "speaker": "⚔️ WARREN",
+      "speaker": "\u2694\ufe0f WARREN",
       "pages": [
         "Warren: That was a great battle!"
       ],
@@ -4151,7 +4151,7 @@
       "y": 3,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ JIMMY",
+      "speaker": "\u2694\ufe0f JIMMY",
       "pages": [
         "Jimmy: That was a great battle!"
       ],
@@ -4179,7 +4179,7 @@
       "y": 5,
       "dir": "DOWN",
       "sprite": "fisherman",
-      "speaker": "⚔️ BURT",
+      "speaker": "\u2694\ufe0f BURT",
       "pages": [
         "Burt: That was a great battle!"
       ],
@@ -4211,7 +4211,7 @@
       "id": "mount_moon_gift_shop_gramps_0",
       "speaker": "GRAMPS",
       "pages": [
-        "If your POKéMON gets hurt, head to the nearest POKéMON CENTER."
+        "If your POK\u00e9MON gets hurt, head to the nearest POK\u00e9MON CENTER."
       ]
     },
     {
@@ -4233,7 +4233,7 @@
       "id": "mount_moon_gift_shop_lass_2",
       "speaker": "LASS",
       "pages": [
-        "Have you filled your POKéDEX yet? Keep exploring!"
+        "Have you filled your POK\u00e9DEX yet? Keep exploring!"
       ]
     },
     {
@@ -4244,7 +4244,7 @@
       "id": "mount_moon_gift_shop_lass_3",
       "speaker": "LASS",
       "pages": [
-        "Trainers from all over pass through here on their way to the POKéMON LEAGUE."
+        "Trainers from all over pass through here on their way to the POK\u00e9MON LEAGUE."
       ]
     }
   ],
@@ -4255,7 +4255,7 @@
       "y": 9,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ HANK",
+      "speaker": "\u2694\ufe0f HANK",
       "pages": [
         "Hank: That was a great battle!"
       ],
@@ -4283,7 +4283,7 @@
       "y": 7,
       "dir": "LEFT",
       "sprite": "girl",
-      "speaker": "⚔️ HOPE",
+      "speaker": "\u2694\ufe0f HOPE",
       "pages": [
         "Hope: That was a great battle!"
       ],
@@ -4317,7 +4317,7 @@
       "y": 12,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ REX",
+      "speaker": "\u2694\ufe0f REX",
       "pages": [
         "Rex: That was a great battle!"
       ],
@@ -4341,7 +4341,7 @@
       "y": 12,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ ALLAN",
+      "speaker": "\u2694\ufe0f ALLAN",
       "pages": [
         "Allan: That was a great battle!"
       ],
@@ -4401,7 +4401,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "vermilion_gym_surge_0",
-      "speaker": "🏆 LEADER SURGE",
+      "speaker": "\ud83c\udfc6 LEADER SURGE",
       "action": "SURGE_EVENT",
       "trainerId": "surge",
       "trainerName": "Leader Surge",
@@ -4464,7 +4464,7 @@
       "y": 8,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ GREGORY",
+      "speaker": "\u2694\ufe0f GREGORY",
       "pages": [
         "Gregory: That was a great battle!"
       ],
@@ -4492,7 +4492,7 @@
       "y": 7,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ VINCENT",
+      "speaker": "\u2694\ufe0f VINCENT",
       "pages": [
         "Vincent: That was a great battle!"
       ],
@@ -4528,7 +4528,7 @@
       "y": 10,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ HORTON",
+      "speaker": "\u2694\ufe0f HORTON",
       "pages": [
         "Horton: That was a great battle!"
       ],
@@ -4564,7 +4564,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "vermilion_gym_gym_guide_4",
-      "speaker": "🏆 GYM GUIDE"
+      "speaker": "\ud83c\udfc6 GYM GUIDE"
     }
   ],
   "vermilion_poke_center": [
@@ -4574,10 +4574,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "vermilion_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -4614,7 +4614,7 @@
       "dir": "RIGHT",
       "sprite": "boy",
       "id": "vermilion_mart_clerk_0",
-      "speaker": "🏪 CLERK",
+      "speaker": "\ud83c\udfea CLERK",
       "pages": [
         "Welcome! How may I help you?"
       ],
@@ -4753,7 +4753,7 @@
       "y": 3,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ SEAN",
+      "speaker": "\u2694\ufe0f SEAN",
       "pages": [
         "Sean: That was a great battle!"
       ],
@@ -4785,7 +4785,7 @@
       "y": 5,
       "dir": "UP",
       "sprite": "girl",
-      "speaker": "⚔️ CAROL",
+      "speaker": "\u2694\ufe0f CAROL",
       "pages": [
         "Carol: That was a great battle!"
       ],
@@ -4817,7 +4817,7 @@
       "y": 17,
       "dir": "UP",
       "sprite": "fat_man",
-      "speaker": "⚔️ NOLAND",
+      "speaker": "\u2694\ufe0f NOLAND",
       "pages": [
         "Noland: That was a great battle!"
       ],
@@ -4853,7 +4853,7 @@
       "y": 30,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ EDWARD",
+      "speaker": "\u2694\ufe0f EDWARD",
       "pages": [
         "Edward: That was a great battle!"
       ],
@@ -4877,7 +4877,7 @@
       "y": 30,
       "dir": "UP",
       "sprite": "teacher",
-      "speaker": "⚔️ COREY",
+      "speaker": "\u2694\ufe0f COREY",
       "pages": [
         "Corey: That was a great battle!"
       ],
@@ -4915,7 +4915,7 @@
       "y": 15,
       "dir": "DOWN",
       "sprite": "fisherman",
-      "speaker": "⚔️ LYLE",
+      "speaker": "\u2694\ufe0f LYLE",
       "pages": [
         "Lyle: That was a great battle!"
       ],
@@ -4947,7 +4947,7 @@
       "y": 15,
       "dir": "DOWN",
       "sprite": "bug_catcher",
-      "speaker": "⚔️ KEN",
+      "speaker": "\u2694\ufe0f KEN",
       "pages": [
         "Ken: That was a great battle!"
       ],
@@ -4975,7 +4975,7 @@
       "y": 26,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ CASSIE",
+      "speaker": "\u2694\ufe0f CASSIE",
       "pages": [
         "Cassie: That was a great battle!"
       ],
@@ -5003,7 +5003,7 @@
       "y": 28,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ CLYDE",
+      "speaker": "\u2694\ufe0f CLYDE",
       "pages": [
         "Clyde: That was a great battle!"
       ],
@@ -5053,7 +5053,7 @@
       "y": 6,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ COLIN",
+      "speaker": "\u2694\ufe0f COLIN",
       "pages": [
         "Colin: That was a great battle!"
       ],
@@ -5077,7 +5077,7 @@
       "y": 5,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ RODNEY",
+      "speaker": "\u2694\ufe0f RODNEY",
       "pages": [
         "Rodney: That was a great battle!"
       ],
@@ -5105,7 +5105,7 @@
       "y": 3,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ JEREMY",
+      "speaker": "\u2694\ufe0f JEREMY",
       "pages": [
         "Jeremy: That was a great battle!"
       ],
@@ -5137,7 +5137,7 @@
       "y": 15,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ SHAWN",
+      "speaker": "\u2694\ufe0f SHAWN",
       "pages": [
         "Shawn: That was a great battle!"
       ],
@@ -5187,7 +5187,7 @@
       "y": 11,
       "dir": "UP",
       "sprite": "fisherman",
-      "speaker": "⚔️ JEFF",
+      "speaker": "\u2694\ufe0f JEFF",
       "pages": [
         "Jeff: That was a great battle!"
       ],
@@ -5215,7 +5215,7 @@
       "y": 4,
       "dir": "UP",
       "sprite": "girl",
-      "speaker": "⚔️ DEBRA",
+      "speaker": "\u2694\ufe0f DEBRA",
       "pages": [
         "Debra: That was a great battle!"
       ],
@@ -5239,7 +5239,7 @@
       "y": 9,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ FRITZ",
+      "speaker": "\u2694\ufe0f FRITZ",
       "pages": [
         "Fritz: That was a great battle!"
       ],
@@ -5271,7 +5271,7 @@
       "y": 4,
       "dir": "RIGHT",
       "sprite": "fisherman",
-      "speaker": "⚔️ GARRETT",
+      "speaker": "\u2694\ufe0f GARRETT",
       "pages": [
         "Garrett: That was a great battle!"
       ],
@@ -5295,7 +5295,7 @@
       "y": 8,
       "dir": "UP",
       "sprite": "fisherman",
-      "speaker": "⚔️ JONAH",
+      "speaker": "\u2694\ufe0f JONAH",
       "pages": [
         "Jonah: That was a great battle!"
       ],
@@ -5331,7 +5331,7 @@
       "y": 11,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ WAI",
+      "speaker": "\u2694\ufe0f WAI",
       "pages": [
         "Wai: That was a great battle!"
       ],
@@ -5363,7 +5363,7 @@
       "y": 4,
       "dir": "RIGHT",
       "sprite": "fisherman",
-      "speaker": "⚔️ KENNETH",
+      "speaker": "\u2694\ufe0f KENNETH",
       "pages": [
         "Kenneth: That was a great battle!"
       ],
@@ -5399,7 +5399,7 @@
       "y": 9,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ NATE",
+      "speaker": "\u2694\ufe0f NATE",
       "pages": [
         "Nate: That was a great battle!"
       ],
@@ -5427,7 +5427,7 @@
       "y": 11,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ RICKY",
+      "speaker": "\u2694\ufe0f RICKY",
       "pages": [
         "Ricky: That was a great battle!"
       ],
@@ -5525,7 +5525,7 @@
       "y": 14,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ OWEN",
+      "speaker": "\u2694\ufe0f OWEN",
       "pages": [
         "Owen: That was a great battle!"
       ],
@@ -5549,7 +5549,7 @@
       "y": 4,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ JASON",
+      "speaker": "\u2694\ufe0f JASON",
       "pages": [
         "Jason: That was a great battle!"
       ],
@@ -5577,7 +5577,7 @@
       "y": 7,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ HERMAN",
+      "speaker": "\u2694\ufe0f HERMAN",
       "pages": [
         "Herman: That was a great battle!"
       ],
@@ -5609,7 +5609,7 @@
       "y": 6,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ FIDEL",
+      "speaker": "\u2694\ufe0f FIDEL",
       "pages": [
         "Fidel: That was a great battle!"
       ],
@@ -5645,7 +5645,7 @@
       "y": 11,
       "dir": "LEFT",
       "sprite": "boy",
-      "speaker": "⚔️ DEAN",
+      "speaker": "\u2694\ufe0f DEAN",
       "pages": [
         "Dean: That was a great battle!"
       ],
@@ -5673,7 +5673,7 @@
       "y": 8,
       "dir": "DOWN",
       "sprite": "girl",
-      "speaker": "⚔️ HEIDI",
+      "speaker": "\u2694\ufe0f HEIDI",
       "pages": [
         "Heidi: That was a great battle!"
       ],
@@ -5701,7 +5701,7 @@
       "y": 4,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ SID",
+      "speaker": "\u2694\ufe0f SID",
       "pages": [
         "Sid: That was a great battle!"
       ],
@@ -5733,7 +5733,7 @@
       "y": 15,
       "dir": "UP",
       "sprite": "girl",
-      "speaker": "⚔️ EDNA",
+      "speaker": "\u2694\ufe0f EDNA",
       "pages": [
         "Edna: That was a great battle!"
       ],
@@ -5761,7 +5761,7 @@
       "y": 3,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ TIM",
+      "speaker": "\u2694\ufe0f TIM",
       "pages": [
         "Tim: That was a great battle!"
       ],
@@ -5793,7 +5793,7 @@
       "y": 15,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ SIDNEY",
+      "speaker": "\u2694\ufe0f SIDNEY",
       "pages": [
         "Sidney: That was a great battle!"
       ],
@@ -5823,7 +5823,7 @@
       "y": 3,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ JIM",
+      "speaker": "\u2694\ufe0f JIM",
       "pages": [
         "Jim: That was a great battle!"
       ],
@@ -5847,7 +5847,7 @@
       "y": 10,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ ROBERT",
+      "speaker": "\u2694\ufe0f ROBERT",
       "pages": [
         "Robert: That was a great battle!"
       ],
@@ -5873,10 +5873,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "route_10_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -5895,7 +5895,7 @@
       "dir": "DOWN",
       "sprite": "boy",
       "id": "route_10_poke_center_gym_guide_2",
-      "speaker": "🏆 GYM GUIDE"
+      "speaker": "\ud83c\udfc6 GYM GUIDE"
     },
     {
       "x": 1,
@@ -5947,10 +5947,10 @@
       "dir": "DOWN",
       "sprite": "nurse",
       "id": "lavender_poke_center_nurse_0",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -5987,7 +5987,7 @@
       "dir": "RIGHT",
       "sprite": "boy",
       "id": "lavender_mart_clerk_0",
-      "speaker": "🏪 CLERK",
+      "speaker": "\ud83c\udfea CLERK",
       "pages": [
         "Welcome! How may I help you?"
       ],
@@ -6071,10 +6071,10 @@
       "y": 1,
       "dir": "DOWN",
       "sprite": "nurse",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true
@@ -6104,7 +6104,7 @@
       "y": 3,
       "dir": "RIGHT",
       "sprite": "boy",
-      "speaker": "🏪 CLERK",
+      "speaker": "\ud83c\udfea CLERK",
       "pages": [
         "Welcome! How may I help you?"
       ],
@@ -6162,7 +6162,7 @@
       "y": 13,
       "dir": "DOWN",
       "sprite": "fisherman",
-      "speaker": "⚔️ MARTIN",
+      "speaker": "\u2694\ufe0f MARTIN",
       "trainerName": "Fisher Martin",
       "vision": 1,
       "team": [
@@ -6191,7 +6191,7 @@
       "y": 6,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ PERRY",
+      "speaker": "\u2694\ufe0f PERRY",
       "trainerName": "Bird Keeper Perry",
       "vision": 2,
       "team": [
@@ -6206,7 +6206,7 @@
       "y": 6,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ BRET",
+      "speaker": "\u2694\ufe0f BRET",
       "trainerName": "Bird Keeper Bret",
       "vision": 2,
       "team": [
@@ -6225,7 +6225,7 @@
       "y": 8,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ JOSHUA",
+      "speaker": "\u2694\ufe0f JOSHUA",
       "trainerName": "Pokefanm Joshua",
       "vision": 3,
       "team": [
@@ -6260,7 +6260,7 @@
       "y": 10,
       "dir": "LEFT",
       "sprite": "fat_man",
-      "speaker": "⚔️ KENNY",
+      "speaker": "\u2694\ufe0f KENNY",
       "trainerName": "Hiker Kenny",
       "vision": 4,
       "team": [
@@ -6287,7 +6287,7 @@
       "y": 6,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ ALEX",
+      "speaker": "\u2694\ufe0f ALEX",
       "trainerName": "Pokefanm Alex",
       "vision": 4,
       "team": [
@@ -6312,7 +6312,7 @@
       "y": 15,
       "dir": "RIGHT",
       "sprite": "fat_man",
-      "speaker": "⚔️ CARTER",
+      "speaker": "\u2694\ufe0f CARTER",
       "trainerName": "Pokefanm Carter",
       "vision": 3,
       "team": [
@@ -6335,7 +6335,7 @@
       "y": 27,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ ROY",
+      "speaker": "\u2694\ufe0f ROY",
       "trainerName": "Bird Keeper Roy",
       "vision": 3,
       "team": [
@@ -6354,7 +6354,7 @@
       "y": 11,
       "dir": "DOWN",
       "sprite": "fat_man",
-      "speaker": "⚔️ TREVOR",
+      "speaker": "\u2694\ufe0f TREVOR",
       "trainerName": "Pokefanm Trevor",
       "vision": 3,
       "team": [
@@ -6377,7 +6377,7 @@
       "y": 10,
       "dir": "RIGHT",
       "sprite": "boy",
-      "speaker": "⚔️ KIPP",
+      "speaker": "\u2694\ufe0f KIPP",
       "trainerName": "Schoolboy Kipp",
       "vision": 4,
       "team": [
@@ -6404,7 +6404,7 @@
       "y": 13,
       "dir": "UP",
       "sprite": "boy",
-      "speaker": "⚔️ TOMMY",
+      "speaker": "\u2694\ufe0f TOMMY",
       "trainerName": "Schoolboy Tommy",
       "vision": 3,
       "team": [
@@ -6423,7 +6423,7 @@
       "y": 10,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ JOHNNY",
+      "speaker": "\u2694\ufe0f JOHNNY",
       "trainerName": "Schoolboy Johnny",
       "vision": 3,
       "team": [
@@ -6446,7 +6446,7 @@
       "y": 10,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "⚔️ BILLY",
+      "speaker": "\u2694\ufe0f BILLY",
       "trainerName": "Schoolboy Billy",
       "vision": 3,
       "team": [
@@ -6473,7 +6473,7 @@
       "y": 12,
       "dir": "UP",
       "sprite": "teacher",
-      "speaker": "⚔️ COLETTE",
+      "speaker": "\u2694\ufe0f COLETTE",
       "trainerName": "Teacher Colette",
       "vision": 4,
       "team": [
@@ -6488,7 +6488,7 @@
       "y": 10,
       "dir": "DOWN",
       "sprite": "teacher",
-      "speaker": "⚔️ HILLARY",
+      "speaker": "\u2694\ufe0f HILLARY",
       "trainerName": "Teacher Hillary",
       "vision": 3,
       "team": [
@@ -6523,7 +6523,7 @@
       "y": 2,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "🏆 LEADER BLAINE",
+      "speaker": "\ud83c\udfc6 LEADER BLAINE",
       "action": "BLAINE_EVENT",
       "trainerId": "blaine",
       "trainerName": "Leader Blaine",
@@ -6565,7 +6565,7 @@
       "y": 5,
       "dir": "UP",
       "sprite": "boy",
-      "speaker": "🏆 GYM GUIDE"
+      "speaker": "\ud83c\udfc6 GYM GUIDE"
     }
   ],
   "cinnabar_island": [
@@ -6574,71 +6574,12 @@
       "y": 6,
       "dir": "DOWN",
       "sprite": "boy",
-      "speaker": "🏆 LEADER BLUE",
-      "action": "BLUE_EVENT",
-      "trainerId": "blue",
-      "trainerName": "Leader Blue",
-      "team": [
-        {
-          "speciesId": "pidgeot",
-          "level": 56,
-          "moves": [
-            "quickattack",
-            "whirlwind",
-            "wingattack",
-            "mirrormove"
-          ]
-        },
-        {
-          "speciesId": "alakazam",
-          "level": 54,
-          "moves": [
-            "disable",
-            "recover",
-            "psychic",
-            "reflect"
-          ]
-        },
-        {
-          "speciesId": "rhydon",
-          "level": 56,
-          "moves": [
-            "furyattack",
-            "sandstorm",
-            "rockslide",
-            "earthquake"
-          ]
-        },
-        {
-          "speciesId": "gyarados",
-          "level": 58,
-          "moves": [
-            "twister",
-            "hydropump",
-            "raindance",
-            "hyperbeam"
-          ]
-        },
-        {
-          "speciesId": "exeggutor",
-          "level": 58,
-          "moves": [
-            "sunnyday",
-            "leechseed",
-            "eggbomb",
-            "solarbeam"
-          ]
-        },
-        {
-          "speciesId": "arcanine",
-          "level": 58,
-          "moves": [
-            "roar",
-            "swift",
-            "flamethrower",
-            "extremespeed"
-          ]
-        }
+      "speaker": "\ud83c\udfc6 LEADER BLUE",
+      "action": "BLUE_CINNABAR_MEET",
+      "id": "cinnabar_island_blue",
+      "pages": [
+        "BLUE: \u2026Hmph. So you're the one who beat the League.",
+        "The GYM in VIRIDIAN? I only left it empty for a while. Fine. I'll head back. Come challenge me there."
       ]
     }
   ],
@@ -6648,10 +6589,10 @@
       "y": 1,
       "dir": "DOWN",
       "sprite": "nurse",
-      "speaker": "👩‍⚕️ NURSE JOY",
+      "speaker": "\ud83d\udc69\u200d\u2695\ufe0f NURSE JOY",
       "pages": [
-        "Welcome to our POKéMON CENTER!",
-        "We can heal your POKéMON to full health."
+        "Welcome to our POK\u00e9MON CENTER!",
+        "We can heal your POK\u00e9MON to full health."
       ],
       "action": "HEAL_AND_SAVE",
       "counter": true

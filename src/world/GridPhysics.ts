@@ -152,6 +152,7 @@ export interface GridEntity {
     | 'SABRINA_EVENT'
     | 'BLAINE_EVENT'
     | 'BLUE_EVENT'
+    | 'BLUE_CINNABAR_MEET'
     | 'E4_EVENT'
     | 'AMPHY_EVENT'
     | 'PHARMACY_SECRET_POTION_EVENT'

@@ -107,7 +107,7 @@ export const WEST_AND_NORTH_JOHTO_GENERATED_NPCS: Record<string, GeneratedNpc[]>
     n(undefined,6,5,"UP","boy",D6,undefined),
   ],
   "cinnabar_island": [
-    n(undefined,9,6,"DOWN","boy","🏆 LEADER BLUE",undefined, {"action":"BLUE_EVENT","trainerId":"blue","trainerName":"Leader Blue","team":[{"speciesId":"pidgeot","level":56,"moves":["quickattack","whirlwind","wingattack","mirrormove"]},{"speciesId":"alakazam","level":54,"moves":["disable","recover","psychic","reflect"]},{"speciesId":"rhydon","level":56,"moves":["furyattack","sandstorm","rockslide","earthquake"]},{"speciesId":"gyarados","level":58,"moves":["twister","hydropump","raindance","hyperbeam"]},{"speciesId":"exeggutor","level":58,"moves":["sunnyday","leechseed","eggbomb","solarbeam"]},{"speciesId":"arcanine","level":58,"moves":["roar","swift","flamethrower","extremespeed"]}]}),
+    n("cinnabar_island_blue",9,6,"DOWN","boy","🏆 LEADER BLUE",["BLUE: …Hmph. So you're the one who beat the League.","The GYM in VIRIDIAN? I only left it empty for a while. Fine. I'll head back. Come challenge me there."], {"action":"BLUE_CINNABAR_MEET"}),
   ],
   "cinnabar_poke_center": [
     n(undefined,3,1,"DOWN","nurse",D2,[D3,D4], {"action":"HEAL_AND_SAVE","counter":true}),
