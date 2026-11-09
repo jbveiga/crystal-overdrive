@@ -34,11 +34,11 @@ export const handleLugiaShrineOrBoss: NpcInteractionHandler = (_targetNpc, curre
   const hasSilverWing =
     ctx.storyFlags.has('has_silver_wing') ||
     ctx.storyFlags.has('EVENT_GOT_SILVER_WING') ||
-    Boolean((ctx.inventory as any)?.items?.silver_wing) ||
-    Boolean((ctx.inventory as any)?.items?.['silver-wing']) ||
-    Boolean((ctx.inventory as any)?.keyItems?.includes?.('silver_wing')) ||
-    Boolean((ctx.inventory as any)?.keyItems?.includes?.('silver-wing')) ||
-    Boolean((ctx.inventory as any)?.keyItems?.some?.((k: string) => k.toLowerCase().includes('silver')));
+    Boolean(ctx.inventory?.items?.silver_wing) ||
+    Boolean(ctx.inventory?.items?.['silver-wing']) ||
+    Boolean(ctx.inventory?.keyItems?.includes?.('silver_wing')) ||
+    Boolean(ctx.inventory?.keyItems?.includes?.('silver-wing')) ||
+    Boolean(ctx.inventory?.keyItems?.some?.((k: string) => k.toLowerCase().includes('silver')));
 
   if (!hasSilverWing) {
     ctx.openDialogue(
