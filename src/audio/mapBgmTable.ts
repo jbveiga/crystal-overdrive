@@ -63,6 +63,8 @@ export const MAP_BGM_TABLE: Record<string, BgmTrackId> = {
   route_39_barn: 'bgm_violet_city',
   route_39_farmhouse: 'bgm_violet_city',
   route_40: 'bgm_route_29',
+  route_40_battle_tower_gate: 'bgm_route_29',
+  battle_tower_lobby: 'bgm_violet_city',
   route_41: 'bgm_route_29',
   route_42: 'bgm_route_29',
   route_42_ecruteak_gate: 'bgm_ecruteak_city',

@@ -6,6 +6,7 @@ import { getGoldenrodAndRoute34Interactions } from './GoldenrodAndRoute34Interac
 import { getJohtoTownServiceInteractions } from './JohtoTownServiceInteractions';
 import { getGoldenrodExpansionInteractions } from './GoldenrodExpansionInteractions';
 import { getEastJohtoQuestInteractions } from './EastJohtoQuestInteractions';
+import { createBattleTowerInteractions } from './BattleTowerInteractions';
 import { createGoldenrodTakeoverInteractions } from './GoldenrodTakeoverInteractions';
 import { getMahoganyTownAndLakeInteractions } from './MahoganyTownAndLakeInteractions';
 import { getMahoganyRocketHideoutInteractions } from './MahoganyRocketHideoutInteractions';
@@ -69,6 +70,7 @@ export function createDefaultNpcInteractionRouter(): NpcInteractionRouter {
     ...getGoldenrodExpansionInteractions(),
     ...getEastJohtoQuestInteractions(),
     ...createGoldenrodTakeoverInteractions(),
+    ...createBattleTowerInteractions(),
     ...getMahoganyTownAndLakeInteractions(),
     ...getMahoganyRocketHideoutInteractions(),
     ...getWhirlIslandsInteractions(),

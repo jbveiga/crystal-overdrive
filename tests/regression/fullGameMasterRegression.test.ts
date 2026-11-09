@@ -1,6 +1,6 @@
 /**
  * @fileoverview Master Full-Game Regression Suite (Issue #52 & Issues #63, #64).
- * Comprehensive validation across all 343 maps, warps, boundaries, NPCs,
+ * Comprehensive validation across all 344 maps, warps, boundaries, NPCs,
  * overworld items, progression gates, HM mechanics, and save state integrity.
  *
  * @module tests/regression/fullGameMasterRegression
@@ -39,16 +39,16 @@ describe('Master Regression Suite — Crystal Overdrive (Issue #52)', () => {
   });
 
   // =========================================================================
-  // Pillar 1: 343-Map Universe Integrity & Dimensions
+  // Pillar 1: 344-Map Universe Integrity & Dimensions
   // =========================================================================
-  describe('Pillar 1: 343-Map Universe Integrity & Dimensions', () => {
-    it('verifies world_maps.json contains all 343 canonical maps with standalone map files', () => {
-      expect(maps.length).toBe(343);
+  describe('Pillar 1: 344-Map Universe Integrity & Dimensions', () => {
+    it('verifies world_maps.json contains all 344 canonical maps with standalone map files', () => {
+      expect(maps.length).toBe(344);
 
       const standaloneFiles = fs
         .readdirSync(mapsDir)
         .filter((f) => f.endsWith('.json'));
-      expect(standaloneFiles.length).toBe(343);
+      expect(standaloneFiles.length).toBe(344);
 
       for (const file of standaloneFiles) {
         const id = file.replace('.json', '');
@@ -235,7 +235,7 @@ describe('Master Regression Suite — Crystal Overdrive (Issue #52)', () => {
       expect(f5.collisionGrid[7 * f5.width + 9]).toBe(0);
     });
 
-    it('verifies all map warps target valid maps within the 343-map universe and valid bounds', () => {
+    it('verifies all map warps target valid maps within the 344-map universe and valid bounds', () => {
       for (const m of maps) {
         for (const w of m.warps) {
           expect(mapsById.has(w.targetMapId), `Map ${m.id} warp targets unknown map ${w.targetMapId}`).toBe(true);

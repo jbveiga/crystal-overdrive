@@ -92,8 +92,14 @@ export function createSeaRoutesNpcs(): Record<string, GridEntity[]> {
 
     route_40_battle_tower_gate: [
       makeNpc('route_40_gate_officer', 5, 2, 'DOWN', 'officer', '👮 GATE OFFICER', [
-        'Beyond lies the BATTLE TOWER, where elite trainers test their bonds! It is currently undergoing preparations for the grand championship.',
+        'Straight ahead is the BATTLE TOWER, where trainers face 7 opponents in a row for a bundle of vitamins!',
       ]),
+    ],
+
+    battle_tower_lobby: [
+      makeNpc('battle_tower_receptionist', 5, 3, 'DOWN', 'teacher', '🏢 BATTLE TOWER RECEPTIONIST', [
+        'Welcome to the BATTLE TOWER!',
+      ], { action: 'BATTLE_TOWER_RECEPTIONIST' }),
     ],
 
     route_41: [

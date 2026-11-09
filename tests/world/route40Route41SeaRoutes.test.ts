@@ -53,9 +53,10 @@ describe('TICKET-WORLD-ROUTE40-ROUTE41-COMPLETE-01: Route 40 & Route 41 Sea Rout
       const gateLandingCol = gate.collisionGrid[6 * gate.width + 4];
       expect(gateLandingCol === 0 || gateLandingCol === 2).toBe(true);
 
-      // Gate warps back to Route 40
-      expect(gate.warps?.length).toBe(2);
-      for (const w of gate.warps ?? []) {
+      // Gate warps back to Route 40 (south) and onward to the Battle Tower lobby (north)
+      expect(gate.warps?.length).toBe(4);
+      expect(gate.warps?.filter(w => w.targetMapId === 'battle_tower_lobby').length).toBe(2);
+      for (const w of (gate.warps ?? []).filter(w => w.targetMapId !== 'battle_tower_lobby')) {
         expect(w.targetMapId).toBe('route_40');
         expect(w.targetX).toBe(9);
         expect(w.targetY).toBe(6);
