@@ -213,7 +213,7 @@ async function bootstrap() {
   };
   const getTransitionContext = (): OverworldTransitionContext => ({
     mapManager, overworldRenderer, overworldItemManager, missionManager, storyFlags, defeatedTrainers,
-    playerParty, player, activeNpcCache, npcsByMap, roamingManager,
+    playerParty, player, activeNpcCache, npcsByMap, roamingManager, boxManager,
     overworldHUD, isCutsceneLocked: () => isCutsceneLocked, visitedMaps, saveCurrentGame,
     detectChosenStarterSpecies, getLastVisitedPokecenter: () => lastVisitedPokecenter,
     setLastVisitedPokecenter: (loc) => { lastVisitedPokecenter = loc; },

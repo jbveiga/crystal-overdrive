@@ -44,7 +44,7 @@ export interface FieldObstacleContext {
 
 export interface OverworldTransitionContext {
   mapManager: MapManager; storyFlags: Set<string>; visitedMaps: Set<string>; inventory: BagInventory;
-  playerParty: PokemonInstance[]; player: GridEntity; playerName: string;
+  playerParty: PokemonInstance[]; player: GridEntity; playerName: string; boxManager?: BoxManager;
   isCutsceneLocked: () => boolean; setCutsceneLocked: (locked: boolean) => void;
   audioManager: { playMapBgm: (mapId: string, volume?: number) => void };
   overworldRenderer: {

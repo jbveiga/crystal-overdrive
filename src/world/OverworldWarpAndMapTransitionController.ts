@@ -12,6 +12,7 @@ import type { GridEntity } from './GridPhysics';
 import { MapManager } from './MapManager';
 import { OverworldItemManager } from './OverworldItemManager';
 import { applyMapNpcStoryMutations } from './npcData';
+import { BOX_FULL_FLAG, pickPokegearCall } from './PokegearCalls';
 import { BattleAudio } from '../audio/BattleAudio';
 import { checkHasAllJohtoBadges } from './interactions/VictoryRoadGateInteractions';
 import { evaluateFastShipWarp } from './interactions/FastShipAndVermilionInteractions';
@@ -476,6 +477,19 @@ export class OverworldWarpAndMapTransitionController {
               saveCurrentGame();
             }
           );
+        } else {
+          const box = ctx.boxManager?.getCurrentBox?.();
+          const activeBoxCount = box ? box.pokemon.filter((p) => p !== null).length : 0;
+          // Re-arm Bill's call once the box has room again
+          if (activeBoxCount < 20) storyFlags.delete(BOX_FULL_FLAG);
+          const call = pickPokegearCall({ storyFlags, activeBoxCount });
+          if (call) {
+            storyFlags.add(call.flag);
+            BattleAudio.playOverworldSound('PHONE_RING');
+            overworldHUD.openDialogue(call.pages, call.speaker, () => {
+              saveCurrentGame();
+            });
+          }
         }
       });
   }
