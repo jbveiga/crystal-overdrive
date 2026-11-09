@@ -329,6 +329,8 @@ export interface RenderOptionsModalParams {
   options: GameOptions;
   onClose: () => void;
   onUpdateOptions: (patch: Partial<GameOptions>) => void;
+  /** Optional hook to append extra sections (e.g. Offline Play) once the modal markup is in place. */
+  onRendered?: (modal: HTMLElement) => void;
 }
 
 /**
@@ -340,6 +342,7 @@ export function renderOptionsModal({
   options,
   onClose,
   onUpdateOptions,
+  onRendered,
 }: RenderOptionsModalParams): void {
   if (!optionsModalElement) return;
   optionsModalElement.style.display = optionsModalOpen ? 'flex' : 'none';
@@ -510,6 +513,8 @@ export function renderOptionsModal({
       </div>
     </div>
   `;
+
+  onRendered?.(optionsModalElement);
 
   const closeBtn = optionsModalElement.querySelector('#options-close-btn');
   closeBtn?.addEventListener('click', (e) => {

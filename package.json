@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build:maps": "node -e \"if(require('fs').existsSync('scripts/build-world-maps.cjs')) require('child_process').execSync('node scripts/build-world-maps.cjs', {stdio:'inherit'})\"",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node scripts/build-offline-manifest.cjs",
     "preview": "vite preview",
     "test": "vitest run",
     "review": "node scripts/project-optimization-review.cjs"

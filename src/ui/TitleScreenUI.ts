@@ -10,6 +10,8 @@
 import type { GameOptions, SavePreview, SpeedMultiplier } from '../types/game';
 import { SaveManager } from '../core/SaveManager';
 import { BattleAudio } from '../audio/BattleAudio';
+import { OfflineManager } from './offline/OfflineManager';
+import { mountOfflinePlaySection } from './offline/OfflinePlaySection';
 import {
   injectTitleScreenStyles,
   renderMainMenu,
@@ -48,6 +50,7 @@ export class TitleScreenUI {
   private savePreview: SavePreview | null;
   private options: GameOptions;
   private callbacks: TitleScreenCallbacks;
+  private readonly offline: OfflineManager = OfflineManager.fromBrowser();
 
   private visible: boolean = true;
   private gateUnlocked: boolean = false;
@@ -70,6 +73,7 @@ export class TitleScreenUI {
     }
   ) {
     this.savePreview = savePreview;
+    void this.offline.refreshIfStale().catch(() => false); // keep an existing offline copy current when online
     this.options = initialOptions
       ? { ...initialOptions }
       : SaveManager.getDefaultOptions();
@@ -719,6 +723,7 @@ export class TitleScreenUI {
       options: this.options,
       onClose: () => this.closeOptionsModal(),
       onUpdateOptions: (patch) => this.updateOptions(patch),
+      onRendered: (modal) => mountOfflinePlaySection(modal, this.offline),
     });
 
     renderSaveDataModal({
