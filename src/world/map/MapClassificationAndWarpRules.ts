@@ -157,7 +157,12 @@ export function getRequiredWarpDirection(warp: WarpEvent, currentMap: MapData): 
   if (warp.y <= 1) {
     return 'UP';
   }
-  if (warp.y >= currentMap.height - 2 || (warp.y >= currentMap.height - 3 && isOutdoorMap(warp.targetMapId))) {
+  // Stairs between interior floors can sit near the bottom of a map with open floor below them
+  // (e.g. Sprout Tower 2F/3F at row 14 of 16). Those trigger from any direction, like all stairs.
+  const rowBelow = (warp.y + 1) * currentMap.width + warp.x;
+  const tileBelow = warp.y + 1 < currentMap.height ? currentMap.collisionGrid?.[rowBelow] : undefined;
+  const isInteriorStair = !isOutdoorMap(warp.targetMapId) && (tileBelow === 0 || tileBelow === 2);
+  if (!isInteriorStair && (warp.y >= currentMap.height - 2 || (warp.y >= currentMap.height - 3 && isOutdoorMap(warp.targetMapId)))) {
     return 'DOWN';
   }
   if (warp.x <= 1) {
