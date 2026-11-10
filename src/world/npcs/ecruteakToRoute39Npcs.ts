@@ -279,7 +279,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
       ),
     ],
     burned_tower_1f: [
-      makeNpc('eusine', 10, 12, 'DOWN', 'eusine', '🎩 EUSINE', 
+      makeNpc('eusine', 12, 12, 'LEFT', 'eusine', '🎩 EUSINE', 
         [
           "I'm EUSINE! I’ve spent my entire life pursuing the legendary SUICUNE across the world!",
           'It is said to represent the north wind and pure water!',
@@ -287,7 +287,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         ],
         { movementType: 'WANDER', wanderRadius: 1 }
       ),
-      makeNpc('morty_burned', 12, 12, 'LEFT', 'morty', '👻 MORTY', 
+      makeNpc('morty_burned', 13, 11, 'DOWN', 'morty', '👻 MORTY', 
         [
           'ECRUTEAK GYM LEADER MORTY: The BURNED TOWER burned down 150 years ago in a lightning storm.',
           'Three nameless POKéMON perished here, but were revived by the rainbow phoenix into legends.',
@@ -295,7 +295,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
         ],
         { movementType: 'SPINRANDOM' }
       ),
-      makeNpc('firebreather_ned', 15, 4, 'DOWN', 'firebreather', '🔥 FIREBREATHER NED',
+      makeNpc('firebreather_ned', 16, 4, 'LEFT', 'firebreather', '🔥 FIREBREATHER NED',
         ['My soul burns hotter than the flames that scorched this tower!'],
         {
           movementType: 'SPINRANDOM',
@@ -313,7 +313,7 @@ export function createEcruteakToRoute39Npcs(): Record<string, GridEntity[]> {
           ],
         }
       ),
-      makeNpc('firebreather_richard', 4, 12, 'RIGHT', 'firebreather', '🔥 FIREBREATHER RICHARD',
+      makeNpc('firebreather_richard', 5, 12, 'LEFT', 'firebreather', '🔥 FIREBREATHER RICHARD',
         ['I practice fire-breathing amid these ancient charred beams!'],
         {
           movementType: 'SPINRANDOM',

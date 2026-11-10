@@ -226,12 +226,12 @@ describe('NPC Path and Sprite Audit', () => {
     expect(morty).toBeDefined();
     expect(silver).toBeDefined();
 
-    expect(eusine?.x).toBe(10);
+    expect(eusine?.x).toBe(12);
     expect(eusine?.y).toBe(12);
     expect(eusine?.spriteType).toBe('eusine');
 
-    expect(morty?.x).toBe(12);
-    expect(morty?.y).toBe(12);
+    expect(morty?.x).toBe(13);
+    expect(morty?.y).toBe(11);
     expect(morty?.spriteType).toBe('morty');
 
     expect(silver?.x).toBe(10);
