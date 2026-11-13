@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { OfflineManager, OFFLINE_CACHE_NAME, OFFLINE_RECORD_KEY, type OfflineDeps } from '../../src/ui/offline/OfflineManager';
+import { OfflineManager, OFFLINE_CACHE_NAME, OFFLINE_RECORD_KEY, OFFLINE_PROGRESS_KEY, type OfflineDeps } from '../../src/ui/offline/OfflineManager';
 import { describeOfflineState } from '../../src/ui/offline/OfflinePlaySection';
 
 const BASE = 'https://game.test/app/';
@@ -126,8 +126,36 @@ describe('OfflineManager', () => {
   });
 });
 
+describe('OfflineManager bundles', () => {
+  const files = ['a', 'b', 'c', 'd', 'e'].map((n) => `assets/${n}.bin`);
+  const bundled = () => ({
+    version: 'vb', totalBytes: 50, files: files.map((url) => ({ url, size: 10 })),
+    bundles: [{ start: 0, end: 2, bytes: 20 }, { start: 2, end: 4, bytes: 20 }, { start: 4, end: 5, bytes: 10 }],
+  });
+
+  it('downloads bundle by bundle and clears progress when done', async () => {
+    const t = setup({ manifest: bundled() });
+    expect(await new OfflineManager(t.deps).enable()).toBe(true);
+    for (const f of files) expect(t.store.has(BASE + f)).toBe(true);
+    expect(t.ls.has(OFFLINE_PROGRESS_KEY)).toBe(false);
+  });
+
+  it('a failure keeps finished bundles and a retry skips them', async () => {
+    const t = setup({ manifest: bundled(), failUrl: 'assets/e.bin' });
+    expect(await new OfflineManager(t.deps).enable()).toBe(false);
+    expect(JSON.parse(t.ls.get(OFFLINE_PROGRESS_KEY)!)).toEqual({ version: 'vb', done: [0, 1] });
+    t.store.delete(BASE + 'assets/a.bin');
+    const retry = setup({ manifest: bundled() });
+    retry.ls.set(OFFLINE_PROGRESS_KEY, t.ls.get(OFFLINE_PROGRESS_KEY)!);
+    const m = new OfflineManager(retry.deps);
+    expect(await m.enable()).toBe(true);
+    // bundles 0 and 1 were skipped, only the last bundle was fetched
+    expect([...retry.store.keys()].filter((k) => k.includes('assets/'))).toEqual([BASE + 'assets/e.bin']);
+  });
+});
+
 describe('offline manifest builder', () => {
-  const { buildManifest } = createRequire(import.meta.url)('../../scripts/build-offline-manifest.cjs');
+  const { buildManifest, groupIntoBundles } = createRequire(import.meta.url)('../../scripts/build-offline-manifest.cjs');
   it('lists built files (excluding the worker and itself) with a stable, content-sensitive version', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'co-dist-'));
     fs.mkdirSync(path.join(dir, 'assets'));
@@ -146,5 +174,19 @@ describe('offline manifest builder', () => {
     expect(sw).toContain("'crystal-overdrive-offline'");
     expect(sw).toContain("cache.match(req)");
     expect(sw).toContain("index.html");
+  });
+
+  it('groups files into bundles of at most 500 files or 20 MB', () => {
+    const MB = 1024 * 1024;
+    const many = Array.from({ length: 1201 }, (_, i) => ({ url: `f${i}`, size: 1 }));
+    const b1 = groupIntoBundles(many);
+    expect(b1.map((b: any) => b.end - b.start)).toEqual([500, 500, 201]);
+    const big = [8, 8, 8, 8, 25, 1].map((m, i) => ({ url: `b${i}`, size: m * MB }));
+    const b2 = groupIntoBundles(big);
+    expect(b2.map((b: any) => [b.start, b.end])).toEqual([[0, 2], [2, 4], [4, 5], [5, 6]]);
+    for (const b of b2) expect(b.bytes <= 20 * MB || b.end - b.start === 1).toBe(true);
+    // contiguous, complete coverage
+    expect(b1[0].start).toBe(0);
+    expect(b1.at(-1).end).toBe(many.length);
   });
 });

@@ -2,20 +2,28 @@
  * @fileoverview OfflineManager: opt-in offline play (downloads the game into the browser cache and registers a service worker).
  * @module ui/offline/OfflineManager
  * @role Browser-side controller for Offline Play; saves already live in local browser storage regardless
- * @exports OfflineState, OfflineProgress, OfflineDeps, OfflineManager, OFFLINE_CACHE_NAME, OFFLINE_RECORD_KEY
+ * @exports OfflineState, OfflineProgress, OfflineDeps, OfflineManager, OFFLINE_CACHE_NAME, OFFLINE_RECORD_KEY, OFFLINE_PROGRESS_KEY
  * @layer ui
  * @sections L1-30: Header & Types | L31-150: Manager
  */
 
 export const OFFLINE_CACHE_NAME = 'crystal-overdrive-offline';
 export const OFFLINE_RECORD_KEY = 'crystal_overdrive_offline';
+/** Tracks bundles already downloaded for a build so an interrupted download resumes instead of restarting. */
+export const OFFLINE_PROGRESS_KEY = 'crystal_overdrive_offline_progress';
 const FONT_CSS_URL =
   'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap';
 
 export type OfflineState = 'UNSUPPORTED' | 'UNAVAILABLE' | 'OFF' | 'DOWNLOADING' | 'READY' | 'ERROR';
 
 export interface OfflineProgress { done: number; total: number; bytes: number; totalBytes: number }
-interface Manifest { version: string; totalBytes: number; files: { url: string; size: number }[] }
+interface Manifest {
+  version: string;
+  totalBytes: number;
+  files: { url: string; size: number }[];
+  /** Contiguous slices of `files` (max 500 files / 20 MB each). Absent in older builds: treated as one bundle. */
+  bundles?: { start: number; end: number; bytes: number }[];
+}
 interface OfflineRecord { version: string; bytes: number; savedAt: number }
 
 /** Injectable browser surface so the manager can be unit-tested without a DOM. */
@@ -106,6 +114,7 @@ export class OfflineManager {
     const regs = await this.deps.serviceWorker!.getRegistrations().catch(() => []);
     await Promise.all(regs.map((r) => r.unregister().catch(() => false)));
     this.deps.storage.removeItem(OFFLINE_RECORD_KEY);
+    this.deps.storage.removeItem(OFFLINE_PROGRESS_KEY);
     this.error = '';
     this.setState('OFF');
   }
@@ -135,22 +144,47 @@ export class OfflineManager {
     return Array.isArray(data.files) ? data : null;
   }
 
+  private readDoneBundles(version: string): Set<number> {
+    try {
+      const p = JSON.parse(this.deps.storage.getItem(OFFLINE_PROGRESS_KEY) ?? 'null') as { version: string; done: number[] } | null;
+      return new Set(p && p.version === version ? p.done : []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  /** Downloads bundle by bundle (each <= 500 files / 20 MB); finished bundles are remembered so a retry skips them. */
   private async downloadAll(cache: Pick<Cache, 'put' | 'keys' | 'delete'>, manifest: Manifest): Promise<void> {
-    const queue = [...manifest.files];
+    const bundles = manifest.bundles?.length ? manifest.bundles : [{ start: 0, end: manifest.files.length, bytes: manifest.totalBytes }];
+    const doneBundles = this.readDoneBundles(manifest.version);
     let done = 0;
     let bytes = 0;
-    const worker = async () => {
-      for (let f = queue.shift(); f; f = queue.shift()) {
-        const url = new URL(f.url, this.deps.baseUrl).href;
-        const res = await this.deps.fetchFn(url, { cache: 'reload' });
-        if (!res.ok) throw new Error(`Could not download ${f.url} (${res.status})`);
-        await cache.put(url, res);
-        done++;
-        bytes += f.size;
-        this.setState('DOWNLOADING', { done, total: manifest.files.length, bytes, totalBytes: manifest.totalBytes });
+    const progress = () =>
+      this.setState('DOWNLOADING', { done, total: manifest.files.length, bytes, totalBytes: manifest.totalBytes });
+    for (const [i, b] of bundles.entries()) {
+      if (doneBundles.has(i)) {
+        done += b.end - b.start;
+        bytes += b.bytes;
+        progress();
+        continue;
       }
-    };
-    await Promise.all(Array.from({ length: Math.min(this.concurrency, queue.length) }, worker));
+      const queue = manifest.files.slice(b.start, b.end);
+      const worker = async () => {
+        for (let f = queue.shift(); f; f = queue.shift()) {
+          const url = new URL(f.url, this.deps.baseUrl).href;
+          const res = await this.deps.fetchFn(url, { cache: 'reload' });
+          if (!res.ok) throw new Error(`Could not download ${f.url} (${res.status})`);
+          await cache.put(url, res);
+          done++;
+          bytes += f.size;
+          progress();
+        }
+      };
+      await Promise.all(Array.from({ length: Math.min(this.concurrency, queue.length) }, worker));
+      doneBundles.add(i);
+      this.deps.storage.setItem(OFFLINE_PROGRESS_KEY, JSON.stringify({ version: manifest.version, done: [...doneBundles] }));
+    }
+    this.deps.storage.removeItem(OFFLINE_PROGRESS_KEY);
     // Drop cached files that no longer belong to this build
     const keep = new Set(manifest.files.map((f) => new URL(f.url, this.deps.baseUrl).href));
     const existing = (await cache.keys?.()) ?? [];
