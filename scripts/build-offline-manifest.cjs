@@ -15,7 +15,7 @@ function listFiles(dir, base = dir) {
     if (entry.isDirectory()) out.push(...listFiles(full, base));
     else {
       const rel = path.relative(base, full).split(path.sep).join('/');
-      if (!EXCLUDE.has(rel) && !entry.name.startsWith('.')) out.push({ url: rel, size: fs.statSync(full).size });
+      if (!EXCLUDE.has(rel) && !entry.name.startsWith('.')) out.push({ url: rel, size: fs.statSync(full).size, md5: crypto.createHash('md5').update(fs.readFileSync(full)).digest('hex') });
     }
   }
   return out;
@@ -47,10 +47,7 @@ function groupIntoBundles(files, maxFiles = MAX_BUNDLE_FILES, maxBytes = MAX_BUN
 function buildManifest(distDir) {
   const files = listFiles(distDir).sort((a, b) => (a.url < b.url ? -1 : 1));
   const hash = crypto.createHash('sha1');
-  for (const f of files) hash.update(`${f.url}:${f.size}\n`);
-  // Same-sized edits are caught by hashing the entry HTML (it references every hashed bundle)
-  const indexPath = path.join(distDir, 'index.html');
-  if (fs.existsSync(indexPath)) hash.update(fs.readFileSync(indexPath));
+  for (const f of files) hash.update(`${f.url}:${f.md5}\n`);
   return { version: hash.digest('hex').slice(0, 12), totalBytes: files.reduce((a, f) => a + f.size, 0), files, bundles: groupIntoBundles(files) };
 }
 

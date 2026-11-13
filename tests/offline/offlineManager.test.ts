@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { OfflineManager, OFFLINE_CACHE_NAME, OFFLINE_RECORD_KEY, OFFLINE_PROGRESS_KEY, type OfflineDeps } from '../../src/ui/offline/OfflineManager';
+import { OfflineManager, OFFLINE_CACHE_NAME, OFFLINE_RECORD_KEY, OFFLINE_INDEX_PATH, type OfflineDeps } from '../../src/ui/offline/OfflineManager';
 import { describeOfflineState } from '../../src/ui/offline/OfflinePlaySection';
 
 const BASE = 'https://game.test/app/';
@@ -12,9 +12,12 @@ const manifest = (version = 'v1', files = ['index.html', 'assets/a.js', 'assets/
 });
 
 function setup(opts: { manifest?: any; failUrl?: string; online?: boolean } = {}) {
+  const fetches: string[] = [];
+  const state = { failUrl: opts.failUrl };
   const store = new Map<string, Response>();
   const cacheObj = {
     put: async (u: any, r: Response) => { store.set(typeof u === 'string' ? u : u.url, r); },
+    match: async (u: any) => store.get(typeof u === 'string' ? u : u.url)?.clone(),
     keys: async () => [...store.keys()].map((url) => ({ url }) as Request),
     delete: async (r: any) => store.delete(typeof r === 'string' ? r : r.url),
   };
@@ -23,10 +26,11 @@ function setup(opts: { manifest?: any; failUrl?: string; online?: boolean } = {}
   let currentManifest = opts.manifest === undefined ? manifest() : opts.manifest;
   const fetchFn = (async (input: any) => {
     const url = String(input);
+    fetches.push(url);
     if (url.endsWith('offline-manifest.json')) return currentManifest ? new Response(JSON.stringify(currentManifest)) : new Response('', { status: 404 });
     if (url.includes('fonts.googleapis')) return new Response('@font-face{src:url(https://fonts.gstatic.com/x.woff2)}');
     if (url.includes('fonts.gstatic')) return new Response('font');
-    if (opts.failUrl && url.endsWith(opts.failUrl)) return new Response('nope', { status: 500 });
+    if (state.failUrl && url.endsWith(state.failUrl)) return new Response('nope', { status: 500 });
     return new Response(`body:${url}`);
   }) as typeof fetch;
   const deps: OfflineDeps = {
@@ -38,7 +42,7 @@ function setup(opts: { manifest?: any; failUrl?: string; online?: boolean } = {}
     baseUrl: BASE,
     isOnline: () => opts.online ?? true,
   };
-  return { deps, store, ls, setManifest: (m: any) => (currentManifest = m), get: () => ({ cachesDeleted, registered, unregistered, persisted }) };
+  return { deps, store, ls, fetches, set failUrl(v: string | undefined) { state.failUrl = v; }, setManifest: (m: any) => (currentManifest = m), get: () => ({ cachesDeleted, registered, unregistered, persisted }) };
 }
 
 describe('OfflineManager', () => {
@@ -126,31 +130,52 @@ describe('OfflineManager', () => {
   });
 });
 
-describe('OfflineManager bundles', () => {
-  const files = ['a', 'b', 'c', 'd', 'e'].map((n) => `assets/${n}.bin`);
-  const bundled = () => ({
-    version: 'vb', totalBytes: 50, files: files.map((url) => ({ url, size: 10 })),
+describe('OfflineManager bundles and incremental updates', () => {
+  const names = ['a', 'b', 'c', 'd', 'e'].map((n) => `assets/${n}.bin`);
+  const mk = (version: string, md5s: Record<string, string> = {}) => ({
+    version, totalBytes: 50, files: names.map((url) => ({ url, size: 10, md5: md5s[url] ?? 'h0' })),
     bundles: [{ start: 0, end: 2, bytes: 20 }, { start: 2, end: 4, bytes: 20 }, { start: 4, end: 5, bytes: 10 }],
   });
+  const fetched = (t: ReturnType<typeof setup>) => t.fetches;
 
-  it('downloads bundle by bundle and clears progress when done', async () => {
-    const t = setup({ manifest: bundled() });
+  it('downloads every file bundle by bundle and stores an md5 index', async () => {
+    const t = setup({ manifest: mk('v1') });
     expect(await new OfflineManager(t.deps).enable()).toBe(true);
-    for (const f of files) expect(t.store.has(BASE + f)).toBe(true);
-    expect(t.ls.has(OFFLINE_PROGRESS_KEY)).toBe(false);
+    for (const f of names) expect(t.store.has(BASE + f)).toBe(true);
+    const index = await t.store.get(BASE + OFFLINE_INDEX_PATH)!.json();
+    expect(index['assets/c.bin']).toBe('h0');
   });
 
-  it('a failure keeps finished bundles and a retry skips them', async () => {
-    const t = setup({ manifest: bundled(), failUrl: 'assets/e.bin' });
-    expect(await new OfflineManager(t.deps).enable()).toBe(false);
-    expect(JSON.parse(t.ls.get(OFFLINE_PROGRESS_KEY)!)).toEqual({ version: 'vb', done: [0, 1] });
-    t.store.delete(BASE + 'assets/a.bin');
-    const retry = setup({ manifest: bundled() });
-    retry.ls.set(OFFLINE_PROGRESS_KEY, t.ls.get(OFFLINE_PROGRESS_KEY)!);
-    const m = new OfflineManager(retry.deps);
+  it('an update only fetches files whose md5 changed, and drops removed files', async () => {
+    const t = setup({ manifest: mk('v1') });
+    const m = new OfflineManager(t.deps);
+    await m.enable();
+    t.fetches.length = 0;
+    t.setManifest({ ...mk('v2', { 'assets/d.bin': 'h1' }), files: [...mk('v2', { 'assets/d.bin': 'h1' }).files.slice(0, 5)].filter((f) => f.url !== 'assets/e.bin') });
     expect(await m.enable()).toBe(true);
-    // bundles 0 and 1 were skipped, only the last bundle was fetched
-    expect([...retry.store.keys()].filter((k) => k.includes('assets/'))).toEqual([BASE + 'assets/e.bin']);
+    expect(fetched(t).filter((u) => u.includes('assets/'))).toEqual([BASE + 'assets/d.bin']);
+    expect(t.store.has(BASE + 'assets/e.bin')).toBe(false);
+    expect(t.store.has(BASE + OFFLINE_INDEX_PATH)).toBe(true);
+  });
+
+  it('a file evicted from the cache is fetched again even if its md5 matches', async () => {
+    const t = setup({ manifest: mk('v1') });
+    const m = new OfflineManager(t.deps);
+    await m.enable();
+    t.store.delete(BASE + 'assets/b.bin');
+    t.fetches.length = 0;
+    await m.enable();
+    expect(fetched(t).filter((u) => u.includes('assets/'))).toEqual([BASE + 'assets/b.bin']);
+  });
+
+  it('a failure keeps finished bundles so the retry only fetches the rest', async () => {
+    const t = setup({ manifest: mk('v1'), failUrl: 'assets/e.bin' });
+    const m = new OfflineManager(t.deps);
+    expect(await m.enable()).toBe(false);
+    t.failUrl = undefined;
+    t.fetches.length = 0;
+    expect(await m.enable()).toBe(true);
+    expect(fetched(t).filter((u) => u.includes('assets/'))).toEqual([BASE + 'assets/e.bin']);
   });
 });
 
@@ -174,6 +199,17 @@ describe('offline manifest builder', () => {
     expect(sw).toContain("'crystal-overdrive-offline'");
     expect(sw).toContain("cache.match(req)");
     expect(sw).toContain("index.html");
+  });
+
+  it('records an md5 per file and the version changes with any same-size edit', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'co-dist-'));
+    fs.writeFileSync(path.join(dir, 'x.js'), 'abc');
+    const a = buildManifest(dir);
+    expect(a.files[0].md5).toBe('900150983cd24fb0d6963f7d28e17f72');
+    fs.writeFileSync(path.join(dir, 'x.js'), 'abd');
+    const b = buildManifest(dir);
+    expect(b.files[0].md5).not.toBe(a.files[0].md5);
+    expect(b.version).not.toBe(a.version);
   });
 
   it('groups files into bundles of at most 500 files or 20 MB', () => {
